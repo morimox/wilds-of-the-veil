@@ -18,8 +18,8 @@
 [hidden] { display: none !important; }
 body { margin: 0; min-width: 280px; }
 button, summary { -webkit-tap-highlight-color: transparent; }
-button { font: inherit; }
-button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--jade); outline-offset: 3px; }
+button, textarea, select { font: inherit; }
+button:focus-visible, summary:focus-visible, a:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--jade); outline-offset: 3px; }
 button:disabled { cursor: default; opacity: .55; }
 h1, h2, h3, p { margin: 0; }
 h1, h2, h3 { line-height: 1.35; }
@@ -154,11 +154,12 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .card, .choice { padding: 8px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
 .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .card .actions { margin-top: 7px; }
-.choice { display: grid; justify-items: start; }
+.choice { display: grid; justify-items: start; gap: 5px; }
 .choice-list { margin-top: 6px; }
-.card p, .choice p { margin-top: 3px; }
+.card p { margin-top: 3px; }
 .intro, .fine, .section-note, .card p, .choice p { color: var(--muted); }
 .fine, .section-note, .card p, .choice p, .tag { font-size: 13px; }
+.choice .choice-blocker { color: var(--amber); }
 .tag { color: var(--jade); }
 .tag.off { color: var(--muted); }
 .tag.warn, .metal { color: var(--amber); }
@@ -166,11 +167,11 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .notices {
   position: fixed;
   z-index: 20;
-  left: max(12px, env(safe-area-inset-left), calc((100vw - 830px) / 2));
+  right: max(12px, env(safe-area-inset-right), calc((100vw - 830px) / 2));
   bottom: max(12px, env(safe-area-inset-bottom));
   display: grid;
   gap: 6px;
-  width: min(350px, calc(100% - 24px));
+  width: min(215px, calc(100% - 24px));
   pointer-events: none;
 }
 .toast {
@@ -201,13 +202,26 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .scene-hidden { background-image: url("./assets/hidden-wharf.webp"); }
 .workshop-art { height: 64px; background-image: url("./assets/alchemy-bench.webp"); }
 .deduction { display: grid; gap: 9px; }
-.deduction fieldset { margin: 0; padding: 8px; min-width: 0; border: 1px solid var(--line); border-radius: 5px; }
-.deduction legend { padding: 0 5px; color: var(--jade); }
+.deduction-clues, .trial-thought { color: var(--muted); }
+.deduction-clues > summary, .trial-thought > summary { color: var(--jade); cursor: pointer; }
 .deduction input { margin-top: 3px; accent-color: var(--jade); }
+.deduction-writing, .experiment-control { display: grid; gap: 5px; min-width: 0; }
+.deduction textarea, .experiment select {
+  width: 100%;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid #405347;
+  border-radius: 5px;
+  padding: 7px;
+}
+.deduction textarea { resize: vertical; min-height: 70px; }
 .evidence-option { display: flex; align-items: flex-start; gap: 7px; padding: 5px; cursor: pointer; }
 .evidence-option:has(input:checked) { background: #283c2d; }
 .evidence-option small { display: block; color: var(--muted); }
 .deduction-cases { margin-bottom: 9px; }
+.experiment { display: grid; gap: 8px; padding: 10px 0 2px; border-top: 1px solid var(--line); }
+.experiment-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr)); gap: 8px; }
+.player-thought { overflow-wrap: anywhere; white-space: pre-wrap; }
 dialog { width: min(414px, calc(100% - 26px)); color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
 dialog::backdrop { background: #08100bd1; }
 dialog ol { padding-left: 22px; color: var(--muted); }
@@ -218,5 +232,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   .layout { grid-template-columns: minmax(0, 1fr); width: calc(100% - 24px); margin: 12px; padding: 13px; gap: 14px; }
   .kit { padding: 12px 0 0; border-width: 1px 0 0; border-style: solid; border-color: var(--line); }
   .button, .navigation button, .item-trigger { min-height: 38px; }
+  .notices { width: min(345px, calc(100% - 24px)); }
+  .toast:not(:last-child) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }

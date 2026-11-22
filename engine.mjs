@@ -6,9 +6,11 @@ const records = Object.fromEntries(
   ['realms', 'items', 'gear', 'pills', 'talismans', 'arts', 'recipes', 'regions', 'events', 'enemies', 'quests', 'deductions', 'sites']
     .map((key) => [key, Object.assign(Object.create(null), Object.fromEntries((data[key] ?? []).map((entry) => [entry.id, entry])))]),
 );
+const experiments = Object.fromEntries(data.events.filter(({ experiment }) => experiment).map(({ experiment }) => [experiment.id, experiment]));
 const supply = 'ration';
 const hub = 'village';
 const slots = ['weapon', 'armor', 'charm'];
+const hypothesisLimit = 180;
 
 export const rules = Object.freeze({
   restDays: 0.5,
@@ -306,6 +308,7 @@ export function createGame() {
       .slice(0, 1).map((entry) => entry.id))],
     completedQuests: [],
     completedDeductions: [],
+    deductionThoughts: {},
     explored: [],
     discovered: [],
     eventsSeen: {},
@@ -408,11 +411,18 @@ function siteText(state, site, event) {
   return [changed?.[1] ?? event.text, ...details].join('');
 }
 
+function availableExperiment(state, event) {
+  const trial = event?.experiment;
+  if (!trial || records.sites[event.id]?.region !== state.region) return null;
+  const thought = state.deductionThoughts?.[trial.id];
+  return thought && !state.completedDeductions.includes(trial.id) && hasChoiceNeeds(state, trial) ? trial : null;
+}
+
 function revisitableEvents(state) {
   if (atHome(state) || state.event || state.combat) return [];
   return (state.eventsSeen[state.region] ?? []).map((id) => records.events[id]).filter((event) =>
-    event.revisit && event.choices.some((choice, index) =>
-      choice.hidden && hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`)));
+    availableExperiment(state, event) || (event.revisit && event.choices.some((choice, index) =>
+      choice.hidden && hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`))));
 }
 
 export function view(state) {
@@ -423,10 +433,11 @@ export function view(state) {
   const discoveredQuests = services.includes('quests') ? data.quests.filter((quest) => knowsQuest(state, quest)) : [];
   const currentEvent = state.event ? records.events[state.event] : null;
   const currentSite = currentEvent && records.sites[currentEvent.id];
+  const experiment = availableExperiment(state, currentEvent);
   const visibleChoices = (currentEvent?.choices ?? []).map((choice, index) => {
-    const lockedReason = choiceBlocker(state, choice, currentSite, index);
+    const blocker = choiceBlocker(state, choice, currentSite, index);
     const { label, desc, hidden } = choice;
-    return { label, desc, hidden, index, available: !lockedReason, lockedReason };
+    return { label, desc: blocker?.depleted ? '' : desc, hidden, index, available: !blocker, lockedReason: blocker?.reason ?? '' };
   }).filter(({ hidden, index }) => !completedSiteChoice(state, currentSite, index) &&
     (!hidden || hasChoiceNeeds(state, currentEvent.choices[index])));
   return {
@@ -445,8 +456,16 @@ export function view(state) {
     backpackCapacity: rules.backpackCapacity,
     groundLoot: { ...groundAt(state) },
     sites: currentSites(state).map((site) => viewSite(state, site)),
-    currentEvent: currentEvent ? { ...currentEvent, text: siteText(state, currentSite, currentEvent), choices: visibleChoices } : null,
+    currentEvent: currentEvent ? { id: currentEvent.id, name: currentEvent.name, text: siteText(state, currentSite, currentEvent), choices: visibleChoices } : null,
     visibleChoices,
+    experiment: experiment ? {
+      id: experiment.id,
+      desc: experiment.desc,
+      thought: state.deductionThoughts[experiment.id],
+      controls: experiment.controls.map(({ id, label, options }) => ({
+        id, label, options: options.map(({ id, label }) => ({ id, label })),
+      })),
+    } : null,
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
     currentEnemy: enemy ? { ...enemy, maxHp: enemy.hp, hp: state.combat.hp } : null,
     intent,
@@ -459,9 +478,12 @@ export function view(state) {
     evidence: data.items.filter((item) => isEvidence(item) && owns(state, item.id) > 0)
       .map(({ id, name, desc }) => ({ id, name, desc, count: owns(state, id) })),
     deductions: (data.deductions ?? []).filter((entry) => knowsDeduction(state, entry)).map((entry) => {
-      const { id, name, desc, hypotheses, days, success } = entry;
-      const completed = (state.completedDeductions ?? []).includes(id);
-      return { id, name, desc, hypotheses: hypotheses.map(({ id, label }) => ({ id, label })), days, completed, ...(completed ? { success } : {}) };
+      const { id, name, desc } = entry;
+      const completed = state.completedDeductions.includes(id);
+      return {
+        id, name, desc, completed, thought: state.deductionThoughts?.[id] ?? null,
+        ...(completed ? { observation: experiments[id]?.outcome } : {}),
+      };
     }),
     quests: discoveredQuests.map((quest) => ({
       ...quest,
@@ -541,16 +563,20 @@ function choiceStocks(site, choice, index) {
 }
 
 function choiceBlocker(state, choice, site, index) {
-  if (completedSiteChoice(state, site, index)) return '这件事已经办过了。';
-  if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy)) return '腹中空空，先吃些干粮。';
+  if (completedSiteChoice(state, site, index)) return { reason: '这件事已经办过了。' };
+  if (site?.creatures?.[choice.enemy] && poolAt(state, site, 'creatures', choice.enemy).count === 0) {
+    return { reason: '眼下没有可追的对手。', depleted: true };
+  }
+  const stocks = choiceStocks(site, choice, index);
+  if (stocks.length && stocks.every(([id]) => poolAt(state, site, 'stocks', id).count === 0)) {
+    return { reason: '这里暂时已经采空了。', depleted: true };
+  }
+  if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy)) return { reason: '腹中空空，先吃些干粮。' };
   const coins = choice.coins ?? 0;
   const missing = missingItems(state, choice.need);
-  if (Object.keys(missing).length) return `还缺${goodsText(missing)}。`;
-  if (state.coins + coins < 0) return `还需${-coins}枚灵钱。`;
-  if (site?.creatures?.[choice.enemy] && poolAt(state, site, 'creatures', choice.enemy).count === 0) return '眼下没有可追的对手。';
-  const stocks = choiceStocks(site, choice, index);
-  if (stocks.length && stocks.every(([id]) => poolAt(state, site, 'stocks', id).count === 0)) return '这里暂时已经采空了。';
-  return '';
+  if (Object.keys(missing).length) return { reason: `还缺${goodsText(missing)}。` };
+  if (state.coins + coins < 0) return { reason: `还需${-coins}枚灵钱。` };
+  return null;
 }
 
 function choose(state, index) {
@@ -561,7 +587,7 @@ function choose(state, index) {
     return refuse('请选择眼前能做的事。');
   }
   const blocker = choiceBlocker(state, choice, site, index);
-  if (blocker) return refuse(blocker);
+  if (blocker) return refuse(blocker.reason);
   const lootAvailable = { ...choice.loot };
   for (const [id] of choiceStocks(site, choice, index)) {
     const picked = Math.min(lootAvailable[id], poolAt(state, site, 'stocks', id).count);
@@ -1038,28 +1064,41 @@ function handin(state, id) {
 function deduce(state, { id, evidence, hypothesis }) {
   const deduction = records.deductions[id];
   if (!deduction || !knowsDeduction(state, deduction)) return refuse('眼下没有这桩疑案的头绪。');
-  if (state.completedDeductions?.includes(id)) return refuse('这桩疑案已经推明。');
-  if (!deduction.hypotheses.some(({ id }) => id === hypothesis) || !Array.isArray(evidence)) {
-    return refuse('请摆好证物，再选一个推断。');
+  if (state.completedDeductions.includes(id)) return refuse('这桩疑案已经在现场验过了。');
+  const text = typeof hypothesis === 'string' ? hypothesis.trim() : '';
+  if (!text || text.length > hypothesisLimit || !Array.isArray(evidence)) {
+    return refuse(`请写下自己的猜想，最多${hypothesisLimit}字。`);
   }
-  const submitted = new Map();
-  for (const itemId of evidence) {
-    if (typeof itemId !== 'string' || !isEvidence(records.items[itemId])) return refuse('只能使用随身可查的证物。');
-    const count = (submitted.get(itemId) ?? 0) + 1;
-    if (count > owns(state, itemId)) return refuse('行囊里没有这么多证物。');
-    submitted.set(itemId, count);
+  const selected = [...new Set(evidence)];
+  if (selected.some((itemId) => typeof itemId !== 'string' || !isEvidence(records.items[itemId]) || !owns(state, itemId))) {
+    return refuse('只能摆上随身可查的证物。');
   }
-  advance(state, deduction.days);
-  const required = resourceEntries(deduction.evidence);
-  const matches = submitted.size === required.length && required.every(([id, count]) => submitted.get(id) === count);
-  if (!matches || hypothesis !== deduction.answer) {
-    return { ...say(state, deduction.miss ?? '线索还连不起来，重新理一理证物和推断。'), deduction: 'miss' };
+  (state.deductionThoughts ??= {})[id] = { hypothesis: text, evidence: selected };
+  return { ...say(state, '猜想已摆在沙盘上。'), deduction: 'pinned' };
+}
+
+function tryExperiment(state, { id, settings }) {
+  const trial = availableExperiment(state, records.events[state.event]);
+  if (!trial || trial.id !== id) return refuse('眼前还没有能这样试的东西。');
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings) ||
+    Object.keys(settings).length !== trial.controls.length || trial.controls.some(({ id: control, options }) =>
+      !Object.hasOwn(settings, control) || !options.some(({ id: option }) => option === settings[control]))) {
+    return refuse('先决定眼前每一步怎么做。');
   }
-  (state.completedDeductions ??= []).push(id);
-  state.insight += deduction.insight ?? 0;
-  const { spilled } = addItems(state, deduction.reward);
-  const result = say(state, deduction.success);
-  return { ...result, deduction: 'solved', spilled };
+  if (state.satiety === 0 && trial.days > 0) return refuse('腹中空空，先吃些干粮。');
+  advance(state, trial.days ?? 0);
+  const mismatch = trial.controls.find(({ id: control }) => settings[control] !== trial.solution[control]);
+  if (mismatch) {
+    const observation = trial.misses?.[mismatch.id]?.[settings[mismatch.id]] ?? '动静平了，眼前仍和先前一样。';
+    return { ...say(state, observation), deduction: 'miss' };
+  }
+  state.completedDeductions.push(id);
+  state.insight += trial.insight ?? 0;
+  for (const art of trial.learnArts ?? []) {
+    if (!state.knownArts.includes(art)) state.knownArts.push(art);
+  }
+  const { spilled } = addItems(state, trial.reward, true);
+  return { ...say(state, trial.outcome), deduction: 'verified', spilled };
 }
 
 const villageActions = {
@@ -1126,6 +1165,7 @@ function takeTurn(state, action, payload) {
   if (state.event) {
     if (action === 'eat') return eat(state, false);
     if (action === 'choose') return choose(state, payload.index);
+    if (action === 'experiment') return tryExperiment(state, payload);
     if (action === 'leave') {
       state.event = null;
       return say(state, '你放下这桩事，沿原路退出。');

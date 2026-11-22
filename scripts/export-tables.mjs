@@ -175,16 +175,15 @@ const traitText = (trait) => [
 const intents = data.enemies.flatMap(({ id, name, intents }) =>
   intents.map((intent, index) => ({ enemyId: id, enemyName: name, order: index + 1, ...intent })));
 const deductions = data.deductions ?? [];
-const hypotheses = deductions.flatMap((deduction) => deduction.hypotheses.map((hypothesis, index) => ({
-  deductionId: deduction.id,
-  deductionName: deduction.name,
-  order: index + 1,
-  ...hypothesis,
-})));
-const deductionRows = deductions.map((deduction) => ({
-  ...deduction,
-  answerText: deduction.hypotheses.find(({ id }) => id === deduction.answer)?.label,
-}));
+const experiments = data.events.filter((event) => event.experiment)
+  .map(({ id, experiment }) => ({ site: id, ...experiment }));
+const experimentOptions = experiments.flatMap(({ id, site, controls, solution, misses }) =>
+  controls.flatMap((control) => control.options.map((option) => ({
+    deductionId: id, site, control: control.id, controlLabel: control.label,
+    id: option.id, label: option.label,
+    producesResult: solution[control.id] === option.id,
+    observation: misses?.[control.id]?.[option.id],
+  }))));
 const ruleRows = Object.entries({ ...data.rules, ...rules })
   .map(([id, value]) => ({ id, value, desc: ruleDescriptions[id] ?? '' }));
 
@@ -228,7 +227,7 @@ const tables = [
     ['choices', '消耗此资源的选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
   ], { note: '经游戏时间恢复到上限。恢复间隔或恢复量为 0 时，现场耗尽后不会重生。只有击败当场对手才减少该地点种群。' }),
   table('events', '事件正文', data.events, ['id', 'name', 'revisit', 'text'], {
-    omit: ['choices'],
+    omit: ['choices', 'experiment'],
     note: '每个事件对应一个可选地点。回到地点后可看到之前行动留下的变化，满足条件的隐藏选项才显示。'
   }),
   table('event-choices', '事件选项', choices, [
@@ -254,19 +253,28 @@ const tables = [
   ], {
     note: '公开村务开局即可办理。其他入口在满足表中的任一条件后记住，回村即可使用。具体人物仍需实际接触。'
   }),
-  table('deductions', '沙盘推演答案与奖励', gated(deductionRows), [
-    'id', 'name', 'tier', tier, 'reveal', 'desc', ['evidence', '所需证物及份数', resources],
-    ['answer', '正确解释标识'], ['answerText', '正确解释'], ['days', '单次推演用时（天）'],
-    'reward', ['insight', '成功所得修为'], ['miss', '失败反馈'], ['success', '成功反馈'],
+  table('deductions', '沙盘疑点', gated(deductions), [
+    'id', 'name', 'tier', tier, 'reveal', 'desc',
   ], {
-    omit: ['hypotheses'],
-    note: '**剧透。** 此表公开每桩疑案的证物组合、正确解释、结果与奖励。有效提交会消耗时间，证物及数量须与所需组合完全相符。'
+    note: '玩家写下自己的猜想，可选携带的物件作参考。沙盘本身不判定猜想，也不会发放奖励。'
   }),
-  table('deduction-hypotheses', '沙盘推演的解释候选', hypotheses, [
-    ['deductionId', '推演标识'], ['deductionName', '推演名称'], ['order', '候选序号'], ['id', '解释标识'], ['label', '解释文本'],
-  ]),
+  table('field-experiments', '现场验证与发现', experiments, [
+    ['id', '沙盘疑点', ref], ['site', '验证地点', siteRef], ['desc', '现场观察'], 'need',
+    ['days', '每次尝试用时（天）'], 'reward', ['learnArts', '现场学会术诀', (ids) => ids.map(ref).join('、')],
+    ['insight', '成功所得修为'], ['outcome', '验证后的观察'],
+  ], {
+    omit: ['controls', 'solution', 'misses'],
+    note: '**剧透。** 此表列出各处验证的现场条件和奖励。持有现场能用到的物件并带着猜想才能尝试。结论由操作结果成立后获得。'
+  }),
+  table('experiment-controls', '现场操作与观察结果', experimentOptions, [
+    ['deductionId', '沙盘疑点', ref], ['site', '验证地点', siteRef],
+    ['control', '操作标识'], ['controlLabel', '操作名称'], ['id', '设定标识'], ['label', '现场设定'],
+    ['producesResult', '验证成立所用位置或时机'], ['observation', '此设定的现场反馈'],
+  ], {
+    note: '**剧透。** 每处验证由多项实际操作共同决定。失败只显示一项可在现场察觉的反应。'
+  }),
   table('rules', '通用规则参数', ruleRows, ['id', 'value', 'desc'], {
-    note: '村内休整会清空野外探索压力，回村也会清空。修为来自首次探索某个地区、首次选择指定选项、首次击败对应敌人、静修、委托和沙盘推演。'
+    note: '村内休整会清空野外探索压力，回村也会清空。修为来自首次探索某个地区、首次选择指定选项、首次击败对应敌人、静修、委托和现场验证。'
   }),
   table('starting-state', '开局状态与完成条件', startState, ['id', 'name', 'value'],
     { note: '交付结束委托记录当时所用天数并显示结算，之后可继续探索。' }),
@@ -298,7 +306,7 @@ await mkdir(output, { recursive: true });
 const introduction = [
   '# 《雾渡山河》数值与内容表',
   '',
-  '**剧透。** 此页包含完整地图、线索、委托、遭遇及沙盘推演答案。首次游玩可以直接从落灯村出发。',
+  '**剧透。** 此页包含完整地图、线索、委托、遭遇及现场验证的成立条件。首次游玩可以直接从落灯村出发。',
   '',
   '由游戏数据和规则自动生成。同目录 CSV 使用 UTF-8 和字节顺序标记，可直接导入表格软件。空白单元格表示该字段未设置，数字 0 表示明确设为零。',
   '',

@@ -21,6 +21,7 @@ let openingTimer;
 let selectedItem = null;
 let activeDeduction = null;
 const deductionDrafts = new Map();
+const experimentDrafts = new Map();
 
 function dismissOpening() {
   if (opening.hidden) return;
@@ -196,13 +197,43 @@ function eventScreen(s) {
   const local = (s.sites ?? []).find(site => site.id === event.id);
   const resources = siteResources(s, local);
   const choices = s.visibleChoices.map(choice => {
-    const details = [choice.desc, choice.lockedReason].map(text => publicText(text)).filter(Boolean).join(" ");
-    return `<div class="choice">${linkButton(choice.label, "choose", choice.index, "", choice.available === false)}${details ? `<p>${escape(details)}</p>` : ""}</div>`;
+    const cue = publicText(choice.desc);
+    const blocker = publicText(choice.lockedReason);
+    return `<div class="choice">
+      ${cue ? `<p class="choice-cue">${escape(cue)}</p>` : ""}
+      ${linkButton(choice.label, "choose", choice.index, "", choice.available === false)}
+      ${blocker ? `<p class="choice-blocker">${escape(blocker)}</p>` : ""}
+    </div>`;
   }).join("");
   return panel(event.name, `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>
     <p class="intro">${escape(publicText(event.text))}</p>
     ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
-    <div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
+    <div class="choice-list">${choices}</div>
+    ${s.experiment ? experimentForm(s.experiment) : ""}
+    <div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
+}
+
+function thoughtDetails(thought) {
+  return thought ? `<details class="trial-thought"><summary>看沙盘上的猜想</summary>
+    <p class="player-thought">${escape(thought.hypothesis)}</p>
+  </details>` : "";
+}
+
+function experimentForm(experiment) {
+  const draft = experimentDrafts.get(experiment.id);
+  const controls = experiment.controls.map(control => `<label class="experiment-control">
+    <span>${escape(control.label)}</span>
+    <select name="setting-${escape(control.id)}" required>
+      <option value="" disabled${draft?.[control.id] ? "" : " selected"}>请选择</option>
+      ${control.options.map(option => `<option value="${escape(option.id)}"${draft?.[control.id] === option.id ? " selected" : ""}>${escape(option.label)}</option>`).join("")}
+    </select>
+    </label>`).join("");
+  return `<form class="experiment" data-experiment="${escape(experiment.id)}">
+    <p class="intro">${escape(experiment.desc)}</p>
+    ${thoughtDetails(experiment.thought)}
+    <div class="experiment-controls">${controls}</div>
+    <div class="actions"><button type="submit" class="button">当场试一次</button></div>
+  </form>`;
 }
 
 function pillSummary(row) {
@@ -223,12 +254,16 @@ function combatScreen(s) {
   const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
   const observation = enemy.desc ? `<details class="field-note"><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
+  const techniques = arts.map(row => {
+    const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" : "";
+    return card(row.name, "", "", linkButton(reason || "施展", "art", row.id, "", Boolean(reason)), row.desc);
+  });
   return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
     ${meter("对方气血", hp, enemy.maxHp)}
     <div class="actions">${linkButton("出手", "attack", "", "primary")}${linkButton("防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}</div>
     ${observation}
-    ${arts.length ? `<div class="card-grid learned-arts">${arts.map(row => card(row.name, "", "", linkButton(s.qi < row.cost ? "真气不足" : "施展", "art", row.id, "", s.qi < row.cost), row.desc)).join("")}</div>` : ""}
+    ${techniques.length ? `<div class="card-grid learned-arts">${techniques.join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
 }
 
@@ -334,12 +369,16 @@ function cultivation(s) {
 function workshop(s) {
   const recipes = data.recipes.filter(row => s.discoveredRecipes.includes(row.id));
   const smithMap = s.quests.find(row => row.id === "sell_forging" && !row.completed);
-  const noticesHide = s.inventory.hide > 0 && recipes.some(row => row.id === "r_hide_coat");
-  const line = noticesHide ? "工匠捻了捻你带来的泥蜕。「这皮韧，攒两张，我给你缝件挡牙的褂子。」" :
-    !smithMap && !recipes.length ? "工匠在门边磨剪子，脚边卷着几块旧皮。" : "";
+  const remarks = [
+    s.inventory.hide > 0 && recipes.some(row => row.id === "r_hide_coat") &&
+      "工匠捻了捻你带来的泥蜕。「这皮韧，攒两张，我给你缝件挡牙的褂子。」",
+    s.inventory.eddy_note > 0 && recipes.some(row => row.id === "r_bank_talisman") &&
+      "工匠用炭条顺着回汊图勾了一遍。「把这道弯画进符里，缠住你的劲就能往旁边卸。」",
+    !smithMap && !recipes.length && "工匠在门边磨剪子，脚边卷着几块旧皮。",
+  ].filter(Boolean).map(line => `<p class="intro">${escape(line)}</p>`).join("");
   const mapTrade = smithMap ? `<p class="intro">${escape(smithMap.desc)}</p>${smithMap.ready ? `<div class="actions">${linkButton("递一块寒铁", "handin", smithMap.id)}</div>` : ""}` : "";
   return panel("工坊", `${recipes.length ? '<div class="workshop-art" aria-hidden="true"></div>' : ""}
-    ${line ? `<p class="intro">${escape(line)}</p>` : ""}${mapTrade}
+    ${remarks}${mapTrade}
     <div class="card-grid">${recipes.map(row => {
     const result = itemRows[row.result];
     const gear = data.gear.find(g => g.id === row.result);
@@ -405,19 +444,19 @@ function deductionBoard(s) {
   const cases = s.deductions ?? [];
   if (!cases.length) return panel("沙盘", '<p class="intro">旅途中值得推敲的疑点会收进这里。</p>');
   const current = cases.find(row => row.id === activeDeduction) ?? cases.find(row => !row.completed) ?? cases[0];
-  const draft = deductionDrafts.get(current.id);
+  const draft = deductionDrafts.get(current.id) ?? current.thought;
   const casesBar = cases.length > 1 ? `<div class="actions deduction-cases">${cases.map(row => `<button type="button" class="button ${row.id === current.id ? "primary" : ""}" data-case="${escape(row.id)}" aria-pressed="${row.id === current.id}">${escape(row.name)}${row.completed ? " ✓" : ""}</button>`).join("")}</div>` : "";
   const evidence = (s.evidence ?? []).map(item => `<label class="evidence-option"><input type="checkbox" name="evidence" value="${escape(item.id)}"${draft?.evidence.includes(item.id) ? " checked" : ""}>
     <span><strong>${escape(item.name)}</strong><small>${escape(publicText(item.desc))}</small></span></label>`).join("");
-  const hypotheses = current.hypotheses.map(hypothesis => `<label class="evidence-option"><input type="radio" name="hypothesis" value="${escape(hypothesis.id)}" required${draft?.hypothesis === hypothesis.id ? " checked" : ""}>
-    <span>${escape(publicText(hypothesis.label))}</span></label>`).join("");
-  return panel("沙盘推演", casesBar + `<h3>${escape(current.name)}</h3><p class="intro training-note">${escape(publicText(current.desc))}</p>` +
-    (current.completed ? `<p class="intent">${escape(publicText(current.success))}</p>` :
+  return panel("沙盘", casesBar + `<h3>${escape(current.name)}</h3><p class="intro training-note">${escape(publicText(current.desc))}</p>` +
+    (current.completed ? `<p class="intent">${escape(publicText(current.observation))}</p>${thoughtDetails(current.thought)}` :
       `<form class="deduction" data-deduction="${escape(current.id)}">
-        <fieldset><legend>选出支撑结论的证物</legend>${evidence || '<p class="intro">手头还没有证物。</p>'}</fieldset>
-        <fieldset><legend>你的解释</legend>${hypotheses}</fieldset>
-        <div class="actions"><button class="button primary" type="submit"${evidence ? "" : " disabled"}>落子推演</button></div>
-      </form>`), tag(current.completed ? "已解" : "待推敲", current.completed ? "" : "warn"));
+        ${evidence ? `<details class="deduction-clues"${draft?.evidence.length ? " open" : ""}><summary>摊开随身物件</summary>${evidence}</details>` : ""}
+        <label class="deduction-writing">你的猜想
+          <textarea name="hypothesis" rows="3" maxlength="180" required>${escape(draft?.hypothesis)}</textarea>
+        </label>
+        <div class="actions"><button class="button" type="submit">带着猜想去试</button></div>
+      </form>`), current.completed ? tag("已在现场验过") : current.thought ? tag("待查证", "warn") : "");
 }
 
 function render() {
@@ -526,15 +565,36 @@ function performAction(action, payload) {
   if (["travel", "visit", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
 }
 
+function readDeduction(form) {
+  const selected = new FormData(form);
+  return { id: form.dataset.deduction, hypothesis: selected.get("hypothesis"), evidence: selected.getAll("evidence") };
+}
+
+function readExperiment(form) {
+  const settings = Object.fromEntries([...new FormData(form)].map(([key, value]) => [key.slice("setting-".length), value]));
+  return { id: form.dataset.experiment, settings };
+}
+
+document.addEventListener("input", event => {
+  const form = event.target.form;
+  if (form?.dataset.deduction) deductionDrafts.set(form.dataset.deduction, readDeduction(form));
+  if (form?.dataset.experiment) experimentDrafts.set(form.dataset.experiment, readExperiment(form).settings);
+});
+
 document.addEventListener("submit", event => {
   const form = event.target;
-  if (!form.matches("[data-deduction]")) return;
+  if (!form.matches("[data-deduction], [data-experiment]")) return;
   event.preventDefault();
-  const selected = new FormData(form);
-  activeDeduction = form.dataset.deduction;
-  const guess = { id: activeDeduction, evidence: selected.getAll("evidence"), hypothesis: selected.get("hypothesis") };
-  deductionDrafts.set(activeDeduction, guess);
-  performAction("deduce", guess);
+  if (form.dataset.deduction) {
+    const guess = readDeduction(form);
+    activeDeduction = guess.id;
+    deductionDrafts.set(guess.id, guess);
+    performAction("deduce", guess);
+  } else {
+    const trial = readExperiment(form);
+    experimentDrafts.set(trial.id, trial.settings);
+    performAction("experiment", trial);
+  }
 });
 
 document.addEventListener("click", event => {
@@ -567,6 +627,7 @@ document.addEventListener("click", event => {
     selectedItem = null;
     activeDeduction = null;
     deductionDrafts.clear();
+    experimentDrafts.clear();
     notices.replaceChildren();
     guide.close();
     render();
