@@ -7,14 +7,14 @@ const realms = [
 const items = [
   { id: 'ration', name: '干粮', kind: 'material', price: 3, sell: 1, desc: '用油纸分包的干粮，饿了就拆一包吃。' },
   { id: 'wood', name: '松枝', kind: 'material', price: 3, sell: 1, desc: '引火温药，也能充作绘符的符骨。' },
-  { id: 'reed', name: '白苇芯', kind: 'material', price: 8, sell: 3, desc: '白苇滩浅水所得，可调药，也可用在筑基时。' },
+  { id: 'reed', name: '白苇芯', kind: 'material', price: 8, sell: 3, desc: '村里的药僮收它熬伤药。' },
   { id: 'hide', name: '泥蜕', kind: 'material', price: 7, sell: 3, desc: '从泥鳞兽身上取得的韧皮，可制护具。' },
   { id: 'ore', name: '寒铁', kind: 'material', price: 13, sell: 5, desc: '沉钟岭废矿中出产的寒铁，可制器，也可用于凝丹。' },
   { id: 'core', name: '回声石心', kind: 'material', price: 0, sell: 9, desc: '沉钟岭的咒音凝成的石心，可用于凝丹。' },
   { id: 'sand', name: '潮砂', kind: 'material', price: 14, sell: 6, desc: '闭潮渡退水后留下的细砂，入药或研作符墨。' },
   { id: 'seal', name: '镇渡印', kind: 'material', price: 0, sell: 0, keepOnFall: true, desc: '闭潮渡守潮灵遗落的渡印，落灯村有人认得它。' },
   { id: 'lost_basket', name: '落水药篓', kind: 'material', price: 0, sell: 0, keepOnFall: true, desc: '从木桩旁捞起的竹篓，箍带尚未松开。落灯村的药僮用这种篓子背药。' },
-  { id: 'ridge_rubbing', name: '钟纹拓片', kind: 'key', price: 0, sell: 0, desc: '苇滩渡工拓下旧钟的纹路，图边有一笔进山的记号。' },
+  { id: 'ridge_rubbing', name: '沉钟岭路图', kind: 'key', price: 0, sell: 0, desc: '画着白苇滩北面进山的路，循着路上的倒钟就能到沉钟岭。' },
   { id: 'ford_chart', name: '旧渡水图', kind: 'key', price: 0, sell: 0, desc: '上面画着废矿与旧渡之间的水路，尚可辨认。' },
   { id: 'echo_note', name: '茶棚墙上的掌谱', kind: 'key', price: 0, sell: 0, desc: '一块烤黑的薄木板。板上一人贴耳听岩，另一手掌心向下。' },
   { id: 'tide_note', name: '闸工的潮牌', kind: 'key', price: 0, sell: 0, desc: '值守闸门时用的潮牌，边缘刻着涨水与落水的时刻。' },
@@ -133,19 +133,20 @@ const recipes = [
 
 const regions = [
   { id: 'village', name: '落灯村', tier: 0, travel: 1, desc: '旧渡停了之后，村人每晚仍点一盏灯。这里可问路、休整、补给。' },
-  { id: 'marsh', name: '白苇滩', tier: 0, travel: 1, desc: '浅水下有白苇芯，泥面有兽足印。老渡工认得更往里的路。' },
-  { id: 'ridge', name: '沉钟岭', tier: 1, travel: 2, reveal: { item: 'ridge_rubbing', quest: 'reed_salve' }, hint: '问问苇滩渡工，或替村中药僮采一份白苇芯。', desc: '旧钟倒在废矿外，回音仍在山腹打转。岩壁上有这里曾经通水的痕迹。' },
-  { id: 'ford', name: '闭潮渡', tier: 2, travel: 2, reveal: { item: 'ford_chart', quest: 'sell_forging' }, hint: '山上的旧石龛留着刻痕。村里老匠人也记得这里的水路。', desc: '旧渡的闸门还在自行开合。沿废船与潮痕寻找挂锁的闸槽。' },
+  { id: 'marsh', name: '白苇滩', tier: 0, travel: 1, desc: '岸上望得见浅水中的一片白苇。' },
+  { id: 'ridge', name: '沉钟岭', tier: 1, travel: 2, reveal: { item: 'ridge_rubbing' }, hint: '苇滩渡工常循旧道往山里去。', desc: '旧钟倒在废矿外，回音仍在山腹打转。岩壁上有这里曾经通水的痕迹。' },
+  { id: 'ford', name: '闭潮渡', tier: 2, travel: 2, reveal: { item: 'ford_chart' }, hint: '山上的旧石龛留着刻痕。村里老匠人也记得这里的水路。', desc: '旧渡的闸门还在自行开合。沿废船与潮痕寻找挂锁的闸槽。' },
   { id: 'hidden', name: '回灯埠', tier: 2, travel: 2, secret: true, reveal: { item: 'secret_pass' }, desc: '夹在上下两道水流之间的避风埠，渡工过去在此换灯、卸客。' },
 ];
 
 const sites = [
   { id: 'reed_banks', region: 'marsh', name: '浅水苇丛',
+    afterChoicesByChoice: { 1: ['reed_banks:0'] },
     stocks: { reed: { start: 5, cap: 8, interval: 4, growth: 2, choices: [0, 1] } },
     emptyText: '脚边都是翻开的泥。能拔的苇芯已经采完了。' },
-  { id: 'sunk_pack', region: 'marsh', name: '烂木桩浅汊', once: [0],
+  { id: 'sunk_pack', region: 'marsh', name: '烂木桩浅汊', afterChoices: ['reed_banks:1'], reveal: { quest: 'reed_salve' }, once: [0],
     afterOnceText: { 0: '桩脚只剩几丝篓绳，泥面有拖过竹篓的浅槽。' } },
-  { id: 'mud_track', region: 'marsh', name: '碎石水眼',
+  { id: 'mud_track', region: 'marsh', name: '碎石水眼', afterChoices: ['reed_banks:1'], reveal: { quest: 'reed_salve' },
     stocks: { wood: { start: 4, cap: 6, interval: 2.5, growth: 2, choices: [1] } },
     creatures: {
       mud_beast: { start: 1, cap: 3, interval: 4, growth: 1 },
@@ -153,16 +154,19 @@ const sites = [
     },
     creatureText: {
       mud_beast: { present: '水泡排成一线，几片硬鳞时隐时现。', absent: '水面平静，没有鳞片浮出来。' },
-      reed_fox: { present: '干地上有新足印，芦梗挂着短毛。', absent: '干埂只剩被风磨浅的旧足印。' },
+      reed_fox: { present: '干地有新足印，芦梗上挂着短毛和碎油纸。', absent: '干埂只剩被风磨浅的旧足印。' },
     },
     emptyText: '水眼没有动静，干埂的旧足印已被风磨浅，堆在石间的松枝也拾尽了。' },
-  { id: 'old_fire', region: 'marsh', name: '背雨石渠', after: ['reed_banks', 'sunk_pack'],
+  { id: 'old_fire', region: 'marsh', name: '背雨石渠', after: ['mud_track', 'sunk_pack'],
     stocks: { wood: { start: 6, cap: 6, interval: 0, growth: 0, choices: [1] } }, once: [2, 3],
     afterOnceText: { 2: '半截石渠挡着雨。渠底那片反字瓦已经被带走，灰里还印着瓦角。' } },
-  { id: 'reed_ferryman', region: 'marsh', name: '渡工的刨木滩', after: ['old_fire'], reveal: { item: 'lost_basket' }, once: [0],
+  { id: 'reed_ferryman', region: 'marsh', name: '渡工的刨木滩', after: ['old_fire'], reveal: { item: 'lost_basket' }, once: [0, 2],
     creatures: { marsh_ghost: { start: 1, cap: 2, interval: 3, growth: 1 } },
     creatureText: { marsh_ghost: { present: '对岸有团影子贴着滩脚走。', absent: '滩脚只有芦苇被风吹动。' } },
     emptyText: '老渡工把刨好的桨平码在石头上。今日岸边没有游影。' },
+  { id: 'bank_watch', region: 'marsh', name: '矮石堤', after: ['mud_track', 'old_fire'],
+    creatures: { bank_runner: { start: 1, cap: 1, interval: 0, growth: 0 } },
+    emptyText: '拦滩客已经让路，矮石堤上只剩被踩松的石块。' },
   { id: 'drowned_mast', region: 'marsh', name: '沉桅高埂', after: ['mud_track', 'sunk_pack'],
     creatures: { mast_beast: { start: 1, cap: 1, interval: 0, growth: 0 } },
     creatureText: { mast_beast: { present: '桅下有头会行真气的水兽，齿间卡着半枚旧渡钱。', absent: '桅根上还挂着断下的水草，再没有伏兽。' } },
@@ -216,18 +220,18 @@ const sites = [
 ];
 
 const events = [
-  { id: 'reed_banks', name: '倒伏的白苇', text: '风把苇叶压向水面。浅处能看见垫脚的石头，里头的白苇长得更密。', choices: [
-    { label: '挖浅处的苇芯', days: 1, coins: 0, hp: 0, qi: 0, insight: 2, loot: { reed: 2 }, enemy: null, outcome: '踩着石头挖了几株白苇。' },
-    { label: '蹚过去挖深处的苇芯', days: 1, coins: 0, hp: -4, qi: 0, insight: 3, loot: { reed: 3 }, enemy: null, outcome: '深水里的苇根连成一团，最后整丛拔了出来。', injury: '拔脚时，泥里一片碎蚌壳划破了小腿。' },
+  { id: 'reed_banks', name: '浅水苇丛', text: '石头边长着白苇，伸手就够得着。', choices: [
+    { label: '挖浅处的苇芯', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 2, loot: { reed: 2 }, enemy: null, outcome: '你挖出几根白苇芯。' },
+    { label: '蹚过去挖密处的苇芯', desc: '前头的苇丛长得更密。', days: 0.5, coins: 0, hp: -4, qi: 0, insight: 3, loot: { reed: 3 }, enemy: null, outcome: '你拔起一整丛白苇。', injury: '拔脚时，泥里一片碎蚌壳划破了小腿。' },
   ] },
   { id: 'sunk_pack', name: '烂木桩浅汊', text: '木桩旁卡着个竹篓。水一涨，背带便往桩上缠紧。篓口还扣着。', choices: [
     { label: '把药篓拉上岸', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 1, loot: { lost_basket: 1 }, enemy: null, outcome: '你踩住背带，把整个篓子拖上岸。扣结还紧着，先照原样带走也行。' },
     { label: '沿岸看看搁浅的水路', days: 0.125, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '桩内侧有一排老石头，踩着它们就能走回浅滩。' },
   ] },
   { id: 'mud_track', name: '碎石水眼', text: '浅滩在这里分成两股，一股绕过水眼，一股贴着铺了碎石的干埂。', choices: [
-    { label: '上石滩迎战', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'mud_beast', outcome: '硬鳞破水，泥鳞兽扑上了石滩。' },
+    { label: '去石滩猎泥鳞兽', desc: '泥蜕可以做护具。', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'mud_beast', outcome: '硬鳞破水，泥鳞兽扑上了石滩。' },
     { label: '沿干地绕行，拾漂到埂上的松枝', days: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 2 }, enemy: null, outcome: '你从干埂绕过水眼，拾走晒透的松枝。' },
-    { label: '沿小足印过去', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', outcome: '一尾蓬松的苇狐挡在干埂上。' },
+    { label: '循足印找粮包', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', outcome: '粮包卡在苇梗上，一只苇尾狐龇着牙守在旁边。' },
   ] },
   { id: 'old_fire', name: '干透的柴窝', revisit: true, text: '半截石渠挡了雨，里面还有旧日烤苇火留下的黑灰。渠底铺着几片手掌大的破瓦。', choices: [
     { label: '添柴歇脚', need: { wood: 1 }, consume: true, days: 0.5, coins: 0, hp: 6, qi: 4, insight: 0, loot: {}, enemy: null, outcome: '火把石壁烘热，湿鞋上慢慢蒸出白气。' },
@@ -235,9 +239,14 @@ const events = [
     { label: '掀开渠底的破瓦', days: 0, coins: 0, hp: 0, qi: 0, insight: 1, loot: { kiln_shard: 1 }, enemy: null, outcome: '一片瓦背面刻着反字。用手擦去灰黑，才辨出「两叩一停」。' },
     { label: '把瓦片和刻样架到炉火前', hidden: true, need: { kiln_shard: 1, bell_clapper: 1, backwash_mark: 1, backwash_theory: 1 }, days: 1, coins: 0, hp: 0, qi: 0, insight: 3, loot: { secret_pass: 1 }, enemy: null, outcome: '火一低，铃舌的影子便与两条断纹接上了。渠外灯影逆水而去，那里有条窄路。' },
   ] },
-  { id: 'reed_ferryman', name: '修桨的人', text: '一名老渡工坐在水边削桨。他知道哪里能抄近路，也知道哪条路表面平整却会陷脚。', choices: [
-    { label: '给渡工搭把手', days: 1, coins: 6, hp: 0, qi: 0, insight: 3, loot: { ration: 1, ridge_rubbing: 1, oar_mark: 1 }, enemy: null, outcome: '老渡工刨平桨柄，抹去旧桨背面的泥，让你看几处船桩。「往里走有座旧钟。找路的话，这一张你拿着。」' },
+  { id: 'reed_ferryman', name: '修桨的人', text: '老渡工把裂桨架在石头上。「两份苇芯、一根松枝，补桨用。我拿一张进山的路图跟你换。」', choices: [
+    { label: '把补桨的料递给渡工', need: { reed: 2, wood: 1 }, consume: true, days: 0.25, coins: 0, hp: 0, qi: 0, insight: 3, loot: { ration: 1, ridge_rubbing: 1, oar_mark: 1 }, enemy: null, outcome: '渡工收了料，从斗笠夹层里取出沉钟岭的路图，又指给你看桨背上的靠岸记号。' },
     { label: '替他赶走巡岸的水鬼', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'marsh_ghost', outcome: '水鬼横在岸边，抱住两臂等人上前。' },
+    { label: '帮他把旧桨翻过来', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 1, loot: { oar_mark: 1 }, enemy: null, outcome: '渡工擦掉桨背的泥，指给你看他画下的三处靠岸位置。' },
+  ] },
+  { id: 'bank_watch', name: '矮石堤', text: '有人靠在堤上歇脚，腰间别着一张折图。你问进山怎么走，他把手搭上木杖。「想借图？跟我过两招。」', choices: [
+    { label: '跟拦滩客过招', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'bank_runner', outcome: '拦滩客把图塞回腰间，横着木杖站稳。' },
+    { label: '下堤另找渡工', days: 0, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '你从较低的石阶下了堤。' },
   ] },
   { id: 'drowned_mast', name: '苇海沉桅', text: '乱苇朝一根断桅倒去。高埂很窄，只容一人站稳。', choices: [
     { label: '到桅边夺渡钱', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'mast_beast', outcome: '你刚踩上桅杆，它便张开头侧两道水鳍。' },
@@ -307,6 +316,7 @@ const enemies = [
   { id: 'mud_beast', name: '泥鳞兽', tags: ['beast', 'scaled'], tier: 0, hp: 25, atk: 7, def: 2, intents: [{ name: '偏头啃咬', kind: 'attack', mult: 1 }, { name: '伏身猛扑', kind: 'heavy', mult: 1.7 }, { name: '蜷尾守鳞', kind: 'guard', mult: 1.35 }, { name: '掀尾扫腿', kind: 'attack', mult: 1 }], coins: 8, insight: 3, loot: { hide: 2, ration: 1 }, desc: '伏身后会扑向脚下，硬鳞收拢时适合恢复真气或蓄势。' },
   { id: 'reed_fox', name: '苇尾狐', tags: ['beast', 'furred'], tier: 0, hp: 24, atk: 6, def: 1, intents: [{ name: '斜掠扑咬', kind: 'attack', mult: 1 }, { name: '团尾护腹', kind: 'guard', mult: 1.4 }, { name: '伏脊跳扑', kind: 'heavy', mult: 1.5 }], coins: 4, insight: 2, loot: { wood: 1, ration: 1 }, desc: '尾上的厚毛扫起了枯苇。它会先绕着干埂寻找扑咬的空当。' },
   { id: 'marsh_ghost', name: '巡岸水鬼', tags: ['spirit'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '抱臂裹雾', kind: 'guard', mult: 1.4 }, { name: '伸指拖拽', kind: 'attack', mult: 1 }, { name: '借雾扑面', kind: 'heavy', mult: 1.6 }], coins: 10, insight: 4, loot: { reed: 2, reed_talisman: 1 }, desc: '开场先抱臂结雾，准备好再把它拖出水边。' },
+  { id: 'bank_runner', name: '拦滩客', tags: ['human'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '用杖头试探', kind: 'attack', mult: 1 }, { name: '抡杖砸下', kind: 'heavy', mult: 1.5 }, { name: '横杖护身', kind: 'guard', mult: 1.3 }], coins: 6, insight: 3, loot: { ridge_rubbing: 1 }, desc: '这人走惯了滩北的山道，腰间那张正是进山的路图。见他抡起木杖，可以先架住重招。' },
   { id: 'mast_beast', name: '沉桅虺', tags: ['beast', 'scaled'], tier: 1, hp: 34, atk: 10, def: 3, intents: [{ name: '借桅缠身', kind: 'attack', mult: 1 }, { name: '开鳍扑水', kind: 'heavy', mult: 1.65 }, { name: '绕桅遮身', kind: 'guard', mult: 1.2 }, { name: '甩尾扫水', kind: 'attack', mult: 1 }], coins: 19, insight: 5, loot: { path_charm: 1, reed: 2 }, desc: '筑基境的伏水兽。带上破招术和撤退用的符，可留一条回路。' },
   { id: 'ore_wight', name: '持锤矿煞', tags: ['spirit'], tier: 1, hp: 40, atk: 12, def: 4, intents: [{ name: '平锤试探', kind: 'attack', mult: 1 }, { name: '举锤砸顶', kind: 'heavy', mult: 1.72 }, { name: '横锤护臂', kind: 'guard', mult: 1.45 }, { name: '甩锤碰撞', kind: 'attack', mult: 1.1 }], coins: 14, insight: 5, loot: { core: 1, ore: 2 }, desc: '它击打沉重且规律。越阶挑战时先做好撑过重锤的准备。' },
   { id: 'stone_badger', name: '石甲獾', tags: ['beast', 'furred'], tier: 1, hp: 43, atk: 11, def: 6, intents: [{ name: '缩头挡路', kind: 'guard', mult: 1.38 }, { name: '沿坡顶撞', kind: 'attack', mult: 1 }, { name: '转身重掀', kind: 'heavy', mult: 1.62 }], coins: 15, insight: 5, loot: { hide: 2, ore: 1, salve: 1 }, desc: '皮毛粗厚，脊甲又硬。找它转身露侧肋时出手。' },
@@ -317,19 +327,20 @@ const enemies = [
 ];
 
 const quests = [
-  { id: 'patch_ferry', name: '把旧灯支起来', desc: '村人请你带松枝，把渡口那盏灯支稳。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, requiresKnownMaterials: false, outcome: '村人往灯座下垫进松枝，松开手，灯没再倒。' },
+  { id: 'patch_ferry', name: '把旧灯支起来', desc: '村人请你带松枝，把渡口那盏灯支稳。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, outcome: '村人往灯座下垫进松枝，松开手，灯没再倒。' },
   { id: 'lost_basket_return', name: '把药篓还给药僮', desc: '药僮一看见篓把上的青绳就站起来了。「是我在浅汊落下的，药没散吧？」', need: { lost_basket: 1 }, reward: { salve: 1, ration: 2 }, coins: 8, insight: 2, outcome: '药僮接过药篓，把背带挪回篓口。「扣还紧着，药都在。多谢你原样捞回来。」他分了一包松脂膏给你。' },
-  { id: 'reed_salve', name: '给药僮送苇芯', desc: '药僮掀开锅盖。「膏药还差苇芯。要是碰见白苇，替我挖些回来。」', need: { reed: 1 }, reward: { ration: 2, reed_talisman: 1, ridge_rubbing: 1, oar_mark: 1, reed_lines: 1 }, coins: 10, insight: 2, outcome: '药僮把苇芯下了锅。「涨水时别认浮沫，看石背的回水。」他把水线图和渡工留下的东西递给你。' },
+  { id: 'reed_salve', name: '拿苇芯换伤药', desc: '药僮朝药锅一指。「给我一份苇芯，换一包伤药。」', need: { reed: 1 }, reward: { salve: 1 }, coins: 4, insight: 2, outcome: '药僮收下苇芯，包好一份松脂膏。「擦在伤口上就行。」' },
+  { id: 'apprentice_waterline', name: '问药僮怎么看水线', afterQuest: 'reed_salve', reveal: { item: 'oar_mark' }, desc: '「这不是渡工画的靠岸图吗？再给我一份苇芯，我把采药用的水线图找给你。」', need: { reed: 1 }, reward: { reed_lines: 1 }, coins: 0, insight: 2, outcome: '药僮把两张图并排放在锅台上。「涨水时别认浮沫，看石背的回水。」他把水线图递给你。' },
   { id: 'coat_mend', name: '补蓑衣的里衬', desc: '渡工捏着蓑衣上的破洞，想换一块整泥蜕。', need: { hide: 1 }, reward: { salve: 2, ration: 1 }, coins: 10, insight: 2, outcome: '渡工把泥蜕比在裂口上，拣了两包自己用惯的止血膏给你。' },
-  { id: 'sell_forging', name: '先打一截闸栓', tier: 1, reveal: { item: 'ridge_rubbing' }, desc: '老匠人想试试寒铁能不能打闸栓，请你带些矿样。', need: { ore: 1 }, reward: { iron_talisman: 1, ration: 3, ford_chart: 1 }, coins: 17, insight: 3, outcome: '老匠人把寒铁放进火里，顺手从抽屉拿出一张折坏的水图。「旧渡要换闸栓，就得从这头走。」' },
-  { id: 'last_lantern', name: '把旧渡的印带回来', tier: 2, reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。村老请你带回镇渡印。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6, outcome: '村老接过镇渡印，在闸书上压稳，带人去开旧闸。' },
+  { id: 'sell_forging', name: '拿寒铁换旧渡水图', reveal: { item: 'ridge_rubbing' }, desc: '老匠人从抽屉里抽出一张折旧的水图。「给我一块寒铁试打闸栓，这图你拿去。」', need: { ore: 1 }, reward: { iron_talisman: 1, ration: 3, ford_chart: 1 }, coins: 17, insight: 3, outcome: '老匠人掂了掂寒铁，把通往闭潮渡的水图交给你。' },
+  { id: 'last_lantern', name: '把旧渡的印带回来', reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。村老请你带回镇渡印。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6, outcome: '村老接过镇渡印，在闸书上压稳，带人去开旧闸。' },
 ];
 
 const services = [
   { id: 'quests', name: '委托', items: ['reed', 'lost_basket'], choices: ['reed_ferryman:0'] },
   { id: 'market', name: '坊市', choices: ['old_fire:1', 'reed_ferryman:0'] },
   { id: 'workshop', name: '工坊', items: ['hide'], choices: ['old_fire:0', 'old_fire:1', 'mud_track:1'] },
-  { id: 'cultivate', name: '修行', items: ['reed_lines'], choices: ['drowned_mast:1', 'reed_ferryman:0'] },
+  { id: 'cultivate', name: '修行', items: ['ridge_rubbing', 'reed_lines'], choices: ['drowned_mast:1'] },
 ];
 
 const deductions = [
@@ -360,7 +371,7 @@ const deductions = [
     miss: '按这个时点落掌，石屑在你沉掌前后便已落开。查查石面真正应声的是哪一拍。',
   },
   {
-    id: 'trace_backwash', name: '旧物为何都刻反了', tier: 2, reveal: { item: 'backwash_mark' },
+    id: 'trace_backwash', name: '旧物为何都刻反了', tier: 0, reveal: { item: 'backwash_mark' },
     desc: '反字、绳结和倒潮刻样都能标方向，放在一处时却对不上。把它们摆进同一段水路里。',
     evidence: { kiln_shard: 1, bell_clapper: 1, backwash_mark: 1 },
     hypotheses: [
@@ -375,10 +386,11 @@ const deductions = [
 ];
 
 const starting = {
-  inventory: { ration: 10 },
+  inventory: { ration: 3 },
   gear: { weapon: 'cudgel', armor: 'straw_cape', charm: null },
   arts: [],
   coins: 20,
+  satiety: 68,
 };
 const basket = {
   item: 'lost_basket',

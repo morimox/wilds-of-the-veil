@@ -212,11 +212,13 @@ const tables = [
     'id', 'result', 'count', 'tier', tier, ['cost', '制作费用（灵钱）'], 'need', 'days', 'reveal',
   ]),
   table('regions', '地区', gated(data.regions), [
-    'id', 'name', 'tier', tier, 'travel', 'reveal', 'hint', 'desc',
-  ], { omit: ['draws', 'food'], note: '发现去处后，仍需达到对应境界才能前往。行走消耗游戏时间和饱腹，干粮由玩家主动食用。' }),
+    'id', 'name', ['tier', '威胁参考阶'], ['realmName', '威胁参考境界'], 'travel', 'reveal', 'hint', 'desc',
+  ], { omit: ['draws', 'food'], note: '拿到对应路图或通行信物即可前往。威胁标记只用于内容参考。行走消耗游戏时间和饱腹。' }),
   table('region-encounters', '地区内的可选地点', data.sites, [
     'region', 'id', 'name', ['after', '经过任一地点后发现', (ids) => ids.map(siteRef).join('、')],
+    ['afterChoices', '完成任一动作后发现', (keys) => keys.map(describeChoice).join('、')],
     'reveal', ['once', '一次性选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
+    ['afterChoicesByChoice', '逐步显露的地点动作', (groups) => Object.entries(groups).map(([index, keys]) => `选项 ${+index + 1} ← ${keys.map(describeChoice).join('、')}`).join('；')],
     ['emptyText', '地点耗尽时可见情形'], ['afterOnceText', '一次性行动后的场景'],
     ['creatureText', '动物存在或耗尽时的景象'],
   ], { omit: ['stocks', 'creatures'], note: '玩家直接选择区域内可以到达的地点。发现条件为空时到达该地区即可见。' }),
@@ -244,7 +246,7 @@ const tables = [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
-    'id', 'name', ['tier', '标注境界'], tier, 'reveal', 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
+    'id', 'name', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '前置委托', ref], 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),
   table('services', '村务发现条件', data.services, [
     'id', 'name', ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],

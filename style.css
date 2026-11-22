@@ -59,7 +59,15 @@ h3 { font-size: 15px; }
 .player-line { min-height: 23px; padding: 10px 0 11px; color: var(--muted); font-size: 13px; }
 .realm { color: var(--jade); font-weight: 600; }
 .warning, .vital.low { color: var(--amber); }
-.vital { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vital { position: relative; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vital > summary { list-style: none; cursor: pointer; }
+.vital > summary::-webkit-details-marker { display: none; }
+.vital > summary:hover { color: var(--text); }
+.vital > p {
+  position: absolute; top: calc(100% + 5px); left: 0; z-index: 8;
+  width: 180px; white-space: normal; padding: 7px 8px; border: 1px solid #526b59;
+  border-radius: 5px; background: #1c2b21; color: var(--text); font-size: 13px;
+}
 .vital b { color: var(--text); font-weight: 600; }
 .vital.low b { color: inherit; }
 .button.quick-eat { min-height: 25px; padding: 2px 6px; background: transparent; font-size: 12px; }
@@ -82,6 +90,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .site-list:not(:empty) { margin-bottom: 12px; }
 .site-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; }
 .site-stock { margin-top: 5px; color: var(--muted); font-size: 13px; }
+.field-note { margin-top: 8px; color: var(--muted); font-size: 13px; }
 .kit { padding-left: 17px; border-left: 1px solid var(--line); }
 .kit-section + .kit-section { margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line); }
 .kit-section h2 { margin: 0 0 4px; font-size: 15px; }

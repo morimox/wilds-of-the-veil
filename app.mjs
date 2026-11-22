@@ -33,7 +33,7 @@ function showOpening() {
   opening.hidden = false;
   app.inert = true;
   opening.querySelector("[data-skip-opening]").focus({ preventScroll: true });
-  openingTimer = setTimeout(dismissOpening, matchMedia("(prefers-reduced-motion: reduce)").matches ? 1600 : 5200);
+  openingTimer = setTimeout(dismissOpening, matchMedia("(prefers-reduced-motion: reduce)").matches ? 800 : 2800);
 }
 
 function freshGame() {
@@ -112,31 +112,38 @@ function inVillage(s) {
 
 function hasApprentice(s) {
   return inVillage(s) && (Boolean(s.inventory.lost_basket) || s.basketDisposition === "returned" ||
-    s.quests.some(quest => quest.id === "reed_salve"));
+    s.quests.some(quest => quest.id === "reed_salve" || quest.id === "apprentice_waterline"));
+}
+
+function vital(label, current, max, low, explanation) {
+  return `<details class="vital${low ? " low" : ""}">
+    <summary>${label} <b>${Math.floor(current)}/${max}</b></summary>
+    <p>${escape(explanation)}</p>
+  </details>`;
 }
 
 function stats(s) {
   const warnings = [];
-  if (s.mode === "combat") {
-    warnings.push(`真气${condition(s.qi, s.maxQi)}`);
-  } else {
-    if (s.qi < s.maxQi / 3) warnings.push("真气将尽");
-  }
+  const showsQi = s.knownArts.length > 0 || s.pressure > rules.pressureThreshold;
   if (s.satiety === 0) warnings.push("空腹乏力");
-  if ((s.inventory.ration ?? 0) < rules.reliefRations) warnings.push("口粮不足");
+  if (!s.inventory.ration && s.satiety < 32) warnings.push("干粮已尽");
   if (s.toxin >= rules.toxinThreshold) warnings.push("丹毒发作");
   const danger = s.pressure > rules.pressureThreshold;
   const marks = Array.from({ length: rules.pressureThreshold }, (_, i) =>
     `<i class="${i < s.pressure ? "filled" : ""}"></i>`).join("");
-  const fog = s.pressure ? `<details class="pressure${danger ? " danger" : ""}">
+  const fog = s.pressure >= rules.pressureThreshold ? `<details class="pressure${danger ? " danger" : ""}">
     <summary>${danger ? "雾压过重" : "雾压"} <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
     <span>雾积满后，再探索会耗真气。回村就会散去。</span>
   </details>` : "";
   const canEat = s.mode !== "victory" && (s.inventory.ration ?? 0) > 0 && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
+  const canUseSalve = s.hp < s.maxHp && s.inventory.salve > 0 && ["village", "field", "combat"].includes(s.mode);
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
-    <span class="vital${s.hp / s.maxHp < 0.3 ? " low" : ""}">气血 <b>${s.hp}/${s.maxHp}</b></span>
-    <span class="vital${s.satiety < 24 ? " low" : ""}">饱腹 <b>${Math.floor(s.satiety)}/${s.maxSatiety}</b></span>
-    ${canEat ? linkButton("吃干粮", "eat", "", "quick-eat") : ""}${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
+    ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。伤药和回村歇息可以恢复。")}
+    ${canUseSalve ? linkButton("敷伤药", "use", "salve", "quick-eat") : ""}
+    ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
+    ${canEat ? linkButton("吃干粮", "eat", "", "quick-eat") : ""}
+    ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "术诀和久留雾中会耗真气。回村歇息可以恢复。") : ""}
+    ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
 function discovered(s, region) {
@@ -148,11 +155,10 @@ function discovered(s, region) {
 
 function routeAction(s, r, primary) {
   const homeward = r.id === "village";
-  const locked = r.tier > s.realm.id;
   const hungry = !homeward && s.satiety <= 0;
   const days = homeward ? s.region.travel + (s.satiety <= 0 ? rules.emptyReturnDays : 0) : r.travel;
-  const note = locked ? `需${tierName(r.tier)}` : hungry ? "空腹" : days ? `${days} 日` : "";
-  return `<div class="route-action">${linkButton(homeward ? "回村" : `去${r.name}`, "travel", r.id, primary ? "primary" : "", locked || hungry)}${note ? `<span class="fine">${escape(note)}</span>` : ""}</div>`;
+  const note = hungry ? "空腹" : days ? `${days} 日` : "";
+  return `<div class="route-action">${linkButton(homeward ? "回村" : `去${r.name}`, "travel", r.id, primary ? "primary" : "", hungry)}${note ? `<span class="fine">${escape(note)}</span>` : ""}</div>`;
 }
 
 function siteResources(s, site) {
@@ -172,19 +178,31 @@ function siteList(s) {
   }).join("")}</div>`;
 }
 
+function firstUse(s) {
+  const harvested = s.seenChoices.includes("reed_banks:0");
+  if (inVillage(s) && s.day === 1 && !s.didEat && s.inventory.ration) return "走路会消耗饱腹，吃干粮可以补回来。";
+  if (s.region.id !== "marsh" || s.completedQuests.includes("reed_salve")) return "";
+  if (!harvested) return "白苇芯可以带回村换伤药。";
+  if (s.mode === "field" && s.inventory.reed) return "回村找药僮，可以用白苇芯换松脂膏。";
+  return "";
+}
+
 function journey(s) {
   if (s.mode === "event") return eventScreen(s);
   if (s.mode === "combat") return combatScreen(s);
   if (s.mode === "victory") return panel("潮印归灯", `<p class="intro">旧渡重新点起了灯。</p><div class="actions">${linkButton("继续行旅", "resume", "", "primary")}</div>`);
   const known = data.regions.filter(region => region.id !== s.region.id && discovered(s, region));
   const isHome = inVillage(s);
+  const lesson = firstUse(s);
+  const wantsReeds = s.quests.some(quest => quest.id === "reed_salve" && quest.ready && !quest.completed);
+  const apprenticeLabel = !s.inventory.lost_basket && wantsReeds ? "找药僮换伤药" : "找药僮";
   const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.pressure || (s.inventory.ration ?? 0) < rules.reliefRations;
   return panel(s.region.name, `${isHome ? "" : siteList(s)}<div class="actions place-actions">
     ${known.map((r, i) => routeAction(s, r, isHome && i === 0)).join("")}
     ${isHome && needRest ? linkButton("歇息", "rest") : ""}
-    ${hasApprentice(s) ? tabButton("找药僮", "apprentice") : ""}
+    ${hasApprentice(s) ? tabButton(apprenticeLabel, "apprentice") : ""}
     ${!isHome || s.explored.length ? linkButton("等半日", "wait", "", "quiet", !isHome && s.satiety <= 0) : ""}
-  </div>`);
+  </div>${lesson ? `<p class="field-note">${escape(lesson)}</p>` : ""}`);
 }
 
 function eventScreen(s) {
@@ -195,7 +213,14 @@ function eventScreen(s) {
     const details = [choice.desc, choice.lockedReason].map(text => publicText(text)).filter(Boolean).join(" ");
     return `<div class="choice">${linkButton(choice.label, "choose", choice.index, "", choice.available === false)}${details ? `<p>${escape(details)}</p>` : ""}</div>`;
   }).join("");
-  return panel(event.name, `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div><p class="intro">${escape(publicText(event.text))}</p>${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}<div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
+  const firstGather = event.id === "reed_banks" && !s.seenChoices.includes("reed_banks:0");
+  const firstHunt = event.id === "mud_track" && s.visibleChoices.some(choice => choice.index === 0 && choice.available) && !s.defeated.includes("mud_beast");
+  const lesson = firstGather ? firstUse(s) : firstHunt ? "泥鳞兽身上的泥蜕能做护具。只想赶路也可以绕行。" : "";
+  return panel(event.name, `${firstGather ? "" : `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>`}
+    <p class="intro">${escape(publicText(event.text))}</p>
+    ${lesson ? `<p class="field-note">${escape(lesson)}</p>` : ""}
+    ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
+    <div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
 }
 
 function pillSummary(row) {
@@ -215,10 +240,14 @@ function combatScreen(s) {
   const intent = s.intent;
   const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
-  return panel(enemy.name, `<p class="intro">${escape(publicText(enemy.desc))}</p>
+  const firstTurn = s.combat.round === 0 && !s.defeated.length;
+  const observation = s.defeated.length && enemy.desc ? `<details class="field-note"><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
+  return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
     ${meter("对方气血", hp, enemy.maxHp)}
     <div class="actions">${linkButton("出手", "attack", "", "primary")}${linkButton("防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}</div>
+    ${firstTurn ? '<p class="field-note">先看对方下一招，遇到重招可以防御。</p>' : ""}
+    ${observation}
     ${arts.length ? `<div class="card-grid learned-arts">${arts.map(row => card(row.name, "", "", linkButton(s.qi < row.cost ? "真气不足" : "施展", "art", row.id, "", s.qi < row.cost), row.desc)).join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
 }
@@ -266,7 +295,11 @@ function pack(s) {
       actions = (canEquip ? linkButton("装备", "equip", row.id, "", gear.tier > s.realm.id || remaining <= 0) : "") +
         (canRepair && remaining < gear.durability ? linkButton(s.coins < gear.repair ? "灵钱不足" : "修理", "repair", row.id, "quiet", s.coins < gear.repair) : "");
     }
-    if (pill && canUse) actions = linkButton("服用", "use", row.id, "", pill.tier > s.realm.id);
+    if (pill && canUse) {
+      const healthy = row.id === "salve" && s.hp >= s.maxHp;
+      const label = row.id === "salve" ? (healthy ? "气血已满" : "敷伤药") : "服用";
+      actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy);
+    }
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
     if (row.id === "ration" && canEat && (s.satiety < s.maxSatiety || s.hp < s.maxHp)) actions = linkButton("吃干粮", "eat");
     if (row.id === "lost_basket" && canEquip) {
@@ -366,12 +399,13 @@ function questBoard(s) {
 function apprentice(s) {
   const delivery = s.quests.find(quest => quest.id === "lost_basket_return");
   const reeds = s.quests.find(quest => quest.id === "reed_salve" && !quest.completed);
+  const waterline = s.quests.find(quest => quest.id === "apprentice_waterline" && !quest.completed);
   const holding = Boolean(s.inventory.lost_basket);
-  const greeting = holding ? "药僮认出了你手里的竹篓。" : "药僮正忙着看火。";
   const basket = holding && delivery ? linkButton("交还药篓", "handin", delivery.id, "primary") : "";
-  const herb = reeds ? `<div class="card"><p>${escape(reeds.desc)}</p><p>需${escape(supplies(reeds.need))}</p>
-    <div class="actions">${linkButton("把苇芯给他", "handin", reeds.id, "", !hasSupply(s, reeds.need))}</div></div>` : "";
-  return panel("药僮", `<p class="intro">${greeting}</p>${basket ? `<div class="actions">${basket}</div>` : ""}${herb}`);
+  const tasks = [[reeds, "用苇芯换松脂膏"], [waterline, "问水线图"]].filter(([quest]) => quest).map(([quest, label]) =>
+    `<div class="card"><p>${escape(quest.desc)}</p><p>需${escape(supplies(quest.need))}</p>
+      <div class="actions">${linkButton(label, "handin", quest.id, "", !hasSupply(s, quest.need))}</div></div>`).join("");
+  return panel("药僮", `${basket ? `<p class="intro">药僮认出了你手里的竹篓。</p><div class="actions">${basket}</div>` : ""}${tasks || (basket ? "" : '<p class="intro">药僮正忙着看火。</p>')}`);
 }
 
 function deductionBoard(s) {
@@ -467,13 +501,15 @@ function feedback(before, after, result, action) {
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
   const didRecover = ["choose", "eat", "use", "rest"].includes(action) && after.hp > before.hp && !result.injury;
   const changes = [
-    didRecover && !narrative.includes("气血") && "气血恢复",
+    didRecover && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
     after.qi > before.qi && ["choose", "use", "rest"].includes(action) && !narrative.includes("真气") && "真气恢复",
-    after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && "消耗了真气",
+    after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
     after.satiety > before.satiety && action === "eat" && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
+    action === "travel" && !before.explored && before.region === "village" && after.satiety < before.satiety && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
     after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",
   ].filter(Boolean);
   if (changes.length) lines.push(changes.join("，") + "。");
+  if (!before.inventory.hide && goods.some(item => item.id === "hide")) lines.push("泥蜕可以拿去工坊做护具。");
   const overflow = Object.keys(result.spilled ?? {}).map(id => itemRows[id].name);
   if (overflow.length) lines.push(`行囊装不下，${overflow.join("、")}留在脚边。`);
   for (const id of after.discovered) {
@@ -485,7 +521,7 @@ function feedback(before, after, result, action) {
 function performAction(action, payload) {
   const before = {
     inventory: { ...state.inventory }, discovered: [...state.discovered],
-    sites: view(state).sites.map(site => site.id), region: state.region,
+    sites: view(state).sites.map(site => site.id), region: state.region, explored: state.explored.length,
     hp: state.hp, qi: state.qi, satiety: state.satiety, coins: state.coins,
   };
   const result = act(state, action, payload);

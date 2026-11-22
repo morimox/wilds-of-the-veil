@@ -5,6 +5,7 @@
 碎石水眼（mud_track）,种群,苇尾狐（reed_fox）,2,4,4,1,
 背雨石渠（old_fire）,资源,松枝（wood）,6,6,0,0,2
 渡工的刨木滩（reed_ferryman）,种群,巡岸水鬼（marsh_ghost）,1,2,3,1,
+矮石堤（bank_watch）,种群,拦滩客（bank_runner）,1,1,0,0,
 沉桅高埂（drowned_mast）,种群,沉桅虺（mast_beast）,1,1,0,0,
 落矿的冲沟（ore_rain）,资源,寒铁（ore）,5,7,3.5,2,1、2
 有回声的矿道（miner_echo）,资源,寒铁（ore）,2,4,3,2,2

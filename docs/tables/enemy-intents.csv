@@ -9,6 +9,9 @@ reed_fox,苇尾狐,3,伏脊跳扑,重招,1.5
 marsh_ghost,巡岸水鬼,1,抱臂裹雾,防御,1.4
 marsh_ghost,巡岸水鬼,2,伸指拖拽,普通攻势,1
 marsh_ghost,巡岸水鬼,3,借雾扑面,重招,1.6
+bank_runner,拦滩客,1,用杖头试探,普通攻势,1
+bank_runner,拦滩客,2,抡杖砸下,重招,1.5
+bank_runner,拦滩客,3,横杖护身,防御,1.3
 mast_beast,沉桅虺,1,借桅缠身,普通攻势,1
 mast_beast,沉桅虺,2,开鳍扑水,重招,1.65
 mast_beast,沉桅虺,3,绕桅遮身,防御,1.2

@@ -68,7 +68,15 @@ h3 { font-size: 15px; }
 .player-line { min-height: 23px; padding: 10px 0 11px; color: var(--muted); font-size: 13px; }
 .realm { color: var(--jade); font-weight: 600; }
 .warning, .vital.low { color: var(--amber); }
-.vital { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vital { position: relative; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vital > summary { list-style: none; cursor: pointer; }
+.vital > summary::-webkit-details-marker { display: none; }
+.vital > summary:hover { color: var(--text); }
+.vital > p {
+  position: absolute; top: calc(100% + 5px); left: 0; z-index: 8;
+  width: 180px; white-space: normal; padding: 7px 8px; border: 1px solid #526b59;
+  border-radius: 5px; background: #1c2b21; color: var(--text); font-size: 13px;
+}
 .vital b { color: var(--text); font-weight: 600; }
 .vital.low b { color: inherit; }
 .button.quick-eat { min-height: 25px; padding: 2px 6px; background: transparent; font-size: 12px; }
@@ -91,6 +99,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .site-list:not(:empty) { margin-bottom: 12px; }
 .site-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; }
 .site-stock { margin-top: 5px; color: var(--muted); font-size: 13px; }
+.field-note { margin-top: 8px; color: var(--muted); font-size: 13px; }
 .kit { padding-left: 17px; border-left: 1px solid var(--line); }
 .kit-section + .kit-section { margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line); }
 .kit-section h2 { margin: 0 0 4px; font-size: 15px; }
@@ -222,7 +231,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
 
 #opening.intro {
-  --intro-duration: 5.2s;
+  --intro-duration: 2.8s;
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -355,7 +364,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=5" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=6" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -387,6 +396,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
     <div class="dialog-head"><h2 id="guide-title">行旅指南</h2><button type="button" data-close aria-label="关闭指南">×</button></div>
     <ol>
       <li>经过时间就会变饿。打开行囊里的干粮可以吃饭，空腹也能回村。</li>
+      <li>点开状态名可以查看它的用途。拿到路图后可以试着走新路。</li>
       <li>把指针放到物品上可看词条，点一下可使用或整理。</li>
     </ol>
     <button type="button" class="text-danger" data-reset>开始新行程</button>
@@ -404,14 +414,14 @@ const realms = [
 const items = [
   { id: 'ration', name: '干粮', kind: 'material', price: 3, sell: 1, desc: '用油纸分包的干粮，饿了就拆一包吃。' },
   { id: 'wood', name: '松枝', kind: 'material', price: 3, sell: 1, desc: '引火温药，也能充作绘符的符骨。' },
-  { id: 'reed', name: '白苇芯', kind: 'material', price: 8, sell: 3, desc: '白苇滩浅水所得，可调药，也可用在筑基时。' },
+  { id: 'reed', name: '白苇芯', kind: 'material', price: 8, sell: 3, desc: '村里的药僮收它熬伤药。' },
   { id: 'hide', name: '泥蜕', kind: 'material', price: 7, sell: 3, desc: '从泥鳞兽身上取得的韧皮，可制护具。' },
   { id: 'ore', name: '寒铁', kind: 'material', price: 13, sell: 5, desc: '沉钟岭废矿中出产的寒铁，可制器，也可用于凝丹。' },
   { id: 'core', name: '回声石心', kind: 'material', price: 0, sell: 9, desc: '沉钟岭的咒音凝成的石心，可用于凝丹。' },
   { id: 'sand', name: '潮砂', kind: 'material', price: 14, sell: 6, desc: '闭潮渡退水后留下的细砂，入药或研作符墨。' },
   { id: 'seal', name: '镇渡印', kind: 'material', price: 0, sell: 0, keepOnFall: true, desc: '闭潮渡守潮灵遗落的渡印，落灯村有人认得它。' },
   { id: 'lost_basket', name: '落水药篓', kind: 'material', price: 0, sell: 0, keepOnFall: true, desc: '从木桩旁捞起的竹篓，箍带尚未松开。落灯村的药僮用这种篓子背药。' },
-  { id: 'ridge_rubbing', name: '钟纹拓片', kind: 'key', price: 0, sell: 0, desc: '苇滩渡工拓下旧钟的纹路，图边有一笔进山的记号。' },
+  { id: 'ridge_rubbing', name: '沉钟岭路图', kind: 'key', price: 0, sell: 0, desc: '画着白苇滩北面进山的路，循着路上的倒钟就能到沉钟岭。' },
   { id: 'ford_chart', name: '旧渡水图', kind: 'key', price: 0, sell: 0, desc: '上面画着废矿与旧渡之间的水路，尚可辨认。' },
   { id: 'echo_note', name: '茶棚墙上的掌谱', kind: 'key', price: 0, sell: 0, desc: '一块烤黑的薄木板。板上一人贴耳听岩，另一手掌心向下。' },
   { id: 'tide_note', name: '闸工的潮牌', kind: 'key', price: 0, sell: 0, desc: '值守闸门时用的潮牌，边缘刻着涨水与落水的时刻。' },
@@ -530,19 +540,20 @@ const recipes = [
 
 const regions = [
   { id: 'village', name: '落灯村', tier: 0, travel: 1, desc: '旧渡停了之后，村人每晚仍点一盏灯。这里可问路、休整、补给。' },
-  { id: 'marsh', name: '白苇滩', tier: 0, travel: 1, desc: '浅水下有白苇芯，泥面有兽足印。老渡工认得更往里的路。' },
-  { id: 'ridge', name: '沉钟岭', tier: 1, travel: 2, reveal: { item: 'ridge_rubbing', quest: 'reed_salve' }, hint: '问问苇滩渡工，或替村中药僮采一份白苇芯。', desc: '旧钟倒在废矿外，回音仍在山腹打转。岩壁上有这里曾经通水的痕迹。' },
-  { id: 'ford', name: '闭潮渡', tier: 2, travel: 2, reveal: { item: 'ford_chart', quest: 'sell_forging' }, hint: '山上的旧石龛留着刻痕。村里老匠人也记得这里的水路。', desc: '旧渡的闸门还在自行开合。沿废船与潮痕寻找挂锁的闸槽。' },
+  { id: 'marsh', name: '白苇滩', tier: 0, travel: 1, desc: '岸上望得见浅水中的一片白苇。' },
+  { id: 'ridge', name: '沉钟岭', tier: 1, travel: 2, reveal: { item: 'ridge_rubbing' }, hint: '苇滩渡工常循旧道往山里去。', desc: '旧钟倒在废矿外，回音仍在山腹打转。岩壁上有这里曾经通水的痕迹。' },
+  { id: 'ford', name: '闭潮渡', tier: 2, travel: 2, reveal: { item: 'ford_chart' }, hint: '山上的旧石龛留着刻痕。村里老匠人也记得这里的水路。', desc: '旧渡的闸门还在自行开合。沿废船与潮痕寻找挂锁的闸槽。' },
   { id: 'hidden', name: '回灯埠', tier: 2, travel: 2, secret: true, reveal: { item: 'secret_pass' }, desc: '夹在上下两道水流之间的避风埠，渡工过去在此换灯、卸客。' },
 ];
 
 const sites = [
   { id: 'reed_banks', region: 'marsh', name: '浅水苇丛',
+    afterChoicesByChoice: { 1: ['reed_banks:0'] },
     stocks: { reed: { start: 5, cap: 8, interval: 4, growth: 2, choices: [0, 1] } },
     emptyText: '脚边都是翻开的泥。能拔的苇芯已经采完了。' },
-  { id: 'sunk_pack', region: 'marsh', name: '烂木桩浅汊', once: [0],
+  { id: 'sunk_pack', region: 'marsh', name: '烂木桩浅汊', afterChoices: ['reed_banks:1'], reveal: { quest: 'reed_salve' }, once: [0],
     afterOnceText: { 0: '桩脚只剩几丝篓绳，泥面有拖过竹篓的浅槽。' } },
-  { id: 'mud_track', region: 'marsh', name: '碎石水眼',
+  { id: 'mud_track', region: 'marsh', name: '碎石水眼', afterChoices: ['reed_banks:1'], reveal: { quest: 'reed_salve' },
     stocks: { wood: { start: 4, cap: 6, interval: 2.5, growth: 2, choices: [1] } },
     creatures: {
       mud_beast: { start: 1, cap: 3, interval: 4, growth: 1 },
@@ -550,16 +561,19 @@ const sites = [
     },
     creatureText: {
       mud_beast: { present: '水泡排成一线，几片硬鳞时隐时现。', absent: '水面平静，没有鳞片浮出来。' },
-      reed_fox: { present: '干地上有新足印，芦梗挂着短毛。', absent: '干埂只剩被风磨浅的旧足印。' },
+      reed_fox: { present: '干地有新足印，芦梗上挂着短毛和碎油纸。', absent: '干埂只剩被风磨浅的旧足印。' },
     },
     emptyText: '水眼没有动静，干埂的旧足印已被风磨浅，堆在石间的松枝也拾尽了。' },
-  { id: 'old_fire', region: 'marsh', name: '背雨石渠', after: ['reed_banks', 'sunk_pack'],
+  { id: 'old_fire', region: 'marsh', name: '背雨石渠', after: ['mud_track', 'sunk_pack'],
     stocks: { wood: { start: 6, cap: 6, interval: 0, growth: 0, choices: [1] } }, once: [2, 3],
     afterOnceText: { 2: '半截石渠挡着雨。渠底那片反字瓦已经被带走，灰里还印着瓦角。' } },
-  { id: 'reed_ferryman', region: 'marsh', name: '渡工的刨木滩', after: ['old_fire'], reveal: { item: 'lost_basket' }, once: [0],
+  { id: 'reed_ferryman', region: 'marsh', name: '渡工的刨木滩', after: ['old_fire'], reveal: { item: 'lost_basket' }, once: [0, 2],
     creatures: { marsh_ghost: { start: 1, cap: 2, interval: 3, growth: 1 } },
     creatureText: { marsh_ghost: { present: '对岸有团影子贴着滩脚走。', absent: '滩脚只有芦苇被风吹动。' } },
     emptyText: '老渡工把刨好的桨平码在石头上。今日岸边没有游影。' },
+  { id: 'bank_watch', region: 'marsh', name: '矮石堤', after: ['mud_track', 'old_fire'],
+    creatures: { bank_runner: { start: 1, cap: 1, interval: 0, growth: 0 } },
+    emptyText: '拦滩客已经让路，矮石堤上只剩被踩松的石块。' },
   { id: 'drowned_mast', region: 'marsh', name: '沉桅高埂', after: ['mud_track', 'sunk_pack'],
     creatures: { mast_beast: { start: 1, cap: 1, interval: 0, growth: 0 } },
     creatureText: { mast_beast: { present: '桅下有头会行真气的水兽，齿间卡着半枚旧渡钱。', absent: '桅根上还挂着断下的水草，再没有伏兽。' } },
@@ -613,18 +627,18 @@ const sites = [
 ];
 
 const events = [
-  { id: 'reed_banks', name: '倒伏的白苇', text: '风把苇叶压向水面。浅处能看见垫脚的石头，里头的白苇长得更密。', choices: [
-    { label: '挖浅处的苇芯', days: 1, coins: 0, hp: 0, qi: 0, insight: 2, loot: { reed: 2 }, enemy: null, outcome: '踩着石头挖了几株白苇。' },
-    { label: '蹚过去挖深处的苇芯', days: 1, coins: 0, hp: -4, qi: 0, insight: 3, loot: { reed: 3 }, enemy: null, outcome: '深水里的苇根连成一团，最后整丛拔了出来。', injury: '拔脚时，泥里一片碎蚌壳划破了小腿。' },
+  { id: 'reed_banks', name: '浅水苇丛', text: '石头边长着白苇，伸手就够得着。', choices: [
+    { label: '挖浅处的苇芯', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 2, loot: { reed: 2 }, enemy: null, outcome: '你挖出几根白苇芯。' },
+    { label: '蹚过去挖密处的苇芯', desc: '前头的苇丛长得更密。', days: 0.5, coins: 0, hp: -4, qi: 0, insight: 3, loot: { reed: 3 }, enemy: null, outcome: '你拔起一整丛白苇。', injury: '拔脚时，泥里一片碎蚌壳划破了小腿。' },
   ] },
   { id: 'sunk_pack', name: '烂木桩浅汊', text: '木桩旁卡着个竹篓。水一涨，背带便往桩上缠紧。篓口还扣着。', choices: [
     { label: '把药篓拉上岸', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 1, loot: { lost_basket: 1 }, enemy: null, outcome: '你踩住背带，把整个篓子拖上岸。扣结还紧着，先照原样带走也行。' },
     { label: '沿岸看看搁浅的水路', days: 0.125, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '桩内侧有一排老石头，踩着它们就能走回浅滩。' },
   ] },
   { id: 'mud_track', name: '碎石水眼', text: '浅滩在这里分成两股，一股绕过水眼，一股贴着铺了碎石的干埂。', choices: [
-    { label: '上石滩迎战', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'mud_beast', outcome: '硬鳞破水，泥鳞兽扑上了石滩。' },
+    { label: '去石滩猎泥鳞兽', desc: '泥蜕可以做护具。', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'mud_beast', outcome: '硬鳞破水，泥鳞兽扑上了石滩。' },
     { label: '沿干地绕行，拾漂到埂上的松枝', days: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 2 }, enemy: null, outcome: '你从干埂绕过水眼，拾走晒透的松枝。' },
-    { label: '沿小足印过去', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', outcome: '一尾蓬松的苇狐挡在干埂上。' },
+    { label: '循足印找粮包', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', outcome: '粮包卡在苇梗上，一只苇尾狐龇着牙守在旁边。' },
   ] },
   { id: 'old_fire', name: '干透的柴窝', revisit: true, text: '半截石渠挡了雨，里面还有旧日烤苇火留下的黑灰。渠底铺着几片手掌大的破瓦。', choices: [
     { label: '添柴歇脚', need: { wood: 1 }, consume: true, days: 0.5, coins: 0, hp: 6, qi: 4, insight: 0, loot: {}, enemy: null, outcome: '火把石壁烘热，湿鞋上慢慢蒸出白气。' },
@@ -632,9 +646,14 @@ const events = [
     { label: '掀开渠底的破瓦', days: 0, coins: 0, hp: 0, qi: 0, insight: 1, loot: { kiln_shard: 1 }, enemy: null, outcome: '一片瓦背面刻着反字。用手擦去灰黑，才辨出「两叩一停」。' },
     { label: '把瓦片和刻样架到炉火前', hidden: true, need: { kiln_shard: 1, bell_clapper: 1, backwash_mark: 1, backwash_theory: 1 }, days: 1, coins: 0, hp: 0, qi: 0, insight: 3, loot: { secret_pass: 1 }, enemy: null, outcome: '火一低，铃舌的影子便与两条断纹接上了。渠外灯影逆水而去，那里有条窄路。' },
   ] },
-  { id: 'reed_ferryman', name: '修桨的人', text: '一名老渡工坐在水边削桨。他知道哪里能抄近路，也知道哪条路表面平整却会陷脚。', choices: [
-    { label: '给渡工搭把手', days: 1, coins: 6, hp: 0, qi: 0, insight: 3, loot: { ration: 1, ridge_rubbing: 1, oar_mark: 1 }, enemy: null, outcome: '老渡工刨平桨柄，抹去旧桨背面的泥，让你看几处船桩。「往里走有座旧钟。找路的话，这一张你拿着。」' },
+  { id: 'reed_ferryman', name: '修桨的人', text: '老渡工把裂桨架在石头上。「两份苇芯、一根松枝，补桨用。我拿一张进山的路图跟你换。」', choices: [
+    { label: '把补桨的料递给渡工', need: { reed: 2, wood: 1 }, consume: true, days: 0.25, coins: 0, hp: 0, qi: 0, insight: 3, loot: { ration: 1, ridge_rubbing: 1, oar_mark: 1 }, enemy: null, outcome: '渡工收了料，从斗笠夹层里取出沉钟岭的路图，又指给你看桨背上的靠岸记号。' },
     { label: '替他赶走巡岸的水鬼', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'marsh_ghost', outcome: '水鬼横在岸边，抱住两臂等人上前。' },
+    { label: '帮他把旧桨翻过来', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 1, loot: { oar_mark: 1 }, enemy: null, outcome: '渡工擦掉桨背的泥，指给你看他画下的三处靠岸位置。' },
+  ] },
+  { id: 'bank_watch', name: '矮石堤', text: '有人靠在堤上歇脚，腰间别着一张折图。你问进山怎么走，他把手搭上木杖。「想借图？跟我过两招。」', choices: [
+    { label: '跟拦滩客过招', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'bank_runner', outcome: '拦滩客把图塞回腰间，横着木杖站稳。' },
+    { label: '下堤另找渡工', days: 0, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '你从较低的石阶下了堤。' },
   ] },
   { id: 'drowned_mast', name: '苇海沉桅', text: '乱苇朝一根断桅倒去。高埂很窄，只容一人站稳。', choices: [
     { label: '到桅边夺渡钱', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'mast_beast', outcome: '你刚踩上桅杆，它便张开头侧两道水鳍。' },
@@ -704,6 +723,7 @@ const enemies = [
   { id: 'mud_beast', name: '泥鳞兽', tags: ['beast', 'scaled'], tier: 0, hp: 25, atk: 7, def: 2, intents: [{ name: '偏头啃咬', kind: 'attack', mult: 1 }, { name: '伏身猛扑', kind: 'heavy', mult: 1.7 }, { name: '蜷尾守鳞', kind: 'guard', mult: 1.35 }, { name: '掀尾扫腿', kind: 'attack', mult: 1 }], coins: 8, insight: 3, loot: { hide: 2, ration: 1 }, desc: '伏身后会扑向脚下，硬鳞收拢时适合恢复真气或蓄势。' },
   { id: 'reed_fox', name: '苇尾狐', tags: ['beast', 'furred'], tier: 0, hp: 24, atk: 6, def: 1, intents: [{ name: '斜掠扑咬', kind: 'attack', mult: 1 }, { name: '团尾护腹', kind: 'guard', mult: 1.4 }, { name: '伏脊跳扑', kind: 'heavy', mult: 1.5 }], coins: 4, insight: 2, loot: { wood: 1, ration: 1 }, desc: '尾上的厚毛扫起了枯苇。它会先绕着干埂寻找扑咬的空当。' },
   { id: 'marsh_ghost', name: '巡岸水鬼', tags: ['spirit'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '抱臂裹雾', kind: 'guard', mult: 1.4 }, { name: '伸指拖拽', kind: 'attack', mult: 1 }, { name: '借雾扑面', kind: 'heavy', mult: 1.6 }], coins: 10, insight: 4, loot: { reed: 2, reed_talisman: 1 }, desc: '开场先抱臂结雾，准备好再把它拖出水边。' },
+  { id: 'bank_runner', name: '拦滩客', tags: ['human'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '用杖头试探', kind: 'attack', mult: 1 }, { name: '抡杖砸下', kind: 'heavy', mult: 1.5 }, { name: '横杖护身', kind: 'guard', mult: 1.3 }], coins: 6, insight: 3, loot: { ridge_rubbing: 1 }, desc: '这人走惯了滩北的山道，腰间那张正是进山的路图。见他抡起木杖，可以先架住重招。' },
   { id: 'mast_beast', name: '沉桅虺', tags: ['beast', 'scaled'], tier: 1, hp: 34, atk: 10, def: 3, intents: [{ name: '借桅缠身', kind: 'attack', mult: 1 }, { name: '开鳍扑水', kind: 'heavy', mult: 1.65 }, { name: '绕桅遮身', kind: 'guard', mult: 1.2 }, { name: '甩尾扫水', kind: 'attack', mult: 1 }], coins: 19, insight: 5, loot: { path_charm: 1, reed: 2 }, desc: '筑基境的伏水兽。带上破招术和撤退用的符，可留一条回路。' },
   { id: 'ore_wight', name: '持锤矿煞', tags: ['spirit'], tier: 1, hp: 40, atk: 12, def: 4, intents: [{ name: '平锤试探', kind: 'attack', mult: 1 }, { name: '举锤砸顶', kind: 'heavy', mult: 1.72 }, { name: '横锤护臂', kind: 'guard', mult: 1.45 }, { name: '甩锤碰撞', kind: 'attack', mult: 1.1 }], coins: 14, insight: 5, loot: { core: 1, ore: 2 }, desc: '它击打沉重且规律。越阶挑战时先做好撑过重锤的准备。' },
   { id: 'stone_badger', name: '石甲獾', tags: ['beast', 'furred'], tier: 1, hp: 43, atk: 11, def: 6, intents: [{ name: '缩头挡路', kind: 'guard', mult: 1.38 }, { name: '沿坡顶撞', kind: 'attack', mult: 1 }, { name: '转身重掀', kind: 'heavy', mult: 1.62 }], coins: 15, insight: 5, loot: { hide: 2, ore: 1, salve: 1 }, desc: '皮毛粗厚，脊甲又硬。找它转身露侧肋时出手。' },
@@ -714,19 +734,20 @@ const enemies = [
 ];
 
 const quests = [
-  { id: 'patch_ferry', name: '把旧灯支起来', desc: '村人请你带松枝，把渡口那盏灯支稳。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, requiresKnownMaterials: false, outcome: '村人往灯座下垫进松枝，松开手，灯没再倒。' },
+  { id: 'patch_ferry', name: '把旧灯支起来', desc: '村人请你带松枝，把渡口那盏灯支稳。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, outcome: '村人往灯座下垫进松枝，松开手，灯没再倒。' },
   { id: 'lost_basket_return', name: '把药篓还给药僮', desc: '药僮一看见篓把上的青绳就站起来了。「是我在浅汊落下的，药没散吧？」', need: { lost_basket: 1 }, reward: { salve: 1, ration: 2 }, coins: 8, insight: 2, outcome: '药僮接过药篓，把背带挪回篓口。「扣还紧着，药都在。多谢你原样捞回来。」他分了一包松脂膏给你。' },
-  { id: 'reed_salve', name: '给药僮送苇芯', desc: '药僮掀开锅盖。「膏药还差苇芯。要是碰见白苇，替我挖些回来。」', need: { reed: 1 }, reward: { ration: 2, reed_talisman: 1, ridge_rubbing: 1, oar_mark: 1, reed_lines: 1 }, coins: 10, insight: 2, outcome: '药僮把苇芯下了锅。「涨水时别认浮沫，看石背的回水。」他把水线图和渡工留下的东西递给你。' },
+  { id: 'reed_salve', name: '拿苇芯换伤药', desc: '药僮朝药锅一指。「给我一份苇芯，换一包伤药。」', need: { reed: 1 }, reward: { salve: 1 }, coins: 4, insight: 2, outcome: '药僮收下苇芯，包好一份松脂膏。「擦在伤口上就行。」' },
+  { id: 'apprentice_waterline', name: '问药僮怎么看水线', afterQuest: 'reed_salve', reveal: { item: 'oar_mark' }, desc: '「这不是渡工画的靠岸图吗？再给我一份苇芯，我把采药用的水线图找给你。」', need: { reed: 1 }, reward: { reed_lines: 1 }, coins: 0, insight: 2, outcome: '药僮把两张图并排放在锅台上。「涨水时别认浮沫，看石背的回水。」他把水线图递给你。' },
   { id: 'coat_mend', name: '补蓑衣的里衬', desc: '渡工捏着蓑衣上的破洞，想换一块整泥蜕。', need: { hide: 1 }, reward: { salve: 2, ration: 1 }, coins: 10, insight: 2, outcome: '渡工把泥蜕比在裂口上，拣了两包自己用惯的止血膏给你。' },
-  { id: 'sell_forging', name: '先打一截闸栓', tier: 1, reveal: { item: 'ridge_rubbing' }, desc: '老匠人想试试寒铁能不能打闸栓，请你带些矿样。', need: { ore: 1 }, reward: { iron_talisman: 1, ration: 3, ford_chart: 1 }, coins: 17, insight: 3, outcome: '老匠人把寒铁放进火里，顺手从抽屉拿出一张折坏的水图。「旧渡要换闸栓，就得从这头走。」' },
-  { id: 'last_lantern', name: '把旧渡的印带回来', tier: 2, reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。村老请你带回镇渡印。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6, outcome: '村老接过镇渡印，在闸书上压稳，带人去开旧闸。' },
+  { id: 'sell_forging', name: '拿寒铁换旧渡水图', reveal: { item: 'ridge_rubbing' }, desc: '老匠人从抽屉里抽出一张折旧的水图。「给我一块寒铁试打闸栓，这图你拿去。」', need: { ore: 1 }, reward: { iron_talisman: 1, ration: 3, ford_chart: 1 }, coins: 17, insight: 3, outcome: '老匠人掂了掂寒铁，把通往闭潮渡的水图交给你。' },
+  { id: 'last_lantern', name: '把旧渡的印带回来', reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。村老请你带回镇渡印。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6, outcome: '村老接过镇渡印，在闸书上压稳，带人去开旧闸。' },
 ];
 
 const services = [
   { id: 'quests', name: '委托', items: ['reed', 'lost_basket'], choices: ['reed_ferryman:0'] },
   { id: 'market', name: '坊市', choices: ['old_fire:1', 'reed_ferryman:0'] },
   { id: 'workshop', name: '工坊', items: ['hide'], choices: ['old_fire:0', 'old_fire:1', 'mud_track:1'] },
-  { id: 'cultivate', name: '修行', items: ['reed_lines'], choices: ['drowned_mast:1', 'reed_ferryman:0'] },
+  { id: 'cultivate', name: '修行', items: ['ridge_rubbing', 'reed_lines'], choices: ['drowned_mast:1'] },
 ];
 
 const deductions = [
@@ -757,7 +778,7 @@ const deductions = [
     miss: '按这个时点落掌，石屑在你沉掌前后便已落开。查查石面真正应声的是哪一拍。',
   },
   {
-    id: 'trace_backwash', name: '旧物为何都刻反了', tier: 2, reveal: { item: 'backwash_mark' },
+    id: 'trace_backwash', name: '旧物为何都刻反了', tier: 0, reveal: { item: 'backwash_mark' },
     desc: '反字、绳结和倒潮刻样都能标方向，放在一处时却对不上。把它们摆进同一段水路里。',
     evidence: { kiln_shard: 1, bell_clapper: 1, backwash_mark: 1 },
     hypotheses: [
@@ -772,10 +793,11 @@ const deductions = [
 ];
 
 const starting = {
-  inventory: { ration: 10 },
+  inventory: { ration: 3 },
   gear: { weapon: 'cudgel', armor: 'straw_cape', charm: null },
   arts: [],
   coins: 20,
+  satiety: 68,
 };
 const basket = {
   item: 'lost_basket',
@@ -1050,6 +1072,7 @@ function knowsMaterials(state, need) {
 function knowsQuest(state, quest) {
   if (state.completedQuests.includes(quest.id)) return true;
   if (quest.id === 'lost_basket_return' && state.basketDisposition === 'unpacked') return false;
+  if (quest.afterQuest && !state.completedQuests.includes(quest.afterQuest)) return false;
   if ((quest.tier ?? 0) > state.realm) return false;
   if (quest.id === victoryQuestId() && !state.discovered.includes('ford') && !state.knownItems.includes('seal')) return false;
   if (quest.need?.ore && !state.discovered.includes('ridge')) return false;
@@ -1083,7 +1106,8 @@ function createGame() {
     realm: 0,
     region: hub,
     hp: 0,
-    satiety: rules.maxSatiety,
+    satiety: clamp(settings.satiety ?? rules.maxSatiety, 0, rules.maxSatiety),
+    didEat: false,
     qi: 0,
     coins: settings.coins ?? 10,
     insight: settings.insight ?? 0,
@@ -1143,10 +1167,21 @@ function hasChoiceNeeds(state, choice) {
   return Object.keys(missingItems(state, choice.need)).length === 0;
 }
 
+function hasSeenAnyChoice(state, choices) {
+  return Boolean(choices?.some((id) => state.seenChoices.includes(id)));
+}
+
 function knowsSite(state, site) {
   const visited = state.eventsSeen[site.region] ?? [];
-  return visited.includes(site.id) || !site.after?.length && !site.reveal ||
-    Boolean(site.after?.some((id) => visited.includes(id))) || Boolean(site.reveal && isRevealed(state, site.reveal));
+  const startsVisible = !site.after?.length && !site.afterChoices?.length && !site.reveal;
+  return startsVisible || visited.includes(site.id) ||
+    Boolean(site.after?.some((id) => visited.includes(id))) || hasSeenAnyChoice(state, site.afterChoices) ||
+    Boolean(site.reveal && isRevealed(state, site.reveal));
+}
+
+function knowsSiteChoice(state, site, index) {
+  const previous = site?.afterChoicesByChoice?.[index];
+  return !previous?.length || hasSeenAnyChoice(state, previous);
 }
 
 function poolAt(state, site, kind, id) {
@@ -1203,7 +1238,8 @@ function revisitableEvents(state) {
   if (atHome(state) || state.event || state.combat) return [];
   return (state.eventsSeen[state.region] ?? []).map((id) => records.events[id]).filter((event) =>
     event.revisit && event.choices.some((choice, index) =>
-      choice.hidden && hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`)));
+      choice.hidden && knowsSiteChoice(state, records.sites[event.id], index) &&
+      hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`)));
 }
 
 function view(state) {
@@ -1219,7 +1255,8 @@ function view(state) {
     const lockedReason = choiceBlocker(state, choice, currentSite, index);
     const { label, desc, hidden } = choice;
     return { label, desc, hidden, index, available: !lockedReason, lockedReason };
-  }).filter(({ hidden, index }) => !completedSiteChoice(state, currentSite, index) &&
+  }).filter(({ hidden, index }) => knowsSiteChoice(state, currentSite, index) &&
+    !completedSiteChoice(state, currentSite, index) &&
     (!hidden || hasChoiceNeeds(state, currentEvent.choices[index])));
   return {
     ...state,
@@ -1270,7 +1307,6 @@ function travel(state, id) {
   if (!destination) return refuse('找不到这条路。');
   if (!state.discovered.includes(id)) return refuse('你还没有找到那条路。');
   if (state.region === id) return refuse('你已经在这里。');
-  if (destination.tier > state.realm) return refuse(`前往${destination.name}需要${records.realms[destination.tier].name}。`);
   if (id !== hub && state.satiety === 0) return refuse('腹中空空，先吃些干粮。');
   const route = id === hub ? regionOf(state) : destination;
   const hungryReturn = id === hub && state.satiety === 0;
@@ -1351,7 +1387,8 @@ function choose(state, index) {
   const event = records.events[state.event];
   const site = records.sites[event.id];
   const choice = event.choices[index];
-  if (!Number.isInteger(index) || !choice || (choice.hidden && !hasChoiceNeeds(state, choice))) {
+  if (!Number.isInteger(index) || !choice || !knowsSiteChoice(state, site, index) ||
+      (choice.hidden && !hasChoiceNeeds(state, choice))) {
     return refuse('请选择眼前能做的事。');
   }
   const blocker = choiceBlocker(state, choice, site, index);
@@ -1546,6 +1583,7 @@ function eat(state, inCombat) {
   if (!owns(state, supply)) return refuse('没有可吃的口粮。');
   if (state.satiety >= rules.maxSatiety && state.hp >= stats(state).maxHp) return refuse('你还很饱，气血也足。');
   removeItem(state, supply, 1);
+  state.didEat = true;
   const before = state.hp;
   const initialSatiety = state.satiety;
   state.satiety = Math.min(rules.maxSatiety, state.satiety + rules.rationSatiety);
@@ -1596,7 +1634,8 @@ function use(state, id, inCombat) {
     const toxic = state.toxin >= rules.toxinThreshold;
     const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
     state.hp -= toxinDamage;
-    const message = `你服下${nameOf(id)}。${toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : ''}`;
+    const applied = id === 'salve' ? '你把松脂膏敷在伤口上。' : `你服下${nameOf(id)}。`;
+    const message = applied + (toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : '');
     const result = inCombat ? combatTurn(state, { message }) : say(state, message);
     return {
       ...result,
@@ -1844,7 +1883,6 @@ function deduce(state, { id, evidence, hypothesis }) {
   state.insight += deduction.insight ?? 0;
   const { spilled } = addItems(state, deduction.reward);
   const result = say(state, deduction.success);
-  refreshDiscovery(state);
   return { ...result, deduction: 'solved', spilled };
 }
 
@@ -1905,20 +1943,12 @@ function takeTurn(state, action, payload) {
     return say(state, '旧渡照常开船。你仍可留在村里，或再去寻路。');
   }
   if (state.combat) {
-    if (Object.hasOwn(combatActions, action)) {
-      const result = combatActions[action](state, payload);
-      if (result.ok) refreshDiscovery(state);
-      return result;
-    }
+    if (Object.hasOwn(combatActions, action)) return combatActions[action](state, payload);
     return refuse('先处理眼前的对手。');
   }
   if (state.event) {
     if (action === 'eat') return eat(state, false);
-    if (action === 'choose') {
-      const result = choose(state, payload.index);
-      if (result.ok) refreshDiscovery(state);
-      return result;
-    }
+    if (action === 'choose') return choose(state, payload.index);
     if (action === 'leave') {
       state.event = null;
       return say(state, '你放下这桩事，沿原路退出。');
@@ -1929,9 +1959,7 @@ function takeTurn(state, action, payload) {
     if (!atHome(state)) return refuse('这件事要回村办理。');
     const service = serviceForAction[action];
     if (service && !knowsService(state, service)) return refuse('你还没有找到这个门路。');
-    const result = villageActions[action](state, payload);
-    if (result.ok) refreshDiscovery(state);
-    return result;
+    return villageActions[action](state, payload);
   }
   if (Object.hasOwn(generalActions, action)) return generalActions[action](state, payload);
   return refuse('眼下无法这样做。');
@@ -1941,6 +1969,7 @@ function act(state, action, payload = {}) {
   const unknownServices = data.services.filter(({ id }) => !knowsService(state, id));
   const result = takeTurn(state, action, payload);
   if (!result.ok) return result;
+  refreshDiscovery(state);
   const found = unknownServices.filter(({ id }) => knowsService(state, id)).map(({ name }) => name);
   if (!found.length) return result;
   const notice = `打听到了村里的${found.join('、')}。`;
@@ -1985,7 +2014,7 @@ function showOpening() {
   opening.hidden = false;
   app.inert = true;
   opening.querySelector("[data-skip-opening]").focus({ preventScroll: true });
-  openingTimer = setTimeout(dismissOpening, matchMedia("(prefers-reduced-motion: reduce)").matches ? 1600 : 5200);
+  openingTimer = setTimeout(dismissOpening, matchMedia("(prefers-reduced-motion: reduce)").matches ? 800 : 2800);
 }
 
 function freshGame() {
@@ -2064,31 +2093,38 @@ function inVillage(s) {
 
 function hasApprentice(s) {
   return inVillage(s) && (Boolean(s.inventory.lost_basket) || s.basketDisposition === "returned" ||
-    s.quests.some(quest => quest.id === "reed_salve"));
+    s.quests.some(quest => quest.id === "reed_salve" || quest.id === "apprentice_waterline"));
+}
+
+function vital(label, current, max, low, explanation) {
+  return `<details class="vital${low ? " low" : ""}">
+    <summary>${label} <b>${Math.floor(current)}/${max}</b></summary>
+    <p>${escape(explanation)}</p>
+  </details>`;
 }
 
 function stats(s) {
   const warnings = [];
-  if (s.mode === "combat") {
-    warnings.push(`真气${condition(s.qi, s.maxQi)}`);
-  } else {
-    if (s.qi < s.maxQi / 3) warnings.push("真气将尽");
-  }
+  const showsQi = s.knownArts.length > 0 || s.pressure > rules.pressureThreshold;
   if (s.satiety === 0) warnings.push("空腹乏力");
-  if ((s.inventory.ration ?? 0) < rules.reliefRations) warnings.push("口粮不足");
+  if (!s.inventory.ration && s.satiety < 32) warnings.push("干粮已尽");
   if (s.toxin >= rules.toxinThreshold) warnings.push("丹毒发作");
   const danger = s.pressure > rules.pressureThreshold;
   const marks = Array.from({ length: rules.pressureThreshold }, (_, i) =>
     `<i class="${i < s.pressure ? "filled" : ""}"></i>`).join("");
-  const fog = s.pressure ? `<details class="pressure${danger ? " danger" : ""}">
+  const fog = s.pressure >= rules.pressureThreshold ? `<details class="pressure${danger ? " danger" : ""}">
     <summary>${danger ? "雾压过重" : "雾压"} <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
     <span>雾积满后，再探索会耗真气。回村就会散去。</span>
   </details>` : "";
   const canEat = s.mode !== "victory" && (s.inventory.ration ?? 0) > 0 && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
+  const canUseSalve = s.hp < s.maxHp && s.inventory.salve > 0 && ["village", "field", "combat"].includes(s.mode);
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
-    <span class="vital${s.hp / s.maxHp < 0.3 ? " low" : ""}">气血 <b>${s.hp}/${s.maxHp}</b></span>
-    <span class="vital${s.satiety < 24 ? " low" : ""}">饱腹 <b>${Math.floor(s.satiety)}/${s.maxSatiety}</b></span>
-    ${canEat ? linkButton("吃干粮", "eat", "", "quick-eat") : ""}${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
+    ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。伤药和回村歇息可以恢复。")}
+    ${canUseSalve ? linkButton("敷伤药", "use", "salve", "quick-eat") : ""}
+    ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
+    ${canEat ? linkButton("吃干粮", "eat", "", "quick-eat") : ""}
+    ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "术诀和久留雾中会耗真气。回村歇息可以恢复。") : ""}
+    ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
 function discovered(s, region) {
@@ -2100,11 +2136,10 @@ function discovered(s, region) {
 
 function routeAction(s, r, primary) {
   const homeward = r.id === "village";
-  const locked = r.tier > s.realm.id;
   const hungry = !homeward && s.satiety <= 0;
   const days = homeward ? s.region.travel + (s.satiety <= 0 ? rules.emptyReturnDays : 0) : r.travel;
-  const note = locked ? `需${tierName(r.tier)}` : hungry ? "空腹" : days ? `${days} 日` : "";
-  return `<div class="route-action">${linkButton(homeward ? "回村" : `去${r.name}`, "travel", r.id, primary ? "primary" : "", locked || hungry)}${note ? `<span class="fine">${escape(note)}</span>` : ""}</div>`;
+  const note = hungry ? "空腹" : days ? `${days} 日` : "";
+  return `<div class="route-action">${linkButton(homeward ? "回村" : `去${r.name}`, "travel", r.id, primary ? "primary" : "", hungry)}${note ? `<span class="fine">${escape(note)}</span>` : ""}</div>`;
 }
 
 function siteResources(s, site) {
@@ -2124,19 +2159,31 @@ function siteList(s) {
   }).join("")}</div>`;
 }
 
+function firstUse(s) {
+  const harvested = s.seenChoices.includes("reed_banks:0");
+  if (inVillage(s) && s.day === 1 && !s.didEat && s.inventory.ration) return "走路会消耗饱腹，吃干粮可以补回来。";
+  if (s.region.id !== "marsh" || s.completedQuests.includes("reed_salve")) return "";
+  if (!harvested) return "白苇芯可以带回村换伤药。";
+  if (s.mode === "field" && s.inventory.reed) return "回村找药僮，可以用白苇芯换松脂膏。";
+  return "";
+}
+
 function journey(s) {
   if (s.mode === "event") return eventScreen(s);
   if (s.mode === "combat") return combatScreen(s);
   if (s.mode === "victory") return panel("潮印归灯", `<p class="intro">旧渡重新点起了灯。</p><div class="actions">${linkButton("继续行旅", "resume", "", "primary")}</div>`);
   const known = data.regions.filter(region => region.id !== s.region.id && discovered(s, region));
   const isHome = inVillage(s);
+  const lesson = firstUse(s);
+  const wantsReeds = s.quests.some(quest => quest.id === "reed_salve" && quest.ready && !quest.completed);
+  const apprenticeLabel = !s.inventory.lost_basket && wantsReeds ? "找药僮换伤药" : "找药僮";
   const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.pressure || (s.inventory.ration ?? 0) < rules.reliefRations;
   return panel(s.region.name, `${isHome ? "" : siteList(s)}<div class="actions place-actions">
     ${known.map((r, i) => routeAction(s, r, isHome && i === 0)).join("")}
     ${isHome && needRest ? linkButton("歇息", "rest") : ""}
-    ${hasApprentice(s) ? tabButton("找药僮", "apprentice") : ""}
+    ${hasApprentice(s) ? tabButton(apprenticeLabel, "apprentice") : ""}
     ${!isHome || s.explored.length ? linkButton("等半日", "wait", "", "quiet", !isHome && s.satiety <= 0) : ""}
-  </div>`);
+  </div>${lesson ? `<p class="field-note">${escape(lesson)}</p>` : ""}`);
 }
 
 function eventScreen(s) {
@@ -2147,7 +2194,14 @@ function eventScreen(s) {
     const details = [choice.desc, choice.lockedReason].map(text => publicText(text)).filter(Boolean).join(" ");
     return `<div class="choice">${linkButton(choice.label, "choose", choice.index, "", choice.available === false)}${details ? `<p>${escape(details)}</p>` : ""}</div>`;
   }).join("");
-  return panel(event.name, `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div><p class="intro">${escape(publicText(event.text))}</p>${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}<div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
+  const firstGather = event.id === "reed_banks" && !s.seenChoices.includes("reed_banks:0");
+  const firstHunt = event.id === "mud_track" && s.visibleChoices.some(choice => choice.index === 0 && choice.available) && !s.defeated.includes("mud_beast");
+  const lesson = firstGather ? firstUse(s) : firstHunt ? "泥鳞兽身上的泥蜕能做护具。只想赶路也可以绕行。" : "";
+  return panel(event.name, `${firstGather ? "" : `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>`}
+    <p class="intro">${escape(publicText(event.text))}</p>
+    ${lesson ? `<p class="field-note">${escape(lesson)}</p>` : ""}
+    ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
+    <div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
 }
 
 function pillSummary(row) {
@@ -2167,10 +2221,14 @@ function combatScreen(s) {
   const intent = s.intent;
   const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
-  return panel(enemy.name, `<p class="intro">${escape(publicText(enemy.desc))}</p>
+  const firstTurn = s.combat.round === 0 && !s.defeated.length;
+  const observation = s.defeated.length && enemy.desc ? `<details class="field-note"><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
+  return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
     ${meter("对方气血", hp, enemy.maxHp)}
     <div class="actions">${linkButton("出手", "attack", "", "primary")}${linkButton("防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}</div>
+    ${firstTurn ? '<p class="field-note">先看对方下一招，遇到重招可以防御。</p>' : ""}
+    ${observation}
     ${arts.length ? `<div class="card-grid learned-arts">${arts.map(row => card(row.name, "", "", linkButton(s.qi < row.cost ? "真气不足" : "施展", "art", row.id, "", s.qi < row.cost), row.desc)).join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
 }
@@ -2218,7 +2276,11 @@ function pack(s) {
       actions = (canEquip ? linkButton("装备", "equip", row.id, "", gear.tier > s.realm.id || remaining <= 0) : "") +
         (canRepair && remaining < gear.durability ? linkButton(s.coins < gear.repair ? "灵钱不足" : "修理", "repair", row.id, "quiet", s.coins < gear.repair) : "");
     }
-    if (pill && canUse) actions = linkButton("服用", "use", row.id, "", pill.tier > s.realm.id);
+    if (pill && canUse) {
+      const healthy = row.id === "salve" && s.hp >= s.maxHp;
+      const label = row.id === "salve" ? (healthy ? "气血已满" : "敷伤药") : "服用";
+      actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy);
+    }
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
     if (row.id === "ration" && canEat && (s.satiety < s.maxSatiety || s.hp < s.maxHp)) actions = linkButton("吃干粮", "eat");
     if (row.id === "lost_basket" && canEquip) {
@@ -2318,12 +2380,13 @@ function questBoard(s) {
 function apprentice(s) {
   const delivery = s.quests.find(quest => quest.id === "lost_basket_return");
   const reeds = s.quests.find(quest => quest.id === "reed_salve" && !quest.completed);
+  const waterline = s.quests.find(quest => quest.id === "apprentice_waterline" && !quest.completed);
   const holding = Boolean(s.inventory.lost_basket);
-  const greeting = holding ? "药僮认出了你手里的竹篓。" : "药僮正忙着看火。";
   const basket = holding && delivery ? linkButton("交还药篓", "handin", delivery.id, "primary") : "";
-  const herb = reeds ? `<div class="card"><p>${escape(reeds.desc)}</p><p>需${escape(supplies(reeds.need))}</p>
-    <div class="actions">${linkButton("把苇芯给他", "handin", reeds.id, "", !hasSupply(s, reeds.need))}</div></div>` : "";
-  return panel("药僮", `<p class="intro">${greeting}</p>${basket ? `<div class="actions">${basket}</div>` : ""}${herb}`);
+  const tasks = [[reeds, "用苇芯换松脂膏"], [waterline, "问水线图"]].filter(([quest]) => quest).map(([quest, label]) =>
+    `<div class="card"><p>${escape(quest.desc)}</p><p>需${escape(supplies(quest.need))}</p>
+      <div class="actions">${linkButton(label, "handin", quest.id, "", !hasSupply(s, quest.need))}</div></div>`).join("");
+  return panel("药僮", `${basket ? `<p class="intro">药僮认出了你手里的竹篓。</p><div class="actions">${basket}</div>` : ""}${tasks || (basket ? "" : '<p class="intro">药僮正忙着看火。</p>')}`);
 }
 
 function deductionBoard(s) {
@@ -2419,13 +2482,15 @@ function feedback(before, after, result, action) {
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
   const didRecover = ["choose", "eat", "use", "rest"].includes(action) && after.hp > before.hp && !result.injury;
   const changes = [
-    didRecover && !narrative.includes("气血") && "气血恢复",
+    didRecover && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
     after.qi > before.qi && ["choose", "use", "rest"].includes(action) && !narrative.includes("真气") && "真气恢复",
-    after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && "消耗了真气",
+    after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
     after.satiety > before.satiety && action === "eat" && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
+    action === "travel" && !before.explored && before.region === "village" && after.satiety < before.satiety && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
     after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",
   ].filter(Boolean);
   if (changes.length) lines.push(changes.join("，") + "。");
+  if (!before.inventory.hide && goods.some(item => item.id === "hide")) lines.push("泥蜕可以拿去工坊做护具。");
   const overflow = Object.keys(result.spilled ?? {}).map(id => itemRows[id].name);
   if (overflow.length) lines.push(`行囊装不下，${overflow.join("、")}留在脚边。`);
   for (const id of after.discovered) {
@@ -2437,7 +2502,7 @@ function feedback(before, after, result, action) {
 function performAction(action, payload) {
   const before = {
     inventory: { ...state.inventory }, discovered: [...state.discovered],
-    sites: view(state).sites.map(site => site.id), region: state.region,
+    sites: view(state).sites.map(site => site.id), region: state.region, explored: state.explored.length,
     hp: state.hp, qi: state.qi, satiety: state.satiety, coins: state.coins,
   };
   const result = act(state, action, payload);

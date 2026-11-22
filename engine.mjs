@@ -253,6 +253,7 @@ function knowsMaterials(state, need) {
 function knowsQuest(state, quest) {
   if (state.completedQuests.includes(quest.id)) return true;
   if (quest.id === 'lost_basket_return' && state.basketDisposition === 'unpacked') return false;
+  if (quest.afterQuest && !state.completedQuests.includes(quest.afterQuest)) return false;
   if ((quest.tier ?? 0) > state.realm) return false;
   if (quest.id === victoryQuestId() && !state.discovered.includes('ford') && !state.knownItems.includes('seal')) return false;
   if (quest.need?.ore && !state.discovered.includes('ridge')) return false;
@@ -286,7 +287,8 @@ export function createGame() {
     realm: 0,
     region: hub,
     hp: 0,
-    satiety: rules.maxSatiety,
+    satiety: clamp(settings.satiety ?? rules.maxSatiety, 0, rules.maxSatiety),
+    didEat: false,
     qi: 0,
     coins: settings.coins ?? 10,
     insight: settings.insight ?? 0,
@@ -346,10 +348,21 @@ function hasChoiceNeeds(state, choice) {
   return Object.keys(missingItems(state, choice.need)).length === 0;
 }
 
+function hasSeenAnyChoice(state, choices) {
+  return Boolean(choices?.some((id) => state.seenChoices.includes(id)));
+}
+
 function knowsSite(state, site) {
   const visited = state.eventsSeen[site.region] ?? [];
-  return visited.includes(site.id) || !site.after?.length && !site.reveal ||
-    Boolean(site.after?.some((id) => visited.includes(id))) || Boolean(site.reveal && isRevealed(state, site.reveal));
+  const startsVisible = !site.after?.length && !site.afterChoices?.length && !site.reveal;
+  return startsVisible || visited.includes(site.id) ||
+    Boolean(site.after?.some((id) => visited.includes(id))) || hasSeenAnyChoice(state, site.afterChoices) ||
+    Boolean(site.reveal && isRevealed(state, site.reveal));
+}
+
+function knowsSiteChoice(state, site, index) {
+  const previous = site?.afterChoicesByChoice?.[index];
+  return !previous?.length || hasSeenAnyChoice(state, previous);
 }
 
 function poolAt(state, site, kind, id) {
@@ -406,7 +419,8 @@ function revisitableEvents(state) {
   if (atHome(state) || state.event || state.combat) return [];
   return (state.eventsSeen[state.region] ?? []).map((id) => records.events[id]).filter((event) =>
     event.revisit && event.choices.some((choice, index) =>
-      choice.hidden && hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`)));
+      choice.hidden && knowsSiteChoice(state, records.sites[event.id], index) &&
+      hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`)));
 }
 
 export function view(state) {
@@ -422,7 +436,8 @@ export function view(state) {
     const lockedReason = choiceBlocker(state, choice, currentSite, index);
     const { label, desc, hidden } = choice;
     return { label, desc, hidden, index, available: !lockedReason, lockedReason };
-  }).filter(({ hidden, index }) => !completedSiteChoice(state, currentSite, index) &&
+  }).filter(({ hidden, index }) => knowsSiteChoice(state, currentSite, index) &&
+    !completedSiteChoice(state, currentSite, index) &&
     (!hidden || hasChoiceNeeds(state, currentEvent.choices[index])));
   return {
     ...state,
@@ -473,7 +488,6 @@ function travel(state, id) {
   if (!destination) return refuse('找不到这条路。');
   if (!state.discovered.includes(id)) return refuse('你还没有找到那条路。');
   if (state.region === id) return refuse('你已经在这里。');
-  if (destination.tier > state.realm) return refuse(`前往${destination.name}需要${records.realms[destination.tier].name}。`);
   if (id !== hub && state.satiety === 0) return refuse('腹中空空，先吃些干粮。');
   const route = id === hub ? regionOf(state) : destination;
   const hungryReturn = id === hub && state.satiety === 0;
@@ -554,7 +568,8 @@ function choose(state, index) {
   const event = records.events[state.event];
   const site = records.sites[event.id];
   const choice = event.choices[index];
-  if (!Number.isInteger(index) || !choice || (choice.hidden && !hasChoiceNeeds(state, choice))) {
+  if (!Number.isInteger(index) || !choice || !knowsSiteChoice(state, site, index) ||
+      (choice.hidden && !hasChoiceNeeds(state, choice))) {
     return refuse('请选择眼前能做的事。');
   }
   const blocker = choiceBlocker(state, choice, site, index);
@@ -749,6 +764,7 @@ function eat(state, inCombat) {
   if (!owns(state, supply)) return refuse('没有可吃的口粮。');
   if (state.satiety >= rules.maxSatiety && state.hp >= stats(state).maxHp) return refuse('你还很饱，气血也足。');
   removeItem(state, supply, 1);
+  state.didEat = true;
   const before = state.hp;
   const initialSatiety = state.satiety;
   state.satiety = Math.min(rules.maxSatiety, state.satiety + rules.rationSatiety);
@@ -799,7 +815,8 @@ function use(state, id, inCombat) {
     const toxic = state.toxin >= rules.toxinThreshold;
     const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
     state.hp -= toxinDamage;
-    const message = `你服下${nameOf(id)}。${toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : ''}`;
+    const applied = id === 'salve' ? '你把松脂膏敷在伤口上。' : `你服下${nameOf(id)}。`;
+    const message = applied + (toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : '');
     const result = inCombat ? combatTurn(state, { message }) : say(state, message);
     return {
       ...result,
@@ -1047,7 +1064,6 @@ function deduce(state, { id, evidence, hypothesis }) {
   state.insight += deduction.insight ?? 0;
   const { spilled } = addItems(state, deduction.reward);
   const result = say(state, deduction.success);
-  refreshDiscovery(state);
   return { ...result, deduction: 'solved', spilled };
 }
 
@@ -1108,20 +1124,12 @@ function takeTurn(state, action, payload) {
     return say(state, '旧渡照常开船。你仍可留在村里，或再去寻路。');
   }
   if (state.combat) {
-    if (Object.hasOwn(combatActions, action)) {
-      const result = combatActions[action](state, payload);
-      if (result.ok) refreshDiscovery(state);
-      return result;
-    }
+    if (Object.hasOwn(combatActions, action)) return combatActions[action](state, payload);
     return refuse('先处理眼前的对手。');
   }
   if (state.event) {
     if (action === 'eat') return eat(state, false);
-    if (action === 'choose') {
-      const result = choose(state, payload.index);
-      if (result.ok) refreshDiscovery(state);
-      return result;
-    }
+    if (action === 'choose') return choose(state, payload.index);
     if (action === 'leave') {
       state.event = null;
       return say(state, '你放下这桩事，沿原路退出。');
@@ -1132,9 +1140,7 @@ function takeTurn(state, action, payload) {
     if (!atHome(state)) return refuse('这件事要回村办理。');
     const service = serviceForAction[action];
     if (service && !knowsService(state, service)) return refuse('你还没有找到这个门路。');
-    const result = villageActions[action](state, payload);
-    if (result.ok) refreshDiscovery(state);
-    return result;
+    return villageActions[action](state, payload);
   }
   if (Object.hasOwn(generalActions, action)) return generalActions[action](state, payload);
   return refuse('眼下无法这样做。');
@@ -1144,6 +1150,7 @@ export function act(state, action, payload = {}) {
   const unknownServices = data.services.filter(({ id }) => !knowsService(state, id));
   const result = takeTurn(state, action, payload);
   if (!result.ok) return result;
+  refreshDiscovery(state);
   const found = unknownServices.filter(({ id }) => knowsService(state, id)).map(({ name }) => name);
   if (!found.length) return result;
   const notice = `打听到了村里的${found.join('、')}。`;
