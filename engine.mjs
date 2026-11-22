@@ -1,5 +1,6 @@
 import * as moduleData from './data.mjs';
 import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo } from './economy.mjs';
+import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
 
 const data = { ...moduleData.default, ...moduleData };
 
@@ -36,7 +37,8 @@ export const rules = Object.freeze({
   emptyAttackMultiplier: 0.75,
   unpackBasketDays: 0.25,
   guardBonus: 3,
-  guardCounter: 2,
+  heavyGuardBonus: 4,
+  guardCounter: 3,
   enemyGuardBonus: 2,
   minAttackDamage: 1,
   durabilityLoss: 1,
@@ -274,7 +276,9 @@ function knowsQuest(state, quest) {
 
 function knowsRecipe(state, recipe) {
   return recipe.tier <= state.realm && (!recipe.requiresShownHide || state.showedHideToSmith) &&
-    isRevealed(state, recipe.reveal) && knowsMaterials(state, recipe.need);
+    isRevealed(state, recipe.reveal) && (recipe.formula
+      ? state.knownItems.includes(recipe.formula)
+      : knowsMaterials(state, recipe.need));
 }
 
 function knowsItem(state, item) {
@@ -293,7 +297,7 @@ function knowsDeduction(state, entry) {
   return (entry.tier ?? 0) <= state.realm && isRevealed(state, entry.reveal);
 }
 
-export function createGame() {
+export function createGame(lootSeed = Math.floor(Math.random() * 0x100000000)) {
   const settings = data.starting ?? {};
   const state = {
     day: 1,
@@ -318,6 +322,7 @@ export function createGame() {
       .slice(0, 1).map((entry) => entry.id))],
     completedQuests: [],
     economy: initialEconomyState(),
+    alchemy: initialAlchemyState(),
     completedDeductions: [],
     deductionThoughts: {},
     explored: [],
@@ -329,6 +334,7 @@ export function createGame() {
     basketDisposition: null,
     showedHideToSmith: false,
     defeated: [],
+    lootSeed: lootSeed >>> 0,
     studies: {},
     practice: {},
     practicedOn: {},
@@ -506,8 +512,9 @@ export function view(state) {
     discoveredItems: data.items.filter((item) => knowsItem(state, item)).map(({ id }) => id),
     market: marketView(state),
     economy: economyView(state, economyKit),
+    alchemy: alchemyView(state, economyKit),
     homeMaterials: atHome(state) ? Object.fromEntries(data.items.map(({ id }) => [id, homeSupplies(state, id)]).filter(([, count]) => count > 0)) : {},
-    evidence: data.items.filter((item) => isEvidence(item) && owns(state, item.id) > 0)
+    evidence: data.items.filter((item) => item.id !== 'foundation_pill' && isEvidence(item) && owns(state, item.id) > 0)
       .map(({ id, name, desc }) => ({ id, name, desc, count: owns(state, id) })),
     deductions: (data.deductions ?? []).filter((entry) => knowsDeduction(state, entry)).map((entry) => {
       const { id, name, desc } = entry;
@@ -690,7 +697,13 @@ function finishCombat(state, enemy) {
   state.insight += insight;
   recordPractice(state);
   state.coins += enemy.coins ?? 0;
-  const { accepted, spilled } = addItems(state, enemy.loot, true);
+  const lootTable = { ...enemy.loot };
+  const drop = enemy.weaponDrop;
+  if (drop && !gearReserved(state, drop.id) && !groundAt(state)[drop.id]) {
+    state.lootSeed = (Math.imul(state.lootSeed, 1664525) + 1013904223) >>> 0;
+    if (state.lootSeed / 0x100000000 < drop.chance) lootTable[drop.id] = 1;
+  }
+  const { accepted, spilled } = addItems(state, lootTable, true);
   const loot = goodsText(accepted);
   return {
     message: `击退${enemy.name}。${loot ? `获得${loot}。` : ''}${enemy.coins ? `灵钱+${enemy.coins}。` : ''}${insight ? `见识+${insight}。` : ''}`,
@@ -901,6 +914,7 @@ function unpackBasket(state) {
 function use(state, id, inCombat) {
   if (id === supply) return eat(state, inCombat);
   if (!owns(state, id)) return refuse('行囊里没有这件物品。');
+  if (id === 'foundation_pill') return refuse('筑基丹要在闭关突破时服下。');
   const pill = records.pills[id];
   const talisman = records.talismans[id];
   const entry = pill ?? talisman;
@@ -975,7 +989,7 @@ function takeFromGround(state, id, count = groundAt(state)[id]) {
   const ground = groundAt(state);
   if (!records.items[id] || !Number.isInteger(count) || count < 1 || count > (ground[id] ?? 0)) return refuse('这里没有这么多东西可捡。');
   const gear = records.gear[id];
-  if (gear && owns(state, id)) return refuse('已经有同样的装备了。');
+  if (gear && gearReserved(state, id)) return refuse('同名装备已在手上、仓里或锻炉里。');
   const { accepted } = fittingItems(state, { [id]: count });
   const taken = accepted[id] ?? 0;
   if (!taken) return refuse('行囊已满。');
@@ -1074,8 +1088,8 @@ function hasRoom(state, loot, spent) {
   return !Object.keys(fittingItems(state, loot, spent).spilled).length;
 }
 
-function homeGearReserved(state, id) {
-  return homeSupplies(state, id) || state.economy.jobs.some(({ loot }) => loot[id]);
+function gearReserved(state, id) {
+  return owns(state, id) || state.economy.warehouse[id] || state.economy.jobs.some(({ loot }) => loot[id]);
 }
 
 function breakthroughBlockers(state, next) {
@@ -1117,7 +1131,7 @@ function craft(state, id) {
   if (recipe.facility) return refuse('这道工序需要在相应设施里开工。');
   if (recipe.tier > state.realm) return refuse('这一手做法需要更高境界。');
   if (!knowsRecipe(state, recipe)) return refuse('你还没找到这个做法。');
-  if (records.gear[recipe.result] && homeGearReserved(state, recipe.result)) return refuse('同名装备已在手上、仓里或锻炉里。');
+  if (records.gear[recipe.result] && gearReserved(state, recipe.result)) return refuse('同名装备已在手上、仓里或锻炉里。');
   const missing = homeRequirements(state, recipe.cost, recipe.need);
   if (missing) return refuse(missing);
   const loot = { [recipe.result]: recipe.count ?? 1 };
@@ -1129,10 +1143,10 @@ function craft(state, id) {
 }
 
 function showHideToSmith(state) {
-  if (!owns(state, 'hide')) return refuse('手里没有泥蜕。');
-  if (state.showedHideToSmith) return refuse('工匠已经看过泥蜕。');
+  if (!owns(state, 'hide')) return refuse('手里没有兽革。');
+  if (state.showedHideToSmith) return refuse('工匠已经看过兽革。');
   state.showedHideToSmith = true;
-  return say(state, '工匠拎起泥蜕，顺着纹路拽了拽。「两片就够衬一件褂子。下回让那水兽咬在这上头。」');
+  return say(state, '工匠拎起兽革，顺着纹路拽了拽。「两片就够衬一件褂子。下回让那水兽咬在这上头。」');
 }
 
 function stockedOffers(state, offers) {
@@ -1145,7 +1159,7 @@ function purchaseBlocker(state, item, count, stock) {
   const gear = records.gear[item.id];
   const object = gear ?? records.pills[item.id] ?? records.talismans[item.id];
   if (object && object.tier > state.realm) return `需${records.realms[object.tier].name}境方可购入。`;
-  if (gear && (homeGearReserved(state, item.id) || count !== 1)) return '同种装备只能持有一件。';
+  if (gear && (gearReserved(state, item.id) || count !== 1)) return '同种装备只能持有一件。';
   if (state.coins < item.price * count) return '灵钱不足。';
   if (!hasRoom(state, { [item.id]: count })) return '行囊已满。';
   return '';
@@ -1337,11 +1351,14 @@ const combatActions = {
   attack,
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   combatEquip: (state, { id }) => equip(state, id, true),
-  guard: (state) => combatTurn(state, {
-    guard: rules.guardBonus,
-    counter: currentIntent(state).kind === 'heavy' ? rules.guardCounter : 0,
-    message: '你收身架守。',
-  }),
+  guard: (state) => {
+    const heavy = currentIntent(state).kind === 'heavy';
+    return combatTurn(state, {
+      guard: rules.guardBonus + (heavy ? rules.heavyGuardBonus : 0),
+      counter: heavy ? rules.guardCounter : 0,
+      message: heavy ? '你架住重招，顺势还手。' : '你收身架守。',
+    });
+  },
   art: (state, { id }) => cast(state, id),
   use: (state, { id }) => use(state, id, true),
   eat: (state) => eat(state, true),
@@ -1376,7 +1393,8 @@ function takeTurn(state, action, payload) {
     return villageActions[action](state, payload);
   }
   if (Object.hasOwn(generalActions, action)) return generalActions[action](state, payload);
-  return economyAction(state, action, payload, economyKit) ?? refuse('眼下无法这样做。');
+  return economyAction(state, action, payload, economyKit) ?? alchemyAction(state, action, payload, economyKit) ??
+    refuse('眼下无法这样做。');
 }
 
 export function act(state, action, payload = {}) {

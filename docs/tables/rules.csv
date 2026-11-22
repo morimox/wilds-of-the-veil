@@ -21,7 +21,8 @@ rationSatiety,32,每份普通干粮恢复的饱腹度
 emptyAttackMultiplier,0.75,空腹交手时对普通与兵刃术诀出伤的倍率
 unpackBasketDays,0.25,拆开药篓所用的游戏天数
 guardBonus,3,主动格挡增加的防御（点）
-guardCounter,2,格挡重招时的反击伤害（点）
+heavyGuardBonus,4,主动格挡遇到重招时再增加的防御（点）
+guardCounter,3,格挡重招时的反击伤害（点）
 enemyGuardBonus,2,敌方防御意图至少增加的防御（点）
 minAttackDamage,1,有攻击伤害的行动经防御结算后的最小伤害（点）
 durabilityLoss,1,每次触发装备磨损扣除的耐久（点）

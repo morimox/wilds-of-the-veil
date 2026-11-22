@@ -217,6 +217,8 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .scene-ridge { background-image: url("./assets/bell-ridge.webp"); }
 .scene-ford { background-image: url("./assets/floodgate.webp"); }
 .scene-hidden { background-image: url("./assets/hidden-wharf.webp"); }
+.alchemy-inquiry { margin: 10px 0; padding: 10px 0; border-block: 1px solid var(--line); }
+.formula-kit > summary { color: var(--jade); cursor: pointer; }
 .workshop-art { height: 64px; background-image: url("./assets/alchemy-bench.webp"); }
 .deduction { display: grid; gap: 9px; }
 .deduction-clues, .trial-thought { color: var(--muted); }

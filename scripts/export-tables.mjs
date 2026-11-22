@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import data from '../data.mjs';
 import { createGame, rules } from '../engine.mjs';
 import { economyData } from '../economy.mjs';
+import { alchemyData } from '../alchemy.mjs';
 
 const output = fileURLToPath(new URL('../docs/tables/', import.meta.url));
 const names = new Map();
@@ -53,6 +54,7 @@ const ruleDescriptions = {
   emptyAttackMultiplier: '空腹交手时对普通与兵刃术诀出伤的倍率',
   unpackBasketDays: '拆开药篓所用的游戏天数',
   guardBonus: '主动格挡增加的防御（点）',
+  heavyGuardBonus: '主动格挡遇到重招时再增加的防御（点）',
   guardCounter: '格挡重招时的反击伤害（点）',
   enemyGuardBonus: '敌方防御意图至少增加的防御（点）',
   minAttackDamage: '有攻击伤害的行动经防御结算后的最小伤害（点）',
@@ -199,17 +201,54 @@ const merchantOrders = Object.entries(economyData.merchantOrders).flatMap(([good
 ]);
 const facilityNames = new Map(economyData.facilities.map(({ id, name: label }) => [id, label]));
 const facilityRef = (id) => `${facilityNames.get(id) ?? id}（${id}）`;
-const facilityLevels = economyData.facilities.flatMap(({ id, name, start, desc, reveal, upgrades }) =>
+const facilityLevels = economyData.facilities.flatMap(({ id, name, start, desc, reveal, alternateReveal, upgrades }) =>
   [{ id, name, level: start, desc }, ...upgrades.map((upgrade, index) => ({ id, name, desc, level: start + index + 1, ...upgrade }))]
     .map((row) => ({
       ...row,
       slots: id === 'warehouse' ? economyData.warehouseCap[row.level] : row.level,
       stack: id === 'warehouse' ? economyData.warehouseStack : undefined,
       reveal,
+      alternateReveal,
     })));
-const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', bow: '弓', crossbow: '弩' };
+const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', axe: '斧', bow: '弓', crossbow: '弩' };
 const offeredItems = new Set(marketOffers.map(({ id }) => id));
 const itemTradeRows = data.items.map((item) => ({ ...item, price: offeredItems.has(item.id) ? item.price : 0 }));
+const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMap(({ id }) => [
+  ...(Object.values(data.starting.gear).includes(id) ? [{ id, method: '初始装备' }] : []),
+  ...marketOffers.filter((offer) => offer.id === id).map((offer) => ({
+    id, method: '坊市', source: offer.stallName, price: offer.price, interval: offer.interval, afterQuest: offer.afterQuest,
+    repeatable: offer.cap === undefined || offer.growth > 0,
+  })),
+  ...data.recipes.filter((recipe) => recipe.result === id).map((recipe) => ({
+    id, method: '制作', source: recipe.id, price: recipe.cost, need: recipe.need, repeatable: true,
+  })),
+  ...data.enemies.filter((enemy) => enemy.weaponDrop?.id === id || enemy.loot?.[id]).flatMap((enemy) =>
+    data.sites.filter((site) => site.creatures?.[enemy.id]).map((site) => ({
+      id, method: '胜利战利品', source: `${site.name} · ${enemy.name}`, chance: enemy.loot?.[id] ? 1 : enemy.weaponDrop.chance,
+      interval: site.creatures[enemy.id].interval, repeatable: site.creatures[enemy.id].growth > 0,
+    }))),
+  ...choices.filter(({ loot }) => loot?.[id]).map(({ event, order }) => ({
+    id, method: '现场获得', source: describeChoice(`${event}:${order - 1}`),
+    repeatable: !data.sites.find((site) => site.id === event)?.once?.includes(order - 1),
+  })),
+]).map((row) => ({ ...row, weapon: name(row.id) }));
+const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay'].map((id) => ({
+  id, name: name(id),
+  pools: worldPools.filter((pool) => pool.object === id && pool.growth > 0).map((pool) => siteRef(pool.site)).join('、'),
+  recipes: data.recipes.filter(({ need }) => need?.[id]).length,
+  facilities: facilityLevels.filter(({ need }) => need?.[id]).length,
+  exchanges: choices.filter(({ consume, need }) => consume && need?.[id]).length,
+  breakthrough: data.realms.filter(({ need }) => need?.[id]).length,
+}));
+const alchemyFormulae = data.recipes.filter(({ formula }) => formula).map((recipe) => {
+  const offer = alchemyData.offers.find(({ id }) => id === recipe.formula);
+  const step = alchemyData.inquiry.find(({ reward }) => reward?.[recipe.formula]);
+  const found = choices.filter(({ loot }) => loot?.[recipe.formula]);
+  const handins = data.quests.filter(({ reward }) => reward?.[recipe.formula]).map(({ name }) => name);
+  return { id: recipe.formula, name: name(recipe.formula), result: recipe.result, recipe: recipe.id, need: recipe.need,
+    source: offer ? alchemyData.town.name : step?.label ?? [...found.map(({ event, order }) => describeChoice(`${event}:${order - 1}`)), ...handins].join('、'),
+    price: offer?.price, reveal: offer?.reveal };
+});
 const ruleRows = Object.entries({ ...data.rules, ...rules })
   .map(([id, value]) => ({ id, value, desc: ruleDescriptions[id] ?? '' }));
 ruleRows.push(
@@ -226,6 +265,10 @@ const tables = [
   ], { note: '出伤倍率用于向更高境界进攻。相隔两境时，两档倍率连乘。' }),
   table('items', '物品与交易', itemTradeRows, ['id', 'name', 'kind', 'price', 'sell', 'desc'],
     { note: '价格为 0 表示无对应买卖渠道。买入的货源与到货条件见坊市货单。卖出按手中符合规则的物件结算。' }),
+  table('common-materials', '常用原料跨系统用途', stapleRows, [
+    'id', 'name', ['pools', '可回生的现场'], ['recipes', '用到的配方数'], ['facilities', '用到的设施升级数'],
+    ['exchanges', '野外交付选择数'], ['breakthrough', '直接用于突破的境数'],
+  ]),
   table('market-offers', '坊市货单', marketOffers, [
     ['stallId', '摊位标识'], ['stallName', '摊位'], 'id', 'name', 'price',
     ['afterQuest', '实际到货所需的委托', ref], ['purchaseTier', '购入所需境界', realm],
@@ -239,7 +282,7 @@ const tables = [
   ], { note: '实际成功买入的件数累加。首单只结一次，续单等到商人处理完上一批货再接。' }),
   table('facility-levels', '后院设施与升级', facilityLevels, [
     'id', 'name', ['level', '设施等级'], ['slots', '仓储格数或并行工位数'],
-    ['stack', '仓库每格堆叠上限'], ['reveal', '看见设施需实际取得的物件', ref],
+    ['stack', '仓库每格堆叠上限'], ['reveal', '看见设施需实际取得的物件', ref], ['alternateReveal', '另一件可引出设施的物件', ref],
     'need', ['cost', '搭建扩建费用（灵钱）'], 'days', 'desc',
   ], { note: '起始仓库已经可用。等级 0 的生产设施需要先搭建。生产工位数与等级相等，仓库单列实际格数。' }),
   table('yard-projects', '后院种植与备粮', economyData.projects, [
@@ -253,12 +296,25 @@ const tables = [
     'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'],
     'retreat', 'durability', 'repair', ['entry', '玩家主动查读的词条'], ['trait', '特殊作用与具体数值', traitText],
   ], { note: '装备耐久为 0 后失去加成。脱身加成为伤害减免系数，0.17 即减免 17%。' }),
+  table('weapon-acquisition', '武器获取渠道', acquisitionRows, [
+    'id', ['weapon', '武器'], ['method', '获得方法'], ['source', '具体来源'], ['price', '单次成本（灵钱）'],
+    'need', ['chance', '成功胜利时掉率（0–1）'], ['interval', '货源或对手恢复间隔（天）'],
+    ['repeatable', '可重复获取'], ['afterQuest', '供货前置', ref],
+  ], { note: '胜利概率行由在场对手的种群供给决定。手上、仓库或已有未领取同名成品时，重复掉落不会生成额外副本。' }),
   table('ammunition', '弹药与命中效果', described(data.ammunition ?? []), [
     'id', 'name', ['atk', '每发攻击修正'], ['pierce', '每发基础穿甲'], ['trait', '适用目标与加成', traitText],
   ], { note: '远射和借远兵的术诀每次实际出手扣 1 发。缺弹时普通出手改为徒手，换兵刃会经过一回合。' }),
   table('pills', '丹药', gated(described(data.pills)), [
     'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['food', '获得干粮'], 'toxin', 'wound', 'focus',
+  ], { note: '筑基丹用于突破，实际制作配方和各阶段成本见筑基丹访查及制作用方。' }),
+  table('alchemy-formulas', '丹方与取得方式', alchemyFormulae, [
+    'id', 'name', 'result', ['recipe', '制法标识'], ['source', '来源'], ['price', '丹方买价（灵钱）'],
+    ['reveal', '丹师愿出示前提', ref], 'need',
   ]),
+  table('foundation-inquiry', '筑基丹访查', alchemyData.inquiry, [
+    'id', ['label', '步骤'], ['price', '费用（灵钱）'], 'days', 'tier', ['proof', '需带回的实物', ref],
+    ['defeated', '需胜过的对手', ref], 'reward', 'text', ['reply', '交付结果'], ['progress', '离村前一站提示'],
+  ], { note: '依序完成。合方后仍须用炼丹炉投料、等待并领取筑基丹。' }),
   table('talismans', '符箓', gated(described(data.talismans)), [
     'id', 'name', 'tier', tier, 'damage', 'guard', 'retreat',
   ]),
@@ -268,7 +324,7 @@ const tables = [
   ]),
   table('recipes', '制作用方', gated(data.recipes), [
     'id', 'result', 'count', 'tier', tier, ['cost', '制作费用（灵钱）'], 'need', 'days', 'reveal',
-    ['requiresShownHide', '需给工匠看过泥蜕'],
+    ['requiresShownHide', '需给工匠看过兽革'], ['formula', '所需丹方', ref],
     ['facility', '生产设施', facilityRef], ['facilityLevel', '设施最低等级'],
   ]),
   table('regions', '地区', gated(data.regions), [
@@ -301,7 +357,7 @@ const tables = [
   ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
   table('enemies', '敌人', gated(data.enemies), [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', 'atk', 'def', ['tags', '装备克制标签'], ['coins', '战利灵钱'], ['insight', '首胜修为'], 'loot', 'desc',
-  ], { omit: ['intents'] }),
+  ], { omit: ['intents', 'weaponDrop'], note: '概率武器和重复条件见武器获取渠道表。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),

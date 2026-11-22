@@ -12,8 +12,8 @@ const facilities = [
     desc: '后墙下有两道蓄雨的浅沟，正好翻成畦安置粟种。下种后可以出门，等熟时再来收。',
     upgrades: [
       { need: { wood: 8, reed: 6 }, cost: 5, days: 1 },
-      { need: { wood: 14, kiln_clay: 12, pine_resin: 6 }, cost: 14, days: 2 },
-      { need: { kiln_clay: 20, spirit_leaf: 14, frost_silk: 8 }, cost: 32, days: 3 },
+      { need: { wood: 18, kiln_clay: 10 }, cost: 14, days: 2 },
+      { need: { kiln_clay: 14, reed: 12, hide: 6 }, cost: 32, days: 3 },
     ],
   },
   {
@@ -25,12 +25,12 @@ const facilities = [
     ],
   },
   {
-    id: 'furnace', name: '炼丹炉', start: 0, reveal: 'kiln_manual',
-    desc: '照窑匠牌上的灰痕留一道低风口。药材拣净入炉，添料起火后可以留它慢慢温养。',
+    id: 'furnace', name: '炼丹炉', start: 0, reveal: 'kiln_manual', alternateReveal: 'furnace_sketch',
+    desc: '在背风墙下留一道低风口。摊开丹方投药点火，封过炉便可留它慢慢温养。',
     upgrades: [
       { need: { wood: 12, ore: 5, reed: 6 }, cost: 12, days: 1.5 },
-      { need: { kiln_clay: 12, ore: 10, pine_resin: 6 }, cost: 24, days: 2.5 },
-      { need: { black_iron: 18, frost_silk: 8, cloud_jade: 6 }, cost: 56, days: 4 },
+      { need: { kiln_clay: 10, ore: 8, wood: 10 }, cost: 24, days: 2.5 },
+      { need: { black_iron: 12, hide: 6, core: 5 }, cost: 56, days: 4 },
     ],
   },
   {
@@ -38,8 +38,8 @@ const facilities = [
     desc: '有了寒铁，可以用铁箍固定炉口，挨着干墙搭起锻炉。炉体越稳，一回能接下的活越多。',
     upgrades: [
       { need: { wood: 14, ore: 8 }, cost: 14, days: 2 },
-      { need: { ore: 14, kiln_clay: 10, black_iron: 8 }, cost: 28, days: 3 },
-      { need: { black_iron: 22, frost_silk: 12, cloud_jade: 8 }, cost: 56, days: 4 },
+      { need: { ore: 10, kiln_clay: 8, black_iron: 6 }, cost: 28, days: 3 },
+      { need: { black_iron: 16, hide: 8, core: 6 }, cost: 56, days: 4 },
     ],
   },
 ];
@@ -47,18 +47,18 @@ const facilities = [
 const projects = [
   {
     id: 'sow_millet', name: '下种育粟', facility: 'garden', level: 1,
-    description: '在浅沟里拢上碎苇保湿，留下一穗作下回的种。',
+    description: '在浅沟上拢些灵草的长茎保湿，留下一穗作下回的种。',
     need: { millet_seed: 1, reed: 1 }, loot: { millet_grain: 6, millet_seed: 1 }, days: 6, cost: 0,
   },
   {
-    id: 'root_spirit_leaf', name: '压枝培灵叶', facility: 'garden', level: 2,
-    description: '留一片叶在地面，带芽的茎压进湿土，等茎节自己生根。',
-    need: { spirit_leaf: 2, reed: 2 }, loot: { spirit_leaf: 5 }, days: 9, cost: 0, reveal: 'spirit_leaf',
+    id: 'root_spirit_leaf', name: '压茎培灵草', facility: 'garden', level: 2,
+    description: '用松木支起遮阴架，把灵草带芽的茎压进湿土，等茎节生根。',
+    need: { reed: 2, wood: 2 }, loot: { reed: 6 }, days: 9, cost: 0, reveal: 'reed',
   },
   {
-    id: 'winter_spirit_leaf', name: '暖畦育灵叶', facility: 'garden', level: 3,
-    description: '隔着暖湿土慢慢育一整畦药苗。叶子多，等得也久。',
-    need: { spirit_leaf: 4, frost_silk: 1, reed: 4 }, loot: { spirit_leaf: 13 }, days: 15, cost: 3, reveal: 'frost_silk',
+    id: 'winter_spirit_leaf', name: '暖畦育灵草', facility: 'garden', level: 3,
+    description: '把兽革盖住新苗，松木在畦边慢烧保温。一次能育满一畦，等得也久。',
+    need: { reed: 4, hide: 1, wood: 3 }, loot: { reed: 14 }, days: 15, cost: 3, reveal: 'hide',
   },
   {
     id: 'steam_millet', name: '蒸粟烘干粮', facility: 'hearth', level: 1,
@@ -73,16 +73,16 @@ const projects = [
   {
     id: 'render_resin_salve', name: '熬松脂膏', facility: 'hearth', level: 2,
     description: '用小火把松油里的水汽收出去，分进干净的瓷罐。',
-    need: { pine_resin: 2, reed: 2, wood: 1 }, loot: { salve: 6 }, days: 2.5, cost: 2, reveal: 'pine_resin',
+    need: { wood: 3, reed: 2 }, loot: { salve: 6 }, days: 2.5, cost: 2, reveal: 'wood',
   },
 ];
 
 const merchantOrders = {
   ration: {
     units: 6, regularText: '「你几趟都来我这儿包干粮。柜后还压着能下种的谷子。你肯收拾院子的话，试着种一畦。」',
-    name: '给粮摊补两张苇席', text: '换一批干净苇芯垫蒸笼，陶嫂答应分你发得好的粟种。',
+    name: '给粮摊补两张蒸席', text: '拣灵草的干净长茎编成垫蒸笼的席，陶嫂答应分你发得好的粟种。',
     need: { reed: 6 }, reward: { millet_seed: 3, millet_grain: 4 },
-    outcome: '陶嫂把苇芯交给编席的人，捧出一包饱满粟种。「收的时候留一穗，冬前用得上。」',
+    outcome: '陶嫂把灵草交给编席的人，捧出一包饱满粟种。「收的时候留一穗，冬前用得上。」',
     repeat: {
       name: '送一袋晒谷', text: '陶嫂愿收晒好的谷子，把蒸好的口粮匀给种粮人。',
       need: { millet_grain: 8 }, reward: { ration: 8 }, cooldown: 6,
@@ -91,36 +91,36 @@ const merchantOrders = {
   },
   wood: {
     units: 5, regularText: '「你拣柴跟买柴都舍得费工。我以前沿石脊去割过松脂，有条小路，别人容易踩过去。」',
-    name: '缚稳木客的柴担', text: '用芦芯把松散的柴捆扎紧，木客就肯把旧松道告诉你。',
+    name: '缚稳木客的柴担', text: '木客要借晾韧了的灵草长茎捆柴，也愿把自己走过的一道旧路说给你。',
     need: { reed: 8 }, reward: { pine_ledge_note: 1 },
     outcome: '木客挨根试过柴绳，从挑担夹层抽出一张旧纸。青崖一侧，石脊背后标着一线细路。',
   },
   reed: {
-    units: 3, regularText: '「我晒苇芯的架子松了。你要有直的松枝，我换一把能播的粟种给你。」',
-    name: '把晒苇架撑直', text: '摊主缺松枝替掉旧支脚。有了架子，铺着的苇芯就能晒透。',
+    units: 3, regularText: '「我晒灵草的架子松了。你要有直的松木，我换一把能播的粟种给你。」',
+    name: '把晒草架撑直', text: '摊主缺松木替掉旧支脚。有了架子，铺着的灵草就能晒透。',
     need: { wood: 7 }, reward: { millet_seed: 2, reed: 4 },
-    outcome: '新撑条把晒架挑高，苇芯终于离开了潮气。鹭娘抖掉夹层里的糠，分出一小把粟种。',
+    outcome: '新撑条把晒架挑高，灵草终于离开了潮气。鹭娘抖掉夹层里的糠，分出一小把粟种。',
     repeat: {
       name: '收一束补架柴', text: '摊主隔几天收些结实的枝条来更换晒架。',
       need: { wood: 9 }, reward: { reed: 5 }, cooldown: 7,
-      outcome: '摊主取下晒透的一束苇芯，把新松枝捆在架脚下备用。',
+      outcome: '摊主取下晒透的一束灵草，把新松木捆在架脚下备用。',
     },
   },
   salve: {
     units: 4, regularText: '「常往野外跑的人，一罐膏用得是真快。我锅里的护草也快没了。」',
-    name: '给药商续锅料', text: '捎来够一锅的苇芯和引火松枝，药商留两罐自用，剩下的分给你。',
-    need: { reed: 8, wood: 3 }, reward: { salve: 4, pine_resin: 2 },
-    outcome: '药商煨好两小锅膏，分出四罐，还捎给你一团包在苇纸里的松脂。',
+    name: '给药商续锅料', text: '捎来够一锅的灵草和引火松木，药商留两罐自用，剩下的分给你。',
+    need: { reed: 8, wood: 3 }, reward: { salve: 4, wood: 2 },
+    outcome: '药商煨好两小锅膏，分出四罐，把未用的两块松木一并还给你。',
   },
   qi_powder: {
     units: 4, regularText: '「你要的多，我也得天天碾。旧碾槽裂了，撑得住寒铁的才能再开。」',
-    name: '重钉药碾', text: '用寒铁给药碾做紧箍，再补几束用来筛药的苇芯。',
+    name: '重钉药碾', text: '用寒铁给药碾做紧箍，再给下一磨备几束灵草。',
     need: { ore: 5, reed: 8 }, reward: { qi_powder: 5 },
     outcome: '药商推了推修紧的碾轮，粉从缝里落进布袋。他晾开一半，另一半称给你。',
   },
   reed_arrow: {
     units: 12, regularText: '「你拿走的苇箭够插一圈靶了。木头会削，不妨看看铁箭头是怎么收口的。」',
-    name: '替箭匠凑齐一扎箭坯', text: '箭匠用松枝试直度，也要一点寒铁示范套上箭头的做法。',
+    name: '替箭匠凑齐一扎箭坯', text: '箭匠用松木试直度，也要一点寒铁示范套上箭头的做法。',
     need: { wood: 8, ore: 4 }, reward: { arrow_pattern: 1 },
     outcome: '锥子在箭头后面转了一圈，寒铁刚好套稳。箭匠把开料寸路画给你，顺手搁下一枝样箭。',
   },
@@ -136,23 +136,23 @@ const merchantOrders = {
     },
   },
   reed_talisman: {
-    units: 3, regularText: '「一张符管一阵水汽。你下次带苇芯来，我也能跟你分一炉。」',
-    name: '收一批干苇作符底', text: '摊主说纸糊得太湿，一翻便卷。先要一扎晾干的芯子。',
+    units: 3, regularText: '「一张符管一阵水汽。你下次带晒过的灵草来，我也能跟你分一匣。」',
+    name: '收一束干灵草作符底', text: '摊主说纸糊得太湿，一翻便卷。先要一扎晾干的灵草长茎。',
     need: { reed: 12, wood: 6 }, reward: { reed_talisman: 6 },
-    outcome: '船商挑了最干的苇芯糊纸，等到边角平整，把揭下的六张分给你。',
+    outcome: '船商挑了最干的灵草捣浆糊纸，等到边角平整，把揭下的六张分给你。',
   },
   heal_pill: {
     units: 2, regularText: '「药船在旧闸等了好些年。如今上了岸，还得找些活叶慢慢温炉。」',
-    name: '给复航药船送鲜药', text: '药商愿拿成丹换整束灵叶，移栽几株，余下接着配药。',
-    need: { spirit_leaf: 12, pine_resin: 5 }, reward: { heal_pill: 5 },
-    outcome: '药商把灵叶带芽的另放，其余放到窗纸下晾着，分给你一只装好丹药的瓷瓶。',
+    name: '给复航药船送鲜药', text: '药商想用松木温炉，也愿拿成丹换几束新拔的灵草。',
+    need: { reed: 12, wood: 5 }, reward: { heal_pill: 5 },
+    outcome: '药商把带芽的灵草另放，其余放到窗纸下晾着，分给你一只装好丹药的瓷瓶。',
   },
 };
 
 const stockSources = {
   ration: '陶嫂去看和好的面，下一屉还要等面醒透。',
   wood: '木贩指了指院里晾着的几根湿枝。「干透才搬过来。」',
-  reed: '鹭娘把空篮翻面晾水。「下一捆芯子还铺在晒架上。」',
+  reed: '鹭娘把空篮翻面晾水。「下一捆灵草还铺在晒架上。」',
   cudgel: '裴匠把竹篓下那段木头往手边挪了挪。「杖节得一寸寸削平。」',
   knife: '炉里只剩一坯粗铁，卢打铁截好刀料，压回炭上。',
   straw_cape: '任匠掰开一把刚理好的蓑草，压在膝头等编。',
@@ -196,8 +196,9 @@ function effectiveLevel(state, facility) {
 }
 
 function knowsFacility(state, facility, kit) {
-  return effectiveLevel(state, facility) > 0 || !facility.reveal ||
-    state.knownItems.includes(facility.reveal) || kit.homeSupplies(state, facility.reveal) > 0;
+  if (effectiveLevel(state, facility) > 0 || !facility.reveal) return true;
+  return [facility.reveal, facility.alternateReveal].filter(Boolean).some((id) =>
+    state.knownItems.includes(id) || kit.homeSupplies(state, id) > 0);
 }
 
 function goodsVolume(goods, kit) {
@@ -447,7 +448,7 @@ export function merchantInfo(state, stall, kit) {
   const saved = merchantState(state, stall.id);
   const regular = Boolean(profile && saved.paid >= profile.units);
   const order = orderAt(state, stall);
-  const unavailable = marketStock(state, stall.id, offer) === 0 ? stockSources[offer.id] : '';
+  const unavailable = marketStock(state, stall.id, offer) === 0 ? (offer.restockText ?? stockSources[offer.id]) : '';
   const greeting = regular && !saved.completed ? profile.regularText : stall.desc;
   return {
     greeting: [greeting, unavailable].filter(Boolean).join(' '),

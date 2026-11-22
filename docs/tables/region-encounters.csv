@@ -11,7 +11,7 @@
 沉钟岭（ridge）,miner_echo,有回声的矿道,,,3,主道里没有锤声，旁孔也已经翻过。更高一点的石缝还透着外头的天光。,,ore_wight＝present＝握锤的影子在主道里缓慢巡行。、absent＝主道再无锤声，只剩旁孔透风。
 沉钟岭（ridge）,rope_run,断绳坡,,,1,,0＝挑夫把车推回了山路。坡下两道车辙经过一堆松碎石，岩下有口能藏小兽的窄洞。,stone_badger＝present＝碎石后传来爪尖蹭岩的声响。、absent＝碎石后空空荡荡。
 沉钟岭（ridge）,stone_niche,回声石龛,有回声的矿道（miner_echo） · 贴着透光的石缝往外看、断绳坡（rope_run） · 从侧坡绕下去帮挑夫,,1、2、3,,0＝矿壳里只剩空槽。破铃仍搁在龛沿，两侧岩面留着许多用手摸出来的浅印。,
-沉钟岭（ridge）,cracked_bell,裂钟背面,回声石龛（stone_niche） · 提起石龛里的破铃,,,钟腹已经空了，碎片落了满地。背后的窄石脊还能绕回山坡。,,bell_wraith＝present＝钟腹里伏着一团灰影，碎片正沿它身边打转。、absent＝钟腹已空，碎片散落在钟座周围。
+沉钟岭（ridge）,cracked_bell,裂钟背面,回声石龛（stone_niche） · 提起石龛里的破铃,,,钟腹已经空了，碎片落了满地。背后的窄石脊还能绕回山坡。,,bell_wraith＝present＝钟腹里伏着一团灰影。它一缩身，脚下的窄脊就跟着颤。、absent＝钟腹已空，碎片散落在钟座周围。
 闭潮渡（ford）,low_tide,闸外浅阶,,,,浅阶已经扫净，下游的船绳浮着不动。只有浪沫漫过石缝。,,rope_eel＝present＝下游船绳被水里什么东西拖得发紧。、absent＝下游船绳浮在水上，无物牵动。
 闭潮渡（ford）,boat_shade,没篷的渡舟,,,2、3,,1＝柜子移走了，船底铁箍旁留着一道擦痕。船凳还干，旧缆仍挂在朝水的钩上。船头灯架上留着旧烟。,
 闭潮渡（ford）,flood_lines,刻洪痕的石壁,,,1,,0＝石缝里只剩一道压痕。洪水在壁根留了薄薄的沙，水还够不到这里。,
@@ -25,19 +25,23 @@
 青崖松场（pine_ridge）,timber_bridge,缺板的驮桥,,,1,,0＝驮夫打好最后一只楔子。桥板不再晃，石墩仍可坐人。,
 青崖松场（pine_ridge）,pine_hollow,翻车的松沟,,,,,,pitch_bear＝present＝空车一侧拱动，车轴底还拴着几缕毛。、absent＝车底已经空了。泥面只剩拖着爪走过的深痕。
 青崖松场（pine_ridge）,pine_ledges,背阴的断肩崖,,得知物品 松崖背阴旧址（pine_ledge_note）,,靠里的几道脂槽见底了。石面还有旧挖凿的横痕。,,
+青崖松场（pine_ridge）,pine_spar,索棚拳场,,,,,,road_sparrer＝present＝轮值人去过了索桥，回来时往门口摆了一把奖给胜者的刀。、absent＝刀架空了。这班守索人要去巡绳，棚口的当值牌还没有翻过来。
 云炉石谷（kiln_valley）,clay_bank,白泥洗坯坡,,,,坡根的白泥已经铲尽，拐弯处只剩风干的灰壳。,,
 云炉石谷（kiln_valley）,abandoned_kiln,冷下来的老窑,,,1、3,,0＝铁箍下面的石牌取出来了。灰线后的平石仍能挡风，墙边斜靠一段烧焦的木柄。、2＝墙边落着擦下来的焦灰。风还往窑门的铁箍底下钻，灰线后有石头能挡风。,
 云炉石谷（kiln_valley）,kiln_carter,药篓车棚,,,1、2,,0＝车帮已经封好，赶车人把最后一个药篓提到了石檐下。车底的旧篷布还压着什么。、1＝旧篷卷到车轮边，能看见空药篓和车帮上晾泥的地方。,
-云炉石谷（kiln_valley）,kiln_flue,废窑烟道,冷下来的老窑（abandoned_kiln） · 从铁箍下面取出石牌,,,,,cinder_hound＝present＝鱼鳞似的窑砖抖动了几下，缝间喷出细灰。、absent＝窑砖已经稳下来，通风处只漏残灰。
+云炉石谷（kiln_valley）,kiln_flue,废窑烟道,冷下来的老窑（abandoned_kiln） · 从铁箍下面取出石牌,,3,,2＝墙缝里只剩黄釉上的半片纸痕。靠外窑砖积灰，坡下温水从后崖渗进窑沟。,cinder_hound＝present＝鱼鳞似的窑砖抖动了几下，缝间喷出细灰。、absent＝窑砖已经稳下来，通风处只漏残灰。
 篁泽药谷（herb_basin）,herb_beds,银脉水畦,,,,水畦里的老叶已经剪尽。细芽还贴着湿泥，只等抽出来。,,
 篁泽药谷（herb_basin）,mist_shelter,垫高脚的药棚,,,1、2,,0＝泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。、1＝席上的捣药板已经腾出来了。泽医身边还放着几只给矿队装药的篓。,
 篁泽药谷（herb_basin）,vine_pond,白藤塘,,,,,,vine_stag＝present＝两片白角在藤叶下晃，里面像有只兽在低头啃叶。、absent＝白藤散开了，角印没了新痕。
 玄砂矿脉（black_mine）,mine_tailings,黑砂洗矿槽,,,,石槽里只剩碎砂。激流过后，有颜色的石块才会再卡进来。,,
 玄砂矿脉（black_mine）,winch_house,断榫绞盘屋,,,1、2,,0＝绞盘转得起来了，矿工把量榫口的铁样搁回窗边。、1＝铁样被矿工让了出来，折断的木榫还在绞架边，架外的石阶顺坡下去。,
-玄砂矿脉（black_mine）,deep_vein,横肩偏井,,,,,,vein_sentinel＝present＝井口两面黑岩像肩骨似地拢到一起。、absent＝井口散着一些凿开的黑纹石。
-碎云雪关（snow_pass）,silk_bough,背风冰藤坡,,,,这几丛老藤已经没丝可抽。低处绑着能避开冰口的石绳。,,
+玄砂矿脉（black_mine）,deep_vein,横肩偏井,,,,,,vein_sentinel＝present＝井口两面黑岩像肩骨似地拢到一起，车轮被挤得裂了一道缝。、absent＝井口散着一些凿开的黑纹石。
+碎云雪关（snow_pass）,silk_bough,背风雪蜥径,,,,老石窝的蜥蜕拾净了。雪蜥咬出的几道浅窝还露在外头，低处绑着避冰口的石绳。,,
 碎云雪关（snow_pass）,snow_fire,护栈火棚,,,1、3,,0＝守栈人把收紧的绳索一根根盘好。火盆还有余烬，他手边搭着一块半缝好的布套。、2＝守栈人把练缝剩下的碎布卷好，脚边还有待换的旧套和一只火盆。,
 碎云雪关（snow_pass）,white_ravine,露背的雪沟,,,3,高背留下的雪痕已经浅了。短栈的护绳贴着一处锈痕，沿绳还能退到避风处。,,snow_warden＝present＝沟里伏着一道高背，呼吸声把雪粉一层层掀开。、absent＝雪沟只剩高背拖过的痕迹，风很快就把它吹平了。
-天衡石台（sky_terrace）,cloud_scree,浮光玉屑坡,,,3,玉屑已拾净。高岩后有张旧工台，雾从工台的几道浅槽间吹过来。,,
+天衡石台（sky_terrace）,cloud_scree,浮光晶坡,,,3、4,晶屑已拾净。高岩后有旧工台和嵌在石边的火盏架，雾从几道浅槽间吹过来。,,
 天衡石台（sky_terrace）,old_observatory,偏影观星梁,,,1、3,,0＝星刻已拓下来了。梁背小槽里的木账片还在，反照石门的影子仍落在半尺之外。、2＝木账片拿出来后，梁背露出一块平整的木纹。雾散时，三道刻圈的影子还是偏着落下。,
-天衡石台（sky_terrace）,mirror_gate,反峰镜门,偏影观星梁（old_observatory） · 趁雾散拓下石梁里的刻圈,,,镜里只剩山势，空印座上还留着浅浅的手痕。,,mirror_warden＝present＝镜里那道握印的影子在等你把身子移到梁影之外。、absent＝镜里握印的身影已经散开。反照的远峰一时异常清楚。
+天衡石台（sky_terrace）,mirror_gate,反峰镜门,偏影观星梁（old_observatory） · 趁雾散拓下石梁里的刻圈,,,镜里只剩山势，空印座上还留着浅浅的手痕。,,mirror_warden＝present＝镜里有道握印的影子。梁影掠过时，它的右肩跟着沉了半寸。、absent＝镜里握印的身影已经散开。反照的远峰一时异常清楚。
+沉钟岭（ridge）,foundation_duel,背钟试剑亭,,得知物品 背钟亭借卷帖（foundation_letter）,,,,foundation_duelist＝present＝亭柱背后靠着两柄钝剑，守卷人的袖口露出一块有残角的墨印。、absent＝守卷人收好钝剑，将捺了角印的借卷帖还给你。
+云炉石谷（kiln_valley）,foundation_kiln,旧丹窑内壁,,得知物品 丹窑移灰牌（foundation_delivery）,,,,foundation_kiln_echo＝present＝炉影每次掠过挡板，胸前都有一道缺半的金光。、absent＝窑影已经散了。灰堆中只剩那枚脱开的旧印挤过的痕迹。
+碎云雪关（snow_pass）,foundation_court,封石验药室,,得知物品 封石之约（foundation_snow_order）,,,,foundation_warden＝present＝炉火在矮墙后稳着。护炉人抬手示意把覆印约压在温盏下。、absent＝护炉人支起木门。第三枚印已经交给你，他转身去换火口。

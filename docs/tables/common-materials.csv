@@ -1,0 +1,8 @@
+﻿标识,名称,可回生的现场,用到的配方数,用到的设施升级数,野外交付选择数,直接用于突破的境数
+wood,松木,碎石水眼（mud_track）、刮脂松架（pine_stand）、背阴的断肩崖（pine_ledges）,27,9,9,0
+reed,灵草,浅水苇丛（reed_banks）、银脉水畦（herb_beds）,16,5,3,2
+hide,兽革,背风雪蜥径（silk_bough）,13,3,1,1
+ore,寒铁,落矿的冲沟（ore_rain）、有回声的矿道（miner_echo）,9,6,0,1
+core,灵晶,落矿的冲沟（ore_rain）、闸外浅阶（low_tide）、刻洪痕的石壁（flood_lines）、浮光晶坡（cloud_scree）,12,2,0,1
+black_iron,暗金,废窑烟道（kiln_flue）、黑砂洗矿槽（mine_tailings）,6,4,1,0
+kiln_clay,耐火泥,白泥洗坯坡（clay_bank）,1,5,2,0

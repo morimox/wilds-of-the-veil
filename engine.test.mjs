@@ -102,7 +102,7 @@ test('public village services are accessible immediately while material trades a
   assert.equal(opening.nextRealm, null);
   const start = JSON.stringify(state);
   for (const [action, payload] of [
-    ['handin', { id: 'reed_salve' }], ['handin', { id: 'patch_ferry' }], ['craft', { id: 'r_salve' }],
+    ['handin', { id: 'reed_salve' }], ['handin', { id: 'patch_ferry' }], ['craft', { id: 'r_reed_bow' }],
     ['repair', { id: 'cudgel' }], ['research'], ['breakthrough'], ['learn', { id: 'reed_cleave' }],
     ['buy', { id: 'path_charm' }], ['showHideToSmith'],
   ]) {
@@ -128,7 +128,7 @@ test('public village services are accessible immediately while material trades a
   chooseAt(state, 'mud_track', 1);
   uncoverFerryman(state);
   assert.deepEqual(view(state).services, ['quests', 'market', 'workshop']);
-  assert.ok(view(state).discoveredRecipes.includes('r_salve'));
+  assert.ok(view(state).discoveredRecipes.includes('r_reed_bow'));
   assert.equal(view(state).discoveredRecipes.includes('r_hide_coat'), false);
   feed(state, 35);
   chooseAt(state, 'reed_ferryman', 0);
@@ -141,14 +141,16 @@ test('public village services are accessible immediately while material trades a
   state = JSON.parse(JSON.stringify(state));
   assert.equal(state.inventory.reed, undefined);
   assert.deepEqual(view(state).services, ['quests', 'market', 'workshop', 'cultivate']);
-  assert.ok(view(state).discoveredRecipes.includes('r_qi'));
+  assert.ok(view(state).discoveredRecipes.includes('r_reed_bow'));
   play(state, 'learn', { id: 'reed_cleave' });
 });
 
 test('stalls stock real goods from the start and crafting knowledge does not add to the shelves', () => {
   const state = createGame();
-  const initialStock = ['ration', 'wood', 'reed', 'cudgel', 'knife', 'straw_cape', 'salve', 'qi_powder', 'reed_arrow', 'millet_seed'];
-  assert.deepEqual(marketStock(state), initialStock);
+  const initialStock = marketStock(state);
+  for (const item of ['ration', 'wood', 'reed', 'cudgel', 'knife', 'straw_cape', 'salve', 'qi_powder', 'reed_arrow', 'millet_seed']) {
+    assert.ok(initialStock.includes(item), item);
+  }
   assert.equal(view(state).discoveredRecipes.includes('r_qi'), false);
   const coins = state.coins;
   play(state, 'buy', { id: 'qi_powder' });
@@ -162,7 +164,7 @@ test('stalls stock real goods from the start and crafting knowledge does not add
   chooseAt(state, 'mud_track', 1);
   walk(state, 'village');
   assert.ok(view(state).discoveredRecipes.includes('r_reed_bow'));
-  assert.ok(view(state).discoveredRecipes.includes('r_grain'));
+  assert.equal(view(state).discoveredRecipes.includes('r_grain'), false);
   assert.deepEqual(marketStock(state), initialStock);
   const unchanged = structuredClone(state);
   assert.match(act(state, 'buy', { id: 'grain_pill' }).message, /摊上没摆/);
@@ -211,6 +213,29 @@ test('a supply hand-in changes its stall and protected possessions cannot be sol
   play(state, 'buy', { id: 'reed_talisman' });
   assert.equal(state.inventory.reed_talisman, 1);
   assert.equal(view(state).discoveredRecipes.includes('r_reed'), false);
+});
+
+test('a weapon maker restocks and can sell a replacement after the first is sold', () => {
+  const state = createGame();
+  const id = 'split_axe';
+  const offer = () => view(state).market.stalls.find(({ offers }) => offers.some((row) => row.id === id))
+    .offers.find((row) => row.id === id);
+  const start = offer();
+  state.coins = start.price * 2;
+  play(state, 'buy', { id });
+  assert.equal(offer().stock, start.stock - 1);
+  assert.equal(state.inventory[id], 1);
+  play(state, 'econDeposit', { id, count: 1 });
+  for (let tick = 0; offer().stock === 0 && tick < 40; tick++) play(state, 'wait');
+  assert.ok(offer().stock > 0);
+  const stored = structuredClone(state);
+  assert.match(act(state, 'buy', { id }).message, /只能持有一件/);
+  assert.deepEqual(state, stored);
+  play(state, 'econWithdraw', { id, count: 1 });
+  play(state, 'sell', { id });
+  assert.equal(state.inventory[id], undefined);
+  play(state, 'buy', { id });
+  assert.equal(state.inventory[id], 1);
 });
 
 test('marsh landmarks are consistent across visits and new sites require an actual route clue', () => {
@@ -502,17 +527,18 @@ test('capacity checks do not charge for a refused transaction and discarded gear
   walk(state, 'marsh');
   chooseAt(state, 'reed_banks', 0);
   walk(state, 'village');
-  state.inventory = { cudgel: 1, straw_cape: 1, reed: 2, ration: (rules.backpackCapacity - 1) * rules.backpackStackSize };
+  supplyFixture(state, { wood: 3 });
+  state.inventory = { cudgel: 1, straw_cape: 1, reed: 2, wood: 3, ration: (rules.backpackCapacity - 2) * rules.backpackStackSize };
   assert.equal(view(state).backpackUsed, rules.backpackCapacity);
   const before = structuredClone(state);
   for (const [action, payload] of [
-    ['craft', { id: 'r_qi' }], ['buy', { id: 'ration' }], ['handin', { id: 'reed_salve' }],
+    ['craft', { id: 'r_reed_arrow' }], ['buy', { id: 'ration' }], ['handin', { id: 'reed_salve' }],
   ]) {
     assert.match(act(state, action, payload).message, /行囊已满/);
     assert.deepEqual(state, before);
   }
   play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
-  play(state, 'craft', { id: 'r_qi' });
+  play(state, 'craft', { id: 'r_reed_arrow' });
   play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
   play(state, 'handin', { id: 'reed_salve' });
   play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
@@ -527,7 +553,7 @@ test('the boatman and village smith trade maps that open travel for a beginning 
   const state = createGame();
   assert.deepEqual(view(state).discovered, ['village', 'marsh']);
   assert.equal(act(state, 'travel', { id: 'ridge' }).ok, false);
-  assert.equal(view(state).discoveredItems.includes('sand'), false);
+  assert.equal(view(state).discoveredItems.includes('core'), false);
   assert.equal(view(state).discoveredQuests.includes('last_lantern'), false);
   walk(state, 'marsh');
   chooseAt(state, 'reed_banks', 0);
@@ -601,6 +627,51 @@ test('the opponent carries another copy of the first map until a fight is won', 
   assert.equal(view(state).realmIndex, 0);
 });
 
+test('returning for a new shift at the sparring ground can replace a sold prize blade', () => {
+  const state = createGame(42);
+  state.realm = 1;
+  supplyFixture(state, { pine_pass: 1, short_spear: 1 });
+  const spear = data.gear.find(({ id }) => id === 'short_spear');
+  state.durability.short_spear = spear.durability;
+  state.knownArts.push('reed_cleave', 'stone_brace');
+  play(state, 'equip', { id: spear.id });
+
+  const prize = 'trail_cutter';
+  const spar = () => {
+    while (state.hp < view(state).maxHp || state.qi < view(state).maxQi) play(state, 'rest');
+    feed(state, 90);
+    walk(state, 'pine_ridge');
+    chooseAt(state, 'pine_spar', 0);
+    assert.equal(view(state).currentEnemy.id, 'road_sparrer');
+    for (let turns = 0; state.combat && turns < 8; turns++) {
+      const move = view(state).intent.kind === 'heavy' ? 'stone_brace' : 'reed_cleave';
+      if (state.qi >= 2) play(state, 'art', { id: move });
+      else play(state, 'attack');
+    }
+    assert.equal(view(state).mode, 'field', state.log.slice(-6).join('\n'));
+    assert.equal(view(state).sites.find(({ id }) => id === 'pine_spar').creatures.road_sparrer, 0);
+    walk(state, 'village');
+  };
+  const waitForShift = () => {
+    const nextAt = state.localPools.pine_spar.creatures.road_sparrer.nextAt;
+    while (state.day < nextAt) play(state, 'wait');
+  };
+
+  spar();
+  assert.equal(state.inventory[prize], 1);
+  play(state, 'econDeposit', { id: prize, count: 1 });
+  waitForShift();
+  spar();
+  assert.equal(state.inventory[prize], undefined);
+  assert.equal(state.economy.warehouse[prize], 1);
+  assert.equal(state.ground.pine_ridge?.[prize], undefined);
+  play(state, 'econWithdraw', { id: prize, count: 1 });
+  play(state, 'sell', { id: prize });
+  waitForShift();
+  spar();
+  assert.equal(state.inventory[prize], 1);
+});
+
 test('a spent expedition can abandon an event and reach free relief without resetting progress', () => {
   const state = createGame();
   walk(state, 'marsh');
@@ -616,6 +687,25 @@ test('a spent expedition can abandon an event and reach free relief without rese
   assert.ok(state.inventory.ration >= 3);
   assert.equal(act(state, 'sell', { id: 'ration' }).ok, false);
   assert.equal(view(state).insight, 1);
+});
+
+test('reading a heavy attack gives free bracing and a counter while guarding a regular hit does not counter', () => {
+  const state = createGame(0);
+  walk(state, 'marsh');
+  chooseAt(state, 'mud_track', 0);
+  const regular = structuredClone(state);
+  const regularGuard = play(regular, 'guard');
+  assert.equal(regularGuard.damageDealt, 0);
+  play(state, 'attack');
+  assert.equal(view(state).intent.kind, 'heavy');
+  const attacking = structuredClone(state);
+  const traded = play(attacking, 'attack');
+  const beforeQi = state.qi;
+  const braced = play(state, 'guard');
+  assert.equal(state.qi, beforeQi);
+  assert.equal(braced.damageDealt, rules.guardCounter);
+  assert.equal(braced.damageTaken, Math.max(0, traded.damageTaken - rules.guardBonus - rules.heavyGuardBonus));
+  assert.equal(view(state).mode, 'combat');
 });
 
 test('damage wears equipped gear, defeating an enemy rewards only first-kill insight, and falling is recoverable', () => {
@@ -677,22 +767,31 @@ test('a bow found by following material knowledge hits a furred beast harder', (
   choose(state, 2);
   assert.equal(view(state).currentEnemy.id, 'reed_fox');
 
+  const fox = data.enemies.find(({ id }) => id === 'reed_fox');
+  const beast = data.enemies.find(({ id }) => id === 'mud_beast');
+  const bow = data.gear.find(({ id }) => id === 'reed_bow');
+  const arrow = data.ammunition.find(({ id }) => id === 'reed_arrow');
+  const unarmed = data.realms[0].atk;
+  const ammunition = state.inventory.reed_arrow;
+  const bowPower = unarmed + bow.atk + arrow.atk;
   const broken = structuredClone(state);
   broken.durability.reed_bow = 0;
-  play(broken, 'attack');
-  assert.equal(view(broken).currentEnemy.hp, 24 - 7);
-  assert.equal(broken.inventory.reed_arrow, 8);
+  assert.equal(play(broken, 'attack').damageDealt, unarmed - fox.def);
+  assert.equal(broken.inventory.reed_arrow, ammunition);
   const scaled = structuredClone(state);
-  scaled.combat = { id: 'mud_beast', hp: 25, round: 0, escapeBonus: 0 };
-  play(scaled, 'attack');
-  assert.equal(view(scaled).currentEnemy.hp, 25 - 9);
+  scaled.combat = { id: beast.id, hp: beast.hp, round: 0, escapeBonus: 0 };
+  assert.equal(play(scaled, 'attack').damageDealt, bowPower - Math.max(0, beast.def - arrow.pierce));
 
-  play(state, 'attack');
-  assert.equal(view(state).currentEnemy.hp, 24 - 14);
-  play(state, 'attack');
+  assert.ok(bow.trait.bonus > 0);
+  assert.equal(play(state, 'attack').damageDealt, bowPower + bow.trait.bonus - Math.max(0, fox.def - arrow.pierce));
+  let turns = 1;
+  while (state.combat && turns < 5) {
+    play(state, 'attack');
+    turns++;
+  }
   assert.equal(view(state).mode, 'field');
   assert.ok(view(state).defeated.includes('reed_fox'));
-  assert.equal(state.inventory.reed_arrow, 6);
+  assert.equal(state.inventory.reed_arrow, ammunition - turns);
 });
 
 test('weapon piercing and armor effects follow the actual enemy and intent', () => {
@@ -704,30 +803,39 @@ test('weapon piercing and armor effects follow the actual enemy and intent', () 
   state.durability.hide_coat = 29;
   play(state, 'equip', { id: 'knife' });
   play(state, 'equip', { id: 'hide_coat' });
-  state.combat = { id: 'mud_beast', hp: 25, round: 0, escapeBonus: 0 };
+  const knife = data.gear.find(({ id }) => id === 'knife');
+  const hide = data.gear.find(({ id }) => id === 'hide_coat');
+  const beast = data.enemies.find(({ id }) => id === 'mud_beast');
+  const spirit = data.enemies.find(({ id }) => id === 'marsh_ghost');
+  const power = data.realms[0].atk + knife.atk;
+  const defense = view(state).defense;
+  assert.ok(knife.trait.bonus > 0 && hide.trait.bonus > 0);
+  state.combat = { id: beast.id, hp: beast.hp, round: 0, escapeBonus: 0 };
   const beforeBeast = state.hp;
-  play(state, 'attack');
-  assert.equal(view(state).currentEnemy.hp, 25 - 11);
-  assert.equal(state.hp, beforeBeast - 1);
+  assert.equal(play(state, 'attack').damageDealt, power - Math.max(0, beast.def - knife.trait.bonus));
+  assert.equal(state.hp, beforeBeast - Math.max(0, Math.ceil(beast.atk * beast.intents[0].mult) - defense - hide.trait.bonus));
 
-  state.combat = { id: 'marsh_ghost', hp: 28, round: 1, escapeBonus: 0 };
+  state.combat = { id: spirit.id, hp: spirit.hp, round: 1, escapeBonus: 0 };
   const beforeSpirit = state.hp;
-  play(state, 'attack');
-  assert.equal(view(state).currentEnemy.hp, 28 - 9);
-  assert.equal(state.hp, beforeSpirit - 4);
+  assert.equal(play(state, 'attack').damageDealt, power - spirit.def);
+  assert.equal(state.hp, beforeSpirit - Math.max(0, Math.ceil(spirit.atk * spirit.intents[1].mult) - defense));
 
   state.combat = null;
   state.realm = 1;
   state.inventory.iron_coat = 1;
-  state.durability.iron_coat = 38;
+  const iron = data.gear.find(({ id }) => id === 'iron_coat');
+  const wight = data.enemies.find(({ id }) => id === 'ore_wight');
+  state.durability.iron_coat = iron.durability;
   play(state, 'equip', { id: 'iron_coat' });
-  state.hp = 40;
-  state.combat = { id: 'ore_wight', hp: 40, round: 0, escapeBonus: 0 };
+  const healthy = view(state).maxHp;
+  state.hp = healthy;
+  state.combat = { id: wight.id, hp: wight.hp, round: 0, escapeBonus: 0 };
   const armorDefense = view(state).defense;
   play(state, 'attack');
-  assert.equal(state.hp, 40 - (12 - armorDefense));
+  assert.equal(state.hp, healthy - Math.max(0, Math.ceil(wight.atk * wight.intents[0].mult) - armorDefense));
+  const beforeHeavy = state.hp;
   play(state, 'attack');
-  assert.equal(state.hp, 40 - (12 - armorDefense) - (Math.ceil(12 * 1.72) - armorDefense - 2));
+  assert.equal(state.hp, beforeHeavy - Math.max(0, Math.ceil(wight.atk * wight.intents[1].mult) - armorDefense - iron.trait.bonus));
 });
 
 test('restoratives heal, toxin applies at the threshold, and a retreat talisman is spent immediately', () => {
@@ -923,7 +1031,7 @@ test('separate mountain observations lead to learning a technique at the site in
   assert.equal(view(state).mode, 'combat');
   const tooSoon = act(state, 'art', { id: 'earth_echo' });
   assert.equal(tooSoon.ok, false);
-  assert.match(tooSoon.message, /境界|筑基/);
+  assert.match(tooSoon.message, /境界|炼气中期/);
 });
 
 test('the old ford route and its optional hidden map remain playable with earned gear', () => {
@@ -980,6 +1088,13 @@ test('the old ford route and its optional hidden map remain playable with earned
   travelFed('ford');
   workFed('low_tide', 0);
   workFed('flood_lines', 0);
+  travelFed('village');
+  assert.equal(state.inventory.tide_note, 1);
+  state.coins = Math.max(state.coins, 66);
+  play(state, 'learn', { id: 'tide_part' });
+  play(state, 'learn', { id: 'cross_weir' });
+  while (state.hp < view(state).maxHp || state.qi < view(state).maxQi) play(state, 'rest');
+  travelFed('ford');
   assert.equal(siteIds(state).includes('tide_keeper'), false);
   workFed('lock_deck', 1);
   assert.ok(siteIds(state).includes('tide_keeper'));
@@ -991,10 +1106,14 @@ test('the old ford route and its optional hidden map remain playable with earned
     const panel = view(state);
     if (panel.intent.kind === 'guard' && panel.hp < panel.maxHp - 8 && state.inventory.salve) {
       play(state, 'use', { id: 'salve' });
+    } else if (panel.intent.kind === 'heavy' && panel.qi >= 5) {
+      play(state, 'art', { id: 'cross_weir' });
     } else if (panel.intent.kind === 'heavy' && panel.currentEnemy.hp > 17 && panel.qi >= techniqueCost) {
       play(state, 'art', { id: 'stone_brace' });
     } else if (state.inventory.tide_talisman && panel.currentEnemy.hp > 17) {
       play(state, 'use', { id: 'tide_talisman' });
+    } else if (panel.qi >= 5) {
+      play(state, 'art', { id: 'tide_part' });
     } else if (panel.qi >= techniqueCost) {
       play(state, 'art', { id: 'reed_cleave' });
     } else {
@@ -1017,7 +1136,7 @@ test('the old ford route and its optional hidden map remain playable with earned
   const lowRealm = { ...state, realm: 0 };
   const lateOffer = view(lowRealm).market.stalls.flatMap(({ offers }) => offers).find(({ id }) => id === 'heal_pill');
   assert.equal(lateOffer.canBuy, false);
-  assert.match(lateOffer.blockedReason, /筑基/);
+  assert.match(lateOffer.blockedReason, /境界|炼气中期/);
   assert.deepEqual(marketStock(lowRealm), marketStock(state));
   assert.equal(view(state).discovered.includes('hidden'), false);
   assert.equal(act(state, 'travel', { id: 'hidden' }).ok, false);
@@ -1109,7 +1228,7 @@ test('paid purchases reveal only that specialist’s order and the planted seed 
   const regular = play(state, 'buy', { stallId, id: 'ration' });
   assert.ok(regular.merchantMessage);
   assert.equal(merchant().regular, true);
-  assert.match(merchant().order.reason, /苇芯/);
+  assert.match(merchant().order.reason, new RegExp(data.items.find(({ id }) => id === 'reed').name));
   assert.equal(facility(state, 'garden'), undefined);
   assert.equal(view(state).market.stalls.filter(({ merchant: row }) => row.regular).length, 1);
 
@@ -1178,6 +1297,7 @@ test('ranged weapon arts spend compatible ammo and independent arts and defensiv
   assert.equal(state.inventory.iron_arrow, undefined);
   assert.equal(state.inventory.black_bolt, 3);
   assert.equal(view(state).combatWeapon.selectedAmmo, 'reed_arrow');
+  state.combat.hp = 1;
   assert.equal(play(state, 'attack').ok, true);
   assert.equal(view(state).mode, 'field');
   assert.equal(state.inventory.reed_arrow, undefined);
@@ -1205,7 +1325,7 @@ test('ranged weapon arts spend compatible ammo and independent arts and defensiv
   assert.equal(state.inventory.black_bolt, 3);
 });
 
-test('a prepared ford expedition opens each later region through field contacts, then verifies a design and finishes at 元婴', () => {
+test('a prepared ford expedition opens each later region through field contacts, then verifies a design and finishes at 筑基初期', () => {
   const state = createGame();
   // The earlier route test obtains the ford seal in combat. Start this test with that expedition's supplies.
   supplyFixture(state, { ford_chart: 1, ridge_rubbing: 1, seal: 1, ore: 1, tide_coat: 1, tide_note: 1 });
@@ -1244,15 +1364,17 @@ test('a prepared ford expedition opens each later region through field contacts,
   };
   const openRoute = (siteId, key, next) => {
     assert.equal(act(state, 'travel', { id: next }).ok, false);
+    const require = data.events.find(({ id }) => id === siteId).choices[0].need;
+    const carried = { ...state.inventory };
     visitAndChoose(siteId, 0);
+    for (const [id, count] of Object.entries(require)) assert.equal(state.inventory[id] ?? 0, carried[id] - count, id);
     assert.equal(state.inventory[key], 1);
     assert.ok(view(state).discovered.includes(next));
   };
 
   provision();
   walk(state, 'pine_ridge');
-  gather('pine_stand', 'pine_resin', 8);
-  gather('pine_stand', 'wood', 3, 1);
+  gather('pine_stand', 'wood', 8);
   openRoute('timber_bridge', 'kiln_tracks', 'kiln_valley');
   assert.equal(view(state).realmIndex, 2);
 
@@ -1272,11 +1394,11 @@ test('a prepared ford expedition opens each later region through field contacts,
   assert.equal(facility(state, 'furnace').level, 0);
   play(state, 'buy', { id: 'wood', count: 4 });
   walk(state, 'herb_basin');
-  gather('herb_beds', 'spirit_leaf', 8);
+  gather('herb_beds', 'reed', 8);
   openRoute('mist_shelter', 'mine_guide', 'black_mine');
   visitAndChoose('mist_shelter', 1);
   assert.equal(state.inventory.herb_press, 1);
-  gather('herb_beds', 'spirit_leaf', 5);
+  gather('herb_beds', 'reed', 5);
 
   provision();
   walk(state, 'black_mine');
@@ -1288,7 +1410,7 @@ test('a prepared ford expedition opens each later region through field contacts,
 
   provision();
   walk(state, 'snow_pass');
-  gather('silk_bough', 'frost_silk', 6);
+  gather('silk_bough', 'hide', 6);
   openRoute('snow_fire', 'sky_cord', 'sky_terrace');
   visitAndChoose('white_ravine', 2);
   assert.equal(state.inventory.hook_iron, 1);
@@ -1310,14 +1432,13 @@ test('a prepared ford expedition opens each later region through field contacts,
   assert.equal(play(state, 'experiment', { id: deduction, settings: { notch: 'inner', shadow: 'center' } }).deduction, 'verified');
   assert.equal(state.inventory.axis_tuning, 1);
   play(state, 'leave');
-  gather('cloud_scree', 'cloud_jade', 12);
+  gather('cloud_scree', 'core', 8);
 
   provision();
   assert.deepEqual(view(state).discovered.filter(id => id !== 'village' && id !== 'hidden'), data.regions.filter(({ id }) => id !== 'village' && id !== 'hidden').map(({ id }) => id));
   assert.equal(data.regions.filter(({ id }) => id !== 'village').length, 10);
   assert.ok(data.regions.filter(({ id }) => id !== 'village').every(({ id }) => data.sites.filter(({ region }) => region === id).length >= 3));
   assert.equal(view(state).quests.some(({ id }) => id === 'sky_treaty'), false);
-  assert.match(act(state, 'breakthrough').message, /雪脊兽/);
   workForge(state, 'r_snow_halberd');
   play(state, 'equip', { id: 'snow_halberd' });
   play(state, 'learn', { id: 'reed_cleave' });
@@ -1337,25 +1458,17 @@ test('a prepared ford expedition opens each later region through field contacts,
   assert.ok(state.defeated.includes('snow_warden'));
 
   provision();
-  buildFromFixture(state, 'furnace', 2);
   const realm = data.realms.at(-1);
-  const { leaf_pill: neededDrinks, ...otherMaterials } = realm.need;
-  supplyFixture(state, otherMaterials);
   state.coins = Math.max(state.coins, realm.cost + 20);
   assert.ok(state.insight >= realm.insight);
   assert.ok(state.practice[2] >= realm.practice);
-  assert.match(act(state, 'breakthrough').message, /清脉饮/);
-  const infusion = data.recipes.find(({ id }) => id === 'r_leaf_pill');
-  supplyFixture(state, { ...infusion.need, spirit_leaf: otherMaterials.spirit_leaf + infusion.need.spirit_leaf });
-  play(state, 'econDeposit', { id: 'spirit_leaf', count: state.inventory.spirit_leaf });
-  play(state, 'econStart', { id: infusion.id });
-  assert.equal(state.inventory.leaf_pill, undefined);
-  assert.equal(state.economy.warehouse.spirit_leaf, otherMaterials.spirit_leaf);
-  finishProject(state, 'furnace');
-  assert.equal(state.inventory.leaf_pill, infusion.count);
+  assert.match(act(state, 'breakthrough').message, /筑基丹/);
+  // The alchemy-chain integration test earns and brews the pill from its own clues.
+  // Here it is a fixture to isolate the old world's independent final route.
+  supplyFixture(state, { foundation_pill: 1 });
   play(state, 'breakthrough');
   assert.equal(state.realm, 3);
-  assert.equal(state.inventory.leaf_pill, infusion.count - neededDrinks);
+  assert.equal(state.inventory.foundation_pill, undefined);
   assert.equal(view(state).nextRealm, null);
 
   for (const id of ['r_sky_bow', 'r_cloud_arrow', 'r_sky_cloak']) workForge(state, id);

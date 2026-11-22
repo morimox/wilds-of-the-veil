@@ -1,5 +1,5 @@
 ﻿标识,名称,每发攻击修正,每发基础穿甲,适用目标与加成
-reed_arrow,削苇箭,1,0,
-iron_arrow,包铁箭,2,2,额外穿甲 · 敌人标签 scaled · 加成 2
-black_bolt,玄铁短矢,3,4,额外穿甲 · 敌人标签 stoneborn · 加成 2
-cloud_arrow,凝光箭,4,3,额外伤害 · 敌人标签 spirit · 加成 4
+reed_arrow,削苇箭,0,0,
+iron_arrow,包铁箭,1,1,
+black_bolt,暗金短矢,1,2,
+cloud_arrow,凝光箭,1,2,额外伤害 · 敌人标签 spirit · 加成 2

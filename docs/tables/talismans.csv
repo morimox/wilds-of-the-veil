@@ -1,6 +1,6 @@
 ﻿标识,名称,境界要求,境界名,固定伤害,额外防御,脱身减伤加成
-ember_talisman,燃枝符,0,炼气,10,0,0
-reed_talisman,遮痕符,0,炼气,0,3,0.38
-bank_talisman,回汊符,0,炼气,0,2,0.56
-iron_talisman,铁障符,1,筑基,0,10,0
-tide_talisman,逆潮符,2,凝丹,19,4,0
+ember_talisman,燃枝符,0,炼气初期,10,0,0
+reed_talisman,遮痕符,0,炼气初期,0,3,0.38
+bank_talisman,回汊符,0,炼气初期,0,2,0.56
+iron_talisman,铁障符,1,炼气中期,0,10,0
+tide_talisman,逆潮符,2,炼气后期,19,4,0

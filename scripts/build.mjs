@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const file = async path => (await readFile(new URL(path, root), "utf8")).replace(/\r\n/g, "\n");
-const [html, style, intro, data, economy, engine, app] = await Promise.all([
-  file("game.html"), file("style.css"), file("intro.css"), file("data.mjs"), file("economy.mjs"), file("engine.mjs"), file("app.mjs"),
+const [html, style, intro, data, economy, alchemy, engine, app] = await Promise.all([
+  file("game.html"), file("style.css"), file("intro.css"), file("data.mjs"), file("economy.mjs"), file("alchemy.mjs"), file("engine.mjs"), file("app.mjs"),
 ]);
 const originalCss = `${style}\n${intro}`;
 const destination = process.argv[2] ? resolve(process.argv[2]) : fileURLToPath(new URL("dist/雾渡山河.html", root));
@@ -36,6 +36,10 @@ ${moduleBody(economy)}
 return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo };
 })();
 const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo } = economyModule;
+const { alchemyData, initialAlchemyState, alchemyView, alchemyAction } = (() => {
+${moduleBody(alchemy)}
+return { alchemyData, initialAlchemyState, alchemyView, alchemyAction };
+})();
 const { act, createGame, rules, view } = (() => {
 ${moduleBody(engine)}
 return { act, createGame, rules, view };
