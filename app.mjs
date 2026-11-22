@@ -414,7 +414,7 @@ function feedback(before, after, result, action) {
   if (result.ok && (action === "travel" || action === "explore" || action === "revisit")) {
     narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
   }
-  narrative = publicText(narrative).trim();
+  narrative = publicText(narrative).replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
   if (goods.length) lines.push(`获得${goods.map(item => item.name).join("、")}。`);
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);

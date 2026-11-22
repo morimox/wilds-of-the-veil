@@ -148,7 +148,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .notices {
   position: fixed;
   z-index: 20;
-  left: max(12px, env(safe-area-inset-left));
+  left: max(12px, env(safe-area-inset-left), calc((100vw - 830px) / 2));
   bottom: max(12px, env(safe-area-inset-bottom));
   display: grid;
   gap: 6px;

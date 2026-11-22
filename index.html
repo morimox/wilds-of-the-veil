@@ -157,7 +157,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .notices {
   position: fixed;
   z-index: 20;
-  left: max(12px, env(safe-area-inset-left));
+  left: max(12px, env(safe-area-inset-left), calc((100vw - 830px) / 2));
   bottom: max(12px, env(safe-area-inset-bottom));
   display: grid;
   gap: 6px;
@@ -2170,7 +2170,7 @@ function feedback(before, after, result, action) {
   if (result.ok && (action === "travel" || action === "explore" || action === "revisit")) {
     narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
   }
-  narrative = publicText(narrative).trim();
+  narrative = publicText(narrative).replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
   if (goods.length) lines.push(`获得${goods.map(item => item.name).join("、")}。`);
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
