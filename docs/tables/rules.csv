@@ -13,7 +13,13 @@ pressureQi,1,压力超限的每次探索所消耗的真气（点）
 battleDays,0.125,战斗操作每回合用时（天）
 retreatDays,0.25,撤出战斗所需用时（天）
 retreatDamageFactor,0.5,脱身时先乘此值，再计算减伤和防御
-returnShortageDays,0.25,回村路上每少带一份干粮额外用时（天）
+emptyReturnDays,0.25,空腹返村额外用时（天）
+waitDays,0.5,主动等候一次的游戏天数
+maxSatiety,100,饱腹度上限
+satietyDrainPerDay,16,每游戏日消耗的饱腹度
+rationSatiety,32,每份普通干粮恢复的饱腹度
+emptyAttackMultiplier,0.75,空腹交手时对普通与兵刃术诀出伤的倍率
+unpackBasketDays,0.25,拆开药篓所用的游戏天数
 guardBonus,3,主动格挡增加的防御（点）
 guardCounter,2,格挡重招时的反击伤害（点）
 enemyGuardBonus,2,敌方防御意图至少增加的防御（点）

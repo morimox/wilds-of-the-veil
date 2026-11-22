@@ -2,6 +2,8 @@ import { data } from "./data.mjs";
 import { act, createGame, rules, view } from "./engine.mjs";
 
 const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
+const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
+const eventRows = Object.fromEntries(data.events.map(event => [event.id, event]));
 const slotNames = { weapon: "兵刃", armor: "护具", charm: "法器" };
 const intentNames = { attack: "进攻", heavy: "蓄势", guard: "守势", heal: "疗伤", drain: "夺气" };
 const kindNames = { material: "材料", food: "口粮", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索" };
@@ -58,9 +60,10 @@ function tag(text, tone = "") {
   return `<span class="tag ${tone}">${escape(text)}</span>`;
 }
 
-function card(title, desc, badge = "", actions = "", entry = "") {
+function card(title, desc, badge = "", actions = "", entry = "", need = null) {
   const name = entry ? `<span class="entry-anchor"><button class="item-trigger" type="button" data-entry aria-expanded="false">${escape(title)}</button><span class="item-tip" role="tooltip">${escape(publicText(entry))}</span></span>` : escape(title);
-  return `<article class="card"><div class="card-head"><h3>${name}</h3>${badge}</div>${desc ? `<p>${escape(publicText(desc))}</p>` : ""}${actions ? `<div class="actions">${actions}</div>` : ""}</article>`;
+  const required = need ? supplies(need) : "";
+  return `<article class="card"><div class="card-head"><h3>${name}</h3>${badge}</div>${desc ? `<p>${escape(publicText(desc))}</p>` : ""}${required ? `<p>需${escape(required)}</p>` : ""}${actions ? `<div class="actions">${actions}</div>` : ""}</article>`;
 }
 
 function meter(label, current, total) {
@@ -70,7 +73,7 @@ function meter(label, current, total) {
 }
 
 function supplies(entries) {
-  return Object.keys(entries ?? {}).map(id => itemRows[id]?.name ?? id).join("、");
+  return Object.entries(entries ?? {}).map(([id, count]) => `${itemRows[id]?.name ?? id} ×${count}`).join("、");
 }
 
 function condition(current, total) {
@@ -107,15 +110,19 @@ function inVillage(s) {
   return s.mode === "village";
 }
 
+function hasApprentice(s) {
+  return inVillage(s) && (Boolean(s.inventory.lost_basket) || s.basketDisposition === "returned" ||
+    s.quests.some(quest => quest.id === "reed_salve"));
+}
+
 function stats(s) {
   const warnings = [];
   if (s.mode === "combat") {
-    warnings.push(`气血${condition(s.hp, s.maxHp)}`, `真气${condition(s.qi, s.maxQi)}`);
+    warnings.push(`真气${condition(s.qi, s.maxQi)}`);
   } else {
-    if (s.hp / s.maxHp < 0.3) warnings.push("气血危急");
-    else if (s.hp < s.maxHp || s.wounds) warnings.push("受伤");
     if (s.qi < s.maxQi / 3) warnings.push("真气将尽");
   }
+  if (s.satiety === 0) warnings.push("空腹乏力");
   if ((s.inventory.ration ?? 0) < rules.reliefRations) warnings.push("口粮不足");
   if (s.toxin >= rules.toxinThreshold) warnings.push("丹毒发作");
   const danger = s.pressure > rules.pressureThreshold;
@@ -125,7 +132,11 @@ function stats(s) {
     <summary>${danger ? "雾压过重" : "雾压"} <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
     <span>雾积满后，再探索会耗真气。回村就会散去。</span>
   </details>` : "";
-  return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
+  const canEat = s.mode !== "victory" && (s.inventory.ration ?? 0) > 0 && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
+  return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
+    <span class="vital${s.hp / s.maxHp < 0.3 ? " low" : ""}">气血 <b>${s.hp}/${s.maxHp}</b></span>
+    <span class="vital${s.satiety < 24 ? " low" : ""}">饱腹 <b>${Math.floor(s.satiety)}/${s.maxSatiety}</b></span>
+    ${canEat ? linkButton("吃干粮", "eat", "", "quick-eat") : ""}${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
 function discovered(s, region) {
@@ -138,10 +149,27 @@ function discovered(s, region) {
 function routeAction(s, r, primary) {
   const homeward = r.id === "village";
   const locked = r.tier > s.realm.id;
-  const route = homeward ? s.region : r;
-  const shortfall = Math.max(0, route.food - (s.inventory.ration ?? 0));
-  const note = locked ? `需${tierName(r.tier)}` : shortfall ? (homeward ? "缺粮回程会慢些" : "口粮不足") : "";
-  return `<div class="route-action">${linkButton(homeward ? "回村" : `去${r.name}`, "travel", r.id, primary ? "primary" : "", locked || (!homeward && shortfall > 0))}${note ? `<span class="fine">${escape(note)}</span>` : ""}</div>`;
+  const hungry = !homeward && s.satiety <= 0;
+  const days = homeward ? s.region.travel + (s.satiety <= 0 ? rules.emptyReturnDays : 0) : r.travel;
+  const note = locked ? `需${tierName(r.tier)}` : hungry ? "空腹" : days ? `${days} 日` : "";
+  return `<div class="route-action">${linkButton(homeward ? "回村" : `去${r.name}`, "travel", r.id, primary ? "primary" : "", locked || hungry)}${note ? `<span class="fine">${escape(note)}</span>` : ""}</div>`;
+}
+
+function siteResources(s, site) {
+  const stock = Object.entries(site?.stocks ?? {}).map(([id, count]) =>
+    count > 0 ? `${itemRows[id].name} ×${count}` : `${itemRows[id].name}已采空`);
+  const witnessedEnemies = (eventRows[site?.id]?.choices ?? []).filter((choice, index) =>
+    choice.enemy && s.seenChoices.includes(`${site.id}:${index}`)).map(choice => choice.enemy);
+  const creatures = Object.entries(site?.creatures ?? {}).filter(([id]) => witnessedEnemies.includes(id)).map(([id, count]) =>
+    count > 0 ? `${enemyRows[id].name} ×${count}` : `暂未见${enemyRows[id].name}`);
+  return [...stock, ...creatures].join(" · ");
+}
+
+function siteList(s) {
+  return `<div class="site-list">${(s.sites ?? []).map(site => {
+    const stateText = siteResources(s, site);
+    return `<div class="site-row">${linkButton(site.name, "visit", site.id, "", s.satiety <= 0)}${stateText ? `<span class="fine">${escape(stateText)}</span>` : ""}</div>`;
+  }).join("")}</div>`;
 }
 
 function journey(s) {
@@ -151,21 +179,23 @@ function journey(s) {
   const known = data.regions.filter(region => region.id !== s.region.id && discovered(s, region));
   const isHome = inVillage(s);
   const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.pressure || (s.inventory.ration ?? 0) < rules.reliefRations;
-  return panel(s.region.name, `<div class="actions place-actions">
-    ${isHome ? "" : linkButton("探索", "explore", "", "primary")}
+  return panel(s.region.name, `${isHome ? "" : siteList(s)}<div class="actions place-actions">
     ${known.map((r, i) => routeAction(s, r, isHome && i === 0)).join("")}
     ${isHome && needRest ? linkButton("歇息", "rest") : ""}
-    ${(s.revisitableEvents ?? []).map(e => linkButton(`回查${e.name}`, "revisit", e.id)).join("")}
+    ${hasApprentice(s) ? tabButton("找药僮", "apprentice") : ""}
+    ${!isHome || s.explored.length ? linkButton("等半日", "wait", "", "quiet", !isHome && s.satiety <= 0) : ""}
   </div>`);
 }
 
 function eventScreen(s) {
   const event = s.currentEvent;
+  const local = (s.sites ?? []).find(site => site.id === event.id);
+  const resources = siteResources(s, local);
   const choices = s.visibleChoices.map(choice => {
     const details = [choice.desc, choice.lockedReason].map(text => publicText(text)).filter(Boolean).join(" ");
     return `<div class="choice">${linkButton(choice.label, "choose", choice.index, "", choice.available === false)}${details ? `<p>${escape(details)}</p>` : ""}</div>`;
   }).join("");
-  return panel(event.name, `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div><p class="intro">${escape(publicText(event.text))}</p><div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
+  return panel(event.name, `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div><p class="intro">${escape(publicText(event.text))}</p>${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}<div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
 }
 
 function pillSummary(row) {
@@ -202,12 +232,12 @@ function gearDescription(item, gear, remaining) {
   return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
 }
 
-function itemSlot(item, location, description, actions = "", label = "") {
+function itemSlot(item, location, description, actions = "", label = "", count = 0) {
   const key = `${location}-${item.id}`;
   const open = selectedItem === key;
   return `<div class="item-row" data-item-row="${escape(key)}">
     ${label ? `<span class="slot-label">${escape(label)}</span>` : ""}
-    <button type="button" class="item-trigger" data-item="${escape(key)}" aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}</button>
+    <button type="button" class="item-trigger" data-item="${escape(key)}" aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
     <span class="item-tip" id="tip-${escape(key)}" role="tooltip">${escape(publicText(description))}</span>
     ${actions ? `<div class="item-tools"${open ? "" : " hidden"}>${actions}</div>` : ""}
   </div>`;
@@ -216,6 +246,7 @@ function itemSlot(item, location, description, actions = "", label = "") {
 function pack(s) {
   const canEquip = inVillage(s) || s.mode === "field";
   const canUse = canEquip || s.mode === "combat";
+  const canEat = canUse || s.mode === "event";
   const canRepair = inVillage(s) && s.services?.includes("workshop");
   const worn = Object.entries(s.equipment).filter(([, id]) => id).map(([slot, id]) => {
     const gear = data.gear.find(row => row.id === id);
@@ -237,16 +268,21 @@ function pack(s) {
     }
     if (pill && canUse) actions = linkButton("服用", "use", row.id, "", pill.tier > s.realm.id);
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
-    if (row.id === "ration" && canUse && s.hp < s.maxHp) actions = linkButton("吃口粮", "eat");
+    if (row.id === "ration" && canEat && (s.satiety < s.maxSatiety || s.hp < s.maxHp)) actions = linkButton("吃干粮", "eat");
+    if (row.id === "lost_basket" && canEquip) {
+      if (!s.basketInspected) actions += linkButton("查看药篓", "inspectBasket");
+      if (inVillage(s)) actions += tabButton("找药僮", "apprentice");
+      actions += linkButton("拆篓取药", "unpackBasket", "", "danger");
+    }
     if (canEquip) actions += linkButton("放下", "discard", row.id, "quiet");
     const description = gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
-    return itemSlot(row, "held", description, actions);
+    return itemSlot(row, "held", description, actions, "", s.inventory[row.id]);
   });
-  const clues = carried.filter(row => row.kind === "key").map(row => itemSlot(row, "clue", row.desc));
+  const clues = carried.filter(row => row.kind === "key").map(row => itemSlot(row, "clue", row.desc, "", "", s.inventory[row.id]));
   const ground = canEquip ? Object.keys(s.groundLoot ?? {}).map(id => {
     const item = itemRows[id];
     const gear = data.gear.find(row => row.id === id);
-    return itemSlot(item, "ground", gear ? gearDescription(item, gear) : item.desc, linkButton("拾起", "take", id));
+    return itemSlot(item, "ground", gear ? gearDescription(item, gear) : item.desc, linkButton("拾起", "take", id), "", s.groundLoot[id]);
   }) : [];
   const meter = Array.from({ length: s.backpackCapacity }, (_, i) => `<i${i < s.backpackUsed ? ' class="filled"' : ""}></i>`).join("");
   const room = s.backpackUsed >= s.backpackCapacity ? "已满" : s.backpackUsed >= s.backpackCapacity - 2 ? "快满了" : "有空位";
@@ -284,10 +320,9 @@ function workshop(s) {
     const gear = data.gear.find(g => g.id === row.result);
     const pill = data.pills.find(g => g.id === row.result);
     const talisman = data.talismans.find(g => g.id === row.result);
-    const need = supplies(row.need);
     const reason = !hasSupply(s, row.need) ? "材料不足" : s.coins < row.cost ? "灵钱不足" : "";
     const entry = gear ? gearDescription(result, gear) : pill ? pillSummary(pill) : talisman ? talismanSummary(talisman) : result.desc;
-    return card(result.name, need ? `需${need}` : "", tag(kindNames[result.kind] ?? ""), linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), entry);
+    return card(result.name, "", tag(kindNames[result.kind] ?? ""), linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), entry, row.need);
   }).join("")}</div>`);
 }
 
@@ -322,10 +357,21 @@ function questBoard(s) {
   return panel("委托", `<div class="card-grid">${list.map(row => {
     const done = questDone(s, row);
     const unmet = !hasSupply(s, row.need);
-    return card(row.name, `${row.desc} 交付 ${supplies(row.need)}。`,
+    return card(row.name, row.desc,
       done ? tag("已交付", "off") : "",
-      done ? "" : linkButton(unmet ? "材料不足" : "交付", "handin", row.id, "primary", unmet));
+      done ? "" : linkButton(unmet ? "材料不足" : row.id === "lost_basket_return" ? "交还药篓" : "交付", "handin", row.id, "primary", unmet), "", row.need);
   }).join("")}</div>`);
+}
+
+function apprentice(s) {
+  const delivery = s.quests.find(quest => quest.id === "lost_basket_return");
+  const reeds = s.quests.find(quest => quest.id === "reed_salve" && !quest.completed);
+  const holding = Boolean(s.inventory.lost_basket);
+  const greeting = holding ? "药僮认出了你手里的竹篓。" : "药僮正忙着看火。";
+  const basket = holding && delivery ? linkButton("交还药篓", "handin", delivery.id, "primary") : "";
+  const herb = reeds ? `<div class="card"><p>${escape(reeds.desc)}</p><p>需${escape(supplies(reeds.need))}</p>
+    <div class="actions">${linkButton("把苇芯给他", "handin", reeds.id, "", !hasSupply(s, reeds.need))}</div></div>` : "";
+  return panel("药僮", `<p class="intro">${greeting}</p>${basket ? `<div class="actions">${basket}</div>` : ""}${herb}`);
 }
 
 function deductionBoard(s) {
@@ -352,12 +398,12 @@ function render() {
   const inEncounter = s.mode === "event" || s.mode === "combat" || s.mode === "victory";
   const showVillage = inVillage(s) && Boolean(s.services?.length);
   const available = {
-    journey: true, village: showVillage, deduction: Boolean(s.deductions?.length),
+    journey: true, village: showVillage, apprentice: hasApprentice(s), deduction: Boolean(s.deductions?.length),
   };
   for (const service of Object.keys(serviceNames)) available[service] = showVillage && s.services.includes(service);
   const tab = inEncounter || !available[screen] ? "journey" : screen;
-  const content = { journey, village, cultivate: cultivation, workshop, market, quests: questBoard, deduction: deductionBoard };
-  document.querySelector("#clock").textContent = s.day % 1 < 0.5 ? "白昼" : "夜里";
+  const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, quests: questBoard, deduction: deductionBoard };
+  document.querySelector("#clock").textContent = `第${Math.floor(s.day)}日 · ${s.day % 1 < 0.5 ? "白昼" : "夜里"}`;
   document.querySelector("#player-status").innerHTML = stats(s);
   kit.innerHTML = pack(s);
   for (const button of document.querySelectorAll(".navigation button")) {
@@ -406,24 +452,25 @@ function feedback(before, after, result, action) {
   const goods = acquired.filter(item => item.kind !== "key");
   const clues = acquired.filter(item => item.kind === "key");
   let narrative = result.message ?? "";
+  if (action === "eat") narrative = narrative.replace(/(?:饱腹|气血)\+\d+(?:\.\d+)?[，。]?/g, "");
   if (result.damageDealt || result.damageTaken) {
     narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "").replace(/反击，[。]?/g, "反击。");
   }
   if (acquired.length) narrative = narrative.replace(/获得[^。]+。/g, "");
   if (result.injury) narrative = narrative.replace(result.injury.cause, "").replace(/丹毒积重，损失\d+点生命。?/g, "");
-  if (result.ok && (action === "travel" || action === "explore" || action === "revisit")) {
+  if (result.ok && ["travel", "visit", "revisit"].includes(action)) {
     narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
   }
   narrative = publicText(narrative).replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
-  if (goods.length) lines.push(`获得${goods.map(item => item.name).join("、")}。`);
+  if (goods.length) lines.push(`获得${goods.map(item => `${item.name} ×${after.inventory[item.id] - (before.inventory[item.id] ?? 0)}`).join("、")}。`);
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
   const didRecover = ["choose", "eat", "use", "rest"].includes(action) && after.hp > before.hp && !result.injury;
   const changes = [
     didRecover && !narrative.includes("气血") && "气血恢复",
     after.qi > before.qi && ["choose", "use", "rest"].includes(action) && !narrative.includes("真气") && "真气恢复",
-    after.qi < before.qi && ["choose", "explore", "revisit", "art"].includes(action) && !narrative.includes("真气") && "消耗了真气",
-    (after.inventory.ration ?? 0) < (before.inventory.ration ?? 0) && ["travel", "choose"].includes(action) && "用了些口粮",
+    after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && "消耗了真气",
+    after.satiety > before.satiety && action === "eat" && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
     after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",
   ].filter(Boolean);
   if (changes.length) lines.push(changes.join("，") + "。");
@@ -436,13 +483,22 @@ function feedback(before, after, result, action) {
 }
 
 function performAction(action, payload) {
-  const before = { inventory: { ...state.inventory }, discovered: [...state.discovered], hp: state.hp, qi: state.qi, coins: state.coins };
+  const before = {
+    inventory: { ...state.inventory }, discovered: [...state.discovered],
+    sites: view(state).sites.map(site => site.id), region: state.region,
+    hp: state.hp, qi: state.qi, satiety: state.satiety, coins: state.coins,
+  };
   const result = act(state, action, payload);
-  if (["travel", "explore", "choose", "leave", "revisit", "resume"].includes(action)) screen = "journey";
+  if (["travel", "visit", "choose", "leave", "revisit", "resume"].includes(action)) screen = "journey";
   if (action === "travel" || action === "discard" || action === "take" || action === "equip" || action === "unequip") selectedItem = null;
   render();
-  showNotice(feedback(before, state, result, action), Boolean(result.injury || result.damageTaken || !result.ok));
-  if (["travel", "explore", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
+  const lines = feedback(before, state, result, action);
+  if (result.ok && state.region === before.region && (action === "visit" || action === "choose" || action === "take")) {
+    const nearby = view(state).sites.filter(site => !before.sites.includes(site.id)).map(site => site.name);
+    if (nearby.length) lines.push(`附近还能去${nearby.join("、")}。`);
+  }
+  showNotice(lines, Boolean(result.injury || result.damageTaken || !result.ok));
+  if (["travel", "visit", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
 }
 
 document.addEventListener("submit", event => {

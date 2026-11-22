@@ -1,5 +1,5 @@
 ﻿标识,名称,获得任一材料或线索,完成任一事件选项
-quests,委托,白苇芯（reed）,翻倒的药篓（sunk_pack） · 叫人来认药篓、修桨的人（reed_ferryman） · 给渡工搭把手
-market,坊市,,翻倒的药篓（sunk_pack） · 叫人来认药篓、干透的柴窝（old_fire） · 捆些干柴、修桨的人（reed_ferryman） · 给渡工搭把手
-workshop,工坊,泥蜕（hide）,翻倒的药篓（sunk_pack） · 把篓拉回来、干透的柴窝（old_fire） · 添柴歇脚、泥下冒泡（mud_track） · 沿干地绕行
-cultivate,修行,药僮的水线图（reed_lines）,苇海沉桅（drowned_mast） · 退上高埂、修桨的人（reed_ferryman） · 给渡工搭把手
+quests,委托,白苇芯（reed）、落水药篓（lost_basket）,修桨的人（reed_ferryman） · 给渡工搭把手
+market,坊市,,干透的柴窝（old_fire） · 捆些干柴、修桨的人（reed_ferryman） · 给渡工搭把手
+workshop,工坊,泥蜕（hide）,干透的柴窝（old_fire） · 添柴歇脚、干透的柴窝（old_fire） · 捆些干柴、碎石水眼（mud_track） · 沿干地绕行，拾漂到埂上的松枝
+cultivate,修行,药僮的水线图（reed_lines）,苇海沉桅（drowned_mast） · 站在高埂上看水势、修桨的人（reed_ferryman） · 给渡工搭把手

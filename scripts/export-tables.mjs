@@ -44,7 +44,13 @@ const ruleDescriptions = {
   battleDays: '战斗操作每回合用时（天）',
   retreatDays: '撤出战斗所需用时（天）',
   retreatDamageFactor: '脱身时先乘此值，再计算减伤和防御',
-  returnShortageDays: '回村路上每少带一份干粮额外用时（天）',
+  emptyReturnDays: '空腹返村额外用时（天）',
+  waitDays: '主动等候一次的游戏天数',
+  maxSatiety: '饱腹度上限',
+  satietyDrainPerDay: '每游戏日消耗的饱腹度',
+  rationSatiety: '每份普通干粮恢复的饱腹度',
+  emptyAttackMultiplier: '空腹交手时对普通与兵刃术诀出伤的倍率',
+  unpackBasketDays: '拆开药篓所用的游戏天数',
   guardBonus: '主动格挡增加的防御（点）',
   guardCounter: '格挡重招时的反击伤害（点）',
   enemyGuardBonus: '敌方防御意图至少增加的防御（点）',
@@ -138,17 +144,21 @@ const startState = [
     .map((key) => [key, ({
       pressure: '探索压力', wounds: '伤势', toxin: '丹毒', focus: '定息', reliefRations: '自用补助干粮',
     })[key] ?? titles[key], initial[key]]),
+  ['satiety', '饱腹度', initial.satiety],
   ['discovered', '已知地区', initial.discovered.map(ref).join('、')],
   ['victoryQuest', '完成故事的委托', ref(data.victoryQuest)],
 ].map(([id, name, value]) => ({ id, name, value }));
 
-const drawn = data.regions.flatMap((region) => {
-  const total = region.draws.reduce((sum, draw) => sum + Math.max(0, draw.weight), 0);
-  return region.draws.map((draw) => ({
-    region: region.id, ...draw, eventName: name(draw.event), total,
-    chance: total > 0 && draw.weight > 0 ? `${(100 * draw.weight / total).toFixed(2)}%` : '0.00%',
-  }));
-});
+const siteNames = new Map(data.sites.map(site => [site.id, site.name]));
+const siteRef = (id) => `${siteNames.get(id)}（${id}）`;
+const worldPools = data.sites.flatMap(site => [
+  ...Object.entries(site.stocks ?? {}).map(([id, pool]) => ({ site: site.id, kind: '资源', object: id, ...pool })),
+  ...Object.entries(site.creatures ?? {}).map(([id, pool]) => ({ site: site.id, kind: '种群', object: id, ...pool })),
+]);
+const basketOptions = [
+  { action: '查看', note: data.basket.inspect, days: 0 },
+  { action: '拆篓', note: data.basket.unpack.outcome, days: rules.unpackBasketDays, loot: data.basket.unpack.loot, spent: { [data.basket.item]: 1 } },
+];
 const choices = data.events.flatMap(({ id, name, choices }) =>
   choices.map((choice, index) => ({ event: id, eventName: name, order: index + 1, ...choice })));
 const describeChoice = (key) => {
@@ -202,21 +212,31 @@ const tables = [
     'id', 'result', 'count', 'tier', tier, ['cost', '制作费用（灵钱）'], 'need', 'days', 'reveal',
   ]),
   table('regions', '地区', gated(data.regions), [
-    'id', 'name', 'tier', tier, 'travel', ['food', '行程干粮'], 'reveal', 'hint', 'desc',
-  ], { omit: ['draws'], note: '发现去处后，仍需达到对应境界才能前往。发现条件通过线索与委托判定，遇见哪些事件见下表。' }),
-  table('region-encounters', '地区遭遇概率', drawn, [
-    'region', ['event', '事件标识'], ['eventName', '事件名称'], ['weight', '权重'],
-    ['total', '有效总权重'], ['chance', '单次探索概率'],
-  ], { note: '每次探索独立抽选，正权重除以该地区有效总权重。百分比显示到小数点后两位，精确值可用权重相除。' }),
+    'id', 'name', 'tier', tier, 'travel', 'reveal', 'hint', 'desc',
+  ], { omit: ['draws', 'food'], note: '发现去处后，仍需达到对应境界才能前往。行走消耗游戏时间和饱腹，干粮由玩家主动食用。' }),
+  table('region-encounters', '地区内的可选地点', data.sites, [
+    'region', 'id', 'name', ['after', '经过任一地点后发现', (ids) => ids.map(siteRef).join('、')],
+    'reveal', ['once', '一次性选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
+    ['emptyText', '地点耗尽时可见情形'], ['afterOnceText', '一次性行动后的场景'],
+    ['creatureText', '动物存在或耗尽时的景象'],
+  ], { omit: ['stocks', 'creatures'], note: '玩家直接选择区域内可以到达的地点。发现条件为空时到达该地区即可见。' }),
+  table('world-regrowth', '各地点库存与种群', worldPools, [
+    ['site', '地点', siteRef], ['kind', '类型', valueText], ['object', '资源或敌人', ref],
+    ['start', '初始量'], ['cap', '上限'], ['interval', '恢复间隔（游戏日）'], ['growth', '每次恢复'],
+    ['choices', '消耗此资源的选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
+  ], { note: '经游戏时间恢复到上限。恢复间隔或恢复量为 0 时，现场耗尽后不会重生。只有击败当场对手才减少该地点种群。' }),
   table('events', '事件正文', data.events, ['id', 'name', 'revisit', 'text'], {
     omit: ['choices'],
-    note: '已见过的可回查事件，若有满足要求且尚未走过的隐藏选项，当前地区可主动回查。主动回查使用与寻常探索相同的时间与压力。'
+    note: '每个事件对应一个可选地点。回到地点后可看到之前行动留下的变化，满足条件的隐藏选项才显示。'
   }),
   table('event-choices', '事件选项', choices, [
-    ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days', ['food', '消耗干粮'],
+    ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days',
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
     'need', 'consume', 'hidden', 'loot', 'enemy', ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
-  ], { note: '标为消耗所需物品时会扣除该列物品。隐藏选项所需物品齐备后才显示。受伤原因、扣血、战斗与所得只在选择后结算。' }),
+  ], { omit: ['food'], note: '标为消耗所需物品时会扣除该列物品。隐藏选项所需物品齐备后才显示。受伤原因、扣血、战斗与所得只在选择后结算。' }),
+  table('basket', '药篓物件操作', basketOptions, [
+    ['action', '操作'], 'days', ['spent', '消耗物件', resources], 'loot', ['note', '执行后反馈'],
+  ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
   table('enemies', '敌人', gated(data.enemies), [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', 'atk', 'def', ['tags', '装备克制标签'], ['coins', '战利灵钱'], ['insight', '首胜修为'], 'loot', 'desc',
   ], { omit: ['intents'] }),

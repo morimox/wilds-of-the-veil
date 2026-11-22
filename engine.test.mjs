@@ -17,32 +17,22 @@ function walk(state, id) {
   play(state, 'travel', { id });
 }
 
-function exploreWith(state, actions) {
-  play(state, 'explore');
-  const index = actions[view(state).currentEvent.id];
-  if (index === undefined) play(state, 'leave');
-  else choose(state, index);
-}
-
-function restock(state, minimum) {
-  const short = minimum - (state.inventory.ration ?? 0);
-  if (short <= 0) return;
-  const buyable = Math.min(short, Math.floor(state.coins / 3));
-  if (buyable > 0) play(state, 'buy', { id: 'ration', count: buyable });
-  if ((state.inventory.ration ?? 0) < 3) play(state, 'rest');
-}
-
 function seek(state, id) {
-  for (let draw = 0; draw < 48; draw++) {
-    play(state, 'explore');
-    if (view(state).currentEvent.id === id) return;
-    play(state, 'leave');
-  }
-  assert.fail(`没有找到测试事件 ${id}`);
+  play(state, 'visit', { id });
+  assert.equal(view(state).currentEvent.id, id);
+}
+
+function chooseAt(state, site, index) {
+  seek(state, site);
+  return play(state, 'choose', { index });
+}
+
+function feed(state, minimum) {
+  while (state.satiety < minimum) play(state, 'eat');
 }
 
 test('village services and their contents are found gradually and guarded by the engine', () => {
-  let state = createGame(1);
+  let state = createGame();
   const opening = view(state);
   assert.deepEqual(opening.services, []);
   assert.deepEqual(opening.discoveredQuests, []);
@@ -67,7 +57,7 @@ test('village services and their contents are found gradually and guarded by the
   assert.deepEqual(view(state).services, ['quests']);
   seek(state, 'old_fire');
   choose(state, 1);
-  assert.deepEqual(view(state).services, ['quests', 'market']);
+  assert.deepEqual(view(state).services, ['quests', 'market', 'workshop']);
   seek(state, 'sunk_pack');
   choose(state, 0);
   assert.deepEqual(view(state).services, ['quests', 'market', 'workshop']);
@@ -88,8 +78,12 @@ test('village services and their contents are found gradually and guarded by the
   assert.ok(view(state).discoveredItems.includes('knife'));
   play(state, 'learn', { id: 'reed_cleave' });
 
-  const ferrymanRoute = createGame(1);
+  const ferrymanRoute = createGame();
   walk(ferrymanRoute, 'marsh');
+  seek(ferrymanRoute, 'reed_banks');
+  play(ferrymanRoute, 'leave');
+  seek(ferrymanRoute, 'old_fire');
+  play(ferrymanRoute, 'leave');
   seek(ferrymanRoute, 'reed_ferryman');
   choose(ferrymanRoute, 0);
   assert.deepEqual(view(ferrymanRoute).services, ['quests', 'market', 'cultivate']);
@@ -97,7 +91,7 @@ test('village services and their contents are found gradually and guarded by the
 });
 
 test('harvesting only gives materials and reveals damage strictly after an action', () => {
-  const state = createGame(9);
+  const state = createGame();
   walk(state, 'marsh');
   seek(state, 'reed_banks');
   const choices = view(state).visibleChoices;
@@ -123,12 +117,159 @@ test('harvesting only gives materials and reveals damage strictly after an actio
   assert.ok(view(state).deductions.some(({ id }) => id === 'find_eddy'));
 });
 
+test('chosen sites retain depletion, and only elapsed days replenish their local stocks and animals', () => {
+  const huntCount = (state) => view(state).sites.find(({ id }) => id === 'mud_track').creatures.mud_beast;
+  const reeds = (state) => view(state).sites.find(({ id }) => id === 'reed_banks').stocks.reed;
+  const state = createGame();
+  walk(state, 'marsh');
+  assert.deepEqual(view(state).sites.map(({ id }) => id), ['reed_banks', 'sunk_pack', 'mud_track']);
+  assert.equal(Object.hasOwn(view(state).sites.find(({ id }) => id === 'mud_track'), 'creatures'), false);
+  const beforeInvalid = structuredClone(state);
+  assert.equal(act(state, 'visit', { id: 'drowned_mast' }).ok, false);
+  assert.deepEqual(state, beforeInvalid);
+
+  seek(state, 'reed_banks');
+  const reedStart = reeds(state);
+  assert.ok(view(state).sites.some(({ id }) => id === 'old_fire'));
+  choose(state, 1);
+  assert.equal(reeds(state), reedStart - 3);
+  chooseAt(state, 'reed_banks', 1);
+  assert.equal(state.inventory.reed, reedStart);
+  assert.equal(reeds(state), 0);
+  seek(state, 'reed_banks');
+  assert.match(view(state).currentEvent.text, /采完/);
+  const beforeInvalidHarvest = structuredClone(state);
+  assert.equal(act(state, 'choose', { index: 0 }).ok, false);
+  assert.deepEqual(state, beforeInvalidHarvest);
+  play(state, 'leave');
+  assert.equal(reeds(state), 0);
+  play(state, 'wait');
+  assert.ok(reeds(state) > 0);
+  const beforeLooking = structuredClone(state);
+  view(state);
+  assert.deepEqual(state, beforeLooking);
+
+  const hunting = createGame();
+  walk(hunting, 'marsh');
+  seek(hunting, 'mud_track');
+  const initial = huntCount(hunting);
+  const retreating = structuredClone(hunting);
+  choose(retreating, 0);
+  play(retreating, 'retreat');
+  assert.equal(huntCount(retreating), initial);
+  choose(hunting, 0);
+  for (let turn = 0; hunting.combat && turn < 6; turn++) play(hunting, 'attack');
+  assert.equal(hunting.combat, null);
+  assert.equal(huntCount(hunting), initial - 1);
+  assert.ok(hunting.inventory.hide);
+  seek(hunting, 'mud_track');
+  assert.equal(view(hunting).visibleChoices[0].available, false);
+  assert.match(view(hunting).currentEvent.text, /水面平静/);
+  assert.equal(act(hunting, 'choose', { index: 0 }).ok, false);
+  play(hunting, 'leave');
+  while (hunting.day < 5) play(hunting, 'wait');
+  assert.equal(huntCount(hunting), initial);
+  seek(hunting, 'mud_track');
+  assert.equal(view(hunting).visibleChoices[0].available, true);
+});
+
+test('satiety follows game time and only a deliberate meal consumes food', () => {
+  const state = createGame();
+  const initialRations = state.inventory.ration;
+  const day = state.day;
+  assert.equal(view(state).satiety, 100);
+  assert.equal(view(state).maxSatiety, rules.maxSatiety);
+  assert.equal(act(state, 'eat').ok, false);
+  assert.equal(state.day, day);
+
+  walk(state, 'marsh');
+  assert.equal(state.satiety, 100 - rules.satietyDrainPerDay);
+  assert.equal(state.inventory.ration, initialRations);
+  seek(state, 'reed_banks');
+  assert.equal(state.satiety, 100 - (1 + rules.exploreDays) * rules.satietyDrainPerDay);
+  assert.equal(state.hp, view(state).maxHp);
+  const beforeEating = state.day;
+  play(state, 'eat');
+  assert.equal(state.day, beforeEating);
+  assert.equal(state.satiety, rules.maxSatiety);
+  assert.equal(state.inventory.ration, initialRations - 1);
+  choose(state, 0);
+  assert.equal(state.satiety, 100 - rules.satietyDrainPerDay);
+  assert.equal(state.inventory.ration, initialRations - 1);
+  while (state.satiety > 0) play(state, 'wait');
+  assert.equal(act(state, 'visit', { id: 'reed_banks' }).ok, false);
+  assert.equal(act(state, 'travel', { id: 'ridge' }).ok, false);
+  const beforeReturn = state.day;
+  walk(state, 'village');
+  assert.equal(state.day - beforeReturn, 1 + rules.emptyReturnDays);
+  play(state, 'eat');
+  assert.equal(state.satiety, rules.rationSatiety);
+
+  const full = createGame();
+  full.combat = { id: 'mud_beast', hp: 25, round: 0, escapeBonus: 0 };
+  const hungry = structuredClone(full);
+  hungry.satiety = 0;
+  assert.ok(play(full, 'attack').damageDealt > play(hungry, 'attack').damageDealt);
+});
+
+test('the actual lost basket can be inspected and returned once, or its contents taken instead', () => {
+  const state = createGame();
+  walk(state, 'marsh');
+  state.inventory.ration = rules.backpackCapacity * rules.backpackStackSize;
+  const lifted = chooseAt(state, 'sunk_pack', 0);
+  assert.equal(lifted.spilled.lost_basket, 1);
+  assert.equal(state.inventory.lost_basket, undefined);
+  assert.equal(view(state).groundLoot.lost_basket, 1);
+  seek(state, 'sunk_pack');
+  assert.match(view(state).currentEvent.text, /篓绳/);
+  assert.equal(act(state, 'choose', { index: 0 }).ok, false);
+  play(state, 'leave');
+  play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
+  play(state, 'take', { id: 'lost_basket' });
+  assert.equal(state.inventory.lost_basket, 1);
+  assert.equal(view(state).groundLoot.lost_basket, undefined);
+  assert.equal(state.inventory.salve, undefined);
+  play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
+  const inspected = play(state, 'inspectBasket');
+  assert.ok(inspected.outcome);
+  assert.equal(view(state).basketInspected, true);
+  assert.equal(state.inventory.lost_basket, 1);
+
+  const wounded = structuredClone(state);
+  wounded.hp = 1;
+  wounded.combat = { id: 'mud_beast', hp: 25, round: 1, escapeBonus: 0 };
+  play(wounded, 'attack');
+  assert.equal(wounded.region, 'village');
+  assert.equal(wounded.inventory.lost_basket, 1);
+
+  const opened = structuredClone(state);
+  play(opened, 'unpackBasket');
+  assert.equal(view(opened).basketDisposition, 'unpacked');
+  assert.equal(opened.inventory.lost_basket, undefined);
+  assert.ok(opened.inventory.salve);
+  walk(opened, 'village');
+  assert.equal(act(opened, 'handin', { id: 'lost_basket_return' }).ok, false);
+  assert.equal(view(opened).discoveredQuests.includes('lost_basket_return'), false);
+
+  walk(state, 'village');
+  assert.ok(view(state).quests.some(({ id, ready }) => id === 'lost_basket_return' && ready));
+  const handedIn = play(state, 'handin', { id: 'lost_basket_return' });
+  assert.ok(handedIn.outcome);
+  assert.equal(view(state).basketDisposition, 'returned');
+  assert.equal(state.inventory.lost_basket, undefined);
+  assert.equal(act(state, 'handin', { id: 'lost_basket_return' }).ok, false);
+  assert.equal(act(state, 'unpackBasket').ok, false);
+  walk(state, 'marsh');
+  seek(state, 'sunk_pack');
+  assert.equal(act(state, 'choose', { index: 0 }).ok, false);
+});
+
 test('backpack slots are finite and overflow can be picked up in the same place', () => {
-  const state = createGame(1);
+  const state = createGame();
   const { backpackCapacity, backpackStackSize } = rules;
   assert.equal(view(state).backpackUsed, 1);
   assert.equal(view(state).backpackCapacity, backpackCapacity);
-  state.inventory.ration = backpackCapacity * backpackStackSize;
+  state.inventory.ration = backpackCapacity * backpackStackSize - 1;
   assert.equal(view(state).backpackUsed, backpackCapacity);
   assert.equal(act(state, 'unequip', { slot: 'weapon' }).ok, false);
   assert.equal(act(state, 'discard', { id: 'cudgel' }).ok, false);
@@ -156,7 +297,7 @@ test('backpack slots are finite and overflow can be picked up in the same place'
 });
 
 test('capacity checks do not charge for a refused transaction and discarded gear keeps its wear', () => {
-  const state = createGame(1);
+  const state = createGame();
   walk(state, 'marsh');
   seek(state, 'reed_banks');
   choose(state, 0);
@@ -188,13 +329,13 @@ test('capacity checks do not charge for a refused transaction and discarded gear
 });
 
 test('a clue reveals a road across saves and travel still requires the appropriate realm', () => {
-  let state = createGame(1);
+  let state = createGame();
   assert.deepEqual(view(state).discovered, ['village', 'marsh']);
   assert.equal(act(state, 'travel', { id: 'ridge' }).ok, false);
   assert.equal(view(state).discoveredItems.includes('sand'), false);
   assert.equal(view(state).discoveredQuests.includes('last_lantern'), false);
   walk(state, 'marsh');
-  exploreWith(state, { reed_banks: 0 });
+  chooseAt(state, 'reed_banks', 0);
   walk(state, 'village');
   play(state, 'handin', { id: 'reed_salve' });
   assert.ok(view(state).discovered.includes('ridge'));
@@ -205,9 +346,10 @@ test('a clue reveals a road across saves and travel still requires the appropria
 });
 
 test('a spent expedition can abandon an event and reach free relief without resetting progress', () => {
-  const state = createGame(1);
+  const state = createGame();
   walk(state, 'marsh');
-  play(state, 'explore');
+  seek(state, 'reed_banks');
+  state.satiety = 0;
   state.inventory.ration = 0;
   const before = JSON.stringify(state);
   assert.equal(act(state, 'choose', { index: 0 }).ok, false);
@@ -221,7 +363,7 @@ test('a spent expedition can abandon an event and reach free relief without rese
 });
 
 test('damage wears equipped gear, defeating an enemy rewards only first-kill insight, and falling is recoverable', () => {
-  const state = createGame(1);
+  const state = createGame();
   walk(state, 'marsh');
   const before = state.durability.cudgel;
   state.combat = { id: 'mud_beast', hp: 1, round: 0, escapeBonus: 0 };
@@ -253,7 +395,7 @@ test('damage wears equipped gear, defeating an enemy rewards only first-kill ins
 });
 
 test('a bow found by following material knowledge hits a furred beast harder', () => {
-  const state = createGame(1);
+  const state = createGame();
   for (const { entry } of data.gear) {
     assert.ok(entry);
     assert.doesNotMatch(entry, /[0-9]/);
@@ -269,6 +411,7 @@ test('a bow found by following material knowledge hits a furred beast harder', (
   assert.ok(view(state).discoveredRecipes.includes('r_reed_bow'));
   play(state, 'craft', { id: 'r_reed_bow' });
   play(state, 'equip', { id: 'reed_bow' });
+  feed(state, 50);
   walk(state, 'marsh');
   seek(state, 'mud_track');
   choose(state, 2);
@@ -291,7 +434,7 @@ test('a bow found by following material knowledge hits a furred beast harder', (
 });
 
 test('weapon piercing and armor effects follow the actual enemy and intent', () => {
-  const state = createGame(1);
+  const state = createGame();
   walk(state, 'marsh');
   state.inventory.knife = 1;
   state.durability.knife = 30;
@@ -325,10 +468,11 @@ test('weapon piercing and armor effects follow the actual enemy and intent', () 
 });
 
 test('restoratives heal, toxin applies at the threshold, and a retreat talisman is spent immediately', () => {
-  const state = createGame(1);
+  const state = createGame();
   walk(state, 'marsh');
   seek(state, 'sunk_pack');
   choose(state, 0);
+  play(state, 'unpackBasket');
   seek(state, 'reed_banks');
   choose(state, 0);
   walk(state, 'village');
@@ -354,7 +498,7 @@ test('restoratives heal, toxin applies at the threshold, and a retreat talisman 
 });
 
 test('deduction checks actual evidence and offers no spoilers, spends time on mistakes, and persists success', () => {
-  const state = createGame(1);
+  const state = createGame();
   const id = 'find_eddy';
   const answer = 'behind_stone';
   const evidence = ['reed_lines', 'oar_mark'];
@@ -405,48 +549,34 @@ test('deduction checks actual evidence and offers no spoilers, spends time on mi
   assert.equal(reloaded.inventory.eddy_note, 1);
 });
 
-test('a seeded run completes both realms and the main quest, then unlocks the secret map', () => {
-  const state = createGame(1);
-  walk(state, 'marsh');
-  seek(state, 'reed_banks');
-  choose(state, 0);
-  seek(state, 'old_fire');
-  choose(state, 1);
-  seek(state, 'sunk_pack');
-  choose(state, 0);
-  walk(state, 'village');
+test('a chosen route completes both realms and the main quest, then unlocks the secret map', () => {
+  const state = createGame();
+  const travelFed = (id) => { feed(state, 75); walk(state, id); };
+  const workFed = (id, index) => { feed(state, 45); chooseAt(state, id, index); };
+  travelFed('marsh');
+  workFed('reed_banks', 1);
+  workFed('old_fire', 1);
+  workFed('sunk_pack', 0);
+  workFed('reed_ferryman', 0);
+  travelFed('village');
+  play(state, 'handin', { id: 'lost_basket_return' });
   play(state, 'handin', { id: 'patch_ferry' });
-  const marshActions = { reed_banks: 0, sunk_pack: 1, mud_track: 1, old_fire: 1, reed_ferryman: 0 };
-  const ridgeActions = { ore_rain: 0, empty_oven: 1, miner_echo: 1, rope_run: 0, stone_niche: 0 };
-
-  for (let visit = 0; visit < 5 && ((state.inventory.reed ?? 0) < 3 || state.insight < 8); visit++) {
-    restock(state, 9);
-    walk(state, 'marsh');
-    for (let draw = 0; draw < 6 && (state.inventory.ration ?? 0) > 0; draw++) {
-      if ((state.inventory.reed ?? 0) >= 3 && state.insight >= 8) break;
-      exploreWith(state, marshActions);
-    }
-    walk(state, 'village');
-    const firewood = Math.max(0, (state.inventory.wood ?? 0) - 2);
-    if (firewood) play(state, 'sell', { id: 'wood', count: firewood });
-  }
   play(state, 'handin', { id: 'reed_salve' });
   play(state, 'breakthrough');
   assert.equal(view(state).realmIndex, 1);
 
-  const ridgePrepared = () => (state.inventory.ore ?? 0) >= 5 && state.inventory.core && state.insight >= 20 && state.coins >= 50;
-  for (let visit = 0; visit < 6 && !ridgePrepared(); visit++) {
-    restock(state, 9);
-    walk(state, 'ridge');
-    for (let draw = 0; draw < 6 && (state.inventory.ration ?? 0) > 0; draw++) {
-      if (ridgePrepared()) break;
-      exploreWith(state, ridgeActions);
-    }
-    walk(state, 'village');
-    const surplus = Math.max(0, (state.inventory.ore ?? 0) - 5);
-    if (surplus) play(state, 'sell', { id: 'ore', count: surplus });
-  }
-  assert.ok(ridgePrepared(), JSON.stringify({ inventory: state.inventory, coins: state.coins, insight: state.insight, log: state.log.slice(-15) }));
+  travelFed('ridge');
+  workFed('ore_rain', 0);
+  workFed('ore_rain', 1);
+  workFed('empty_oven', 1);
+  workFed('miner_echo', 1);
+  workFed('rope_run', 0);
+  workFed('stone_niche', 0);
+  travelFed('village');
+  const surplus = Math.max(0, (state.inventory.ore ?? 0) - 5);
+  if (surplus) play(state, 'sell', { id: 'ore', count: surplus });
+  assert.ok(state.inventory.ore >= 5);
+  assert.equal(state.inventory.core, 1);
   play(state, 'handin', { id: 'sell_forging' });
   play(state, 'craft', { id: 'r_iron_sword' });
   play(state, 'equip', { id: 'iron_sword' });
@@ -456,17 +586,10 @@ test('a seeded run completes both realms and the main quest, then unlocks the se
   play(state, 'learn', { id: 'reed_cleave' });
   play(state, 'learn', { id: 'stone_brace' });
 
-  restock(state, 9);
-  walk(state, 'ford');
-  const fordActions = { low_tide: 0, boat_shade: 0, tide_keeper: 0, flood_lines: 0, lock_deck: 0 };
-  for (let draw = 0; draw < 12 && !state.combat; draw++) {
-    if (!state.inventory.ration) {
-      walk(state, 'village');
-      restock(state, 6);
-      walk(state, 'ford');
-    }
-    exploreWith(state, fordActions);
-  }
+  travelFed('ford');
+  workFed('low_tide', 0);
+  workFed('flood_lines', 0);
+  workFed('tide_keeper', 0);
   assert.equal(view(state).currentEnemy.id, 'tide_spirit');
 
   const techniqueCost = 2;
@@ -487,7 +610,8 @@ test('a seeded run completes both realms and the main quest, then unlocks the se
   assert.equal(view(state).mode, 'field', state.log.slice(-8).join('\n'));
   assert.equal(state.inventory.seal, 1);
   assert.equal(state.won, false);
-  walk(state, 'village');
+  assert.equal(view(state).sites.find(({ id }) => id === 'tide_keeper').creatures.tide_spirit, 0);
+  travelFed('village');
   play(state, 'handin', { id: 'last_lantern' });
   assert.equal(view(state).mode, 'victory');
   assert.equal(state.inventory.seal, undefined);
@@ -497,8 +621,7 @@ test('a seeded run completes both realms and the main quest, then unlocks the se
   assert.equal(view(state).discovered.includes('hidden'), false);
   assert.equal(view(state).discoveryHint, '');
   assert.equal(act(state, 'travel', { id: 'hidden' }).ok, false);
-  restock(state, 8);
-  walk(state, 'marsh');
+  travelFed('marsh');
   seek(state, 'old_fire');
   const early = view(state);
   assert.equal(early.visibleChoices.some(({ index }) => index === 3), false);
@@ -506,13 +629,13 @@ test('a seeded run completes both realms and the main quest, then unlocks the se
   assert.equal(act(state, 'choose', { index: 3 }).ok, false);
   choose(state, 2);
   assert.equal(state.inventory.kiln_shard, 1);
-  walk(state, 'ridge');
+  travelFed('ridge');
   seek(state, 'stone_niche');
   assert.ok(view(state).visibleChoices.some(({ index, available }) => index === 2 && available));
   choose(state, 2);
   assert.equal(state.inventory.kiln_shard, 1);
   assert.equal(state.inventory.bell_clapper, 1);
-  walk(state, 'ford');
+  travelFed('ford');
   seek(state, 'boat_shade');
   choose(state, 2);
   assert.equal(state.inventory.bell_clapper, 1);
@@ -524,18 +647,19 @@ test('a seeded run completes both realms and the main quest, then unlocks the se
   }).deduction, 'solved');
   assert.equal(state.inventory.backwash_theory, 1);
   assert.equal(view(state).discovered.includes('hidden'), false);
-  walk(state, 'marsh');
+  travelFed('marsh');
   assert.ok(view(state).revisitableEvents.some(({ id }) => id === 'old_fire'));
   play(state, 'revisit', { id: 'old_fire' });
   choose(state, 3);
   assert.ok(view(state).discovered.includes('hidden'));
-  walk(state, 'village');
-  restock(state, 5);
-  walk(state, 'hidden');
+  travelFed('village');
+  travelFed('hidden');
   seek(state, 'upstream_lights');
   const wood = state.inventory.wood;
   choose(state, 0);
   assert.equal(state.inventory.wood, wood - 1);
   assert.ok(state.inventory.dry_wick > 0);
   assert.equal(state.wonDay, wonDay);
+  travelFed('ford');
+  assert.equal(view(state).sites.find(({ id }) => id === 'tide_keeper').creatures.tide_spirit, 0);
 });

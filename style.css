@@ -58,7 +58,11 @@ h3 { font-size: 15px; }
 .navigation:has(button:not([hidden])) { margin-top: 13px; }
 .player-line { min-height: 23px; padding: 10px 0 11px; color: var(--muted); font-size: 13px; }
 .realm { color: var(--jade); font-weight: 600; }
-.warning { color: var(--amber); }
+.warning, .vital.low { color: var(--amber); }
+.vital { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vital b { color: var(--text); font-weight: 600; }
+.vital.low b { color: inherit; }
+.button.quick-eat { min-height: 25px; padding: 2px 6px; background: transparent; font-size: 12px; }
 .pressure { color: var(--muted); }
 .pressure summary { cursor: pointer; }
 .pressure > span { color: var(--muted); display: block; padding-top: 4px; }
@@ -74,6 +78,10 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .actions { margin-top: 9px; }
 .place-actions { margin-top: 0; }
 .route-action { display: inline-flex; align-items: center; gap: 6px; }
+.site-list { display: grid; gap: 6px; }
+.site-list:not(:empty) { margin-bottom: 12px; }
+.site-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; }
+.site-stock { margin-top: 5px; color: var(--muted); font-size: 13px; }
 .kit { padding-left: 17px; border-left: 1px solid var(--line); }
 .kit-section + .kit-section { margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line); }
 .kit-section h2 { margin: 0 0 4px; font-size: 15px; }
@@ -104,6 +112,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
   cursor: pointer;
 }
 .item-trigger:hover, .item-trigger:focus-visible, .item-trigger[aria-expanded="true"] { color: var(--jade); }
+.item-count { margin-left: 6px; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .item-tip {
   display: none;
   grid-column: 1 / -1;
