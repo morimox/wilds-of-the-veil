@@ -6,6 +6,7 @@ import { act, createGame, rules, view } from './engine.mjs';
 function play(state, action, payload) {
   const result = act(state, action, payload);
   assert.equal(result.ok, true, `${action}: ${result.message}`);
+  return result;
 }
 
 function choose(state, index) {
@@ -62,20 +63,18 @@ test('village services and their contents are found gradually and guarded by the
   walk(state, 'marsh');
   seek(state, 'reed_banks');
   assert.deepEqual(view(state).services, []);
-  choose(state, 2);
-  assert.deepEqual(view(state).services, ['cultivate']);
+  choose(state, 0);
+  assert.deepEqual(view(state).services, ['quests']);
   seek(state, 'old_fire');
   choose(state, 1);
-  assert.deepEqual(view(state).services, ['market', 'cultivate']);
+  assert.deepEqual(view(state).services, ['quests', 'market']);
   seek(state, 'sunk_pack');
   choose(state, 0);
-  assert.deepEqual(view(state).services, ['market', 'workshop', 'cultivate']);
+  assert.deepEqual(view(state).services, ['quests', 'market', 'workshop']);
   assert.ok(view(state).discoveredRecipes.includes('r_salve'));
   assert.equal(view(state).discoveredRecipes.includes('r_hide_coat'), false);
-  seek(state, 'reed_banks');
-  choose(state, 0);
   walk(state, 'village');
-  assert.deepEqual(view(state).services, ['quests', 'market', 'workshop', 'cultivate']);
+  assert.deepEqual(view(state).services, ['quests', 'market', 'workshop']);
   assert.ok(view(state).discoveredQuests.includes('reed_salve'));
   assert.equal(view(state).discoveredQuests.includes('coat_mend'), false);
   assert.equal(view(state).discoveredItems.includes('path_charm'), false);
@@ -95,6 +94,97 @@ test('village services and their contents are found gradually and guarded by the
   choose(ferrymanRoute, 0);
   assert.deepEqual(view(ferrymanRoute).services, ['quests', 'market', 'cultivate']);
   assert.deepEqual(view(ferrymanRoute).discoveredQuests, ['patch_ferry']);
+});
+
+test('harvesting only gives materials and reveals damage strictly after an action', () => {
+  const state = createGame(9);
+  walk(state, 'marsh');
+  seek(state, 'reed_banks');
+  const choices = view(state).visibleChoices;
+  assert.equal(choices.length, 2);
+  assert.ok(choices.every((choice) =>
+    !['hp', 'injury', 'outcome', 'loot', 'enemy'].some((field) => Object.hasOwn(choice, field))));
+  assert.doesNotMatch(JSON.stringify(choices), /割伤|划伤|划破|受伤|蚌壳/);
+  const healthBefore = state.hp;
+  const result = play(state, 'choose', { index: 1 });
+  assert.equal(result.injury.amount, healthBefore - state.hp);
+  assert.equal(result.injury.amount, 4);
+  assert.match(result.injury.cause, /划破/);
+  assert.equal(state.log.some((entry) => entry.includes(result.injury.cause)), false);
+  assert.ok(state.inventory.reed);
+  assert.equal(state.inventory.reed_lines, undefined);
+  assert.equal(view(state).deductions.some(({ id }) => id === 'find_eddy'), false);
+
+  walk(state, 'village');
+  const handin = play(state, 'handin', { id: 'reed_salve' });
+  assert.match(handin.outcome, /水|石/);
+  assert.equal(state.inventory.reed_lines, 1);
+  assert.equal(state.inventory.oar_mark, 1);
+  assert.ok(view(state).deductions.some(({ id }) => id === 'find_eddy'));
+});
+
+test('backpack slots are finite and overflow can be picked up in the same place', () => {
+  const state = createGame(1);
+  const { backpackCapacity, backpackStackSize } = rules;
+  assert.equal(view(state).backpackUsed, 1);
+  assert.equal(view(state).backpackCapacity, backpackCapacity);
+  state.inventory.ration = backpackCapacity * backpackStackSize;
+  assert.equal(view(state).backpackUsed, backpackCapacity);
+  assert.equal(act(state, 'unequip', { slot: 'weapon' }).ok, false);
+  assert.equal(act(state, 'discard', { id: 'cudgel' }).ok, false);
+  walk(state, 'marsh');
+  seek(state, 'reed_banks');
+  const overflow = play(state, 'choose', { index: 0 });
+  assert.ok(overflow.spilled.reed > 0);
+  assert.equal(state.inventory.reed, undefined);
+  assert.equal(view(state).groundLoot.reed, overflow.spilled.reed);
+  assert.equal(act(state, 'take', { id: 'reed' }).ok, false);
+  assert.equal(view(state).backpackUsed, backpackCapacity);
+  play(state, 'discard', { id: 'ration', count: backpackStackSize });
+  assert.equal(view(state).groundLoot.ration, backpackStackSize);
+  play(state, 'take', { id: 'reed' });
+  assert.equal(state.inventory.reed, overflow.spilled.reed);
+  assert.equal(view(state).groundLoot.reed, undefined);
+  const before = state.inventory.ration;
+  play(state, 'take', { id: 'ration' });
+  assert.equal(state.inventory.ration, backpackStackSize * (backpackCapacity - 1));
+  assert.equal(view(state).groundLoot.ration, backpackStackSize - (state.inventory.ration - before));
+  walk(state, 'village');
+  assert.deepEqual(view(state).groundLoot, {});
+  walk(state, 'marsh');
+  assert.ok(view(state).groundLoot.ration > 0);
+});
+
+test('capacity checks do not charge for a refused transaction and discarded gear keeps its wear', () => {
+  const state = createGame(1);
+  walk(state, 'marsh');
+  seek(state, 'reed_banks');
+  choose(state, 0);
+  seek(state, 'old_fire');
+  choose(state, 1);
+  seek(state, 'sunk_pack');
+  choose(state, 0);
+  walk(state, 'village');
+  state.inventory = { cudgel: 1, straw_cape: 1, reed: 2, ration: (rules.backpackCapacity - 1) * rules.backpackStackSize };
+  assert.equal(view(state).backpackUsed, rules.backpackCapacity);
+  const before = structuredClone(state);
+  for (const [action, payload] of [
+    ['craft', { id: 'r_qi' }], ['buy', { id: 'ration' }], ['handin', { id: 'reed_salve' }],
+  ]) {
+    assert.match(act(state, action, payload).message, /行囊已满/);
+    assert.deepEqual(state, before);
+  }
+  play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
+  play(state, 'craft', { id: 'r_qi' });
+  play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
+  play(state, 'handin', { id: 'reed_salve' });
+  play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
+  state.durability.cudgel = 5;
+  play(state, 'unequip', { slot: 'weapon' });
+  play(state, 'discard', { id: 'cudgel' });
+  play(state, 'take', { id: 'cudgel' });
+  assert.equal(state.durability.cudgel, 5);
+  assert.equal(act(state, 'discard', { id: 'reed_lines' }).ok, false);
 });
 
 test('a clue reveals a road across saves and travel still requires the appropriate realm', () => {
@@ -135,7 +225,9 @@ test('damage wears equipped gear, defeating an enemy rewards only first-kill ins
   walk(state, 'marsh');
   const before = state.durability.cudgel;
   state.combat = { id: 'mud_beast', hp: 1, round: 0, escapeBonus: 0 };
-  play(state, 'attack');
+  const finishingBlow = play(state, 'attack');
+  assert.equal(finishingBlow.damageDealt, 1);
+  assert.equal(finishingBlow.damageTaken, 0);
   assert.equal(state.durability.cudgel, before - 1);
   const insight = state.insight;
   state.combat = { id: 'mud_beast', hp: 1, round: 0, escapeBonus: 0 };
@@ -147,7 +239,7 @@ test('damage wears equipped gear, defeating an enemy rewards only first-kill ins
   state.inventory.kiln_shard = 1;
   state.expeditionLoot.kiln_shard = 1;
   state.hp = 1;
-  play(state, 'attack');
+  assert.equal(play(state, 'attack').damageTaken, 1);
   assert.equal(view(state).mode, 'village');
   assert.equal(state.wounds, 1);
   assert.equal(state.inventory.hide, undefined);

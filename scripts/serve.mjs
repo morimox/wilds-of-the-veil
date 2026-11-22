@@ -5,7 +5,7 @@ import { extname } from "node:path";
 const root = new URL("../", import.meta.url);
 const port = Number(process.env.PORT || 4173);
 const types = { ".html": "text/html", ".css": "text/css", ".mjs": "text/javascript", ".webp": "image/webp", ".png": "image/png" };
-const pages = new Set(["/index.html", "/game.html", "/app.mjs", "/engine.mjs", "/data.mjs", "/style.css"]);
+const pages = new Set(["/index.html", "/game.html", "/app.mjs", "/engine.mjs", "/data.mjs", "/style.css", "/intro.css"]);
 
 createServer(async (request, response) => {
   const pathname = new URL(request.url, "http://localhost").pathname.replace(/^\/$/, "/game.html");

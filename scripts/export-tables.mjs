@@ -28,6 +28,8 @@ const titles = {
 };
 
 const ruleDescriptions = {
+  backpackCapacity: '行囊格数。已装备物品和关键线索不占格',
+  backpackStackSize: '同种可堆叠物品每格上限',
   restDays: '村内休整单次用时（天）',
   restHp: '村内休整单次恢复气血（点）',
   restQi: '村内休整单次恢复真气（点）',
@@ -213,8 +215,8 @@ const tables = [
   table('event-choices', '事件选项', choices, [
     ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days', ['food', '消耗干粮'],
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
-    'need', 'consume', 'hidden', 'loot', 'enemy', 'desc',
-  ], { note: '标为消耗所需物品时会扣除该列物品。隐藏选项所需物品齐备后才显示。' }),
+    'need', 'consume', 'hidden', 'loot', 'enemy', ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
+  ], { note: '标为消耗所需物品时会扣除该列物品。隐藏选项所需物品齐备后才显示。受伤原因、扣血、战斗与所得只在选择后结算。' }),
   table('enemies', '敌人', gated(data.enemies), [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', 'atk', 'def', ['tags', '装备克制标签'], ['coins', '战利灵钱'], ['insight', '首胜修为'], 'loot', 'desc',
   ], { omit: ['intents'] }),
@@ -222,7 +224,7 @@ const tables = [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
-    'id', 'name', ['tier', '标注境界'], tier, 'reveal', 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'],
+    'id', 'name', ['tier', '标注境界'], tier, 'reveal', 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),
   table('services', '村务发现条件', data.services, [
     'id', 'name', ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],

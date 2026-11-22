@@ -49,6 +49,8 @@ export const rules = Object.freeze({
   fallQi: 1,
   maxWounds: 3,
   maxTradeCount: 99,
+  backpackCapacity: 12,
+  backpackStackSize: 20,
 });
 
 const resourceEntries = (resources) => Object.entries(resources && typeof resources === 'object' ? resources : {});
@@ -111,19 +113,76 @@ function advance(state, days) {
   state.day = Math.round((state.day + (days ?? 0)) * 1000) / 1000;
 }
 
-function addItems(state, resources, found = false) {
+function occupiesBackpack(state, id) {
+  return !isEvidence(records.items[id]) && !Object.values(state.equipment).includes(id);
+}
+
+function backpackSlots(state, inventory = state.inventory) {
+  return resourceEntries(inventory).reduce((slotsUsed, [id, count]) =>
+    slotsUsed + (occupiesBackpack(state, id) ? Math.ceil(count / rules.backpackStackSize) : 0), 0);
+}
+
+function fittingItems(state, resources, spent = {}) {
+  const inventory = { ...state.inventory };
+  for (const [id, count] of resourceEntries(spent)) inventory[id] = Math.max(0, (inventory[id] ?? 0) - count);
+  let available = Math.max(0, rules.backpackCapacity - backpackSlots(state, inventory));
+  const accepted = {};
+  const spilled = {};
+  const stackSize = rules.backpackStackSize;
   for (const [id, count] of resourceEntries(resources)) {
-    if (count <= 0) continue;
+    if (count <= 0 || !records.items[id]) continue;
+    const current = inventory[id] ?? 0;
     const gear = records.gear[id];
-    if (gear && owns(state, id)) continue;
-    state.inventory[id] = owns(state, id) + (gear ? 1 : count);
-    if (!state.knownItems.includes(id)) state.knownItems.push(id);
-    if (gear) state.durability[id] = gear.durability;
-    if (found && !atHome(state)) state.expeditionLoot[id] = (state.expeditionLoot[id] ?? 0) + (gear ? 1 : count);
+    if (gear && current) continue;
+    const desired = gear ? 1 : count;
+    const occupies = occupiesBackpack(state, id);
+    const used = Math.ceil(current / stackSize);
+    const fits = occupies ? Math.min(desired, (available + used) * stackSize - current) : desired;
+    if (fits) accepted[id] = fits;
+    if (fits < desired) spilled[id] = desired - fits;
+    if (occupies) available -= Math.ceil((current + fits) / stackSize) - used;
+  }
+  return { accepted, spilled };
+}
+
+function combinedResources(...lists) {
+  const combined = {};
+  for (const list of lists) {
+    for (const [id, count] of resourceEntries(list)) combined[id] = (combined[id] ?? 0) + count;
+  }
+  return combined;
+}
+
+function groundAt(state) {
+  return state.ground?.[state.region] ?? {};
+}
+
+function leaveOnGround(state, resources, durability = {}) {
+  if (Object.keys(resources).length) {
+    (state.ground ??= {})[state.region] = combinedResources(groundAt(state), resources);
+  }
+  for (const [id, count] of resourceEntries(resources)) {
+    const gear = records.gear[id];
+    if (!gear) continue;
+    const worn = ((state.groundDurability ??= {})[state.region] ??= {});
+    (worn[id] ??= []).push(...Array(count).fill(durability[id] ?? gear.durability));
   }
 }
 
-function removeItem(state, id, count) {
+function addItems(state, resources, found = false) {
+  const result = fittingItems(state, resources);
+  leaveOnGround(state, result.spilled);
+  for (const [id, count] of resourceEntries(result.accepted)) {
+    const gear = records.gear[id];
+    state.inventory[id] = owns(state, id) + count;
+    if (!state.knownItems.includes(id)) state.knownItems.push(id);
+    if (gear) state.durability[id] = gear.durability;
+    if (found && !atHome(state)) state.expeditionLoot[id] = (state.expeditionLoot[id] ?? 0) + count;
+  }
+  return result;
+}
+
+function removeItem(state, id, count, spendRelief = true) {
   const remaining = owns(state, id) - count;
   if (remaining > 0) {
     state.inventory[id] = remaining;
@@ -139,7 +198,7 @@ function removeItem(state, id, count) {
     state.expeditionLoot[id] = Math.max(0, state.expeditionLoot[id] - count);
     if (state.expeditionLoot[id] === 0) delete state.expeditionLoot[id];
   }
-  if (id === supply) state.reliefRations = Math.max(0, state.reliefRations - count);
+  if (id === supply && spendRelief) state.reliefRations = Math.max(0, state.reliefRations - count);
 }
 
 function missingItems(state, resources) {
@@ -263,6 +322,8 @@ export function createGame(seed = Date.now()) {
     event: null,
     combat: null,
     expeditionLoot: {},
+    ground: {},
+    groundDurability: {},
     won: false,
     wonDay: null,
     victoryPending: false,
@@ -309,8 +370,9 @@ export function view(state) {
   const currentEvent = state.event ? records.events[state.event] : null;
   const visibleChoices = (currentEvent?.choices ?? []).map((choice, index) => {
     const lockedReason = choiceBlocker(state, choice);
-    return { ...choice, index, available: !lockedReason, lockedReason };
-  }).filter((choice) => !choice.hidden || hasChoiceNeeds(state, choice));
+    const { label, desc, hidden } = choice;
+    return { label, desc, hidden, index, available: !lockedReason, lockedReason };
+  }).filter(({ hidden, index }) => !hidden || hasChoiceNeeds(state, currentEvent.choices[index]));
   return {
     ...state,
     ...stats(state),
@@ -322,6 +384,9 @@ export function view(state) {
     regionId: state.region,
     region: regionOf(state),
     services,
+    backpackUsed: backpackSlots(state),
+    backpackCapacity: rules.backpackCapacity,
+    groundLoot: { ...groundAt(state) },
     currentEvent: currentEvent ? { ...currentEvent, choices: visibleChoices } : null,
     visibleChoices,
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
@@ -434,9 +499,12 @@ function choose(state, index) {
   state.event = null;
   advance(state, choice.days);
   state.coins += coins;
+  const healthBefore = state.hp;
   state.hp += choice.hp ?? 0;
   state.qi += choice.qi ?? 0;
   normalize(state);
+  const amount = Math.max(0, healthBefore - state.hp);
+  const injury = amount ? { cause: choice.injury ?? '你在途中受了伤。', amount } : undefined;
   const choiceKey = `${event.id}:${index}`;
   const first = !state.seenChoices.includes(choiceKey);
   const insight = first ? (choice.insight ?? 0) : 0;
@@ -444,12 +512,17 @@ function choose(state, index) {
     state.seenChoices.push(choiceKey);
     state.insight = Math.max(0, state.insight + insight);
   }
-  addItems(state, choice.loot, true);
+  const { accepted, spilled } = addItems(state, choice.loot, true);
   if (choice.enemy && records.enemies[choice.enemy]) startCombat(state, choice.enemy);
-  const loot = goodsText(choice.loot);
-  const detail = [choice.desc, loot && `获得${loot}。`, insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
-  say(state, detail || choice.label);
-  return state.hp === 0 ? fall(state) : { ok: true, message: state.log.at(-1) };
+  const loot = goodsText(accepted);
+  const detail = [choice.outcome, loot && `获得${loot}。`, insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
+  const result = say(state, detail || choice.label);
+  return {
+    ...(state.hp === 0 ? fall(state) : result),
+    outcome: choice.outcome,
+    injury,
+    spilled,
+  };
 }
 
 function fall(state) {
@@ -480,9 +553,12 @@ function finishCombat(state, enemy) {
   const insight = first ? (enemy.insight ?? 0) : 0;
   state.insight += insight;
   state.coins += enemy.coins ?? 0;
-  addItems(state, enemy.loot, true);
-  const loot = goodsText(enemy.loot);
-  return `击退${enemy.name}。${loot ? `获得${loot}。` : ''}${enemy.coins ? `灵钱+${enemy.coins}。` : ''}${insight ? `见识+${insight}。` : ''}`;
+  const { accepted, spilled } = addItems(state, enemy.loot, true);
+  const loot = goodsText(accepted);
+  return {
+    message: `击退${enemy.name}。${loot ? `获得${loot}。` : ''}${enemy.coins ? `灵钱+${enemy.coins}。` : ''}${insight ? `见识+${insight}。` : ''}`,
+    spilled,
+  };
 }
 
 function estimatedHit(enemy, intent) {
@@ -518,6 +594,8 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
     : enemy.def;
   const effectiveDamage = Math.floor((damage + weaponDamageBonus) * crossRealmFactor(state, enemy));
   const dealt = damage > 0 ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - weaponPierceBonus)) : 0;
+  const damageDealt = Math.min(state.combat.hp, dealt + counter);
+  const healthBefore = state.hp;
   state.combat.hp -= dealt + counter;
   advance(state, rules.battleDays);
   const weaponDamage = wearWeapon ? wear(state, 'weapon') : '';
@@ -525,7 +603,7 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
   if (state.combat.hp <= 0) {
     const outcome = finishCombat(state, enemy);
     normalize(state);
-    return say(state, summary + outcome);
+    return { ...say(state, summary + outcome.message), damageDealt, damageTaken: 0, spilled: outcome.spilled };
   }
   if (intent.kind === 'heal') {
     const before = state.combat.hp;
@@ -549,8 +627,9 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
   }
   state.combat.round += 1;
   normalize(state);
+  const damageTaken = Math.max(0, healthBefore - state.hp);
   say(state, summary);
-  return state.hp === 0 ? fall(state) : { ok: true, message: summary };
+  return { ...(state.hp === 0 ? fall(state) : { ok: true, message: summary }), damageDealt, damageTaken };
 }
 
 function retreat(state, bonus = 0, lead = '', guard = 0) {
@@ -563,12 +642,14 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   advance(state, rules.retreatDays);
   const charmDamage = retreatBonus > 0 ? wear(state, 'charm') : '';
   const armorDamage = received ? wear(state, 'armor') : '';
+  const healthBefore = state.hp;
   state.hp -= received;
   state.combat = null;
   normalize(state);
+  const damageTaken = Math.max(0, healthBefore - state.hp);
   const summary = `${lead}你退出了与${enemy.name}的交手，仍在${regionOf(state).name}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
   say(state, summary);
-  return state.hp === 0 ? fall(state) : { ok: true, message: summary };
+  return { ...(state.hp === 0 ? fall(state) : { ok: true, message: summary }), damageDealt: 0, damageTaken };
 }
 
 function cast(state, id) {
@@ -617,13 +698,18 @@ function use(state, id, inCombat) {
     state.toxin += pill.toxin ?? 0;
     state.wounds -= pill.wound ?? 0;
     state.focus += pill.focus ?? 0;
-    if (pill.food > 0) addItems(state, { [supply]: pill.food });
+    const { spilled } = addItems(state, { [supply]: pill.food ?? 0 });
     normalize(state);
     const toxic = state.toxin >= rules.toxinThreshold;
     const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
     state.hp -= toxinDamage;
     const message = `你服下${nameOf(id)}。${toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : ''}`;
-    return inCombat ? combatTurn(state, { message }) : say(state, message);
+    const result = inCombat ? combatTurn(state, { message }) : say(state, message);
+    return {
+      ...result,
+      injury: toxinDamage ? { cause: '丹毒发作。', amount: toxinDamage } : undefined,
+      spilled: combinedResources(spilled, result.spilled),
+    };
   }
   const message = `你催动${nameOf(id)}。`;
   if (talisman.retreat > 0 && !talisman.damage) return retreat(state, talisman.retreat, message, talisman.guard);
@@ -649,16 +735,47 @@ function equip(state, id) {
 
 function unequip(state, slot) {
   if (!slots.includes(slot) || !state.equipment[slot]) return refuse('这个位置没有装备。');
+  if (backpackSlots(state) >= rules.backpackCapacity) return refuse('行囊已满，收不下这件装备。');
   const id = state.equipment[slot];
   state.equipment[slot] = null;
   normalize(state);
   return say(state, `收起${nameOf(id)}。`);
 }
 
+function discard(state, id, count = owns(state, id)) {
+  if (!records.items[id] || !Number.isInteger(count) || count < 1 || count > owns(state, id)) return refuse('行囊里没有这件东西。');
+  if (isEvidence(records.items[id])) return refuse('随身信物不能放到地上。');
+  if (!occupiesBackpack(state, id)) return refuse('先把装备收下。');
+  if (id === supply && owns(state, id) - state.reliefRations < count) return refuse('村里匀给你的口粮只供自用。');
+  leaveOnGround(state, { [id]: count }, state.durability);
+  removeItem(state, id, count, false);
+  return say(state, `把${nameOf(id)}放到地上。`);
+}
+
+function takeFromGround(state, id, count = groundAt(state)[id]) {
+  const ground = groundAt(state);
+  if (!records.items[id] || !Number.isInteger(count) || count < 1 || count > (ground[id] ?? 0)) return refuse('这里没有这么多东西可捡。');
+  const gear = records.gear[id];
+  if (gear && owns(state, id)) return refuse('已经有同样的装备了。');
+  const { accepted } = fittingItems(state, { [id]: count });
+  const taken = accepted[id] ?? 0;
+  if (!taken) return refuse('行囊已满。');
+  ground[id] -= taken;
+  if (!ground[id]) delete ground[id];
+  addItems(state, accepted, true);
+  if (gear) {
+    const worn = state.groundDurability?.[state.region]?.[id];
+    state.durability[id] = worn?.shift() ?? gear.durability;
+  }
+  return say(state, `拾起${goodsText(accepted)}。`);
+}
+
 function rest(state) {
   const needsRest = state.hp < stats(state).maxHp || state.qi < stats(state).maxQi || state.wounds || state.toxin || state.pressure;
   const relief = Math.max(0, rules.reliefRations - owns(state, supply));
   if (!needsRest && !relief) return refuse('你已经歇足了。');
+  const granted = fittingItems(state, { [supply]: relief }).accepted[supply] ?? 0;
+  if (relief && !granted && !needsRest) return refuse('行囊已满，拿不了干粮。');
   advance(state, rules.restDays);
   state.wounds -= rules.restWounds;
   state.toxin -= rules.restToxin;
@@ -666,11 +783,11 @@ function rest(state) {
   state.hp += rules.restHp;
   state.qi += rules.restQi;
   normalize(state);
-  if (relief) {
-    state.reliefRations += relief;
-    addItems(state, { [supply]: relief });
+  if (granted) {
+    state.reliefRations += granted;
+    addItems(state, { [supply]: granted });
   }
-  return say(state, `在村里歇了半日。${relief ? `灶上匀给你${relief}份${nameOf(supply)}。` : ''}`);
+  return say(state, `在村里歇了半日。${granted ? `灶上匀给你${granted}份${nameOf(supply)}。` : relief ? '行囊已满，拿不了干粮。' : ''}`);
 }
 
 function learn(state, id) {
@@ -715,6 +832,10 @@ function pay(state, cost, need) {
   payItems(state, need);
 }
 
+function hasRoom(state, loot, spent) {
+  return !Object.keys(fittingItems(state, loot, spent).spilled).length;
+}
+
 function breakthrough(state) {
   const next = records.realms[state.realm + 1];
   if (!next) return refuse('你已经走到了此地传承的尽头。');
@@ -738,9 +859,11 @@ function craft(state, id) {
   if (records.gear[recipe.result] && owns(state, recipe.result)) return refuse('你已经有这件装备，可以在坊市修理。');
   const missing = requirements(state, recipe.cost, recipe.need);
   if (missing) return refuse(missing);
+  const loot = { [recipe.result]: recipe.count ?? 1 };
+  if (!hasRoom(state, loot, combinedResources(recipe.cost, recipe.need))) return refuse('行囊已满，放不下制成的东西。');
   pay(state, recipe.cost, recipe.need);
   advance(state, recipe.days);
-  addItems(state, { [recipe.result]: recipe.count ?? 1 });
+  addItems(state, loot);
   return say(state, `制成${nameOf(recipe.result)}×${recipe.count ?? 1}。`);
 }
 
@@ -756,13 +879,14 @@ function trade(state, id, count, buying) {
     if (object && object.tier > state.realm) return refuse('等境界到了再想这件物品。');
     if (gear && (owns(state, id) || count !== 1)) return refuse('同种装备只能持有一件。');
     if (state.coins < price * count) return refuse(`这批物品需要${price * count}枚灵钱。`);
+    if (!hasRoom(state, { [id]: count })) return refuse('行囊已满。');
     state.coins -= price * count;
     addItems(state, { [id]: count });
   } else {
     if (owns(state, id) < count) return refuse('行囊里没有这么多。');
     if (gear && state.equipment[gear.slot] === id) return refuse('先把这件装备收下。');
     if (id === supply && owns(state, id) - state.reliefRations < count) return refuse('村里匀给你的口粮只供自用。');
-    removeItem(state, id, count);
+    removeItem(state, id, count, false);
     state.coins += price * count;
   }
   return say(state, `${buying ? '买入' : '卖出'}${item.name}×${count}，${price * count}枚灵钱。`);
@@ -786,6 +910,7 @@ function handin(state, id) {
   if (state.completedQuests.includes(id)) return refuse('这份委托已经交付。');
   const missing = missingItems(state, quest.need);
   if (Object.keys(missing).length) return refuse(`还缺${goodsText(missing)}。`);
+  if (!hasRoom(state, quest.reward, quest.need)) return refuse('行囊已满，放不下回礼。');
   payItems(state, quest.need);
   addItems(state, quest.reward);
   state.coins += quest.coins ?? 0;
@@ -797,7 +922,8 @@ function handin(state, id) {
     state.wonDay = state.day;
     state.victoryPending = true;
   }
-  return say(state, `已交付${quest.name}。${victory ? '村人接过镇渡印，旧渡重新开闸。' : ''}`);
+  const outcome = quest.outcome ?? (victory ? '村人接过镇渡印，旧渡重新开闸。' : undefined);
+  return { ...say(state, outcome ?? `已交付${quest.name}。`), outcome };
 }
 
 function deduce(state, { id, evidence, hypothesis }) {
@@ -822,10 +948,10 @@ function deduce(state, { id, evidence, hypothesis }) {
   }
   (state.completedDeductions ??= []).push(id);
   state.insight += deduction.insight ?? 0;
-  addItems(state, deduction.reward);
+  const { spilled } = addItems(state, deduction.reward);
   const result = say(state, deduction.success);
   refreshDiscovery(state);
-  return { ...result, deduction: 'solved' };
+  return { ...result, deduction: 'solved', spilled };
 }
 
 const villageActions = {
@@ -853,6 +979,8 @@ const generalActions = {
   use: (state, { id }) => use(state, id, false),
   equip: (state, { id }) => equip(state, id),
   unequip: (state, { slot }) => unequip(state, slot),
+  discard: (state, { id, count }) => discard(state, id, count),
+  take: (state, { id, count }) => takeFromGround(state, id, count),
   deduce,
 };
 

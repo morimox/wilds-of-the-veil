@@ -6,46 +6,46 @@
   <meta name="theme-color" content="#101713">
   <title>雾渡山河</title>
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./intro.css">
   <script type="module" src="./app.mjs"></script>
 </head>
 <body>
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=3" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=4" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
-    <header class="topbar">
-      <h1>雾渡山河</h1>
-      <span class="clock" id="clock"></span>
-      <button type="button" class="top-button" data-help aria-label="帮助">?</button>
-    </header>
-    <div id="player-status" aria-label="角色状态"></div>
-    <p class="save" id="save" hidden>本页无法自动存档</p>
-    <main id="main" aria-label="游戏操作区"></main>
-    <div class="utilities">
-      <details id="backpack" class="backpack">
-        <summary>行囊</summary>
-        <div id="backpack-content"></div>
-      </details>
+    <div class="travel-column">
+      <header class="topbar">
+        <h1>雾渡山河</h1>
+        <span class="clock" id="clock"></span>
+        <button type="button" class="top-button" data-help aria-label="帮助">?</button>
+      </header>
+      <div id="player-status" aria-label="角色状态"></div>
+      <main id="main" aria-label="游戏操作区"></main>
       <nav class="navigation" aria-label="其他操作">
         <button type="button" data-tab="journey" hidden>回行旅</button>
         <button type="button" data-tab="village" hidden>村务</button>
         <button type="button" data-tab="deduction" hidden>沙盘</button>
-        <button type="button" data-tab="journal" hidden>行记</button>
       </nav>
     </div>
-    <div id="opening" class="opening" hidden>
-      <div class="opening-scene" aria-hidden="true"></div>
-      <button type="button" data-skip-opening>跳过</button>
-    </div>
+    <aside id="kit" class="kit" aria-label="装备和行囊"></aside>
   </div>
-  <p id="announce" class="sr-only" role="status"></p>
+  <section id="opening" class="intro" hidden aria-label="开场">
+    <div class="intro-village" aria-hidden="true"></div>
+    <div class="intro-marsh" aria-hidden="true"></div>
+    <div class="intro-fog" aria-hidden="true"></div>
+    <div class="intro-light" aria-hidden="true"></div>
+    <h1 class="intro-title">雾渡山河</h1>
+    <button type="button" class="intro-skip" data-skip-opening>跳过</button>
+  </section>
+  <div id="notices" class="notices" role="status" aria-live="polite" aria-relevant="additions"></div>
   <dialog id="help" aria-labelledby="guide-title">
     <div class="dialog-head"><h2 id="guide-title">行旅指南</h2><button type="button" data-close aria-label="关闭指南">×</button></div>
     <ol>
       <li>赶路花口粮。缺粮也能回村，会多花些时间。</li>
-      <li>交战先看对手下一招。展开行囊可以服药或用符。</li>
+      <li>把指针放到物品上可看词条，点一下可使用或整理。</li>
     </ol>
     <button type="button" class="text-danger" data-reset>开始新行程</button>
   </dialog>

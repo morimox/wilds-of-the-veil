@@ -1,0 +1,127 @@
+#opening.intro {
+  --intro-duration: 5.2s;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b120f;
+  animation: intro-away var(--intro-duration) linear both;
+}
+.intro-village, .intro-marsh, .intro-fog, .intro-fog::before, .intro-fog::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.intro-village {
+  background: var(--village-image) 64.3% 47.5% / cover;
+  transform-origin: 64.3% 47.5%;
+  animation: intro-village var(--intro-duration) ease-out both;
+}
+.intro-marsh {
+  background: var(--marsh-image) 72% 55% / cover;
+  transform-origin: 72% 55%;
+  animation: intro-marsh var(--intro-duration) ease-out both;
+}
+.intro-light {
+  position: absolute;
+  left: 64.3%;
+  top: 47.5%;
+  width: clamp(80px, 12vmin, 180px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #ffd89180, #f3a04830 29%, transparent 70%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: intro-light var(--intro-duration) ease both;
+}
+.intro-fog::before, .intro-fog::after {
+  content: "";
+  inset: -20% -75%;
+  will-change: transform, opacity;
+}
+.intro-fog::before {
+  background:
+    radial-gradient(ellipse 34% 21% at 50% 59%, #a8b8b0ca 4%, transparent 98%),
+    radial-gradient(ellipse 27% 11% at 42% 70%, #bac9c193, transparent 98%),
+    radial-gradient(ellipse 28% 25% at 61% 48%, #b6c5bbaf, transparent 95%);
+  animation: intro-fog-low var(--intro-duration) linear both;
+}
+.intro-fog::after {
+  background:
+    radial-gradient(ellipse 29% 39% at 54% 53%, #bdcfc5ee 10%, transparent 95%),
+    radial-gradient(ellipse 25% 33% at 42% 61%, #9cafabdf, transparent 95%);
+  animation: intro-fog-wipe var(--intro-duration) ease-in-out both;
+}
+#opening.intro::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, #070f0bf0 0%, transparent 21%, transparent 50%, #090f0cba 99%);
+}
+.intro-title {
+  position: absolute;
+  z-index: 1;
+  left: clamp(24px, 10vw, 140px);
+  bottom: max(clamp(35px, 14vh, 150px), env(safe-area-inset-bottom));
+  margin: 0;
+  color: #f1eee0;
+  font: 600 clamp(30px, 6.5vw, 78px)/1.3 "Songti SC", "Noto Serif CJK SC", STSong, SimSun, serif;
+  letter-spacing: .18em;
+  text-shadow: 0 3px 22px #060e08;
+  animation: intro-title var(--intro-duration) ease both;
+}
+.intro-skip {
+  position: absolute;
+  z-index: 2;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(clamp(16px, 4vw, 54px), env(safe-area-inset-right));
+  min-height: 44px;
+  padding: 7px 15px;
+  border: 1px solid #d6e1d3a3;
+  border-radius: 6px;
+  background: #0b120fe8;
+  color: #f1eee0;
+  cursor: pointer;
+}
+.intro-skip:hover { background: #243a2d; }
+@keyframes intro-village {
+  0% { opacity: .4; transform: scale(1.02); }
+  10% { opacity: 1; }
+  48% { opacity: 1; transform: scale(1.16); }
+  63%, 100% { opacity: 0; transform: scale(1.2); }
+}
+@keyframes intro-marsh {
+  0%, 42% { opacity: 0; transform: scale(1.14); }
+  67% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1.02); }
+}
+@keyframes intro-light {
+  0% { opacity: 0; }
+  8%, 23% { opacity: .55; }
+  16%, 35% { opacity: .92; }
+  55%, 100% { opacity: 0; }
+}
+@keyframes intro-fog-low {
+  0% { opacity: .54; transform: translate(-21%, 5%); }
+  47% { opacity: .78; }
+  100% { opacity: .21; transform: translate(20%, -6%); }
+}
+@keyframes intro-fog-wipe {
+  0%, 24% { opacity: 0; transform: translate(-27%, 13%); }
+  49% { opacity: 1; }
+  78%, 100% { opacity: 0; transform: translate(26%, -9%); }
+}
+@keyframes intro-title {
+  0%, 52% { opacity: 0; transform: translateY(12px); }
+  68%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes intro-away {
+  0%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #opening.intro, .intro-village, .intro-title { animation: none; }
+  .intro-marsh, .intro-fog, .intro-light { display: none; }
+}

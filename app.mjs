@@ -1,65 +1,41 @@
 import { data } from "./data.mjs";
 import { act, createGame, rules, view } from "./engine.mjs";
 
-const key = "wilds-of-the-veil-save-v1";
 const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const slotNames = { weapon: "兵刃", armor: "护具", charm: "法器" };
 const intentNames = { attack: "进攻", heavy: "蓄势", guard: "守势", heal: "疗伤", drain: "夺气" };
 const kindNames = { material: "材料", food: "口粮", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索" };
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
-const screens = ["journey", "village", ...Object.keys(serviceNames), "deduction", "journal"];
+const app = document.querySelector("#app");
 const main = document.querySelector("#main");
 const guide = document.querySelector("#help");
-const backpack = document.querySelector("#backpack");
-const saveLabel = document.querySelector("#save");
+const kit = document.querySelector("#kit");
+const notices = document.querySelector("#notices");
 const opening = document.querySelector("#opening");
-const initialTab = location.hash.slice(1);
-let state = load();
-let screen = screens.includes(initialTab) ? initialTab : "journey";
-let response = null;
+let state = freshGame();
+let screen = "journey";
+let openingTimer;
+let selectedItem = null;
 let activeDeduction = null;
 const deductionDrafts = new Map();
 
 function dismissOpening() {
+  if (opening.hidden) return;
+  clearTimeout(openingTimer);
   opening.hidden = true;
+  app.inert = false;
+  main.querySelector("button")?.focus({ preventScroll: true });
 }
 
 function showOpening() {
-  if (state.day !== 1 || initialTab || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  try {
-    if (localStorage.getItem(`${key}-opening`)) return;
-    localStorage.setItem(`${key}-opening`, "1");
-  } catch {
-    // The opening remains skippable when local storage is unavailable.
-  }
   opening.hidden = false;
-  setTimeout(dismissOpening, 2700);
+  app.inert = true;
+  opening.querySelector("[data-skip-opening]").focus({ preventScroll: true });
+  openingTimer = setTimeout(dismissOpening, matchMedia("(prefers-reduced-motion: reduce)").matches ? 1600 : 5200);
 }
 
 function freshGame() {
   return createGame(crypto.getRandomValues(new Uint32Array(1))[0] || 1);
-}
-
-function load() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(key));
-    if (saved?.format === 1 && saved.state) {
-      const snapshot = view(saved.state);
-      if (snapshot.realm && snapshot.region && Number.isFinite(snapshot.hp)) return saved.state;
-    }
-  } catch {
-    // A missing, invalid, or blocked local save can be replaced by a new game.
-  }
-  return freshGame();
-}
-
-function persist() {
-  try {
-    localStorage.setItem(key, JSON.stringify({ format: 1, state }));
-    saveLabel.hidden = true;
-  } catch {
-    saveLabel.hidden = false;
-  }
 }
 
 function escape(value) {
@@ -83,11 +59,8 @@ function tag(text, tone = "") {
 }
 
 function card(title, desc, badge = "", actions = "", entry = "") {
-  return `<article class="card"><div class="card-head"><h3>${escape(title)}</h3>${badge}</div>${desc ? `<p>${escape(publicText(desc))}</p>` : ""}${entry}${actions ? `<div class="actions">${actions}</div>` : ""}</article>`;
-}
-
-function readEntry(text) {
-  return text ? `<details class="item-entry"><summary>读词条</summary><p>${escape(publicText(text))}</p></details>` : "";
+  const name = entry ? `<span class="entry-anchor"><button class="item-trigger" type="button" data-entry aria-expanded="false">${escape(title)}</button><span class="item-tip" role="tooltip">${escape(publicText(entry))}</span></span>` : escape(title);
+  return `<article class="card"><div class="card-head"><h3>${name}</h3>${badge}</div>${desc ? `<p>${escape(publicText(desc))}</p>` : ""}${actions ? `<div class="actions">${actions}</div>` : ""}</article>`;
 }
 
 function meter(label, current, total) {
@@ -188,12 +161,9 @@ function journey(s) {
 
 function eventScreen(s) {
   const event = s.currentEvent;
-  const choices = (s.visibleChoices ?? event.choices.map((choice, index) => ({ ...choice, index }))).map(choice => {
-    const costs = [choice.days >= 0.5 ? "耗时" : "", choice.food ? "耗粮" : "", choice.coins < 0 ? "花钱" : "",
-      choice.hp < 0 ? "可能受伤" : "", choice.qi < 0 ? "耗真气" : "", choice.enemy ? "可能交战" : ""].filter(Boolean).join(" · ");
-    const disabled = choice.available === false || s.coins < -(choice.coins ?? 0) || (s.inventory.ration ?? 0) < (choice.food ?? 0);
-    const condition = choice.lockedReason ? `<br><span class="fine">${escape(publicText(choice.lockedReason))}</span>` : "";
-    return `<article class="choice"><div><h3>${escape(choice.label)}</h3><p>${escape(publicText(choice.desc))}${costs ? `<br><span class="metal">${escape(costs)}</span>` : ""}${condition}</p></div>${linkButton("选择", "choose", choice.index, choice.index === 0 ? "primary" : "", disabled)}</article>`;
+  const choices = s.visibleChoices.map(choice => {
+    const details = [choice.desc, choice.lockedReason].map(text => publicText(text)).filter(Boolean).join(" ");
+    return `<div class="choice">${linkButton(choice.label, "choose", choice.index, "", choice.available === false)}${details ? `<p>${escape(details)}</p>` : ""}</div>`;
   }).join("");
   return panel(event.name, `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div><p class="intro">${escape(publicText(event.text))}</p><div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
 }
@@ -215,12 +185,11 @@ function combatScreen(s) {
   const intent = s.intent;
   const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
-  const retreatDamage = Math.max(0, Math.ceil(s.intentDamage * rules.retreatDamageFactor * (1 - Math.min(1, s.retreat + (s.combat?.escapeBonus ?? 0)))) - s.defense);
   return panel(enemy.name, `<p class="intro">${escape(publicText(enemy.desc))}</p>
-    <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}${s.intentDamage ? ` · 伤害 ${s.intentDamage}（减伤前）` : ""}</div>
+    <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
     ${meter("对方气血", hp, enemy.maxHp)}
-    <div class="actions">${linkButton("出手", "attack", "", "primary")}${linkButton("防御", "guard")}${linkButton(`撤退 · ${retreatDamage} 点伤`, "retreat", "", "danger")}</div>
-    ${arts.length ? `<div class="card-grid learned-arts">${arts.map(row => card(row.name, "", "", linkButton(s.qi < row.cost ? "真气不足" : "施展", "art", row.id, "", s.qi < row.cost), readEntry(row.desc))).join("")}</div>` : ""}
+    <div class="actions">${linkButton("出手", "attack", "", "primary")}${linkButton("防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}</div>
+    ${arts.length ? `<div class="card-grid learned-arts">${arts.map(row => card(row.name, "", "", linkButton(s.qi < row.cost ? "真气不足" : "施展", "art", row.id, "", s.qi < row.cost), row.desc)).join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
 }
 
@@ -228,9 +197,20 @@ function gearCondition(remaining, total) {
   return !remaining ? "损坏" : remaining / total < 0.25 ? "将坏" : remaining < total ? "磨损" : "完好";
 }
 
-function gearEntry(item, gear, remaining) {
+function gearDescription(item, gear, remaining) {
   const description = gear.entry || `${tierName(gear.tier)}散修可用。${item.desc}`;
-  return readEntry(remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`);
+  return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
+}
+
+function itemSlot(item, location, description, actions = "", label = "") {
+  const key = `${location}-${item.id}`;
+  const open = selectedItem === key;
+  return `<div class="item-row" data-item-row="${escape(key)}">
+    ${label ? `<span class="slot-label">${escape(label)}</span>` : ""}
+    <button type="button" class="item-trigger" data-item="${escape(key)}" aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}</button>
+    <span class="item-tip" id="tip-${escape(key)}" role="tooltip">${escape(publicText(description))}</span>
+    ${actions ? `<div class="item-tools"${open ? "" : " hidden"}>${actions}</div>` : ""}
+  </div>`;
 }
 
 function pack(s) {
@@ -240,11 +220,12 @@ function pack(s) {
   const worn = Object.entries(s.equipment).filter(([, id]) => id).map(([slot, id]) => {
     const gear = data.gear.find(row => row.id === id);
     const remaining = s.durability[id] ?? gear.durability;
-    return card(itemRows[id].name, "", tag(slotNames[slot]),
+    return itemSlot(itemRows[id], "worn", gearDescription(itemRows[id], gear, remaining),
       (canEquip ? linkButton("卸下", "unequip", slot) : "") + (canRepair && remaining < gear.durability ? linkButton(s.coins < gear.repair ? "灵钱不足" : "修理", "repair", id, "quiet", s.coins < gear.repair) : ""),
-      gearEntry(itemRows[id], gear, remaining));
+      slotNames[slot]);
   });
-  const inventory = data.items.filter(row => s.inventory[row.id] && !Object.values(s.equipment).includes(row.id)).map(row => {
+  const carried = data.items.filter(row => s.inventory[row.id] && !Object.values(s.equipment).includes(row.id));
+  const inventory = carried.filter(row => row.kind !== "key").map(row => {
     const gear = data.gear.find(g => g.id === row.id);
     const pill = data.pills.find(g => g.id === row.id);
     const seal = data.talismans.find(g => g.id === row.id);
@@ -257,10 +238,25 @@ function pack(s) {
     if (pill && canUse) actions = linkButton("服用", "use", row.id, "", pill.tier > s.realm.id);
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
     if (row.id === "ration" && canUse && s.hp < s.maxHp) actions = linkButton("吃口粮", "eat");
-    const details = gear ? gearEntry(row, gear, s.durability[row.id] ?? gear.durability) : readEntry(pill ? pillSummary(pill) : seal ? talismanSummary(seal) : "");
-    return card(row.name, row.kind === "key" ? row.desc : "", row.kind === "key" ? tag("线索") : "", actions, details);
+    if (canEquip) actions += linkButton("放下", "discard", row.id, "quiet");
+    const description = gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
+    return itemSlot(row, "held", description, actions);
   });
-  return `<div class="inventory-list">${worn.join("")}${inventory.join("")}${worn.length || inventory.length ? "" : '<p class="fine">空</p>'}</div>`;
+  const clues = carried.filter(row => row.kind === "key").map(row => itemSlot(row, "clue", row.desc));
+  const ground = canEquip ? Object.keys(s.groundLoot ?? {}).map(id => {
+    const item = itemRows[id];
+    const gear = data.gear.find(row => row.id === id);
+    return itemSlot(item, "ground", gear ? gearDescription(item, gear) : item.desc, linkButton("拾起", "take", id));
+  }) : [];
+  const meter = Array.from({ length: s.backpackCapacity }, (_, i) => `<i${i < s.backpackUsed ? ' class="filled"' : ""}></i>`).join("");
+  const room = s.backpackUsed >= s.backpackCapacity ? "已满" : s.backpackUsed >= s.backpackCapacity - 2 ? "快满了" : "有空位";
+  return `<section class="kit-section"><h2>装备</h2>${worn.join("") || '<p class="fine">空</p>'}</section>
+    <section class="kit-section"><div class="kit-head"><h2>行囊</h2><span class="fine">${room}</span></div>
+      <div class="bag-slots" role="img" aria-label="行囊容量${room}">${meter}</div>
+      ${inventory.join("") || '<p class="fine">空</p>'}
+    </section>
+    ${clues.length ? `<section class="kit-section"><h2>线索</h2>${clues.join("")}</section>` : ""}
+    ${ground.length ? `<section class="kit-section"><h2>脚边</h2>${ground.join("")}</section>` : ""}`;
 }
 
 function village(s) {
@@ -277,7 +273,7 @@ function cultivation(s) {
   return training + (visibleArts.length ? panel("术诀", `<div class="card-grid">${visibleArts.map(row => {
     const known = s.knownArts.includes(row.id);
     return card(row.name, "", known ? tag("已习得") : "",
-      known ? "" : linkButton(s.coins < row.price ? "灵钱不足" : "习得", "learn", row.id, "", s.coins < row.price), readEntry(`${artSummary(row)}。 ${row.desc}`));
+      known ? "" : linkButton(s.coins < row.price ? "灵钱不足" : "习得", "learn", row.id, "", s.coins < row.price), `${artSummary(row)}。 ${row.desc}`);
   }).join("")}</div>`) : "");
 }
 
@@ -290,7 +286,7 @@ function workshop(s) {
     const talisman = data.talismans.find(g => g.id === row.result);
     const need = supplies(row.need);
     const reason = !hasSupply(s, row.need) ? "材料不足" : s.coins < row.cost ? "灵钱不足" : "";
-    const entry = gear ? gearEntry(result, gear) : readEntry(pill ? pillSummary(pill) : talisman ? talismanSummary(talisman) : result.desc);
+    const entry = gear ? gearDescription(result, gear) : pill ? pillSummary(pill) : talisman ? talismanSummary(talisman) : result.desc;
     return card(result.name, need ? `需${need}` : "", tag(kindNames[result.kind] ?? ""), linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), entry);
   }).join("")}</div>`);
 }
@@ -305,7 +301,9 @@ function market(s) {
       row.price > 0 && (currentTier.get(row.id) ?? 0) <= s.realm.id ? linkButton(row.price > s.coins ? "灵钱不足" : "购入", "buy", row.id, "", row.price > s.coins) : "",
       row.sell > 0 && s.inventory[row.id] ? linkButton("卖出", "sell", row.id, "quiet", equipped) : "",
     ].join("");
-    return card(row.name, "", s.inventory[row.id] ? tag("持有") : "", options, gear ? gearEntry(row, gear) : readEntry(row.desc));
+    const pill = data.pills.find(entry => entry.id === row.id);
+    const seal = data.talismans.find(entry => entry.id === row.id);
+    return card(row.name, "", s.inventory[row.id] ? tag("持有") : "", options, gear ? gearDescription(row, gear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc);
   }).join("")}</div>`);
 }
 
@@ -349,44 +347,101 @@ function deductionBoard(s) {
       </form>`), tag(current.completed ? "已解" : "待推敲", current.completed ? "" : "warn"));
 }
 
-function placeJournal(s) {
-  const entries = (s.log ?? []).slice(-9).reverse().map(entry => {
-    if (typeof entry === "string") return entry;
-    return entry.text ?? entry.message;
-  }).filter(Boolean);
-  return panel("行记", `<ul class="journal-list">${entries.map(line => `<li>${escape(publicText(line))}</li>`).join("")}</ul>`);
-}
-
 function render() {
   const s = view(state);
   const inEncounter = s.mode === "event" || s.mode === "combat" || s.mode === "victory";
   const showVillage = inVillage(s) && Boolean(s.services?.length);
   const available = {
-    journey: true, village: showVillage, deduction: Boolean(s.deductions?.length), journal: (s.log?.length ?? 0) > 1,
+    journey: true, village: showVillage, deduction: Boolean(s.deductions?.length),
   };
   for (const service of Object.keys(serviceNames)) available[service] = showVillage && s.services.includes(service);
   const tab = inEncounter || !available[screen] ? "journey" : screen;
-  const content = { journey, village, cultivate: cultivation, workshop, market, quests: questBoard, deduction: deductionBoard, journal: placeJournal };
+  const content = { journey, village, cultivate: cultivation, workshop, market, quests: questBoard, deduction: deductionBoard };
   document.querySelector("#clock").textContent = s.day % 1 < 0.5 ? "白昼" : "夜里";
   document.querySelector("#player-status").innerHTML = stats(s);
-  document.querySelector("#backpack-content").innerHTML = pack(s);
+  kit.innerHTML = pack(s);
   for (const button of document.querySelectorAll(".navigation button")) {
     button.hidden = inEncounter || button.dataset.tab === tab || !available[button.dataset.tab];
   }
-  const feedback = response?.deduction === "miss" ? " miss" : response?.ok ? "" : " error";
-  const message = publicText(response?.message, s.mode === "combat");
-  main.innerHTML = (message ? `<p class="status-message${feedback}">${escape(message)}</p>` : "") + content[tab](s);
+  main.innerHTML = content[tab](s);
+}
+
+function selectItem(key) {
+  selectedItem = selectedItem === key ? null : key;
+  for (const trigger of kit.querySelectorAll("[data-item]")) {
+    const open = trigger.dataset.item === selectedItem;
+    trigger.setAttribute("aria-expanded", String(open));
+    const tools = trigger.parentElement.querySelector(".item-tools");
+    if (tools) tools.hidden = !open;
+  }
+}
+
+function showNotice(lines, warning) {
+  if (!lines.length) return;
+  const toast = document.createElement("div");
+  toast.className = warning ? "toast warning-toast" : "toast";
+  for (const line of lines) {
+    const text = document.createElement("p");
+    text.textContent = line;
+    toast.append(text);
+  }
+  notices.append(toast);
+  while (notices.childElementCount > 3) notices.firstElementChild.remove();
+  setTimeout(() => toast.remove(), 4400);
+}
+
+function feedback(before, after, result, action) {
+  const lines = [];
+  if (result.injury?.amount) {
+    const cause = result.injury.cause.replace(/[。！]+$/, "");
+    lines.push(`${cause}，气血减少 ${result.injury.amount} 点。`);
+  }
+  if (result.damageDealt || result.damageTaken) {
+    lines.push([
+      result.damageDealt && `造成 ${result.damageDealt} 点伤害。`,
+      result.damageTaken && `受到 ${result.damageTaken} 点伤害。`,
+    ].filter(Boolean).join(""));
+  }
+  const acquired = data.items.filter(item => (after.inventory[item.id] ?? 0) > (before.inventory[item.id] ?? 0));
+  const goods = acquired.filter(item => item.kind !== "key");
+  const clues = acquired.filter(item => item.kind === "key");
+  let narrative = result.message ?? "";
+  if (result.damageDealt || result.damageTaken) {
+    narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "").replace(/反击，[。]?/g, "反击。");
+  }
+  if (acquired.length) narrative = narrative.replace(/获得[^。]+。/g, "");
+  if (result.injury) narrative = narrative.replace(result.injury.cause, "").replace(/丹毒积重，损失\d+点生命。?/g, "");
+  if (result.ok && (action === "travel" || action === "explore" || action === "revisit")) {
+    narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
+  }
+  narrative = publicText(narrative).trim();
+  if (narrative) lines.push(narrative);
+  if (goods.length) lines.push(`获得${goods.map(item => item.name).join("、")}。`);
+  if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
+  const didRecover = ["choose", "eat", "use", "rest"].includes(action) && after.hp > before.hp && !result.injury;
+  const changes = [
+    didRecover && !narrative.includes("气血") && "气血恢复",
+    after.qi > before.qi && ["choose", "use", "rest"].includes(action) && !narrative.includes("真气") && "真气恢复",
+    after.qi < before.qi && ["choose", "explore", "revisit", "art"].includes(action) && !narrative.includes("真气") && "消耗了真气",
+    (after.inventory.ration ?? 0) < (before.inventory.ration ?? 0) && ["travel", "choose"].includes(action) && "用了些口粮",
+    after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",
+  ].filter(Boolean);
+  if (changes.length) lines.push(changes.join("，") + "。");
+  const overflow = Object.keys(result.spilled ?? {}).map(id => itemRows[id].name);
+  if (overflow.length) lines.push(`行囊装不下，${overflow.join("、")}留在脚边。`);
+  for (const id of after.discovered) {
+    if (!before.discovered.includes(id)) lines.push(`找到去${data.regions.find(region => region.id === id).name}的路。`);
+  }
+  return lines;
 }
 
 function performAction(action, payload) {
-  const before = new Set(state.discovered);
-  response = act(state, action, payload);
-  const newRoutes = data.regions.filter(region => state.discovered.includes(region.id) && !before.has(region.id));
-  if (newRoutes.length) response.message += newRoutes.map(region => `找到了去${region.name}的路。`).join("");
+  const before = { inventory: { ...state.inventory }, discovered: [...state.discovered], hp: state.hp, qi: state.qi, coins: state.coins };
+  const result = act(state, action, payload);
   if (["travel", "explore", "choose", "leave", "revisit", "resume"].includes(action)) screen = "journey";
-  persist();
+  if (action === "travel" || action === "discard" || action === "take" || action === "equip" || action === "unequip") selectedItem = null;
   render();
-  document.querySelector("#announce").textContent = publicText(response.message, view(state).mode === "combat");
+  showNotice(feedback(before, state, result, action), Boolean(result.injury || result.damageTaken || !result.ok));
   if (["travel", "explore", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
 }
 
@@ -402,10 +457,20 @@ document.addEventListener("submit", event => {
 });
 
 document.addEventListener("click", event => {
-  if (event.target.closest("button, summary")) dismissOpening();
-  const button = event.target.closest("button, a[data-tab]");
+  const button = event.target.closest("button");
   if (!button) return;
-  if (button.hasAttribute("data-skip-opening")) return;
+  if (button.hasAttribute("data-skip-opening")) {
+    dismissOpening();
+    return;
+  }
+  if (button.dataset.item) {
+    selectItem(button.dataset.item);
+    return;
+  }
+  if (button.hasAttribute("data-entry")) {
+    button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
+    return;
+  }
   if (button.hasAttribute("data-help")) {
     guide.showModal();
     return;
@@ -415,33 +480,25 @@ document.addEventListener("click", event => {
     return;
   }
   if (button.hasAttribute("data-reset")) {
-    if (!window.confirm("要清除当前行记，重新开始吗？")) return;
+    if (!window.confirm("重新开始这一局？")) return;
     state = freshGame();
-    response = null;
     screen = "journey";
+    selectedItem = null;
     activeDeduction = null;
     deductionDrafts.clear();
-    backpack.open = false;
+    notices.replaceChildren();
     guide.close();
-    persist();
     render();
+    showOpening();
     return;
   }
   if (button.dataset.tab) {
-    event.preventDefault();
     screen = button.dataset.tab;
-    try {
-      history.replaceState(null, "", `#${screen}`);
-    } catch {
-      // Some embedded browsers restrict history. Navigation only needs local state.
-    }
-    response = null;
     render();
     return;
   }
   if (button.dataset.case) {
     activeDeduction = button.dataset.case;
-    response = null;
     render();
     return;
   }
@@ -449,13 +506,11 @@ document.addEventListener("click", event => {
   if (!action) return;
   const value = button.dataset.value;
   const payload = action === "choose" ? { index: Number(value) } :
-    action === "unequip" ? { slot: value } : { id: value, count: 1 };
+    action === "unequip" ? { slot: value } : { id: value };
   performAction(action, payload);
 });
 
-persist();
 render();
 document.querySelector("#boot-status").hidden = true;
-document.querySelector("#app").hidden = false;
-if (initialTab === "pack") backpack.open = true;
+app.hidden = false;
 showOpening();

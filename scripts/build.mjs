@@ -4,9 +4,10 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const file = async path => (await readFile(new URL(path, root), "utf8")).replace(/\r\n/g, "\n");
-const [html, originalCss, data, engine, app] = await Promise.all([
-  file("game.html"), file("style.css"), file("data.mjs"), file("engine.mjs"), file("app.mjs"),
+const [html, style, intro, data, engine, app] = await Promise.all([
+  file("game.html"), file("style.css"), file("intro.css"), file("data.mjs"), file("engine.mjs"), file("app.mjs"),
 ]);
+const originalCss = `${style}\n${intro}`;
 const destination = process.argv[2] ? resolve(process.argv[2]) : fileURLToPath(new URL("dist/雾渡山河.html", root));
 
 // Embed the local images so the resulting HTML can open independently.
@@ -39,6 +40,7 @@ ${moduleBody(app)}
 
 const result = html
   .replace('<link rel="stylesheet" href="./style.css">', () => `<style>\n${css}\n</style>`)
+  .replace('  <link rel="stylesheet" href="./intro.css">\n', "")
   .replace('  <script type="module" src="./app.mjs"></script>\n', "")
   .replace("</body>", () => `<script>\n${script}\n</script>\n</body>`);
 await mkdir(dirname(destination), { recursive: true });

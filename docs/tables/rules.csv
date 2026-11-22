@@ -37,3 +37,5 @@ fallHpFactor,0.5,被救回时将气血设为当时气血上限的此比例，向
 fallQi,1,被救回后留下的真气（点），受真气上限限制
 maxWounds,3,伤势数量上限
 maxTradeCount,99,单次买卖可提交的最大数量
+backpackCapacity,12,行囊格数。已装备物品和关键线索不占格
+backpackStackSize,20,同种可堆叠物品每格上限
