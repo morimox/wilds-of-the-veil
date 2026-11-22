@@ -1,0 +1,11 @@
+﻿摊位标识,摊位,标识,名称,购入价（灵钱）,实际到货所需的委托,购入所需境界
+provisions,渡口杂货,ration,干粮,3,,
+provisions,渡口杂货,wood,松枝,3,,
+provisions,渡口杂货,reed,白苇芯,8,,
+gear,行旅器具,cudgel,枣木杖,5,,炼气
+gear,行旅器具,knife,割苇短刀,16,,炼气
+gear,行旅器具,straw_cape,蓑衣,6,,炼气
+gear,行旅器具,reed_talisman,遮痕符,7,把旧灯支起来（patch_ferry）,炼气
+medicine,药摊,salve,松脂膏,6,,炼气
+medicine,药摊,qi_powder,回气散,6,,炼气
+medicine,药摊,heal_pill,合络丹,11,把旧渡的印带回来（last_lantern）,筑基

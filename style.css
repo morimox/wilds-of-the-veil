@@ -154,6 +154,10 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .card, .choice { padding: 8px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
 .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .card .actions { margin-top: 7px; }
+.market-switch { margin: 0 0 12px; }
+.market-stall + .market-stall { margin-top: 12px; }
+.market-stall > .intro { margin: 4px 0 7px; font-size: 13px; }
+.market-stall > h3 { color: var(--jade); margin-bottom: 4px; }
 .choice { display: grid; justify-items: start; gap: 5px; }
 .choice-list { margin-top: 6px; }
 .card p { margin-top: 3px; }

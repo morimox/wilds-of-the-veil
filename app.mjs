@@ -17,6 +17,7 @@ const notices = document.querySelector("#notices");
 const opening = document.querySelector("#opening");
 let state = freshGame();
 let screen = "journey";
+let marketMode = "buy";
 let openingTimer;
 let selectedItem = null;
 let activeDeduction = null;
@@ -390,20 +391,33 @@ function workshop(s) {
   }).join("")}</div>`);
 }
 
+function marketItem(s, entry, selling) {
+  const item = itemRows[entry.id];
+  const gear = data.gear.find(row => row.id === item.id);
+  const pill = data.pills.find(row => row.id === item.id);
+  const seal = data.talismans.find(row => row.id === item.id);
+  const allowed = selling ? entry.canSell : entry.canBuy;
+  const label = allowed ? (selling ? "卖出" : "购入") : entry.blockedReason;
+  const detail = gear ? gearDescription(item, gear, selling ? s.durability[item.id] : undefined) :
+    pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
+  const price = tag(`${entry.price} 灵钱/件`);
+  const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}</span>` : "";
+  return card(item.name, "", price, `${linkButton(label, selling ? "sell" : "buy", item.id, "", !allowed)}${quantity}`, detail);
+}
+
 function market(s) {
   if (!inVillage(s)) return panel("坊市", '<p class="section-note">村里的摊主还在，回来再做打算。</p>');
-  const currentTier = new Map([...data.gear, ...data.pills, ...data.talismans].map(row => [row.id, row.tier]));
-  return panel("坊市", `<div class="card-grid">${data.items.filter(row => s.discoveredItems.includes(row.id) && ((row.price > 0 && (currentTier.get(row.id) ?? 0) <= s.realm.id) || (row.sell > 0 && s.inventory[row.id]))).map(row => {
-    const equipped = Object.values(s.equipment).includes(row.id);
-    const gear = data.gear.find(g => g.id === row.id);
-    const options = [
-      row.price > 0 && (currentTier.get(row.id) ?? 0) <= s.realm.id ? linkButton(row.price > s.coins ? "灵钱不足" : "购入", "buy", row.id, "", row.price > s.coins) : "",
-      row.sell > 0 && s.inventory[row.id] ? linkButton("卖出", "sell", row.id, "quiet", equipped) : "",
-    ].join("");
-    const pill = data.pills.find(entry => entry.id === row.id);
-    const seal = data.talismans.find(entry => entry.id === row.id);
-    return card(row.name, "", s.inventory[row.id] ? tag("持有") : "", options, gear ? gearDescription(row, gear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc);
-  }).join("")}</div>`);
+  const modeButton = (id, name) => `<button type="button" class="button${marketMode === id ? " primary" : " quiet"}"
+    data-market-mode="${id}" aria-pressed="${marketMode === id}">${name}</button>`;
+  const switcher = `<div class="actions market-switch">${modeButton("buy", "摊上的货")}${modeButton("sell", "卖手里的货")}</div>`;
+  const contents = marketMode === "sell"
+    ? (s.market.sales.length ? `<div class="card-grid">${s.market.sales.map(entry => marketItem(s, entry, true)).join("")}</div>`
+      : '<p class="intro">行囊里暂时没有能卖的东西。</p>')
+    : s.market.stalls.map(stall => `<section class="market-stall">
+      <h3>${escape(stall.name)}</h3>${stall.desc ? `<p class="intro">${escape(stall.desc)}</p>` : ""}
+      <div class="card-grid">${stall.offers.map(entry => marketItem(s, entry, false)).join("")}</div>
+    </section>`).join("");
+  return panel("坊市", switcher + contents, tag(`灵钱 ${s.coins}`));
 }
 
 function questDone(s, row) {
@@ -505,6 +519,14 @@ function showNotice(lines, warning) {
 }
 
 function feedback(before, after, result, action) {
+  if (result.ok && (action === "buy" || action === "sell")) {
+    const selling = action === "sell";
+    const quantity = item => ((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0)) * (selling ? -1 : 1);
+    const traded = data.items.find(item => quantity(item) > 0);
+    if (traded) {
+      return [`${selling ? "卖出" : "买入"}${traded.name} ×${quantity(traded)}，${selling ? "收到" : "付出"} ${Math.abs(after.coins - before.coins)} 灵钱。`];
+    }
+  }
   const lines = [];
   if (result.injury?.amount) {
     const cause = result.injury.cause.replace(/[。！]+$/, "");
@@ -624,6 +646,7 @@ document.addEventListener("click", event => {
     if (!window.confirm("重新开始这一局？")) return;
     state = freshGame();
     screen = "journey";
+    marketMode = "buy";
     selectedItem = null;
     activeDeduction = null;
     deductionDrafts.clear();
@@ -632,6 +655,11 @@ document.addEventListener("click", event => {
     guide.close();
     render();
     showOpening();
+    return;
+  }
+  if (button.dataset.marketMode) {
+    marketMode = button.dataset.marketMode;
+    render();
     return;
   }
   if (button.dataset.tab) {

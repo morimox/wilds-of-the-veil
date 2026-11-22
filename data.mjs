@@ -370,13 +370,13 @@ const enemies = [
 ];
 
 const quests = [
-  { id: 'patch_ferry', name: '把旧灯支起来', desc: '村人请你带松枝，把渡口那盏灯支稳。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, outcome: '村人往灯座下垫进松枝，松开手，灯没再倒。' },
+  { id: 'patch_ferry', name: '把旧灯支起来', desc: '渡口的灯照不稳，送货的船不敢靠岸。村人想找两根松枝垫牢灯座。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, outcome: '村人往灯座下垫进松枝，松开手，灯没再倒。一艘小舟循灯靠岸，船家抱出一匣遮痕符，托行旅器具摊代卖。' },
   { id: 'lost_basket_return', name: '把药篓还给药僮', desc: '药僮一看见篓把上的青绳就站起来了。「是我在浅汊落下的，药没散吧？」', need: { lost_basket: 1 }, reward: { salve: 1, ration: 2 }, coins: 8, insight: 2, outcome: '药僮接过药篓，把背带挪回篓口。「扣还紧着，药都在。多谢你原样捞回来。」他分了一包松脂膏给你。' },
   { id: 'reed_salve', name: '给药僮一份白苇芯', desc: '药僮搅着锅里的松脂。「还差一份白苇芯。你要有，匀我一份，这锅熬好也包你一份。」', need: { reed: 1 }, requiresKnownMaterials: false, reward: { salve: 1 }, coins: 4, insight: 2, outcome: '药僮收下苇芯，包好一份松脂膏。「擦在伤口上就行。」' },
   { id: 'apprentice_waterline', name: '问药僮怎么看水线', reveal: { item: 'oar_mark' }, desc: '药僮瞥见桨背的画。「渡工画的是桩。我找药草，不同水位都得去一趟。帮我匀一份白苇芯，我把水线图给你。」', need: { reed: 1 }, requiresKnownMaterials: false, reward: { reed_lines: 1 }, coins: 0, insight: 2, outcome: '药僮从灶台下抽出叠在一起的两页。「这不是一回画的。水刚涨时去一趟，退了又走一趟。有几道线两次可不一样。」' },
   { id: 'coat_mend', name: '补蓑衣的里衬', desc: '渡工捏着蓑衣上的破洞，想换一块整泥蜕。', need: { hide: 1 }, reward: { salve: 2, ration: 1 }, coins: 10, insight: 2, outcome: '渡工把泥蜕比在裂口上，拣了两包自己用惯的止血膏给你。' },
   { id: 'sell_forging', name: '拿寒铁换旧渡水图', reveal: { item: 'ridge_rubbing' }, desc: '老匠人从抽屉里抽出一张折旧的水图。「给我一块寒铁试打闸栓，这图你拿去。」', need: { ore: 1 }, reward: { iron_talisman: 1, ration: 3, ford_chart: 1 }, coins: 17, insight: 3, outcome: '老匠人掂了掂寒铁，把通往闭潮渡的水图交给你。' },
-  { id: 'last_lantern', name: '把旧渡的印带回来', reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。村老请你带回镇渡印。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6, outcome: '村老接过镇渡印，在闸书上压稳，带人去开旧闸。' },
+  { id: 'last_lantern', name: '把旧渡的印带回来', reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。村老请你带回镇渡印。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6, outcome: '村老接过镇渡印，在闸书上压稳，带人去开旧闸。久停的药船终于从闸下驶过，给村里的药摊捎来合络丹。' },
 ];
 
 const services = [
@@ -385,6 +385,19 @@ const services = [
   { id: 'workshop', name: '工坊', public: true },
   { id: 'cultivate', name: '修行', choices: ['drowned_mast:1'] },
 ];
+
+const market = {
+  stalls: [
+    { id: 'provisions', name: '渡口杂货', offers: [{ id: 'ration' }, { id: 'wood' }, { id: 'reed' }] },
+    { id: 'gear', name: '行旅器具', offers: [
+      { id: 'cudgel' }, { id: 'knife' }, { id: 'straw_cape' },
+      { id: 'reed_talisman', afterQuest: 'patch_ferry' },
+    ] },
+    { id: 'medicine', name: '药摊', offers: [
+      { id: 'salve' }, { id: 'qi_powder' }, { id: 'heal_pill', afterQuest: 'last_lantern' },
+    ] },
+  ],
+};
 
 const deductions = [
   {
@@ -417,7 +430,7 @@ const basket = {
   },
 };
 const victoryQuest = 'last_lantern';
-const data = { realms, items, gear, pills, talismans, arts, recipes, regions, sites, events, enemies, quests, services, deductions, rules: {}, starting, basket, victoryQuest };
+const data = { realms, items, gear, pills, talismans, arts, recipes, regions, sites, events, enemies, quests, services, market, deductions, rules: {}, starting, basket, victoryQuest };
 
-export { data, realms, items, gear, pills, talismans, arts, recipes, regions, sites, events, enemies, quests, services, deductions, starting, basket, victoryQuest };
+export { data, realms, items, gear, pills, talismans, arts, recipes, regions, sites, events, enemies, quests, services, market, deductions, starting, basket, victoryQuest };
 export default data;

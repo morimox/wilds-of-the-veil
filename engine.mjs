@@ -475,6 +475,7 @@ export function view(state) {
     discoveredRecipes: services.includes('workshop') ? data.recipes.filter((recipe) => knowsRecipe(state, recipe)).map(({ id }) => id) : [],
     discoveredQuests: discoveredQuests.map(({ id }) => id),
     discoveredItems: data.items.filter((item) => knowsItem(state, item)).map(({ id }) => id),
+    market: marketView(state),
     evidence: data.items.filter((item) => isEvidence(item) && owns(state, item.id) > 0)
       .map(({ id, name, desc }) => ({ id, name, desc, count: owns(state, id) })),
     deductions: (data.deductions ?? []).filter((entry) => knowsDeduction(state, entry)).map((entry) => {
@@ -1001,25 +1002,65 @@ function showHideToSmith(state) {
   return say(state, '工匠拎起泥蜕，顺着纹路拽了拽。「两片就够衬一件褂子。下回让那水兽咬在这上头。」');
 }
 
+function stockedOffers(state, offers) {
+  return offers.filter(({ id, afterQuest }) =>
+    records.items[id]?.price > 0 && (!afterQuest || state.completedQuests.includes(afterQuest)));
+}
+
+function purchaseBlocker(state, item, count) {
+  const gear = records.gear[item.id];
+  const object = gear ?? records.pills[item.id] ?? records.talismans[item.id];
+  if (object && object.tier > state.realm) return `需${records.realms[object.tier].name}境方可购入。`;
+  if (gear && (owns(state, item.id) || count !== 1)) return '同种装备只能持有一件。';
+  if (state.coins < item.price * count) return '灵钱不足。';
+  if (!hasRoom(state, { [item.id]: count })) return '行囊已满。';
+  return '';
+}
+
+function saleTerms(state, id, requested = 1) {
+  const held = owns(state, id);
+  const gear = records.gear[id];
+  const equipped = gear && state.equipment[gear.slot] === id;
+  const reserved = id === supply ? state.reliefRations : 0;
+  const count = equipped ? 0 : Math.max(0, held - reserved);
+  let blockedReason = '';
+  if (held < requested) blockedReason = '行囊里没有这么多。';
+  else if (equipped) blockedReason = '先卸下这件装备。';
+  else if (count < requested) blockedReason = '村里匀给你的口粮只供自用。';
+  return { count, blockedReason };
+}
+
+function marketView(state) {
+  const stalls = data.market.stalls.map(({ offers, ...stall }) => ({
+    ...stall,
+    offers: stockedOffers(state, offers).map(({ id }) => {
+      const item = records.items[id];
+      const blockedReason = purchaseBlocker(state, item, 1);
+      return { id, price: item.price, canBuy: !blockedReason, blockedReason };
+    }),
+  })).filter(({ offers }) => offers.length);
+  const sales = data.items.filter(({ id, sell }) => sell > 0 && owns(state, id)).map(({ id, sell }) => {
+    const { count, blockedReason } = saleTerms(state, id);
+    return { id, price: sell, count, canSell: !blockedReason, blockedReason };
+  });
+  return { stalls, sales };
+}
+
 function trade(state, id, count, buying) {
   const item = records.items[id];
   if (!item || !Number.isInteger(count) || count < 1 || count > rules.maxTradeCount) return refuse('请选择交易物品及数量。');
-  if (!knowsItem(state, item)) return refuse('坊市还没有这件物品的消息。');
   const price = buying ? item.price : item.sell;
   if (!(price > 0)) return refuse('坊市没有这门买卖。');
-  const gear = records.gear[id];
   if (buying) {
-    const object = gear ?? records.pills[id] ?? records.talismans[id];
-    if (object && object.tier > state.realm) return refuse('等境界到了再想这件物品。');
-    if (gear && (owns(state, id) || count !== 1)) return refuse('同种装备只能持有一件。');
-    if (state.coins < price * count) return refuse(`这批物品需要${price * count}枚灵钱。`);
-    if (!hasRoom(state, { [id]: count })) return refuse('行囊已满。');
+    const stocked = data.market.stalls.some(({ offers }) => stockedOffers(state, offers).some((offer) => offer.id === id));
+    if (!stocked) return refuse('摊上没摆这件货。');
+    const blockedReason = purchaseBlocker(state, item, count);
+    if (blockedReason) return refuse(blockedReason);
     state.coins -= price * count;
     addItems(state, { [id]: count });
   } else {
-    if (owns(state, id) < count) return refuse('行囊里没有这么多。');
-    if (gear && state.equipment[gear.slot] === id) return refuse('先把这件装备收下。');
-    if (id === supply && owns(state, id) - state.reliefRations < count) return refuse('村里匀给你的口粮只供自用。');
+    const { blockedReason } = saleTerms(state, id, count);
+    if (blockedReason) return refuse(blockedReason);
     removeItem(state, id, count, false);
     state.coins += price * count;
   }

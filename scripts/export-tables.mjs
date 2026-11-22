@@ -184,6 +184,14 @@ const experimentOptions = experiments.flatMap(({ id, site, controls, solution, m
     producesResult: solution[control.id] === option.id,
     observation: misses?.[control.id]?.[option.id],
   }))));
+const itemsById = new Map(data.items.map((item) => [item.id, item]));
+const purchaseTiers = new Map([...data.gear, ...data.pills, ...data.talismans].map(({ id, tier }) => [id, tier]));
+const marketOffers = data.market.stalls.flatMap((stall) => stall.offers.map(({ id, afterQuest }) => ({
+  stallId: stall.id, stallName: stall.name, id, name: name(id),
+  price: itemsById.get(id).price, afterQuest, purchaseTier: purchaseTiers.get(id),
+})));
+const offeredItems = new Set(marketOffers.map(({ id }) => id));
+const itemTradeRows = data.items.map((item) => ({ ...item, price: offeredItems.has(item.id) ? item.price : 0 }));
 const ruleRows = Object.entries({ ...data.rules, ...rules })
   .map(([id, value]) => ({ id, value, desc: ruleDescriptions[id] ?? '' }));
 
@@ -192,8 +200,12 @@ const tables = [
     'id', 'name', ['hp', '基础气血'], ['qi', '基础真气'], ['atk', '基础攻击'], ['def', '基础防御'],
     ['insight', '突破所需修为'], ['cost', '突破费用（灵钱）'], 'need', ['pressure', '越过本境的出伤倍率'], 'days',
   ], { note: '出伤倍率用于向更高境界进攻。相隔两境时，两档倍率连乘。' }),
-  table('items', '物品与交易', data.items, ['id', 'name', 'kind', 'price', 'sell', 'desc'],
-    { note: '价格为 0 表示没有对应的买入或卖出选项。' }),
+  table('items', '物品与交易', itemTradeRows, ['id', 'name', 'kind', 'price', 'sell', 'desc'],
+    { note: '价格为 0 表示无对应买卖渠道。买入的货源与到货条件见坊市货单。卖出按手中符合规则的物件结算。' }),
+  table('market-offers', '坊市货单', marketOffers, [
+    ['stallId', '摊位标识'], ['stallName', '摊位'], 'id', 'name', 'price',
+    ['afterQuest', '实际到货所需的委托', ref], ['purchaseTier', '购入所需境界', realm],
+  ], { note: '到货条件为空的商品从开局陈列。售价按件。商品出现由摊位的货单决定，制作条件另见配方表。' }),
   table('gear', '装备', gated(described(data.gear)), [
     'id', 'name', 'slot', 'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'],
     'retreat', 'durability', 'repair', ['entry', '玩家主动查读的词条'], ['trait', '特殊作用与具体数值', traitText],

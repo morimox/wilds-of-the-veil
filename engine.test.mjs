@@ -40,6 +40,7 @@ function uncoverFerryman(state) {
 
 const marshLandmarks = ['reed_banks', 'sunk_pack', 'mud_track', 'bank_watch'];
 const siteIds = (state) => view(state).sites.map(({ id }) => id);
+const marketStock = (state) => view(state).market.stalls.flatMap(({ offers }) => offers.map(({ id }) => id));
 
 test('public village services are accessible immediately while material trades and recipes retain prerequisites', () => {
   let state = createGame();
@@ -94,6 +95,74 @@ test('public village services are accessible immediately while material trades a
   assert.deepEqual(view(state).services, ['quests', 'market', 'workshop', 'cultivate']);
   assert.ok(view(state).discoveredRecipes.includes('r_qi'));
   play(state, 'learn', { id: 'reed_cleave' });
+});
+
+test('stalls stock real goods from the start and crafting knowledge does not add to the shelves', () => {
+  const state = createGame();
+  const initialStock = ['ration', 'wood', 'reed', 'cudgel', 'knife', 'straw_cape', 'salve', 'qi_powder'];
+  assert.deepEqual(marketStock(state), initialStock);
+  assert.equal(view(state).discoveredRecipes.includes('r_qi'), false);
+  const coins = state.coins;
+  play(state, 'buy', { id: 'qi_powder' });
+  assert.equal(state.inventory.qi_powder, 1);
+  assert.equal(state.coins, coins - data.items.find(({ id }) => id === 'qi_powder').price);
+  assert.equal(view(state).discoveredRecipes.includes('r_qi'), false);
+  assert.deepEqual(marketStock(state), initialStock);
+
+  walk(state, 'marsh');
+  chooseAt(state, 'reed_banks', 0);
+  chooseAt(state, 'mud_track', 1);
+  walk(state, 'village');
+  assert.ok(view(state).discoveredRecipes.includes('r_reed_bow'));
+  assert.ok(view(state).discoveredRecipes.includes('r_grain'));
+  assert.deepEqual(marketStock(state), initialStock);
+  const unchanged = structuredClone(state);
+  assert.match(act(state, 'buy', { id: 'grain_pill' }).message, /摊上没摆/);
+  assert.deepEqual(state, unchanged);
+  assert.equal(view(state).market.sales.some(({ id }) => id === 'reed_bow'), false);
+
+  play(state, 'craft', { id: 'r_reed_bow' });
+  assert.deepEqual(marketStock(state), initialStock);
+  const bow = view(state).market.sales.find(({ id }) => id === 'reed_bow');
+  assert.equal(bow.count, 1);
+  assert.equal(bow.canSell, true);
+  play(state, 'sell', { id: 'reed_bow' });
+  assert.equal(view(state).market.sales.some(({ id }) => id === 'reed_bow'), false);
+  assert.deepEqual(marketStock(state), initialStock);
+});
+
+test('a supply hand-in changes its stall and protected possessions cannot be sold', () => {
+  const state = createGame();
+  const stock = marketStock(state);
+  assert.ok(!stock.includes('reed_talisman'));
+  const staff = view(state).market.sales.find(({ id }) => id === 'cudgel');
+  assert.equal(staff.count, 0);
+  assert.equal(staff.canSell, false);
+  assert.match(act(state, 'sell', { id: 'cudgel' }).message, /先卸下/);
+
+  play(state, 'sell', { id: 'ration', count: 3 });
+  play(state, 'rest');
+  const reliefFood = view(state).market.sales.find(({ id }) => id === 'ration');
+  assert.equal(reliefFood.count, 0);
+  assert.equal(reliefFood.canSell, false);
+  assert.match(act(state, 'sell', { id: 'ration' }).message, /只供自用/);
+  play(state, 'buy', { id: 'ration' });
+  assert.equal(view(state).market.sales.find(({ id }) => id === 'ration').count, 1);
+  play(state, 'sell', { id: 'ration' });
+  assert.equal(state.inventory.ration, rules.reliefRations);
+  assert.equal(state.reliefRations, rules.reliefRations);
+
+  walk(state, 'marsh');
+  chooseAt(state, 'mud_track', 1);
+  walk(state, 'village');
+  assert.deepEqual(marketStock(state), stock);
+  assert.equal(view(state).discoveredRecipes.includes('r_reed'), false);
+  assert.match(act(state, 'buy', { id: 'reed_talisman' }).message, /摊上没摆/);
+  play(state, 'handin', { id: 'patch_ferry' });
+  assert.deepEqual(marketStock(state).filter(id => !stock.includes(id)), ['reed_talisman']);
+  play(state, 'buy', { id: 'reed_talisman' });
+  assert.equal(state.inventory.reed_talisman, 1);
+  assert.equal(view(state).discoveredRecipes.includes('r_reed'), false);
 });
 
 test('marsh landmarks are consistent across visits and new sites require an actual route clue', () => {
@@ -853,12 +922,20 @@ test('a chosen route completes both realms and the main quest, then unlocks the 
   assert.equal(state.won, false);
   assert.equal(view(state).sites.find(({ id }) => id === 'tide_keeper').creatures.tide_spirit, 0);
   travelFed('village');
+  assert.equal(marketStock(state).includes('heal_pill'), false);
   play(state, 'handin', { id: 'last_lantern' });
   assert.equal(view(state).mode, 'victory');
   assert.equal(state.inventory.seal, undefined);
   const wonDay = state.day;
   play(state, 'resume');
   assert.equal(view(state).mode, 'village');
+  assert.ok(marketStock(state).includes('heal_pill'));
+  const lowRealm = { ...state, realm: 0 };
+  const medicine = view(lowRealm).market.stalls.find(({ id }) => id === 'medicine');
+  const lateOffer = medicine.offers.find(({ id }) => id === 'heal_pill');
+  assert.equal(lateOffer.canBuy, false);
+  assert.match(lateOffer.blockedReason, /筑基/);
+  assert.deepEqual(marketStock(lowRealm), marketStock(state));
   assert.equal(view(state).discovered.includes('hidden'), false);
   assert.equal(act(state, 'travel', { id: 'hidden' }).ok, false);
   play(state, 'buy', { id: 'ration', count: 4 });

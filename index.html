@@ -163,6 +163,10 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .card, .choice { padding: 8px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
 .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .card .actions { margin-top: 7px; }
+.market-switch { margin: 0 0 12px; }
+.market-stall + .market-stall { margin-top: 12px; }
+.market-stall > .intro { margin: 4px 0 7px; font-size: 13px; }
+.market-stall > h3 { color: var(--jade); margin-bottom: 4px; }
 .choice { display: grid; justify-items: start; gap: 5px; }
 .choice-list { margin-top: 6px; }
 .card p { margin-top: 3px; }
@@ -380,7 +384,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=8" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=9" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -793,13 +797,13 @@ const enemies = [
 ];
 
 const quests = [
-  { id: 'patch_ferry', name: '把旧灯支起来', desc: '村人请你带松枝，把渡口那盏灯支稳。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, outcome: '村人往灯座下垫进松枝，松开手，灯没再倒。' },
+  { id: 'patch_ferry', name: '把旧灯支起来', desc: '渡口的灯照不稳，送货的船不敢靠岸。村人想找两根松枝垫牢灯座。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, outcome: '村人往灯座下垫进松枝，松开手，灯没再倒。一艘小舟循灯靠岸，船家抱出一匣遮痕符，托行旅器具摊代卖。' },
   { id: 'lost_basket_return', name: '把药篓还给药僮', desc: '药僮一看见篓把上的青绳就站起来了。「是我在浅汊落下的，药没散吧？」', need: { lost_basket: 1 }, reward: { salve: 1, ration: 2 }, coins: 8, insight: 2, outcome: '药僮接过药篓，把背带挪回篓口。「扣还紧着，药都在。多谢你原样捞回来。」他分了一包松脂膏给你。' },
   { id: 'reed_salve', name: '给药僮一份白苇芯', desc: '药僮搅着锅里的松脂。「还差一份白苇芯。你要有，匀我一份，这锅熬好也包你一份。」', need: { reed: 1 }, requiresKnownMaterials: false, reward: { salve: 1 }, coins: 4, insight: 2, outcome: '药僮收下苇芯，包好一份松脂膏。「擦在伤口上就行。」' },
   { id: 'apprentice_waterline', name: '问药僮怎么看水线', reveal: { item: 'oar_mark' }, desc: '药僮瞥见桨背的画。「渡工画的是桩。我找药草，不同水位都得去一趟。帮我匀一份白苇芯，我把水线图给你。」', need: { reed: 1 }, requiresKnownMaterials: false, reward: { reed_lines: 1 }, coins: 0, insight: 2, outcome: '药僮从灶台下抽出叠在一起的两页。「这不是一回画的。水刚涨时去一趟，退了又走一趟。有几道线两次可不一样。」' },
   { id: 'coat_mend', name: '补蓑衣的里衬', desc: '渡工捏着蓑衣上的破洞，想换一块整泥蜕。', need: { hide: 1 }, reward: { salve: 2, ration: 1 }, coins: 10, insight: 2, outcome: '渡工把泥蜕比在裂口上，拣了两包自己用惯的止血膏给你。' },
   { id: 'sell_forging', name: '拿寒铁换旧渡水图', reveal: { item: 'ridge_rubbing' }, desc: '老匠人从抽屉里抽出一张折旧的水图。「给我一块寒铁试打闸栓，这图你拿去。」', need: { ore: 1 }, reward: { iron_talisman: 1, ration: 3, ford_chart: 1 }, coins: 17, insight: 3, outcome: '老匠人掂了掂寒铁，把通往闭潮渡的水图交给你。' },
-  { id: 'last_lantern', name: '把旧渡的印带回来', reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。村老请你带回镇渡印。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6, outcome: '村老接过镇渡印，在闸书上压稳，带人去开旧闸。' },
+  { id: 'last_lantern', name: '把旧渡的印带回来', reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。村老请你带回镇渡印。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6, outcome: '村老接过镇渡印，在闸书上压稳，带人去开旧闸。久停的药船终于从闸下驶过，给村里的药摊捎来合络丹。' },
 ];
 
 const services = [
@@ -808,6 +812,19 @@ const services = [
   { id: 'workshop', name: '工坊', public: true },
   { id: 'cultivate', name: '修行', choices: ['drowned_mast:1'] },
 ];
+
+const market = {
+  stalls: [
+    { id: 'provisions', name: '渡口杂货', offers: [{ id: 'ration' }, { id: 'wood' }, { id: 'reed' }] },
+    { id: 'gear', name: '行旅器具', offers: [
+      { id: 'cudgel' }, { id: 'knife' }, { id: 'straw_cape' },
+      { id: 'reed_talisman', afterQuest: 'patch_ferry' },
+    ] },
+    { id: 'medicine', name: '药摊', offers: [
+      { id: 'salve' }, { id: 'qi_powder' }, { id: 'heal_pill', afterQuest: 'last_lantern' },
+    ] },
+  ],
+};
 
 const deductions = [
   {
@@ -840,7 +857,7 @@ const basket = {
   },
 };
 const victoryQuest = 'last_lantern';
-const data = { realms, items, gear, pills, talismans, arts, recipes, regions, sites, events, enemies, quests, services, deductions, rules: {}, starting, basket, victoryQuest };
+const data = { realms, items, gear, pills, talismans, arts, recipes, regions, sites, events, enemies, quests, services, market, deductions, rules: {}, starting, basket, victoryQuest };
 
 
 
@@ -1326,6 +1343,7 @@ function view(state) {
     discoveredRecipes: services.includes('workshop') ? data.recipes.filter((recipe) => knowsRecipe(state, recipe)).map(({ id }) => id) : [],
     discoveredQuests: discoveredQuests.map(({ id }) => id),
     discoveredItems: data.items.filter((item) => knowsItem(state, item)).map(({ id }) => id),
+    market: marketView(state),
     evidence: data.items.filter((item) => isEvidence(item) && owns(state, item.id) > 0)
       .map(({ id, name, desc }) => ({ id, name, desc, count: owns(state, id) })),
     deductions: (data.deductions ?? []).filter((entry) => knowsDeduction(state, entry)).map((entry) => {
@@ -1852,25 +1870,65 @@ function showHideToSmith(state) {
   return say(state, '工匠拎起泥蜕，顺着纹路拽了拽。「两片就够衬一件褂子。下回让那水兽咬在这上头。」');
 }
 
+function stockedOffers(state, offers) {
+  return offers.filter(({ id, afterQuest }) =>
+    records.items[id]?.price > 0 && (!afterQuest || state.completedQuests.includes(afterQuest)));
+}
+
+function purchaseBlocker(state, item, count) {
+  const gear = records.gear[item.id];
+  const object = gear ?? records.pills[item.id] ?? records.talismans[item.id];
+  if (object && object.tier > state.realm) return `需${records.realms[object.tier].name}境方可购入。`;
+  if (gear && (owns(state, item.id) || count !== 1)) return '同种装备只能持有一件。';
+  if (state.coins < item.price * count) return '灵钱不足。';
+  if (!hasRoom(state, { [item.id]: count })) return '行囊已满。';
+  return '';
+}
+
+function saleTerms(state, id, requested = 1) {
+  const held = owns(state, id);
+  const gear = records.gear[id];
+  const equipped = gear && state.equipment[gear.slot] === id;
+  const reserved = id === supply ? state.reliefRations : 0;
+  const count = equipped ? 0 : Math.max(0, held - reserved);
+  let blockedReason = '';
+  if (held < requested) blockedReason = '行囊里没有这么多。';
+  else if (equipped) blockedReason = '先卸下这件装备。';
+  else if (count < requested) blockedReason = '村里匀给你的口粮只供自用。';
+  return { count, blockedReason };
+}
+
+function marketView(state) {
+  const stalls = data.market.stalls.map(({ offers, ...stall }) => ({
+    ...stall,
+    offers: stockedOffers(state, offers).map(({ id }) => {
+      const item = records.items[id];
+      const blockedReason = purchaseBlocker(state, item, 1);
+      return { id, price: item.price, canBuy: !blockedReason, blockedReason };
+    }),
+  })).filter(({ offers }) => offers.length);
+  const sales = data.items.filter(({ id, sell }) => sell > 0 && owns(state, id)).map(({ id, sell }) => {
+    const { count, blockedReason } = saleTerms(state, id);
+    return { id, price: sell, count, canSell: !blockedReason, blockedReason };
+  });
+  return { stalls, sales };
+}
+
 function trade(state, id, count, buying) {
   const item = records.items[id];
   if (!item || !Number.isInteger(count) || count < 1 || count > rules.maxTradeCount) return refuse('请选择交易物品及数量。');
-  if (!knowsItem(state, item)) return refuse('坊市还没有这件物品的消息。');
   const price = buying ? item.price : item.sell;
   if (!(price > 0)) return refuse('坊市没有这门买卖。');
-  const gear = records.gear[id];
   if (buying) {
-    const object = gear ?? records.pills[id] ?? records.talismans[id];
-    if (object && object.tier > state.realm) return refuse('等境界到了再想这件物品。');
-    if (gear && (owns(state, id) || count !== 1)) return refuse('同种装备只能持有一件。');
-    if (state.coins < price * count) return refuse(`这批物品需要${price * count}枚灵钱。`);
-    if (!hasRoom(state, { [id]: count })) return refuse('行囊已满。');
+    const stocked = data.market.stalls.some(({ offers }) => stockedOffers(state, offers).some((offer) => offer.id === id));
+    if (!stocked) return refuse('摊上没摆这件货。');
+    const blockedReason = purchaseBlocker(state, item, count);
+    if (blockedReason) return refuse(blockedReason);
     state.coins -= price * count;
     addItems(state, { [id]: count });
   } else {
-    if (owns(state, id) < count) return refuse('行囊里没有这么多。');
-    if (gear && state.equipment[gear.slot] === id) return refuse('先把这件装备收下。');
-    if (id === supply && owns(state, id) - state.reliefRations < count) return refuse('村里匀给你的口粮只供自用。');
+    const { blockedReason } = saleTerms(state, id, count);
+    if (blockedReason) return refuse(blockedReason);
     removeItem(state, id, count, false);
     state.coins += price * count;
   }
@@ -2060,6 +2118,7 @@ const notices = document.querySelector("#notices");
 const opening = document.querySelector("#opening");
 let state = freshGame();
 let screen = "journey";
+let marketMode = "buy";
 let openingTimer;
 let selectedItem = null;
 let activeDeduction = null;
@@ -2433,20 +2492,33 @@ function workshop(s) {
   }).join("")}</div>`);
 }
 
+function marketItem(s, entry, selling) {
+  const item = itemRows[entry.id];
+  const gear = data.gear.find(row => row.id === item.id);
+  const pill = data.pills.find(row => row.id === item.id);
+  const seal = data.talismans.find(row => row.id === item.id);
+  const allowed = selling ? entry.canSell : entry.canBuy;
+  const label = allowed ? (selling ? "卖出" : "购入") : entry.blockedReason;
+  const detail = gear ? gearDescription(item, gear, selling ? s.durability[item.id] : undefined) :
+    pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
+  const price = tag(`${entry.price} 灵钱/件`);
+  const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}</span>` : "";
+  return card(item.name, "", price, `${linkButton(label, selling ? "sell" : "buy", item.id, "", !allowed)}${quantity}`, detail);
+}
+
 function market(s) {
   if (!inVillage(s)) return panel("坊市", '<p class="section-note">村里的摊主还在，回来再做打算。</p>');
-  const currentTier = new Map([...data.gear, ...data.pills, ...data.talismans].map(row => [row.id, row.tier]));
-  return panel("坊市", `<div class="card-grid">${data.items.filter(row => s.discoveredItems.includes(row.id) && ((row.price > 0 && (currentTier.get(row.id) ?? 0) <= s.realm.id) || (row.sell > 0 && s.inventory[row.id]))).map(row => {
-    const equipped = Object.values(s.equipment).includes(row.id);
-    const gear = data.gear.find(g => g.id === row.id);
-    const options = [
-      row.price > 0 && (currentTier.get(row.id) ?? 0) <= s.realm.id ? linkButton(row.price > s.coins ? "灵钱不足" : "购入", "buy", row.id, "", row.price > s.coins) : "",
-      row.sell > 0 && s.inventory[row.id] ? linkButton("卖出", "sell", row.id, "quiet", equipped) : "",
-    ].join("");
-    const pill = data.pills.find(entry => entry.id === row.id);
-    const seal = data.talismans.find(entry => entry.id === row.id);
-    return card(row.name, "", s.inventory[row.id] ? tag("持有") : "", options, gear ? gearDescription(row, gear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc);
-  }).join("")}</div>`);
+  const modeButton = (id, name) => `<button type="button" class="button${marketMode === id ? " primary" : " quiet"}"
+    data-market-mode="${id}" aria-pressed="${marketMode === id}">${name}</button>`;
+  const switcher = `<div class="actions market-switch">${modeButton("buy", "摊上的货")}${modeButton("sell", "卖手里的货")}</div>`;
+  const contents = marketMode === "sell"
+    ? (s.market.sales.length ? `<div class="card-grid">${s.market.sales.map(entry => marketItem(s, entry, true)).join("")}</div>`
+      : '<p class="intro">行囊里暂时没有能卖的东西。</p>')
+    : s.market.stalls.map(stall => `<section class="market-stall">
+      <h3>${escape(stall.name)}</h3>${stall.desc ? `<p class="intro">${escape(stall.desc)}</p>` : ""}
+      <div class="card-grid">${stall.offers.map(entry => marketItem(s, entry, false)).join("")}</div>
+    </section>`).join("");
+  return panel("坊市", switcher + contents, tag(`灵钱 ${s.coins}`));
 }
 
 function questDone(s, row) {
@@ -2548,6 +2620,14 @@ function showNotice(lines, warning) {
 }
 
 function feedback(before, after, result, action) {
+  if (result.ok && (action === "buy" || action === "sell")) {
+    const selling = action === "sell";
+    const quantity = item => ((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0)) * (selling ? -1 : 1);
+    const traded = data.items.find(item => quantity(item) > 0);
+    if (traded) {
+      return [`${selling ? "卖出" : "买入"}${traded.name} ×${quantity(traded)}，${selling ? "收到" : "付出"} ${Math.abs(after.coins - before.coins)} 灵钱。`];
+    }
+  }
   const lines = [];
   if (result.injury?.amount) {
     const cause = result.injury.cause.replace(/[。！]+$/, "");
@@ -2667,6 +2747,7 @@ document.addEventListener("click", event => {
     if (!window.confirm("重新开始这一局？")) return;
     state = freshGame();
     screen = "journey";
+    marketMode = "buy";
     selectedItem = null;
     activeDeduction = null;
     deductionDrafts.clear();
@@ -2675,6 +2756,11 @@ document.addEventListener("click", event => {
     guide.close();
     render();
     showOpening();
+    return;
+  }
+  if (button.dataset.marketMode) {
+    marketMode = button.dataset.marketMode;
+    render();
     return;
   }
   if (button.dataset.tab) {
