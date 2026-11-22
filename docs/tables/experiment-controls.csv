@@ -17,3 +17,8 @@
 瓦上反字（trace_backwash）,没篷的渡舟（boat_shade）,hanger,铃舌挂在哪里,outer,舷外弯钩,是,
 瓦上反字（trace_backwash）,没篷的渡舟（boat_shade）,plate,铜片插进哪道扁缝,wall,朝船心一侧,否,铜片上只照亮半道刻纹，船外的水面还是黑的。
 瓦上反字（trace_backwash）,没篷的渡舟（boat_shade）,plate,铜片插进哪道扁缝,water,朝水一侧,是,
+三圈偏影（align_axis）,偏影观星梁（old_observatory）,notch,把镜脚插进,outer,凿得深的外榫,否,镜脚插得太深，枢轴回转时立刻卡住了。
+三圈偏影（align_axis）,偏影观星梁（old_observatory）,notch,把镜脚插进,inner,较短的内榫,是,
+三圈偏影（align_axis）,偏影观星梁（old_observatory）,shadow,等到梁影,north,压住梁脚,否,反光还差一段才接触到圈心。
+三圈偏影（align_axis）,偏影观星梁（old_observatory）,shadow,等到梁影,center,缩成一线,是,
+三圈偏影（align_axis）,偏影观星梁（old_observatory）,shadow,等到梁影,east,越过第三圈,否,亮斑从梁脚外滚过，三道刻圈仍各在一边。

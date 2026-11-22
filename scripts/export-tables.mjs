@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import data from '../data.mjs';
 import { createGame, rules } from '../engine.mjs';
+import { economyData } from '../economy.mjs';
 
 const output = fileURLToPath(new URL('../docs/tables/', import.meta.url));
 const names = new Map();
@@ -82,7 +83,7 @@ const resources = (entries = {}) => Object.entries(entries)
   .map(([id, count]) => `${ref(id)}×${count}`).join('、');
 const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
-  gear: '装备', material: '材料', food: '口粮', pill: '丹药', talisman: '符箓', key: '线索',
+  gear: '装备', material: '材料', food: '口粮', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药',
   attack: '普通攻势', heavy: '重招', guard: '防御', drain: '吸取真气', heal: '恢复',
 };
 const slotNames = { weapon: '武器', armor: '护具', charm: '饰物' };
@@ -146,7 +147,8 @@ const startState = [
     })[key] ?? titles[key], initial[key]]),
   ['satiety', '饱腹度', initial.satiety],
   ['discovered', '已知地区', initial.discovered.map(ref).join('、')],
-  ['victoryQuest', '完成故事的委托', ref(data.victoryQuest)],
+  ['victoryQuest', '旧渡章节委托', ref(data.victoryQuest)],
+  ...(data.finalQuest ? [['finalQuest', '最终委托', ref(data.finalQuest)]] : []),
 ].map(([id, name, value]) => ({ id, name, value }));
 
 const siteNames = new Map(data.sites.map(site => [site.id, site.name]));
@@ -186,30 +188,74 @@ const experimentOptions = experiments.flatMap(({ id, site, controls, solution, m
   }))));
 const itemsById = new Map(data.items.map((item) => [item.id, item]));
 const purchaseTiers = new Map([...data.gear, ...data.pills, ...data.talismans].map(({ id, tier }) => [id, tier]));
-const marketOffers = data.market.stalls.flatMap((stall) => stall.offers.map(({ id, afterQuest }) => ({
-  stallId: stall.id, stallName: stall.name, id, name: name(id),
+const marketOffers = data.market.stalls.flatMap((stall) => stall.offers.map(({ id, afterQuest, stock }) => ({
+  stallId: stall.id, stallName: stall.name, merchantText: stall.desc, id, name: name(id),
   price: itemsById.get(id).price, afterQuest, purchaseTier: purchaseTiers.get(id),
+  cap: stock?.cap, interval: stock?.interval, growth: stock?.growth,
 })));
+const merchantOrders = Object.entries(economyData.merchantOrders).flatMap(([goods, { repeat, units, regularText, ...order }]) => [
+  { goods, phase: '首单', units, regularText, ...order },
+  ...(repeat ? [{ goods, phase: '续单', units, ...repeat }] : []),
+]);
+const facilityNames = new Map(economyData.facilities.map(({ id, name: label }) => [id, label]));
+const facilityRef = (id) => `${facilityNames.get(id) ?? id}（${id}）`;
+const facilityLevels = economyData.facilities.flatMap(({ id, name, start, desc, reveal, upgrades }) =>
+  [{ id, name, level: start, desc }, ...upgrades.map((upgrade, index) => ({ id, name, desc, level: start + index + 1, ...upgrade }))]
+    .map((row) => ({
+      ...row,
+      slots: id === 'warehouse' ? economyData.warehouseCap[row.level] : row.level,
+      stack: id === 'warehouse' ? economyData.warehouseStack : undefined,
+      reveal,
+    })));
+const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', bow: '弓', crossbow: '弩' };
 const offeredItems = new Set(marketOffers.map(({ id }) => id));
 const itemTradeRows = data.items.map((item) => ({ ...item, price: offeredItems.has(item.id) ? item.price : 0 }));
 const ruleRows = Object.entries({ ...data.rules, ...rules })
   .map(([id, value]) => ({ id, value, desc: ruleDescriptions[id] ?? '' }));
+ruleRows.push(
+  { id: 'setupDays', value: economyData.setupDays, desc: '每次开启生产的操作耗时（日）' },
+  { id: 'collectDays', value: economyData.collectDays, desc: '每次领取成品的操作耗时（日）' },
+);
 
 const tables = [
   table('realms', '境界与突破', data.realms, [
     'id', 'name', ['hp', '基础气血'], ['qi', '基础真气'], ['atk', '基础攻击'], ['def', '基础防御'],
-    ['insight', '突破所需修为'], ['cost', '突破费用（灵钱）'], 'need', ['pressure', '越过本境的出伤倍率'], 'days',
+    ['insight', '突破所需修为'], ['practice', '本境有效历练日'], ['cost', '突破费用（灵钱）'], 'need',
+    ['requireQuest', '所需世界进程', ref], ['requireDefeated', '须亲自击败的对手', (ids) => ids.map(ref).join('、')],
+    ['pressure', '越过本境的出伤倍率'], 'days',
   ], { note: '出伤倍率用于向更高境界进攻。相隔两境时，两档倍率连乘。' }),
   table('items', '物品与交易', itemTradeRows, ['id', 'name', 'kind', 'price', 'sell', 'desc'],
     { note: '价格为 0 表示无对应买卖渠道。买入的货源与到货条件见坊市货单。卖出按手中符合规则的物件结算。' }),
   table('market-offers', '坊市货单', marketOffers, [
     ['stallId', '摊位标识'], ['stallName', '摊位'], 'id', 'name', 'price',
     ['afterQuest', '实际到货所需的委托', ref], ['purchaseTier', '购入所需境界', realm],
-  ], { note: '到货条件为空的商品从开局陈列。售价按件。商品出现由摊位的货单决定，制作条件另见配方表。' }),
+    ['cap', '常态库存上限'], ['interval', '每批补货间隔（天）'], ['growth', '每批补货量'],
+    ['merchantText', '摊主介绍'],
+  ], { note: '到货条件为空的商品从开局陈列。售价按件。库存一栏为空时可常时补货。每位摊主专卖一种，制作条件由配方表另列。' }),
+  table('merchant-orders', '商人熟客委托', merchantOrders, [
+    ['goods', '商人专营物品', ref], ['phase', '委托阶段'], ['units', '累计付费购入件数'],
+    'name', ['regularText', '成为熟客时摊主的话'], ['text', '商人委托'], 'need', 'cost', 'reward',
+    ['cooldown', '可接下一单的间隔（天）'], ['outcome', '交付后回话'],
+  ], { note: '实际成功买入的件数累加。首单只结一次，续单等到商人处理完上一批货再接。' }),
+  table('facility-levels', '后院设施与升级', facilityLevels, [
+    'id', 'name', ['level', '设施等级'], ['slots', '仓储格数或并行工位数'],
+    ['stack', '仓库每格堆叠上限'], ['reveal', '看见设施需实际取得的物件', ref],
+    'need', ['cost', '搭建扩建费用（灵钱）'], 'days', 'desc',
+  ], { note: '起始仓库已经可用。等级 0 的生产设施需要先搭建。生产工位数与等级相等，仓库单列实际格数。' }),
+  table('yard-projects', '后院种植与备粮', economyData.projects, [
+    'id', 'name', ['facility', '使用设施', facilityRef], ['level', '所需设施等级'],
+    'need', 'loot', ['cost', '费用（灵钱）'], ['days', '等待成熟天数'],
+    ['reveal', '来源线索', ref], ['description', '现场说明'],
+  ], { note: '炼丹和锻造的批次产量与投入见制作用方。操作后世界时间继续走，成熟后需要当面收取。' }),
   table('gear', '装备', gated(described(data.gear)), [
-    'id', 'name', 'slot', 'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'],
+    'id', 'name', 'slot', ['weaponClass', '兵刃类别', (id) => weaponClass[id] ?? id],
+    ['ammo', '适用弹药', (ids) => ids.map(ref).join('、')],
+    'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'],
     'retreat', 'durability', 'repair', ['entry', '玩家主动查读的词条'], ['trait', '特殊作用与具体数值', traitText],
   ], { note: '装备耐久为 0 后失去加成。脱身加成为伤害减免系数，0.17 即减免 17%。' }),
+  table('ammunition', '弹药与命中效果', described(data.ammunition ?? []), [
+    'id', 'name', ['atk', '每发攻击修正'], ['pierce', '每发基础穿甲'], ['trait', '适用目标与加成', traitText],
+  ], { note: '远射和借远兵的术诀每次实际出手扣 1 发。缺弹时普通出手改为徒手，换兵刃会经过一回合。' }),
   table('pills', '丹药', gated(described(data.pills)), [
     'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['food', '获得干粮'], 'toxin', 'wound', 'focus',
   ]),
@@ -218,10 +264,12 @@ const tables = [
   ]),
   table('arts', '术法', gated(data.arts), [
     'id', 'name', 'tier', tier, ['cost', '施术耗气'], 'power', 'pierce', 'guard', 'break', ['price', '学习费用（灵钱）'], 'reveal', 'desc',
+    ['weaponBased', '借兵刃施展'],
   ]),
   table('recipes', '制作用方', gated(data.recipes), [
     'id', 'result', 'count', 'tier', tier, ['cost', '制作费用（灵钱）'], 'need', 'days', 'reveal',
     ['requiresShownHide', '需给工匠看过泥蜕'],
+    ['facility', '生产设施', facilityRef], ['facilityLevel', '设施最低等级'],
   ]),
   table('regions', '地区', gated(data.regions), [
     'id', 'name', ['tier', '威胁参考阶'], ['realmName', '威胁参考境界'], 'travel', 'reveal', 'hint', 'desc',
@@ -236,6 +284,7 @@ const tables = [
   table('world-regrowth', '各地点库存与种群', worldPools, [
     ['site', '地点', siteRef], ['kind', '类型', valueText], ['object', '资源或敌人', ref],
     ['start', '初始量'], ['cap', '上限'], ['interval', '恢复间隔（游戏日）'], ['growth', '每次恢复'],
+    ['depletedFactor', '耗空后首次恢复用时倍率'],
     ['choices', '消耗此资源的选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
   ], { note: '经游戏时间恢复到上限。恢复间隔或恢复量为 0 时，现场耗尽后不会重生。只有击败当场对手才减少该地点种群。' }),
   table('events', '事件正文', data.events, ['id', 'name', 'revisit', 'text'], {

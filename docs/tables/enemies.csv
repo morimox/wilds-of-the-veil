@@ -10,3 +10,9 @@ bell_wraith,裂钟魄,2,凝丹,54,14,5,spirit,25,6,定声铃（bell_charm）×1�
 rope_eel,缠舟兽,2,凝丹,50,15,5,beast,20,6,潮砂（sand）×2、干粮（ration）×2,动作快，扯紧船绳后会随浪发动重击。
 tide_spirit,守潮灵,2,凝丹,72,17,7,spirit,28,8,镇渡印（seal）×1、潮砂（sand）×3,带印回村便可复开旧渡。它的两次重招隔得很近，重进闸前先确认药符够用。
 wick_husk,湿蓑灯蜕,2,凝丹,64,16,6,spirit,23,7,无烟灯芯（dry_wick）×2、济潮丹（tide_pill）×1,会在风回过来时从灯芯汲力。拖久了，它能补回缺损。
+pitch_bear,灰脊松熊,1,筑基,52,13,4,beast、furred,14,5,窑车辙样（kiln_tracks）×1、青松脂（pine_resin）×3、山筋（beast_tendon）×2,厚毛挡得住浅刃。它用背压低窑车时，接下来会往外猛撞。
+cinder_hound,炉渣犬,2,凝丹,60,16,6,spirit、stoneborn,17,6,耐火石泥（kiln_clay）×3、青松脂（pine_resin）×2、松脂膏（salve）×1,身上的炉渣容易结成硬壳。回身舔灰时会把散开的地方补起来。
+vine_stag,白角藤鹿,2,凝丹,67,17,5,beast、furred,18,6,银脉药叶（spirit_leaf）×4、山筋（beast_tendon）×2、泥蜕（hide）×2,它能借湿藤牵走气息。白角还没压低之前，脚下总会先拨藤。
+vein_sentinel,横肩矿傀,2,凝丹,77,18,8,stoneborn、scaled,21,7,玄砂铁（black_iron）×5、寒铁（ore）×2、回声石心（core）×1,两肩石片相合时很难砍进去。窄矢或穿甲的兵刃能省不少力。
+snow_warden,雪脊兽,2,凝丹,89,19,7,beast、scaled,32,10,雪脊鳞（snow_scale）×1、冰藤丝（frost_silk）×4、山筋（beast_tendon）×3,雪脊鳞叠得厚，压背后会沿沟猛撞。趁它还没贴近时服药或换术。
+mirror_warden,持衡镜灵,3,元婴,114,24,10,spirit、stoneborn,55,14,镜门衡印（sky_seal）×1、浮光玉（cloud_jade）×5、照心露（jade_pill）×1,它守印的时候两道影子贴在一起。影子分开以后先试探，再借梁影出重招。

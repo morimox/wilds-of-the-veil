@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const file = async path => (await readFile(new URL(path, root), "utf8")).replace(/\r\n/g, "\n");
-const [html, style, intro, data, engine, app] = await Promise.all([
-  file("game.html"), file("style.css"), file("intro.css"), file("data.mjs"), file("engine.mjs"), file("app.mjs"),
+const [html, style, intro, data, economy, engine, app] = await Promise.all([
+  file("game.html"), file("style.css"), file("intro.css"), file("data.mjs"), file("economy.mjs"), file("engine.mjs"), file("app.mjs"),
 ]);
 const originalCss = `${style}\n${intro}`;
 const destination = process.argv[2] ? resolve(process.argv[2]) : fileURLToPath(new URL("dist/雾渡山河.html", root));
@@ -17,7 +17,7 @@ for (const [reference, path, type] of originalCss.matchAll(/url\("\.\/(assets\/[
   css = css.replace(reference, `url("data:image/${type};base64,${bytes.toString("base64")}")`);
 }
 
-// The three project modules have static imports and a small, known public API.
+// Each module is scoped separately so the standalone bundle behaves like the module build.
 function moduleBody(source) {
   return source
     .replace(/^import .*?;[ \t]*\r?$/gm, "")
@@ -31,6 +31,11 @@ ${moduleBody(data)}
 return { default: data, ...data };
 })();
 const { data } = (() => ({ data: moduleData.default }))();
+const economyModule = (() => {
+${moduleBody(economy)}
+return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo };
+})();
+const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo } = economyModule;
 const { act, createGame, rules, view } = (() => {
 ${moduleBody(engine)}
 return { act, createGame, rules, view };

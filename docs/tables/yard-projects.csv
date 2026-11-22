@@ -1,0 +1,7 @@
+﻿标识,名称,使用设施,所需设施等级,所需物品,所得物品,费用（灵钱）,等待成熟天数,来源线索,现场说明
+sow_millet,下种育粟,药畦（garden）,1,早粟种（millet_seed）×1、白苇芯（reed）×1,新收的谷子（millet_grain）×6、早粟种（millet_seed）×1,0,6,,在浅沟里拢上碎苇保湿，留下一穗作下回的种。
+root_spirit_leaf,压枝培灵叶,药畦（garden）,2,银脉药叶（spirit_leaf）×2、白苇芯（reed）×2,银脉药叶（spirit_leaf）×5,0,9,银脉药叶（spirit_leaf）,留一片叶在地面，带芽的茎压进湿土，等茎节自己生根。
+winter_spirit_leaf,暖畦育灵叶,药畦（garden）,3,银脉药叶（spirit_leaf）×4、冰藤丝（frost_silk）×1、白苇芯（reed）×4,银脉药叶（spirit_leaf）×13,3,15,冰藤丝（frost_silk）,隔着暖湿土慢慢育一整畦药苗。叶子多，等得也久。
+steam_millet,蒸粟烘干粮,备粮灶（hearth）,1,新收的谷子（millet_grain）×3、松枝（wood）×1,干粮（ration）×6,0,1.5,,蒸熟的粟米摊在苇席上烘干，再拿油纸分包。
+cook_travel_cakes,烘一匣行粮,备粮灶（hearth）,2,新收的谷子（millet_grain）×8、松枝（wood）×2、白苇芯（reed）×1,干粮（ration）×18,2,3,,炉炕能铺两张苇席，天还亮着先把下一趟路的粮做起来。
+render_resin_salve,熬松脂膏,备粮灶（hearth）,2,青松脂（pine_resin）×2、白苇芯（reed）×2、松枝（wood）×1,松脂膏（salve）×6,2,2.5,青松脂（pine_resin）,用小火把松油里的水汽收出去，分进干净的瓷罐。

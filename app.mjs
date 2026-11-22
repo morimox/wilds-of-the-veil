@@ -6,7 +6,7 @@ const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]
 const eventRows = Object.fromEntries(data.events.map(event => [event.id, event]));
 const slotNames = { weapon: "兵刃", armor: "护具", charm: "法器" };
 const intentNames = { attack: "进攻", heavy: "蓄势", guard: "守势", heal: "疗伤", drain: "夺气" };
-const kindNames = { material: "材料", food: "口粮", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索" };
+const kindNames = { material: "材料", food: "口粮", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药" };
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
 const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterline"];
 const app = document.querySelector("#app");
@@ -18,6 +18,7 @@ const opening = document.querySelector("#opening");
 let state = freshGame();
 let screen = "journey";
 let marketMode = "buy";
+let activeFacility = "warehouse";
 let openingTimer;
 let selectedItem = null;
 let activeDeduction = null;
@@ -47,8 +48,8 @@ function escape(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-function linkButton(label, action, value = "", tone = "", disabled = false) {
-  return `<button type="button" class="button ${tone}" data-action="${action}" data-value="${escape(value)}"${disabled ? " disabled" : ""}>${escape(label)}</button>`;
+function linkButton(label, action, value = "", tone = "", disabled = false, count = 1) {
+  return `<button type="button" class="button ${tone}" data-action="${action}" data-value="${escape(value)}"${count > 1 ? ` data-count="${count}"` : ""}${disabled ? " disabled" : ""}>${escape(label)}</button>`;
 }
 
 function tabButton(label, tab) {
@@ -105,8 +106,12 @@ function tierName(id) {
   return data.realms.find(row => row.id === id)?.name ?? "";
 }
 
-function hasSupply(s, needed) {
-  return Object.entries(needed ?? {}).every(([id, count]) => (s.inventory[id] ?? 0) >= count);
+function hasSupply(s, needed, stock = s.inventory) {
+  return Object.entries(needed ?? {}).every(([id, count]) => (stock[id] ?? 0) >= count);
+}
+
+function homeMaterials(s) {
+  return s.homeMaterials ?? s.inventory;
 }
 
 function inVillage(s) {
@@ -179,23 +184,32 @@ function siteList(s) {
 function journey(s) {
   if (s.mode === "event") return eventScreen(s);
   if (s.mode === "combat") return combatScreen(s);
-  if (s.mode === "victory") return panel("潮印归灯", `<p class="intro">旧渡重新点起了灯。</p><div class="actions">${linkButton("继续行旅", "resume", "", "primary")}</div>`);
+  if (s.mode === "victory") {
+    const final = s.completionPhase === "final";
+    return panel(final ? "山河归定" : "潮印归灯", `<p class="intro">${final ? "衡印归村，送信的人带着你走过的山路，往沿途驿站去了。" : "旧渡重新点起了灯。渡船也带回了岭外的消息。"}</p><div class="actions">${linkButton("继续行旅", "resume", "", "primary")}</div>`);
+  }
   const known = data.regions.filter(region => region.id !== s.region.id && discovered(s, region));
+  const newest = [...s.discovered].reverse().find(id => id !== s.region.id && id !== "village");
+  const nearby = known.length <= 4 ? known : known.filter(region => region.id === "village" || region.id === newest ||
+    (s.region.id !== "marsh" && region.id === "marsh"));
+  const further = known.filter(region => !nearby.includes(region));
   const isHome = inVillage(s);
   const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.pressure || (s.inventory.ration ?? 0) < rules.reliefRations;
   return panel(s.region.name, `${isHome ? "" : siteList(s)}<div class="actions place-actions">
-    ${known.map(region => routeAction(s, region)).join("")}
+    ${nearby.map(region => routeAction(s, region)).join("")}
     ${isHome ? tabButton("找药僮", "apprentice") : ""}
     ${isHome && s.services.includes("workshop") ? tabButton("去工坊", "workshop") : ""}
     ${isHome && s.services.includes("market") ? tabButton("逛坊市", "market") : ""}
+    ${isHome && s.economy ? tabButton("去后院", "yard") : ""}
     ${isHome && needRest ? linkButton("歇息", "rest") : ""}
     ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) : ""}
-  </div>`);
+  </div>${further.length ? `<details class="route-list"><summary>其他已知去路</summary><div class="actions">${further.map(region => routeAction(s, region)).join("")}</div></details>` : ""}`);
 }
 
 function eventScreen(s) {
   const event = s.currentEvent;
   const local = (s.sites ?? []).find(site => site.id === event.id);
+  const painted = ["marsh", "ridge", "ford", "hidden"].includes(s.region.id);
   const resources = siteResources(s, local);
   const choices = s.visibleChoices.map(choice => {
     const cue = publicText(choice.desc);
@@ -206,7 +220,7 @@ function eventScreen(s) {
       ${blocker ? `<p class="choice-blocker">${escape(blocker)}</p>` : ""}
     </div>`;
   }).join("");
-  return panel(event.name, `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>
+  return panel(event.name, `${painted ? `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>` : ""}
     <p class="intro">${escape(publicText(event.text))}</p>
     ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
     <div class="choice-list">${choices}</div>
@@ -254,15 +268,27 @@ function combatScreen(s) {
   const intent = s.intent;
   const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
+  const weapon = s.combatWeapon;
+  const ammoBar = weapon?.needsAmmo ? `<div class="combat-ammo">
+    <p class="fine">${escape(weapon.name)} · ${weapon.isLoaded ? "已备弹药" : "弹药已尽，可徒手出手"}</p>
+    <div class="actions">${(weapon.ammo ?? []).map(ammo => linkButton(
+      `${ammo.name} ×${ammo.count}`, "selectAmmo", ammo.id, ammo.selected ? "primary" : "quiet", ammo.count <= 0 || ammo.selected,
+    )).join("")}</div>
+  </div>` : "";
+  const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
   const observation = enemy.desc ? `<details class="field-note"><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
   const techniques = arts.map(row => {
-    const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" : "";
+    const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" :
+      weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽" : "";
     return card(row.name, "", "", linkButton(reason || "施展", "art", row.id, "", Boolean(reason)), row.desc);
   });
   return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
     ${meter("对方气血", hp, enemy.maxHp)}
-    <div class="actions">${linkButton("出手", "attack", "", "primary")}${linkButton("防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}</div>
+    ${ammoBar}
+    <div class="actions">${linkButton(weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手", "attack", "", "primary")}${linkButton("防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}
+      ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
+    </div>
     ${observation}
     ${techniques.length ? `<div class="card-grid learned-arts">${techniques.join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
@@ -309,6 +335,7 @@ function pack(s) {
     if (gear) {
       const remaining = s.durability[row.id] ?? gear.durability;
       actions = (canEquip ? linkButton("装备", "equip", row.id, "", gear.tier > s.realm.id || remaining <= 0) : "") +
+        (s.mode === "combat" && gear.slot === "weapon" ? linkButton("换用兵刃", "combatEquip", row.id, "", gear.tier > s.realm.id || remaining <= 0) : "") +
         (canRepair && remaining < gear.durability ? linkButton(s.coins < gear.repair ? "灵钱不足" : "修理", "repair", row.id, "quiet", s.coins < gear.repair) : "");
     }
     if (pill && canUse) {
@@ -355,7 +382,8 @@ function village(s) {
 
 function cultivation(s) {
   const next = s.nextRealm;
-  const missing = next ? [s.insight < next.insight && "根基尚未稳固", s.coins < next.cost && "灵钱不足", !hasSupply(s, next.need) && `还缺${supplies(next.need)}`].filter(Boolean) : [];
+  const missing = s.progression?.pending ?? (next ? [s.insight < next.insight && "根基尚未稳固", s.coins < next.cost && "灵钱不足",
+    !hasSupply(s, next.need, homeMaterials(s)) && `还缺${supplies(next.need)}`].filter(Boolean) : []);
   const training = panel("修行", `<div class="actions place-actions">${linkButton("打坐", "research")}
     ${next ? linkButton("尝试突破", "breakthrough", "", "primary", missing.length > 0) : ""}</div>
     ${missing.length ? `<p class="fine">${escape(missing.join(" · "))}</p>` : ""}`);
@@ -368,7 +396,8 @@ function cultivation(s) {
 }
 
 function workshop(s) {
-  const recipes = data.recipes.filter(row => s.discoveredRecipes.includes(row.id));
+  const recipes = data.recipes.filter(row => !row.facility && s.discoveredRecipes.includes(row.id));
+  const household = homeMaterials(s);
   const smithMap = s.quests.find(row => row.id === "sell_forging" && !row.completed);
   const remarks = [
     s.inventory.hide > 0 && recipes.some(row => row.id === "r_hide_coat") &&
@@ -385,10 +414,65 @@ function workshop(s) {
     const gear = data.gear.find(g => g.id === row.result);
     const pill = data.pills.find(g => g.id === row.result);
     const talisman = data.talismans.find(g => g.id === row.result);
-    const reason = !hasSupply(s, row.need) ? "材料不足" : s.coins < row.cost ? "灵钱不足" : "";
+    const reason = !hasSupply(s, row.need, household) ? "材料不足" : s.coins < row.cost ? "灵钱不足" : "";
     const entry = gear ? gearDescription(result, gear) : pill ? pillSummary(pill) : talisman ? talismanSummary(talisman) : result.desc;
     return card(result.name, "", tag(kindNames[result.kind] ?? ""), linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), entry, row.need);
   }).join("")}</div>`);
+}
+
+function storageRows(rows, action) {
+  const depositing = action === "econDeposit";
+  const label = depositing ? "存入" : "取出";
+  return rows.length ? rows.map(row => {
+    const bulk = Math.min(row.count, row.maximum ?? row.count);
+    return `<div class="storage-row"><span>${escape(row.name)} <small>×${row.count}</small></span>
+      <div class="actions">
+        ${linkButton(row.reason || `${label}一份`, action, row.id, "quiet", Boolean(row.reason))}
+        ${!row.reason && bulk > 1 ? linkButton(`${label} ×${bulk}`, action, row.id, "", false, bulk) : ""}
+      </div>
+    </div>`;
+  }).join("") : '<p class="fine">空</p>';
+}
+
+function warehouseScreen(warehouse) {
+  return `<div class="storage-columns">
+    <section><h3>行囊可存</h3>${storageRows(warehouse.carried, "econDeposit")}</section>
+    <section><h3>仓中存货 <span class="fine">${warehouse.used}/${warehouse.capacity} 格</span></h3>
+      ${storageRows(warehouse.stored, "econWithdraw")}
+    </section>
+  </div>`;
+}
+
+function productionScreen(facility) {
+  const upgrade = facility.upgrade;
+  const upgradePanel = upgrade ? `<div class="facility-upgrade">
+    <p class="fine">${[supplies(upgrade.need), upgrade.cost && `${upgrade.cost} 灵钱`, upgrade.days && `${upgrade.days} 日`].filter(Boolean).map(escape).join(" · ")}</p>
+    <div class="actions">${linkButton(upgrade.reason || (facility.level ? "扩建" : "搭建"), "econBuild", facility.id, "", Boolean(upgrade.reason))}</div>
+  </div>` : "";
+  const jobs = facility.jobs.map(job => card(
+    job.name, "", job.ready ? tag("已可领取") : tag(`还需 ${Number(job.remaining.toFixed(2))} 日`, "off"),
+    job.ready ? linkButton(job.reason || "收取", "econCollect", job.id, "", Boolean(job.reason)) : "",
+  )).join("");
+  const projects = facility.projects.map(project => {
+    const badge = [project.days && `${project.days} 日`, project.cost && `${project.cost} 灵钱`].filter(Boolean).join(" · ");
+    return card(project.name, project.description, badge ? tag(badge, "off") : "",
+      linkButton(project.reason || "开始", "econStart", project.id, "", Boolean(project.reason)), "", project.need);
+  }).join("");
+  return upgradePanel + (jobs ? `<div class="card-grid">${jobs}</div>` : "") +
+    (projects ? `<div class="card-grid">${projects}</div>` : "");
+}
+
+function yard(s) {
+  const { facilities, warehouse } = s.economy;
+  const current = facilities.find(facility => facility.id === activeFacility) ?? facilities[0];
+  if (!current) return panel("后院", "");
+  const entrances = facilities.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
+    data-facility="${escape(facility.id)}" aria-pressed="${facility.id === current.id}">${escape(facility.name)}</button>`).join("");
+  const inside = current.id === "warehouse"
+    ? warehouseScreen(warehouse) + productionScreen(current)
+    : productionScreen(current);
+  return panel("后院", `<div class="actions facility-tabs">${entrances}</div>
+    <p class="intro facility-intro">${escape(current.desc)}</p>${inside}`, current.level > 0 ? tag(`${current.name} · ${current.level} 级`) : "");
 }
 
 function marketItem(s, entry, selling) {
@@ -402,7 +486,23 @@ function marketItem(s, entry, selling) {
     pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
   const price = tag(`${entry.price} 灵钱/件`);
   const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}</span>` : "";
-  return card(item.name, "", price, `${linkButton(label, selling ? "sell" : "buy", item.id, "", !allowed)}${quantity}`, detail);
+  const action = selling ? "sell" : "buy";
+  const batch = Math.min(5, rules.maxTradeCount, selling ? entry.count : entry.maximum);
+  const bulk = allowed && !gear && batch > 1 ? linkButton(`${selling ? "卖出" : "购入"} ×${batch}`, action, item.id, "quiet", false, batch) : "";
+  const stock = !selling && Number.isFinite(entry.stock) ? `<span class="fine">摊上余 ${entry.stock}</span>` : "";
+  return card(item.name, "", price, `${linkButton(label, action, item.id, "", !allowed)}${bulk}${quantity}${stock}`, detail);
+}
+
+function merchantOffer(stall) {
+  if (!stall.merchant) return "";
+  const info = stall.merchant;
+  const order = info.order;
+  return `<div class="actions merchant-actions">${linkButton("问货", "merchantTalk", stall.id, "quiet")}</div>
+    ${order ? `<details class="merchant-order"><summary>${escape(order.name)}</summary>
+      <p class="intro">${escape(order.text)}</p>
+      ${order.need ? `<p class="fine">需${escape(supplies(order.need))}</p>` : ""}
+      <div class="actions">${linkButton(order.reason || "交给摊主", "merchantOrder", stall.id, "", Boolean(order.reason))}</div>
+    </details>` : ""}`;
 }
 
 function market(s) {
@@ -414,8 +514,9 @@ function market(s) {
     ? (s.market.sales.length ? `<div class="card-grid">${s.market.sales.map(entry => marketItem(s, entry, true)).join("")}</div>`
       : '<p class="intro">行囊里暂时没有能卖的东西。</p>')
     : s.market.stalls.map(stall => `<section class="market-stall">
-      <h3>${escape(stall.name)}</h3>${stall.desc ? `<p class="intro">${escape(stall.desc)}</p>` : ""}
+      <h3>${escape(stall.name)}</h3>
       <div class="card-grid">${stall.offers.map(entry => marketItem(s, entry, false)).join("")}</div>
+      ${merchantOffer(stall)}
     </section>`).join("");
   return panel("坊市", switcher + contents, tag(`灵钱 ${s.coins}`));
 }
@@ -481,10 +582,11 @@ function render() {
     journey: true, village: Boolean(services.length), apprentice: inVillage(s), deduction: Boolean(s.deductions?.length),
     workshop: inVillage(s) && s.services.includes("workshop"),
     market: inVillage(s) && s.services.includes("market"),
+    yard: inVillage(s) && Boolean(s.economy),
   };
   for (const service of services) available[service] = true;
   const tab = inEncounter || !available[screen] ? "journey" : screen;
-  const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, quests: questBoard, deduction: deductionBoard };
+  const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, yard, quests: questBoard, deduction: deductionBoard };
   document.querySelector("#clock").textContent = `第${Math.floor(s.day)}日 · ${s.day % 1 < 0.5 ? "白昼" : "夜里"}`;
   document.querySelector("#player-status").innerHTML = stats(s);
   kit.innerHTML = pack(s);
@@ -524,10 +626,20 @@ function feedback(before, after, result, action) {
     const quantity = item => ((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0)) * (selling ? -1 : 1);
     const traded = data.items.find(item => quantity(item) > 0);
     if (traded) {
-      return [`${selling ? "卖出" : "买入"}${traded.name} ×${quantity(traded)}，${selling ? "收到" : "付出"} ${Math.abs(after.coins - before.coins)} 灵钱。`];
+      return [`${selling ? "卖出" : "买入"}${traded.name} ×${quantity(traded)}，${selling ? "收到" : "付出"} ${Math.abs(after.coins - before.coins)} 灵钱。`, result.merchantMessage].filter(Boolean);
     }
   }
+  if (result.ok && (action === "econDeposit" || action === "econWithdraw")) {
+    const depositing = action === "econDeposit";
+    const quantity = item => ((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0)) * (depositing ? -1 : 1);
+    const moved = data.items.find(item => quantity(item) > 0);
+    if (moved) return [`${depositing ? "存入" : "取出"}${moved.name} ×${quantity(moved)}。`];
+  }
   const lines = [];
+  if (result.ok && (action === "attack" || action === "art")) {
+    const spent = (data.ammunition ?? []).filter(({ id }) => (before.inventory[id] ?? 0) > (after.inventory[id] ?? 0));
+    for (const { id } of spent) lines.push(`消耗${itemRows[id].name} ×${before.inventory[id] - (after.inventory[id] ?? 0)}。`);
+  }
   if (result.injury?.amount) {
     const cause = result.injury.cause.replace(/[。！]+$/, "");
     lines.push(`${cause}，气血减少 ${result.injury.amount} 点。`);
@@ -647,6 +759,7 @@ document.addEventListener("click", event => {
     state = freshGame();
     screen = "journey";
     marketMode = "buy";
+    activeFacility = "warehouse";
     selectedItem = null;
     activeDeduction = null;
     deductionDrafts.clear();
@@ -659,6 +772,11 @@ document.addEventListener("click", event => {
   }
   if (button.dataset.marketMode) {
     marketMode = button.dataset.marketMode;
+    render();
+    return;
+  }
+  if (button.dataset.facility) {
+    activeFacility = button.dataset.facility;
     render();
     return;
   }
@@ -679,7 +797,7 @@ document.addEventListener("click", event => {
   if (!action) return;
   const value = button.dataset.value;
   const payload = action === "choose" ? { index: Number(value) } :
-    action === "unequip" ? { slot: value } : { id: value };
+    action === "unequip" ? { slot: value } : { id: value, count: Number(button.dataset.count ?? 1) };
   performAction(action, payload);
 });
 

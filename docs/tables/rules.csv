@@ -34,6 +34,8 @@ researchDays,0.5,每次静修耗时（天）
 researchQi,1,每次静修消耗的真气（点）
 researchInsight,1,每次静修获得的修为（点）
 researchLimit,2,每一境界可进行的有效静修次数
+practicePerDay,1,
+combatSwitchGuard,1,
 mealHeal,2,吃一份干粮恢复的气血
 fallDays,1,战败或气血耗尽被救回村所用的时间（天）
 fallMaxCoinLoss,4,被救回时扣除灵钱的上限
@@ -45,3 +47,5 @@ maxWounds,3,伤势数量上限
 maxTradeCount,99,单次买卖可提交的最大数量
 backpackCapacity,12,行囊格数。已装备物品和关键线索不占格
 backpackStackSize,20,同种可堆叠物品每格上限
+setupDays,0.25,每次开启生产的操作耗时（日）
+collectDays,0.25,每次领取成品的操作耗时（日）

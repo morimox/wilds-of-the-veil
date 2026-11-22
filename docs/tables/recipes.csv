@@ -1,20 +1,36 @@
-﻿标识,产物,数量,境界要求,境界名,制作费用（灵钱）,所需物品,时间（天）,发现条件,需给工匠看过泥蜕
-r_salve,松脂膏（salve）,2,0,炼气,2,松枝（wood）×1,1,,
-r_qi,回气散（qi_powder）,2,0,炼气,2,白苇芯（reed）×1,1,,
-r_grain,暖谷丸（grain_pill）,2,0,炼气,2,干粮（ration）×2、松枝（wood）×1,1,,
-r_detox,清露丸（detox_pill）,2,0,炼气,3,白苇芯（reed）×1、松枝（wood）×1,1,,
-r_focus,定息丹（focus_pill）,1,0,炼气,3,白苇芯（reed）×1、松枝（wood）×1,1,,
-r_heal,合络丹（heal_pill）,2,1,筑基,4,白苇芯（reed）×1、泥蜕（hide）×1,1,,
-r_tide,济潮丹（tide_pill）,2,2,凝丹,7,白苇芯（reed）×1、潮砂（sand）×1,1,,
-r_ember,燃枝符（ember_talisman）,2,0,炼气,3,松枝（wood）×1、白苇芯（reed）×1,1,,
-r_reed,遮痕符（reed_talisman）,2,0,炼气,2,白苇芯（reed）×1、松枝（wood）×1,1,,
-r_bank_talisman,回汊符（bank_talisman）,2,0,炼气,3,白苇芯（reed）×1、松枝（wood）×2,1,得知物品 回汊图（eddy_note）,
-r_iron,铁障符（iron_talisman）,2,1,筑基,4,寒铁（ore）×1、松枝（wood）×1,1,,
-r_tide_talisman,逆潮符（tide_talisman）,2,2,凝丹,6,潮砂（sand）×1、松枝（wood）×1,1,得知物品 闸工的潮牌（tide_note）,
-r_hide_coat,泥蜕褂（hide_coat）,1,0,炼气,5,泥蜕（hide）×2,1,,是
-r_reed_bow,苇弦弓（reed_bow）,1,0,炼气,4,松枝（wood）×1、白苇芯（reed）×2,1,,
-r_iron_sword,寒铁剑（iron_sword）,1,1,筑基,11,寒铁（ore）×2、松枝（wood）×1,1,,
-r_iron_coat,叠铁袍（iron_coat）,1,1,筑基,12,寒铁（ore）×2、泥蜕（hide）×1,1,,是
-r_tide_spear,分潮枪（tide_spear）,1,2,凝丹,20,寒铁（ore）×2、潮砂（sand）×2,2,,
-r_tide_coat,定潮甲（tide_coat）,1,2,凝丹,19,寒铁（ore）×2、泥蜕（hide）×1、潮砂（sand）×1,2,,是
-r_jetty_charm,回灯坠（jetty_charm）,1,2,凝丹,8,无烟灯芯（dry_wick）×2、白苇芯（reed）×1,1,得知物品 伏流路引（secret_pass）,
+﻿标识,产物,数量,境界要求,境界名,制作费用（灵钱）,所需物品,时间（天）,发现条件,需给工匠看过泥蜕,生产设施,设施最低等级
+r_salve,松脂膏（salve）,2,0,炼气,2,松枝（wood）×1,1,,,,
+r_qi,回气散（qi_powder）,2,0,炼气,2,白苇芯（reed）×1,1,,,,
+r_grain,暖谷丸（grain_pill）,2,0,炼气,2,干粮（ration）×2、松枝（wood）×1,1,,,,
+r_detox,清露丸（detox_pill）,2,0,炼气,3,白苇芯（reed）×1、松枝（wood）×1,1,得知物品 药僮的验膏小札（clinic_note）,,,
+r_focus,定息丹（focus_pill）,1,0,炼气,3,白苇芯（reed）×1、松枝（wood）×1,1,得知物品 茶棚木板上的掌谱（echo_note）,,,
+r_heal,合络丹（heal_pill）,2,1,筑基,4,白苇芯（reed）×1、泥蜕（hide）×1,1,得知物品 药僮的验膏小札（clinic_note）,,,
+r_tide,济潮丹（tide_pill）,2,2,凝丹,7,白苇芯（reed）×1、潮砂（sand）×1,1,得知物品 闸工的潮牌（tide_note）,,,
+r_ember,燃枝符（ember_talisman）,2,0,炼气,3,松枝（wood）×1、白苇芯（reed）×1,1,得知物品 石炉沿的折纸样（ember_fold）,,,
+r_reed,遮痕符（reed_talisman）,2,0,炼气,2,白苇芯（reed）×1、松枝（wood）×1,1,得知物品 遮痕符（reed_talisman）,,,
+r_bank_talisman,回汊符（bank_talisman）,2,0,炼气,3,白苇芯（reed）×1、松枝（wood）×2,1,得知物品 回汊图（eddy_note）,,,
+r_iron,铁障符（iron_talisman）,2,1,筑基,4,寒铁（ore）×1、松枝（wood）×1,1,得知物品 铁障符（iron_talisman）,,,
+r_tide_talisman,逆潮符（tide_talisman）,2,2,凝丹,6,潮砂（sand）×1、松枝（wood）×1,1,得知物品 闸工的潮牌（tide_note）,,,
+r_hide_coat,泥蜕褂（hide_coat）,1,0,炼气,5,泥蜕（hide）×2,1,,是,,
+r_reed_bow,苇弦弓（reed_bow）,1,0,炼气,4,松枝（wood）×1、白苇芯（reed）×2,1,,,,
+r_iron_sword,寒铁剑（iron_sword）,1,1,筑基,13,寒铁（ore）×7、松枝（wood）×3,2,得知物品 厚脊剑坯样（blade_template）,,锻炉（forge）,
+r_iron_coat,叠铁袍（iron_coat）,1,1,筑基,16,寒铁（ore）×8、泥蜕（hide）×3,2,得知物品 挑夫的叠片缝样（plate_lacing）,是,锻炉（forge）,
+r_tide_spear,分潮枪（tide_spear）,1,2,凝丹,25,寒铁（ore）×8、潮砂（sand）×6,3,得知物品 闸把的分水榫（spear_joint）,,锻炉（forge）,
+r_tide_coat,定潮甲（tide_coat）,1,2,凝丹,24,寒铁（ore）×7、泥蜕（hide）×3、潮砂（sand）×5,3,得知物品 旧排的护甲扣（gate_buckles）,是,锻炉（forge）,
+r_jetty_charm,回灯坠（jetty_charm）,1,2,凝丹,8,无烟灯芯（dry_wick）×2、白苇芯（reed）×1,1,得知物品 伏流路引（secret_pass）,,,
+r_reed_arrow,削苇箭（reed_arrow）,8,0,炼气,1,松枝（wood）×2、白苇芯（reed）×1,0.5,,,,
+r_iron_arrow,包铁箭（iron_arrow）,6,1,筑基,3,寒铁（ore）×2、白苇芯（reed）×2,1,得知物品 包铁箭样（arrow_pattern）,,锻炉（forge）,
+r_black_bolt,玄铁短矢（black_bolt）,6,2,凝丹,5,玄砂铁（black_iron）×3、松枝（wood）×2,1,得知物品 两寸机臂铁样（vein_pattern）,,锻炉（forge）,2
+r_cloud_arrow,凝光箭（cloud_arrow）,8,3,元婴,10,浮光玉（cloud_jade）×3、冰藤丝（frost_silk）×2、松枝（wood）×3,2,得知物品 玉镞轻重样（cloud_tip）,,锻炉（forge）,3
+r_pine_bow,松筋长弓（pine_bow）,1,1,筑基,16,松枝（wood）×8、山筋（beast_tendon）×4、青松脂（pine_resin）×5,2,得知物品 松架上的试弓木（bow_stave）,,锻炉（forge）,
+r_resin_staff,藏火杖（resin_staff）,1,1,筑基,15,松枝（wood）×9、青松脂（pine_resin）×6、寒铁（ore）×3,2,得知物品 守炉杖的样柄（resin_tamper）,,锻炉（forge）,
+r_black_crossbow,玄砂机弩（black_crossbow）,1,2,凝丹,43,玄砂铁（black_iron）×11、青松脂（pine_resin）×7、山筋（beast_tendon）×4,4,得知物品 两寸机臂铁样（vein_pattern）,,锻炉（forge）,2
+r_snow_halberd,断雪戟（snow_halberd）,1,2,凝丹,40,玄砂铁（black_iron）×10、松枝（wood）×6、冰藤丝（frost_silk）×6,4,得知物品 断雪戟的回钩样（hook_iron）,,锻炉（forge）,2
+r_frost_robe,锁温袍（frost_robe）,1,2,凝丹,31,冰藤丝（frost_silk）×9、泥蜕（hide）×5、青松脂（pine_resin）×3,3,得知物品 护栈人的冰丝缝样（pass_seam）,,锻炉（forge）,2
+r_sky_sword,归衡剑（sky_sword）,1,3,元婴,65,玄砂铁（black_iron）×13、浮光玉（cloud_jade）×11、冰藤丝（frost_silk）×6,5,得知物品 天衡位刻（meridian_etching）,,锻炉（forge）,3
+r_sky_bow,鸣岳弓（sky_bow）,1,3,元婴,60,松枝（wood）×11、浮光玉（cloud_jade）×9、冰藤丝（frost_silk）×9、山筋（beast_tendon）×5,5,得知物品 落影调枢图（axis_tuning）,,锻炉（forge）,3
+r_sky_cloak,合纹披甲（sky_cloak）,1,3,元婴,54,冰藤丝（frost_silk）×12、浮光玉（cloud_jade）×7、泥蜕（hide）×6,5,得知物品 玉片披甲的接丝账（loom_tack）,,锻炉（forge）,3
+r_jade_pendant,照腕佩（jade_pendant）,1,3,元婴,38,浮光玉（cloud_jade）×8、冰藤丝（frost_silk）×4,3,得知物品 落影调枢图（axis_tuning）,,锻炉（forge）,3
+r_resin_pill,温枝丸（resin_pill）,3,1,筑基,6,青松脂（pine_resin）×3、白苇芯（reed）×4、松枝（wood）×2,2,得知物品 窑匠火候牌（kiln_manual）,,炼丹炉（furnace）,
+r_leaf_pill,清脉饮（leaf_pill）,3,2,凝丹,10,银脉药叶（spirit_leaf）×5、耐火石泥（kiln_clay）×2、松枝（wood）×3,3,得知物品 泽医捣药板（herb_press）,,炼丹炉（furnace）,2
+r_jade_pill,照心露（jade_pill）,3,3,元婴,20,银脉药叶（spirit_leaf）×7、浮光玉（cloud_jade）×4、冰藤丝（frost_silk）×3、松枝（wood）×4,4,得知物品 天衡位刻（meridian_etching）,,炼丹炉（furnace）,3

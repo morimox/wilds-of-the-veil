@@ -13,4 +13,5 @@ focus,定息,0
 reliefRations,自用补助干粮,0
 satiety,饱腹度,68
 discovered,已知地区,落灯村（village）、白苇滩（marsh）
-victoryQuest,完成故事的委托,把旧渡的印带回来（last_lantern）
+victoryQuest,旧渡章节委托,把旧渡的印带回来（last_lantern）
+finalQuest,最终委托,沿新路把衡印带回村（sky_treaty）
