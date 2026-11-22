@@ -210,18 +210,18 @@ const tables = [
   ]),
   table('recipes', '制作用方', gated(data.recipes), [
     'id', 'result', 'count', 'tier', tier, ['cost', '制作费用（灵钱）'], 'need', 'days', 'reveal',
+    ['requiresShownHide', '需给工匠看过泥蜕'],
   ]),
   table('regions', '地区', gated(data.regions), [
     'id', 'name', ['tier', '威胁参考阶'], ['realmName', '威胁参考境界'], 'travel', 'reveal', 'hint', 'desc',
   ], { omit: ['draws', 'food'], note: '拿到对应路图或通行信物即可前往。威胁标记只用于内容参考。行走消耗游戏时间和饱腹。' }),
   table('region-encounters', '地区内的可选地点', data.sites, [
-    'region', 'id', 'name', ['after', '经过任一地点后发现', (ids) => ids.map(siteRef).join('、')],
-    ['afterChoices', '完成任一动作后发现', (keys) => keys.map(describeChoice).join('、')],
+    'region', 'id', 'name',
+    ['afterChoices', '发现路线的具体动作', (keys) => keys.map(describeChoice).join('、')],
     'reveal', ['once', '一次性选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
-    ['afterChoicesByChoice', '逐步显露的地点动作', (groups) => Object.entries(groups).map(([index, keys]) => `选项 ${+index + 1} ← ${keys.map(describeChoice).join('、')}`).join('；')],
     ['emptyText', '地点耗尽时可见情形'], ['afterOnceText', '一次性行动后的场景'],
     ['creatureText', '动物存在或耗尽时的景象'],
-  ], { omit: ['stocks', 'creatures'], note: '玩家直接选择区域内可以到达的地点。发现条件为空时到达该地区即可见。' }),
+  ], { omit: ['stocks', 'creatures'], note: '发现条件为空即是入境可见的地标。隐蔽地点需遇到相应的指路、岔路或物证。发现后会持续显示。' }),
   table('world-regrowth', '各地点库存与种群', worldPools, [
     ['site', '地点', siteRef], ['kind', '类型', valueText], ['object', '资源或敌人', ref],
     ['start', '初始量'], ['cap', '上限'], ['interval', '恢复间隔（游戏日）'], ['growth', '每次恢复'],
@@ -249,10 +249,10 @@ const tables = [
     'id', 'name', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '前置委托', ref], 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),
   table('services', '村务发现条件', data.services, [
-    'id', 'name', ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],
+    'id', 'name', ['public', '开局已有入口'], ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],
     ['choices', '完成任一事件选项', (keys) => keys.map(describeChoice).join('、')],
   ], {
-    note: '任一条件满足即记得入口。回村可使用已发现的设施，消耗材料后仍然记得。'
+    note: '公开村务开局即可办理。其他入口在满足表中的任一条件后记住，回村即可使用。具体人物仍需实际接触。'
   }),
   table('deductions', '沙盘推演答案与奖励', gated(deductionRows), [
     'id', 'name', 'tier', tier, 'reveal', 'desc', ['evidence', '所需证物及份数', resources],

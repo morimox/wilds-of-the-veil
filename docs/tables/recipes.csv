@@ -1,20 +1,20 @@
-﻿标识,产物,数量,境界要求,境界名,制作费用（灵钱）,所需物品,时间（天）,发现条件
-r_salve,松脂膏（salve）,2,0,炼气,2,松枝（wood）×1,1,
-r_qi,回气散（qi_powder）,2,0,炼气,2,白苇芯（reed）×1,1,
-r_grain,暖谷丸（grain_pill）,2,0,炼气,2,干粮（ration）×2、松枝（wood）×1,1,
-r_detox,清露丸（detox_pill）,2,0,炼气,3,白苇芯（reed）×1、松枝（wood）×1,1,
-r_focus,定息丹（focus_pill）,1,0,炼气,3,白苇芯（reed）×1、松枝（wood）×1,1,
-r_heal,合络丹（heal_pill）,2,1,筑基,4,白苇芯（reed）×1、泥蜕（hide）×1,1,
-r_tide,济潮丹（tide_pill）,2,2,凝丹,7,白苇芯（reed）×1、潮砂（sand）×1,1,
-r_ember,燃枝符（ember_talisman）,2,0,炼气,3,松枝（wood）×1、白苇芯（reed）×1,1,
-r_reed,遮痕符（reed_talisman）,2,0,炼气,2,白苇芯（reed）×1、松枝（wood）×1,1,
-r_bank_talisman,回汊符（bank_talisman）,2,0,炼气,3,白苇芯（reed）×1、松枝（wood）×2,1,得知物品 回汊图（eddy_note）
-r_iron,铁障符（iron_talisman）,2,1,筑基,4,寒铁（ore）×1、松枝（wood）×1,1,
-r_tide_talisman,逆潮符（tide_talisman）,2,2,凝丹,6,潮砂（sand）×1、松枝（wood）×1,1,得知物品 闸工的潮牌（tide_note）
-r_hide_coat,泥蜕褂（hide_coat）,1,0,炼气,5,泥蜕（hide）×2,1,
-r_reed_bow,苇弦弓（reed_bow）,1,0,炼气,4,松枝（wood）×1、白苇芯（reed）×2,1,
-r_iron_sword,寒铁剑（iron_sword）,1,1,筑基,11,寒铁（ore）×2、松枝（wood）×1,1,
-r_iron_coat,叠铁袍（iron_coat）,1,1,筑基,12,寒铁（ore）×2、泥蜕（hide）×1,1,
-r_tide_spear,分潮枪（tide_spear）,1,2,凝丹,20,寒铁（ore）×2、潮砂（sand）×2,2,
-r_tide_coat,定潮甲（tide_coat）,1,2,凝丹,19,寒铁（ore）×2、泥蜕（hide）×1、潮砂（sand）×1,2,
-r_jetty_charm,回灯坠（jetty_charm）,1,2,凝丹,8,无烟灯芯（dry_wick）×2、白苇芯（reed）×1,1,得知物品 伏流路引（secret_pass）
+﻿标识,产物,数量,境界要求,境界名,制作费用（灵钱）,所需物品,时间（天）,发现条件,需给工匠看过泥蜕
+r_salve,松脂膏（salve）,2,0,炼气,2,松枝（wood）×1,1,,
+r_qi,回气散（qi_powder）,2,0,炼气,2,白苇芯（reed）×1,1,,
+r_grain,暖谷丸（grain_pill）,2,0,炼气,2,干粮（ration）×2、松枝（wood）×1,1,,
+r_detox,清露丸（detox_pill）,2,0,炼气,3,白苇芯（reed）×1、松枝（wood）×1,1,,
+r_focus,定息丹（focus_pill）,1,0,炼气,3,白苇芯（reed）×1、松枝（wood）×1,1,,
+r_heal,合络丹（heal_pill）,2,1,筑基,4,白苇芯（reed）×1、泥蜕（hide）×1,1,,
+r_tide,济潮丹（tide_pill）,2,2,凝丹,7,白苇芯（reed）×1、潮砂（sand）×1,1,,
+r_ember,燃枝符（ember_talisman）,2,0,炼气,3,松枝（wood）×1、白苇芯（reed）×1,1,,
+r_reed,遮痕符（reed_talisman）,2,0,炼气,2,白苇芯（reed）×1、松枝（wood）×1,1,,
+r_bank_talisman,回汊符（bank_talisman）,2,0,炼气,3,白苇芯（reed）×1、松枝（wood）×2,1,得知物品 回汊图（eddy_note）,
+r_iron,铁障符（iron_talisman）,2,1,筑基,4,寒铁（ore）×1、松枝（wood）×1,1,,
+r_tide_talisman,逆潮符（tide_talisman）,2,2,凝丹,6,潮砂（sand）×1、松枝（wood）×1,1,得知物品 闸工的潮牌（tide_note）,
+r_hide_coat,泥蜕褂（hide_coat）,1,0,炼气,5,泥蜕（hide）×2,1,,是
+r_reed_bow,苇弦弓（reed_bow）,1,0,炼气,4,松枝（wood）×1、白苇芯（reed）×2,1,,
+r_iron_sword,寒铁剑（iron_sword）,1,1,筑基,11,寒铁（ore）×2、松枝（wood）×1,1,,
+r_iron_coat,叠铁袍（iron_coat）,1,1,筑基,12,寒铁（ore）×2、泥蜕（hide）×1,1,,是
+r_tide_spear,分潮枪（tide_spear）,1,2,凝丹,20,寒铁（ore）×2、潮砂（sand）×2,2,,
+r_tide_coat,定潮甲（tide_coat）,1,2,凝丹,19,寒铁（ore）×2、泥蜕（hide）×1、潮砂（sand）×1,2,,是
+r_jetty_charm,回灯坠（jetty_charm）,1,2,凝丹,8,无烟灯芯（dry_wick）×2、白苇芯（reed）×1,1,得知物品 伏流路引（secret_pass）,

@@ -242,7 +242,7 @@ function knowsService(state, id) {
   if (id === 'quests' && state.completedQuests.length) return true;
   if (id === 'cultivate' && (state.realm > 0 || Object.values(state.studies).some(Boolean))) return true;
   const service = data.services.find((entry) => entry.id === id);
-  return (service?.items ?? []).some((item) => state.knownItems.includes(item)) ||
+  return Boolean(service?.public) || (service?.items ?? []).some((item) => state.knownItems.includes(item)) ||
     (service?.choices ?? []).some((choice) => state.seenChoices.includes(choice));
 }
 
@@ -261,7 +261,8 @@ function knowsQuest(state, quest) {
 }
 
 function knowsRecipe(state, recipe) {
-  return recipe.tier <= state.realm && isRevealed(state, recipe.reveal) && knowsMaterials(state, recipe.need);
+  return recipe.tier <= state.realm && (!recipe.requiresShownHide || state.showedHideToSmith) &&
+    isRevealed(state, recipe.reveal) && knowsMaterials(state, recipe.need);
 }
 
 function knowsItem(state, item) {
@@ -312,6 +313,7 @@ export function createGame() {
     localPools: {},
     basketInspected: false,
     basketDisposition: null,
+    showedHideToSmith: false,
     defeated: [],
     studies: {},
     event: null,
@@ -348,21 +350,12 @@ function hasChoiceNeeds(state, choice) {
   return Object.keys(missingItems(state, choice.need)).length === 0;
 }
 
-function hasSeenAnyChoice(state, choices) {
-  return Boolean(choices?.some((id) => state.seenChoices.includes(id)));
-}
-
 function knowsSite(state, site) {
   const visited = state.eventsSeen[site.region] ?? [];
-  const startsVisible = !site.after?.length && !site.afterChoices?.length && !site.reveal;
+  const startsVisible = !site.afterChoices?.length && !site.reveal;
   return startsVisible || visited.includes(site.id) ||
-    Boolean(site.after?.some((id) => visited.includes(id))) || hasSeenAnyChoice(state, site.afterChoices) ||
+    Boolean(site.afterChoices?.some((id) => state.seenChoices.includes(id))) ||
     Boolean(site.reveal && isRevealed(state, site.reveal));
-}
-
-function knowsSiteChoice(state, site, index) {
-  const previous = site?.afterChoicesByChoice?.[index];
-  return !previous?.length || hasSeenAnyChoice(state, previous);
 }
 
 function poolAt(state, site, kind, id) {
@@ -419,15 +412,13 @@ function revisitableEvents(state) {
   if (atHome(state) || state.event || state.combat) return [];
   return (state.eventsSeen[state.region] ?? []).map((id) => records.events[id]).filter((event) =>
     event.revisit && event.choices.some((choice, index) =>
-      choice.hidden && knowsSiteChoice(state, records.sites[event.id], index) &&
-      hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`)));
+      choice.hidden && hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`)));
 }
 
 export function view(state) {
   const enemy = enemyOf(state);
   const intent = currentIntent(state);
   const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.event ? 'event' : atHome(state) ? 'village' : 'field';
-  const nextRegion = data.regions.find(({ id, secret, hidden }) => !secret && !hidden && !state.discovered.includes(id));
   const services = data.services.filter(({ id }) => knowsService(state, id)).map(({ id }) => id);
   const discoveredQuests = services.includes('quests') ? data.quests.filter((quest) => knowsQuest(state, quest)) : [];
   const currentEvent = state.event ? records.events[state.event] : null;
@@ -436,8 +427,7 @@ export function view(state) {
     const lockedReason = choiceBlocker(state, choice, currentSite, index);
     const { label, desc, hidden } = choice;
     return { label, desc, hidden, index, available: !lockedReason, lockedReason };
-  }).filter(({ hidden, index }) => knowsSiteChoice(state, currentSite, index) &&
-    !completedSiteChoice(state, currentSite, index) &&
+  }).filter(({ hidden, index }) => !completedSiteChoice(state, currentSite, index) &&
     (!hidden || hasChoiceNeeds(state, currentEvent.choices[index])));
   return {
     ...state,
@@ -461,7 +451,6 @@ export function view(state) {
     currentEnemy: enemy ? { ...enemy, maxHp: enemy.hp, hp: state.combat.hp } : null,
     intent,
     intentDamage: enemy && intent ? estimatedHit(enemy, intent) : 0,
-    discoveryHint: state.explored.length ? nextRegion?.hint ?? '' : '',
     discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
       (services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
     discoveredRecipes: services.includes('workshop') ? data.recipes.filter((recipe) => knowsRecipe(state, recipe)).map(({ id }) => id) : [],
@@ -568,8 +557,7 @@ function choose(state, index) {
   const event = records.events[state.event];
   const site = records.sites[event.id];
   const choice = event.choices[index];
-  if (!Number.isInteger(index) || !choice || !knowsSiteChoice(state, site, index) ||
-      (choice.hidden && !hasChoiceNeeds(state, choice))) {
+  if (!Number.isInteger(index) || !choice || (choice.hidden && !hasChoiceNeeds(state, choice))) {
     return refuse('请选择眼前能做的事。');
   }
   const blocker = choiceBlocker(state, choice, site, index);
@@ -980,6 +968,13 @@ function craft(state, id) {
   return say(state, `制成${nameOf(recipe.result)}×${recipe.count ?? 1}。`);
 }
 
+function showHideToSmith(state) {
+  if (!owns(state, 'hide')) return refuse('手里没有泥蜕。');
+  if (state.showedHideToSmith) return refuse('工匠已经看过泥蜕。');
+  state.showedHideToSmith = true;
+  return say(state, '工匠拎起泥蜕，顺着纹路拽了拽。「两片就够衬一件褂子。下回让那水兽咬在这上头。」');
+}
+
 function trade(state, id, count, buying) {
   const item = records.items[id];
   if (!item || !Number.isInteger(count) || count < 1 || count > rules.maxTradeCount) return refuse('请选择交易物品及数量。');
@@ -1073,6 +1068,7 @@ const villageActions = {
   research: (state) => research(state),
   breakthrough: (state) => breakthrough(state),
   craft: (state, { id }) => craft(state, id),
+  showHideToSmith,
   buy: (state, { id, count = 1 }) => trade(state, id, count, true),
   sell: (state, { id, count = 1 }) => trade(state, id, count, false),
   repair: (state, { id }) => repair(state, id),
@@ -1081,7 +1077,7 @@ const villageActions = {
 
 const serviceForAction = {
   learn: 'cultivate', research: 'cultivate', breakthrough: 'cultivate',
-  craft: 'workshop', repair: 'workshop', buy: 'market', sell: 'market', handin: 'quests',
+  craft: 'workshop', showHideToSmith: 'workshop', repair: 'workshop', buy: 'market', sell: 'market', handin: 'quests',
 };
 
 const generalActions = {
@@ -1147,13 +1143,7 @@ function takeTurn(state, action, payload) {
 }
 
 export function act(state, action, payload = {}) {
-  const unknownServices = data.services.filter(({ id }) => !knowsService(state, id));
   const result = takeTurn(state, action, payload);
-  if (!result.ok) return result;
-  refreshDiscovery(state);
-  const found = unknownServices.filter(({ id }) => knowsService(state, id)).map(({ name }) => name);
-  if (!found.length) return result;
-  const notice = `打听到了村里的${found.join('、')}。`;
-  say(state, notice);
-  return { ...result, message: result.message + notice };
+  if (result.ok) refreshDiscovery(state);
+  return result;
 }

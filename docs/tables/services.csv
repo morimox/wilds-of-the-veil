@@ -1,5 +1,5 @@
-﻿标识,名称,获得任一材料或线索,完成任一事件选项
-quests,委托,白苇芯（reed）、落水药篓（lost_basket）,修桨的人（reed_ferryman） · 把补桨的料递给渡工
-market,坊市,,干透的柴窝（old_fire） · 捆些干柴、修桨的人（reed_ferryman） · 把补桨的料递给渡工
-workshop,工坊,泥蜕（hide）,干透的柴窝（old_fire） · 添柴歇脚、干透的柴窝（old_fire） · 捆些干柴、碎石水眼（mud_track） · 沿干地绕行，拾漂到埂上的松枝
-cultivate,修行,沉钟岭路图（ridge_rubbing）、药僮的水线图（reed_lines）,苇海沉桅（drowned_mast） · 站在高埂上看水势
+﻿标识,名称,开局已有入口,获得任一材料或线索,完成任一事件选项
+quests,委托,是,,
+market,坊市,是,,
+workshop,工坊,是,,
+cultivate,修行,,,苇海沉桅（drowned_mast） · 站在高埂上看水势

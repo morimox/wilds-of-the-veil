@@ -8,6 +8,7 @@ const slotNames = { weapon: "兵刃", armor: "护具", charm: "法器" };
 const intentNames = { attack: "进攻", heavy: "蓄势", guard: "守势", heal: "疗伤", drain: "夺气" };
 const kindNames = { material: "材料", food: "口粮", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索" };
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
+const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterline"];
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
 const guide = document.querySelector("#help");
@@ -110,11 +111,6 @@ function inVillage(s) {
   return s.mode === "village";
 }
 
-function hasApprentice(s) {
-  return inVillage(s) && (Boolean(s.inventory.lost_basket) || s.basketDisposition === "returned" ||
-    s.quests.some(quest => quest.id === "reed_salve" || quest.id === "apprentice_waterline"));
-}
-
 function vital(label, current, max, low, explanation) {
   return `<details class="vital${low ? " low" : ""}">
     <summary>${label} <b>${Math.floor(current)}/${max}</b></summary>
@@ -153,12 +149,12 @@ function discovered(s, region) {
   return !region.reveal || region.id === s.region.id;
 }
 
-function routeAction(s, r, primary) {
+function routeAction(s, r) {
   const homeward = r.id === "village";
   const hungry = !homeward && s.satiety <= 0;
   const days = homeward ? s.region.travel + (s.satiety <= 0 ? rules.emptyReturnDays : 0) : r.travel;
   const note = hungry ? "空腹" : days ? `${days} 日` : "";
-  return `<div class="route-action">${linkButton(homeward ? "回村" : `去${r.name}`, "travel", r.id, primary ? "primary" : "", hungry)}${note ? `<span class="fine">${escape(note)}</span>` : ""}</div>`;
+  return `<div class="route-action">${linkButton(homeward ? "回村" : `去${r.name}`, "travel", r.id, "", hungry)}${note ? `<span class="fine">${escape(note)}</span>` : ""}</div>`;
 }
 
 function siteResources(s, site) {
@@ -178,31 +174,21 @@ function siteList(s) {
   }).join("")}</div>`;
 }
 
-function firstUse(s) {
-  const harvested = s.seenChoices.includes("reed_banks:0");
-  if (inVillage(s) && s.day === 1 && !s.didEat && s.inventory.ration) return "走路会消耗饱腹，吃干粮可以补回来。";
-  if (s.region.id !== "marsh" || s.completedQuests.includes("reed_salve")) return "";
-  if (!harvested) return "白苇芯可以带回村换伤药。";
-  if (s.mode === "field" && s.inventory.reed) return "回村找药僮，可以用白苇芯换松脂膏。";
-  return "";
-}
-
 function journey(s) {
   if (s.mode === "event") return eventScreen(s);
   if (s.mode === "combat") return combatScreen(s);
   if (s.mode === "victory") return panel("潮印归灯", `<p class="intro">旧渡重新点起了灯。</p><div class="actions">${linkButton("继续行旅", "resume", "", "primary")}</div>`);
   const known = data.regions.filter(region => region.id !== s.region.id && discovered(s, region));
   const isHome = inVillage(s);
-  const lesson = firstUse(s);
-  const wantsReeds = s.quests.some(quest => quest.id === "reed_salve" && quest.ready && !quest.completed);
-  const apprenticeLabel = !s.inventory.lost_basket && wantsReeds ? "找药僮换伤药" : "找药僮";
   const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.pressure || (s.inventory.ration ?? 0) < rules.reliefRations;
   return panel(s.region.name, `${isHome ? "" : siteList(s)}<div class="actions place-actions">
-    ${known.map((r, i) => routeAction(s, r, isHome && i === 0)).join("")}
+    ${known.map(region => routeAction(s, region)).join("")}
+    ${isHome ? tabButton("找药僮", "apprentice") : ""}
+    ${isHome && s.services.includes("workshop") ? tabButton("去工坊", "workshop") : ""}
+    ${isHome && s.services.includes("market") ? tabButton("逛坊市", "market") : ""}
     ${isHome && needRest ? linkButton("歇息", "rest") : ""}
-    ${hasApprentice(s) ? tabButton(apprenticeLabel, "apprentice") : ""}
-    ${!isHome || s.explored.length ? linkButton("等半日", "wait", "", "quiet", !isHome && s.satiety <= 0) : ""}
-  </div>${lesson ? `<p class="field-note">${escape(lesson)}</p>` : ""}`);
+    ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) : ""}
+  </div>`);
 }
 
 function eventScreen(s) {
@@ -213,12 +199,8 @@ function eventScreen(s) {
     const details = [choice.desc, choice.lockedReason].map(text => publicText(text)).filter(Boolean).join(" ");
     return `<div class="choice">${linkButton(choice.label, "choose", choice.index, "", choice.available === false)}${details ? `<p>${escape(details)}</p>` : ""}</div>`;
   }).join("");
-  const firstGather = event.id === "reed_banks" && !s.seenChoices.includes("reed_banks:0");
-  const firstHunt = event.id === "mud_track" && s.visibleChoices.some(choice => choice.index === 0 && choice.available) && !s.defeated.includes("mud_beast");
-  const lesson = firstGather ? firstUse(s) : firstHunt ? "泥鳞兽身上的泥蜕能做护具。只想赶路也可以绕行。" : "";
-  return panel(event.name, `${firstGather ? "" : `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>`}
+  return panel(event.name, `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>
     <p class="intro">${escape(publicText(event.text))}</p>
-    ${lesson ? `<p class="field-note">${escape(lesson)}</p>` : ""}
     ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
     <div class="choice-list">${choices}</div><div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
 }
@@ -240,13 +222,11 @@ function combatScreen(s) {
   const intent = s.intent;
   const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
-  const firstTurn = s.combat.round === 0 && !s.defeated.length;
-  const observation = s.defeated.length && enemy.desc ? `<details class="field-note"><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
+  const observation = enemy.desc ? `<details class="field-note"><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
   return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
     ${meter("对方气血", hp, enemy.maxHp)}
     <div class="actions">${linkButton("出手", "attack", "", "primary")}${linkButton("防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}</div>
-    ${firstTurn ? '<p class="field-note">先看对方下一招，遇到重招可以防御。</p>' : ""}
     ${observation}
     ${arts.length ? `<div class="card-grid learned-arts">${arts.map(row => card(row.name, "", "", linkButton(s.qi < row.cost ? "真气不足" : "施展", "art", row.id, "", s.qi < row.cost), row.desc)).join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
@@ -328,8 +308,13 @@ function pack(s) {
     ${ground.length ? `<section class="kit-section"><h2>脚边</h2>${ground.join("")}</section>` : ""}`;
 }
 
+function villageServices(s) {
+  return s.services.filter(service => service !== "workshop" && service !== "market" &&
+    (service !== "quests" || visibleQuests(s).length));
+}
+
 function village(s) {
-  return panel("村务", `<div class="actions place-actions">${(s.services ?? []).map(service => tabButton(serviceNames[service], service)).join("")}</div>`);
+  return panel("村务", `<div class="actions place-actions">${villageServices(s).map(service => tabButton(serviceNames[service], service)).join("")}</div>`);
 }
 
 function cultivation(s) {
@@ -348,7 +333,14 @@ function cultivation(s) {
 
 function workshop(s) {
   const recipes = data.recipes.filter(row => s.discoveredRecipes.includes(row.id));
-  return panel("工坊", `<div class="workshop-art" aria-hidden="true"></div><div class="card-grid">${recipes.map(row => {
+  const smithMap = s.quests.find(row => row.id === "sell_forging" && !row.completed);
+  const noticesHide = s.inventory.hide > 0 && recipes.some(row => row.id === "r_hide_coat");
+  const line = noticesHide ? "工匠捻了捻你带来的泥蜕。「这皮韧，攒两张，我给你缝件挡牙的褂子。」" :
+    !smithMap && !recipes.length ? "工匠在门边磨剪子，脚边卷着几块旧皮。" : "";
+  const mapTrade = smithMap ? `<p class="intro">${escape(smithMap.desc)}</p>${smithMap.ready ? `<div class="actions">${linkButton("递一块寒铁", "handin", smithMap.id)}</div>` : ""}` : "";
+  return panel("工坊", `${recipes.length ? '<div class="workshop-art" aria-hidden="true"></div>' : ""}
+    ${line ? `<p class="intro">${escape(line)}</p>` : ""}${mapTrade}
+    <div class="card-grid">${recipes.map(row => {
     const result = itemRows[row.result];
     const gear = data.gear.find(g => g.id === row.result);
     const pill = data.pills.find(g => g.id === row.result);
@@ -382,7 +374,8 @@ function questDone(s, row) {
 }
 
 function visibleQuests(s) {
-  return s.quests.filter(row => (row.tier ?? 0) <= s.realm.id);
+  return s.quests.filter(row => (row.tier ?? 0) <= s.realm.id &&
+    !apprenticeQuests.includes(row.id) && row.id !== "sell_forging");
 }
 
 function questBoard(s) {
@@ -402,9 +395,9 @@ function apprentice(s) {
   const waterline = s.quests.find(quest => quest.id === "apprentice_waterline" && !quest.completed);
   const holding = Boolean(s.inventory.lost_basket);
   const basket = holding && delivery ? linkButton("交还药篓", "handin", delivery.id, "primary") : "";
-  const tasks = [[reeds, "用苇芯换松脂膏"], [waterline, "问水线图"]].filter(([quest]) => quest).map(([quest, label]) =>
-    `<div class="card"><p>${escape(quest.desc)}</p><p>需${escape(supplies(quest.need))}</p>
-      <div class="actions">${linkButton(label, "handin", quest.id, "", !hasSupply(s, quest.need))}</div></div>`).join("");
+  const tasks = [[reeds, "递一份苇芯"], [waterline, "拿苇芯换水线图"]].filter(([quest]) => quest)
+    .map(([quest, label]) => `<p class="intro">${escape(quest.desc)}</p>
+      ${quest.ready ? `<div class="actions">${linkButton(label, "handin", quest.id)}</div>` : ""}`).join("");
   return panel("药僮", `${basket ? `<p class="intro">药僮认出了你手里的竹篓。</p><div class="actions">${basket}</div>` : ""}${tasks || (basket ? "" : '<p class="intro">药僮正忙着看火。</p>')}`);
 }
 
@@ -430,11 +423,13 @@ function deductionBoard(s) {
 function render() {
   const s = view(state);
   const inEncounter = s.mode === "event" || s.mode === "combat" || s.mode === "victory";
-  const showVillage = inVillage(s) && Boolean(s.services?.length);
+  const services = inVillage(s) ? villageServices(s) : [];
   const available = {
-    journey: true, village: showVillage, apprentice: hasApprentice(s), deduction: Boolean(s.deductions?.length),
+    journey: true, village: Boolean(services.length), apprentice: inVillage(s), deduction: Boolean(s.deductions?.length),
+    workshop: inVillage(s) && s.services.includes("workshop"),
+    market: inVillage(s) && s.services.includes("market"),
   };
-  for (const service of Object.keys(serviceNames)) available[service] = showVillage && s.services.includes(service);
+  for (const service of services) available[service] = true;
   const tab = inEncounter || !available[screen] ? "journey" : screen;
   const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, quests: questBoard, deduction: deductionBoard };
   document.querySelector("#clock").textContent = `第${Math.floor(s.day)}日 · ${s.day % 1 < 0.5 ? "白昼" : "夜里"}`;
@@ -505,11 +500,10 @@ function feedback(before, after, result, action) {
     after.qi > before.qi && ["choose", "use", "rest"].includes(action) && !narrative.includes("真气") && "真气恢复",
     after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
     after.satiety > before.satiety && action === "eat" && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
-    action === "travel" && !before.explored && before.region === "village" && after.satiety < before.satiety && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
+    action === "travel" && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
     after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",
   ].filter(Boolean);
   if (changes.length) lines.push(changes.join("，") + "。");
-  if (!before.inventory.hide && goods.some(item => item.id === "hide")) lines.push("泥蜕可以拿去工坊做护具。");
   const overflow = Object.keys(result.spilled ?? {}).map(id => itemRows[id].name);
   if (overflow.length) lines.push(`行囊装不下，${overflow.join("、")}留在脚边。`);
   for (const id of after.discovered) {
@@ -521,7 +515,6 @@ function feedback(before, after, result, action) {
 function performAction(action, payload) {
   const before = {
     inventory: { ...state.inventory }, discovered: [...state.discovered],
-    sites: view(state).sites.map(site => site.id), region: state.region, explored: state.explored.length,
     hp: state.hp, qi: state.qi, satiety: state.satiety, coins: state.coins,
   };
   const result = act(state, action, payload);
@@ -529,10 +522,6 @@ function performAction(action, payload) {
   if (action === "travel" || action === "discard" || action === "take" || action === "equip" || action === "unequip") selectedItem = null;
   render();
   const lines = feedback(before, state, result, action);
-  if (result.ok && state.region === before.region && (action === "visit" || action === "choose" || action === "take")) {
-    const nearby = view(state).sites.filter(site => !before.sites.includes(site.id)).map(site => site.name);
-    if (nearby.length) lines.push(`附近还能去${nearby.join("、")}。`);
-  }
   showNotice(lines, Boolean(result.injury || result.damageTaken || !result.ok));
   if (["travel", "visit", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
 }
@@ -586,6 +575,9 @@ document.addEventListener("click", event => {
   }
   if (button.dataset.tab) {
     screen = button.dataset.tab;
+    if (screen === "workshop" && state.inventory.hide > 0 && !state.showedHideToSmith) {
+      act(state, "showHideToSmith");
+    }
     render();
     return;
   }
