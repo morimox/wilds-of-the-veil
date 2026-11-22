@@ -1,0 +1,10 @@
+﻿推演标识,推演名称,候选序号,解释标识,解释文本
+find_eddy,苇滩哪里能脱身,1,follow_foam,看浮沫在哪一侧堆积，便往那一侧退
+find_eddy,苇滩哪里能脱身,2,behind_stone,贴露头石的背面，借内弯的回流脱身
+find_eddy,苇滩哪里能脱身,3,deep_center,离岸远的水流更均匀，可以横穿河心脱身
+read_echo,何时借得到山力,1,first_beat,手叩石面的一刹那沉掌，以冲撞催力
+read_echo,何时借得到山力,2,no_sound,等到回音全消再沉掌，免得杂音打乱气息
+read_echo,何时借得到山力,3,return_beat,等第二声回音触及石背，在岩腹应声时沉掌
+trace_backwash,旧物为何都刻反了,1,lamplit_reverse,让炉火从瓦背照出刻样，用铃影定方向，再看水中灯影
+trace_backwash,旧物为何都刻反了,2,follow_mooring,按铃舌被船拖动的方向，把三处记号都读作下游
+trace_backwash,旧物为何都刻反了,3,tide_record,把瓦和刻样当作两次洪水的记录，绳结只标曾用的泊位

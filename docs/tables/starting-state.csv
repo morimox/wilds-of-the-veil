@@ -1,0 +1,15 @@
+﻿标识,名称,数值
+day,日期（天）,1
+region,地区,落灯村（village）
+realm,境界,炼气
+hp,气血,33
+qi,真气,12
+coins,灵钱,20
+insight,修为,0
+pressure,探索压力,0
+wounds,伤势,0
+toxin,丹毒,0
+focus,定息,0
+reliefRations,自用补助干粮,0
+discovered,已知地区,落灯村（village）、白苇滩（marsh）
+victoryQuest,完成故事的委托,把旧渡的印带回来（last_lantern）
