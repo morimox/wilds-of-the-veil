@@ -189,21 +189,36 @@ function refreshDiscovery(state) {
   }
 }
 
+function knowsService(state, id) {
+  if (id === 'quests' && state.completedQuests.length) return true;
+  if (id === 'cultivate' && (state.realm > 0 || Object.values(state.studies).some(Boolean))) return true;
+  const service = data.services.find((entry) => entry.id === id);
+  return (service?.items ?? []).some((item) => state.knownItems.includes(item)) ||
+    (service?.choices ?? []).some((choice) => state.seenChoices.includes(choice));
+}
+
+function knowsMaterials(state, need) {
+  return resourceEntries(need).every(([id, count]) => count <= 0 || state.knownItems.includes(id));
+}
+
 function knowsQuest(state, quest) {
+  if (state.completedQuests.includes(quest.id)) return true;
   if ((quest.tier ?? 0) > state.realm) return false;
   if (quest.id === victoryQuestId() && !state.discovered.includes('ford') && !state.knownItems.includes('seal')) return false;
   if (quest.need?.ore && !state.discovered.includes('ridge')) return false;
-  return isRevealed(state, quest.reveal);
+  return isRevealed(state, quest.reveal) && (quest.requiresKnownMaterials === false || knowsMaterials(state, quest.need));
+}
+
+function knowsRecipe(state, recipe) {
+  return recipe.tier <= state.realm && isRevealed(state, recipe.reveal) && knowsMaterials(state, recipe.need);
 }
 
 function knowsItem(state, item) {
   if (state.knownItems.includes(item.id)) return true;
   const object = records.gear[item.id] ?? records.pills[item.id] ?? records.talismans[item.id];
-  if (item.reveal && !isRevealed(state, item.reveal)) return false;
-  if (item.id === 'ore' || item.id === 'core') return state.discovered.includes('ridge');
-  if (item.id === 'sand') return state.discovered.includes('ford');
-  if (object) return object.tier <= state.realm;
-  return item.price > 0 || item.sell > 0;
+  if (object && object.tier > state.realm) return false;
+  if (item.reveal) return isRevealed(state, item.reveal);
+  return data.recipes.some((recipe) => recipe.result === item.id && knowsRecipe(state, recipe));
 }
 
 function isEvidence(item) {
@@ -263,7 +278,6 @@ export function createGame(seed = Date.now()) {
   const { maxHp, maxQi } = stats(state);
   state.hp = maxHp;
   state.qi = maxQi;
-  say(state, '你在村里留了一处落脚的地方。辎粮备齐，便可出门。');
   refreshDiscovery(state);
   return state;
 }
@@ -290,7 +304,8 @@ export function view(state) {
   const intent = currentIntent(state);
   const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.event ? 'event' : atHome(state) ? 'village' : 'field';
   const nextRegion = data.regions.find(({ id, secret, hidden }) => !secret && !hidden && !state.discovered.includes(id));
-  const discoveredQuests = data.quests.filter((quest) => knowsQuest(state, quest));
+  const services = data.services.filter(({ id }) => knowsService(state, id)).map(({ id }) => id);
+  const discoveredQuests = services.includes('quests') ? data.quests.filter((quest) => knowsQuest(state, quest)) : [];
   const currentEvent = state.event ? records.events[state.event] : null;
   const visibleChoices = (currentEvent?.choices ?? []).map((choice, index) => {
     const lockedReason = choiceBlocker(state, choice);
@@ -303,18 +318,20 @@ export function view(state) {
     day: state.day,
     realmIndex: state.realm,
     realm: realmOf(state),
-    nextRealm: records.realms[state.realm + 1] ?? null,
+    nextRealm: services.includes('cultivate') ? records.realms[state.realm + 1] ?? null : null,
     regionId: state.region,
     region: regionOf(state),
+    services,
     currentEvent: currentEvent ? { ...currentEvent, choices: visibleChoices } : null,
     visibleChoices,
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
     currentEnemy: enemy ? { ...enemy, maxHp: enemy.hp, hp: state.combat.hp } : null,
     intent,
     intentDamage: enemy && intent ? estimatedHit(enemy, intent) : 0,
-    discoveryHint: nextRegion?.hint ?? (nextRegion ? '村外还有路，先从走得通的地方问起。' : ''),
-    discoveredArts: data.arts.filter((art) => art.tier <= state.realm && isRevealed(state, art.reveal)).map(({ id }) => id),
-    discoveredRecipes: data.recipes.filter((recipe) => recipe.tier <= state.realm && isRevealed(state, recipe.reveal)).map(({ id }) => id),
+    discoveryHint: state.explored.length ? nextRegion?.hint ?? '' : '',
+    discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
+      (services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
+    discoveredRecipes: services.includes('workshop') ? data.recipes.filter((recipe) => knowsRecipe(state, recipe)).map(({ id }) => id) : [],
     discoveredQuests: discoveredQuests.map(({ id }) => id),
     discoveredItems: data.items.filter((item) => knowsItem(state, item)).map(({ id }) => id),
     evidence: data.items.filter((item) => isEvidence(item) && owns(state, item.id) > 0)
@@ -479,15 +496,28 @@ function crossRealmFactor(state, enemy) {
     .reduce((factor, realm) => factor * (realm.pressure ?? 1), 1);
 }
 
+function combatTraits(state, enemy, intent) {
+  const effects = { damage: 0, pierce: 0, guard: 0 };
+  for (const { trait } of activeGear(state)) {
+    if (!trait || (trait.enemyTag && !enemy.tags?.includes(trait.enemyTag)) ||
+        (trait.intent && trait.intent !== intent.kind)) continue;
+    effects[trait.kind] += trait.bonus;
+  }
+  return effects;
+}
+
 function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, counter = 0, wearWeapon = false, message }) {
   const enemy = enemyOf(state);
   const intent = currentIntent(state);
   const { defense } = stats(state);
+  const traits = combatTraits(state, enemy, intent);
+  const weaponDamageBonus = wearWeapon ? traits.damage : 0;
+  const weaponPierceBonus = wearWeapon ? traits.pierce : 0;
   const armor = intent.kind === 'guard'
     ? Math.max(enemy.def + rules.enemyGuardBonus, Math.ceil(enemy.def * (intent.mult ?? 1)))
     : enemy.def;
-  const effectiveDamage = Math.floor(damage * crossRealmFactor(state, enemy));
-  const dealt = damage > 0 ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce)) : 0;
+  const effectiveDamage = Math.floor((damage + weaponDamageBonus) * crossRealmFactor(state, enemy));
+  const dealt = damage > 0 ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - weaponPierceBonus)) : 0;
   state.combat.hp -= dealt + counter;
   advance(state, rules.battleDays);
   const weaponDamage = wearWeapon ? wear(state, 'weapon') : '';
@@ -504,7 +534,7 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
   } else {
-    const received = Math.max(0, estimatedHit(enemy, intent) - defense - guard - interrupt);
+    const received = Math.max(0, estimatedHit(enemy, intent) - defense - guard - traits.guard - interrupt);
     if (intent.kind === 'drain') {
       const lostQi = Math.min(state.qi, received);
       state.qi -= lostQi;
@@ -703,8 +733,8 @@ function breakthrough(state) {
 function craft(state, id) {
   const recipe = records.recipes[id];
   if (!recipe) return refuse('没有这张配方。');
-  if (!isRevealed(state, recipe.reveal)) return refuse('你还没找到这个做法。');
   if (recipe.tier > state.realm) return refuse('这一手做法需要更高境界。');
+  if (!knowsRecipe(state, recipe)) return refuse('你还没找到这个做法。');
   if (records.gear[recipe.result] && owns(state, recipe.result)) return refuse('你已经有这件装备，可以在坊市修理。');
   const missing = requirements(state, recipe.cost, recipe.need);
   if (missing) return refuse(missing);
@@ -722,6 +752,8 @@ function trade(state, id, count, buying) {
   if (!(price > 0)) return refuse('坊市没有这门买卖。');
   const gear = records.gear[id];
   if (buying) {
+    const object = gear ?? records.pills[id] ?? records.talismans[id];
+    if (object && object.tier > state.realm) return refuse('等境界到了再想这件物品。');
     if (gear && (owns(state, id) || count !== 1)) return refuse('同种装备只能持有一件。');
     if (state.coins < price * count) return refuse(`这批物品需要${price * count}枚灵钱。`);
     state.coins -= price * count;
@@ -808,6 +840,11 @@ const villageActions = {
   handin: (state, { id }) => handin(state, id),
 };
 
+const serviceForAction = {
+  learn: 'cultivate', research: 'cultivate', breakthrough: 'cultivate',
+  craft: 'workshop', repair: 'workshop', buy: 'market', sell: 'market', handin: 'quests',
+};
+
 const generalActions = {
   travel: (state, { id }) => travel(state, id),
   explore: (state) => explore(state),
@@ -836,7 +873,7 @@ const combatActions = {
   retreat: (state) => retreat(state),
 };
 
-export function act(state, action, payload = {}) {
+function takeTurn(state, action, payload) {
   if (state.victoryPending) {
     if (action !== 'resume') return refuse('收好这段游记，即可继续出门。');
     state.victoryPending = false;
@@ -864,10 +901,23 @@ export function act(state, action, payload = {}) {
   }
   if (Object.hasOwn(villageActions, action)) {
     if (!atHome(state)) return refuse('这件事要回村办理。');
+    const service = serviceForAction[action];
+    if (service && !knowsService(state, service)) return refuse('你还没有找到这个门路。');
     const result = villageActions[action](state, payload);
     if (result.ok) refreshDiscovery(state);
     return result;
   }
   if (Object.hasOwn(generalActions, action)) return generalActions[action](state, payload);
   return refuse('眼下无法这样做。');
+}
+
+export function act(state, action, payload = {}) {
+  const unknownServices = data.services.filter(({ id }) => !knowsService(state, id));
+  const result = takeTurn(state, action, payload);
+  if (!result.ok) return result;
+  const found = unknownServices.filter(({ id }) => knowsService(state, id)).map(({ name }) => name);
+  if (!found.length) return result;
+  const notice = `打听到了村里的${found.join('、')}。`;
+  say(state, notice);
+  return { ...result, message: result.message + notice };
 }

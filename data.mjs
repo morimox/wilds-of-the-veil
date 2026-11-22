@@ -31,17 +31,18 @@ const items = [
   { id: 'lamp_sketch', name: '灯夫手势', kind: 'key', price: 0, sell: 0, reveal: { item: 'secret_pass' }, desc: '风口那名灯夫划出的两道弧，记录一式护灯的手势。' },
 
   { id: 'cudgel', name: '枣木杖', kind: 'gear', price: 5, sell: 2, desc: '行路探泥和近身抵挡都用得上。' },
-  { id: 'knife', name: '割苇短刀', kind: 'gear', price: 16, sell: 7, desc: '巡滩人的短刀，轻便，刃口薄。' },
+  { id: 'knife', name: '割苇短刀', kind: 'gear', price: 16, sell: 7, reveal: { item: 'reed' }, desc: '巡滩人的短刀，轻便，刃口薄。' },
+  { id: 'reed_bow', name: '苇弦弓', kind: 'gear', price: 0, sell: 8, desc: '将削薄的苇片贴在韧木上制成的猎弓。' },
   { id: 'iron_sword', name: '寒铁剑', kind: 'gear', price: 33, sell: 14, desc: '用沉钟岭的铁打成，兼顾出手和耐用。' },
   { id: 'tide_spear', name: '分潮枪', kind: 'gear', price: 57, sell: 25, desc: '闭潮渡的旧式枪，适合在开阔地先发制人。' },
   { id: 'straw_cape', name: '蓑衣', kind: 'gear', price: 6, sell: 2, desc: '挡潮气，也能缓掉浅处的抓咬。' },
   { id: 'hide_coat', name: '泥蜕褂', kind: 'gear', price: 18, sell: 7, desc: '泥蜕内衬柔韧，适合滩地的持久战。' },
   { id: 'iron_coat', name: '叠铁袍', kind: 'gear', price: 33, sell: 14, desc: '用寒铁片缝出护心和护肩。' },
   { id: 'tide_coat', name: '定潮甲', kind: 'gear', price: 55, sell: 24, desc: '潜到深处才显本事的沉甲。' },
-  { id: 'reed_charm', name: '苇哨结', kind: 'gear', price: 8, sell: 3, desc: '编作腰佩，发急时能稳住气息。' },
+  { id: 'reed_charm', name: '苇哨结', kind: 'gear', price: 8, sell: 3, reveal: { item: 'oar_mark' }, desc: '编作腰佩，发急时能稳住气息。' },
   { id: 'path_charm', name: '认路钱', kind: 'gear', price: 15, sell: 6, desc: '半枚打过眼的渡钱，挂着它好找回头路。' },
   { id: 'bell_charm', name: '定声铃', kind: 'gear', price: 29, sell: 12, desc: '贴身佩戴的哑铃，可以收住散乱真气。' },
-  { id: 'tide_charm', name: '避潮玉', kind: 'gear', price: 43, sell: 18, desc: '潮高时会微微发烫，提醒佩戴者提早抽身。' },
+  { id: 'tide_charm', name: '避潮玉', kind: 'gear', price: 43, sell: 18, reveal: { item: 'sand' }, desc: '潮高时会微微发烫，提醒佩戴者提早抽身。' },
   { id: 'jetty_charm', name: '回灯坠', kind: 'gear', price: 0, sell: 17, reveal: { item: 'secret_pass' }, desc: '以无烟灯芯束成的挂坠。险中看着一线灯影，仍能辨认来路。' },
 
   { id: 'salve', name: '松脂膏', kind: 'pill', price: 6, sell: 2, desc: '便宜的应急药，可恢复少量气血。' },
@@ -60,19 +61,20 @@ const items = [
 ];
 
 const gear = [
-  { id: 'cudgel', slot: 'weapon', tier: 0, atk: 1, def: 0, hp: 0, qi: 0, retreat: 0, durability: 26, repair: 3 },
-  { id: 'knife', slot: 'weapon', tier: 0, atk: 3, def: 0, hp: 0, qi: 0, retreat: 0, durability: 30, repair: 5 },
-  { id: 'iron_sword', slot: 'weapon', tier: 1, atk: 5, def: 1, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 8 },
-  { id: 'tide_spear', slot: 'weapon', tier: 2, atk: 8, def: 0, hp: 0, qi: 1, retreat: 0, durability: 46, repair: 12 },
-  { id: 'straw_cape', slot: 'armor', tier: 0, atk: 0, def: 1, hp: 3, qi: 0, retreat: 0, durability: 24, repair: 3 },
-  { id: 'hide_coat', slot: 'armor', tier: 0, atk: 0, def: 2, hp: 5, qi: 0, retreat: 0, durability: 29, repair: 5 },
-  { id: 'iron_coat', slot: 'armor', tier: 1, atk: 0, def: 3, hp: 7, qi: 0, retreat: 0, durability: 38, repair: 8 },
-  { id: 'tide_coat', slot: 'armor', tier: 2, atk: 0, def: 5, hp: 10, qi: -1, retreat: 0, durability: 46, repair: 12 },
-  { id: 'reed_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 0, qi: 2, retreat: 0.05, durability: 25, repair: 3 },
-  { id: 'path_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 2, qi: 0, retreat: 0.17, durability: 28, repair: 5 },
-  { id: 'bell_charm', slot: 'charm', tier: 1, atk: 0, def: 1, hp: 0, qi: 4, retreat: 0.05, durability: 38, repair: 8 },
-  { id: 'tide_charm', slot: 'charm', tier: 2, atk: 0, def: 1, hp: 4, qi: 3, retreat: 0.20, durability: 46, repair: 12 },
-  { id: 'jetty_charm', slot: 'charm', tier: 2, atk: 0, def: 0, hp: 0, qi: 5, retreat: 0.30, durability: 38, repair: 9 },
+  { id: 'cudgel', slot: 'weapon', tier: 0, atk: 1, def: 0, hp: 0, qi: 0, retreat: 0, durability: 26, repair: 3, entry: '寻常行杖。出手稳当，力道偏轻，适合刚出门的散修。' },
+  { id: 'knife', slot: 'weapon', tier: 0, atk: 3, def: 0, hp: 0, qi: 0, retreat: 0, durability: 30, repair: 5, entry: '利落的凡制短刃。薄刃能从鳞缝里切进去，打披鳞的敌人时容易破防。', trait: { kind: 'pierce', enemyTag: 'scaled', bonus: 2 } },
+  { id: 'reed_bow', slot: 'weapon', tier: 0, atk: 2, def: 0, hp: 0, qi: 0, retreat: 0, durability: 28, repair: 4, entry: '寻常猎弓，弓力温和。射入厚毛的箭不易滑脱，出手时对带皮毛的野兽格外有效。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 4 } },
+  { id: 'iron_sword', slot: 'weapon', tier: 1, atk: 5, def: 1, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '筑基修士使得稳的实用剑。剑身厚实，斩击沉稳，架住来招也可靠。' },
+  { id: 'tide_spear', slot: 'weapon', tier: 2, atk: 8, def: 0, hp: 0, qi: 1, retreat: 0, durability: 46, repair: 12, entry: '凝丹之后才使得开的长枪。出手凌厉，握柄时还容得下些许真气。' },
+  { id: 'straw_cape', slot: 'armor', tier: 0, atk: 0, def: 1, hp: 3, qi: 0, retreat: 0, durability: 24, repair: 3, entry: '渔人常穿的轻护具。能缓掉些寻常抓咬，遇到沉重来招仍须躲闪。' },
+  { id: 'hide_coat', slot: 'armor', tier: 0, atk: 0, def: 2, hp: 5, qi: 0, retreat: 0, durability: 29, repair: 5, entry: '结实的凡制软甲。泥蜕织面咬不住，能额外卸掉野兽来招的力道。', trait: { kind: 'guard', enemyTag: 'beast', bonus: 2 } },
+  { id: 'iron_coat', slot: 'armor', tier: 1, atk: 0, def: 3, hp: 7, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '筑基修士穿得动的重护具。叠铁护心能分散重击，接蓄势之后的重招更稳。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
+  { id: 'tide_coat', slot: 'armor', tier: 2, atk: 0, def: 5, hp: 10, qi: -1, retreat: 0, durability: 46, repair: 12, entry: '凝丹重甲，护身厚实。甲下气息走得窄，穿着时体内少容些真气。' },
+  { id: 'reed_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 0, qi: 2, retreat: 0.05, durability: 25, repair: 3, entry: '小巧的凡制护符。苇声能帮助稳住真气，脱身时也能少挨些追击。' },
+  { id: 'path_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 2, qi: 0, retreat: 0.17, durability: 28, repair: 5, entry: '旧渡工用的护身钱。擅长在混乱中辨来路，撤出战斗时能少受追击。' },
+  { id: 'bell_charm', slot: 'charm', tier: 1, atk: 0, def: 1, hp: 0, qi: 4, retreat: 0.05, durability: 38, repair: 8, entry: '适合筑基修士的哑铃。能收住散乱真气，佩着有些许护身与脱身之助。' },
+  { id: 'tide_charm', slot: 'charm', tier: 2, atk: 0, def: 1, hp: 4, qi: 3, retreat: 0.20, durability: 46, repair: 12, entry: '凝丹修士方能温养的玉佩。能护身存气，也擅长在抽身时卸掉身后的追击。' },
+  { id: 'jetty_charm', slot: 'charm', tier: 2, atk: 0, def: 0, hp: 0, qi: 5, retreat: 0.30, durability: 38, repair: 9, entry: '凝丹修士佩着才显灵的旧埠灯坠。长于蓄气，也特别适合在凶险处脱身。' },
 ];
 
 const pills = [
@@ -96,12 +98,12 @@ const talismans = [
 const arts = [
   { id: 'reed_cleave', name: '分苇诀', tier: 0, cost: 2, power: 3, pierce: 1, guard: 0, break: 0, price: 6, desc: '用少量真气补强一次出手，适合对付薄甲。' },
   { id: 'stone_brace', name: '压石诀', tier: 0, cost: 2, power: -3, pierce: 0, guard: 5, break: 0, price: 8, desc: '沉桩护身，兼有一记轻击。' },
-  { id: 'hook_current', name: '钩水手', tier: 0, cost: 3, power: 0, pierce: 1, guard: 1, break: 7, price: 12, desc: '用巧劲削弱对方重招，适合看准了再用。' },
-  { id: 'bell_strike', name: '敲山劲', tier: 1, cost: 4, power: 6, pierce: 3, guard: 0, break: 0, price: 19, desc: '集中力量打穿厚甲，耗气较重。' },
+  { id: 'hook_current', name: '钩水手', tier: 0, cost: 3, power: 0, pierce: 1, guard: 1, break: 7, price: 12, reveal: { item: 'oar_mark' }, desc: '用巧劲削弱对方重招，适合看准了再用。' },
+  { id: 'bell_strike', name: '敲山劲', tier: 1, cost: 4, power: 6, pierce: 3, guard: 0, break: 0, price: 19, reveal: { item: 'ore' }, desc: '集中力量打穿厚甲，耗气较重。' },
   { id: 'earth_echo', name: '抱地听钟', tier: 1, cost: 3, power: -3, pierce: 0, guard: 9, break: 0, price: 18, reveal: { item: 'echo_method' }, desc: '在第二声回音到来时收气固守，可接下较重一击。' },
-  { id: 'cliff_cut', name: '截崖步', tier: 1, cost: 4, power: 1, pierce: 1, guard: 3, break: 11, price: 22, desc: '移步切入攻势，削弱重招时也护住自身。' },
-  { id: 'tide_part', name: '破潮指', tier: 2, cost: 5, power: 10, pierce: 5, guard: 0, break: 0, price: 31, desc: '用一瞬间的爆发击穿坚甲。' },
-  { id: 'tide_return', name: '回澜式', tier: 2, cost: 4, power: -3, pierce: 1, guard: 13, break: 0, price: 27, desc: '以退借势，留力应对沉重的反扑。' },
+  { id: 'cliff_cut', name: '截崖步', tier: 1, cost: 4, power: 1, pierce: 1, guard: 3, break: 11, price: 22, reveal: { item: 'echo_note' }, desc: '移步切入攻势，削弱重招时也护住自身。' },
+  { id: 'tide_part', name: '破潮指', tier: 2, cost: 5, power: 10, pierce: 5, guard: 0, break: 0, price: 31, reveal: { item: 'sand' }, desc: '用一瞬间的爆发击穿坚甲。' },
+  { id: 'tide_return', name: '回澜式', tier: 2, cost: 4, power: -3, pierce: 1, guard: 13, break: 0, price: 27, reveal: { item: 'tide_note' }, desc: '以退借势，留力应对沉重的反扑。' },
   { id: 'cross_weir', name: '截流式', tier: 2, cost: 5, power: 3, pierce: 2, guard: 4, break: 15, price: 32, reveal: { item: 'tide_note' }, desc: '截住对手蓄势的时机，逼对方改走别处。' },
   { id: 'lamp_still', name: '护灯式', tier: 2, cost: 3, power: -4, pierce: 0, guard: 9, break: 4, price: 14, reveal: { item: 'lamp_sketch' }, desc: '仿着暗埠人守风口灯火的手势，省气护身。' },
 ];
@@ -120,6 +122,7 @@ const recipes = [
   { id: 'r_iron', result: 'iron_talisman', count: 2, tier: 1, cost: 4, need: { ore: 1, wood: 1 }, days: 1 },
   { id: 'r_tide_talisman', result: 'tide_talisman', count: 2, tier: 2, cost: 6, need: { sand: 1, wood: 1 }, days: 1, reveal: { item: 'tide_note' } },
   { id: 'r_hide_coat', result: 'hide_coat', count: 1, tier: 0, cost: 5, need: { hide: 2 }, days: 1 },
+  { id: 'r_reed_bow', result: 'reed_bow', count: 1, tier: 0, cost: 4, need: { wood: 1, reed: 2 }, days: 1 },
   { id: 'r_iron_sword', result: 'iron_sword', count: 1, tier: 1, cost: 11, need: { ore: 2, wood: 1 }, days: 1 },
   { id: 'r_iron_coat', result: 'iron_coat', count: 1, tier: 1, cost: 12, need: { ore: 2, hide: 1 }, days: 1 },
   { id: 'r_tide_spear', result: 'tide_spear', count: 1, tier: 2, cost: 20, need: { ore: 2, sand: 2 }, days: 2 },
@@ -145,9 +148,10 @@ const events = [
     { label: '把篓拉回来', days: 1, food: 1, coins: 3, hp: 0, qi: 0, insight: 1, loot: { wood: 1, salve: 1 }, enemy: null, desc: '慢慢解开缠绳，捡得一些用得上的东西。' },
     { label: '点灯把失主叫来', days: 1, food: 1, coins: 7, hp: 0, qi: 0, insight: 2, loot: { ration: 2 }, enemy: null, desc: '失主分一袋干粮付谢礼，也指了水面下的石坎。' },
   ] },
-  { id: 'mud_track', name: '泥下冒泡', text: '水泡沿一条直线过来。泥鳞兽伏得很深，只有背上的硬鳞隔一阵浮起来。', choices: [
+  { id: 'mud_track', name: '泥下冒泡', text: '水泡沿一条直线过来。泥鳞兽伏得很深，只有背上的硬鳞隔一阵浮起来。干地另有一串小足印，芦梗上挂着几缕短毛。', choices: [
     { label: '上石滩迎战', days: 1, food: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'mud_beast', desc: '先把脚底站稳。它收身低伏时，多半是在攒力扑咬。' },
     { label: '沿另一侧绕行', days: 1, food: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 2 }, enemy: null, desc: '让它守着水眼，在干地捡些枯枝。' },
+    { label: '跟着小足迹去看看', days: 1, food: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', desc: '一尾蓬松的苇狐挡在干埂上。' },
   ] },
   { id: 'old_fire', name: '干透的柴窝', revisit: true, text: '半截石渠挡了雨，里面还有旧日烤苇火留下的黑灰。渠底铺着几片手掌大的破瓦。', choices: [
     { label: '添柴歇脚', days: 1, food: 1, coins: 0, hp: 6, qi: 4, insight: 0, loot: { wood: 1 }, enemy: null, desc: '暖过手脚再走，顺便拿几截干柴。' },
@@ -224,23 +228,31 @@ const events = [
 ];
 
 const enemies = [
-  { id: 'mud_beast', name: '泥鳞兽', tier: 0, hp: 25, atk: 7, def: 2, intents: [{ name: '偏头啃咬', kind: 'attack', mult: 1 }, { name: '伏身猛扑', kind: 'heavy', mult: 1.7 }, { name: '蜷尾守鳞', kind: 'guard', mult: 1.35 }, { name: '掀尾扫腿', kind: 'attack', mult: 1 }], coins: 8, insight: 3, loot: { hide: 2, ration: 1 }, desc: '伏身后会扑向脚下，硬鳞收拢时适合恢复真气或蓄势。' },
-  { id: 'marsh_ghost', name: '巡岸水鬼', tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '抱臂裹雾', kind: 'guard', mult: 1.4 }, { name: '伸指拖拽', kind: 'attack', mult: 1 }, { name: '借雾扑面', kind: 'heavy', mult: 1.6 }], coins: 10, insight: 4, loot: { reed: 2, reed_talisman: 1 }, desc: '开场先抱臂结雾，准备好再把它拖出水边。' },
-  { id: 'mast_beast', name: '沉桅虺', tier: 1, hp: 34, atk: 10, def: 3, intents: [{ name: '借桅缠身', kind: 'attack', mult: 1 }, { name: '开鳍扑水', kind: 'heavy', mult: 1.65 }, { name: '绕桅遮身', kind: 'guard', mult: 1.2 }, { name: '甩尾扫水', kind: 'attack', mult: 1 }], coins: 19, insight: 5, loot: { path_charm: 1, reed: 2 }, desc: '筑基境的伏水兽。带上破招术和撤退用的符，可留一条回路。' },
-  { id: 'ore_wight', name: '持锤矿煞', tier: 1, hp: 40, atk: 12, def: 4, intents: [{ name: '平锤试探', kind: 'attack', mult: 1 }, { name: '举锤砸顶', kind: 'heavy', mult: 1.72 }, { name: '横锤护臂', kind: 'guard', mult: 1.45 }, { name: '甩锤碰撞', kind: 'attack', mult: 1.1 }], coins: 14, insight: 5, loot: { core: 1, ore: 2 }, desc: '它击打沉重且规律。越阶挑战时先做好撑过重锤的准备。' },
-  { id: 'stone_badger', name: '石甲獾', tier: 1, hp: 43, atk: 11, def: 6, intents: [{ name: '缩头挡路', kind: 'guard', mult: 1.38 }, { name: '沿坡顶撞', kind: 'attack', mult: 1 }, { name: '转身重掀', kind: 'heavy', mult: 1.62 }], coins: 15, insight: 5, loot: { hide: 2, ore: 1, salve: 1 }, desc: '厚甲能吃下平砍。找它转身露侧肋时出手。' },
-  { id: 'bell_wraith', name: '裂钟魄', tier: 2, hp: 54, atk: 14, def: 5, intents: [{ name: '叩钟抖尘', kind: 'attack', mult: 1 }, { name: '聚响压顶', kind: 'heavy', mult: 1.72 }, { name: '并片挡锋', kind: 'guard', mult: 1.38 }, { name: '崩响回荡', kind: 'attack', mult: 1.1 }], coins: 25, insight: 6, loot: { bell_charm: 1, core: 1 }, desc: '钟魄鸣响时正在蓄势，可先护住周身，再截住最重一声。' },
-  { id: 'rope_eel', name: '缠舟兽', tier: 2, hp: 50, atk: 15, def: 5, intents: [{ name: '卷尾扫舟', kind: 'attack', mult: 1 }, { name: '扯绳压顶', kind: 'heavy', mult: 1.7 }, { name: '团身潜浮', kind: 'guard', mult: 1.38 }], coins: 20, insight: 6, loot: { sand: 2, ration: 2 }, desc: '动作快，扯紧船绳后会随浪发动重击。' },
-  { id: 'tide_spirit', name: '守潮灵', tier: 2, hp: 72, atk: 17, def: 7, intents: [{ name: '铁索探身', kind: 'attack', mult: 1 }, { name: '沉锁打浪', kind: 'heavy', mult: 1.82 }, { name: '横锁固闸', kind: 'guard', mult: 1.46 }, { name: '返潮扫岸', kind: 'attack', mult: 1.12 }, { name: '闭闸合潮', kind: 'heavy', mult: 1.87 }], coins: 28, insight: 8, loot: { seal: 1, sand: 3 }, desc: '带印回村便可复开旧渡。它的两次重招隔得很近，重进闸前先确认药符够用。' },
-  { id: 'wick_husk', name: '湿蓑灯蜕', tier: 2, hp: 64, atk: 16, def: 6, intents: [{ name: '压帽护火', kind: 'guard', mult: 1.35 }, { name: '引灯掠手', kind: 'attack', mult: 1.1 }, { name: '借火贴身', kind: 'heavy', mult: 1.9 }, { name: '吮焰回息', kind: 'heal', mult: 0.42 }], coins: 23, insight: 7, loot: { dry_wick: 2, tide_pill: 1 }, desc: '会在风回过来时从灯芯汲力。拖久了，它能补回缺损。' },
+  { id: 'mud_beast', name: '泥鳞兽', tags: ['beast', 'scaled'], tier: 0, hp: 25, atk: 7, def: 2, intents: [{ name: '偏头啃咬', kind: 'attack', mult: 1 }, { name: '伏身猛扑', kind: 'heavy', mult: 1.7 }, { name: '蜷尾守鳞', kind: 'guard', mult: 1.35 }, { name: '掀尾扫腿', kind: 'attack', mult: 1 }], coins: 8, insight: 3, loot: { hide: 2, ration: 1 }, desc: '伏身后会扑向脚下，硬鳞收拢时适合恢复真气或蓄势。' },
+  { id: 'reed_fox', name: '苇尾狐', tags: ['beast', 'furred'], tier: 0, hp: 24, atk: 6, def: 1, intents: [{ name: '斜掠扑咬', kind: 'attack', mult: 1 }, { name: '团尾护腹', kind: 'guard', mult: 1.4 }, { name: '伏脊跳扑', kind: 'heavy', mult: 1.5 }], coins: 4, insight: 2, loot: { wood: 1, ration: 1 }, desc: '尾上的厚毛扫起了枯苇。它会先绕着干埂寻找扑咬的空当。' },
+  { id: 'marsh_ghost', name: '巡岸水鬼', tags: ['spirit'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '抱臂裹雾', kind: 'guard', mult: 1.4 }, { name: '伸指拖拽', kind: 'attack', mult: 1 }, { name: '借雾扑面', kind: 'heavy', mult: 1.6 }], coins: 10, insight: 4, loot: { reed: 2, reed_talisman: 1 }, desc: '开场先抱臂结雾，准备好再把它拖出水边。' },
+  { id: 'mast_beast', name: '沉桅虺', tags: ['beast', 'scaled'], tier: 1, hp: 34, atk: 10, def: 3, intents: [{ name: '借桅缠身', kind: 'attack', mult: 1 }, { name: '开鳍扑水', kind: 'heavy', mult: 1.65 }, { name: '绕桅遮身', kind: 'guard', mult: 1.2 }, { name: '甩尾扫水', kind: 'attack', mult: 1 }], coins: 19, insight: 5, loot: { path_charm: 1, reed: 2 }, desc: '筑基境的伏水兽。带上破招术和撤退用的符，可留一条回路。' },
+  { id: 'ore_wight', name: '持锤矿煞', tags: ['spirit'], tier: 1, hp: 40, atk: 12, def: 4, intents: [{ name: '平锤试探', kind: 'attack', mult: 1 }, { name: '举锤砸顶', kind: 'heavy', mult: 1.72 }, { name: '横锤护臂', kind: 'guard', mult: 1.45 }, { name: '甩锤碰撞', kind: 'attack', mult: 1.1 }], coins: 14, insight: 5, loot: { core: 1, ore: 2 }, desc: '它击打沉重且规律。越阶挑战时先做好撑过重锤的准备。' },
+  { id: 'stone_badger', name: '石甲獾', tags: ['beast', 'furred'], tier: 1, hp: 43, atk: 11, def: 6, intents: [{ name: '缩头挡路', kind: 'guard', mult: 1.38 }, { name: '沿坡顶撞', kind: 'attack', mult: 1 }, { name: '转身重掀', kind: 'heavy', mult: 1.62 }], coins: 15, insight: 5, loot: { hide: 2, ore: 1, salve: 1 }, desc: '皮毛粗厚，脊甲又硬。找它转身露侧肋时出手。' },
+  { id: 'bell_wraith', name: '裂钟魄', tags: ['spirit'], tier: 2, hp: 54, atk: 14, def: 5, intents: [{ name: '叩钟抖尘', kind: 'attack', mult: 1 }, { name: '聚响压顶', kind: 'heavy', mult: 1.72 }, { name: '并片挡锋', kind: 'guard', mult: 1.38 }, { name: '崩响回荡', kind: 'attack', mult: 1.1 }], coins: 25, insight: 6, loot: { bell_charm: 1, core: 1 }, desc: '钟魄鸣响时正在蓄势，可先护住周身，再截住最重一声。' },
+  { id: 'rope_eel', name: '缠舟兽', tags: ['beast'], tier: 2, hp: 50, atk: 15, def: 5, intents: [{ name: '卷尾扫舟', kind: 'attack', mult: 1 }, { name: '扯绳压顶', kind: 'heavy', mult: 1.7 }, { name: '团身潜浮', kind: 'guard', mult: 1.38 }], coins: 20, insight: 6, loot: { sand: 2, ration: 2 }, desc: '动作快，扯紧船绳后会随浪发动重击。' },
+  { id: 'tide_spirit', name: '守潮灵', tags: ['spirit'], tier: 2, hp: 72, atk: 17, def: 7, intents: [{ name: '铁索探身', kind: 'attack', mult: 1 }, { name: '沉锁打浪', kind: 'heavy', mult: 1.82 }, { name: '横锁固闸', kind: 'guard', mult: 1.46 }, { name: '返潮扫岸', kind: 'attack', mult: 1.12 }, { name: '闭闸合潮', kind: 'heavy', mult: 1.87 }], coins: 28, insight: 8, loot: { seal: 1, sand: 3 }, desc: '带印回村便可复开旧渡。它的两次重招隔得很近，重进闸前先确认药符够用。' },
+  { id: 'wick_husk', name: '湿蓑灯蜕', tags: ['spirit'], tier: 2, hp: 64, atk: 16, def: 6, intents: [{ name: '压帽护火', kind: 'guard', mult: 1.35 }, { name: '引灯掠手', kind: 'attack', mult: 1.1 }, { name: '借火贴身', kind: 'heavy', mult: 1.9 }, { name: '吮焰回息', kind: 'heal', mult: 0.42 }], coins: 23, insight: 7, loot: { dry_wick: 2, tide_pill: 1 }, desc: '会在风回过来时从灯芯汲力。拖久了，它能补回缺损。' },
 ];
 
 const quests = [
-  { id: 'patch_ferry', name: '把旧灯支起来', desc: '村人请你带两截松枝，把渡口那盏灯支稳。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2 },
+  { id: 'patch_ferry', name: '把旧灯支起来', desc: '村人请你带两截松枝，把渡口那盏灯支稳。', need: { wood: 2 }, reward: { ration: 3, salve: 1 }, coins: 9, insight: 2, requiresKnownMaterials: false },
   { id: 'reed_salve', name: '拣出一份好苇', desc: '药僮要用白苇芯熬膏，认得老渡工以前送药时留下的路标和靠岸记。', need: { reed: 1 }, reward: { ration: 2, reed_talisman: 1, ridge_rubbing: 1, oar_mark: 1 }, coins: 10, insight: 2 },
   { id: 'coat_mend', name: '补蓑衣的里衬', desc: '渡工愿用几包止血药换一块整泥蜕。', need: { hide: 1 }, reward: { salve: 2, ration: 1 }, coins: 10, insight: 2 },
   { id: 'sell_forging', name: '先打一截闸栓', tier: 1, reveal: { item: 'ridge_rubbing' }, desc: '老匠人要一份寒铁做样。他的工具箱里有旧年修渡留下的几张图。', need: { ore: 1 }, reward: { iron_talisman: 1, ration: 3, ford_chart: 1 }, coins: 17, insight: 3 },
   { id: 'last_lantern', name: '把旧渡的印带回来', tier: 2, reveal: { item: 'ford_chart' }, desc: '落灯村留着引水的最后一段闸书。拿回镇渡印便能重开旧渡。', need: { seal: 1 }, reward: { ration: 6, tide_pill: 1 }, coins: 30, insight: 6 },
+];
+
+const services = [
+  { id: 'quests', name: '委托', items: ['reed'], choices: ['sunk_pack:1', 'reed_ferryman:0'] },
+  { id: 'market', name: '坊市', choices: ['sunk_pack:1', 'old_fire:1', 'reed_ferryman:0'] },
+  { id: 'workshop', name: '工坊', items: ['hide'], choices: ['sunk_pack:0', 'old_fire:0', 'mud_track:1'] },
+  { id: 'cultivate', name: '修行', items: ['reed_lines'], choices: ['drowned_mast:1', 'reed_ferryman:0'] },
 ];
 
 const deductions = [
@@ -286,13 +298,13 @@ const deductions = [
 ];
 
 const starting = {
-  inventory: { ration: 10, wood: 2, salve: 1, qi_powder: 1, ember_talisman: 1, reed_talisman: 1 },
+  inventory: { ration: 10 },
   gear: { weapon: 'cudgel', armor: 'straw_cape', charm: null },
-  arts: ['reed_cleave', 'stone_brace'],
+  arts: [],
   coins: 20,
 };
 const victoryQuest = 'last_lantern';
-const data = { realms, items, gear, pills, talismans, arts, recipes, regions, events, enemies, quests, deductions, rules: {}, starting, victoryQuest };
+const data = { realms, items, gear, pills, talismans, arts, recipes, regions, events, enemies, quests, services, deductions, rules: {}, starting, victoryQuest };
 
-export { data, realms, items, gear, pills, talismans, arts, recipes, regions, events, enemies, quests, deductions, starting, victoryQuest };
+export { data, realms, items, gear, pills, talismans, arts, recipes, regions, events, enemies, quests, services, deductions, starting, victoryQuest };
 export default data;

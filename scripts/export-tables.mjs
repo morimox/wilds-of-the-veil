@@ -149,6 +149,17 @@ const drawn = data.regions.flatMap((region) => {
 });
 const choices = data.events.flatMap(({ id, name, choices }) =>
   choices.map((choice, index) => ({ event: id, eventName: name, order: index + 1, ...choice })));
+const describeChoice = (key) => {
+  const [event, index] = key.split(':');
+  const choice = data.events.find(row => row.id === event)?.choices[Number(index)];
+  return choice ? `${ref(event)} · ${choice.label}` : key;
+};
+const traitText = (trait) => [
+  ({ damage: '额外伤害', pierce: '额外穿甲', guard: '额外护持' })[trait.kind] ?? trait.kind,
+  trait.enemyTag && `敌人标签 ${trait.enemyTag}`,
+  trait.intent && (knownKinds[trait.intent] ?? trait.intent),
+  `加成 ${trait.bonus}`,
+].filter(Boolean).join(' · ');
 const intents = data.enemies.flatMap(({ id, name, intents }) =>
   intents.map((intent, index) => ({ enemyId: id, enemyName: name, order: index + 1, ...intent })));
 const deductions = data.deductions ?? [];
@@ -174,7 +185,7 @@ const tables = [
     { note: '价格为 0 表示没有对应的买入或卖出选项。' }),
   table('gear', '装备', gated(described(data.gear)), [
     'id', 'name', 'slot', 'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'],
-    'retreat', 'durability', 'repair',
+    'retreat', 'durability', 'repair', ['entry', '玩家主动查读的词条'], ['trait', '特殊作用与具体数值', traitText],
   ], { note: '装备耐久为 0 后失去加成。脱身加成为伤害减免系数，0.17 即减免 17%。' }),
   table('pills', '丹药', gated(described(data.pills)), [
     'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['food', '获得干粮'], 'toxin', 'wound', 'focus',
@@ -205,14 +216,20 @@ const tables = [
     'need', 'consume', 'hidden', 'loot', 'enemy', 'desc',
   ], { note: '标为消耗所需物品时会扣除该列物品。隐藏选项所需物品齐备后才显示。' }),
   table('enemies', '敌人', gated(data.enemies), [
-    'id', 'name', ['tier', '敌方境界'], tier, 'hp', 'atk', 'def', ['coins', '战利灵钱'], ['insight', '首胜修为'], 'loot', 'desc',
+    'id', 'name', ['tier', '敌方境界'], tier, 'hp', 'atk', 'def', ['tags', '装备克制标签'], ['coins', '战利灵钱'], ['insight', '首胜修为'], 'loot', 'desc',
   ], { omit: ['intents'] }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
-    'id', 'name', ['tier', '标注境界'], tier, 'reveal', 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'],
-  ]),
+    'id', 'name', ['tier', '标注境界'], tier, 'reveal', 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'],
+  ], { note: '先发现委托入口，材料认知默认有要求。' }),
+  table('services', '村务发现条件', data.services, [
+    'id', 'name', ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],
+    ['choices', '完成任一事件选项', (keys) => keys.map(describeChoice).join('、')],
+  ], {
+    note: '任一条件满足即记得入口。回村可使用已发现的设施，消耗材料后仍然记得。'
+  }),
   table('deductions', '沙盘推演答案与奖励', gated(deductionRows), [
     'id', 'name', 'tier', tier, 'reveal', 'desc', ['evidence', '所需证物及份数', resources],
     ['answer', '正确解释标识'], ['answerText', '正确解释'], ['days', '单次推演用时（天）'],

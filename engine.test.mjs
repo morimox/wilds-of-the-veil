@@ -40,13 +40,69 @@ function seek(state, id) {
   assert.fail(`没有找到测试事件 ${id}`);
 }
 
+test('village services and their contents are found gradually and guarded by the engine', () => {
+  let state = createGame(1);
+  const opening = view(state);
+  assert.deepEqual(opening.services, []);
+  assert.deepEqual(opening.discoveredQuests, []);
+  assert.deepEqual(opening.discoveredRecipes, []);
+  assert.deepEqual(opening.discoveredArts, []);
+  assert.deepEqual(opening.discoveredItems, ['ration', 'cudgel', 'straw_cape']);
+  assert.equal(opening.nextRealm, null);
+  assert.equal(opening.discoveryHint, '');
+  const start = JSON.stringify(state);
+  for (const [action, payload] of [
+    ['handin', { id: 'patch_ferry' }], ['craft', { id: 'r_salve' }], ['repair', { id: 'cudgel' }],
+    ['research'], ['breakthrough'], ['learn', { id: 'reed_cleave' }], ['buy', { id: 'ration' }], ['sell', { id: 'ration' }],
+  ]) {
+    assert.equal(act(state, action, payload).ok, false);
+    assert.equal(JSON.stringify(state), start);
+  }
+
+  walk(state, 'marsh');
+  seek(state, 'reed_banks');
+  assert.deepEqual(view(state).services, []);
+  choose(state, 2);
+  assert.deepEqual(view(state).services, ['cultivate']);
+  seek(state, 'old_fire');
+  choose(state, 1);
+  assert.deepEqual(view(state).services, ['market', 'cultivate']);
+  seek(state, 'sunk_pack');
+  choose(state, 0);
+  assert.deepEqual(view(state).services, ['market', 'workshop', 'cultivate']);
+  assert.ok(view(state).discoveredRecipes.includes('r_salve'));
+  assert.equal(view(state).discoveredRecipes.includes('r_hide_coat'), false);
+  seek(state, 'reed_banks');
+  choose(state, 0);
+  walk(state, 'village');
+  assert.deepEqual(view(state).services, ['quests', 'market', 'workshop', 'cultivate']);
+  assert.ok(view(state).discoveredQuests.includes('reed_salve'));
+  assert.equal(view(state).discoveredQuests.includes('coat_mend'), false);
+  assert.equal(view(state).discoveredItems.includes('path_charm'), false);
+  assert.equal(act(state, 'buy', { id: 'path_charm' }).ok, false);
+  play(state, 'handin', { id: 'reed_salve' });
+  play(state, 'sell', { id: 'reed', count: 1 });
+  state = JSON.parse(JSON.stringify(state));
+  assert.equal(state.inventory.reed, undefined);
+  assert.deepEqual(view(state).services, ['quests', 'market', 'workshop', 'cultivate']);
+  assert.ok(view(state).discoveredRecipes.includes('r_qi'));
+  assert.ok(view(state).discoveredItems.includes('knife'));
+  play(state, 'learn', { id: 'reed_cleave' });
+
+  const ferrymanRoute = createGame(1);
+  walk(ferrymanRoute, 'marsh');
+  seek(ferrymanRoute, 'reed_ferryman');
+  choose(ferrymanRoute, 0);
+  assert.deepEqual(view(ferrymanRoute).services, ['quests', 'market', 'cultivate']);
+  assert.deepEqual(view(ferrymanRoute).discoveredQuests, ['patch_ferry']);
+});
+
 test('a clue reveals a road across saves and travel still requires the appropriate realm', () => {
   let state = createGame(1);
   assert.deepEqual(view(state).discovered, ['village', 'marsh']);
   assert.equal(act(state, 'travel', { id: 'ridge' }).ok, false);
   assert.equal(view(state).discoveredItems.includes('sand'), false);
   assert.equal(view(state).discoveredQuests.includes('last_lantern'), false);
-  play(state, 'handin', { id: 'patch_ferry' });
   walk(state, 'marsh');
   exploreWith(state, { reed_banks: 0 });
   walk(state, 'village');
@@ -104,8 +160,87 @@ test('damage wears equipped gear, defeating an enemy rewards only first-kill ins
   assert.equal(state.durability.cudgel, before);
 });
 
+test('a bow found by following material knowledge hits a furred beast harder', () => {
+  const state = createGame(1);
+  for (const { entry } of data.gear) {
+    assert.ok(entry);
+    assert.doesNotMatch(entry, /[0-9]/);
+  }
+  assert.equal(view(state).discoveredRecipes.includes('r_reed_bow'), false);
+  walk(state, 'marsh');
+  seek(state, 'reed_banks');
+  choose(state, 0);
+  assert.equal(view(state).discoveredRecipes.includes('r_reed_bow'), false);
+  seek(state, 'mud_track');
+  choose(state, 1);
+  walk(state, 'village');
+  assert.ok(view(state).discoveredRecipes.includes('r_reed_bow'));
+  play(state, 'craft', { id: 'r_reed_bow' });
+  play(state, 'equip', { id: 'reed_bow' });
+  walk(state, 'marsh');
+  seek(state, 'mud_track');
+  choose(state, 2);
+  assert.equal(view(state).currentEnemy.id, 'reed_fox');
+
+  const broken = structuredClone(state);
+  broken.durability.reed_bow = 0;
+  play(broken, 'attack');
+  assert.equal(view(broken).currentEnemy.hp, 24 - 7);
+  const scaled = structuredClone(state);
+  scaled.combat = { id: 'mud_beast', hp: 25, round: 0, escapeBonus: 0 };
+  play(scaled, 'attack');
+  assert.equal(view(scaled).currentEnemy.hp, 25 - 8);
+
+  play(state, 'attack');
+  assert.equal(view(state).currentEnemy.hp, 24 - 13);
+  play(state, 'attack');
+  assert.equal(view(state).mode, 'field');
+  assert.ok(view(state).defeated.includes('reed_fox'));
+});
+
+test('weapon piercing and armor effects follow the actual enemy and intent', () => {
+  const state = createGame(1);
+  walk(state, 'marsh');
+  state.inventory.knife = 1;
+  state.durability.knife = 30;
+  state.inventory.hide_coat = 1;
+  state.durability.hide_coat = 29;
+  play(state, 'equip', { id: 'knife' });
+  play(state, 'equip', { id: 'hide_coat' });
+  state.combat = { id: 'mud_beast', hp: 25, round: 0, escapeBonus: 0 };
+  const beforeBeast = state.hp;
+  play(state, 'attack');
+  assert.equal(view(state).currentEnemy.hp, 25 - 11);
+  assert.equal(state.hp, beforeBeast - 1);
+
+  state.combat = { id: 'marsh_ghost', hp: 28, round: 1, escapeBonus: 0 };
+  const beforeSpirit = state.hp;
+  play(state, 'attack');
+  assert.equal(view(state).currentEnemy.hp, 28 - 9);
+  assert.equal(state.hp, beforeSpirit - 4);
+
+  state.combat = null;
+  state.realm = 1;
+  state.inventory.iron_coat = 1;
+  state.durability.iron_coat = 38;
+  play(state, 'equip', { id: 'iron_coat' });
+  state.hp = 40;
+  state.combat = { id: 'ore_wight', hp: 40, round: 0, escapeBonus: 0 };
+  play(state, 'attack');
+  assert.equal(state.hp, 40 - 5);
+  play(state, 'attack');
+  assert.equal(state.hp, 40 - 5 - 12);
+});
+
 test('restoratives heal, toxin applies at the threshold, and a retreat talisman is spent immediately', () => {
   const state = createGame(1);
+  walk(state, 'marsh');
+  seek(state, 'sunk_pack');
+  choose(state, 0);
+  seek(state, 'reed_banks');
+  choose(state, 0);
+  walk(state, 'village');
+  play(state, 'handin', { id: 'reed_salve' });
   const salve = data.pills.find(({ id }) => id === 'salve');
   const maxHp = view(state).maxHp;
   state.hp = maxHp - salve.hp - 2;
@@ -180,6 +315,14 @@ test('deduction checks actual evidence and offers no spoilers, spends time on mi
 
 test('a seeded run completes both realms and the main quest, then unlocks the secret map', () => {
   const state = createGame(1);
+  walk(state, 'marsh');
+  seek(state, 'reed_banks');
+  choose(state, 0);
+  seek(state, 'old_fire');
+  choose(state, 1);
+  seek(state, 'sunk_pack');
+  choose(state, 0);
+  walk(state, 'village');
   play(state, 'handin', { id: 'patch_ferry' });
   const marshActions = { reed_banks: 0, sunk_pack: 1, mud_track: 1, old_fire: 1, reed_ferryman: 0 };
   const ridgeActions = { ore_rain: 0, empty_oven: 1, miner_echo: 1, rope_run: 0, stone_niche: 0 };
@@ -218,6 +361,8 @@ test('a seeded run completes both realms and the main quest, then unlocks the se
   play(state, 'breakthrough');
   assert.equal(view(state).realmIndex, 2);
   assert.ok(view(state).discovered.includes('ford'));
+  play(state, 'learn', { id: 'reed_cleave' });
+  play(state, 'learn', { id: 'stone_brace' });
 
   restock(state, 9);
   walk(state, 'ford');
