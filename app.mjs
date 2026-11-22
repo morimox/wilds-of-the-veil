@@ -383,7 +383,11 @@ document.addEventListener("click", event => {
   if (button.dataset.tab) {
     event.preventDefault();
     screen = button.dataset.tab;
-    history.replaceState(null, "", `#${screen}`);
+    try {
+      history.replaceState(null, "", `#${screen}`);
+    } catch {
+      // Some embedded browsers restrict history. Navigation only needs local state.
+    }
     response = null;
     render();
     return;
@@ -404,3 +408,6 @@ document.addEventListener("click", event => {
 
 persist();
 render();
+document.querySelector("#boot-status").hidden = true;
+document.querySelector("#topbar").hidden = false;
+document.querySelector("#app").hidden = false;

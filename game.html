@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101713">
+  <title>雾渡山河</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <header class="topbar" id="topbar" hidden>
+    <div class="top-inner">
+      <a class="brand" href="#journey" data-tab="journey" aria-label="雾渡山河，行旅">
+        <span class="seal" aria-hidden="true">渡</span>
+        <span>雾渡山河<small>散修行记</small></span>
+      </a>
+      <span class="clock" id="clock"></span>
+      <div class="top-actions">
+        <span class="save" id="save"></span>
+        <button type="button" class="top-button" data-help aria-label="查看行旅指南">指南</button>
+      </div>
+    </div>
+  </header>
+  <section id="boot-status" class="boot-status">
+    <h1>雾渡山河</h1>
+    <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=2" target="_blank" rel="noopener">在浏览器中打开</a>
+  </section>
+  <div id="app" class="layout" hidden>
+    <aside class="sidebar" aria-label="游戏栏目">
+      <nav class="navigation">
+        <button type="button" data-tab="journey"><span aria-hidden="true">◈</span>行旅</button>
+        <button type="button" data-tab="pack"><span aria-hidden="true">▤</span>行囊</button>
+        <button type="button" data-tab="cultivate"><span aria-hidden="true">◉</span>修行</button>
+        <button type="button" data-tab="workshop"><span aria-hidden="true">◇</span>工坊</button>
+        <button type="button" data-tab="market"><span aria-hidden="true">☷</span>坊市</button>
+        <button type="button" data-tab="quests"><span aria-hidden="true">☰</span>委托</button>
+        <button type="button" data-tab="deduction" hidden><span aria-hidden="true">⌘</span>沙盘</button>
+      </nav>
+      <div id="sidebar-status"></div>
+    </aside>
+    <main id="main" aria-label="游戏操作区"></main>
+    <aside id="journal" class="journal" aria-label="行记"></aside>
+  </div>
+  <p id="announce" class="sr-only" role="status"></p>
+  <dialog id="help" aria-labelledby="guide-title">
+    <div class="dialog-head"><h2 id="guide-title">行旅指南</h2><button type="button" data-close aria-label="关闭指南">×</button></div>
+    <ol>
+      <li>先去白苇滩，带些口粮，留出返程消耗。遭遇中的选择会列出可预见的代价。</li>
+      <li>记住村里的委托。采集、参加战斗和在村中修行都能推进你的旅程。</li>
+      <li>交战时先看对方下一招。用术诀应付蓄势或架势，也可以带着战前所得撤离。</li>
+      <li>回村歇息，修理装备，补充口粮和丹符。准备突破后再进深处。</li>
+      <li>带回值得推敲的线索后，可以打开沙盘，选出证物并验证自己的解释。</li>
+    </ol>
+    <button type="button" class="text-danger" data-reset>开始新行程</button>
+  </dialog>
+  <noscript>开启 JavaScript 后即可进入雾渡山河。</noscript>
+</body>
+</html>

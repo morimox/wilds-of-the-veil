@@ -6,7 +6,7 @@
 
 ## 开始玩
 
-打开 [网页试玩](https://morimox.github.io/wilds-of-the-veil/)，即可从落灯村出发。
+用浏览器打开 [网页试玩](https://morimox.github.io/wilds-of-the-veil/?play=2)，即可从落灯村出发。
 
 ### 在本机运行
 
@@ -16,11 +16,13 @@
 node scripts/serve.mjs
 ```
 
-游戏会自动在当前浏览器存档。旅途中可以随时打开右上角的指南。运行以下命令也可构建无需服务器的单文件版，双击打开 `dist/雾渡山河.html` 即可游玩。
+游戏会自动在当前浏览器存档。旅途中可以随时打开右上角的指南。运行以下命令也可构建无需服务器的单文件版，用浏览器打开 `dist/雾渡山河.html` 即可游玩。
 
 ```sh
 node scripts/build.mjs
 ```
+
+GitHub Pages 的入口是同一份单文件构建。修改 `game.html`、源码或插画后，运行 `node scripts/build.mjs index.html` 更新线上入口。
 
 ## 行前须知
 
