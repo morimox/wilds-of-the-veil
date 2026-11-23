@@ -5,6 +5,7 @@ const town = {
   intro: '药案边晾着抄好的小方。安蒲用湿布裹着药炉，等它慢慢散热。',
   greeting: '安蒲把压在秤底的草图抽出来。「院里有背风的墙就能起炉。先用小火，闻见焦味便收。」',
   knownGreeting: '「炉子该收火时就收。若想学做哪味，先拿相应的丹方来。」',
+  coreRemark: '安蒲指了指药案上分开的两只小罐。「妖丹按品级收。丹方用得到的可以留着，缺盘缠时拿到坊市也能换钱。」',
 };
 
 const offers = [
@@ -93,7 +94,8 @@ export function alchemyView(state, kit) {
   const step = currentInquiry(state);
   return {
     name: town.name,
-    intro: town.intro,
+    intro: state.knownItems.some((id) => id === 'qi_core' || id === 'foundation_core')
+      ? `${town.intro}${town.coreRemark}` : town.intro,
     offers: offers.filter((offer) => knowsOffer(state, offer)).map((offer) => ({
       ...offer, known: state.knownItems.includes(offer.id), reason: offerBlocker(state, offer, kit),
     })),

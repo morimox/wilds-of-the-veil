@@ -10,7 +10,18 @@ function play(state, action, payload) {
 }
 
 function choose(state, index) {
-  play(state, 'choose', { index });
+  // The route tests collect the materials from a default batch as a separate action.
+  const result = play(state, 'choose', { index });
+  pickGathered(state, result.gathered);
+  return result;
+}
+
+function pickGathered(state, gathered) {
+  for (const [id, count] of Object.entries(gathered ?? {})) {
+    const available = view(state).groundPickup[id] ?? 0;
+    const taking = Math.min(count, available);
+    if (taking) play(state, 'take', { id, count: taking });
+  }
 }
 
 function walk(state, id) {
@@ -24,7 +35,7 @@ function seek(state, id) {
 
 function chooseAt(state, site, index) {
   seek(state, site);
-  return play(state, 'choose', { index });
+  return choose(state, index);
 }
 
 function supplyFixture(state, needs) {
@@ -293,7 +304,10 @@ test('harvesting only gives materials and reveals damage strictly after an actio
   assert.equal(result.injury.amount, 4);
   assert.match(result.injury.cause, /划破/);
   assert.equal(state.log.some((entry) => entry.includes(result.injury.cause)), false);
-  assert.ok(state.inventory.reed);
+  assert.equal(state.inventory.reed, undefined);
+  assert.ok(result.gathered.reed > 0);
+  pickGathered(state, result.gathered);
+  assert.equal(state.inventory.reed, result.gathered.reed);
   assert.deepEqual(siteIds(state), marshLandmarks);
   assert.equal(state.inventory.reed_lines, undefined);
   assert.equal(view(state).deductions.some(({ id }) => id === 'find_eddy'), false);
@@ -309,6 +323,78 @@ test('harvesting only gives materials and reveals damage strictly after an actio
   feed(state, 45);
   walk(state, 'marsh');
   assert.deepEqual(siteIds(state), marshLandmarks);
+});
+
+test('manual harvest spends exact stock and leaves the chosen quantity on the ground for pickup', () => {
+  const state = createGame();
+  walk(state, 'marsh');
+  seek(state, 'reed_banks');
+  const event = data.events.find(({ id }) => id === 'reed_banks');
+  const { index, gather: [gather] } = view(state).visibleChoices[0];
+  const batch = event.choices[index];
+  const stock = () => view(state).sites.find(({ id }) => id === 'reed_banks').stocks.reed;
+  assert.equal(gather.id, 'reed');
+  assert.equal(gather.maximum, stock());
+  assert.equal(gather.suggested, batch.loot.reed);
+
+  const ready = structuredClone(state);
+  for (const [itemId, count] of [['wood', 1], ['reed', 0], ['reed', 1.25], ['reed', gather.maximum + 1]]) {
+    assert.equal(act(state, 'choose', { index, itemId, count }).ok, false);
+    assert.deepEqual(state, ready);
+  }
+
+  const amount = gather.suggested + 1;
+  const hungry = structuredClone(ready);
+  hungry.satiety = 1;
+  const beforeTrying = structuredClone(hungry);
+  assert.equal(view(hungry).visibleChoices[0].gather[0].maximum, gather.suggested);
+  assert.equal(act(hungry, 'choose', { index, itemId: gather.id, count: amount }).ok, false);
+  assert.deepEqual(hungry, beforeTrying);
+
+  const initialStock = stock();
+  const result = play(state, 'choose', { index, itemId: gather.id, count: amount });
+  assert.deepEqual(result.gathered, { reed: amount });
+  assert.equal(state.day - ready.day, Math.ceil(amount / batch.loot.reed) * batch.days);
+  assert.equal(stock(), initialStock - amount);
+  assert.equal(state.inventory.reed, undefined);
+  assert.equal(view(state).groundLoot.reed, amount);
+  assert.equal(view(state).groundPickup.reed, amount);
+  assert.equal(state.expeditionLoot.reed, undefined);
+
+  const waiting = structuredClone(state);
+  assert.equal(act(state, 'take', { id: 'reed', count: amount + 1 }).ok, false);
+  assert.deepEqual(state, waiting);
+  play(state, 'take', { id: 'reed', count: 1 });
+  assert.equal(state.inventory.reed, 1);
+  assert.equal(view(state).groundLoot.reed, amount - 1);
+  assert.equal(state.expeditionLoot.reed, 1);
+  walk(state, 'village');
+  assert.equal(view(state).groundLoot.reed, undefined);
+  feed(state, 45);
+  walk(state, 'marsh');
+  assert.equal(view(state).groundLoot.reed, amount - 1);
+  play(state, 'take', { id: 'reed', count: amount - 1 });
+  assert.equal(state.inventory.reed, amount);
+  assert.equal(view(state).groundLoot.reed, undefined);
+});
+
+test('a harvesting injury stops further batches and leaves the first batch at the original site', () => {
+  const state = createGame();
+  walk(state, 'marsh');
+  seek(state, 'reed_banks');
+  state.hp = 1;
+  const { index, gather: [gather] } = view(state).visibleChoices[1];
+  assert.ok(gather.maximum > gather.suggested);
+  const result = play(state, 'choose', { index, itemId: gather.id, count: gather.suggested + 1 });
+  assert.equal(result.injury.amount, 1);
+  assert.deepEqual(result.gathered, { reed: gather.suggested });
+  assert.equal(result.gatheredRegion, 'marsh');
+  assert.equal(view(state).mode, 'village');
+  assert.equal(state.inventory.reed, undefined);
+  assert.deepEqual(view(state).groundLoot, {});
+  feed(state, 42);
+  walk(state, 'marsh');
+  assert.equal(view(state).groundLoot.reed, gather.suggested);
 });
 
 test('chosen sites retain depletion, and only elapsed days replenish their local stocks and animals', () => {
@@ -354,6 +440,8 @@ test('chosen sites retain depletion, and only elapsed days replenish their local
   walk(hunting, 'marsh');
   seek(hunting, 'mud_track');
   const initial = huntCount(hunting);
+  const carried = { ...hunting.inventory };
+  const huntCoins = hunting.coins;
   const retreating = structuredClone(hunting);
   choose(retreating, 0);
   play(retreating, 'retreat');
@@ -362,10 +450,10 @@ test('chosen sites retain depletion, and only elapsed days replenish their local
   for (let turn = 0; hunting.combat && turn < 6; turn++) play(hunting, 'attack');
   assert.equal(hunting.combat, null);
   assert.equal(huntCount(hunting), initial - 1);
-  assert.ok(hunting.inventory.hide);
-  assert.equal(hunting.inventory.reed, undefined);
+  pickGathered(hunting, view(hunting).groundLoot);
+  assert.deepEqual(hunting.inventory, { ...carried, beast_meat: 2, hide: 2, qi_core: 1 });
   assert.deepEqual(hunting.completedQuests, []);
-  assert.equal(hunting.inventory.ration, 4);
+  assert.equal(hunting.coins, huntCoins);
   const smith = structuredClone(hunting);
   walk(smith, 'village');
   assert.equal(view(smith).discoveredRecipes.includes('r_hide_coat'), false);
@@ -393,6 +481,52 @@ test('chosen sites retain depletion, and only elapsed days replenish their local
   feed(hunting, 20);
   seek(hunting, 'mud_track');
   assert.equal(view(hunting).visibleChoices[0].available, true);
+});
+
+test('a guarded herb is gathered separately from the spirit that blocks the bank', () => {
+  const state = createGame();
+  play(state, 'buy', { id: 'knife' });
+  play(state, 'equip', { id: 'knife' });
+  const coins = state.coins;
+  walk(state, 'marsh');
+  uncoverFerryman(state);
+  seek(state, 'reed_ferryman');
+  assert.match(view(state).currentEvent.text, /白苇/);
+  assert.equal(view(state).visibleChoices.find(({ index }) => index === 3).available, false);
+  assert.equal(act(state, 'choose', { index: 3 }).ok, false);
+
+  const escaping = structuredClone(state);
+  choose(escaping, 1);
+  play(escaping, 'retreat');
+  seek(escaping, 'reed_ferryman');
+  assert.equal(act(escaping, 'choose', { index: 3 }).ok, false);
+  assert.equal(escaping.inventory.reed, undefined);
+  assert.equal(escaping.inventory.qi_core, undefined);
+
+  for (let tries = 0; tries < 3 && !view(state).visibleChoices.find(({ index }) => index === 3).available; tries++) {
+    choose(state, 1);
+    assert.equal(view(state).currentEnemy.id, 'marsh_ghost');
+    for (let turn = 0; state.combat && turn < 8; turn++) {
+      play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+    }
+    assert.equal(view(state).mode, 'field', state.log.slice(-5).join('\n'));
+    assert.equal(state.inventory.reed, undefined);
+    assert.equal(state.inventory.reed_talisman, undefined);
+    assert.equal(state.coins, coins);
+    assert.equal(view(state).groundLoot.reed, undefined);
+    feed(state, 35);
+    seek(state, 'reed_ferryman');
+  }
+  assert.equal(state.inventory.qi_core, undefined);
+  assert.ok(view(state).groundLoot.qi_core >= 1);
+  assert.equal(view(state).visibleChoices.find(({ index }) => index === 3).available, true);
+  const preHarvest = view(state).sites.find(({ id }) => id === 'reed_ferryman').stocks.reed;
+  play(state, 'choose', { index: 3 });
+  assert.equal(state.inventory.reed, undefined);
+  assert.equal(view(state).groundLoot.reed, 3);
+  play(state, 'take', { id: 'reed', count: 3 });
+  assert.equal(state.inventory.reed, 3);
+  assert.equal(view(state).sites.find(({ id }) => id === 'reed_ferryman').stocks.reed, preHarvest - 3);
 });
 
 test('satiety follows game time and only a deliberate meal consumes food', () => {
@@ -450,7 +584,7 @@ test('the actual lost basket can be inspected and returned once, or its contents
   assert.equal(act(state, 'choose', { index: 0 }).ok, false);
   play(state, 'leave');
   play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
-  play(state, 'take', { id: 'lost_basket' });
+  play(state, 'take', { id: 'lost_basket', count: 1 });
   assert.equal(state.inventory.lost_basket, 1);
   assert.equal(view(state).groundLoot.lost_basket, undefined);
   assert.equal(state.inventory.salve, undefined);
@@ -501,19 +635,27 @@ test('backpack slots are finite and overflow can be picked up in the same place'
   assert.equal(act(state, 'discard', { id: 'cudgel' }).ok, false);
   walk(state, 'marsh');
   seek(state, 'reed_banks');
-  const overflow = play(state, 'choose', { index: 0 });
-  assert.ok(overflow.spilled.reed > 0);
+  const { gathered } = play(state, 'choose', { index: 0 });
+  assert.ok(gathered.reed > 0);
   assert.equal(state.inventory.reed, undefined);
-  assert.equal(view(state).groundLoot.reed, overflow.spilled.reed);
-  assert.equal(act(state, 'take', { id: 'reed' }).ok, false);
+  assert.equal(view(state).groundLoot.reed, gathered.reed);
+  const blocked = structuredClone(state);
+  assert.equal(view(state).groundPickup.reed, 0);
+  assert.equal(act(state, 'take', { id: 'reed', count: 1 }).ok, false);
+  assert.deepEqual(state, blocked);
   assert.equal(view(state).backpackUsed, backpackCapacity);
   play(state, 'discard', { id: 'ration', count: backpackStackSize });
   assert.equal(view(state).groundLoot.ration, backpackStackSize);
-  play(state, 'take', { id: 'reed' });
-  assert.equal(state.inventory.reed, overflow.spilled.reed);
+  play(state, 'take', { id: 'reed', count: gathered.reed });
+  assert.equal(state.inventory.reed, gathered.reed);
   assert.equal(view(state).groundLoot.reed, undefined);
   const before = state.inventory.ration;
-  play(state, 'take', { id: 'ration' });
+  const max = view(state).groundPickup.ration;
+  assert.equal(max, 1);
+  const partialBlocked = structuredClone(state);
+  assert.equal(act(state, 'take', { id: 'ration', count: max + 1 }).ok, false);
+  assert.deepEqual(state, partialBlocked);
+  play(state, 'take', { id: 'ration', count: max });
   assert.equal(state.inventory.ration, backpackStackSize * (backpackCapacity - 1));
   assert.equal(view(state).groundLoot.ration, backpackStackSize - (state.inventory.ration - before));
   walk(state, 'village');
@@ -545,7 +687,7 @@ test('capacity checks do not charge for a refused transaction and discarded gear
   state.durability.cudgel = 5;
   play(state, 'unequip', { slot: 'weapon' });
   play(state, 'discard', { id: 'cudgel' });
-  play(state, 'take', { id: 'cudgel' });
+  play(state, 'take', { id: 'cudgel', count: 1 });
   assert.equal(state.durability.cudgel, 5);
 });
 
@@ -602,10 +744,13 @@ test('the boatman and village smith trade maps that open travel for a beginning 
   assert.deepEqual(siteIds(reloaded), ['low_tide', 'boat_shade', 'flood_lines', 'lock_deck']);
 });
 
-test('the opponent carries another copy of the first map until a fight is won', () => {
+test('the opponent hands over the map and agreed blade only after the spar at that site', () => {
   const state = createGame();
   walk(state, 'marsh');
-  chooseAt(state, 'bank_watch', 0);
+  seek(state, 'bank_watch');
+  assert.equal(view(state).visibleChoices.some(({ index }) => index === 2), false);
+  assert.equal(act(state, 'choose', { index: 2 }).ok, false);
+  choose(state, 0);
   assert.equal(view(state).currentEnemy.id, 'bank_runner');
   assert.equal(state.inventory.ridge_rubbing, undefined);
   assert.equal(state.inventory.reed, undefined);
@@ -614,21 +759,33 @@ test('the opponent carries another copy of the first map until a fight is won', 
   const retreating = structuredClone(state);
   play(retreating, 'retreat');
   assert.equal(retreating.inventory.ridge_rubbing, undefined);
+  seek(retreating, 'bank_watch');
+  assert.equal(act(retreating, 'choose', { index: 2 }).ok, false);
+  play(retreating, 'leave');
   assert.equal(act(retreating, 'travel', { id: 'ridge' }).ok, false);
 
   for (let turn = 0; state.combat && turn < 10; turn++) {
     play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
   }
   assert.ok(view(state).defeated.includes('bank_runner'));
+  assert.equal(state.inventory.ridge_rubbing, undefined);
+  assert.equal(state.inventory.hook_blade, undefined);
+  assert.equal(state.siteVictories.bank_watch.bank_runner, 1);
+  assert.equal(act(state, 'travel', { id: 'ridge' }).ok, false);
+  chooseAt(state, 'bank_watch', 2);
   assert.equal(state.inventory.ridge_rubbing, 1);
+  assert.equal(state.inventory.hook_blade, 1);
   assert.equal(view(state).sites.find(({ id }) => id === 'bank_watch').creatures.bank_runner, 0);
+  seek(state, 'bank_watch');
+  assert.equal(act(state, 'choose', { index: 2 }).ok, false);
+  play(state, 'leave');
   feed(state, 60);
   walk(state, 'ridge');
   assert.equal(view(state).realmIndex, 0);
 });
 
 test('returning for a new shift at the sparring ground can replace a sold prize blade', () => {
-  const state = createGame(42);
+  const state = createGame();
   state.realm = 1;
   supplyFixture(state, { pine_pass: 1, short_spear: 1 });
   const spear = data.gear.find(({ id }) => id === 'short_spear');
@@ -641,7 +798,9 @@ test('returning for a new shift at the sparring ground can replace a sold prize 
     while (state.hp < view(state).maxHp || state.qi < view(state).maxQi) play(state, 'rest');
     feed(state, 90);
     walk(state, 'pine_ridge');
-    chooseAt(state, 'pine_spar', 0);
+    seek(state, 'pine_spar');
+    assert.equal(act(state, 'choose', { index: 2 }).ok, false);
+    choose(state, 0);
     assert.equal(view(state).currentEnemy.id, 'road_sparrer');
     for (let turns = 0; state.combat && turns < 8; turns++) {
       const move = view(state).intent.kind === 'heavy' ? 'stone_brace' : 'reed_cleave';
@@ -650,7 +809,8 @@ test('returning for a new shift at the sparring ground can replace a sold prize 
     }
     assert.equal(view(state).mode, 'field', state.log.slice(-6).join('\n'));
     assert.equal(view(state).sites.find(({ id }) => id === 'pine_spar').creatures.road_sparrer, 0);
-    walk(state, 'village');
+    assert.equal(state.inventory[prize], undefined);
+    seek(state, 'pine_spar');
   };
   const waitForShift = () => {
     const nextAt = state.localPools.pine_spar.creatures.road_sparrer.nextAt;
@@ -658,18 +818,28 @@ test('returning for a new shift at the sparring ground can replace a sold prize 
   };
 
   spar();
+  choose(state, 2);
   assert.equal(state.inventory[prize], 1);
+  seek(state, 'pine_spar');
+  assert.equal(act(state, 'choose', { index: 2 }).ok, false);
+  play(state, 'leave');
+  walk(state, 'village');
   play(state, 'econDeposit', { id: prize, count: 1 });
   waitForShift();
   spar();
+  assert.match(act(state, 'choose', { index: 2 }).message, /奖品已有/);
   assert.equal(state.inventory[prize], undefined);
   assert.equal(state.economy.warehouse[prize], 1);
   assert.equal(state.ground.pine_ridge?.[prize], undefined);
+  play(state, 'leave');
+  walk(state, 'village');
   play(state, 'econWithdraw', { id: prize, count: 1 });
   play(state, 'sell', { id: prize });
-  waitForShift();
-  spar();
+  feed(state, 90);
+  walk(state, 'pine_ridge');
+  chooseAt(state, 'pine_spar', 2);
   assert.equal(state.inventory[prize], 1);
+  assert.equal(state.siteClaims.pine_spar[2], 2);
 });
 
 test('a spent expedition can abandon an event and reach free relief without resetting progress', () => {
@@ -721,6 +891,8 @@ test('damage wears equipped gear, defeating an enemy rewards only first-kill ins
   state.combat = { id: 'mud_beast', hp: 1, round: 0, escapeBonus: 0 };
   play(state, 'attack');
   assert.equal(state.insight, insight);
+  assert.equal(state.inventory.hide, undefined);
+  play(state, 'take', { id: 'hide', count: view(state).groundLoot.hide });
   assert.ok(state.inventory.hide > 0);
 
   state.combat = { id: 'mud_beast', hp: 25, round: 1, escapeBonus: 0 };
@@ -1098,7 +1270,11 @@ test('the old ford route and its optional hidden map remain playable with earned
   assert.equal(siteIds(state).includes('tide_keeper'), false);
   workFed('lock_deck', 1);
   assert.ok(siteIds(state).includes('tide_keeper'));
-  workFed('tide_keeper', 0);
+  feed(state, 45);
+  seek(state, 'tide_keeper');
+  assert.equal(view(state).visibleChoices.some(({ index }) => index === 2), false);
+  assert.equal(act(state, 'choose', { index: 2 }).ok, false);
+  choose(state, 0);
   assert.equal(view(state).currentEnemy.id, 'tide_spirit');
 
   const techniqueCost = 2;
@@ -1121,9 +1297,14 @@ test('the old ford route and its optional hidden map remain playable with earned
     }
   }
   assert.equal(view(state).mode, 'field', state.log.slice(-8).join('\n'));
-  assert.equal(state.inventory.seal, 1);
+  assert.equal(state.inventory.seal, undefined);
+  assert.equal(state.inventory.qi_core, undefined);
+  assert.equal(view(state).groundLoot.qi_core, 4);
+  play(state, 'take', { id: 'qi_core', count: 4 });
   assert.equal(state.won, false);
   assert.equal(view(state).sites.find(({ id }) => id === 'tide_keeper').creatures.tide_spirit, 0);
+  chooseAt(state, 'tide_keeper', 2);
+  assert.equal(state.inventory.seal, 1);
   travelFed('village');
   assert.equal(marketStock(state).includes('heal_pill'), false);
   play(state, 'handin', { id: 'last_lantern' });
@@ -1185,9 +1366,12 @@ test('the old ford route and its optional hidden map remain playable with earned
   assert.deepEqual(siteIds(state), ['upstream_lights', 'sunken_mooring', 'still_pole']);
   seek(state, 'upstream_lights');
   const wood = state.inventory.wood;
+  const qi = state.qi;
   choose(state, 0);
   assert.equal(state.inventory.wood ?? 0, wood - 1);
-  assert.ok(state.inventory.dry_wick > 0);
+  assert.equal(state.qi, Math.min(view(state).maxQi, qi + 4));
+  chooseAt(state, 'still_pole', 0);
+  assert.equal(state.inventory.lamp_sketch, 1);
   assert.equal(state.wonDay, wonDay);
   travelFed('ford');
   assert.equal(view(state).sites.find(({ id }) => id === 'tide_keeper').creatures.tide_spirit, 0);
@@ -1327,7 +1511,7 @@ test('ranged weapon arts spend compatible ammo and independent arts and defensiv
 
 test('a prepared ford expedition opens each later region through field contacts, then verifies a design and finishes at 筑基初期', () => {
   const state = createGame();
-  // The earlier route test obtains the ford seal in combat. Start this test with that expedition's supplies.
+  // The earlier route test earns and collects the ford seal. Start with that expedition's supplies.
   supplyFixture(state, { ford_chart: 1, ridge_rubbing: 1, seal: 1, ore: 1, tide_coat: 1, tide_note: 1 });
   state.realm = 2;
   state.coins = 700;
@@ -1454,7 +1638,8 @@ test('a prepared ford expedition opens each later region through field contacts,
     else if (state.qi >= 2) play(state, 'art', { id: 'reed_cleave' });
     else play(state, 'attack');
   }
-  assert.equal(state.inventory.snow_scale, 1, state.log.slice(-8).join('\n'));
+  assert.equal(view(state).groundLoot.foundation_core, 2, state.log.slice(-8).join('\n'));
+  play(state, 'take', { id: 'foundation_core', count: 2 });
   assert.ok(state.defeated.includes('snow_warden'));
 
   provision();
@@ -1477,16 +1662,31 @@ test('a prepared ford expedition opens each later region through field contacts,
   play(state, 'learn', { id: 'sky_axis' });
   provision();
   walk(state, 'sky_terrace');
-  visitAndChoose('mirror_gate', 0);
+  feed(state, 42);
+  seek(state, 'mirror_gate');
+  assert.equal(view(state).visibleChoices.some(({ index }) => index === 2), false);
+  assert.equal(act(state, 'choose', { index: 2 }).ok, false);
+  choose(state, 0);
   const ammo = state.inventory.cloud_arrow;
+  const cores = state.inventory.foundation_core;
   for (let turn = 0; turn < 12 && state.combat; turn++) {
     if (state.qi >= 7 && state.inventory.cloud_arrow) play(state, 'art', { id: 'sky_axis' });
     else play(state, 'attack');
   }
   assert.ok(state.inventory.cloud_arrow < ammo);
   assert.ok(state.defeated.includes('mirror_warden'), state.log.slice(-8).join('\n'));
+  assert.equal(state.inventory.foundation_core, cores);
+  assert.equal(view(state).groundLoot.foundation_core, 2);
+  play(state, 'take', { id: 'foundation_core', count: 2 });
+  assert.equal(state.inventory.foundation_core, cores + 2);
+  assert.equal(state.inventory.sky_seal, undefined);
+  chooseAt(state, 'mirror_gate', 2);
   assert.equal(state.inventory.sky_seal, 1);
   provision();
+  for (const id of ['foundation_core', 'beast_meat']) {
+    const count = state.inventory[id];
+    if (count) play(state, 'econDeposit', { id, count });
+  }
   play(state, 'handin', { id: 'sky_treaty' });
   assert.equal(state.completionPhase, 'final');
   assert.equal(state.finalWon, true);

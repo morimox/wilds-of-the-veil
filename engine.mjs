@@ -5,7 +5,7 @@ import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
 const data = { ...moduleData.default, ...moduleData };
 
 const records = Object.fromEntries(
-  ['realms', 'items', 'gear', 'pills', 'talismans', 'arts', 'recipes', 'regions', 'events', 'enemies', 'quests', 'deductions', 'sites', 'ammunition']
+  ['realms', 'items', 'gear', 'foods', 'pills', 'talismans', 'arts', 'recipes', 'regions', 'events', 'enemies', 'quests', 'deductions', 'sites', 'ammunition']
     .map((key) => [key, Object.assign(Object.create(null), Object.fromEntries((data[key] ?? []).map((entry) => [entry.id, entry])))]),
 );
 const experiments = Object.fromEntries(data.events.filter(({ experiment }) => experiment).map(({ experiment }) => [experiment.id, experiment]));
@@ -33,7 +33,7 @@ export const rules = Object.freeze({
   waitDays: 0.5,
   maxSatiety: 100,
   satietyDrainPerDay: 16,
-  rationSatiety: 32,
+  rationSatiety: records.foods.ration.satiety,
   emptyAttackMultiplier: 0.75,
   unpackBasketDays: 0.25,
   guardBonus: 3,
@@ -53,7 +53,7 @@ export const rules = Object.freeze({
   researchLimit: 2,
   practicePerDay: 1,
   combatSwitchGuard: 1,
-  mealHeal: 2,
+  mealHeal: records.foods.ration.hp,
   fallDays: 1,
   fallMaxCoinLoss: 4,
   fallCoinLossFactor: 0.2,
@@ -159,6 +159,11 @@ function combinedResources(...lists) {
 
 function groundAt(state) {
   return state.ground?.[state.region] ?? {};
+}
+
+function groundPickupLimit(state, id, available = groundAt(state)[id]) {
+  if (!available || (records.gear[id] && gearReserved(state, id))) return 0;
+  return fittingItems(state, { [id]: available }).accepted[id] ?? 0;
 }
 
 function leaveOnGround(state, resources, durability = {}) {
@@ -297,7 +302,7 @@ function knowsDeduction(state, entry) {
   return (entry.tier ?? 0) <= state.realm && isRevealed(state, entry.reveal);
 }
 
-export function createGame(lootSeed = Math.floor(Math.random() * 0x100000000)) {
+export function createGame() {
   const settings = data.starting ?? {};
   const state = {
     day: 1,
@@ -330,11 +335,12 @@ export function createGame(lootSeed = Math.floor(Math.random() * 0x100000000)) {
     eventsSeen: {},
     seenChoices: [],
     localPools: {},
+    siteVictories: {},
+    siteClaims: {},
     basketInspected: false,
     basketDisposition: null,
     showedHideToSmith: false,
     defeated: [],
-    lootSeed: lootSeed >>> 0,
     studies: {},
     practice: {},
     practicedOn: {},
@@ -374,6 +380,15 @@ function currentIntent(state) {
 
 function hasChoiceNeeds(state, choice) {
   return Object.keys(missingItems(state, choice.need)).length === 0;
+}
+
+function siteWins(state, site, enemy) {
+  return state.siteVictories?.[site?.id]?.[enemy] ?? 0;
+}
+
+function knowsChoice(state, choice, site) {
+  return (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
+    (!choice.hidden || hasChoiceNeeds(state, choice));
 }
 
 function knowsSite(state, site) {
@@ -463,12 +478,15 @@ export function view(state) {
   const currentSite = currentEvent && records.sites[currentEvent.id];
   const experiment = availableExperiment(state, currentEvent);
   const nextRealm = services.includes('cultivate') ? records.realms[state.realm + 1] ?? null : null;
+  const groundLoot = { ...groundAt(state) };
   const visibleChoices = (currentEvent?.choices ?? []).map((choice, index) => {
     const blocker = choiceBlocker(state, choice, currentSite, index);
     const { label, desc, hidden } = choice;
-    return { label, desc: blocker?.depleted ? '' : desc, hidden, index, available: !blocker, lockedReason: blocker?.reason ?? '' };
-  }).filter(({ hidden, index }) => !completedSiteChoice(state, currentSite, index) &&
-    (!hidden || hasChoiceNeeds(state, currentEvent.choices[index])));
+    const gather = gatherOptions(state, choice, currentSite, index);
+    return { label, desc: blocker?.depleted ? '' : desc, hidden, index, available: !blocker, lockedReason: blocker?.reason ?? '',
+      ...(gather.length ? { gather } : {}) };
+  }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
+    knowsChoice(state, currentEvent.choices[index], currentSite));
   return {
     ...state,
     ...stats(state),
@@ -488,7 +506,8 @@ export function view(state) {
     services,
     backpackUsed: backpackSlots(state),
     backpackCapacity: rules.backpackCapacity,
-    groundLoot: { ...groundAt(state) },
+    groundLoot,
+    groundPickup: Object.fromEntries(resourceEntries(groundLoot).map(([id, count]) => [id, groundPickupLimit(state, id, count)])),
     sites: currentSites(state).map((site) => viewSite(state, site)),
     currentEvent: currentEvent ? { id: currentEvent.id, name: currentEvent.name, text: siteText(state, currentSite, currentEvent), choices: visibleChoices } : null,
     visibleChoices,
@@ -538,7 +557,7 @@ function travel(state, id) {
   if (!destination) return refuse('找不到这条路。');
   if (!state.discovered.includes(id)) return refuse('你还没有找到那条路。');
   if (state.region === id) return refuse('你已经在这里。');
-  if (id !== hub && state.satiety === 0) return refuse('腹中空空，先吃些干粮。');
+  if (id !== hub && state.satiety === 0) return refuse('腹中空空，先吃些东西。');
   const route = id === hub ? regionOf(state) : destination;
   const hungryReturn = id === hub && state.satiety === 0;
   advance(state, (route.travel ?? 0) + (hungryReturn ? rules.emptyReturnDays : 0));
@@ -555,7 +574,7 @@ function visit(state, id) {
   if (atHome(state)) return refuse('先选一处去向。');
   const site = records.sites[id];
   if (!site || site.region !== state.region || !knowsSite(state, site)) return refuse('你还不知道怎么去那里。');
-  if (state.satiety === 0) return refuse('腹中空空，先吃些干粮。');
+  if (state.satiety === 0) return refuse('腹中空空，先吃些东西。');
   return encounter(state, site.id);
 }
 
@@ -566,7 +585,7 @@ function revisit(state, id) {
 }
 
 function wait(state) {
-  if (!atHome(state) && state.satiety === 0) return refuse('腹中空空，先吃些干粮，或回村歇脚。');
+  if (!atHome(state) && state.satiety === 0) return refuse('腹中空空，先吃些东西，或回村歇脚。');
   advance(state, rules.waitDays);
   return say(state, '等了半日。');
 }
@@ -594,11 +613,24 @@ function startCombat(state, id, siteId) {
 }
 
 function completedSiteChoice(state, site, index) {
-  return site?.once?.includes(index) && state.seenChoices.includes(`${site.id}:${index}`);
+  if (site?.once?.includes(index) && state.seenChoices.includes(`${site.id}:${index}`)) return true;
+  const choice = site && records.events[site.id]?.choices[index];
+  return Boolean(choice?.perWin && (state.siteClaims?.[site.id]?.[index] ?? 0) >= siteWins(state, site, choice.afterFight));
 }
 
 function choiceStocks(site, choice, index) {
   return Object.entries(site?.stocks ?? {}).filter(([id, pool]) => pool.choices.includes(index) && choice.loot?.[id] > 0);
+}
+
+function gatherOptions(state, choice, site, index) {
+  const foodPerBatch = (choice.days ?? 0) * rules.satietyDrainPerDay;
+  // A final batch can use up the remaining food, but an empty stomach cannot start a new batch.
+  const batches = foodPerBatch ? Math.ceil(state.satiety / foodPerBatch) : Infinity;
+  return choiceStocks(site, choice, index).map(([id]) => {
+    const yieldPerBatch = choice.loot[id];
+    const maximum = Math.min(poolAt(state, site, 'stocks', id).count, yieldPerBatch * batches);
+    return { id, name: nameOf(id), maximum, suggested: Math.min(maximum, yieldPerBatch) };
+  }).filter(({ maximum }) => maximum > 0);
 }
 
 function choiceBlocker(state, choice, site, index) {
@@ -610,7 +642,13 @@ function choiceBlocker(state, choice, site, index) {
   if (stocks.length && stocks.every(([id]) => poolAt(state, site, 'stocks', id).count === 0)) {
     return { reason: '这里暂时已经采空了。', depleted: true };
   }
-  if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy)) return { reason: '腹中空空，先吃些干粮。' };
+  if (site?.creatures?.[choice.guardedBy] && poolAt(state, site, 'creatures', choice.guardedBy).count > 0) {
+    return { reason: '那条路还被堵着。' };
+  }
+  if (choice.perWin && Object.keys(choice.loot ?? {}).some((id) => records.gear[id] && (gearReserved(state, id) || groundAt(state)[id]))) {
+    return { reason: '同样的奖品已有一份。' };
+  }
+  if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy)) return { reason: '腹中空空，先吃些东西。' };
   const coins = choice.coins ?? 0;
   const missing = missingItems(state, choice.need);
   if (Object.keys(missing).length) return { reason: `还缺${goodsText(missing)}。` };
@@ -618,31 +656,53 @@ function choiceBlocker(state, choice, site, index) {
   return null;
 }
 
-function choose(state, index) {
+function choose(state, { index, itemId, count }) {
   const event = records.events[state.event];
   const site = records.sites[event.id];
   const choice = event.choices[index];
-  if (!Number.isInteger(index) || !choice || (choice.hidden && !hasChoiceNeeds(state, choice))) {
+  if (!Number.isInteger(index) || !choice || !knowsChoice(state, choice, site)) {
     return refuse('请选择眼前能做的事。');
   }
   const blocker = choiceBlocker(state, choice, site, index);
   if (blocker) return refuse(blocker.reason);
-  const lootAvailable = { ...choice.loot };
-  const collected = choiceStocks(site, choice, index);
-  for (const [id] of collected) {
-    const picked = Math.min(lootAvailable[id], poolAt(state, site, 'stocks', id).count);
-    lootAvailable[id] = picked;
-    if (picked) spendPool(state, site, 'stocks', id, picked);
+  const options = gatherOptions(state, choice, site, index);
+  const explicitQuantity = itemId !== undefined || count !== undefined;
+  let batches = 1;
+  let gathered;
+  if (explicitQuantity) {
+    const selected = options.find(({ id }) => id === itemId);
+    if (!selected || !Number.isSafeInteger(count) || count < 1 || count > selected.maximum) {
+      return refuse('请选择这里能采的材料和数量。');
+    }
+    const yieldPerBatch = choice.loot[selected.id];
+    const injuryPerBatch = Math.max(0, -(choice.hp ?? 0));
+    batches = Math.ceil(count / yieldPerBatch);
+    // The injury follows gathering. If it causes a fall, no further batch can start.
+    if (injuryPerBatch) batches = Math.min(batches, Math.ceil(state.hp / injuryPerBatch));
+    gathered = { [selected.id]: Math.min(count, batches * yieldPerBatch) };
+  } else {
+    gathered = Object.fromEntries(options.map(({ id, suggested }) => [id, suggested]));
   }
+  const lootAvailable = { ...choice.loot };
+  for (const [id] of choiceStocks(site, choice, index)) delete lootAvailable[id];
+  const collected = resourceEntries(gathered);
   const coins = choice.coins ?? 0;
   if (choice.consume) payItems(state, choice.need);
   state.event = null;
-  advance(state, choice.days);
   state.coins += coins;
   const healthBefore = state.hp;
-  state.hp += choice.hp ?? 0;
-  state.qi += choice.qi ?? 0;
-  normalize(state);
+  for (let batch = 0; batch < batches; batch += 1) {
+    for (const [id, amount] of collected) {
+      const yieldPerBatch = choice.loot[id];
+      const portion = Math.min(yieldPerBatch, amount - batch * yieldPerBatch);
+      if (portion > 0) spendPool(state, site, 'stocks', id, portion);
+    }
+    advance(state, choice.days);
+    state.hp += choice.hp ?? 0;
+    state.qi += choice.qi ?? 0;
+    normalize(state);
+    if (collected.length && state.hp > 0) recordPractice(state);
+  }
   const amount = Math.max(0, healthBefore - state.hp);
   const injury = amount ? { cause: choice.injury ?? '你在途中受了伤。', amount } : undefined;
   const choiceKey = `${event.id}:${index}`;
@@ -652,17 +712,23 @@ function choose(state, index) {
     state.seenChoices.push(choiceKey);
     state.insight = Math.max(0, state.insight + insight);
   }
+  if (choice.perWin) (state.siteClaims[site.id] ??= {})[index] = siteWins(state, site, choice.afterFight);
   const { accepted, spilled } = addItems(state, lootAvailable, true);
-  if (collected.some(([id]) => lootAvailable[id] > 0) && state.hp > 0) recordPractice(state);
+  const gatheredRegion = state.region;
+  const gatheredGoods = goodsText(gathered);
+  leaveOnGround(state, gathered);
   if (choice.enemy && records.enemies[choice.enemy]) startCombat(state, choice.enemy, site?.id);
   const loot = goodsText(accepted);
-  const detail = [choice.outcome, loot && `获得${loot}。`, insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
+  const outcome = choice.outcome;
+  const detail = [outcome, gatheredGoods && `采得${gatheredGoods}，留在脚边。`, loot && `获得${loot}。`,
+    insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
   const result = say(state, detail || choice.label);
   return {
     ...(state.hp === 0 ? fall(state) : result),
-    outcome: choice.outcome,
+    outcome,
     injury,
     spilled,
+    ...(gatheredGoods ? { gathered, gatheredRegion } : {}),
   };
 }
 
@@ -689,25 +755,23 @@ function fall(state) {
 
 function finishCombat(state, enemy) {
   const site = records.sites[state.combat.siteId];
-  if (site?.creatures?.[enemy.id]) spendPool(state, site, 'creatures', enemy.id, 1);
+  if (site?.creatures?.[enemy.id]) {
+    spendPool(state, site, 'creatures', enemy.id, 1);
+    const wins = (state.siteVictories[site.id] ??= {});
+    wins[enemy.id] = (wins[enemy.id] ?? 0) + 1;
+  }
   state.combat = null;
   const first = !state.defeated.includes(enemy.id);
   if (first) state.defeated.push(enemy.id);
   const insight = first ? (enemy.insight ?? 0) : 0;
   state.insight += insight;
   recordPractice(state);
-  state.coins += enemy.coins ?? 0;
-  const lootTable = { ...enemy.loot };
-  const drop = enemy.weaponDrop;
-  if (drop && !gearReserved(state, drop.id) && !groundAt(state)[drop.id]) {
-    state.lootSeed = (Math.imul(state.lootSeed, 1664525) + 1013904223) >>> 0;
-    if (state.lootSeed / 0x100000000 < drop.chance) lootTable[drop.id] = 1;
-  }
-  const { accepted, spilled } = addItems(state, lootTable, true);
-  const loot = goodsText(accepted);
+  const gathered = { ...enemy.loot };
+  leaveOnGround(state, gathered);
+  const loot = goodsText(gathered);
   return {
-    message: `击退${enemy.name}。${loot ? `获得${loot}。` : ''}${enemy.coins ? `灵钱+${enemy.coins}。` : ''}${insight ? `见识+${insight}。` : ''}`,
-    spilled,
+    message: `击退${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}`,
+    ...(loot ? { gathered, gatheredRegion: state.region } : {}),
   };
 }
 
@@ -790,9 +854,9 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
   if (ammo) removeItem(state, ammo.id, 1);
   let summary = `${message}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${dealt + counter ? `造成${dealt + counter}点伤害。` : ''}${weaponDamage}`;
   if (state.combat.hp <= 0) {
-    const outcome = finishCombat(state, enemy);
+    const { message: outcome, ...results } = finishCombat(state, enemy);
     normalize(state);
-    return { ...say(state, summary + outcome.message), damageDealt, damageTaken: 0, spilled: outcome.spilled };
+    return { ...say(state, summary + outcome), damageDealt, damageTaken: 0, ...results };
   }
   if (intent.kind === 'heal') {
     const before = state.combat.hp;
@@ -877,19 +941,21 @@ function attack(state) {
   });
 }
 
-function eat(state, inCombat) {
-  if (!owns(state, supply)) return refuse('没有可吃的口粮。');
+function eat(state, inCombat, id = supply) {
+  if (id === 'beast_meat' && owns(state, id)) return refuse('这肉还生着，得带回村起灶。');
+  const food = records.foods[id];
+  if (!food || !owns(state, id)) return refuse('没有这份可吃的口粮。');
   if (state.satiety >= rules.maxSatiety && state.hp >= stats(state).maxHp) return refuse('你还很饱，气血也足。');
-  removeItem(state, supply, 1);
+  removeItem(state, id, 1);
   state.didEat = true;
   const before = state.hp;
   const initialSatiety = state.satiety;
-  state.satiety = Math.min(rules.maxSatiety, state.satiety + rules.rationSatiety);
-  state.hp += rules.mealHeal;
+  state.satiety = Math.min(rules.maxSatiety, state.satiety + food.satiety);
+  state.hp += food.hp;
   normalize(state);
   const satietyRestored = state.satiety - initialSatiety;
   const recovered = [satietyRestored && `饱腹+${satietyRestored}`, state.hp > before && `气血+${state.hp - before}`].filter(Boolean);
-  const message = `你吃下${nameOf(supply)}。${recovered.length ? `${recovered.join('，')}。` : ''}`;
+  const message = `你吃下${nameOf(id)}。${recovered.length ? `${recovered.join('，')}。` : ''}`;
   return inCombat ? combatTurn(state, { message }) : say(state, message);
 }
 
@@ -903,7 +969,7 @@ function inspectBasket(state) {
 function unpackBasket(state) {
   const basket = data.basket;
   if (!basket || !owns(state, basket.item)) return refuse('手边没有药篓。');
-  if (!atHome(state) && state.satiety === 0) return refuse('腹中空空，先吃些干粮。');
+  if (!atHome(state) && state.satiety === 0) return refuse('腹中空空，先吃些东西。');
   removeItem(state, basket.item, 1);
   state.basketDisposition = 'unpacked';
   advance(state, rules.unpackBasketDays);
@@ -912,7 +978,7 @@ function unpackBasket(state) {
 }
 
 function use(state, id, inCombat) {
-  if (id === supply) return eat(state, inCombat);
+  if (records.foods[id] || id === 'beast_meat') return eat(state, inCombat, id);
   if (!owns(state, id)) return refuse('行囊里没有这件物品。');
   if (id === 'foundation_pill') return refuse('筑基丹要在闭关突破时服下。');
   const pill = records.pills[id];
@@ -987,20 +1053,20 @@ function discard(state, id, count = owns(state, id)) {
 
 function takeFromGround(state, id, count = groundAt(state)[id]) {
   const ground = groundAt(state);
-  if (!records.items[id] || !Number.isInteger(count) || count < 1 || count > (ground[id] ?? 0)) return refuse('这里没有这么多东西可捡。');
+  if (!records.items[id] || !Number.isSafeInteger(count) || count < 1 || count > (ground[id] ?? 0)) return refuse('这里没有这么多东西可捡。');
   const gear = records.gear[id];
   if (gear && gearReserved(state, id)) return refuse('同名装备已在手上、仓里或锻炉里。');
-  const { accepted } = fittingItems(state, { [id]: count });
-  const taken = accepted[id] ?? 0;
-  if (!taken) return refuse('行囊已满。');
-  ground[id] -= taken;
+  const maximum = groundPickupLimit(state, id);
+  if (count > maximum) return refuse(maximum ? `行囊只装得下${maximum}份。` : '行囊已满。');
+  ground[id] -= count;
   if (!ground[id]) delete ground[id];
-  addItems(state, accepted, true);
+  const picked = { [id]: count };
+  addItems(state, picked, true);
   if (gear) {
     const worn = state.groundDurability?.[state.region]?.[id];
     state.durability[id] = worn?.shift() ?? gear.durability;
   }
-  return say(state, `拾起${goodsText(accepted)}。`);
+  return say(state, `拾起${goodsText(picked)}。`);
 }
 
 function rest(state) {
@@ -1290,7 +1356,7 @@ function tryExperiment(state, { id, settings }) {
       !Object.hasOwn(settings, control) || !options.some(({ id: option }) => option === settings[control]))) {
     return refuse('先决定眼前每一步怎么做。');
   }
-  if (state.satiety === 0 && trial.days > 0) return refuse('腹中空空，先吃些干粮。');
+  if (state.satiety === 0 && trial.days > 0) return refuse('腹中空空，先吃些东西。');
   advance(state, trial.days ?? 0);
   const mismatch = trial.controls.find(({ id: control }) => settings[control] !== trial.solution[control]);
   if (mismatch) {
@@ -1335,7 +1401,7 @@ const generalActions = {
   visit: (state, { id }) => visit(state, id),
   revisit: (state, { id }) => revisit(state, id),
   wait,
-  eat: (state) => eat(state, false),
+  eat: (state, { id }) => eat(state, false, id || supply),
   inspectBasket,
   unpackBasket,
   use: (state, { id }) => use(state, id, false),
@@ -1361,7 +1427,7 @@ const combatActions = {
   },
   art: (state, { id }) => cast(state, id),
   use: (state, { id }) => use(state, id, true),
-  eat: (state) => eat(state, true),
+  eat: (state, { id }) => eat(state, true, id || supply),
   retreat: (state) => retreat(state),
 };
 
@@ -1376,9 +1442,9 @@ function takeTurn(state, action, payload) {
     return refuse('先处理眼前的对手。');
   }
   if (state.event) {
-    if (action === 'eat') return eat(state, false);
+    if (action === 'eat') return eat(state, false, payload.id || supply);
     if (action === 'selectAmmo') return selectAmmo(state, payload.id);
-    if (action === 'choose') return choose(state, payload.index);
+    if (action === 'choose') return choose(state, payload);
     if (action === 'experiment') return tryExperiment(state, payload);
     if (action === 'leave') {
       state.event = null;

@@ -85,7 +85,7 @@ const resources = (entries = {}) => Object.entries(entries)
   .map(([id, count]) => `${ref(id)}×${count}`).join('、');
 const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
-  gear: '装备', material: '材料', food: '口粮', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药',
+  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药',
   attack: '普通攻势', heavy: '重招', guard: '防御', drain: '吸取真气', heal: '恢复',
 };
 const slotNames = { weapon: '武器', armor: '护具', charm: '饰物' };
@@ -222,21 +222,21 @@ const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMa
   ...data.recipes.filter((recipe) => recipe.result === id).map((recipe) => ({
     id, method: '制作', source: recipe.id, price: recipe.cost, need: recipe.need, repeatable: true,
   })),
-  ...data.enemies.filter((enemy) => enemy.weaponDrop?.id === id || enemy.loot?.[id]).flatMap((enemy) =>
-    data.sites.filter((site) => site.creatures?.[enemy.id]).map((site) => ({
-      id, method: '胜利战利品', source: `${site.name} · ${enemy.name}`, chance: enemy.loot?.[id] ? 1 : enemy.weaponDrop.chance,
-      interval: site.creatures[enemy.id].interval, repeatable: site.creatures[enemy.id].growth > 0,
-    }))),
-  ...choices.filter(({ loot }) => loot?.[id]).map(({ event, order }) => ({
-    id, method: '现场获得', source: describeChoice(`${event}:${order - 1}`),
-    repeatable: !data.sites.find((site) => site.id === event)?.once?.includes(order - 1),
-  })),
+  ...choices.filter(({ loot }) => loot?.[id]).map(({ event, order, afterFight, perWin }) => {
+    const site = data.sites.find(({ id }) => id === event);
+    return { id, method: afterFight ? '胜后另行领取' : '现场获得', source: describeChoice(`${event}:${order - 1}`), afterFight,
+      interval: perWin ? site.creatures?.[afterFight]?.interval : undefined,
+      repeatable: !site.once?.includes(order - 1),
+    };
+  }),
 ]).map((row) => ({ ...row, weapon: name(row.id) }));
-const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay'].map((id) => ({
+const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay', 'beast_meat', 'qi_core', 'foundation_core', 'beast_eye'].map((id) => ({
   id, name: name(id),
   pools: worldPools.filter((pool) => pool.object === id && pool.growth > 0).map((pool) => siteRef(pool.site)).join('、'),
+  enemySources: data.enemies.filter((enemy) => enemy.loot?.[id]).map((enemy) => enemy.name).join('、'),
   recipes: data.recipes.filter(({ need }) => need?.[id]).length,
   facilities: facilityLevels.filter(({ need }) => need?.[id]).length,
+  projects: economyData.projects.filter(({ need }) => need?.[id]).length,
   exchanges: choices.filter(({ consume, need }) => consume && need?.[id]).length,
   breakthrough: data.realms.filter(({ need }) => need?.[id]).length,
 }));
@@ -255,6 +255,13 @@ ruleRows.push(
   { id: 'setupDays', value: economyData.setupDays, desc: '每次开启生产的操作耗时（日）' },
   { id: 'collectDays', value: economyData.collectDays, desc: '每次领取成品的操作耗时（日）' },
 );
+const normalHit = (enemy) => [...new Set(enemy.intents.filter(({ kind }) => kind === 'attack')
+  .map(({ mult }) => Math.ceil(enemy.atk * (mult ?? 1))))].join(' / ');
+const enemyRows = gated(data.enemies.map((enemy) => ({ ...enemy, normalHits: normalHit(enemy) })));
+const foodRows = described(data.foods).map((meal) => {
+  const project = meal.grade > 0 ? economyData.projects.find((row) => row.loot?.[meal.id]) : undefined;
+  return { ...meal, need: project?.need, level: project?.level, cost: project?.cost, days: project?.days, count: project?.loot[meal.id] };
+});
 
 const tables = [
   table('realms', '境界与突破', data.realms, [
@@ -266,7 +273,8 @@ const tables = [
   table('items', '物品与交易', itemTradeRows, ['id', 'name', 'kind', 'price', 'sell', 'desc'],
     { note: '价格为 0 表示无对应买卖渠道。买入的货源与到货条件见坊市货单。卖出按手中符合规则的物件结算。' }),
   table('common-materials', '常用原料跨系统用途', stapleRows, [
-    'id', 'name', ['pools', '可回生的现场'], ['recipes', '用到的配方数'], ['facilities', '用到的设施升级数'],
+    'id', 'name', ['pools', '可回生的现场'], ['enemySources', '解取的对手'],
+    ['recipes', '用到的配方数'], ['projects', '用到的后院项目数'], ['facilities', '用到的设施升级数'],
     ['exchanges', '野外交付选择数'], ['breakthrough', '直接用于突破的境数'],
   ]),
   table('market-offers', '坊市货单', marketOffers, [
@@ -298,12 +306,16 @@ const tables = [
   ], { note: '装备耐久为 0 后失去加成。脱身加成为伤害减免系数，0.17 即减免 17%。' }),
   table('weapon-acquisition', '武器获取渠道', acquisitionRows, [
     'id', ['weapon', '武器'], ['method', '获得方法'], ['source', '具体来源'], ['price', '单次成本（灵钱）'],
-    'need', ['chance', '成功胜利时掉率（0–1）'], ['interval', '货源或对手恢复间隔（天）'],
+    'need', ['afterFight', '现场领取前需击败', ref], ['interval', '货源或对手恢复间隔（天）'],
     ['repeatable', '可重复获取'], ['afterQuest', '供货前置', ref],
-  ], { note: '胜利概率行由在场对手的种群供给决定。手上、仓库或已有未领取同名成品时，重复掉落不会生成额外副本。' }),
+  ], { note: '胜后另行领取的物件来自事先约定的奖品或实际可查看的位置。交手结算只给身体材料。' }),
   table('ammunition', '弹药与命中效果', described(data.ammunition ?? []), [
     'id', 'name', ['atk', '每发攻击修正'], ['pierce', '每发基础穿甲'], ['trait', '适用目标与加成', traitText],
   ], { note: '远射和借远兵的术诀每次实际出手扣 1 发。缺弹时普通出手改为徒手，换兵刃会经过一回合。' }),
+  table('foods', '口粮与料理', foodRows, [
+    'id', 'name', ['grade', '料理档次'], ['satiety', '食用恢复饱腹'], ['hp', '食用恢复气血'],
+    ['level', '备粮灶等级'], 'need', 'count', ['cost', '每批费用（灵钱）'], 'days',
+  ], { note: '生兽肉须带回备粮灶。恢复值按角色当下上限封顶。干粮也可向摊主买，备粮灶的两种干粮制法列于后院项目。' }),
   table('pills', '丹药', gated(described(data.pills)), [
     'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['food', '获得干粮'], 'toxin', 'wound', 'focus',
   ], { note: '筑基丹用于突破，实际制作配方和各阶段成本见筑基丹访查及制作用方。' }),
@@ -350,14 +362,16 @@ const tables = [
   table('event-choices', '事件选项', choices, [
     ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days',
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
-    'need', 'consume', 'hidden', 'loot', 'enemy', ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
-  ], { omit: ['food'], note: '标为消耗所需物品时会扣除该列物品。隐藏选项所需物品齐备后才显示。受伤原因、扣血、战斗与所得只在选择后结算。' }),
+    'need', 'consume', 'hidden', 'loot', 'enemy', ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
+    ['guardedBy', '在场会挡住选择的对手', ref], ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
+  ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排，指定份数时按所需批次结算。收益先放在原处。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),
   table('basket', '药篓物件操作', basketOptions, [
     ['action', '操作'], 'days', ['spent', '消耗物件', resources], 'loot', ['note', '执行后反馈'],
   ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
-  table('enemies', '敌人', gated(data.enemies), [
-    'id', 'name', ['tier', '敌方境界'], tier, 'hp', 'atk', 'def', ['tags', '装备克制标签'], ['coins', '战利灵钱'], ['insight', '首胜修为'], 'loot', 'desc',
-  ], { omit: ['intents', 'weaponDrop'], note: '概率武器和重复条件见武器获取渠道表。' }),
+  table('enemies', '敌人', enemyRows, [
+    'id', 'name', ['tier', '敌方境界'], tier, 'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
+    'def', ['tags', '装备克制标签'], ['insight', '首胜修为'], ['loot', '实际身体掉落', resources], 'desc',
+  ], { omit: ['intents'], note: '每个普攻取基础攻击乘招式倍率后向上取整。重招另列于意图表。对手守着的草药、矿物、文书与奖品需要在现场另行取得。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),

@@ -32,6 +32,8 @@ test('bringing a real herb to the apprentice introduces the alchemist and a boug
   play(state, 'travel', { id: 'marsh' });
   enter(state, 'reed_banks', 0);
   closeScene(state);
+  assert.equal(state.inventory.reed, undefined);
+  play(state, 'take', { id: 'reed', count: 1 });
   play(state, 'travel', { id: 'village' });
   play(state, 'handin', { id: 'reed_salve' });
   assert.ok(view(state).alchemy.offers.some((offer) => offer.id === 'formula_qi'));

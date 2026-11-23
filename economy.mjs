@@ -17,8 +17,8 @@ const facilities = [
     ],
   },
   {
-    id: 'hearth', name: '备粮灶', start: 0, reveal: 'millet_grain',
-    desc: '刚收来的谷子怕潮。院角的旧火眼还在，垫起蒸屉和烘粮的苇席就能用。',
+    id: 'hearth', name: '备粮灶', start: 0, reveal: 'millet_grain', alternateReveal: 'beast_meat',
+    desc: '院角还留着旧火眼。砌好灶眼能支锅炖兽肉，架上蒸屉也能烘干新收的谷子。',
     upgrades: [
       { need: { wood: 8, reed: 6 }, cost: 5, days: 1 },
       { need: { wood: 16, ore: 8, kiln_clay: 6 }, cost: 12, days: 2 },
@@ -61,14 +61,29 @@ const projects = [
     need: { reed: 4, hide: 1, wood: 3 }, loot: { reed: 14 }, days: 15, cost: 3, reveal: 'hide',
   },
   {
-    id: 'steam_millet', name: '蒸粟烘干粮', facility: 'hearth', level: 1,
+    id: 'steam_millet', name: '蒸粟烘干粮', facility: 'hearth', level: 1, reveal: 'millet_grain',
     description: '蒸熟的粟米摊在苇席上烘干，再拿油纸分包。',
     need: { millet_grain: 3, wood: 1 }, loot: { ration: 6 }, days: 1.5, cost: 0,
   },
   {
-    id: 'cook_travel_cakes', name: '烘一匣行粮', facility: 'hearth', level: 2,
+    id: 'cook_travel_cakes', name: '烘一匣行粮', facility: 'hearth', level: 2, reveal: 'millet_grain',
     description: '炉炕能铺两张苇席，天还亮着先把下一趟路的粮做起来。',
     need: { millet_grain: 8, wood: 2, reed: 1 }, loot: { ration: 18 }, days: 3, cost: 2,
+  },
+  {
+    id: 'simmer_meat_broth', name: '煨山炉肉汤', facility: 'hearth', level: 1, reveal: 'beast_meat',
+    description: '剔去生兽肉上的筋膜，炖熟后连浓汤一并封好。',
+    need: { beast_meat: 1, wood: 1 }, loot: { meat_broth: 1 }, days: 0.5, cost: 0,
+  },
+  {
+    id: 'cook_herb_stew', name: '炖灵草肉', facility: 'hearth', level: 2, reveal: 'meat_broth',
+    description: '照肉汤的火候煨上一锅，收汁前下灵草，分作两包。',
+    need: { beast_meat: 2, reed: 1, wood: 1 }, loot: { herb_stew: 2 }, days: 1.5, cost: 0,
+  },
+  {
+    id: 'cook_crystal_feast', name: '蒸禾香封肉', facility: 'hearth', level: 2, reveal: 'herb_stew',
+    description: '先用灵草焖透兽肉，再在肉汁里蒸熟新谷，最后用荷叶分包扎紧。',
+    need: { beast_meat: 3, reed: 2, millet_grain: 4, wood: 2 }, loot: { crystal_feast: 3 }, days: 2.5, cost: 1,
   },
   {
     id: 'render_resin_salve', name: '熬松脂膏', facility: 'hearth', level: 2,

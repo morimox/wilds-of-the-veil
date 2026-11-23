@@ -5,7 +5,7 @@ formula_detox,清露丸丹方,清露丸（detox_pill）,r_detox,给药僮一份�
 formula_focus,定息丹方,定息丹（focus_pill）,r_focus,丹师安蒲,19,,灵草（reed）×2、松木（wood）×2
 formula_heal,合络丹丹方,合络丹（heal_pill）,r_heal,把旧渡的印带回来,,,灵草（reed）×3、兽革（hide）×1
 formula_tide,济潮丹丹方,济潮丹（tide_pill）,r_tide,刻洪痕的石壁（flood_lines） · 从石缝里拽出布包,,,灵草（reed）×3、灵晶（core）×2
-formula_resin,温枝丸丹方,温枝丸（resin_pill）,r_resin_pill,丹师安蒲,28,窑匠火候牌（kiln_manual）,松木（wood）×3、灵草（reed）×4
-formula_leaf,清脉饮丹方,清脉饮（leaf_pill）,r_leaf_pill,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,,,灵草（reed）×5、耐火泥（kiln_clay）×2、松木（wood）×3
-formula_jade,照心露丹方,照心露（jade_pill）,r_jade_pill,浮光晶坡（cloud_scree） · 托住火盏拨开封泥,,,灵草（reed）×6、灵晶（core）×4、松木（wood）×3
+formula_resin,温枝丸丹方,温枝丸（resin_pill）,r_resin_pill,丹师安蒲,28,窑匠火候牌（kiln_manual）,松木（wood）×3、灵草（reed）×3、炼气期妖丹（qi_core）×1
+formula_leaf,清脉饮丹方,清脉饮（leaf_pill）,r_leaf_pill,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,,,灵草（reed）×4、耐火泥（kiln_clay）×2、松木（wood）×2、炼气期妖丹（qi_core）×2
+formula_jade,照心露丹方,照心露（jade_pill）,r_jade_pill,浮光晶坡（cloud_scree） · 托住火盏拨开封泥,,,灵草（reed）×5、灵晶（core）×2、松木（wood）×2、筑基期妖丹（foundation_core）×1、妖目（beast_eye）×1
 formula_foundation,筑基丹方,筑基丹（foundation_pill）,r_foundation,把验药印交给安蒲,,,封炉药引（foundation_charge）×1、灵草（reed）×8、灵晶（core）×8、暗金（black_iron）×4

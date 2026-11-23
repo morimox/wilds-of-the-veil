@@ -1,4 +1,4 @@
-﻿标识,武器,获得方法,具体来源,单次成本（灵钱）,所需物品,成功胜利时掉率（0–1）,货源或对手恢复间隔（天）,可重复获取,供货前置
+﻿标识,武器,获得方法,具体来源,单次成本（灵钱）,所需物品,现场领取前需击败,货源或对手恢复间隔（天）,可重复获取,供货前置
 cudgel,枣木杖,初始装备,,,,,,,
 cudgel,枣木杖,坊市,裴杖匠·行杖摊,5,,,10,是,
 knife,割苇短刀,坊市,卢打铁·短刀摊,16,,,12,是,
@@ -6,9 +6,10 @@ split_axe,劈柴小钺,坊市,卢五·小钺摊,23,,,7,是,
 split_axe,劈柴小钺,制作,r_split_axe,7,寒铁（ore）×3、松木（wood）×3,,,是,
 short_spear,摊市短矛,坊市,绳叔·短矛摊,27,,,9,是,
 short_spear,摊市短矛,制作,r_short_spear,9,寒铁（ore）×2、松木（wood）×4,,,是,
-hook_blade,渡口钩刃,胜利战利品,矮石堤 · 拦滩客,,,1,0,否,
-trail_cutter,松场习刀,胜利战利品,索棚拳场 · 松场巡索人,,,1,8,是,
-star_blade,暗星刀,胜利战利品,横肩偏井 · 横肩矿傀,,,0.18,9,是,
+hook_blade,渡口钩刃,胜后另行领取,矮石堤（bank_watch） · 等拦滩客兑现比试的约定,,,拦滩客（bank_runner）,,否,
+trail_cutter,松场习刀,胜后另行领取,索棚拳场（pine_spar） · 向轮值的守索人领试刀礼,,,松场巡索人（road_sparrer）,8,是,
+star_blade,暗星刀,制作,r_star_blade,24,暗金（black_iron）×6、灵晶（core）×3、松木（wood）×3,,,是,
+star_blade,暗星刀,胜后另行领取,横肩偏井（deep_vein） · 扶起旧工具柜查看夹层,,,横肩矿傀（vein_sentinel）,,否,
 coil_spear,绕脊枪,制作,r_coil_spear,28,暗金（black_iron）×5、松木（wood）×4、灵晶（core）×3,,,是,
 reed_bow,苇弦弓,制作,r_reed_bow,4,松木（wood）×1、灵草（reed）×2,,,是,
 iron_sword,寒铁剑,坊市,迟师傅·巡矿剑摊,33,,,12,是,拿寒铁换旧渡水图（sell_forging）
