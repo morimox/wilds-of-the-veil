@@ -1,0 +1,319 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { data } from './data.mjs';
+import { act, createGame, rules, view } from './engine.mjs';
+
+const definition = (id) => data.sites.find((site) => site.id === id);
+const field = (state, id) => view(state).sites.find((site) => site.id === id);
+const choice = (state, index) => view(state).visibleChoices.find((row) => row.index === index);
+
+function play(state, action, payload) {
+  const result = act(state, action, payload);
+  assert.equal(result.ok, true, `${action}: ${result.message}`);
+  return result;
+}
+
+function expedition(id, seed = 500) {
+  const site = definition(id);
+  const state = createGame(seed);
+  // Stage a well-equipped traveler late enough for renewable guarding populations to reach their caps.
+  state.day = 24;
+  state.realm = 3;
+  state.discovered.push(site.region);
+  state.inventory.ration = 20;
+  state.inventory.salve = 15;
+  state.knownArts.push('bell_strike');
+  state.seenChoices.push(...(site.afterChoices ?? []).slice(0, 1));
+  for (const [slot, id] of Object.entries({ weapon: 'sky_sword', armor: 'sky_cloak', charm: 'jade_pendant' })) {
+    state.inventory[id] = 1;
+    state.durability[id] = data.gear.find((gear) => gear.id === id).durability;
+    state.equipment[slot] = id;
+  }
+  state.hp = view(state).maxHp;
+  state.qi = view(state).maxQi;
+  play(state, 'travel', { id: site.region });
+  return state;
+}
+
+function feed(state) {
+  if (state.satiety < 53) play(state, 'eat', { id: 'ration' });
+}
+
+function enter(state, id) {
+  feed(state);
+  play(state, 'visit', { id });
+  assert.equal(view(state).currentEvent.id, id);
+}
+
+function defeat(state, index, enemy) {
+  feed(state);
+  play(state, 'choose', { index });
+  assert.equal(view(state).currentEnemy.id, enemy);
+  for (let turn = 0; state.combat && turn < 40; turn += 1) {
+    if (view(state).intent.kind === 'heavy') play(state, 'guard');
+    else if (state.hp < 20) play(state, 'use', { id: 'salve' });
+    else if (state.qi >= 4) play(state, 'art', { id: 'bell_strike' });
+    else play(state, 'attack');
+  }
+  assert.equal(view(state).mode, 'field', state.log.slice(-5).join('\n'));
+}
+
+function waitUntil(state, day) {
+  while (state.day < day) {
+    feed(state);
+    play(state, 'wait');
+  }
+}
+
+test('guarded ore stays closed until the last sentry falls, then reopens for a full cycle', () => {
+  const site = 'miner_echo';
+  const enemy = 'ore_wight';
+  const state = expedition(site);
+  enter(state, site);
+  assert.match(choice(state, 3).lockedReason, /还有\s*2\s*只/);
+  assert.doesNotMatch(choice(state, 3).lockedReason, /持锤矿煞/);
+  assert.equal(choice(state, 1).available, true);
+  defeat(state, 0, enemy);
+  enter(state, site);
+  assert.equal(field(state, site).creatures[enemy], 1);
+  assert.match(choice(state, 3).lockedReason, /还有\s*1\s*只/);
+  assert.equal(act(state, 'choose', { index: 3, itemId: 'ore', count: 1 }).ok, false);
+  const pendingSpawn = state.localPools[site].creatures[enemy].nextAt;
+  defeat(state, 0, enemy);
+  const returnTime = state.localPools[site].creatures[enemy].nextAt;
+  assert(returnTime > pendingSpawn);
+  assert.equal(returnTime - state.day, definition(site).creatures[enemy].interval);
+  enter(state, site);
+  assert.equal(choice(state, 3).available, true);
+  play(state, 'choose', { index: 3, itemId: 'ore', count: 1 });
+  enter(state, site);
+  assert.equal(choice(state, 3).available, true);
+  play(state, 'leave');
+  waitUntil(state, returnTime);
+  enter(state, site);
+  assert.equal(field(state, site).creatures[enemy], 1);
+  assert.equal(choice(state, 3).available, false);
+  assert.equal(choice(state, 1).available, true);
+  play(state, 'leave');
+  assert.equal(view(state).groundLoot.ore, 1);
+  play(state, 'take', { id: 'ore', count: 1 });
+});
+
+test('an unguarded shallow pile has independent stock from the deeper deposit', () => {
+  for (const [site, safe, deep, material, openIndex, deepIndex, needsClearance] of [
+    ['miner_echo', 'ore', 'ore_wall', 'ore', 1, 3, true],
+    ['low_tide', 'core', 'core_silt', 'core', 0, 2, false],
+  ]) {
+    const state = expedition(site, 0);
+    enter(state, site);
+    const stocks = () => Object.fromEntries(field(state, site).stockDetails.map(({ id, count }) => [id, count]));
+    const before = stocks();
+    assert.equal(before[safe], definition(site).stocks[safe].cap);
+    assert.equal(before[deep], definition(site).stocks[deep].cap);
+    assert.equal(choice(state, deepIndex).available, !needsClearance);
+    assert.equal(choice(state, openIndex).available, true);
+    play(state, 'choose', { index: openIndex, itemId: material, count: 1 });
+    assert.equal(view(state).mode, 'field');
+    assert.equal(state.encounterSeed, 0);
+    assert.equal(stocks()[safe], before[safe] - 1);
+    assert.equal(stocks()[deep], before[deep]);
+    assert.equal(view(state).groundLoot[material], 1);
+  }
+});
+
+test('a returning kiln hound does not replenish the finite clay in the cabinet', () => {
+  const site = 'kiln_flue';
+  const enemy = 'cinder_hound';
+  const state = expedition(site);
+  enter(state, site);
+  const guards = field(state, site).creatures[enemy];
+  assert(guards > 0);
+  for (let i = 0; i < guards; i += 1) {
+    defeat(state, 0, enemy);
+    enter(state, site);
+  }
+  const carriedClay = field(state, site).stocks.kiln_clay;
+  assert(carriedClay > 0);
+  play(state, 'choose', { index: 4, itemId: 'kiln_clay', count: carriedClay });
+  waitUntil(state, state.localPools[site].creatures[enemy].nextAt);
+  enter(state, site);
+  assert.equal(field(state, site).creatures[enemy], 1);
+  assert.equal(field(state, site).stocks.kiln_clay, 0);
+  defeat(state, 0, enemy);
+  enter(state, site);
+  assert.equal(choice(state, 4)?.available ?? false, false);
+  assert.equal(field(state, site).stocks.kiln_clay, 0);
+});
+
+test('a confirmed sentry returning during collection stops the next batch', () => {
+  const site = 'miner_echo';
+  const enemy = 'ore_wight';
+  const state = expedition(site);
+  enter(state, site);
+  // Place the expedition just before a scheduled return to cover the batch boundary directly.
+  state.localPools[site] = { creatures: { [enemy]: { count: 0, nextAt: state.day + 1 } } };
+  assert.equal(field(state, site).creatures[enemy], 0);
+  assert.equal(choice(state, 3).available, true);
+  const result = play(state, 'choose', { index: 3, itemId: 'ore', count: 4 });
+  assert.deepEqual(result.gathered, { ore: 3 });
+  assert.equal(view(state).groundLoot.ore, 3);
+  assert.equal(field(state, site).stocks.ore_wall, 1);
+  assert.equal(field(state, site).creatures[enemy], 1);
+  enter(state, site);
+  assert.equal(choice(state, 3).available, false);
+});
+
+test('encounter-prone harvesting can succeed, get interrupted, or be safe when the population is empty', () => {
+  for (const [site, enemy, index, stock, item] of [
+    ['low_tide', 'rope_eel', 2, 'core_silt', 'core'],
+    ['vine_pond', 'vine_stag', 2, 'reed', 'reed'],
+  ]) {
+    const hit = expedition(site, 0);
+    enter(hit, site);
+    assert(field(hit, site).creatures[enemy] > 0);
+    assert.equal(choice(hit, index).available, true);
+    const before = { day: hit.day, insight: hit.insight, stock: field(hit, site).stocks[stock] };
+    const interrupted = play(hit, 'choose', { index, itemId: item, count: 1 });
+    assert.equal(interrupted.ambush, enemy);
+    assert.equal(interrupted.gathered, undefined);
+    assert.equal(hit.day - before.day, rules.harvestEncounterDays);
+    assert.equal(hit.insight, before.insight);
+    assert.equal(hit.seenChoices.includes(`${site}:${index}`), false);
+    assert.equal(field(hit, site).stocks[stock], before.stock);
+    assert.equal(view(hit).groundLoot[item], undefined);
+    assert.equal(view(hit).currentEnemy.id, enemy);
+    const present = field(hit, site).creatures[enemy];
+    play(hit, 'retreat');
+    assert.equal(field(hit, site).creatures[enemy], present);
+    assert(field(hit, site).witnessedEnemies.includes(enemy));
+    enter(hit, site);
+    assert.equal(choice(hit, index).available, true);
+
+    const miss = expedition(site, 500);
+    enter(miss, site);
+    assert(field(miss, site).creatures[enemy] > 0);
+    assert.deepEqual(play(miss, 'choose', { index, itemId: item, count: 1 }).gathered, { [item]: 1 });
+    assert.equal(view(miss).mode, 'field');
+
+    const empty = expedition(site, 0);
+    enter(empty, site);
+    empty.localPools[site] = { creatures: { [enemy]: { count: 0, nextAt: empty.day + 3 } } };
+    const initialSeed = empty.encounterSeed;
+    assert.deepEqual(play(empty, 'choose', { index, itemId: item, count: 1 }).gathered, { [item]: 1 });
+    assert.equal(empty.encounterSeed, initialSeed);
+    assert.equal(view(empty).mode, 'field');
+  }
+});
+
+test('an ambush in a later batch leaves the first batch on the ground', () => {
+  const site = 'vine_pond';
+  const state = expedition(site, 1001);
+  enter(state, site);
+  const stock = field(state, site).stocks.reed;
+  assert(stock >= 6);
+  const started = state.day;
+  const result = play(state, 'choose', { index: 2, itemId: 'reed', count: 6 });
+  assert.equal(result.ambush, 'vine_stag');
+  assert.deepEqual(result.gathered, { reed: 4 });
+  assert.equal(state.day - started, 0.75 + rules.harvestEncounterDays);
+  assert.equal(field(state, site).stocks.reed, stock - 4);
+  assert.equal(view(state).groundLoot.reed, 4);
+  assert.equal(state.inventory.reed, undefined);
+  assert.equal(view(state).currentEnemy.id, 'vine_stag');
+});
+
+test('wild foxes return slowly at the edges and faster around half full', () => {
+  const site = 'mud_track';
+  const enemy = 'reed_fox';
+  const pool = definition(site).creatures[enemy];
+  const state = expedition(site);
+  enter(state, site);
+  assert.equal(field(state, site).creatures[enemy], pool.cap);
+  for (let attempt = 0; field(state, site).creatures[enemy] > 0 && attempt < pool.cap * 2; attempt += 1) {
+    defeat(state, 2, enemy);
+    if (field(state, site).creatures[enemy] > 0) enter(state, site);
+  }
+  assert.equal(field(state, site).creatures[enemy], 0);
+  const countAt = (day) => {
+    const later = structuredClone(state);
+    later.day = day;
+    return field(later, site).creatures[enemy];
+  };
+  let next = state.localPools[site].creatures[enemy].nextAt;
+  assert.equal(next, state.day + pool.interval * (pool.depletedFactor ?? 1));
+  assert.equal(countAt(next - 0.01), 0);
+  const gaps = [];
+  for (let count = 1; count < pool.cap; count += 1) {
+    assert.equal(countAt(next + 0.01), count);
+    const gap = pool.interval * (0.8 + 2.4 * (count / pool.cap - 0.5) ** 2);
+    assert.equal(countAt(next + gap - 0.01), count);
+    gaps.push(gap);
+    next += gap;
+  }
+  assert(gaps[0] > gaps[1] && gaps.at(-1) > gaps[1]);
+  assert.equal(countAt(next + 0.01), pool.cap);
+  assert.equal(countAt(next + 100), pool.cap);
+});
+
+test('the upper grove has a unique leader while the usual deer do not block the shallows', () => {
+  const site = 'vine_pond';
+  const state = expedition(site);
+  enter(state, site);
+  assert.equal(choice(state, 2).available, true);
+  assert.equal(choice(state, 4), undefined);
+  assert.equal(field(state, site).stockDetails.some(({ id }) => id === 'reed_upper'), false);
+  assert.equal(act(state, 'choose', { index: 4, itemId: 'reed', count: 1 }).ok, false);
+  assert.equal(field(state, site).creatures.vine_king, 1);
+  defeat(state, 3, 'vine_king');
+  enter(state, site);
+  assert.equal(field(state, site).creatures.vine_king, 0);
+  assert(field(state, site).creatures.vine_stag > 0);
+  assert.equal(choice(state, 4).available, true);
+  assert(field(state, site).stockDetails.some(({ id }) => id === 'reed_upper'));
+  const upper = field(state, site).stocks.reed_upper;
+  assert.deepEqual(play(state, 'choose', { index: 4, itemId: 'reed', count: upper }).gathered, { reed: upper });
+  waitUntil(state, state.day + 20);
+  enter(state, site);
+  assert.equal(field(state, site).creatures.vine_king, 0);
+  assert(field(state, site).stocks.reed_upper > 0);
+  assert.equal(choice(state, 4).available, true);
+});
+
+test('the human sentry returns on a fixed shift measured from the victory', () => {
+  const site = 'pine_spar';
+  const enemy = 'road_sparrer';
+  const state = expedition(site);
+  enter(state, site);
+  defeat(state, 0, enemy);
+  const pool = state.localPools[site].creatures[enemy];
+  assert.equal(pool.nextAt - state.day, 8);
+  const earlier = { ...state, day: pool.nextAt - 0.01 };
+  const later = { ...state, day: pool.nextAt + 0.01 };
+  assert.equal(field(earlier, site).creatures[enemy], 0);
+  assert.equal(field(later, site).creatures[enemy], 1);
+});
+
+test('one defeated sentry opens the one-time tool locker even when others remain', () => {
+  const site = 'deep_vein';
+  const enemy = 'vein_sentinel';
+  const state = expedition(site);
+  enter(state, site);
+  assert.equal(field(state, site).creatures[enemy], 2);
+  assert.equal(choice(state, 2), undefined);
+  defeat(state, 0, enemy);
+  enter(state, site);
+  assert.equal(field(state, site).creatures[enemy], 1);
+  assert.equal(choice(state, 2).available, true);
+  assert.equal(choice(state, 3).available, false);
+  play(state, 'leave');
+  waitUntil(state, state.localPools[site].creatures[enemy].nextAt);
+  enter(state, site);
+  assert.equal(field(state, site).creatures[enemy], 2);
+  assert.equal(choice(state, 2).available, true);
+  play(state, 'choose', { index: 2 });
+  assert.equal(state.inventory.star_blade, 1);
+  assert.equal(state.inventory.star_blade_pattern, 1);
+  enter(state, site);
+  assert.equal(choice(state, 2), undefined);
+  assert.equal(choice(state, 3).available, false);
+});

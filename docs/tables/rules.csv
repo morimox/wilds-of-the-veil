@@ -11,6 +11,7 @@ firstRegionInsight,1,首次探索一个地区获得的修为（点）
 pressureThreshold,3,探索压力高于此值时开始额外消耗真气（点）
 pressureQi,1,压力超限的每次探索所消耗的真气（点）
 battleDays,0.125,战斗操作每回合用时（天）
+harvestEncounterDays,0.125,采集中遭遇伏击时开打前用时（天）
 retreatDays,0.25,撤出战斗所需用时（天）
 retreatDamageFactor,0.5,脱身时先乘此值，再计算减伤和防御
 emptyReturnDays,0.25,空腹返村额外用时（天）

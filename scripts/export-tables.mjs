@@ -44,6 +44,7 @@ const ruleDescriptions = {
   pressureThreshold: '探索压力高于此值时开始额外消耗真气（点）',
   pressureQi: '压力超限的每次探索所消耗的真气（点）',
   battleDays: '战斗操作每回合用时（天）',
+  harvestEncounterDays: '采集中遭遇伏击时开打前用时（天）',
   retreatDays: '撤出战斗所需用时（天）',
   retreatDamageFactor: '脱身时先乘此值，再计算减伤和防御',
   emptyReturnDays: '空腹返村额外用时（天）',
@@ -155,9 +156,14 @@ const startState = [
 
 const siteNames = new Map(data.sites.map(site => [site.id, site.name]));
 const siteRef = (id) => `${siteNames.get(id)}（${id}）`;
+const stockDetails = (id, { item = id, label, ...pool }) => ({ poolId: id, object: item, label, ...pool });
+const populationCurve = (pool) => pool.interval > 0 && pool.growth > 0 ? pool.curve ?? 'fixed' : 'none';
+const curveText = (id) => ({ wild: '随种群密度变化', fixed: '固定间隔', none: '不回补' })[id] ?? id;
+const percent = (value) => `${Number((value * 100).toFixed(6))}%`;
 const worldPools = data.sites.flatMap(site => [
-  ...Object.entries(site.stocks ?? {}).map(([id, pool]) => ({ site: site.id, kind: '资源', object: id, ...pool })),
-  ...Object.entries(site.creatures ?? {}).map(([id, pool]) => ({ site: site.id, kind: '种群', object: id, ...pool })),
+  ...Object.entries(site.stocks ?? {}).map(([id, pool]) => ({ site: site.id, kind: '资源', ...stockDetails(id, pool) })),
+  ...Object.entries(site.creatures ?? {}).map(([id, pool]) =>
+    ({ site: site.id, kind: '种群', poolId: id, object: id, ...pool, curve: populationCurve(pool) })),
 ]);
 const basketOptions = [
   { action: '查看', note: data.basket.inspect, days: 0 },
@@ -165,6 +171,40 @@ const basketOptions = [
 ];
 const choices = data.events.flatMap(({ id, name, choices }) =>
   choices.map((choice, index) => ({ event: id, eventName: name, order: index + 1, ...choice })));
+const guardedChoices = choices.filter(({ guardedBy, afterFight, ambush }) => guardedBy || afterFight || ambush).map((choice) => {
+  const site = data.sites.find(({ id }) => id === choice.event);
+  const actor = choice.guardedBy ?? choice.ambush?.enemy ?? choice.afterFight;
+  const pool = site.creatures[actor];
+  const curve = populationCurve(pool);
+  const stocks = Object.entries(site.stocks ?? {}).filter(([, stock]) => stock.choices.includes(choice.order - 1))
+    .map(([id, stock]) => stockDetails(id, stock));
+  const finite = stocks.length > 0 && stocks.every(({ interval, growth }) => !interval || !growth);
+  const clearDelayApplies = choice.guardedBy || (choice.ambush && curve === 'wild');
+  let condition;
+  let revisit;
+  if (choice.guardedBy) {
+    condition = curve === 'none' ? '击败看守后永久开放' : '清除本地全部看守';
+    revisit = curve === 'none' ? '取胜后有余料即可直接采，库存单独回生' :
+      finite ? '有余料且看守回来时须再清场，采尽后不再补充' : '看守回来才须再清场，库存单独回生';
+  } else if (choice.ambush) {
+    condition = '可直接采，活跃对手可能打断每批采集';
+    revisit = '回补后仍可直接采，有对手在场时每批可能遭遇';
+  } else if (choice.perWin) {
+    condition = '每次获胜解锁本班奖品';
+    revisit = '换班后再胜可领取下一班奖品';
+  } else {
+    condition = '获胜一次后可办理一次';
+    revisit = '已获胜便可回来办理，领取后关闭选项';
+  }
+  return {
+    site: site.id, region: site.region, actor, action: choice.label, condition, revisit, loot: choice.loot, ambush: choice.ambush?.chance,
+    stocks: stocks.map(({ object, label, start, cap, interval, growth }) =>
+      `${label ?? name(object)}（初始${start}、上限${cap}${interval > 0 && growth > 0 ? `、每${interval}日补${growth}` : '、存量有限'}）`).join('、'),
+    start: pool.start, cap: pool.cap, interval: pool.interval, growth: pool.growth, curve,
+    firstReturn: clearDelayApplies && curve !== 'none'
+      ? Number((pool.interval * (pool.depletedFactor ?? 1)).toFixed(6)) : undefined,
+  };
+});
 const describeChoice = (key) => {
   const [event, index] = key.split(':');
   const choice = data.events.find(row => row.id === event)?.choices[Number(index)];
@@ -232,7 +272,8 @@ const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMa
 ]).map((row) => ({ ...row, weapon: name(row.id) }));
 const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay', 'beast_meat', 'qi_core', 'foundation_core', 'beast_eye'].map((id) => ({
   id, name: name(id),
-  pools: worldPools.filter((pool) => pool.object === id && pool.growth > 0).map((pool) => siteRef(pool.site)).join('、'),
+  pools: worldPools.filter((pool) => pool.kind === '资源' && pool.object === id && pool.growth > 0)
+    .map(({ site, label }) => label ? `${siteRef(site)} · ${label}` : siteRef(site)).join('、'),
   enemySources: data.enemies.filter((enemy) => enemy.loot?.[id]).map((enemy) => enemy.name).join('、'),
   recipes: data.recipes.filter(({ need }) => need?.[id]).length,
   facilities: facilityLevels.filter(({ need }) => need?.[id]).length,
@@ -347,14 +388,22 @@ const tables = [
     ['afterChoices', '发现路线的具体动作', (keys) => keys.map(describeChoice).join('、')],
     'reveal', ['once', '一次性选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
     ['emptyText', '地点耗尽时可见情形'], ['afterOnceText', '一次性行动后的场景'],
+    ['afterWinText', '当地胜利后的场景', (entries) => Object.entries(entries).map(([id, text]) => `${ref(id)}：${text}`).join('、')],
     ['creatureText', '动物存在或耗尽时的景象'],
   ], { omit: ['stocks', 'creatures'], note: '发现条件为空即是入境可见的地标。隐蔽地点需遇到相应的指路、岔路或物证。发现后会持续显示。' }),
   table('world-regrowth', '各地点库存与种群', worldPools, [
     ['site', '地点', siteRef], ['kind', '类型', valueText], ['object', '资源或敌人', ref],
-    ['start', '初始量'], ['cap', '上限'], ['interval', '恢复间隔（游戏日）'], ['growth', '每次恢复'],
+    ['poolId', '存量标识'], ['label', '现场存量名称'],
+    ['start', '初始量'], ['cap', '上限'], ['interval', '基准恢复间隔（游戏日）'], ['growth', '每次恢复'], ['curve', '种群回补规律', curveText],
     ['depletedFactor', '耗空后首次恢复用时倍率'],
     ['choices', '消耗此资源的选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
-  ], { note: '经游戏时间恢复到上限。恢复间隔或恢复量为 0 时，现场耗尽后不会重生。只有击败当场对手才减少该地点种群。' }),
+  ], { note: '恢复间隔或恢复量为 0 时不回补。部分野生种群的非零存量回补间隔随密度调整，系数为 0.8 + 2.4 ×（存量／上限 − 0.5）²。曲线种群和清场点看守从最后一只落败时起按基准间隔和耗空倍率计首只。只有击败当场对手才减少该地点种群。' }),
+  table('guarded-sites', '守护采集、途中伏击与胜后领取', guardedChoices, [
+    ['region', '地区', ref], ['site', '地点', siteRef], ['actor', '对手', ref], ['action', '现场动作'],
+    ['condition', '放行条件'], ['ambush', '有活跃对手时每批触发几率', percent], ['loot', '一批或一次所得'], ['stocks', '物品池'],
+    ['start', '第1日对手数量'], ['cap', '对手上限'], ['interval', '基准补充间隔（游戏日）'], ['growth', '每次补充数量'], ['curve', '种群回补规律', curveText],
+    ['firstReturn', '清场后首只回归（游戏日）'], ['revisit', '再访条件'],
+  ], { note: '对手数量和物品库存分别变化。伏击在每批开始前判定，遭遇后尚未开始的一批留在原处。胜后领取类使用条件列，回归天数仅用于清场和伏击采集点。' }),
   table('events', '事件正文', data.events, ['id', 'name', 'revisit', 'text'], {
     omit: ['choices', 'experiment'],
     note: '每个事件对应一个可选地点。回到地点后可看到之前行动留下的变化，满足条件的隐藏选项才显示。'
@@ -363,7 +412,8 @@ const tables = [
     ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days',
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
     'need', 'consume', 'hidden', 'loot', 'enemy', ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
-    ['guardedBy', '在场会挡住选择的对手', ref], ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
+    ['guardedBy', '在场会挡住选择的对手', ref], ['ambush', '有对手时每批采集伏击', ({ enemy, chance }) => `${ref(enemy)} · ${percent(chance)}`],
+    ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
   ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排，指定份数时按所需批次结算。收益先放在原处。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),
   table('basket', '药篓物件操作', basketOptions, [
     ['action', '操作'], 'days', ['spent', '消耗物件', resources], 'loot', ['note', '执行后反馈'],

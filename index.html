@@ -411,7 +411,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=12" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=13" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -745,8 +745,8 @@ const sites = [
   { id: 'mud_track', region: 'marsh', name: '碎石水眼', once: [3, 4],
     stocks: { wood: { start: 4, cap: 6, interval: 3, growth: 2, depletedFactor: 1.5, choices: [1] } },
     creatures: {
-      mud_beast: { start: 1, cap: 3, interval: 4, growth: 1 },
-      reed_fox: { start: 2, cap: 4, interval: 4, growth: 1 },
+      mud_beast: { start: 1, cap: 3, interval: 4, growth: 1, curve: 'wild' },
+      reed_fox: { start: 2, cap: 4, interval: 4, growth: 1, curve: 'wild' },
     },
     creatureText: {
       mud_beast: { present: '近岸冒一溜水泡，几片硬鳞擦过露出水面的石头。', absent: '近岸平静，水面看不到鳞片。' },
@@ -777,7 +777,8 @@ const sites = [
   { id: 'empty_oven', region: 'ridge', name: '歇炉的茶棚', once: [1],
     afterOnceText: { 1: '木板搬走后露出一条烟痕。棚顶还完整，石灶里的火眼没有堵，没人拦着借火歇脚。' } },
   { id: 'miner_echo', region: 'ridge', name: '有回声的矿道', once: [2],
-    stocks: { ore: { start: 2, cap: 4, interval: 3, growth: 2, choices: [1, 3] },
+    stocks: { ore: { label: '旁孔寒铁', start: 1, cap: 2, interval: 3, growth: 1, choices: [1] },
+      ore_wall: { item: 'ore', label: '主道寒铁', start: 2, cap: 4, interval: 3, growth: 1, choices: [3] },
       core: { start: 2, cap: 4, interval: 5, growth: 1, choices: [3] } },
     creatures: { ore_wight: { start: 1, cap: 2, interval: 3, growth: 1 } },
     creatureText: { ore_wight: { present: '握锤的影子在主道上巡行，一点冷光随它胸口移动。它身后的矿壁另有两条亮脉。', absent: '主道听不到锤声了，锤痕一路通到夹着亮晶的矿壁。' } },
@@ -794,9 +795,10 @@ const sites = [
     afterOnceText: { 2: '龛架铜钩空着。旧钟裂成的两瓣斜在坡上，背后的窄石脊还能绕回山坡。' } },
 
   { id: 'low_tide', region: 'ford', name: '闸外浅阶',
-    stocks: { core: { start: 4, cap: 6, interval: 2, growth: 2, choices: [0, 2] } },
-    creatures: { rope_eel: { start: 1, cap: 3, interval: 2.5, growth: 1 } },
-    creatureText: { rope_eel: { present: '下游船绳被水里什么东西拖得发紧。', absent: '下游船绳浮在水上，无物牵动。' } },
+    stocks: { core: { label: '浅阶灵晶', start: 2, cap: 3, interval: 2, growth: 1, choices: [0] },
+      core_silt: { item: 'core', label: '槽底灵晶', start: 2, cap: 3, interval: 2, growth: 1, choices: [2] } },
+    creatures: { rope_eel: { start: 1, cap: 3, interval: 2.5, growth: 1, curve: 'wild' } },
+    creatureText: { rope_eel: { present: '下游船绳时松时紧，深槽外的水不时打旋。', absent: '下游船绳浮在水上，无物牵动。' } },
     emptyText: '浅阶已经扫净，下游的船绳浮着不动。只有浪沫漫过石缝。' },
   { id: 'boat_shade', region: 'ford', name: '没篷的渡舟', once: [1, 2],
     afterOnceText: { 1: '柜子移走了，船底铁箍旁留着一道擦痕。船凳还干，旧缆仍挂在朝水的钩上。船头灯架上留着旧烟。' } },
@@ -829,7 +831,8 @@ const sites = [
   { id: 'pine_hollow', region: 'pine_ridge', name: '翻车的松沟', once: [2],
     creatures: { pitch_bear: { start: 1, cap: 2, interval: 7, growth: 1, depletedFactor: 1.5 } },
     creatureText: { pitch_bear: { present: '空车一侧拱动，车轴底还拴着几缕毛。', absent: '车底已经空了。泥面只剩拖着爪走过的深痕。' } },
-    afterOnceText: { 2: '车轴边只剩裁下来的麻绳。沟沿有一条能绕回松架的小路。' } },
+    afterWinText: { pitch_bear: '车轴被撞得斜出树沟。麻绳断了，木签落在外侧的小路边。' },
+    afterOnceText: { 2: '车轴边只剩裁下来的麻绳。沟沿那条小路还能绕回松架。' } },
   { id: 'pine_ledges', region: 'pine_ridge', name: '背阴的断肩崖', reveal: { item: 'pine_ledge_note' },
     stocks: { wood: { start: 4, cap: 6, interval: 8, growth: 2, depletedFactor: 1.5, choices: [0] } },
     emptyText: '靠里的几道脂槽见底了。石面还有旧挖凿的横痕。' },
@@ -849,7 +852,7 @@ const sites = [
       kiln_clay: { start: 3, cap: 3, interval: 0, growth: 0, choices: [4] } },
     afterOnceText: { 2: '墙缝里只剩黄釉上的半片纸痕。靠外窑砖积灰，内壁石柜半开。坡下温水从后崖渗进窑沟。' },
     creatures: { cinder_hound: { start: 1, cap: 2, interval: 8, growth: 1, depletedFactor: 1.5 } },
-    creatureText: { cinder_hound: { present: '鱼鳞似的窑砖抖动了几下，缝间喷出细灰。细灰翻过去时，砖缝里的一点暗红也跟着移了半尺。', absent: '窑砖已经稳下来，通风处只漏残灰。' } } },
+    creatureText: { cinder_hound: { present: '鱼鳞似的窑砖抖动了几下，一团带着暗红的细灰在石柜前打转。', absent: '窑砖已经稳下来，通往石柜的过道空了。' } } },
 
   { id: 'herb_beds', region: 'herb_basin', name: '银脉水畦',
     stocks: { reed: { start: 8, cap: 12, interval: 6, growth: 2, depletedFactor: 1.5, choices: [0] } },
@@ -857,9 +860,15 @@ const sites = [
   { id: 'mist_shelter', region: 'herb_basin', name: '垫高脚的药棚', once: [0, 1],
     afterOnceText: { 0: '泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。', 1: '席上的捣药板已经腾出来了。泽医身边还放着几只给矿队装药的篓。' } },
   { id: 'vine_pond', region: 'herb_basin', name: '白藤塘',
-    stocks: { reed: { start: 4, cap: 8, interval: 7, growth: 2, depletedFactor: 1.5, choices: [2] } },
-    creatures: { vine_stag: { start: 1, cap: 3, interval: 8, growth: 1, depletedFactor: 1.5 } },
-    creatureText: { vine_stag: { present: '两片白角在藤叶下晃。鹿踩在去浅水的石头上，低头去够银叶的嫩茎。', absent: '白藤散开了，去浅水的石头没人拦着。' } },
+    stocks: { reed: { label: '塘边银脉叶', start: 4, cap: 8, interval: 7, growth: 2, depletedFactor: 1.5, choices: [2] },
+      reed_upper: { item: 'reed', label: '上游银脉叶', start: 5, cap: 6, interval: 10, growth: 2, choices: [4] } },
+    creatures: { vine_stag: { start: 1, cap: 4, interval: 8, growth: 1, depletedFactor: 1.5, curve: 'wild' },
+      vine_king: { start: 1, cap: 1, interval: 0, growth: 0 } },
+    creatureText: {
+      vine_stag: { present: '藤下偶尔晃过白角，湿泥从踏石边滑进水里。', absent: '藤垂着不动，浅水上也没有动静。' },
+      vine_king: { present: '上游一根粗藤擦掉了树皮，旁边的蹄印比塘边的大得多。', absent: '坝根的倒藤已经伏下，可以顺着水脚上去。' },
+    },
+    afterWinText: { vine_king: '倒藤被顶离了老树，背水坡上露出另一片银脉叶。岸外那块斜石还在。' },
     emptyText: '塘里只剩尚未长开的嫩茎。去浅水的踏石没人挡着，岸外仍有块斜石可绕。' },
 
   { id: 'mine_tailings', region: 'black_mine', name: '黑砂洗矿槽',
@@ -871,8 +880,9 @@ const sites = [
     stocks: { black_iron: { start: 4, cap: 6, interval: 8, growth: 2, choices: [3] },
       core: { start: 1, cap: 3, interval: 8, growth: 1, choices: [3] } },
     creatures: { vein_sentinel: { start: 1, cap: 2, interval: 9, growth: 1, depletedFactor: 1.7 } },
-    creatureText: { vein_sentinel: { present: '井口两面黑岩像肩骨似地拢到一起，车轮被挤得裂了一道缝。每次岩肩移动，石身中间就会闪一下。', absent: '井口散着一些凿开的黑纹石。' } },
-    afterOnceText: { 2: '旧柜的盖子敞着，托刀的木格已经空了。井底露出的矿脉沿碎车槽延伸，右手还可绕回地面。' } },
+    creatureText: { vein_sentinel: { present: '井口两面黑岩像肩骨似地拢到一起，车轮被挤得裂了一道缝。每次岩肩移动，石身中间就会闪一下。', absent: '井口只剩几块倒下的黑纹石，往碎车槽的路空出来了。' } },
+    afterWinText: { vein_sentinel: '旧工具柜被撞上了井外的窄台。碎车槽内侧仍是一道露在石壁上的矿脉。' },
+    afterOnceText: { 2: '井外的旧柜敞着，托刀的木格已经空了。井底露出的矿脉沿碎车槽延伸，右手还可绕回地面。' } },
 
   { id: 'silk_bough', region: 'snow_pass', name: '背风雪蜥径',
     stocks: { hide: { start: 7, cap: 11, interval: 8, growth: 2, depletedFactor: 1.8, choices: [0, 1] } },
@@ -921,7 +931,7 @@ const events = [
     { label: '绕干埂拾松枝', desc: '石垒横在水边，漂来的枝条会卡在这一侧。', days: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 2 }, enemy: null, outcome: '你从干埂绕过水眼，拾走卡在碎石间的松枝。' },
     { label: '沿干埂的脚印看看', desc: '脚印一直进了苇丛，矮苇被什么压低了一截。', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', outcome: '脚下苇梗一响，一只苇尾狐从低处蹿出来。' },
     { label: '踩着石头往苇后探', desc: '水眼背后有几块石头排成一线，像是有人铺过。', days: 0.125, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '拨开最后一丛苇，露出背雨的半截石渠，里面有旧柴火的焦痕。' },
-    { label: '捡起低苇下的油纸包', desc: '干埂低处压着一只绑好的油纸包，没有沾水。', afterFight: 'reed_fox', days: 0, loot: { ration: 1 }, outcome: '油纸里有行旅人落下的一份干粮，系绳还完整。' },
+    { label: '捡起干埂边的油纸包', desc: '那只狐败退时蹬断了几根苇梗，油纸包从低处滚到了干埂边。', afterFight: 'reed_fox', days: 0, loot: { ration: 1 }, outcome: '油纸里有行旅人落下的一份干粮，系绳还完整。' },
   ] },
   { id: 'old_fire', name: '背雨石渠', text: '半截石渠能挡雨。砌进渠脚的小石炉朝水开口，几片瓦挡着风，炉沿有一道未烧尽的纸边。', choices: [
     { label: '添柴歇脚', desc: '石炉还通风，挨着背风一侧便能烤火。', need: { wood: 1 }, consume: true, days: 0.5, coins: 0, hp: 6, qi: 4, insight: 0, loot: {}, enemy: null, outcome: '火把石壁烘热，湿鞋上慢慢蒸出白气。' },
@@ -971,7 +981,7 @@ const events = [
   ] },
   { id: 'miner_echo', name: '有回声的矿道', text: '矿道深处有两条岔口。旁孔窄，风贴着岩壁往外钻。再高些还有道透光的石缝。', choices: [
     { label: '沿主道往里走', desc: '主道一直往下，尽头两条矿脉泛着亮光。', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'ore_wight', outcome: '持锤的影子一转身，握紧石锤挡住了矿壁。' },
-    { label: '侧身钻进旁孔', desc: '旁孔出来的风夹着干粉，脚边碎石有铁色。', days: 1, coins: 0, hp: 0, qi: -2, insight: 3, loot: { ore: 2 }, enemy: null, outcome: '你的杖端磕响了岩壁。趁那边的锤声一停，你侧身挤进旁孔，摸到几块松动的碎矿。' },
+    { label: '侧身钻进旁孔', desc: '旁孔拐在主道外侧，风夹着干粉。脚边的碎石有铁色。', days: 1, coins: 0, hp: 0, qi: -2, insight: 3, loot: { ore: 2 }, enemy: null, outcome: '你侧身绕过岩角。那边的锤声透不过厚岩，脚下有些松动的寒铁。' },
     { label: '贴着透光的石缝往外看', days: 0.125, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '石缝对面是回声石龛，龛口朝山背。矿口外有道窄坡，从那儿能绕过去。' },
     { label: '去主道的矿壁撬松矿脉', desc: '有人沿石壁凿了几道槽，寒铁和灵晶从槽头露出来。', guardedBy: 'ore_wight', days: 1, insight: 2, loot: { ore: 3, core: 2 }, outcome: '你沿先前留下的锤槽撬石，分开寒铁矿片和有光的灵晶。' },
   ] },
@@ -1003,10 +1013,12 @@ const events = [
     { label: '退回山脊', days: 0, coins: 0, hp: 0, qi: 0, insight: 1, loot: {}, enemy: null, outcome: '退过山脊，背后的钟声才听不见。' },
     { label: '把龛架上的小铃取下来', desc: '铜钩紧挨震裂的大钟，钩上小铃倒是完好。', afterFight: 'bell_wraith', days: 0, loot: { bell_charm: 1 }, outcome: '你绕过钟座，解下一枚留在龛里的定声铃。轻轻一拨，铃舌没有跟着震。' },
   ] },
-  { id: 'low_tide', name: '闸外浅阶', text: '退水露出几级能落脚的石阶。阶角堆着潮水留下的细砂。下游船绳旁的水槽积着同一片亮晶砂。', choices: [
+  { id: 'low_tide', name: '闸外浅阶', text: '退水露出几级能落脚的石阶。细晶砂停在阶角，再往下隔着一道破坎，船绳旁的深槽沉着更粗的晶粒。', choices: [
     { label: '扫起浅阶上的亮晶粒', days: 1, coins: 0, hp: 0, qi: 0, insight: 2, loot: { core: 2 }, enemy: null, outcome: '趁潮水未回，把阶角的细砂淘掉，捡出还透着光的灵晶。' },
     { label: '走到下游船绳边', desc: '船绳能当扶手，水下轮廓得靠近些才认得出。', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'rope_eel', outcome: '水里一团长影卷过船绳，是一条缠舟兽。' },
-    { label: '握着船绳扫出槽底的灵晶', desc: '这一槽的晶粒沉得深，握紧船绳才够得着。', guardedBy: 'rope_eel', days: 1, insight: 2, loot: { core: 3 }, outcome: '你扶稳船绳，顺水扫了一遍槽底。浅阶冲下来的晶粒都沉在这里。' },
+    { label: '握着船绳扫出槽底的灵晶', desc: '槽底粗晶沉得深，握紧船绳才够得着。',
+      ambush: { enemy: 'rope_eel', chance: 0.3, outcome: '船绳猛地一绷，缠舟兽从水槽里翻了上来。' },
+      days: 1, insight: 2, loot: { core: 3 }, outcome: '你扶稳船绳，顺水扫开碎砂。亮晶咔嗒碰在石坎底下。' },
   ] },
   { id: 'boat_shade', name: '没篷的渡舟', revisit: true, text: '老船抵在闸槽里，船帮挡得住风。旧缆挂在船沿外侧，绳套上有一圈盐霜。船头灯架被熏黑了一半。', choices: [
     { label: '到船凳上背风歇脚', days: 1, coins: 0, hp: 13, qi: 8, insight: 1, loot: {}, enemy: null, outcome: '船帮挡住了风。坐到潮势走缓，手脚才不再发冷。' },
@@ -1071,9 +1083,9 @@ const events = [
     { label: '在石墩背后歇脚', days: 0.5, hp: 6, qi: 4, insight: 0, loot: {}, outcome: '石墩挡掉了山口横风，你把肩上的箩筐靠到石面。' },
   ] },
   { id: 'pine_hollow', name: '翻车的松沟', text: '旧窑车翻在树沟。车轴上绑着看不清的木签，车边踩出来的爪印很深。', choices: [
-    { label: '靠近车轴查看木签', days: 0.75, enemy: 'pitch_bear', outcome: '一只灰脊松熊从车后滚下来，先把车轴压进湿土。' },
+    { label: '靠近树沟里翻倒的窑车', days: 0.75, enemy: 'pitch_bear', outcome: '一只灰脊松熊从车后滚下来，先把车轴压进湿土。' },
     { label: '沿斜沟绕回松架', days: 0.125, insight: 1, loot: {}, outcome: '你沿沟边走稳脚。转过土脊，回头已看不见窑车。' },
-    { label: '翻过窑车轴上的木签', desc: '木签写字的一面朝下，绳结还能解。', afterFight: 'pitch_bear', days: 0, loot: { kiln_tracks: 1 }, outcome: '车签背后刻着窑车出入的双车辙。老道在贴着松根的那一边转向窑谷。' },
+    { label: '拾起小路边的木签', desc: '松熊败退时撞歪了车轴，绳上的木签掉到沟外。', afterFight: 'pitch_bear', days: 0, loot: { kiln_tracks: 1 }, outcome: '车签背后刻着窑车出入的双车辙。老道在贴着松根的那一边转向窑谷。' },
   ] },
   { id: 'pine_ledges', name: '背阴的断肩崖', text: '风折的松杈落到旧凿痕里，背阴处的松脂凝在木皮上。崖口朝外的一边常被风吹空。', choices: [
     { label: '从松枝之间拣厚木片', days: 1, insight: 2, loot: { wood: 4 }, outcome: '背阴处不晒，松木上的厚脂还粘手，几片能带回去做活。' },
@@ -1115,9 +1127,14 @@ const events = [
     { label: '问泽医板上的凹槽怎么用', desc: '木板深浅不同，中间一槽里压着一张验药小札。', days: 0.5, insight: 2, loot: { herb_press: 1, formula_leaf: 1 }, outcome: '泽医拿药板比给你看，把旧板和袖里一页清脉饮丹方递过来。「这方靠走两次槽，哪次都不能抄近。」' },
   ] },
   { id: 'vine_pond', name: '白藤塘', text: '塘边藤叶都被拱高了，最近的蹄印里已经渗泥。藤后露出一丛银脉叶，岸外有块斜石可绕。', choices: [
-    { label: '朝藤后的银叶探过去', days: 0.75, enemy: 'vine_stag', outcome: '手还没拨开藤叶，一对霜白的角就从藤下挑起来。鹿身侧着横住了去银叶的石路。' },
+    { label: '沿浅滩的蹄印找藤鹿', days: 0.75, enemy: 'vine_stag', outcome: '白角从藤下挑起来，鹿蹄刨开一片湿泥。' },
     { label: '沿斜石绕到岸外听一会儿', days: 0.125, qi: 3, insight: 1, loot: {}, outcome: '藤影在另一边摇动。留在斜石上时，呼吸渐渐平匀。' },
-    { label: '踩过浅水去剪银脉叶', desc: '药叶长在凹水里，踩进泥便会踩烂根，只能顺那条石路去。', guardedBy: 'vine_stag', days: 0.75, insight: 2, loot: { reed: 4 }, outcome: '你走过空出来的踏石，用指尖掐掉熟叶，根还扎在泥里。' },
+    { label: '踩过浅水去剪银脉叶', desc: '药叶长在凹水里，从踏石上俯身正好够得到。',
+      ambush: { enemy: 'vine_stag', chance: 0.35, outcome: '踏石边溅起泥水，一只白角藤鹿从藤后急冲过来。' },
+      days: 0.75, insight: 2, loot: { reed: 4 }, outcome: '你在踏石上掐下熟叶，细根还扎在泥里。' },
+    { label: '顺着上游的大蹄印走', desc: '大蹄印沿水往上，没入一架粗藤后面。', days: 0.75, enemy: 'vine_king', outcome: '粗藤往两边一分，一只老鹿压低交错的白角，堵在坝根。' },
+    { label: '到背水坡剪上游的银脉叶', desc: '倒藤外侧能踩稳脚。坡上的叶已长开。', afterFight: 'vine_king', guardedBy: 'vine_king',
+      days: 1, insight: 3, loot: { reed: 4 }, outcome: '你站在背水坡把熟叶剪下来，水从旧鹿槽绕过去。' },
   ] },
 
   { id: 'mine_tailings', name: '黑砂洗矿槽', text: '长石槽把水往低处引，黑砂拦在几根铁钉前。槽内侧嵌住了两团较重的岩块。', choices: [
@@ -1132,7 +1149,7 @@ const events = [
   { id: 'deep_vein', name: '横肩偏井', text: '井边挤着两道肩形黑岩，遮住一只倒扣的旧工具柜。碎车槽尽头有裸露的矿脉，窄槽从右边还能绕到石井外。', choices: [
     { label: '进偏井敲开卡住的车槽', days: 1, enemy: 'vein_sentinel', outcome: '一声钝响落地。两片黑岩并成一道石身，挡住了车眼。' },
     { label: '沿旧窄槽绕回路面', days: 0.125, insight: 1, loot: {}, outcome: '鞋底踏出了湿亮的车痕，你绕回宽一些的路。' },
-    { label: '扶起旧工具柜查看夹层', desc: '柜底有矿队的烙印，刀托下还压着一叠油布。', afterFight: 'vein_sentinel', guardedBy: 'vein_sentinel', days: 0, loot: { star_blade: 1, star_blade_pattern: 1 }, outcome: '矿队留下的暗星刀还卡在木托上。油布里包着一张照着实刀画的锻打样，连刀口的分厚都标好了。' },
+    { label: '翻开井外的旧工具柜', desc: '败退的矿傀撞开了柜架，柜子滑到了井外，盖子裂出一道缝。', afterFight: 'vein_sentinel', days: 0, loot: { star_blade: 1, star_blade_pattern: 1 }, outcome: '矿队留下的暗星刀还卡在木托上。油布里包着一张照着实刀画的锻打样，连刀口的分厚都标好了。' },
     { label: '顺碎车槽去剔松矿脉', desc: '碎车槽内侧是一条暗金细脉，旁边挨着夹在石里的亮晶。', guardedBy: 'vein_sentinel', days: 1, insight: 2, loot: { black_iron: 4, core: 1 }, outcome: '你清开碎车边的松屑，从石壁剔下暗金和独立成片的灵晶。' },
   ] },
 
@@ -1216,6 +1233,10 @@ const enemies = [
   { id: 'vine_stag', name: '白角藤鹿', tags: ['beast', 'furred'], tier: 2, hp: 60, atk: 14, def: 5,
     intents: [{ name: '探蹄拨藤', kind: 'attack', mult: 1.08 }, { name: '角上引湿', kind: 'drain', mult: 0.52 }, { name: '低眉突刺', kind: 'heavy', mult: 1.62 }, { name: '转背护颈', kind: 'guard', mult: 1.35 }],
     insight: 6, loot: { beast_meat: 3, hide: 2, beast_eye: 1, qi_core: 3 }, desc: '它能借湿藤牵走气息。白角还没压低之前，脚下总会先拨藤。' },
+  { id: 'vine_king', name: '白纹鹿王', tags: ['beast', 'furred'], tier: 2, hp: 79, atk: 15, def: 6,
+    intents: [{ name: '昂角探石', kind: 'attack', mult: 1 }, { name: '低角顶坝', kind: 'heavy', mult: 1.7 },
+      { name: '贴藤守颈', kind: 'guard', mult: 1.42 }, { name: '转身摔角', kind: 'attack', mult: 1.1 }],
+    insight: 9, loot: { beast_meat: 5, hide: 3, beast_eye: 1, qi_core: 4 }, desc: '它的角在老树上蹭出两道白痕。压角低头时，会沿着旧蹄印直撞过来。' },
   { id: 'vein_sentinel', name: '横肩矿傀', tags: ['stoneborn', 'scaled'], tier: 2, hp: 64, atk: 14, def: 6,
     intents: [{ name: '横臂合甲', kind: 'guard', mult: 1.5 }, { name: '左肩撞壁', kind: 'attack', mult: 1.05 }, { name: '抱石砸槽', kind: 'heavy', mult: 1.62 }, { name: '错步碰肩', kind: 'attack', mult: 1.13 }],
     insight: 7, loot: { qi_core: 3 }, desc: '两肩石片相合时很难砍进去。窄矢或穿甲的兵刃能省不少力。' },
@@ -2034,6 +2055,7 @@ const rules = Object.freeze({
   pressureThreshold: 3,
   pressureQi: 1,
   battleDays: 0.125,
+  harvestEncounterDays: 0.125,
   retreatDays: 0.25,
   retreatDamageFactor: 0.5,
   emptyReturnDays: 0.25,
@@ -2309,7 +2331,7 @@ function knowsDeduction(state, entry) {
   return (entry.tier ?? 0) <= state.realm && isRevealed(state, entry.reveal);
 }
 
-function createGame() {
+function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
   const settings = data.starting ?? {};
   const state = {
     day: 1,
@@ -2344,6 +2366,8 @@ function createGame() {
     localPools: {},
     siteVictories: {},
     siteClaims: {},
+    siteWitnesses: {},
+    encounterSeed: seed >>> 0,
     basketInspected: false,
     basketDisposition: null,
     showedHideToSmith: false,
@@ -2406,14 +2430,30 @@ function knowsSite(state, site) {
     Boolean(site.reveal && isRevealed(state, site.reveal));
 }
 
+function recoveryDays(pool, count, wild) {
+  if (count === 0) return pool.interval * (pool.depletedFactor ?? 1);
+  if (!wild) return pool.interval;
+  const distanceFromHalf = count / pool.cap - 0.5;
+  return pool.interval * (0.8 + 2.4 * distanceFromHalf ** 2);
+}
+
 function poolAt(state, site, kind, id) {
   const pool = site[kind][id];
   const canGrow = pool.interval > 0 && pool.growth > 0;
+  const wild = kind === 'creatures' && pool.curve === 'wild';
   const stored = state.localPools[site.id]?.[kind]?.[id] ?? {
     count: pool.start,
-    nextAt: canGrow && pool.start < pool.cap ? 1 + pool.interval * (pool.start === 0 ? pool.depletedFactor ?? 1 : 1) : null,
+    nextAt: canGrow && pool.start < pool.cap ? 1 + recoveryDays(pool, pool.start, wild) : null,
   };
-  if (stored.nextAt === null || state.day < stored.nextAt) return stored;
+  if (!canGrow || stored.nextAt === null || state.day < stored.nextAt) return stored;
+  if (wild) {
+    let { count, nextAt } = stored;
+    while (nextAt !== null && state.day >= nextAt) {
+      count = Math.min(pool.cap, count + pool.growth);
+      nextAt = count < pool.cap ? nextAt + recoveryDays(pool, count, true) : null;
+    }
+    return { count, nextAt };
+  }
   const periods = Math.floor((state.day - stored.nextAt) / pool.interval) + 1;
   const count = Math.min(pool.cap, stored.count + periods * pool.growth);
   return { count, nextAt: count < pool.cap ? stored.nextAt + periods * pool.interval : null };
@@ -2425,8 +2465,10 @@ function spendPool(state, site, kind, id, amount) {
   const count = current.count - amount;
   let nextAt = current.nextAt;
   if (pool.interval > 0 && pool.growth > 0) {
-    const recovery = pool.interval * (count === 0 ? pool.depletedFactor ?? 1 : 1);
-    if (count === 0 && pool.depletedFactor > 1) nextAt = state.day + recovery;
+    const wild = kind === 'creatures' && pool.curve === 'wild';
+    const recovery = recoveryDays(pool, count, wild);
+    const holdsPassage = kind === 'creatures' && records.events[site.id]?.choices.some((choice) => choice.guardedBy === id);
+    if (count === 0 && (pool.depletedFactor > 1 || holdsPassage || wild)) nextAt = state.day + recovery;
     else if (nextAt === null) nextAt = state.day + recovery;
   }
   const local = (state.localPools[site.id] ??= {});
@@ -2443,9 +2485,18 @@ function currentSites(state) {
 
 function viewSite(state, site) {
   const visited = state.eventsSeen[site.region]?.includes(site.id) ?? false;
+  const stocks = visited && site.stocks ? poolCounts(state, site, 'stocks') : null;
+  const choices = records.events[site.id]?.choices ?? [];
   return {
     id: site.id, name: site.name, visited,
-    ...(visited && site.stocks ? { stocks: poolCounts(state, site, 'stocks') } : {}),
+    witnessedEnemies: [...new Set([...(state.siteWitnesses?.[site.id] ?? []), ...Object.keys(state.siteVictories?.[site.id] ?? {})])],
+    ...(stocks ? { stocks, stockDetails: Object.entries(stocks)
+      .filter(([id]) => site.stocks[id].choices.some((index) => choices[index] && knowsChoice(state, choices[index], site)))
+      .map(([id, count]) => {
+        const pool = site.stocks[id];
+        const item = pool.item ?? id;
+        return { id, item, label: pool.label ?? nameOf(item), count, renewable: pool.interval > 0 && pool.growth > 0 };
+      }) } : {}),
     ...(visited && site.creatures ? { creatures: poolCounts(state, site, 'creatures') } : {}),
   };
 }
@@ -2453,11 +2504,12 @@ function viewSite(state, site) {
 function siteText(state, site, event) {
   if (!site) return event.text;
   const changed = Object.entries(site.afterOnceText ?? {}).findLast(([index]) => state.seenChoices.includes(`${event.id}:${index}`));
+  const opened = Object.entries(site.afterWinText ?? {}).find(([id]) => siteWins(state, site, id) > 0);
   const stocks = poolCounts(state, site, 'stocks');
   const creatures = poolCounts(state, site, 'creatures');
   if (site.emptyText && [...Object.values(stocks), ...Object.values(creatures)].every((count) => !count)) return site.emptyText;
   const details = Object.entries(site.creatureText ?? {}).map(([id, words]) => creatures[id] ? words.present : words.absent).filter(Boolean);
-  return [changed?.[1] ?? event.text, ...details].join('');
+  return [changed?.[1] ?? opened?.[1] ?? event.text, ...details].join('');
 }
 
 function availableExperiment(state, event) {
@@ -2616,6 +2668,10 @@ function encounter(state, id) {
 
 function startCombat(state, id, siteId) {
   const enemy = records.enemies[id];
+  if (siteId) {
+    const witnesses = ((state.siteWitnesses ??= {})[siteId] ??= []);
+    if (!witnesses.includes(id)) witnesses.push(id);
+  }
   state.combat = { id, siteId, hp: enemy.hp, round: 0, escapeBonus: 0 };
 }
 
@@ -2626,16 +2682,29 @@ function completedSiteChoice(state, site, index) {
 }
 
 function choiceStocks(site, choice, index) {
-  return Object.entries(site?.stocks ?? {}).filter(([id, pool]) => pool.choices.includes(index) && choice.loot?.[id] > 0);
+  return Object.entries(site?.stocks ?? {})
+    .filter(([key, pool]) => pool.choices.includes(index) && choice.loot?.[pool.item ?? key] > 0)
+    .map(([key, pool]) => ({ key, id: pool.item ?? key, pool }));
+}
+
+function remainingGuards(state, site, choice) {
+  return site?.creatures?.[choice.guardedBy] ? poolAt(state, site, 'creatures', choice.guardedBy).count : 0;
+}
+
+function rollHarvestAmbush(state, site, ambush) {
+  if (!ambush || !records.enemies[ambush.enemy] || !(ambush.chance > 0) || !site?.creatures?.[ambush.enemy] ||
+      poolAt(state, site, 'creatures', ambush.enemy).count === 0) return false;
+  state.encounterSeed = (Math.imul(1664525, state.encounterSeed) + 1013904223) >>> 0;
+  return state.encounterSeed / 0x100000000 < ambush.chance;
 }
 
 function gatherOptions(state, choice, site, index) {
   const foodPerBatch = (choice.days ?? 0) * rules.satietyDrainPerDay;
   // A final batch can use up the remaining food, but an empty stomach cannot start a new batch.
   const batches = foodPerBatch ? Math.ceil(state.satiety / foodPerBatch) : Infinity;
-  return choiceStocks(site, choice, index).map(([id]) => {
+  return choiceStocks(site, choice, index).map(({ key, id }) => {
     const yieldPerBatch = choice.loot[id];
-    const maximum = Math.min(poolAt(state, site, 'stocks', id).count, yieldPerBatch * batches);
+    const maximum = Math.min(poolAt(state, site, 'stocks', key).count, yieldPerBatch * batches);
     return { id, name: nameOf(id), maximum, suggested: Math.min(maximum, yieldPerBatch) };
   }).filter(({ maximum }) => maximum > 0);
 }
@@ -2646,12 +2715,12 @@ function choiceBlocker(state, choice, site, index) {
     return { reason: '眼下没有可追的对手。', depleted: true };
   }
   const stocks = choiceStocks(site, choice, index);
-  if (stocks.length && stocks.every(([id]) => poolAt(state, site, 'stocks', id).count === 0)) {
-    return { reason: '这里暂时已经采空了。', depleted: true };
+  if (stocks.length && stocks.every(({ key }) => poolAt(state, site, 'stocks', key).count === 0)) {
+    const renewable = stocks.some(({ pool }) => pool.interval > 0 && pool.growth > 0);
+    return { reason: renewable ? '这里暂时已经采空了。' : '这处材料已经取尽。', depleted: true };
   }
-  if (site?.creatures?.[choice.guardedBy] && poolAt(state, site, 'creatures', choice.guardedBy).count > 0) {
-    return { reason: '那条路还被堵着。' };
-  }
+  const guards = remainingGuards(state, site, choice);
+  if (guards > 0) return { reason: `还有 ${guards} 只挡着这条路。` };
   if (choice.perWin && Object.keys(choice.loot ?? {}).some((id) => records.gear[id] && (gearReserved(state, id) || groundAt(state)[id]))) {
     return { reason: '同样的奖品已有一份。' };
   }
@@ -2675,7 +2744,7 @@ function choose(state, { index, itemId, count }) {
   const options = gatherOptions(state, choice, site, index);
   const explicitQuantity = itemId !== undefined || count !== undefined;
   let batches = 1;
-  let gathered;
+  let requested;
   if (explicitQuantity) {
     const selected = options.find(({ id }) => id === itemId);
     if (!selected || !Number.isSafeInteger(count) || count < 1 || count > selected.maximum) {
@@ -2686,48 +2755,72 @@ function choose(state, { index, itemId, count }) {
     batches = Math.ceil(count / yieldPerBatch);
     // The injury follows gathering. If it causes a fall, no further batch can start.
     if (injuryPerBatch) batches = Math.min(batches, Math.ceil(state.hp / injuryPerBatch));
-    gathered = { [selected.id]: Math.min(count, batches * yieldPerBatch) };
+    requested = { [selected.id]: Math.min(count, batches * yieldPerBatch) };
   } else {
-    gathered = Object.fromEntries(options.map(({ id, suggested }) => [id, suggested]));
+    requested = Object.fromEntries(options.map(({ id, suggested }) => [id, suggested]));
   }
   const lootAvailable = { ...choice.loot };
-  for (const [id] of choiceStocks(site, choice, index)) delete lootAvailable[id];
-  const collected = resourceEntries(gathered);
+  const stocks = choiceStocks(site, choice, index);
+  const stockKeys = new Map(stocks.map(({ id, key }) => [id, key]));
+  for (const { id } of stocks) delete lootAvailable[id];
+  const collected = resourceEntries(requested);
+  const gathered = {};
+  let interrupted = false;
+  let ambush = null;
+  let completedBatches = 0;
   const coins = choice.coins ?? 0;
-  if (choice.consume) payItems(state, choice.need);
   state.event = null;
-  state.coins += coins;
   const healthBefore = state.hp;
   for (let batch = 0; batch < batches; batch += 1) {
+    if (remainingGuards(state, site, choice) > 0) {
+      interrupted = true;
+      break;
+    }
+    if (collected.length && rollHarvestAmbush(state, site, choice.ambush)) {
+      ambush = choice.ambush;
+      advance(state, rules.harvestEncounterDays);
+      break;
+    }
+    if (batch === 0) {
+      if (choice.consume) payItems(state, choice.need);
+      state.coins += coins;
+    }
     for (const [id, amount] of collected) {
       const yieldPerBatch = choice.loot[id];
       const portion = Math.min(yieldPerBatch, amount - batch * yieldPerBatch);
-      if (portion > 0) spendPool(state, site, 'stocks', id, portion);
+      if (portion > 0) {
+        spendPool(state, site, 'stocks', stockKeys.get(id), portion);
+        gathered[id] = (gathered[id] ?? 0) + portion;
+      }
     }
     advance(state, choice.days);
     state.hp += choice.hp ?? 0;
     state.qi += choice.qi ?? 0;
     normalize(state);
+    completedBatches += 1;
     if (collected.length && state.hp > 0) recordPractice(state);
   }
   const amount = Math.max(0, healthBefore - state.hp);
   const injury = amount ? { cause: choice.injury ?? '你在途中受了伤。', amount } : undefined;
   const choiceKey = `${event.id}:${index}`;
-  const first = !state.seenChoices.includes(choiceKey);
+  const first = completedBatches > 0 && !state.seenChoices.includes(choiceKey);
   const insight = first ? (choice.insight ?? 0) : 0;
   if (first) {
     state.seenChoices.push(choiceKey);
     state.insight = Math.max(0, state.insight + insight);
   }
-  if (choice.perWin) (state.siteClaims[site.id] ??= {})[index] = siteWins(state, site, choice.afterFight);
-  const { accepted, spilled } = addItems(state, lootAvailable, true);
+  if (completedBatches && choice.perWin) (state.siteClaims[site.id] ??= {})[index] = siteWins(state, site, choice.afterFight);
+  const { accepted, spilled } = addItems(state, completedBatches ? lootAvailable : {}, true);
   const gatheredRegion = state.region;
   const gatheredGoods = goodsText(gathered);
   leaveOnGround(state, gathered);
-  if (choice.enemy && records.enemies[choice.enemy]) startCombat(state, choice.enemy, site?.id);
+  const enemy = ambush?.enemy ?? choice.enemy;
+  if (enemy && records.enemies[enemy]) startCombat(state, enemy, site?.id);
   const loot = goodsText(accepted);
-  const outcome = choice.outcome;
-  const detail = [outcome, gatheredGoods && `采得${gatheredGoods}，留在脚边。`, loot && `获得${loot}。`,
+  const ambushText = ambush ? ambush.outcome ?? '你正在采集，有东西忽然扑了过来。' : null;
+  const outcome = ambushText ?? choice.outcome;
+  const detail = [completedBatches > 0 && choice.outcome, interrupted && '看守又回来了，你收手退到外面。', gatheredGoods && `采得${gatheredGoods}，留在脚边。`,
+    ambushText, loot && `获得${loot}。`,
     insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
   const result = say(state, detail || choice.label);
   return {
@@ -2735,6 +2828,7 @@ function choose(state, { index, itemId, count }) {
     outcome,
     injury,
     spilled,
+    ...(ambush ? { ambush: ambush.enemy } : {}),
     ...(gatheredGoods ? { gathered, gatheredRegion } : {}),
   };
 }
@@ -3485,7 +3579,6 @@ const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
 const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [recipe.formula] : []));
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
-const eventRows = Object.fromEntries(data.events.map(event => [event.id, event]));
 const slotNames = { weapon: "兵刃", armor: "护具", charm: "法器" };
 const intentNames = { attack: "进攻", heavy: "蓄势", guard: "守势", heal: "疗伤", drain: "夺气" };
 const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药" };
@@ -3662,10 +3755,9 @@ function routeAction(s, r) {
 }
 
 function siteResources(s, site) {
-  const stock = Object.entries(site?.stocks ?? {}).map(([id, count]) =>
-    count > 0 ? `${itemRows[id].name} ×${count}` : `${itemRows[id].name}已采空`);
-  const witnessedEnemies = (eventRows[site?.id]?.choices ?? []).filter((choice, index) =>
-    choice.enemy && s.seenChoices.includes(`${site.id}:${index}`)).map(choice => choice.enemy);
+  const stock = (site?.stockDetails ?? []).map(({ label, count, renewable }) =>
+    count > 0 ? `${label} ×${count}` : `${label}${renewable ? "已采空" : "已取尽"}`);
+  const witnessedEnemies = site?.witnessedEnemies ?? [];
   const creatures = Object.entries(site?.creatures ?? {}).filter(([id]) => witnessedEnemies.includes(id)).map(([id, count]) =>
     count > 0 ? `${enemyRows[id].name} ×${count}` : `暂未见${enemyRows[id].name}`);
   return [...stock, ...creatures].join(" · ");
@@ -3711,11 +3803,11 @@ function eventScreen(s) {
   const resources = siteResources(s, local);
   const choices = s.visibleChoices.map(choice => {
     const cue = publicText(choice.desc);
-    const blocker = publicText(choice.lockedReason);
+    const blocker = choice.lockedReason;
     const gathers = choice.gather ?? [];
-    const controls = gathers.length ? gathers.map(item => quantityForm("choose", choice.index, item,
+    const controls = choice.available && gathers.length ? gathers.map(item => quantityForm("choose", choice.index, item,
       gathers.length === 1 ? choice.label : `${choice.label} · ${item.name}`,
-      { ...item, showLimit: true, disabled: !choice.available })).join("") :
+      { ...item, showLimit: true })).join("") :
       linkButton(choice.label, "choose", choice.index, "", choice.available === false);
     return `<div class="choice">
       ${cue ? `<p class="choice-cue">${escape(cue)}</p>` : ""}

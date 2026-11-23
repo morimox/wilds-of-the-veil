@@ -5,7 +5,6 @@ const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
 const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [recipe.formula] : []));
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
-const eventRows = Object.fromEntries(data.events.map(event => [event.id, event]));
 const slotNames = { weapon: "兵刃", armor: "护具", charm: "法器" };
 const intentNames = { attack: "进攻", heavy: "蓄势", guard: "守势", heal: "疗伤", drain: "夺气" };
 const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药" };
@@ -182,10 +181,9 @@ function routeAction(s, r) {
 }
 
 function siteResources(s, site) {
-  const stock = Object.entries(site?.stocks ?? {}).map(([id, count]) =>
-    count > 0 ? `${itemRows[id].name} ×${count}` : `${itemRows[id].name}已采空`);
-  const witnessedEnemies = (eventRows[site?.id]?.choices ?? []).filter((choice, index) =>
-    choice.enemy && s.seenChoices.includes(`${site.id}:${index}`)).map(choice => choice.enemy);
+  const stock = (site?.stockDetails ?? []).map(({ label, count, renewable }) =>
+    count > 0 ? `${label} ×${count}` : `${label}${renewable ? "已采空" : "已取尽"}`);
+  const witnessedEnemies = site?.witnessedEnemies ?? [];
   const creatures = Object.entries(site?.creatures ?? {}).filter(([id]) => witnessedEnemies.includes(id)).map(([id, count]) =>
     count > 0 ? `${enemyRows[id].name} ×${count}` : `暂未见${enemyRows[id].name}`);
   return [...stock, ...creatures].join(" · ");
@@ -231,11 +229,11 @@ function eventScreen(s) {
   const resources = siteResources(s, local);
   const choices = s.visibleChoices.map(choice => {
     const cue = publicText(choice.desc);
-    const blocker = publicText(choice.lockedReason);
+    const blocker = choice.lockedReason;
     const gathers = choice.gather ?? [];
-    const controls = gathers.length ? gathers.map(item => quantityForm("choose", choice.index, item,
+    const controls = choice.available && gathers.length ? gathers.map(item => quantityForm("choose", choice.index, item,
       gathers.length === 1 ? choice.label : `${choice.label} · ${item.name}`,
-      { ...item, showLimit: true, disabled: !choice.available })).join("") :
+      { ...item, showLimit: true })).join("") :
       linkButton(choice.label, "choose", choice.index, "", choice.available === false);
     return `<div class="choice">
       ${cue ? `<p class="choice-cue">${escape(cue)}</p>` : ""}

@@ -27,6 +27,7 @@ export const rules = Object.freeze({
   pressureThreshold: 3,
   pressureQi: 1,
   battleDays: 0.125,
+  harvestEncounterDays: 0.125,
   retreatDays: 0.25,
   retreatDamageFactor: 0.5,
   emptyReturnDays: 0.25,
@@ -302,7 +303,7 @@ function knowsDeduction(state, entry) {
   return (entry.tier ?? 0) <= state.realm && isRevealed(state, entry.reveal);
 }
 
-export function createGame() {
+export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
   const settings = data.starting ?? {};
   const state = {
     day: 1,
@@ -337,6 +338,8 @@ export function createGame() {
     localPools: {},
     siteVictories: {},
     siteClaims: {},
+    siteWitnesses: {},
+    encounterSeed: seed >>> 0,
     basketInspected: false,
     basketDisposition: null,
     showedHideToSmith: false,
@@ -399,14 +402,30 @@ function knowsSite(state, site) {
     Boolean(site.reveal && isRevealed(state, site.reveal));
 }
 
+function recoveryDays(pool, count, wild) {
+  if (count === 0) return pool.interval * (pool.depletedFactor ?? 1);
+  if (!wild) return pool.interval;
+  const distanceFromHalf = count / pool.cap - 0.5;
+  return pool.interval * (0.8 + 2.4 * distanceFromHalf ** 2);
+}
+
 function poolAt(state, site, kind, id) {
   const pool = site[kind][id];
   const canGrow = pool.interval > 0 && pool.growth > 0;
+  const wild = kind === 'creatures' && pool.curve === 'wild';
   const stored = state.localPools[site.id]?.[kind]?.[id] ?? {
     count: pool.start,
-    nextAt: canGrow && pool.start < pool.cap ? 1 + pool.interval * (pool.start === 0 ? pool.depletedFactor ?? 1 : 1) : null,
+    nextAt: canGrow && pool.start < pool.cap ? 1 + recoveryDays(pool, pool.start, wild) : null,
   };
-  if (stored.nextAt === null || state.day < stored.nextAt) return stored;
+  if (!canGrow || stored.nextAt === null || state.day < stored.nextAt) return stored;
+  if (wild) {
+    let { count, nextAt } = stored;
+    while (nextAt !== null && state.day >= nextAt) {
+      count = Math.min(pool.cap, count + pool.growth);
+      nextAt = count < pool.cap ? nextAt + recoveryDays(pool, count, true) : null;
+    }
+    return { count, nextAt };
+  }
   const periods = Math.floor((state.day - stored.nextAt) / pool.interval) + 1;
   const count = Math.min(pool.cap, stored.count + periods * pool.growth);
   return { count, nextAt: count < pool.cap ? stored.nextAt + periods * pool.interval : null };
@@ -418,8 +437,10 @@ function spendPool(state, site, kind, id, amount) {
   const count = current.count - amount;
   let nextAt = current.nextAt;
   if (pool.interval > 0 && pool.growth > 0) {
-    const recovery = pool.interval * (count === 0 ? pool.depletedFactor ?? 1 : 1);
-    if (count === 0 && pool.depletedFactor > 1) nextAt = state.day + recovery;
+    const wild = kind === 'creatures' && pool.curve === 'wild';
+    const recovery = recoveryDays(pool, count, wild);
+    const holdsPassage = kind === 'creatures' && records.events[site.id]?.choices.some((choice) => choice.guardedBy === id);
+    if (count === 0 && (pool.depletedFactor > 1 || holdsPassage || wild)) nextAt = state.day + recovery;
     else if (nextAt === null) nextAt = state.day + recovery;
   }
   const local = (state.localPools[site.id] ??= {});
@@ -436,9 +457,18 @@ function currentSites(state) {
 
 function viewSite(state, site) {
   const visited = state.eventsSeen[site.region]?.includes(site.id) ?? false;
+  const stocks = visited && site.stocks ? poolCounts(state, site, 'stocks') : null;
+  const choices = records.events[site.id]?.choices ?? [];
   return {
     id: site.id, name: site.name, visited,
-    ...(visited && site.stocks ? { stocks: poolCounts(state, site, 'stocks') } : {}),
+    witnessedEnemies: [...new Set([...(state.siteWitnesses?.[site.id] ?? []), ...Object.keys(state.siteVictories?.[site.id] ?? {})])],
+    ...(stocks ? { stocks, stockDetails: Object.entries(stocks)
+      .filter(([id]) => site.stocks[id].choices.some((index) => choices[index] && knowsChoice(state, choices[index], site)))
+      .map(([id, count]) => {
+        const pool = site.stocks[id];
+        const item = pool.item ?? id;
+        return { id, item, label: pool.label ?? nameOf(item), count, renewable: pool.interval > 0 && pool.growth > 0 };
+      }) } : {}),
     ...(visited && site.creatures ? { creatures: poolCounts(state, site, 'creatures') } : {}),
   };
 }
@@ -446,11 +476,12 @@ function viewSite(state, site) {
 function siteText(state, site, event) {
   if (!site) return event.text;
   const changed = Object.entries(site.afterOnceText ?? {}).findLast(([index]) => state.seenChoices.includes(`${event.id}:${index}`));
+  const opened = Object.entries(site.afterWinText ?? {}).find(([id]) => siteWins(state, site, id) > 0);
   const stocks = poolCounts(state, site, 'stocks');
   const creatures = poolCounts(state, site, 'creatures');
   if (site.emptyText && [...Object.values(stocks), ...Object.values(creatures)].every((count) => !count)) return site.emptyText;
   const details = Object.entries(site.creatureText ?? {}).map(([id, words]) => creatures[id] ? words.present : words.absent).filter(Boolean);
-  return [changed?.[1] ?? event.text, ...details].join('');
+  return [changed?.[1] ?? opened?.[1] ?? event.text, ...details].join('');
 }
 
 function availableExperiment(state, event) {
@@ -609,6 +640,10 @@ function encounter(state, id) {
 
 function startCombat(state, id, siteId) {
   const enemy = records.enemies[id];
+  if (siteId) {
+    const witnesses = ((state.siteWitnesses ??= {})[siteId] ??= []);
+    if (!witnesses.includes(id)) witnesses.push(id);
+  }
   state.combat = { id, siteId, hp: enemy.hp, round: 0, escapeBonus: 0 };
 }
 
@@ -619,16 +654,29 @@ function completedSiteChoice(state, site, index) {
 }
 
 function choiceStocks(site, choice, index) {
-  return Object.entries(site?.stocks ?? {}).filter(([id, pool]) => pool.choices.includes(index) && choice.loot?.[id] > 0);
+  return Object.entries(site?.stocks ?? {})
+    .filter(([key, pool]) => pool.choices.includes(index) && choice.loot?.[pool.item ?? key] > 0)
+    .map(([key, pool]) => ({ key, id: pool.item ?? key, pool }));
+}
+
+function remainingGuards(state, site, choice) {
+  return site?.creatures?.[choice.guardedBy] ? poolAt(state, site, 'creatures', choice.guardedBy).count : 0;
+}
+
+function rollHarvestAmbush(state, site, ambush) {
+  if (!ambush || !records.enemies[ambush.enemy] || !(ambush.chance > 0) || !site?.creatures?.[ambush.enemy] ||
+      poolAt(state, site, 'creatures', ambush.enemy).count === 0) return false;
+  state.encounterSeed = (Math.imul(1664525, state.encounterSeed) + 1013904223) >>> 0;
+  return state.encounterSeed / 0x100000000 < ambush.chance;
 }
 
 function gatherOptions(state, choice, site, index) {
   const foodPerBatch = (choice.days ?? 0) * rules.satietyDrainPerDay;
   // A final batch can use up the remaining food, but an empty stomach cannot start a new batch.
   const batches = foodPerBatch ? Math.ceil(state.satiety / foodPerBatch) : Infinity;
-  return choiceStocks(site, choice, index).map(([id]) => {
+  return choiceStocks(site, choice, index).map(({ key, id }) => {
     const yieldPerBatch = choice.loot[id];
-    const maximum = Math.min(poolAt(state, site, 'stocks', id).count, yieldPerBatch * batches);
+    const maximum = Math.min(poolAt(state, site, 'stocks', key).count, yieldPerBatch * batches);
     return { id, name: nameOf(id), maximum, suggested: Math.min(maximum, yieldPerBatch) };
   }).filter(({ maximum }) => maximum > 0);
 }
@@ -639,12 +687,12 @@ function choiceBlocker(state, choice, site, index) {
     return { reason: '眼下没有可追的对手。', depleted: true };
   }
   const stocks = choiceStocks(site, choice, index);
-  if (stocks.length && stocks.every(([id]) => poolAt(state, site, 'stocks', id).count === 0)) {
-    return { reason: '这里暂时已经采空了。', depleted: true };
+  if (stocks.length && stocks.every(({ key }) => poolAt(state, site, 'stocks', key).count === 0)) {
+    const renewable = stocks.some(({ pool }) => pool.interval > 0 && pool.growth > 0);
+    return { reason: renewable ? '这里暂时已经采空了。' : '这处材料已经取尽。', depleted: true };
   }
-  if (site?.creatures?.[choice.guardedBy] && poolAt(state, site, 'creatures', choice.guardedBy).count > 0) {
-    return { reason: '那条路还被堵着。' };
-  }
+  const guards = remainingGuards(state, site, choice);
+  if (guards > 0) return { reason: `还有 ${guards} 只挡着这条路。` };
   if (choice.perWin && Object.keys(choice.loot ?? {}).some((id) => records.gear[id] && (gearReserved(state, id) || groundAt(state)[id]))) {
     return { reason: '同样的奖品已有一份。' };
   }
@@ -668,7 +716,7 @@ function choose(state, { index, itemId, count }) {
   const options = gatherOptions(state, choice, site, index);
   const explicitQuantity = itemId !== undefined || count !== undefined;
   let batches = 1;
-  let gathered;
+  let requested;
   if (explicitQuantity) {
     const selected = options.find(({ id }) => id === itemId);
     if (!selected || !Number.isSafeInteger(count) || count < 1 || count > selected.maximum) {
@@ -679,48 +727,72 @@ function choose(state, { index, itemId, count }) {
     batches = Math.ceil(count / yieldPerBatch);
     // The injury follows gathering. If it causes a fall, no further batch can start.
     if (injuryPerBatch) batches = Math.min(batches, Math.ceil(state.hp / injuryPerBatch));
-    gathered = { [selected.id]: Math.min(count, batches * yieldPerBatch) };
+    requested = { [selected.id]: Math.min(count, batches * yieldPerBatch) };
   } else {
-    gathered = Object.fromEntries(options.map(({ id, suggested }) => [id, suggested]));
+    requested = Object.fromEntries(options.map(({ id, suggested }) => [id, suggested]));
   }
   const lootAvailable = { ...choice.loot };
-  for (const [id] of choiceStocks(site, choice, index)) delete lootAvailable[id];
-  const collected = resourceEntries(gathered);
+  const stocks = choiceStocks(site, choice, index);
+  const stockKeys = new Map(stocks.map(({ id, key }) => [id, key]));
+  for (const { id } of stocks) delete lootAvailable[id];
+  const collected = resourceEntries(requested);
+  const gathered = {};
+  let interrupted = false;
+  let ambush = null;
+  let completedBatches = 0;
   const coins = choice.coins ?? 0;
-  if (choice.consume) payItems(state, choice.need);
   state.event = null;
-  state.coins += coins;
   const healthBefore = state.hp;
   for (let batch = 0; batch < batches; batch += 1) {
+    if (remainingGuards(state, site, choice) > 0) {
+      interrupted = true;
+      break;
+    }
+    if (collected.length && rollHarvestAmbush(state, site, choice.ambush)) {
+      ambush = choice.ambush;
+      advance(state, rules.harvestEncounterDays);
+      break;
+    }
+    if (batch === 0) {
+      if (choice.consume) payItems(state, choice.need);
+      state.coins += coins;
+    }
     for (const [id, amount] of collected) {
       const yieldPerBatch = choice.loot[id];
       const portion = Math.min(yieldPerBatch, amount - batch * yieldPerBatch);
-      if (portion > 0) spendPool(state, site, 'stocks', id, portion);
+      if (portion > 0) {
+        spendPool(state, site, 'stocks', stockKeys.get(id), portion);
+        gathered[id] = (gathered[id] ?? 0) + portion;
+      }
     }
     advance(state, choice.days);
     state.hp += choice.hp ?? 0;
     state.qi += choice.qi ?? 0;
     normalize(state);
+    completedBatches += 1;
     if (collected.length && state.hp > 0) recordPractice(state);
   }
   const amount = Math.max(0, healthBefore - state.hp);
   const injury = amount ? { cause: choice.injury ?? '你在途中受了伤。', amount } : undefined;
   const choiceKey = `${event.id}:${index}`;
-  const first = !state.seenChoices.includes(choiceKey);
+  const first = completedBatches > 0 && !state.seenChoices.includes(choiceKey);
   const insight = first ? (choice.insight ?? 0) : 0;
   if (first) {
     state.seenChoices.push(choiceKey);
     state.insight = Math.max(0, state.insight + insight);
   }
-  if (choice.perWin) (state.siteClaims[site.id] ??= {})[index] = siteWins(state, site, choice.afterFight);
-  const { accepted, spilled } = addItems(state, lootAvailable, true);
+  if (completedBatches && choice.perWin) (state.siteClaims[site.id] ??= {})[index] = siteWins(state, site, choice.afterFight);
+  const { accepted, spilled } = addItems(state, completedBatches ? lootAvailable : {}, true);
   const gatheredRegion = state.region;
   const gatheredGoods = goodsText(gathered);
   leaveOnGround(state, gathered);
-  if (choice.enemy && records.enemies[choice.enemy]) startCombat(state, choice.enemy, site?.id);
+  const enemy = ambush?.enemy ?? choice.enemy;
+  if (enemy && records.enemies[enemy]) startCombat(state, enemy, site?.id);
   const loot = goodsText(accepted);
-  const outcome = choice.outcome;
-  const detail = [outcome, gatheredGoods && `采得${gatheredGoods}，留在脚边。`, loot && `获得${loot}。`,
+  const ambushText = ambush ? ambush.outcome ?? '你正在采集，有东西忽然扑了过来。' : null;
+  const outcome = ambushText ?? choice.outcome;
+  const detail = [completedBatches > 0 && choice.outcome, interrupted && '看守又回来了，你收手退到外面。', gatheredGoods && `采得${gatheredGoods}，留在脚边。`,
+    ambushText, loot && `获得${loot}。`,
     insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
   const result = say(state, detail || choice.label);
   return {
@@ -728,6 +800,7 @@ function choose(state, { index, itemId, count }) {
     outcome,
     injury,
     spilled,
+    ...(ambush ? { ambush: ambush.enemy } : {}),
     ...(gatheredGoods ? { gathered, gatheredRegion } : {}),
   };
 }

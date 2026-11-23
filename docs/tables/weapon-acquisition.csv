@@ -9,7 +9,7 @@ short_spear,摊市短矛,制作,r_short_spear,9,寒铁（ore）×2、松木（wo
 hook_blade,渡口钩刃,胜后另行领取,矮石堤（bank_watch） · 等拦滩客兑现比试的约定,,,拦滩客（bank_runner）,,否,
 trail_cutter,松场习刀,胜后另行领取,索棚拳场（pine_spar） · 向轮值的守索人领试刀礼,,,松场巡索人（road_sparrer）,8,是,
 star_blade,暗星刀,制作,r_star_blade,24,暗金（black_iron）×6、灵晶（core）×3、松木（wood）×3,,,是,
-star_blade,暗星刀,胜后另行领取,横肩偏井（deep_vein） · 扶起旧工具柜查看夹层,,,横肩矿傀（vein_sentinel）,,否,
+star_blade,暗星刀,胜后另行领取,横肩偏井（deep_vein） · 翻开井外的旧工具柜,,,横肩矿傀（vein_sentinel）,,否,
 coil_spear,绕脊枪,制作,r_coil_spear,28,暗金（black_iron）×5、松木（wood）×4、灵晶（core）×3,,,是,
 reed_bow,苇弦弓,制作,r_reed_bow,4,松木（wood）×1、灵草（reed）×2,,,是,
 iron_sword,寒铁剑,坊市,迟师傅·巡矿剑摊,33,,,12,是,拿寒铁换旧渡水图（sell_forging）
