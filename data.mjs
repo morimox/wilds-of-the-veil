@@ -301,7 +301,10 @@ const sites = [
       reed: { label: '浅处苇芯', start: 2, cap: 3, interval: 5, growth: 1, depletedFactor: 1.5, choices: [0] },
       reed_deep: { item: 'reed', label: '深处苇芯', start: 3, cap: 5, interval: 5, growth: 1, depletedFactor: 1.5, choices: [1] },
     },
-    emptyText: '岸沿和深水里的白苇都翻过一遍，泥里只剩还没长开的嫩芽。' },
+    stockText: {
+      reed: { present: '几株能挖芯的白苇贴着踏石长。', absent: '踏石边翻过的泥里只剩还没长开的嫩芽。' },
+      reed_deep: { present: '回水湾里还有长实的苇芯。', absent: '回水湾那丛采过了，断茎贴着水面。' },
+    } },
   { id: 'sunk_pack', region: 'marsh', name: '烂木桩浅汊', once: [0, 1],
     afterOnceText: { 0: '木桩上还挂着一小截篓绳。桩内侧的石路绕向河弯，几片新削的木屑从那头漂过来。' } },
   { id: 'mud_track', region: 'marsh', name: '碎石水眼', once: [3, 4],
@@ -317,15 +320,19 @@ const sites = [
     emptyText: '水眼没有动静，干埂只剩浅兽印和拾空的碎枝。另一头仍有几块排齐的石头伸进芦苇。' },
   { id: 'old_fire', region: 'marsh', name: '背雨石渠', afterChoices: ['mud_track:3'],
     stocks: { wood: { start: 6, cap: 6, interval: 0, growth: 0, choices: [1] } }, once: [2, 3],
-    afterOnceText: { 2: '灰里还印着被拿走的瓦角。渠脚背风，石炉通着气，底下的柴有人用石板遮着。' } },
+    stockText: { wood: { present: '渠边石板下露出几截干柴。', absent: '遮柴的石板底下已经空了。' } },
+    choiceText: {
+      2: { before: '炉边的灰里露着一角破瓦。', after: '拿掉瓦角的地方还留着个浅印。' },
+      3: { before: '炉沿的缝里夹着一点纸边。', after: '抽走折纸的砖缝里留下一缕松灰。' },
+    } },
   { id: 'reed_ferryman', region: 'marsh', name: '渡工的刨木滩', afterChoices: ['sunk_pack:1', 'bank_watch:1'], once: [0, 2],
     stocks: { reed: { start: 3, cap: 5, interval: 5, growth: 2, choices: [3] } },
     creatures: { marsh_ghost: { start: 1, cap: 2, interval: 3, growth: 1 } },
     creatureText: { marsh_ghost: { present: '对岸的影子贴着白苇的浅滩来回走，把过水的石路挡住了。渡工停了刀，盯着它看。', absent: '对岸的石路空下来。水从白苇间流走。' } },
     afterOnceText: { 0: '渡工把接上新柄的桨平码在石头上。他脚边另有把翻到背面的旧桨。对岸浅石围着一丛白苇。' } },
-  { id: 'bank_watch', region: 'marsh', name: '矮石堤', once: [1, 2],
+  { id: 'bank_watch', region: 'marsh', name: '矮石堤', once: [1, 2], protectedArena: true,
     creatures: { bank_runner: { start: 1, cap: 1, interval: 0, growth: 0 } },
-    creatureText: { bank_runner: { absent: '拦滩客已经把木杖搁到一旁，自己靠堤坐下。' } },
+    afterWinText: { bank_runner: '拦滩客把木杖靠在堤边，解开了系住折图的细绳。备刀还搁在石面上。' },
     afterOnceText: { 2: '拦滩客靠在堤上揉手腕，放折图和钩刃的石面空了。' } },
   { id: 'drowned_mast', region: 'marsh', name: '沉桅高埂', reveal: { item: 'oar_mark' }, once: [1, 2],
     creatures: { mast_beast: { start: 1, cap: 1, interval: 0, growth: 0 } },
@@ -353,7 +360,11 @@ const sites = [
     creatureText: { stone_badger: { present: '碎石后传来爪尖蹭岩的声响。', absent: '碎石后空空荡荡。' } },
     afterOnceText: { 0: '挑夫把车推回了山路。坡下两道车辙经过一堆松碎石，岩下有口能藏小兽的窄洞。' } },
   { id: 'stone_niche', region: 'ridge', name: '回声石龛', afterChoices: ['miner_echo:2', 'rope_run:0'], once: [0, 1, 2],
-    afterOnceText: { 0: '矿壳里只剩空槽。破铃仍搁在龛沿，两侧岩面留着许多用手摸出来的浅印。' } },
+    choiceText: {
+      0: { before: '铃底的岩石有道细缝，露出一角发白的纸。', after: '水图原先压着的石缝空了，撬松的石头搁在旁边。' },
+      1: { before: '一只破铃倒扣在石壁旁。', after: '提过的破铃靠在岩壁边。再往上是通到裂钟背后的石阶。' },
+      2: { after: '扣住铃舌的裂口只剩一圈擦痕。' },
+    } },
   { id: 'cracked_bell', region: 'ridge', name: '裂钟背面', afterChoices: ['stone_niche:1'], once: [2],
     creatures: { bell_wraith: { start: 1, cap: 1, interval: 0, growth: 0 } },
     creatureText: { bell_wraith: { present: '钟腹里伏着一团灰影。它一缩身，脚下的窄脊就跟着颤。', absent: '钟腹已空，碎片散落在钟座周围。' } },
@@ -498,7 +509,7 @@ const sites = [
 ];
 
 const events = [
-  { id: 'reed_banks', name: '浅水苇丛', text: '岸边的白苇贴着踏石长。再往里水漫过脚踝，另一丛白苇围着回水湾。', choices: [
+  { id: 'reed_banks', name: '浅水苇丛', text: '岸边铺着几块踏石。水越往里越深，在低处绕出一个回水湾。', choices: [
     { label: '挖浅处的苇芯', desc: '站在踏石上，手能伸到近岸的泥边。', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 2, loot: { reed: 2 }, enemy: null, outcome: '你从踏石边的泥里挑出长实的白苇芯。' },
     { label: '蹚过去挖深处的苇芯', desc: '露水沾在水湾那丛苇叶上。', days: 0.5, coins: 0, hp: -4, qi: 0, insight: 3, loot: { reed: 3 }, enemy: null, outcome: '你蹚到水湾，抽出底下发白的嫩芯。', injury: '泥里埋着碎蚌壳，拔脚时划破了小腿。' },
   ] },
@@ -526,7 +537,7 @@ const events = [
     { label: '采下对岸的熟苇芯', desc: '白苇就长在水边的浅石间，叶尖已经黄了。', guardedBy: 'marsh_ghost', days: 0.5, insight: 2, loot: { reed: 3 }, outcome: '踩过空下来的石路，你伸手从齐腰的白苇中抽出熟芯。' },
   ] },
   { id: 'bank_watch', name: '矮石堤', text: '有人在堤边歇脚，腰间别着一张折图，身边的石面上搁着一把钩刃。', choices: [
-    { label: '跟拦滩客过招', desc: '「想借图？跟我过两招，赢了连这把备刀也拿去。」', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'bank_runner', outcome: '拦滩客把折图往腰带里紧了紧，横着木杖站稳。' },
+    { label: '跟拦滩客过招', desc: '「想借图？跟我过两招，赢了连这把备刀也拿去。撑不住就抬手，我收杖。」', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'bank_runner', outcome: '拦滩客把备刀留在石上，紧了紧腰带，横着木杖站稳。' },
     { label: '问他渡工在哪儿', desc: '他顺口提起那张图是河弯的渡工画的。', days: 0, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '他朝那几根歪木桩一抬下巴。「拐过弯就是刨木滩。他给断桨接新柄呢。」' },
     { label: '等拦滩客兑现交手的约定', desc: '他解开腰间缚住折图的细绳，招手让你过去。', afterFight: 'bank_runner', days: 0, loot: { ridge_rubbing: 1, hook_blade: 1 }, outcome: '拦滩客把折图和备刀一起推过来。「说过的算数。走到北边倒钟下，细看图上那道岔。」' },
   ] },
@@ -569,7 +580,7 @@ const events = [
     { label: '从侧坡绕下去帮挑夫', days: 1, coins: 10, hp: 0, qi: 0, insight: 2, loot: { ration: 2, plate_lacing: 1 }, enemy: null, outcome: '挑夫捆好货，分了口粮和盘缠，又从裂开的护板上拆下一片给你。他指向矿口旁的窄坡：「绕到山背就是回声石龛。旧矿工到那儿躲过风。」' },
     { label: '在车辙旁守一会儿', desc: '车辙截断了一串爪印，能看清它在哪堆碎石里断的。', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'stone_badger', outcome: '石甲獾钻出碎石，四爪抓住了坡面。' },
   ] },
-  { id: 'stone_niche', name: '回声石龛', revisit: true, text: '浅石洞的入口倒扣着一只破铃。底下的岩石有道细缝，露出一角发白的纸。', choices: [
+  { id: 'stone_niche', name: '回声石龛', revisit: true, text: '浅石洞朝着山背。伸手摸过洞口，两侧岩面让过路人摸得发亮。', choices: [
     { label: '撬开石缝，取里面的纸', days: 2, coins: 0, hp: 0, qi: -3, insight: 3, loot: { core: 1, ford_chart: 1 }, enemy: null, outcome: '石缝里的一块碎岩松了。拿出来才看见，底下的纸是张叠起来的旧水图。' },
     { label: '提起洞口的破铃', desc: '铃边贴着石壁，一角后面还留着空隙。', days: 1, coins: 5, hp: 0, qi: 0, insight: 1, loot: { ore: 1, stone_rubbing: 1 }, enemy: null, outcome: '破铃碰到石壁，先响一声。等第二阵回声传来，才震下一片寒铁。铃下还压着几枚旧灵钱。沿石缝望去，几级石阶绕到了裂钟背后。' },
     { label: '拿瓦角比对铃沿', desc: '两处凹弧的宽窄正好能接上。', hidden: true, need: { kiln_shard: 1 }, days: 0, coins: 0, hp: 0, qi: 0, insight: 1, loot: { bell_clapper: 1 }, enemy: null, outcome: '照瓦上的旧字叩完，铃腹发出很短的一声。系着细缆的铃舌从裂口滑了出来。' },
@@ -796,7 +807,7 @@ const enemies = [
   { id: 'mud_beast', name: '泥鳞兽', tags: ['beast', 'scaled'], tier: 0, hp: 25, atk: 7, def: 2, intents: [{ name: '偏头啃咬', kind: 'attack', mult: 1 }, { name: '伏身猛扑', kind: 'heavy', mult: 1.7 }, { name: '蜷尾守鳞', kind: 'guard', mult: 1.35 }, { name: '掀尾扫腿', kind: 'attack', mult: 1 }], insight: 3, loot: { beast_meat: 2, hide: 2, qi_core: 1 }, desc: '伏身后会扑向脚下，硬鳞收拢时适合恢复真气或蓄势。' },
   { id: 'reed_fox', name: '苇尾狐', tags: ['beast', 'furred'], tier: 0, hp: 24, atk: 6, def: 1, intents: [{ name: '斜掠扑咬', kind: 'attack', mult: 1 }, { name: '团尾护腹', kind: 'guard', mult: 1.4 }, { name: '伏脊跳扑', kind: 'heavy', mult: 1.5 }], insight: 2, loot: { beast_meat: 1, hide: 1, qi_core: 1 }, desc: '尾上的厚毛扫起了枯苇。它会先绕着干埂寻找扑咬的空当。' },
   { id: 'marsh_ghost', name: '巡岸水鬼', tags: ['spirit'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '抱臂裹雾', kind: 'guard', mult: 1.4 }, { name: '伸指拖拽', kind: 'attack', mult: 1 }, { name: '借雾扑面', kind: 'heavy', mult: 1.6 }], insight: 4, loot: { qi_core: 1 }, desc: '开场先抱臂结雾，准备好再把它拖出水边。' },
-  { id: 'bank_runner', name: '拦滩客', tags: ['human'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '用杖头试探', kind: 'attack', mult: 1 }, { name: '抡杖砸下', kind: 'heavy', mult: 1.5 }, { name: '横杖护身', kind: 'guard', mult: 1.3 }], insight: 3, loot: {}, desc: '这人走惯了滩北的山道，腰间那张正是进山的路图。见他抡起木杖，可以先架住重招。' },
+  { id: 'bank_runner', name: '拦滩客', tags: ['human'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '用杖头试探', kind: 'attack', mult: 1 }, { name: '抡杖砸下', kind: 'heavy', mult: 1.5 }, { name: '横杖护身', kind: 'guard', mult: 1.3 }], insight: 3, loot: {}, sparring: true, desc: '这人走惯了滩北的山道，腰间那张正是进山的路图。见他抡起木杖，可以先架住重招。' },
   { id: 'mast_beast', name: '沉桅虺', tags: ['beast', 'scaled'], tier: 1, hp: 34, atk: 10, def: 3, intents: [{ name: '借桅缠身', kind: 'attack', mult: 1 }, { name: '开鳍扑水', kind: 'heavy', mult: 1.65 }, { name: '绕桅遮身', kind: 'guard', mult: 1.2 }, { name: '甩尾扫水', kind: 'attack', mult: 1 }], insight: 5, loot: { beast_meat: 2, hide: 2, beast_eye: 1, qi_core: 2 }, desc: '有些气候的伏水兽。带上破招术和撤退用的符，可留一条回路。' },
   { id: 'ore_wight', name: '持锤矿煞', tags: ['spirit'], tier: 1, hp: 38, atk: 11, def: 4, intents: [{ name: '平锤试探', kind: 'attack', mult: 1 }, { name: '举锤砸顶', kind: 'heavy', mult: 1.72 }, { name: '横锤护臂', kind: 'guard', mult: 1.45 }, { name: '甩锤碰撞', kind: 'attack', mult: 1.1 }], insight: 5, loot: { qi_core: 2 }, desc: '它击打沉重且规律。越阶挑战时先做好撑过重锤的准备。' },
   { id: 'stone_badger', name: '石甲獾', tags: ['beast', 'furred'], tier: 1, hp: 41, atk: 10, def: 5, intents: [{ name: '缩头挡路', kind: 'guard', mult: 1.38 }, { name: '沿坡顶撞', kind: 'attack', mult: 1 }, { name: '转身重掀', kind: 'heavy', mult: 1.62 }], insight: 5, loot: { beast_meat: 2, hide: 2, qi_core: 2 }, desc: '皮毛粗厚，脊甲又硬。找它转身露侧肋时出手。' },

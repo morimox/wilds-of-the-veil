@@ -456,11 +456,12 @@ const tables = [
     ['sealDamage', '符伤加成'], ['sealGuard', '符护加成'], ['element', '对应五行单项增量'], ['senseMax', '神识上限'], ['senseGuard', '读势减伤'],
   ], { note: '同一修习的各阶段效果不叠加，以当前最高一阶为准。消费当前一级所列材料和时间。当地导师才可升级。' }),
   table('region-encounters', '地区内的可选地点', data.sites, [
-    'region', 'id', 'name', ['protectedArena', '有人主持并护场'],
+    'region', 'id', 'name', ['protectedArena', '是否约定保护性切磋'],
     ['afterChoices', '发现路线的具体动作', (keys) => keys.map(describeChoice).join('、')],
     'reveal', ['once', '一次性选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
     ['emptyText', '地点耗尽时可见情形'], ['afterOnceText', '一次性行动后的场景'],
     ['afterWinText', '当地胜利后的场景', (entries) => Object.entries(entries).map(([id, text]) => `${ref(id)}：${text}`).join('、')],
+    ['stockText', '依各处资源存量出现的景象'], ['choiceText', '可同时出现的行动前后景象'],
     ['creatureText', '动物存在或耗尽时的景象'],
   ], { omit: ['stocks', 'creatures'], note: '发现条件为空即是入境可见的地标。隐蔽地点需遇到相应的指路、岔路或物证。发现后会持续显示。' }),
   table('world-regrowth', '各地点库存与种群', worldPools, [
@@ -490,7 +491,7 @@ const tables = [
   ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排。每点一次、完成一批，所得先放在当前具体地点。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),
   table('mechanisms', '现场机关与试错', mechanismRows, [
     'id', ['site', '现场', siteRef], ['title', '机关'], ['mode', '形式'], 'desc', ['lead', '实际需携带的线索物', ref], ['leadText', '线索内容'],
-    ['moves', '可操作的部件'], ['dials', '实际状态'], ['solution', '开发验收用解法'], ['miss', '误试结果'], ['damage', '误试气血伤害'], ['fatal', '误试是否直接倒下'], 'reward', ['success', '解开的结果'],
+    ['moves', '可操作的部件'], ['dials', '实际状态'], ['solution', '开发验收用解法'], ['miss', '误试结果'], ['damage', '误试气血伤害'], ['fatal', '误试是否直接倒下'], ['resetOnMiss', '误试后机关是否复位'], 'reward', ['success', '解开的结果'],
   ]),
   table('basket', '药篓物件操作', basketOptions, [
     ['action', '操作'], 'days', ['spent', '消耗物件', resources], 'loot', ['note', '执行后反馈'],

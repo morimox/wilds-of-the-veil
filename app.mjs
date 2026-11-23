@@ -29,6 +29,7 @@ const kitSectionOpen = new Map();
 let activeDeduction = null;
 let atlasProvince = null;
 let atlasPoint = null;
+let atlasIndexOpen = false;
 const deductionDrafts = new Map();
 const experimentDrafts = new Map();
 
@@ -285,7 +286,7 @@ function atlas(s) {
   const currentGate = idle && selected.current && world.localGate && !world.localGate.attuned;
   const recipe = data.recipes.find(({ id }) => id === "r_gate_scroll");
   const makeScroll = idle && s.settlement && s.discoveredRecipes.includes(recipe.id);
-  const cannotMake = makeScroll && (s.coins < recipe.cost || !hasSupply(s, recipe.need, homeMaterials(s)));
+  const scrollBlocker = makeScroll && s.craftReasons[recipe.id];
   const usable = gate && !selected.current;
   const transport = `<div class="actions atlas-actions">
       ${road ? routeAction(road) : ""}
@@ -293,11 +294,11 @@ function atlas(s) {
       ${idle && usable && world.localGate?.attuned && selected.province === world.province ? linkButton(`门间传送 · ${gate.price} 灵钱`, "gateJump", gate.id, "", !gate.available) : ""}
       ${usable && world.scrollCount ? linkButton(`展开卷轴 · 余 ${world.scrollCount} 张`, "gateScroll", gate.id, "", !gate.byScroll) : ""}
       ${array && selected.id !== s.region.id && world.localArray?.active ? linkButton(`跨州传送 · ${array.price} 灵钱`, "arrayJump", array.id, "", !array.available) : ""}
-      ${makeScroll && selected.current ? linkButton("制备传送卷轴", "craft", recipe.id, "quiet", cannotMake) : ""}
+      ${makeScroll && selected.current ? linkButton(scrollBlocker || "制备传送卷轴", "craft", recipe.id, "quiet", Boolean(scrollBlocker)) : ""}
     </div>`;
   return panel("山河图", `<div class="actions atlas-tabs" aria-label="州">${tabs}</div>
     ${atlasMap(province, points, selected)}
-    <details class="atlas-index"><summary>查已知地点</summary><div class="actions">${points.map(({ id, name }) =>
+    <details class="atlas-index"${atlasIndexOpen ? " open" : ""}><summary>查已知地点</summary><div class="actions">${points.map(({ id, name }) =>
       `<button type="button" class="button quiet" data-atlas-point="${escape(id)}">${escape(name)}</button>`).join("")}</div></details>
     <div class="atlas-place"><h3>${escape(selected.name)}</h3>${marks ? tag(marks) : ""}
     <p class="intro">${escape(selected.description)}</p>${transport}
@@ -312,6 +313,7 @@ function eventScreen(s) {
   const painted = ["marsh", "ridge", "ford", "hidden"].includes(s.region.id);
   const resources = siteResources(s, local);
   const gathering = s.gathering;
+  const description = s.mechanism?.complete ? s.mechanism.text : event.text;
   const choices = s.visibleChoices.map(choice => {
     const cue = publicText(choice.desc);
     const blocker = choice.lockedReason;
@@ -325,16 +327,15 @@ function eventScreen(s) {
     </div>`;
   }).join("");
   return panel(event.name, `${painted ? `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>` : ""}
-    <p class="intro">${escape(publicText(event.text))}</p>
+    <p class="intro">${escape(publicText(description))}</p>
     ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
     <div class="choice-list">${choices}</div>
-    ${s.mechanism ? mechanismPanel(s.mechanism) : ""}
+    ${s.mechanism && !s.mechanism.complete ? mechanismPanel(s.mechanism) : ""}
     ${s.experiment ? `<fieldset class="event-experiment"${gathering ? " disabled" : ""}>${experimentForm(s.experiment)}</fieldset>` : ""}
     <div class="actions">${linkButton("离开", "leave", "", "quiet", Boolean(gathering))}</div>`, tag(s.region.name));
 }
 
 function mechanismPanel(puzzle) {
-  if (puzzle.complete) return `<section class="mechanism"><p class="intro">${escape(puzzle.text)}</p></section>`;
   const readings = puzzle.readout.map(({ name, value }) => `<div><dt>${escape(name)}</dt><dd>${escape(value)}</dd></div>`).join("");
   const notes = puzzle.mode === "sequence" && puzzle.sequence.length ? `<p class="fine">刚才的顺序　${puzzle.sequence.map(({ label }) => escape(label)).join(" · ")}</p>` : "";
   return `<section class="mechanism"><h3>${escape(puzzle.title)}</h3><p class="intro">${escape(puzzle.desc)}</p>
@@ -401,7 +402,7 @@ function combatScreen(s) {
   });
   return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
-    ${enemy.sparring ? '<p class="fine">有人在旁看着，输的一方撑不住就停手。</p>' : ""}
+    ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
     <div class="actions">${linkButton(weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手", "attack", "", "primary")}${linkButton(intent.kind === "heavy" ? "挡住重招" : "防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}
@@ -542,8 +543,8 @@ function workshop(s) {
   const household = homeMaterials(s);
   const smithMap = s.quests.find(row => row.id === "sell_forging" && !row.completed);
   const remarks = [
-    s.inventory.hide > 0 && recipes.some(row => row.id === "r_hide_coat") &&
-      "工匠捻了捻你带来的兽革。「这皮韧，攒两张，我给你缝件挡牙的褂子。」",
+    household.hide > 0 && recipes.some(row => row.id === "r_hide_coat") &&
+      "工匠捻了捻兽革。「这皮韧，攒两张，我给你缝件挡牙的褂子。」",
     s.inventory.eddy_note > 0 && recipes.some(row => row.id === "r_bank_talisman") &&
       "工匠用炭条描过回汊图上的弯道。「把这道弯画在纸符上。有人追你时，你能借它侧身脱开。」",
     !smithMap && !recipes.length && "工匠在门边磨剪子，脚边卷着几块旧皮。",
@@ -556,9 +557,10 @@ function workshop(s) {
     const gear = data.gear.find(g => g.id === row.result);
     const pill = data.pills.find(g => g.id === row.result);
     const talisman = data.talismans.find(g => g.id === row.result);
-    const reason = !hasSupply(s, row.need, household) ? "材料不足" : s.coins < row.cost ? "灵钱不足" : "";
+    const reason = s.craftReasons[row.id];
     const entry = gear ? gearDescription(result, gear) : pill ? pillSummary(pill) : talisman ? talismanSummary(talisman) : result.desc;
-    return card(result.name, "", tag(kindNames[result.kind] ?? ""), linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), entry, row.need);
+    return card(result.name, `${row.cost} 灵钱 · ${row.days} 日`, tag(kindNames[result.kind] ?? ""),
+      linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), entry, row.need);
   }).join("")}</div>`);
 }
 
@@ -710,9 +712,10 @@ function sectScreen(s) {
     return card(rank.name, [supplies(rank.reward), art?.name].filter(Boolean).join(" · "), tag(`${rank.credit} 功劳`),
       rank.claimed ? "" : linkButton(rank.reason || "领门中回礼", "sectClaim", rank.id, "", !rank.available));
   }).join("") : "";
-  const invitation = sect.joined ? "" : `<p class="fine">入门 ${joining.coins} 灵钱 · ${escape(supplies(joining.need))}</p>`;
+  const invitation = sect.joined ? "" : joining.returning ? '<p class="fine">退门前的功劳还在。</p>' :
+    `<p class="fine">入门 ${joining.coins} 灵钱 · ${escape(supplies(joining.need))}</p>`;
   const button = sect.joined ? linkButton("向管事辞行", "sectLeave", "", "quiet") :
-    linkButton(joining.reason || "向管事投帖", "sectJoin", "", "", !joining.available);
+    linkButton(joining.reason || (joining.returning ? "回师门" : "向管事投帖"), "sectJoin", "", "", !joining.available);
   return panel(sect.name, `<p class="intro">${escape(sect.desc)}</p>${invitation}<div class="actions">${button}</div>
     ${jobs ? `<div class="card-grid">${jobs}${ranks}</div>` : ""}`, sect.joined ? tag(`${sect.credit} 功劳`) : "");
 }
@@ -720,12 +723,11 @@ function sectScreen(s) {
 function tournamentScreen(s) {
   const match = s.tournament;
   const opponent = match.match;
-  const waiting = match.until > s.day ? `第${Math.ceil(match.until)}日再开榜。` : "";
-  const cost = s.coins < match.fee ? "报名钱不够。" : "";
+  const blocker = match.enrolled ? match.fightReason : match.enrollReason;
   return panel(match.name, `<p class="intro">${escape(match.desc)}</p>
     ${match.result ? `<p class="fine">${escape(match.result)}</p>` : ""}
     ${opponent ? `<p class="intro">${escape(opponent.name)} · ${escape(opponent.opponent)}<br>${escape(opponent.note)}</p>` : ""}
-    ${waiting || cost ? `<p class="fine">${escape(waiting || cost)}</p>` : ""}
+    ${blocker ? `<p class="fine">${escape(blocker)}</p>` : ""}
     ${match.claimBlocked ? `<p class="fine">${escape(match.claimBlocked)}</p>` : ""}
     <div class="actions">
       ${!match.enrolled ? linkButton(`报名 · ${match.fee} 灵钱`, "tournamentEnroll", "", "", !match.canEnroll) : ""}
@@ -826,7 +828,37 @@ function deductionBoard(s) {
       </form>`), current.completed ? tag("已在现场验过") : current.thought ? tag("待查证", "warn") : "");
 }
 
+const focusKeys = ["data-action", "data-value", "data-count", "data-tab", "data-facility",
+  "data-market-mode", "data-case", "data-item", "data-atlas-province", "data-atlas-point"];
+
+function keyboardFocus() {
+  const control = document.activeElement;
+  if (!control?.matches("button:focus-visible")) return null;
+  const area = control.closest("#main, #player-status, #kit, .navigation");
+  if (!area) return null;
+  const keys = focusKeys.filter(key => control.hasAttribute(key))
+    .map(key => `[${key}="${CSS.escape(control.getAttribute(key))}"]`).join("");
+  return { area, keys };
+}
+
+function restoreKeyboardFocus(focus) {
+  if (!focus) return;
+  const candidates = focus.keys ? [...focus.area.querySelectorAll(`button${focus.keys}:enabled`)] : [];
+  const chosen = candidates.find(control => control.getClientRects().length) ??
+    [...main.querySelectorAll("button:enabled")].find(control => control.getClientRects().length);
+  if (chosen) {
+    chosen.focus({ preventScroll: true });
+  } else {
+    const heading = main.querySelector("h2");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }
+}
+
 function render() {
+  const focus = keyboardFocus();
   const s = view(state);
   const inEvent = s.mode === "event";
   const inEncounter = s.mode === "combat" || s.mode === "victory" || Boolean(s.gathering);
@@ -856,6 +888,7 @@ function render() {
   }
   guide.querySelector('[data-tab="training"]').hidden = !available.training || inEncounter || inEvent;
   main.innerHTML = content[tab](s);
+  restoreKeyboardFocus(focus);
 }
 
 function selectItem(key) {
@@ -1042,6 +1075,8 @@ document.addEventListener("submit", event => {
 document.addEventListener("click", event => {
   const summary = event.target.closest("summary[data-kit-section]");
   if (summary) kitSectionOpen.set(summary.dataset.kitSection, !summary.parentElement.open);
+  const atlasSummary = event.target.closest(".atlas-index > summary");
+  if (atlasSummary) atlasIndexOpen = !atlasSummary.parentElement.open;
   const button = event.target.closest("button");
   if (!button) return;
   if (button.hasAttribute("data-skip-opening")) {
@@ -1077,6 +1112,7 @@ document.addEventListener("click", event => {
     kitSectionOpen.clear();
     atlasProvince = null;
     atlasPoint = null;
+    atlasIndexOpen = false;
     selectedItem = null;
     activeDeduction = null;
     deductionDrafts.clear();
@@ -1105,16 +1141,17 @@ document.addEventListener("click", event => {
     return;
   }
   if (button.dataset.atlasPoint) {
+    const origin = button.closest(".atlas-index") ? ".atlas-index" : ".atlas-map";
     atlasPoint = button.dataset.atlasPoint;
     atlasProvince = data.regionDetails[atlasPoint].province;
     render();
-    main.querySelector(`.atlas-mark[data-atlas-point="${atlasPoint}"]`)?.focus({ preventScroll: true });
+    main.querySelector(`${origin} [data-atlas-point="${atlasPoint}"]`)?.focus({ preventScroll: true });
     return;
   }
   if (button.dataset.tab) {
     screen = button.dataset.tab;
     if (guide.open) guide.close();
-    if (screen === "workshop" && state.inventory.hide > 0 && !state.showedHideToSmith) {
+    if (screen === "workshop" && !state.showedHideToSmith) {
       act(state, "showHideToSmith");
     }
     render();

@@ -48,6 +48,22 @@ const fighters = new Map(enemies.map((entry) => [entry.id, entry]));
 const actions = new Set(['tournamentEnroll', 'tournamentFight', 'tournamentWithdraw', 'tournamentClaim']);
 const canStaffHelp = (state) => state.region === tournamentData.region && state.knownItems.includes(tournamentData.lead);
 const atRegistration = (state) => !state.combat && !state.gathering && (!state.event || state.event === tournamentData.site);
+const occupied = '先结束眼前的事，再来找裁判。';
+
+function enrollmentBlocker(state, score) {
+  if (!atRegistration(state)) return occupied;
+  if (score.enrolled) return '你已经报过名了。';
+  if (state.day < score.until) return `本届结束后要等四个游戏日才能再报名，第${Math.ceil(score.until)}日可再来。`;
+  if (state.coins < tournamentData.fee) return `报名要付${tournamentData.fee}枚灵钱。`;
+  return '';
+}
+
+function boutBlocker(state, match) {
+  if (!atRegistration(state)) return occupied;
+  if (!match) return '现在没有轮到你的比赛。';
+  if (state.satiety <= 0) return '裁判见你空腹，先请你去吃些东西。';
+  return '';
+}
 
 export function initialTournament() {
   return { enrolled: false, wins: 0, best: -1, claimed: -1, until: 0, result: null };
@@ -62,13 +78,15 @@ export function tournamentView(state, kit) {
   const inMatch = state.combat?.tournament === tournamentData.id;
   const canClaim = Boolean(claim && locationOpen);
   const claimFits = canClaim && kit.hasRoom(state, claim.reward);
+  const enrollReason = score.enrolled ? '' : enrollmentBlocker(state, score);
+  const fightReason = score.enrolled ? boutBlocker(state, next) : '';
   return {
     ...score, name: tournamentData.name, desc: tournamentData.desc, fee: tournamentData.fee,
     cooldown: tournamentData.cooldown, matchCount: tournamentData.matches.length,
     status: inMatch ? 'combat' : score.enrolled ? 'ready' : score.result ? 'finished' : 'idle',
     match: next ? { name: next.name, note: next.note, opponent: fighters.get(next.enemy).name } : null,
-    canEnroll: locationOpen && !score.enrolled && state.day >= score.until && state.coins >= tournamentData.fee,
-    canFight: Boolean(next && locationOpen && state.satiety > 0),
+    enrollReason, canEnroll: !score.enrolled && !enrollReason,
+    fightReason, canFight: score.enrolled && !fightReason,
     canWithdraw: score.enrolled && (locationOpen || inMatch),
     canClaim: claimFits, claimName: claim?.name ?? '',
     claimBlocked: canClaim && !claimFits ? '行囊已满，留空位再领。' : '',
@@ -100,14 +118,13 @@ export function tournamentResolution(state, combat, won) {
 
 export function tournamentAction(state, action, kit) {
   if (!actions.has(action)) return null;
-  if (!canStaffHelp(state)) return kit.refuse('裁判还没有见过你的练尺帖。');
+  if (!canStaffHelp(state)) return kit.refuse('想参加守尺观大比，先到竹尺庭问问傅澄。');
   const inMatch = state.combat?.tournament === tournamentData.id;
-  if (!atRegistration(state) && !(action === 'tournamentWithdraw' && inMatch)) return kit.refuse('先结束眼前的事，再来找裁判。');
+  if (!atRegistration(state) && !(action === 'tournamentWithdraw' && inMatch)) return kit.refuse(occupied);
   const score = state.tournament ??= initialTournament();
   if (action === 'tournamentEnroll') {
-    if (score.enrolled) return kit.refuse('你已经报过名了。');
-    if (state.day < score.until) return kit.refuse('上一次比赛刚结束，等四个游戏日才能再报名。');
-    if (state.coins < tournamentData.fee) return kit.refuse(`报名要付${tournamentData.fee}枚灵钱。`);
+    const reason = enrollmentBlocker(state, score);
+    if (reason) return kit.refuse(reason);
     state.coins -= tournamentData.fee;
     Object.assign(score, { enrolled: true, wins: 0, result: null });
     state.event = null;
@@ -115,8 +132,8 @@ export function tournamentAction(state, action, kit) {
   }
   if (action === 'tournamentFight') {
     const match = score.enrolled && tournamentData.matches[score.wins];
-    if (!match) return kit.refuse('现在没有轮到你的比赛。');
-    if (state.satiety <= 0) return kit.refuse('裁判见你空腹，先请你去吃些东西。');
+    const reason = boutBlocker(state, match);
+    if (reason) return kit.refuse(reason);
     kit.advance(state, tournamentData.boutDays);
     state.event = null;
     kit.startCombat(state, match.enemy, tournamentData.site);

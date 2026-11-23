@@ -323,8 +323,10 @@ function sectView(state, kit) {
   if (!sect) return null;
   const membership = pledge(state, sect);
   const joined = state.world.affiliation === sect.id;
+  const returning = Boolean(membership && !joined);
+  const admission = returning ? { coins: 0, need: {} } : sect.join;
   const joinReason = joined ? '' : state.world.affiliation ? '先回原来的师门辞行，再来拜师。' :
-    membership ? '' : kit.homeRequirements(state, sect.join?.coins ?? 0, sect.join?.need) || '';
+    kit.homeRequirements(state, admission?.coins ?? 0, admission?.need) || '';
   const credit = membership?.credit ?? 0;
   const jobs = sect.jobs.map((job) => {
     const nextAt = membership?.jobs[job.id] ?? 0;
@@ -332,9 +334,13 @@ function sectView(state, kit) {
       kit.homeRequirements(state, 0, job.need) || (!kit.hasRoom(state, job.reward ?? {}, kit.homeBagSpend(state, job.need)) ? '行囊腾出些地方，就能带走回礼。' : '');
     return { ...job, nextAt, available: !reason && !state.event && !state.combat, reason };
   });
-  const ranks = sect.ranks.map((rank, index) => ({ ...rank, id: String(index), claimed: membership?.ranks.includes(index) ?? false,
-    available: joined && credit >= rank.credit && !membership?.ranks.includes(index), reason: credit < rank.credit ? `尚需${rank.credit - credit}份门中功劳。` : '' }));
-  return { ...sect, join: { ...sect.join, available: !joined && !joinReason, reason: joinReason }, joined, credit, jobs, ranks };
+  const ranks = sect.ranks.map((rank, index) => {
+    const claimed = membership?.ranks.includes(index) ?? false;
+    const reason = !joined ? '先入门，再找管事领回礼。' : credit < rank.credit ? `尚需${rank.credit - credit}份门中功劳。` :
+      !claimed && !kit.hasRoom(state, rank.reward ?? {}) ? '行囊装不下这笔回礼。' : '';
+    return { ...rank, id: String(index), claimed, available: !claimed && !reason, reason };
+  });
+  return { ...sect, join: { ...admission, returning, available: !joined && !joinReason, reason: joinReason }, joined, credit, jobs, ranks };
 }
 
 function actSect(state, action, id, kit) {
@@ -343,11 +349,12 @@ function actSect(state, action, id, kit) {
   const view = sectView(state, kit);
   if (action === 'sectJoin') {
     if (!view.join.available) return kit.refuse(view.join.reason || '你已经是这门的人。');
-    if (!pledge(state, local)) {
+    if (!view.join.returning) {
       kit.spendHome(state, local.join?.coins ?? 0, local.join?.need);
       state.world.memberships[local.id] = { credit: 0, jobs: {}, ranks: [] };
     }
     state.world.affiliation = local.id;
+    if (view.join.returning) return kit.say(state, `${local.name}的管事翻到原来那一页，把册子转给你看。旧功劳都在。`);
     return kit.say(state, local.join?.text ?? `${local.name}的管事翻开册子，写下你的名字。`);
   }
   if (!view.joined) return kit.refuse('你还没加入这个师门。');
@@ -368,7 +375,6 @@ function actSect(state, action, id, kit) {
   }
   const rank = view.ranks.find((entry) => entry.id === String(id));
   if (!rank?.available) return kit.refuse(rank?.reason || '这笔门中回礼现在领不了。');
-  if (!kit.hasRoom(state, rank.reward ?? {})) return kit.refuse('行囊装不下这笔回礼。');
   member.ranks.push(Number(rank.id));
   kit.addItems(state, rank.reward ?? {});
   if (rank.art && !state.knownArts.includes(rank.art)) state.knownArts.push(rank.art);

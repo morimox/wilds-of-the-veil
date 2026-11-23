@@ -88,10 +88,23 @@ function offerBlocker(state, offer, kit) {
   return kit.homeRequirements(state, offer.price, {}) || '';
 }
 
+function inquiryProgress(state, index, canDiscuss, kit) {
+  if (!index || canDiscuss) return '';
+  if (index < inquiry.length) return inquiry[index - 1].progress;
+  if (state.realm >= 3) return '';
+  if (kit.owns(state, 'foundation_pill') > 0) return '筑基丹已经收好，闭关突破时再服。';
+  const batch = state.economy?.jobs.find(({ loot }) => loot.foundation_pill);
+  if (batch) return batch.readyDay - state.day > 1e-9
+    ? '后院那炉筑基丹还在火上，等药成了再去收。'
+    : '后院那炉筑基丹已炼好，可以去收丹了。';
+  return inquiry.at(-1).progress;
+}
+
 export function alchemyView(state, kit) {
   if (!kit.atHome(state) || !knowsAlchemist(state)) return null;
   const index = state.alchemy?.inquiryIndex ?? 0;
   const step = currentInquiry(state);
+  const canDiscuss = step && hasInquiryProof(state, step, kit);
   return {
     name: town.name,
     intro: state.knownItems.some((id) => id === 'qi_core' || id === 'foundation_core')
@@ -99,11 +112,11 @@ export function alchemyView(state, kit) {
     offers: offers.filter((offer) => knowsOffer(state, offer)).map((offer) => ({
       ...offer, known: state.knownItems.includes(offer.id), reason: offerBlocker(state, offer, kit),
     })),
-    inquiry: step && hasInquiryProof(state, step, kit) ? {
+    inquiry: canDiscuss ? {
       id: step.id, label: step.label, text: step.text, price: step.price,
       need: { [step.proof]: 1 }, reason: inquiryBlocker(state, step, kit),
     } : null,
-    progressText: index ? inquiry[index - 1].progress : '',
+    progressText: inquiryProgress(state, index, canDiscuss, kit),
   };
 }
 

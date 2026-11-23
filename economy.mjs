@@ -137,7 +137,7 @@ const merchantOrders = {
     units: 12, regularText: '「你拿走的苇箭够插一圈靶了。木头会削，不妨看看铁箭头是怎么收口的。」',
     name: '给箭匠送木料和寒铁', text: '箭匠要用松木做直箭杆，再用寒铁演示怎么套上铁箭头。',
     need: { wood: 8, ore: 4 }, reward: { arrow_pattern: 1 },
-    outcome: '箭匠在箭头后面钻了个孔，把箭杆套牢。他把毛料怎么削、铁头怎么装画给你看，又留下一支样箭。',
+    outcome: '箭匠在箭头后面钻了个孔，把箭杆套牢。他把毛料怎么削、铁头怎么装画给你看，把图样交给了你。',
   },
   millet_seed: {
     units: 4, regularText: '「你买这么些种，看来要种好几轮。晒些谷子拿来，我看看哪畦留种最好。」',
@@ -509,10 +509,11 @@ export function merchantInfo(state, stall, kit) {
   const saved = merchantState(state, stall.id);
   const regular = Boolean(profile && saved.paid >= profile.units);
   const order = orderAt(state, stall);
-  const unavailable = marketStock(state, stall.id, offer) === 0 ? (offer.restockText ?? stockSources[offer.id]) : '';
-  const greeting = regular && !saved.completed ? profile.regularText : stall.desc;
+  const greeting = marketStock(state, stall.id, offer) === 0
+    ? offer.restockText ?? stockSources[offer.id] ?? '这批货已经卖完，摊主在等下一批。'
+    : regular && !saved.completed ? profile.regularText : stall.desc;
   return {
-    greeting: [greeting, unavailable].filter(Boolean).join(' '),
+    greeting,
     regular, completed: saved.completed,
     order: order ? {
       name: order.name, need: order.need, reward: order.reward, cost: order.cost ?? 0,

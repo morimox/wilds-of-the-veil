@@ -92,7 +92,7 @@ export function mechanismAction(state, action, { id }, kit) {
   kit.advance(state, mechanism.tryDays ?? 0.25);
   if (!equalSetting(setting, mechanism.solution)) {
     const result = kit.mechanismFailure(state, mechanism.failure ?? {}, mechanism.miss);
-    if (result.fell) state.mechanisms[mechanism.id] = { setting: original, complete: false };
+    if (result.fell || mechanism.resetOnMiss) state.mechanisms[mechanism.id] = { setting: original, complete: false };
     return result;
   }
   state.mechanisms[mechanism.id] = { setting, complete: true };

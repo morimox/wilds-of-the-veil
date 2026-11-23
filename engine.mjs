@@ -505,8 +505,11 @@ function siteText(state, site, event) {
   const stocks = poolCounts(state, site, 'stocks');
   const creatures = poolCounts(state, site, 'creatures');
   if (site.emptyText && [...Object.values(stocks), ...Object.values(creatures)].every((count) => !count)) return site.emptyText;
-  const details = Object.entries(site.creatureText ?? {}).map(([id, words]) => creatures[id] ? words.present : words.absent).filter(Boolean);
-  return [changed?.[1] ?? opened?.[1] ?? event.text, ...details].join('');
+  const choiceDetails = Object.entries(site.choiceText ?? {}).map(([index, words]) =>
+    state.seenChoices.includes(`${event.id}:${index}`) ? words.after : words.before);
+  const stockDetails = Object.entries(site.stockText ?? {}).map(([id, words]) => stocks[id] ? words.present : words.absent);
+  const creatureDetails = Object.entries(site.creatureText ?? {}).map(([id, words]) => creatures[id] ? words.present : words.absent);
+  return [changed?.[1] ?? opened?.[1] ?? event.text, ...choiceDetails, ...stockDetails, ...creatureDetails].filter(Boolean).join('');
 }
 
 function availableExperiment(state, event) {
@@ -533,6 +536,8 @@ export function view(state) {
   const discoveredQuests = data.quests.filter((quest) => (quest.region ?? hub) === questLocation && knowsQuest(state, quest));
   const services = data.services.filter(({ id }) => knowsService(state, id) && (!inSettlement || atHome(state) ||
     id === 'cultivate' || (id === 'quests' && discoveredQuests.length) || (id === 'workshop' && canCraftScroll(state)))).map(({ id }) => id);
+  const knownRecipes = services.includes('workshop') ? data.recipes.filter((recipe) => !recipe.facility &&
+    (!inSettlement || atHome(state) || recipe.result === 'gate_scroll') && knowsRecipe(state, recipe)) : [];
   const currentEvent = state.event ? records.events[state.event] : null;
   const currentSite = currentEvent && records.sites[currentEvent.id];
   const experiment = availableExperiment(state, currentEvent);
@@ -592,8 +597,8 @@ export function view(state) {
     intentDamage: enemy && intent ? estimatedHit(enemy, intent) : 0,
     discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
       (!art.prizeOnly && (!inSettlement || atHome(state)) && services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
-    discoveredRecipes: services.includes('workshop') ? data.recipes.filter((recipe) => !recipe.facility &&
-      (!inSettlement || atHome(state) || recipe.result === 'gate_scroll') && knowsRecipe(state, recipe)).map(({ id }) => id) : [],
+    discoveredRecipes: knownRecipes.map(({ id }) => id),
+    craftReasons: inSettlement ? Object.fromEntries(knownRecipes.map((recipe) => [recipe.id, craftBlocker(state, recipe)])) : {},
     discoveredQuests: discoveredQuests.map(({ id }) => id),
     discoveredItems: data.items.filter((item) => knowsItem(state, item)).map(({ id }) => id),
     market: !inSettlement || atHome(state) ? marketView(state) : { stalls: [], sales: [] },
@@ -706,7 +711,10 @@ function choiceBlocker(state, choice, site, index) {
   if (completedSiteChoice(state, site, index)) return { reason: '这件事已经办过了。' };
   if ((state.world.recovery[`${site?.id}:${choice.enemy}`] ?? 0) > state.day) return { reason: '教习收了练兵，先歇一歇再来。' };
   if (site?.creatures?.[choice.enemy] && poolAt(state, site, 'creatures', choice.enemy).count === 0) {
-    return { reason: '眼下没有可追的对手。', depleted: true };
+    const reason = records.enemies[choice.enemy]?.sparring
+      ? (site.creatures[choice.enemy].interval > 0 ? '对方收了兵器，过几日再来切磋。' : '这场切磋已经比过了。')
+      : '眼下没有可追的对手。';
+    return { reason, depleted: true };
   }
   const stocks = choiceStocks(site, choice, index);
   if (stocks.length && stocks.every(({ key }) => poolAt(state, site, 'stocks', key).count === 0)) {
@@ -1033,6 +1041,12 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
 function retreat(state, bonus = 0, lead = '', guard = 0) {
   if (state.combat?.tournament === tournamentData.id) return tournamentAction(state, 'tournamentWithdraw', economyKit);
   const enemy = enemyOf(state);
+  if (inProtectedBout(state)) {
+    advance(state, rules.retreatDays);
+    state.combat = null;
+    state.focus = 0;
+    return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
+  }
   const intent = currentIntent(state);
   const { defense, retreat: retreatBonus } = stats(state);
   const training = trainingPerks(state, enemy, intent);
@@ -1048,7 +1062,6 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   const damageTaken = Math.max(0, healthBefore - state.hp);
   const summary = `${lead}你退出了与${enemy.name}的交手，仍在${regionOf(state).name}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
   say(state, summary);
-  if (state.hp === 0 && inProtectedBout(state)) return { ...endSparring(state, enemy), damageDealt: 0, damageTaken };
   state.combat = null;
   return { ...(state.hp === 0 ? fall(state) : { ok: true, message: summary }), damageDealt: 0, damageTaken };
 }
@@ -1352,17 +1365,23 @@ function breakthrough(state) {
   return say(state, `你踏入${next.name}，气血与真气皆满。`);
 }
 
+function craftBlocker(state, recipe) {
+  if (!recipe) return '没有这张配方。';
+  if (recipe.facility) return '要到配方写的那处工位制作。';
+  if (recipe.tier > state.realm) return '这一手做法需要更高境界。';
+  if (!knowsRecipe(state, recipe)) return '你还没找到这个做法。';
+  if (records.gear[recipe.result] && gearReserved(state, recipe.result)) return '同名装备已在手上、仓里或锻炉里。';
+  const missing = homeRequirements(state, recipe.cost, recipe.need);
+  if (missing) return missing;
+  const loot = { [recipe.result]: recipe.count ?? 1 };
+  return hasRoom(state, loot, homeBagSpend(state, combinedResources(recipe.cost, recipe.need))) ? '' : '行囊已满，放不下制成的东西。';
+}
+
 function craft(state, id) {
   const recipe = records.recipes[id];
-  if (!recipe) return refuse('没有这张配方。');
-  if (recipe.facility) return refuse('要到配方写的那处工位制作。');
-  if (recipe.tier > state.realm) return refuse('这一手做法需要更高境界。');
-  if (!knowsRecipe(state, recipe)) return refuse('你还没找到这个做法。');
-  if (records.gear[recipe.result] && gearReserved(state, recipe.result)) return refuse('同名装备已在手上、仓里或锻炉里。');
-  const missing = homeRequirements(state, recipe.cost, recipe.need);
-  if (missing) return refuse(missing);
+  const blocker = craftBlocker(state, recipe);
+  if (blocker) return refuse(blocker);
   const loot = { [recipe.result]: recipe.count ?? 1 };
-  if (!hasRoom(state, loot, homeBagSpend(state, combinedResources(recipe.cost, recipe.need)))) return refuse('行囊已满，放不下制成的东西。');
   spendHome(state, recipe.cost, recipe.need);
   advance(state, recipe.days);
   addItems(state, loot);
@@ -1370,7 +1389,7 @@ function craft(state, id) {
 }
 
 function showHideToSmith(state) {
-  if (!owns(state, 'hide')) return refuse('手里没有兽革。');
+  if (!homeSupplies(state, 'hide')) return refuse('行囊和仓库里都没有兽革。');
   if (state.showedHideToSmith) return refuse('工匠已经看过兽革。');
   state.showedHideToSmith = true;
   return say(state, '工匠拎起兽革，顺着纹路拽了拽。「两片就够衬一件褂子。下回让那水兽咬在这上头。」');

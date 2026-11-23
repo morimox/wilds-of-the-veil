@@ -8,11 +8,14 @@ const items = [
 ];
 
 const sites = [
-  { id: 'puzzle_gauge_pin', region: 'gauge_tower', name: '胥婉的旧水尺', afterChoices: ['gauge_piles:0'], once: [0] },
+  { id: 'puzzle_gauge_pin', region: 'gauge_tower', name: '胥婉的旧水尺', afterChoices: ['gauge_piles:0'], once: [0],
+    afterOnceText: { 0: '木尺顶上多了一截新木。胥婉扶着尺顶试着晃了晃，挂在旁边的小筒已经空了。' } },
   { id: 'puzzle_joint_gates', region: 'fish_ladder', name: '旧渠的分水闸', once: [0] },
-  { id: 'puzzle_scale_register', region: 'zhao_city', name: '挑秤人的砖柜', once: [0] },
+  { id: 'puzzle_scale_register', region: 'zhao_city', name: '挑秤人的砖柜', once: [0],
+    afterOnceText: { 0: '高婆把待修的小秤平放在砖柜上。左盘底下的小方孔空着，她正从木箱里挑合适的木料。' } },
   { id: 'puzzle_lever_cabinet', region: 'measuring_hall', name: '旧柜上的秤', once: [0] },
-  { id: 'puzzle_bridge_verse', region: 'cinder_inn', name: '灶边的旧桥灯', once: [0] },
+  { id: 'puzzle_bridge_verse', region: 'cinder_inn', name: '灶边的旧桥灯', once: [0],
+    afterOnceText: { 0: '旧桥灯仍挂在炉边，灯下少了铜环与小牌。杨芹把一碗刚盛好的汤端给进门的挑担人。' } },
   { id: 'puzzle_sound_relay', region: 'dry_sound_bridge', name: '桥下的传声筒', once: [0] },
   { id: 'puzzle_spool_loom', region: 'reed_meadows', name: '春衫织棚', once: [0] },
   { id: 'puzzle_granary_catch', region: 'crane_granary', name: '歪了的粮箱', once: [0] },
@@ -54,12 +57,12 @@ const events = [
   { id: 'puzzle_spool_loom', name: '春衫织棚',
     text: '小雨刚停，姚莼把织机搬到堤上。机上搭着一把细芦苇丝和一团粗麻线，底下压着一盏打过补丁的旧渔灯罩。', choices: [
       { label: '帮姚莼摊开打湿的旧灯罩', days: 0.125, insight: 2,
-        outcome: '姚莼把旧灯罩举起来。正面的芦苇丝之间透进几道亮光，背面的挂绳孔缠着几圈粗麻线。她把灯罩搁在织机边，给你留出一小截空处试手。' },
+        outcome: '姚莼把旧灯罩举起来。正面的芦苇丝之间透进几道亮光，背面的挂绳孔缠着几圈粗麻线。她把灯罩搁回织机边。' },
     ] },
   { id: 'puzzle_granary_catch', name: '歪了的粮箱',
     text: '粮仓里架着一口上宽下窄的木箱，谷子从箱底的小门放出来。眼下箱子歪了，门缝往下掉谷壳。箱子和木架之间夹着块麻布，地上还有几块垫脚的木头。', choices: [
       { label: '问何绢粮箱为什么会歪', days: 0.125, insight: 2,
-        outcome: '何绢双手扶着木架。「布一干就打滑。箱子歪着，垫在架子底下的木块也会被它推出来。门边那个弹簧还露在外头，手别伸进门里。」' },
+        outcome: '何绢指了指箱子和木架之间的接缝。「布一干就打滑。箱子一歪，架脚下的木块也会被它推出来。开门就按住露在外头的弹簧，手别伸进门里。」' },
     ] },
   { id: 'puzzle_hoof_markers', name: '三块刻着蹄印的石头',
     text: '路边、窄道口和谷底各有一块能转动的石头。每块石头上都凿着蹄印，只是风沙把印子磨得几乎看不见了。', choices: [
@@ -88,7 +91,7 @@ const mechanisms = [
     success: '秧根先沾了水，急水跟着冲下石阶，米库门前还干着。梁溥从石阶旁取出几样修水槽剩下的材料，放在你脚边。',
     miss: '水冲回来，铜把手猛地一弹，打在手背上。',
     failure: { damage: 4 },
-    completeText: '三道水槽各走各的水。梁溥记好了水位，正蹲在岸边洗手。',
+    completeText: '秧田只进了一线水，急水沿石阶下去，米库前干着。梁溥记好了水位，正蹲在岸边洗手。',
     reward: { wood: 7, ore: 5, core: 3 }, insight: 6,
   },
   { id: 'six_liang_cabinet', site: 'puzzle_lever_cabinet', title: '把旧秤调平', mode: 'dials',
@@ -147,7 +150,7 @@ const mechanisms = [
     completeText: '姚莼把你织的那一截挂在旧灯罩旁，两块花纹一深一浅。',
     reward: { wood: 3, hide: 2, ration: 2 }, insight: 3,
   },
-  { id: 'grain_hatch_catch', site: 'puzzle_granary_catch', title: '扶稳粮箱', mode: 'sequence', maxLength: 3,
+  { id: 'grain_hatch_catch', site: 'puzzle_granary_catch', title: '扶稳粮箱', mode: 'sequence', maxLength: 3, resetOnMiss: true,
     desc: '干麻布压不住打滑的箱子。何绢还扶着箱下的木架，架子一歪，垫脚的木块就会掉出来。箱底的小门还扣着，按住门边露出来的弹簧才能往外拉。',
     tryLabel: '站到一旁，拉开箱底的小门',
     moves: [
@@ -157,7 +160,7 @@ const mechanisms = [
     ],
     solution: ['soak_cloth', 'place_chock', 'steady_catch'],
     success: '小门开了，木箱稳稳架着。何绢用簸箕接住流下来的谷子，转身拿了几块谷饼过来，又添了几块用得上的干木。',
-    miss: '木箱一歪，门边的弹簧擦破了你的指节。何绢伸手扶稳了架子。',
+    miss: '木箱一歪，门边的弹簧擦破了你的指节。何绢扶住架子，抽走斜出来的木块，又换了块干布。',
     failure: { damage: 3 },
     completeText: '几块木头还垫在架子脚下。何绢关好小门，把湿布抽出来晾着。',
     reward: { ration: 6, wood: 4 }, insight: 4,

@@ -48,7 +48,15 @@ const animal = (start, cap, interval, growth, curve) => ({ start, cap, interval,
 
 const sites = [
   { id: 'meadow_channel', region: 'reed_meadows', name: '姚六的弯渠', once: [2, 3],
-    stocks: { reed: stock('田边灵草', 4, 7, 4, 2, 0), wood: stock('沟口漂木', 4, 5, 4, 2, 1) } },
+    stocks: { reed: stock('田边灵草', 4, 7, 4, 2, 0), wood: stock('沟口漂木', 4, 5, 4, 2, 1) },
+    stockText: {
+      reed: { present: '内沟边有一茬灵草。', absent: '内沟边的灵草只剩没长成的嫩芽。' },
+      wood: { present: '外沟的窄口卡着漂木。', absent: '外沟口的漂木已清开，水能流出去。' },
+    },
+    choiceText: {
+      2: { before: '两户田之间的槽板向外翘着。', after: '新换的槽板撑稳了，两户的田都能过水。' },
+      3: { after: '先前放走野雁的岸边，还留着几枚浅脚印。' },
+    } },
   { id: 'meadow_ruts', region: 'reed_meadows', name: '雁脚泥垄',
     creatures: { reed_fox: animal(2, 4, 4, 1, 'wild') },
     creatureText: { reed_fox: { present: '狐狸顺着雁的脚印钻进堤下，留了两行新脚印。', absent: '泥垄上只剩让日头晒干的旧脚印。' } } },
@@ -60,7 +68,10 @@ const sites = [
     creatures: { river_gateback: animal(1, 2, 6, 1, 'wild') },
     creatureText: { river_gateback: { present: '水里那条横脊每次摆尾，最下一级的阶都被掩住。', absent: '水阶落出一截，能踩去有铁屑的水槽。' } } },
   { id: 'willow_yard', region: 'willow_post', name: '卸货后院', once: [0, 1],
-    afterOnceText: { 1: '雨水顺着新木槽淌到院外。檐下的行李没再淋湿，门房手边那两块名牌也挪到了干处。' } },
+    choiceText: {
+      0: { before: '门房从钩上摘下两块名牌，一块写着系灯院，一块写着白苇滩。', after: '写着系灯院的木牌挂回了钩上，封乔的那一块压着门房手边的货单。' },
+      1: { before: '檐下的雨槽歪向院里，水顺着石板流到行李旁。', after: '雨水顺着新木槽淌到院外，檐下的行李没再淋湿。' },
+    } },
   { id: 'gauge_piles', region: 'gauge_tower', name: '刻尺水桩', once: [0, 1],
     stocks: { core: stock('水尺旁的灵晶', 2, 5, 6, 1, 2) } },
   { id: 'slope_sieves', region: 'screen_slope', name: '断壁筛架', once: [3],
@@ -83,7 +94,7 @@ const sites = [
 ];
 
 const events = [
-  { id: 'meadow_channel', name: '姚六的弯渠', text: '田坎边并排两道浅沟。内沟边是灵草生根的地方，外沟口窄，最容易卡住上游漂来的枯木。姚六扛着耙子在水槽边歇脚。', choices: [
+  { id: 'meadow_channel', name: '姚六的弯渠', text: '田坎边并排两道浅沟。姚六扛着耙子在田边歇脚。', choices: [
     { label: '采田边的灵草', days: 0.5, insight: 1, loot: { reed: 3 }, outcome: '姚六指了指内沟边的嫩草，你顺着他指的地方采了几束。' },
     { label: '搬开沟口卡住的枯木', days: 0.5, insight: 1, loot: { wood: 2 }, outcome: '枯木挪开后，浑水沿外沟慢慢流了下去。' },
     { label: '拿松木帮姚六修水槽', desc: '水槽边的木板向外翘着。姚六说：「拿两片直木把这个口子撑住，两户田都能过水。修完去驿站报个名。」', need: { wood: 2 }, consume: true, days: 0.5, coins: 7, insight: 2, loot: { river_field_stamp: 1 }, outcome: '水槽修好后，姚六从袖里数出几枚钱，又在修渠凭据背面写上名字，画了去驿站的路。' },
@@ -104,7 +115,7 @@ const events = [
     { label: '到最下面的水槽筛寒铁', guardedBy: 'river_gateback', days: 0.875, insight: 3, loot: { ore: 3 }, outcome: '筛掉浮砂，较沉的铁粒留在布里。' },
     { label: '问岑响为何守着坏掉的水闸', days: 0.125, insight: 1, outcome: '岑响抖了抖鱼篓底的泥。「闸坏了，岸边的鱼游不上来。等找人修好了，总还会回来。」' },
   ] },
-  { id: 'willow_yard', name: '卸货后院', text: '门房从钩上摘下两块名牌，一块写着系灯院，一块写着白苇滩。檐下的雨槽歪向了院里，水顺着石板流到行李旁。', choices: [
+  { id: 'willow_yard', name: '卸货后院', text: '货柜靠墙排成一列，旅人的包袱都暂堆在檐下。', choices: [
     { label: '问门房这两块名牌是谁的', days: 0.125, insight: 1, loot: {}, outcome: '门房把系灯院的牌子挂回钩上，留下写着「白苇滩，封乔」的那块。「咱们夜里只托熟人送货。你若在木台上赢过封乔，他给你木签，我这儿就认得你了。」' },
     { label: '替门房补好接雨水的木槽', desc: '门房瞧了一眼天色。「手头若有三片木，我出八钱。再漏一晚，来歇脚的人都睡不好。」', days: 0.5, need: { wood: 3 }, consume: true, coins: 8, insight: 1, loot: {}, outcome: '木槽接住檐下的水。门房用麻绳固定好，从茶桌下取出约定的钱。' },
   ] },
