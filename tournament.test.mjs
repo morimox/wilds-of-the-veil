@@ -77,7 +77,7 @@ test('three real arena opponents, rest between bouts, and a one-time first place
   }
   assert.equal(view(state).tournament.result, '三场全胜');
   assert.equal(view(state).tournament.best, 3);
-  assert.equal(view(state).tournament.claimName, '立尺头名');
+  assert.match(view(state).tournament.claimName, /三场全胜.*奖品/);
   assert.equal(state.knownArts.includes('terrace_reversing_stance'), false);
   assert.equal(view(state).tournament.canEnroll, false);
 
@@ -98,7 +98,7 @@ test('three real arena opponents, rest between bouts, and a one-time first place
   prizeLead.realm = 5;
   prizeLead.knownItems.push('tournament_citation');
   assert.equal(view(prizeLead).discoveredArts.includes('terrace_reversing_stance'), false);
-  assert.match(act(prizeLead, 'learn', { id: 'terrace_reversing_stance' }).message, /亲自教授/);
+  assert.match(act(prizeLead, 'learn', { id: 'terrace_reversing_stance' }).message, /当面教/);
 });
 
 test('loss preserves score validity and possessions; one consolation with a four-day re-entry delay', () => {
@@ -119,7 +119,7 @@ test('loss preserves score validity and possessions; one consolation with a four
   assert.equal(state.coins, purse);
   assert.equal(state.tournament.wins, 0);
   assert.equal(state.tournament.until - state.day, tournamentData.cooldown);
-  assert.match(act(state, 'tournamentEnroll').message, /清榜/);
+  assert.match(act(state, 'tournamentEnroll').message, /等四个游戏日.*再报名/);
   play(state, 'tournamentClaim');
   assert.equal(state.inventory.ration, belongings.ration + 2);
   assert.equal(act(state, 'tournamentClaim').ok, false);
@@ -144,7 +144,7 @@ test('ordinary retreat concedes a live official match, and legit earlier wins st
   assert.equal(state.tournament.enrolled, false);
   assert.equal(state.tournament.best, 1);
   assert.equal(state.tournament.result, '自行退赛');
-  assert.equal(view(state).tournament.claimName, '丈步回礼');
+  assert.match(view(state).tournament.claimName, /第一场.*奖品/);
   play(state, 'tournamentClaim');
   assert.equal(state.inventory.iron_talisman, 1);
   assert.equal(state.inventory.tournament_citation, undefined);

@@ -6,7 +6,7 @@ const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
 const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [recipe.formula] : []));
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
 const slotNames = { weapon: "兵刃", armor: "护具", charm: "法器" };
-const intentNames = { attack: "进攻", heavy: "蓄势", guard: "守势", heal: "疗伤", drain: "夺气" };
+const intentNames = { attack: "进攻", heavy: "准备重击", guard: "防御", heal: "疗伤", drain: "吸取真气" };
 const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药" };
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
 const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterline"];
@@ -173,17 +173,17 @@ function stats(s) {
   const canUseSalve = s.hp < s.maxHp && s.inventory.salve > 0 && ["village", "field", "combat"].includes(s.mode);
   const sense = s.spiritSense;
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
-    ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。伤药和在据点歇息可以恢复。")}
+    ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。敷伤药或在据点歇息都能恢复。")}
     ${canUseSalve ? linkButton("敷伤药", "use", "salve", "quick-eat") : ""}
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
-    ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "术诀和久留雾中会耗真气。回村歇息可以恢复。") : ""}
-    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一分神识读对手后招。到据点歇息可收回心神。</p></details>` : ""}
+    ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施展术诀、在雾中久留都会消耗真气。在据点歇息能恢复。") : ""}
+    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，可以预看再下一招，并减轻本回合受到的伤害。歇息能恢复神识。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
 function routeAction(road) {
-  const label = road.id === "village" ? "回村" : road.rescue ? `缓行至${road.name}` : `去${road.name}`;
+  const label = road.id === "village" ? "回村" : road.rescue ? `慢慢走到${road.name}` : `去${road.name}`;
   return `<div class="route-action">${linkButton(label, "travel", road.id, "", !road.available)}
     <span class="fine">${escape(road.reason || `${road.days} 日`)}</span></div>`;
 }
@@ -209,7 +209,7 @@ function journey(s) {
   if (s.mode === "combat") return combatScreen(s);
   if (s.mode === "victory") {
     const final = s.completionPhase === "final";
-    return panel(final ? "旧渡通行契" : "潮印归灯", `<p class="intro">${final ? "衡印归村，送信的人出了渡口，沿船路去更远的驿站。" : "旧渡重新点起了灯。渡船也带回了岭外的消息。"}</p><div class="actions">${linkButton("继续行旅", "resume", "", "primary")}</div>`);
+    return panel(final ? "旧渡通行契" : "旧渡重新开船", `<p class="intro">${final ? "村里收到了衡印。送信的人乘渡船出发，去给沿岸驿站送通行文书。" : "渡口重新点起了灯。第一趟船也带回了岭外的消息。"}</p><div class="actions">${linkButton("继续上路", "resume", "", "primary")}</div>`);
   }
   const roads = [...s.world.roads].sort((left, right) => left.days - right.days);
   const nearby = roads.slice(0, 5);
@@ -227,7 +227,7 @@ function journey(s) {
     ${originalHome && s.economy ? tabButton("去后院", "yard") : ""}
     ${originalHome && s.alchemy ? tabButton("找丹师", "alchemy") : ""}
     ${isHome && (needRest || !originalHome) ? linkButton("歇息", "rest") : ""}
-    ${s.sect ? tabButton("见门中管事", "sect") : ""}
+    ${s.sect ? tabButton("找宗门管事", "sect") : ""}
     ${s.tournament ? tabButton("去看宗门大比", "tournament") : ""}
     ${isHome && s.training?.some(({ region }) => region === s.region.id) ? tabButton("请教修习", "training") : ""}
     ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) : ""}
@@ -258,14 +258,14 @@ function atlasMap(province, points, selected) {
 
 function arrayLedger(array) {
   if (!array) return "";
-  if (array.active) return '<p class="fine">州阵已经接通。对面的州阵修好后，就能互相传送。</p>';
+  if (array.active) return '<p class="fine">这里的传送阵已修好。两边都修好后，就能跨州传送。</p>';
   const rows = Object.entries({ ...array.need, coins: array.coins }).map(([id, total]) => {
     const paid = id === "coins" ? array.coinsPaid : array.paid[id] ?? 0;
     const maximum = array.limits[id] ?? 0;
     return `<div class="array-row"><span>${escape(id === "coins" ? "灵钱" : itemRows[id].name)} <b>${paid}/${total}</b></span>
       ${maximum ? `${linkButton("交一份", "arrayContribute", id, "quiet")}${maximum > 1 ? linkButton(`交 ${maximum}`, "arrayContribute", id, "quiet", false, maximum) : ""}` : ""}</div>`;
   }).join("");
-  return `<section class="atlas-local"><h3>修州阵</h3><p class="fine">${escape(array.reason)}</p>${rows}</section>`;
+  return `<section class="atlas-local"><h3>修跨州传送阵</h3><p class="fine">${escape(array.reason)}</p>${rows}</section>`;
 }
 
 function atlas(s) {
@@ -280,7 +280,7 @@ function atlas(s) {
   const road = idle && world.roads.find(({ id }) => id === selected.id);
   const gate = world.gates.find(({ id }) => id === selected.id);
   const array = idle && world.arrays.find(({ id }) => id === selected.id);
-  const marks = [selected.current ? "所在处" : "", selected.settlement ? "可歇息" : "", selected.attuned ? "已认门" : ""].filter(Boolean).join(" · ");
+  const marks = [selected.current ? "你在这里" : "", selected.settlement ? "可歇息" : "", selected.attuned ? "传送门已点亮" : ""].filter(Boolean).join(" · ");
   const currentGate = idle && selected.current && world.localGate && !world.localGate.attuned;
   const recipe = data.recipes.find(({ id }) => id === "r_gate_scroll");
   const makeScroll = idle && s.settlement && s.discoveredRecipes.includes(recipe.id);
@@ -288,10 +288,10 @@ function atlas(s) {
   const usable = gate && !selected.current;
   const transport = `<div class="actions atlas-actions">
       ${road ? routeAction(road) : ""}
-      ${currentGate ? linkButton("按门心，认下这座门", "attuneGate") : ""}
+      ${currentGate ? linkButton("点亮传送门", "attuneGate") : ""}
       ${idle && usable && world.localGate?.attuned && selected.province === world.province ? linkButton(`门间传送 · ${gate.price} 灵钱`, "gateJump", gate.id, "", !gate.available) : ""}
       ${usable && world.scrollCount ? linkButton(`展开卷轴 · 余 ${world.scrollCount} 张`, "gateScroll", gate.id, "", !gate.byScroll) : ""}
-      ${array && selected.id !== s.region.id && world.localArray?.active ? linkButton(`走州阵 · ${array.price} 灵钱`, "arrayJump", array.id, "", !array.available) : ""}
+      ${array && selected.id !== s.region.id && world.localArray?.active ? linkButton(`跨州传送 · ${array.price} 灵钱`, "arrayJump", array.id, "", !array.available) : ""}
       ${makeScroll && selected.current ? linkButton("制备传送卷轴", "craft", recipe.id, "quiet", cannotMake) : ""}
     </div>`;
   return panel("山河图", `<div class="actions atlas-tabs" aria-label="州">${tabs}</div>
@@ -335,12 +335,12 @@ function eventScreen(s) {
 function mechanismPanel(puzzle) {
   if (puzzle.complete) return `<section class="mechanism"><p class="intro">${escape(puzzle.text)}</p></section>`;
   const readings = puzzle.readout.map(({ name, value }) => `<div><dt>${escape(name)}</dt><dd>${escape(value)}</dd></div>`).join("");
-  const notes = puzzle.mode === "sequence" ? `<p class="fine">${puzzle.sequence.length ? puzzle.sequence.map(({ label }) => escape(label)).join(" · ") : "空筒未响"}</p>` : "";
+  const notes = puzzle.mode === "sequence" && puzzle.sequence.length ? `<p class="fine">刚才的顺序　${puzzle.sequence.map(({ label }) => escape(label)).join(" · ")}</p>` : "";
   return `<section class="mechanism"><h3>${escape(puzzle.title)}</h3><p class="intro">${escape(puzzle.desc)}</p>
     ${puzzle.leadText ? `<p class="fine">${escape(puzzle.leadText)}</p>` : ""}
     ${readings ? `<dl class="mechanism-reading">${readings}</dl>` : ""}${notes}
     <div class="actions">${puzzle.moves.map(({ id, label }) => linkButton(label, "mechanismMove", id, "quiet", !puzzle.canMove)).join("")}</div>
-    <div class="actions">${linkButton(puzzle.tryLabel ?? "试试机关", "mechanismTry", "", "primary", !puzzle.canTry)}${linkButton("松开复位", "mechanismReset", "", "quiet", !puzzle.canReset)}</div>
+    <div class="actions">${linkButton(puzzle.tryLabel ?? "试试机关", "mechanismTry", "", "primary", !puzzle.canTry)}${linkButton("恢复原样", "mechanismReset", "", "quiet", !puzzle.canReset)}</div>
     ${puzzle.reason ? `<p class="fine">${escape(puzzle.reason)}</p>` : ""}</section>`;
 }
 
@@ -368,15 +368,15 @@ function experimentForm(experiment) {
 }
 
 function pillSummary(row) {
-  return [row.hp && "疗伤", row.qi && "回气", row.food && "充饥", row.toxin < 0 && "解丹毒", row.wound && "调理伤势", row.focus && "凝神"].filter(Boolean).join(" · ");
+  return [row.hp && "恢复气血", row.qi && "恢复真气", row.satiety && "充饥", row.toxin < 0 && "减轻丹毒", row.wound && "减轻伤势", row.focus && "加强下一次术诀"].filter(Boolean).join(" · ");
 }
 
 function talismanSummary(row) {
-  return [row.damage && "伤敌", row.guard && "护身", row.retreat && "助撤"].filter(Boolean).join(" · ");
+  return [row.damage && "伤敌", row.guard && "少受伤", row.retreat && "撤退时好脱身"].filter(Boolean).join(" · ");
 }
 
 function artSummary(row) {
-  return ["耗真气", row.pierce && "穿甲", row.guard && "护身", row.break && "拆重招"].filter(Boolean).join(" · ");
+  return ["消耗真气", row.pierce && "能穿甲", row.guard && "少受伤", row.break && "能化解重招"].filter(Boolean).join(" · ");
 }
 
 function combatScreen(s) {
@@ -400,14 +400,14 @@ function combatScreen(s) {
   });
   return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
-    ${enemy.sparring ? '<p class="fine">有人护场，失手时即停。</p>' : ""}
+    ${enemy.sparring ? '<p class="fine">有人在旁看着，输的一方撑不住就停手。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
-    <div class="actions">${linkButton(weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手", "attack", "", "primary")}${linkButton(intent.kind === "heavy" ? "架招" : "防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}
+    <div class="actions">${linkButton(weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手", "attack", "", "primary")}${linkButton(intent.kind === "heavy" ? "挡住重招" : "防御", "guard")}${linkButton("撤退", "retreat", "", "danger")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
-      ${s.spiritSense ? linkButton("凝神读势", "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
+      ${s.spiritSense ? linkButton("预看再下一招", "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
     </div>
-    ${s.spiritSense?.prediction ? `<p class="intent">后势 · ${escape(s.spiritSense.prediction.name)}　${escape(intentNames[s.spiritSense.prediction.kind] ?? "")}</p>` : ""}
+    ${s.spiritSense?.prediction ? `<p class="intent">再下一招 · ${escape(s.spiritSense.prediction.name)}　${escape(intentNames[s.spiritSense.prediction.kind] ?? "")}</p>` : ""}
     ${observation}
     ${techniques.length ? `<div class="card-grid learned-arts">${techniques.join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
@@ -533,7 +533,7 @@ function workshop(s) {
     s.inventory.hide > 0 && recipes.some(row => row.id === "r_hide_coat") &&
       "工匠捻了捻你带来的兽革。「这皮韧，攒两张，我给你缝件挡牙的褂子。」",
     s.inventory.eddy_note > 0 && recipes.some(row => row.id === "r_bank_talisman") &&
-      "工匠用炭条顺着回汊图勾了一遍。「把这道弯画进符里，缠住你的劲就能往旁边卸。」",
+      "工匠用炭条描过回汊图上的弯道。「把这道弯画在纸符上。有人追你时，你能借它侧身脱开。」",
     !smithMap && !recipes.length && "工匠在门边磨剪子，脚边卷着几块旧皮。",
   ].filter(Boolean).map(line => `<p class="intro">${escape(line)}</p>`).join("");
   const mapTrade = smithMap ? `<p class="intro">${escape(smithMap.desc)}</p>${smithMap.ready ? `<div class="actions">${linkButton("递一块寒铁", "handin", smithMap.id)}</div>` : ""}` : "";
@@ -709,7 +709,7 @@ function tournamentScreen(s) {
       ${!match.enrolled ? linkButton(`报名 · ${match.fee} 灵钱`, "tournamentEnroll", "", "", !match.canEnroll) : ""}
       ${match.enrolled ? linkButton("登台过招", "tournamentFight", "", "primary", !match.canFight) : ""}
       ${match.canWithdraw ? linkButton("跟裁判说退赛", "tournamentWithdraw", "", "quiet") : ""}
-      ${match.canClaim ? linkButton(match.claimName || "领名次回礼", "tournamentClaim") : ""}
+      ${match.canClaim ? linkButton(match.claimName || "领取奖品", "tournamentClaim") : ""}
     </div>`, match.enrolled ? tag(`已胜 ${match.wins} 场`) : "");
 }
 
@@ -718,18 +718,18 @@ function trainingScreen(s) {
   const contents = rows.map(track => {
     const where = data.regions.find(({ id }) => id === track.region)?.name;
     const teacher = [track.trainer, where].filter(Boolean).join(" · ");
-    const status = track.level ? `${track.level}/${track.maxLevel} 重` : "尚未修习";
+    const status = track.level ? `${track.level}/${track.maxLevel} 阶` : "还没学";
     const next = track.next;
     const payment = next ? `${supplies(next.need)} · ${next.coins} 灵钱 · ${next.days} 日` : "";
-    const button = next ? linkButton(track.blockedReason || "交料修习", "trainStudy", track.id, "", !track.available) : "";
+    const button = next ? linkButton(track.blockedReason || "交材料，跟师傅学", "trainStudy", track.id, "", !track.available) : "";
     return `<article class="card study-track"><h3>${escape(track.name)} ${tag(status)}</h3>
       <p>${escape(track.desc)}</p><p class="fine">${escape(teacher)}</p>
       ${track.level ? `<p class="study-effect">${escape(track.effect)}</p>` : ""}
-      ${next ? `<p class="fine">下一重 ${escape(next.effect)}</p><p class="fine">${escape(payment)}</p>` : ""}
+      ${next ? `<p class="fine">下一阶 ${escape(next.effect)}</p><p class="fine">${escape(payment)}</p>` : ""}
       ${button ? `<div class="actions">${button}</div>` : ""}</article>`;
   }).join("");
   const affiliation = s.affiliation ? tag(`${s.affiliation.name} · ${s.affiliation.credit} 功劳`) : "";
-  return panel("修习账", `<div class="card-grid">${contents}</div>`, affiliation);
+  return panel("修习进度", `<div class="card-grid">${contents}</div>`, affiliation);
 }
 
 function alchemy(s) {

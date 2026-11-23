@@ -1,38 +1,38 @@
 export const trainingData = [
   { id: 'seals', name: '符法', region: 'village', teacher: '莫船家', lead: 'lamp_sketch',
-    desc: '莫船家让你在灶门的穿堂风里压稳纸符。风稳了，符里的火和护身的气才同手势一起走。',
+    desc: '灶门漏风。莫船家把符按在桌上，让你练着用一只手压稳，再用另一只手引出符里的火。',
     ranks: [
       { coins: 12, days: 1, need: { reed: 3, wood: 2 }, sealDamage: 2, sealGuard: 1, effect: '伤敌的符多造成 2 点原始伤害，护身的符多挡 1 点。' },
       { coins: 22, days: 2, need: { reed: 5, ore: 2 }, sealDamage: 3, sealGuard: 2, effect: '伤敌的符多造成 3 点原始伤害，护身的符多挡 2 点。' },
       { coins: 36, days: 3, need: { core: 3, qi_core: 2 }, sealDamage: 5, sealGuard: 3, effect: '伤敌的符多造成 5 点原始伤害，护身的符多挡 3 点。' },
     ] },
   { id: 'breath', name: '内息', region: 'willow_post', teacher: '驿医桑拙', lead: 'echo_method',
-    desc: '桑拙把返声行气稿铺在茶案。等过崖回声远了，才让你接下一段气。',
+    desc: '桑拙把练内息的手稿摊在茶桌上。他敲两下桌面，让你按那两下的间隔慢慢吸气、吐气。',
     ranks: [
       { coins: 14, days: 1, need: { reed: 4, core: 1 }, qi: 3, restQi: 1, effect: '真气上限加 3，在歇脚处每次多恢复 1 点真气。' },
       { coins: 26, days: 2, need: { ore: 3, core: 2 }, qi: 6, restQi: 2, effect: '真气上限加 6，在歇脚处每次多恢复 2 点真气。' },
       { coins: 40, days: 3, need: { qi_core: 2, core: 4 }, qi: 9, restQi: 3, effect: '真气上限加 9，在歇脚处每次多恢复 3 点真气。' },
     ] },
   { id: 'body', name: '炼体', region: 'measuring_hall', teacher: '掌尺人傅澄', lead: 'body_breath_note',
-    desc: '傅澄借出两块试尺的镇石，先教你把脚掌放稳，再慢慢接过它们的分量。',
+    desc: '傅澄把两块压秤的大石头搬来。他让你先站稳，再一点点把重量接到自己手里。',
     ranks: [
       { coins: 16, days: 1, need: { hide: 2, wood: 3 }, hp: 4, def: 0, effect: '气血上限加 4。' },
-      { coins: 28, days: 2, need: { ore: 4, hide: 4 }, hp: 8, def: 1, effect: '气血上限加 8，来伤少 1 点。' },
-      { coins: 44, days: 3, need: { black_iron: 3, hide: 6 }, hp: 12, def: 2, effect: '气血上限加 12，来伤少 2 点。' },
+      { coins: 28, days: 2, need: { ore: 4, hide: 4 }, hp: 8, def: 1, effect: '气血上限加 8，被打中时少受 1 点伤害。' },
+      { coins: 44, days: 3, need: { black_iron: 3, hide: 6 }, hp: 12, def: 2, effect: '气血上限加 12，被打中时少受 2 点伤害。' },
     ] },
   { id: 'elements', name: '五行', region: 'mingsha_city', teacher: '阮杪', lead: 'cold_kiln_record',
-    desc: '阮杪带着冷炉册来井籍房校印。她让你按炉册换料，分别试热、换气与卸力。',
+    desc: '阮杪带着冷炉验火册来登记。她翻出一页，让你换几种材料试一试。同样的力用在石头和兽皮上，效果并不一样。',
     ranks: [
-      { coins: 32, days: 2, need: { core: 4, ore: 4 }, element: 1, effect: '金破鳞石，木缓普通兽咬，水抗夺气，火伤阴灵，土抵石属重招。对应收益为 1 点。' },
-      { coins: 52, days: 3, need: { core: 6, black_iron: 4, foundation_core: 1 }, element: 2, effect: '对应五行收益提升到 2 点。' },
-      { coins: 80, days: 4, need: { core: 9, black_iron: 7, foundation_core: 2 }, element: 3, effect: '对应五行收益提升到 3 点。' },
+      { coins: 32, days: 2, need: { core: 4, ore: 4 }, element: 1, effect: '金更容易打穿石甲和鳞甲，木少受野兽的普通攻击，水抵抗吸取真气的招式，火打阴灵更疼，土能挡石妖的重击。遇上对应情况时，加成是 1 点。' },
+      { coins: 52, days: 3, need: { core: 6, black_iron: 4, foundation_core: 1 }, element: 2, effect: '遇上相应的敌人或招式时，五行加成提高到 2 点。' },
+      { coins: 80, days: 4, need: { core: 9, black_iron: 7, foundation_core: 2 }, element: 3, effect: '遇上相应的敌人或招式时，五行加成提高到 3 点。' },
     ] },
   { id: 'spirit', name: '神识', region: 'zhao_city', teacher: '水师杜椿', lead: 'phase_chart',
-    desc: '杜椿用铜版演示如何听见比眼睛早一步的水声。试过之后，短暂的先觉也能用于交手。',
+    desc: '水还没漫过铜板边缘，杜椿就让你闭眼听它涨上来。交手时，你也能用这个法子提前察觉对方的动作。',
     ranks: [
-      { coins: 30, days: 2, need: { core: 3, qi_core: 2 }, senseMax: 2, senseGuard: 2, effect: '神识上限 2。花一格看对方后招，并少受下一次来伤 2 点。' },
-      { coins: 48, days: 3, need: { core: 5, beast_eye: 1, foundation_core: 1 }, senseMax: 3, senseGuard: 3, effect: '神识上限 3。花一格看对方后招，并少受下一次来伤 3 点。' },
-      { coins: 72, days: 4, need: { core: 8, beast_eye: 2, foundation_core: 2 }, senseMax: 4, senseGuard: 4, effect: '神识上限 4。花一格看对方后招，并少受下一次来伤 4 点。' },
+      { coins: 30, days: 2, need: { core: 3, qi_core: 2 }, senseMax: 2, senseGuard: 2, effect: '神识上限 2。花 1 点预看再下一招，本回合少受 2 点伤害。' },
+      { coins: 48, days: 3, need: { core: 5, beast_eye: 1, foundation_core: 1 }, senseMax: 3, senseGuard: 3, effect: '神识上限 3。花 1 点预看再下一招，本回合少受 3 点伤害。' },
+      { coins: 72, days: 4, need: { core: 8, beast_eye: 2, foundation_core: 2 }, senseMax: 4, senseGuard: 4, effect: '神识上限 4。花 1 点预看再下一招，本回合少受 4 点伤害。' },
     ] },
 ];
 
@@ -131,10 +131,10 @@ export function trainingAction(state, action, { id }, kit) {
 
 export function recordTrainingRead(state, kit) {
   const sense = spiritView(state, kit);
-  if (!sense || !state.combat) return kit.refuse('你还不会引动神识。');
+  if (!sense || !state.combat) return kit.refuse('学会神识后，可以在战斗中预看对手的招式。');
   if (!sense.canRead) return kit.refuse(sense.current ? '这回合已经用神识看过了。' : '神识已经耗尽，歇脚后再用。');
   state.training.sense -= 1;
   state.combat.spiritReadRound = state.combat.round;
   state.combat.spiritGuard = trainedRank(state, 'spirit').senseGuard;
-  return kit.say(state, `凝神看出后招「${spiritView(state, kit).prediction.name}」。`);
+  return kit.say(state, `你看见对方再下一招是「${spiritView(state, kit).prediction.name}」。`);
 }

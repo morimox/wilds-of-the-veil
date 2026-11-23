@@ -631,7 +631,7 @@ function visit(state, id) {
 function revisit(state, id) {
   return revisitableEvents(state).some((event) => event.id === id)
     ? visit(state, id)
-    : refuse('眼下还找不到可回查的去处。');
+    : refuse('你还不知道该回哪里查这条线索。');
 }
 
 function wait(state) {
@@ -654,7 +654,7 @@ function encounter(state, id) {
   }
   const burdened = state.pressure > rules.pressureThreshold && state.qi > 0;
   if (burdened) state.qi = Math.max(0, state.qi - rules.pressureQi);
-  return say(state, `在${region.name}遇上${records.events[id].name}。${first ? `初探此地，见识+${rules.firstRegionInsight}。` : ''}${burdened ? `久探耗神，真气−${rules.pressureQi}。` : ''}`);
+  return say(state, `在${region.name}遇上${records.events[id].name}。${first ? `初探此地，见识+${rules.firstRegionInsight}。` : ''}${burdened ? `在雾里走久了，真气−${rules.pressureQi}。` : ''}`);
 }
 
 function startCombat(state, id, siteId) {
@@ -1087,7 +1087,7 @@ function attack(state) {
 }
 
 function eat(state, inCombat, id = supply) {
-  if (id === 'beast_meat' && owns(state, id)) return refuse('这肉还生着，得带回村起灶。');
+  if (id === 'beast_meat' && owns(state, id)) return refuse('肉还生着。带回村用灶煮熟就能吃。');
   const food = records.foods[id];
   if (!food || !owns(state, id)) return refuse('没有这份可吃的口粮。');
   if (state.satiety >= rules.maxSatiety && state.hp >= stats(state).maxHp) return refuse('你还很饱，气血也足。');
@@ -1131,7 +1131,7 @@ function use(state, id, inCombat) {
   const entry = pill ?? talisman;
   if (!entry) return refuse('这件物品不能直接使用。');
   if (entry.tier > state.realm) return refuse('你目前承受不了这件物品的效力。');
-  if (talisman && !inCombat) return refuse('遇敌时才可催动这道符。');
+  if (talisman && !inCombat) return refuse('这道符要在战斗中用。');
   if (pill?.satiety && state.satiety >= rules.maxSatiety) return refuse('你还很饱。');
   removeItem(state, id, 1);
   if (pill) {
@@ -1249,7 +1249,7 @@ function rest(state) {
 function learn(state, id) {
   const art = records.arts[id];
   if (!art) return refuse('坊市没有这部术诀。');
-  if (art.prizeOnly && !state.knownArts.includes(id)) return refuse('这门术要由传习人亲自教授。');
+  if (art.prizeOnly && !state.knownArts.includes(id)) return refuse('这门术要找会用它的人当面教。');
   if (!isRevealed(state, art.reveal)) return refuse('你还没有这门术的传承线索。');
   if (state.knownArts.includes(id)) return refuse('你已经掌握了这门术。');
   if (art.tier > state.realm) return refuse('这门术需要更高境界。');
@@ -1262,7 +1262,7 @@ function learn(state, id) {
 
 function research(state) {
   const sessions = state.studies[state.realm] ?? 0;
-  if (sessions >= rules.researchLimit) return refuse('这一境的静修已经尽了功效，可到外面增进见识。');
+  if (sessions >= rules.researchLimit) return refuse('在这个境界，静修已不能再增长见识。出门探索、交手或办委托都能继续增长。');
   if (state.qi < rules.researchQi) return refuse('真气不足，先歇息片刻。');
   advance(state, rules.researchDays);
   state.qi -= rules.researchQi;
@@ -1337,7 +1337,7 @@ function breakthroughBlockers(state, next) {
 
 function breakthrough(state) {
   const next = records.realms[state.realm + 1];
-  if (!next) return refuse('你已经走到了此地传承的尽头。');
+  if (!next) return refuse('你已经到了当前最高境界。');
   const [blocker] = breakthroughBlockers(state, next);
   if (blocker) return refuse(blocker);
   spendHome(state, next.cost, next.need);
@@ -1352,7 +1352,7 @@ function breakthrough(state) {
 function craft(state, id) {
   const recipe = records.recipes[id];
   if (!recipe) return refuse('没有这张配方。');
-  if (recipe.facility) return refuse('这道工序需要在相应设施里开工。');
+  if (recipe.facility) return refuse('要到配方写的那处工位制作。');
   if (recipe.tier > state.realm) return refuse('这一手做法需要更高境界。');
   if (!knowsRecipe(state, recipe)) return refuse('你还没找到这个做法。');
   if (records.gear[recipe.result] && gearReserved(state, recipe.result)) return refuse('同名装备已在手上、仓里或锻炉里。');
@@ -1500,7 +1500,7 @@ function handin(state, id) {
 
 function deduce(state, { id, evidence, hypothesis }) {
   const deduction = records.deductions[id];
-  if (!deduction || !knowsDeduction(state, deduction)) return refuse('眼下没有这桩疑案的头绪。');
+  if (!deduction || !knowsDeduction(state, deduction)) return refuse('你还没遇到这个疑点。');
   if (state.completedDeductions.includes(id)) return refuse('这桩疑案已经在现场验过了。');
   const text = typeof hypothesis === 'string' ? hypothesis.trim() : '';
   if (!text || text.length > hypothesisLimit || !Array.isArray(evidence)) {
@@ -1516,7 +1516,7 @@ function deduce(state, { id, evidence, hypothesis }) {
 
 function tryExperiment(state, { id, settings }) {
   const trial = availableExperiment(state, records.events[state.event]);
-  if (!trial || trial.id !== id) return refuse('眼前还没有能这样试的东西。');
+  if (!trial || trial.id !== id) return refuse('这里还缺验证这个猜想的条件。');
   if (!settings || typeof settings !== 'object' || Array.isArray(settings) ||
     Object.keys(settings).length !== trial.controls.length || trial.controls.some(({ id: control, options }) =>
       !Object.hasOwn(settings, control) || !options.some(({ id: option }) => option === settings[control]))) {
@@ -1598,7 +1598,7 @@ const combatActions = {
     return combatTurn(state, {
       guard: rules.guardBonus + (heavy ? rules.heavyGuardBonus : 0),
       counter: heavy ? rules.guardCounter : 0,
-      message: heavy ? '你架住重招，顺势还手。' : '你收身架守。',
+      message: heavy ? '你挡住重招，趁对手还没收招打了回去。' : '你收回手，挡在身前。',
     });
   },
   art: (state, { id }) => cast(state, id),

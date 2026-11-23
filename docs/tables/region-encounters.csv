@@ -1,9 +1,9 @@
 ﻿所属地区,标识,名称,有人主持并护场,发现路线的具体动作,发现条件,一次性选项序号,地点耗尽时可见情形,一次性行动后的场景,当地胜利后的场景,动物存在或耗尽时的景象
 白苇滩（marsh）,reed_banks,浅水苇丛,,,,,岸沿和深水里的白苇都翻过一遍，泥里只剩还没长开的嫩芽。,,,
-白苇滩（marsh）,sunk_pack,烂木桩浅汊,,,,1、2,,0＝桩脚只剩几丝篓绳。木桩内侧那排石头沿水伸进转弯处，水面漂着几片新刨花。,,
+白苇滩（marsh）,sunk_pack,烂木桩浅汊,,,,1、2,,0＝木桩上还挂着一小截篓绳。桩内侧的石路绕向河弯，几片新削的木屑从那头漂过来。,,
 白苇滩（marsh）,mud_track,碎石水眼,,,,4、5,水眼没有动静，干埂只剩浅兽印和拾空的碎枝。另一头仍有几块排齐的石头伸进芦苇。,,,mud_beast＝present＝近岸冒一溜水泡，几片硬鳞擦过露出水面的石头。、absent＝近岸平静，水面看不到鳞片。、reed_fox＝present＝干埂有新兽印，苇梗上还挂着短毛。、absent＝干埂只剩几道磨浅的旧兽印。
 白苇滩（marsh）,old_fire,背雨石渠,,碎石水眼（mud_track） · 踩着石头往苇后探,,3、4,,2＝灰里还印着被拿走的瓦角。渠脚背风，石炉通着气，底下的柴有人用石板遮着。,,
-白苇滩（marsh）,reed_ferryman,渡工的刨木滩,,烂木桩浅汊（sunk_pack） · 踩着木桩内侧的石头往前看、矮石堤（bank_watch） · 问他渡工在哪儿,,1、3,,0＝渡工把接上新柄的桨平码在石头上。他脚边另有把翻到背面的旧桨。对岸浅石围着一丛白苇。,,marsh_ghost＝present＝对岸的影子贴着白苇的浅滩来回走，把过水的石路挡住了。渡工停了刀，盯着它看。、absent＝对岸的石路空下来。水从白苇间流走。
+白苇滩（marsh）,reed_ferryman,渡工的刨木滩,,烂木桩浅汊（sunk_pack） · 沿木桩内侧的石路往前看、矮石堤（bank_watch） · 问他渡工在哪儿,,1、3,,0＝渡工把接上新柄的桨平码在石头上。他脚边另有把翻到背面的旧桨。对岸浅石围着一丛白苇。,,marsh_ghost＝present＝对岸的影子贴着白苇的浅滩来回走，把过水的石路挡住了。渡工停了刀，盯着它看。、absent＝对岸的石路空下来。水从白苇间流走。
 白苇滩（marsh）,bank_watch,矮石堤,,,,2、3,,2＝拦滩客靠在堤上揉手腕，放折图和钩刃的石面空了。,,bank_runner＝absent＝拦滩客已经把木杖搁到一旁，自己靠堤坐下。
 白苇滩（marsh）,drowned_mast,沉桅高埂,,,得知物品 旧桨上的靠岸图（oar_mark）,2、3,,2＝桅木底下露出一道空缝。水仍从高埂下那块露头石的两侧分开。,,mast_beast＝present＝桅下伏着一条有鳍的水兽，尾巴绕着桅根，木缝里透出一点铜色。、absent＝桅根只挂着断下的水草。
 沉钟岭（ridge）,ore_rain,落矿的冲沟,,,,3,沟底已翻过一遍，没有松动的矿块了。护篷下还坐着一位验矿的老人。,,,
@@ -11,13 +11,13 @@
 沉钟岭（ridge）,miner_echo,有回声的矿道,,,,3,主道里没有锤声，旁孔也已经翻过。更高一点的石缝还透着外头的天光。,,,ore_wight＝present＝握锤的影子在主道上巡行，一点冷光随它胸口移动。它身后的矿壁另有两条亮脉。、absent＝主道听不到锤声了，锤痕一路通到夹着亮晶的矿壁。
 沉钟岭（ridge）,rope_run,断绳坡,,,,1,,0＝挑夫把车推回了山路。坡下两道车辙经过一堆松碎石，岩下有口能藏小兽的窄洞。,,stone_badger＝present＝碎石后传来爪尖蹭岩的声响。、absent＝碎石后空空荡荡。
 沉钟岭（ridge）,stone_niche,回声石龛,,有回声的矿道（miner_echo） · 贴着透光的石缝往外看、断绳坡（rope_run） · 从侧坡绕下去帮挑夫,,1、2、3,,0＝矿壳里只剩空槽。破铃仍搁在龛沿，两侧岩面留着许多用手摸出来的浅印。,,
-沉钟岭（ridge）,cracked_bell,裂钟背面,,回声石龛（stone_niche） · 提起石龛里的破铃,,3,,2＝龛架铜钩空着。旧钟裂成的两瓣斜在坡上，背后的窄石脊还能绕回山坡。,,bell_wraith＝present＝钟腹里伏着一团灰影。它一缩身，脚下的窄脊就跟着颤。、absent＝钟腹已空，碎片散落在钟座周围。
+沉钟岭（ridge）,cracked_bell,裂钟背面,,回声石龛（stone_niche） · 提起洞口的破铃,,3,,2＝龛架铜钩空着。旧钟裂成的两瓣斜在坡上，背后的窄石脊还能绕回山坡。,,bell_wraith＝present＝钟腹里伏着一团灰影。它一缩身，脚下的窄脊就跟着颤。、absent＝钟腹已空，碎片散落在钟座周围。
 闭潮渡（ford）,low_tide,闸外浅阶,,,,,浅阶已经扫净，下游的船绳浮着不动。只有浪沫漫过石缝。,,,rope_eel＝present＝下游船绳时松时紧，深槽外的水不时打旋。、absent＝下游船绳浮在水上，无物牵动。
-闭潮渡（ford）,boat_shade,没篷的渡舟,,,,2、3,,1＝柜子移走了，船底铁箍旁留着一道擦痕。船凳还干，旧缆仍挂在朝水的钩上。船头灯架上留着旧烟。,,
+闭潮渡（ford）,boat_shade,没篷的渡舟,,,,2、3,,1＝柜子移走了，船底的铁带留下一道擦痕。船里的凳子还干，旧船绳挂在朝水的钩上。灯架熏黑了一半。,,
 闭潮渡（ford）,flood_lines,刻洪痕的石壁,,,,1,,0＝石缝里只剩一道压痕。洪水在壁根留了薄薄的沙，水还够不到这里。,,
 闭潮渡（ford）,lock_deck,悬锁木排,,,,1、2,,0＝铁环上只剩一圈湿绳痕。木排仍压着大半石阶，水从排边滴下去。、1＝挪开的木排歪倚在石上，石阶已露出。排边套着铁环，伸手就够得着。,,
-闭潮渡（ford）,tide_keeper,旧闸深槽,,悬锁木排（lock_deck） · 抬配重挪开木排,,2、3,,2＝取过印的方槽露在外头，薄水从门缝向外淌。高处还有几级干石阶，可以退过去看涨落。,,tide_spirit＝present＝水退下去时，一道人影扯紧锁链，锁旁露出一个方形印钮。、absent＝重锁已经松落，闸间没有人影。
-闭潮渡（ford）,ford_relay,旧闸外的驮棚,,悬锁木排（lock_deck） · 抬配重挪开木排,,1,,0＝新添的木柱撑住了棚檐。老船工把口粮收在柱旁，棚里还有一处干地可坐。,,
+闭潮渡（ford）,tide_keeper,旧闸深槽,,悬锁木排（lock_deck） · 抬起铁块，挪开木排,,2、3,,2＝取过印的方槽露在外头，薄水从门缝向外淌。高处还有几级干石阶，可以退过去看涨落。,,tide_spirit＝present＝水退下去时，一道人影扯紧锁链，锁旁露出一个方形印钮。、absent＝重锁已经松落，闸间没有人影。
+闭潮渡（ford）,ford_relay,旧闸外的驮棚,,悬锁木排（lock_deck） · 抬起铁块，挪开木排,,1,,0＝新添的木柱撑住了棚檐。老船工把口粮收在柱旁，棚里还有一处干地可坐。,,
 回灯埠（hidden）,upstream_lights,逆水灯龛,,,,1,,0＝干槽里留着点灯后的灰，灯芯缩短了一截。灯壳朝上游开口，灯座背面避风。,,
 回灯埠（hidden）,sunken_mooring,低水船桩,,,,2、3,,1＝粮匣已经解开，湿绳尾梢在水里绕成一圈。桩灯的铜罩伏在木沿上。、2＝桩灯的铜罩已经盖好，留下一圈熏痕。旁边的湿绳仍贴着岸。,,wick_husk＝present＝湿蓑衣下面，一只手攥着微亮的灯芯。、absent＝蓑衣空了，顺水漂过船脚。
 回灯埠（hidden）,still_pole,风口灯杆,,,,1,,,,
@@ -25,36 +25,36 @@
 青崖松场（pine_ridge）,timber_bridge,缺板的驮桥,,,,1,,0＝驮夫打好最后一只楔子。桥板不再晃，石墩仍可坐人。,,
 青崖松场（pine_ridge）,pine_hollow,翻车的松沟,,,,3,,2＝车轴边只剩裁下来的麻绳。沟沿那条小路还能绕回松架。,灰脊松熊（pitch_bear）：车轴被撞得斜出树沟。麻绳断了，木签落在外侧的小路边。,pitch_bear＝present＝空车一侧拱动，车轴底还拴着几缕毛。、absent＝车底已经空了。泥面只剩拖着爪走过的深痕。
 青崖松场（pine_ridge）,pine_ledges,背阴的断肩崖,,,得知物品 松崖背阴旧址（pine_ledge_note）,,靠里的几道脂槽见底了。石面还有旧挖凿的横痕。,,,
-青崖松场（pine_ridge）,pine_spar,索棚拳场,是,,,,,,,road_sparrer＝present＝守索人站在草蒲边，把一把奖给胜者的习刀摆在架上。、absent＝这班守索人把钝刀插回门边，等下一班人来换手。
+青崖松场（pine_ridge）,pine_spar,索棚拳场,是,,,,,,,road_sparrer＝present＝守索人站在草垫边，把一把要奖给胜者的练武刀摆在架上。、absent＝这班守索人把钝刀插回门边，等下一班人来。
 云炉石谷（kiln_valley）,clay_bank,白泥洗坯坡,,,,,坡根的白泥已经铲尽，拐弯处只剩风干的灰壳。,,,
-云炉石谷（kiln_valley）,abandoned_kiln,冷下来的老窑,,,,1、3,,0＝铁箍下面的石牌取出来了。灰线后的平石仍能挡风，墙边斜靠一段烧焦的木柄。、2＝墙边落着擦下来的焦灰。风还往窑门的铁箍底下钻，灰线后有石头能挡风。,,
+云炉石谷（kiln_valley）,abandoned_kiln,冷下来的老窑,,,,1、3,,0＝铁圈下的石牌已经取出来了。灰线后的平石仍能挡风，墙边斜靠着一段烧焦的木柄。、2＝墙边落着擦下来的焦灰。风还往窑门的铁圈底下钻，灰线后有石头能挡风。,,
 云炉石谷（kiln_valley）,kiln_carter,药篓车棚,,,,1、2,,0＝车帮已经封好，赶车人把最后一个药篓提到石檐下。车底有一面挡泥的旧篷。、1＝旧篷卷到车轮边，石檐下叠着几只空药篓。赶车人蹲在车帮旁。,,
-云炉石谷（kiln_valley）,kiln_flue,废窑烟道,,冷下来的老窑（abandoned_kiln） · 从铁箍下面取出石牌,,3,,2＝墙缝里只剩黄釉上的半片纸痕。靠外窑砖积灰，内壁石柜半开。坡下温水从后崖渗进窑沟。,,cinder_hound＝present＝鱼鳞似的窑砖抖动了几下，一团带着暗红的细灰在石柜前打转。、absent＝窑砖已经稳下来，通往石柜的过道空了。
+云炉石谷（kiln_valley）,kiln_flue,废窑烟道,,冷下来的老窑（abandoned_kiln） · 从铁圈下取出石牌,,3,,2＝墙缝里只剩黄釉上的半片纸痕。靠外窑砖积灰，内壁石柜半开。坡下温水从后崖渗进窑沟。,,cinder_hound＝present＝鱼鳞似的窑砖抖动了几下，一团带着暗红的细灰在石柜前打转。、absent＝窑砖已经稳下来，通往石柜的过道空了。
 篁泽药谷（herb_basin）,herb_beds,银脉水畦,,,,,水畦里的老叶已经剪尽。细芽还贴着湿泥，只等抽出来。,,,
 篁泽药谷（herb_basin）,mist_shelter,垫高脚的药棚,,,,1、2,,0＝泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。、1＝席上的捣药板已经腾出来了。泽医身边还放着几只给矿队装药的篓。,,
 篁泽药谷（herb_basin）,vine_pond,白藤塘,,,,,塘里只剩尚未长开的嫩茎。去浅水的踏石没人挡着，岸外仍有块斜石可绕。,,白纹鹿王（vine_king）：倒藤被顶离了老树，背水坡上露出另一片银脉叶。岸外那块斜石还在。,vine_stag＝present＝藤下偶尔晃过白角，湿泥从踏石边滑进水里。、absent＝藤垂着不动，浅水上也没有动静。、vine_king＝present＝上游一根粗藤擦掉了树皮，旁边的蹄印比塘边的大得多。、absent＝坝根的倒藤已经伏下，可以顺着水脚上去。
 玄砂矿脉（black_mine）,mine_tailings,黑砂洗矿槽,,,,,石槽里只剩碎砂。激流过后，有颜色的石块才会再卡进来。,,,
-玄砂矿脉（black_mine）,winch_house,断榫绞盘屋,,,,1、2,,0＝绞盘转得起来了。矿工正在窗边收拾修盘留下的零件，架外的石阶顺坡下去。、1＝矿工让出了量榫口的铁样。断木榫搁在绞架边，架外的石阶顺坡下去。,,
+玄砂矿脉（black_mine）,winch_house,断榫绞盘屋,,,,1、2,,0＝收绳的转盘转起来了。矿工在窗边收拾零件，架外的石阶顺坡而下。、1＝矿工把量尺寸的铁零件给了你。断木接头还搁在转盘边，架外的石阶顺坡而下。,,
 玄砂矿脉（black_mine）,deep_vein,横肩偏井,,,,3,,2＝井外的旧柜敞着，托刀的木格已经空了。井底露出的矿脉沿碎车槽延伸，右手还可绕回地面。,横肩矿傀（vein_sentinel）：旧工具柜被撞上了井外的窄台。碎车槽内侧仍是一道露在石壁上的矿脉。,vein_sentinel＝present＝井口两面黑岩像肩骨似地拢到一起，车轮被挤得裂了一道缝。每次岩肩移动，石身中间就会闪一下。、absent＝井口只剩几块倒下的黑纹石，往碎车槽的路空出来了。
 碎云雪关（snow_pass）,silk_bough,背风雪蜥径,,,,,老石窝的蜥蜕拾净了。雪蜥咬出的几道浅窝还露在外头，低处绑着避冰口的石绳。,,,
-碎云雪关（snow_pass）,snow_fire,护栈火棚,,,,1、3,,0＝守栈人把收紧的绳索一根根盘好。火盆还有余烬，他手边搭着一块半缝好的布套。、2＝守栈人把练缝剩下的碎布卷好，脚边还有待换的旧套和一只火盆。,,
+碎云雪关（snow_pass）,snow_fire,护栈火棚,,,,1、3,,0＝守栈人收起换下的扶绳。火盆里还有红炭，他手边搁着一只缝到一半的护绳套。、2＝守栈人把碎布卷好，往火盆里拨了拨。脚边还放着几个磨破的护绳套。,,
 碎云雪关（snow_pass）,white_ravine,露背的雪沟,,,,3,,2＝短栈护绳旁剩下一块横铁印。风沿雪沟灌上来，沿绳还能退到避风处。,,snow_warden＝present＝雪地有一道新犁痕。远处伏着高背，呼吸声把雪粉一层层掀开。、absent＝风快把犁痕吹平了。沟里没有新脚印。
 天衡石台（sky_terrace）,cloud_scree,浮光晶坡,,,,3、4,晶屑已拾净。高岩后有旧工台和嵌在石边的火盏架，雾从几道浅槽间吹过来。,,,
 天衡石台（sky_terrace）,old_observatory,偏影观星梁,,,,1、3,,0＝星刻已拓下来了。梁背小槽里的木账片还在，反照石门的影子仍落在半尺之外。、2＝梁背的小槽空了，边角只剩几道浅刮痕。雾散时，三道刻圈的影子还是偏着落下。,,
 天衡石台（sky_terrace）,mirror_gate,反峰镜门,,偏影观星梁（old_observatory） · 趁雾散拓下石梁里的刻圈,,3,,2＝空印座上还留着浅浅的手痕。镜外侧的路沿梁影往回。,,mirror_warden＝present＝镜里有道握印的影子。梁影掠过时，它的右肩跟着沉了半寸。、absent＝镜里握印的身影已经散开。反照的远峰一时异常清楚。
-沉钟岭（ridge）,foundation_duel,背钟试剑亭,,,得知物品 背钟亭借卷帖（foundation_letter）,3,,2＝木案上的墨还没干。守卷人在亭边收拾试剑时挪开的草垫。,,foundation_duelist＝present＝亭柱背后靠着两柄钝剑，守卷人的袖口露出一块有残角的墨印。、absent＝守卷人收好了钝剑。
+沉钟岭（ridge）,foundation_duel,背钟试剑亭,,,得知物品 背钟亭借卷帖（foundation_letter）,3,,2＝桌上的墨迹还没干。守书人走到亭边，把刚才挪开的草垫铺回原处。,,foundation_duelist＝present＝守书人把长剑靠在柱边。桌角摆着一枚缺了一角的印章。、absent＝守书人收起长剑，伸手取桌角的印章。
 云炉石谷（kiln_valley）,foundation_kiln,旧丹窑内壁,,,得知物品 丹窑移灰牌（foundation_delivery）,3,,2＝立板的浅槽空了，只留下一圈旧印压过的黑边。,,foundation_kiln_echo＝present＝炉影每次掠过挡板，便用手遮住立板后那道缺半的金光。、absent＝窑影已经散了。灰不再贴着窑口倒吹。
-碎云雪关（snow_pass）,foundation_court,封石验药室,,,得知物品 封石之约（foundation_snow_order）,3,,2＝文案上压着冷掉的温盏，护炉人已经去换火口。,,foundation_warden＝present＝炉火在矮墙后稳着。护炉人抬手示意把覆印约压在温盏下。、absent＝护炉人够得着文案，也伸手掀起了温盏。
-蒲湾圩田（reed_meadows）,meadow_channel,姚六的弯渠,,,,3、4,,2＝姚六把渠契誊了两份，留给他儿子的一份正在晒干。田根还分为两道浅沟，外渠总会拦住顺水漂来的枯木。、3＝野雁已经飞离了田根。姚六在日落前放开外渠，让水冲走田泥。两道浅沟都已露出地面，渠口时常能拦住漂木。,,
-蒲湾圩田（reed_meadows）,meadow_ruts,雁脚泥垄,,,,,,,,reed_fox＝present＝两道狐脚踩着雁迹伸进堤下暗窝。、absent＝泥垄上只剩叫日头烤干的旧足印。
+碎云雪关（snow_pass）,foundation_court,封石验药室,,,得知物品 封石之约（foundation_snow_order）,3,,2＝文案上压着冷掉的温盏，护炉人已经去换火口。,,foundation_warden＝present＝矮墙后炉火烧得很稳。护炉人示意你把封石之约压在灯盏下。、absent＝护炉人走到桌边，伸手抬起灯盏。
+蒲湾圩田（reed_meadows）,meadow_channel,姚六的弯渠,,,,3、4,,2＝姚六抄了两份修渠凭据，留给儿子的那份还在晒。田边有两道浅沟，漂来的枯木常在外沟口卡住。、3＝野雁飞走了。太阳落山前，姚六放水冲去田泥。两道浅沟露了出来，渠口时常能拦住漂木。,,
+蒲湾圩田（reed_meadows）,meadow_ruts,雁脚泥垄,,,,,,,,reed_fox＝present＝狐狸顺着雁的脚印钻进堤下，留了两行新脚印。、absent＝泥垄上只剩让日头晒干的旧脚印。
 灰鹭矶（pale_shoal）,shoal_baskets,灰鹭晒篮处,,,,3,,2＝补鞋的白宜蹲在浅石上晾篮子。她把鞋口重新缠好了，篮底原有一处补布也换了新片。,,
 跃鱼旧渠（fish_ladder）,ladder_drop,第三级闸口,,,,,,,,river_gateback＝present＝水里那条横脊每次摆尾，最下一级的阶都被掩住。、absent＝水阶落出一截，能踩去有铁屑的水槽。
 折水驿（willow_post）,willow_yard,卸货后院,,,,1、2,,1＝驿卒把修好的雨槽推到瓦檐下。挑担人靠着门柱等水开，没人再去搬那捆沉木。,,
 校潮亭（gauge_tower）,gauge_piles,刻尺水桩,,,,1、2,,,,
 晒盘坡（screen_slope）,slope_sieves,断壁筛架,,,,4,,,,stone_badger＝present＝筛架下有个滚圆的东西在磨石头，碎砂直落到外侧。、absent＝架下没有磨石声。从绳结处够得到旧筛。
 系灯院（lantern_court）,lantern_term,夜灯廊,,,,1、2,,1＝挂灯人已把碎护皮换下。廊口的横凳留给巡夜回来的人，右侧还有一条访堂的石路。,,
-回潮母洞（undertow_grotto）,undertow_bed,退水石脊,,,,2,,1＝采走两份伏潮息泥后，中央的坑积着清水。石脊还能绕去出晶的侧腔。,,undertow_moundback＝present＝泥脊忽然抬起整整一尺。粗鳞下挂着河砂，露出的角挡住了泥床。、absent＝泥脊慢慢塌下去，床面留下三圈未被河潮搅散的黑泥。
-反声钟窟（counter_bell）,counter_bell_score,信架与钟枢,,,,2、4,,1＝信架底只剩给抄式人用的墨锭。钟座外圈是原来安引声片的暗金石壁。,,river_copper_echo＝present＝半身铜影随着钟声走到信架前，钟槌先横过它膝头。、absent＝铜影散去，已能拉开钟枢旁的信架。
+回潮母洞（undertow_grotto）,undertow_bed,退水石脊,,,,2,,1＝取走两份伏潮息泥后，中央的坑积着清水。沿石脊还能绕去有灵晶的侧洞。,,undertow_moundback＝present＝泥脊忽然抬起整整一尺。粗鳞下挂着河砂，露出的角挡住了泥床。、absent＝泥脊慢慢塌下去，床面留下三圈未被河潮搅散的黑泥。
+反声钟窟（counter_bell）,counter_bell_score,信架与钟枢,,,,2、4,,1＝信架底只剩抄图时用过的一块墨。钟脚外沿还嵌着几片暗金。,,river_copper_echo＝present＝钟声一响，铜影便挡在信架前，把钟槌横在膝前。、absent＝铜影散去了，古钟旁的信架没人守。
 照原城（zhao_city）,zhao_flood_office,城门水尺档,,,,1、2,,,,
 青埂（green_dyke）,zhao_dyke_bend,两面低埂,,,,3,,,,
 杨木水栈（flood_market）,zhao_float_goods,三姓木码头,,,,1,,,,
@@ -71,7 +71,7 @@
 沉水量站（sunken_lab）,zhao_submerged_table,占着量槽的石背,,,,2,,,槽背水魁（lab_crawler）：低挂的导灯亮起两点。传水的槽终于能抬起铜边，水魁已经退进再深些的岩裂。,
 烧黑的伏火坑（night_pit）,zhao_bank_fire,赤泥横穴,,,,3,,,,ember_yak＝present＝挨着窑脚传来踏炭声。、absent＝窑脚只有被扒短的灰垄。
 碎琉璃滩（glass_bank）,zhao_glass_net,六角晒网,,,,1,,,,
-错水湖底（fault_lake）,zhao_deep_pillars,分水三柱,,,,2,,,分柱水君（fault_warden）：石柱裂口逐渐沉到水下。晒水台露出来，风从笺槽钉死的那一面吹过。,
+错水湖底（fault_lake）,zhao_deep_pillars,分水三柱,,,,2,,,分柱水君（fault_warden）：断裂的柱子渐渐沉下去，石台露了出来。台上有道夹文书的暗槽，一侧的盖子还钉着。,
 拴绳沙洼（rope_sands）,zhao_rope_sound,沙坠顺风线,,,,,,,,
 断齿内堰（burnt_weir）,zhao_broken_rake,三口相背的堰齿,,,,2,,,,
 望船排礁（beacon_reefs）,zhao_ferry_hook,长礁灯脚,,,,2,,,,
@@ -79,38 +79,38 @@
 鸣沙城（mingsha_city）,sand_city_registry,鸣沙井籍房,,,,1,,,,
 炭篷驿（cinder_inn）,sand_cinder_kitchen,炭篷边炉,,,,1,,,,
 叩石院（sand_bell_cloister）,sand_cloister_trial,对簧石台,是,,,1、3,,,,
-叩石院（sand_bell_cloister）,sand_ring_maker,梁弦师的木作,,对簧石台（sand_cloister_trial） · 匀出两件簧料，请梁师修好石架、对簧石台（sand_cloister_trial） · 向袁息讨这场的评语,,1,,,,
+叩石院（sand_bell_cloister）,sand_ring_maker,梁弦的工坊,,对簧石台（sand_cloister_trial） · 给梁弦材料，帮他修挂石板的架子、对簧石台（sand_cloister_trial） · 向袁息讨这场的评语,,1,,,,
 断纬帐道（silk_tent_road）,sand_tent_watch,晾绳矮帐,,,,1,,,,
 断纬帐道（silk_tent_road）,sand_crossing_rail,连鞍岔牌,,,,1,,,,
-担盐岗（salt_ledger_barrows）,sand_salt_ledger,旧井砣秤,,,,1,,,,
-静盐井口（stillwell_mouth）,sand_stillwell_mouth,双绳辘轳,,,,2,,1＝细绳升起来一格，露出铁梯。过处的挂销已经挪开，井盘孔仍随着细响颤动。,,
-静盐井心（stillwell_vault）,sand_stillwell_vault,钉盂的井壁,,,,2,,1＝盐墙露出一串取盐时踩出的脚窝。挂陶盂的长钉空着。,静井伏鳞（sand_well_basilisk）：守井的鳞尾终于垂下，钉盂的盐墙边露出踩脚凹槽。,
+担盐岗（salt_ledger_barrows）,sand_salt_ledger,井边老秤,,,,1,,,,
+静盐井口（stillwell_mouth）,sand_stillwell_mouth,井口的两根绳,,,,2,,1＝细绳提上去后，井沿露出铁梯。挡路的铁销已挪开，卷绳的石轮还在轻轻颤动。,,
+静盐井心（stillwell_vault）,sand_stillwell_vault,挂陶罐的井壁,,,,2,,1＝井壁露出一串取盐时踩过的凹坑，挂陶罐的长钉空了。,静井伏鳞（sand_well_basilisk）：守井兽的尾巴垂下去了。挂着陶罐的井壁旁露出一排踏脚的凹坑。,
 静盐井心（stillwell_vault）,sand_stillwell_sill,井底隔水板,,,,,,,,
-冷炉院（cold_kiln）,sand_cold_kiln_house,阮杪的档房,,,,1、2,,1＝阮杪已将冷炉旧册抄出一份。墙上的原件仍用盐井压绳沿折痕固定着。,,
+冷炉院（cold_kiln）,sand_cold_kiln_house,阮杪的档房,,,,1、2,,1＝阮杪已经抄了一份冷炉旧册。原件还挂在墙上，由一段盐井的旧绳压着折痕。,,
 白蹄旧道（chalk_hoof_trail）,sand_approach_hoof,逆纹马蹄石,,,,2,,,,
-倒驿白廊（chalk_archive）,sand_archive_guard,倒挂的驿印,,,,2,,1＝旧驿送不走的货已搬开一格。歪斜的货更签反光，照出回去的路。,,
+倒驿白廊（chalk_archive）,sand_archive_guard,倒挂的驿印,,,,2,,1＝倒挂的货柜空出一格。柜边歪斜的货牌反着光，照出来时那条路。,,
 空音桥（dry_sound_bridge）,sand_bridge_rail,晃铜的桥栏,,,,2,,,,sand_rattle_viper＝present＝桥钉旁有一线新蛇蜕，阴处的铜结微动。、absent＝铜片垂在平直的桥栏上，下面没人声或兽声。
 架风板（wind_slate）,sand_wind_work,风楔架,,,,,,,,
 空籴仓（hollow_silo）,sand_silo_door,关了一半的仓门,,,,2,,,,sand_silo_marten＝present＝卸谷洞口挤出两道细爪印。、absent＝仓沿落住了浮灰，暂没有新爪痕。
-落琉洼（glass_hail_sink）,sand_hail_floor,断琉棱,,,,3,,2＝断棱底座的风簧已经取下，棱根只剩簧孔。往上退出峡洼的石沿仍可落脚。,,sand_glass_lynx＝present＝内棱有强修惯用的火照路。它扫过几道比手掌还大的爪痕。、absent＝爪迹被石屑盖住一半，内棱底侧渐渐沉寂。
+落琉洼（glass_hail_sink）,sand_hail_floor,断琉棱,,,,3,,2＝晶石底下的弹片已经取走，原处只剩一道空缝。沿上方的石边还能退出洼地。,,sand_glass_lynx＝present＝深处有高阶修士留下的火光。光照着石壁，几道爪痕比手掌还大。、absent＝石屑遮住半截爪印，晶石下面渐渐没了动静。
 横生脉（hanging_vein）,sand_hanging_support,贴壁支木,,,,,,,,sand_vein_jackal＝present＝矿绳里面传出磨齿般的声响，有只金眼从夹层探出来。、absent＝旧支木没再被挤动，绳后空了。
-伏梭草丘（camel_grass_dunes）,sand_dune_grass,伏草沙坎,,,,,,,,sand_dune_hare＝present＝沙面一点点鼓起，小耳朵探出草根。、absent＝伏草旁零散着几条浅沟，没见兔子探头。
+伏兔草丘（camel_grass_dunes）,sand_dune_grass,伏草沙坎,,,,,,,,sand_dune_hare＝present＝沙面一点点鼓起，小耳朵探出草根。、absent＝伏草旁零散着几条浅沟，没见兔子探头。
 并磨坊（guest_mill）,sand_guest_miller,栾火的并磨盘,,,,1、2,,,,
 覆瓦旱畦（kiln_roof_farm）,sand_rooftile_patch,留阴瓦畦,,,,2,,,,
 砾盘浅沟（bone_dry_rill）,sand_gravel_rill,搁木的浅弯,,,,,,,,
 琉脊天室（glass_rotunda）,sand_glass_chamber,三面落光的室心,,,,2,,1＝邢既横坐回角柱边。旧舵已顺过一次，石缝只出清风，不再吐灰。,照壁刀师邢既横（sand_sundial_master）：邢既横把真刀插回鞘中，用脚尖把旧舵的拉环提起来。,
-校潮亭（gauge_tower）,puzzle_gauge_pin,胥婉的尺筒,,刻尺水桩（gauge_piles） · 替胥婉按住湿纸的两角,,1,,,,
-跃鱼旧渠（fish_ladder）,puzzle_joint_gates,三槽联闸,,,,1,,,,
+校潮亭（gauge_tower）,puzzle_gauge_pin,胥婉的旧水尺,,刻尺水桩（gauge_piles） · 替胥婉按住纸，印下水尺刻痕,,1,,,,
+跃鱼旧渠（fish_ladder）,puzzle_joint_gates,旧渠的分水闸,,,,1,,,,
 照原城（zhao_city）,puzzle_scale_register,挑秤人的砖柜,,,,1,,,,
-守尺观（measuring_hall）,puzzle_lever_cabinet,砝码房的合尺秤,,,,1,,,,
-炭篷驿（cinder_inn）,puzzle_bridge_verse,磨损的桥灯签,,,,1,,,,
-空音桥（dry_sound_bridge）,puzzle_sound_relay,桥腹响筒,,,,1,,,,
+守尺观（measuring_hall）,puzzle_lever_cabinet,旧柜上的秤,,,,1,,,,
+炭篷驿（cinder_inn）,puzzle_bridge_verse,灶边的旧桥灯,,,,1,,,,
+空音桥（dry_sound_bridge）,puzzle_sound_relay,桥下的传声筒,,,,1,,,,
 蒲湾圩田（reed_meadows）,puzzle_spool_loom,春衫织棚,,,,1,,,,
-白鹤粮仓（crane_granary）,puzzle_granary_catch,歪斜的隔谷斗,,,,1,,,,
-白蹄旧道（chalk_hoof_trail）,puzzle_hoof_markers,三枚覆蹄石,,逆纹马蹄石（sand_approach_hoof） · 把伏潮息泥搁在倒蹄纹旁,,1,,,,
+白鹤粮仓（crane_granary）,puzzle_granary_catch,歪了的粮箱,,,,1,,,,
+白蹄旧道（chalk_hoof_trail）,puzzle_hoof_markers,三块刻着蹄印的石头,,逆纹马蹄石（sand_approach_hoof） · 在朝反方向的蹄印旁放一点伏潮息泥,,1,,,,
 守尺观（measuring_hall）,zhao_terrace_arena,观内朱线台,是,,得知物品 扶膝起身帖（body_breath_note）,,,,,
-白苇滩（marsh）,undertow_door,反潮石门,,,,2、3,,1＝旧槽里卡着新的连环楔，固定绳直通高处石阶。外侧水涌仍旧折回来，穿过洞口时能伸手扶住引线。,,
+白苇滩（marsh）,undertow_door,反潮石门,,,,2、3,,1＝新铁楔卡在旧槽里，绳子通向高处的石阶。外侧的潮水还会倒流，过洞口时可以抓住绳子。,,
 白苇滩（marsh）,marsh_pole_lesson,封乔的护堤木台,是,,,1、3,,2＝领过试杆签，封乔把另一支短杆扶直，台角还有供照看的安全绳。,,river_spar_captain＝present＝封乔正拿杆尖朝练手台上点，不时让渔人过桥，手和眼睛都没乱。、absent＝封乔退到了灯影下。他把红布搁到台边，让手腕缓一缓再陪来客切磋。
-沉钟岭（ridge）,counter_bell_door,倒钟后的反声门,,,,2,,1＝铜簧斜抵在一宽一窄的两孔之间。石阶的第一层已经落下来，敲石声可以沿内凹的阶棱传入地下。,,
-闭潮渡（ford）,ford_packet_boat,外桩商船,,,,1,,0＝船家把补好的浅船泊回外桩，舷上按乘客名单压着货票。他留了一处座板，从外港可驶去照原城。,,
+沉钟岭（ridge）,counter_bell_door,倒钟后的反声门,,,,2,,1＝铜片斜卡在一宽一窄两个孔之间。第一层台阶已经落下，脚步声顺着台阶传进地下。,,
+闭潮渡（ford）,ford_packet_boat,外桩商船,,,,1,,0＝夏狄把补好的窄船拴回外桩，在船边压着乘客名单。她给你留了个座，从外港能去照原城。,,
 闭潮渡（ford）,ford_below_steps,闸下无灯梯,,,,1、3,,,,ford_lower_spirit＝present＝下面的灯架没亮，但什么东西踢到了第二根石栏，撞得空响。、absent＝第二根石栏下面只剩脱落的湿泥，水面也安静了。

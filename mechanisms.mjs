@@ -18,8 +18,8 @@ function obstruction(state, mechanism, progress, kit) {
   if (progress?.complete) return '机关已经打开。';
   if (state.combat) return '先处理眼前的对手。';
   if (state.gathering) return '这次采集还没结束。';
-  if (mechanism.lead && !kit.owns(state, mechanism.lead.item)) return mechanism.lead.blockedText ?? '机关还缺一件能对上旧槽的东西。';
-  if (state.satiety === 0) return '腹中空空，先吃些东西。';
+  if (mechanism.lead && !kit.owns(state, mechanism.lead.item)) return mechanism.lead.blockedText ?? '机关还缺一个零件。';
+  if (state.satiety === 0) return '太饿了，先吃点东西。';
   return '';
 }
 
@@ -52,7 +52,7 @@ export function mechanismView(state, kit) {
     canMove: !blocked && !full,
     canReset: !blocked && !equalSetting(setting, original),
     canTry: !blocked,
-    reason: complete ? '' : blocked || (full ? '机关上的记号都用完了。可试机关，或复位再来。' : ''),
+    reason: complete ? '' : blocked || (full ? '步骤已经排满。可以试一次，或恢复原样再来。' : ''),
   };
 }
 
@@ -70,23 +70,23 @@ export function mechanismAction(state, action, { id }, kit) {
 
   if (action === 'mechanismMove') {
     const move = mechanism.moves.find((entry) => entry.id === id);
-    if (!move) return kit.refuse('眼前没有那个操作件。');
+    if (!move) return kit.refuse('这里没有这一步可做。');
     const inSequence = mechanism.mode === 'sequence';
-    if (inSequence && setting.length >= (mechanism.maxLength ?? 8)) return kit.refuse('机关上的记号都用完了。');
+    if (inSequence && setting.length >= (mechanism.maxLength ?? 8)) return kit.refuse('步骤已经排满。');
     const next = inSequence ? [...setting, move.id] : mechanism.dials.map(({ states }, index) => {
       const shifted = (setting[index] + (move.shift?.[index] ?? 0)) % states.length;
       return (shifted + states.length) % states.length;
     });
     kit.advance(state, mechanism.moveDays ?? 0.125);
     state.mechanisms[mechanism.id] = { setting: next, complete: false };
-    return kit.say(state, move.outcome ?? '机关动了一格。');
+    return kit.say(state, move.outcome ?? '机关的位置变了。');
   }
 
   if (action === 'mechanismReset') {
     if (equalSetting(setting, original)) return kit.refuse('机关已经在原位。');
     kit.advance(state, mechanism.resetDays ?? 0.125);
     state.mechanisms[mechanism.id] = { setting: original, complete: false };
-    return kit.say(state, '松开卡扣，机关回到了原位。');
+    return kit.say(state, '机关恢复了原样。');
   }
 
   kit.advance(state, mechanism.tryDays ?? 0.25);

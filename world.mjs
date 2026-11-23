@@ -1,8 +1,8 @@
 const home = 'village';
 const legacy = new Set(['village', 'marsh', 'ridge', 'ford', 'hidden', 'pine_ridge', 'kiln_valley', 'herb_basin', 'black_mine', 'snow_pass', 'sky_terrace']);
 const crossings = [
-  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, item: 'ferry_manifest', quest: 'last_lantern', reason: '得等旧渡复航，或带上渡商的行船文牒。' },
-  { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, item: 'sand_writ', reason: '过沙驿需出示两地商队的路引。' },
+  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, item: 'ferry_manifest', quest: 'last_lantern', reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' },
+  { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' },
 ];
 const arrayPlans = {
   wuliang: { coins: 96, need: { wood: 36, ore: 20, core: 18, black_iron: 8 } },
@@ -132,20 +132,20 @@ export function travelRoad(state, id, kit) {
 }
 
 function gateQuote(state, id, kit, scroll) {
-  if (!detail(kit.data, id).portal || !state.world.gates.includes(id)) return '你还没有亲手认过这处门。';
+  if (!detail(kit.data, id).portal || !state.world.gates.includes(id)) return '要先到那里点亮传送门。';
   if (id === state.region) return '你已经在这处门旁。';
   if (scroll) return kit.owns(state, 'gate_scroll') > 0 ? '' : '行囊里没有传送卷轴。';
-  if (!detail(kit.data, state.region).portal || !state.world.gates.includes(state.region)) return '先站到认过的传送门旁。';
-  if (provinceOf(kit.data, id) !== provinceOf(kit.data, state.region)) return '州界之外的门纹接不到这里。';
+  if (!detail(kit.data, state.region).portal || !state.world.gates.includes(state.region)) return '先站到一座已经点亮的传送门旁。';
+  if (provinceOf(kit.data, id) !== provinceOf(kit.data, state.region)) return '普通传送门只能连到本州。';
   if (state.coins < transportRules.gatePrice) return `还差${transportRules.gatePrice - state.coins}枚灵钱。`;
   return '';
 }
 
 function attune(state, kit) {
   if (!detail(kit.data, state.region).portal) return kit.refuse('这里没有传送门。');
-  if (state.world.gates.includes(state.region)) return kit.refuse('这处门已经认过了。');
+  if (state.world.gates.includes(state.region)) return kit.refuse('这座传送门已经点亮。');
   state.world.gates.push(state.region);
-  return kit.say(state, `按过门心，认下${kit.records.regions[state.region].name}的传送门。`);
+  return kit.say(state, `手碰到门上的石块，亮光沿门框绕了一圈。以后可以传到${kit.records.regions[state.region].name}了。`);
 }
 
 function jumpGate(state, id, kit, scroll) {
@@ -154,7 +154,7 @@ function jumpGate(state, id, kit, scroll) {
   if (scroll) kit.removeItem(state, 'gate_scroll', 1);
   else state.coins -= transportRules.gatePrice;
   arrive(state, id, scroll ? transportRules.scrollDays : transportRules.gateDays, kit, true);
-  return kit.say(state, scroll ? `卷轴化成灰，${kit.records.regions[id].name}的门立在身前。` : `门纹一亮，转眼已到${kit.records.regions[id].name}。`);
+  return kit.say(state, scroll ? `卷轴化成灰。抬头已经到了${kit.records.regions[id].name}。` : `门框一亮，转眼已到${kit.records.regions[id].name}。`);
 }
 
 function arrayPlan(data, id) {
@@ -174,15 +174,15 @@ function arrayView(state, id, kit) {
   limits.coins = Math.min(coins - coinsPaid, state.coins);
   const active = Object.values(remaining).every((due) => due === 0) && coins === coinsPaid;
   return { need: plan.need, paid, remaining, coins, coinsPaid, limits, active, canFund: !active && Object.values(limits).some(Boolean),
-    reason: active ? '' : '阵基见了裂缝，逐项补齐石梁与引纹料后才能启阵。' };
+    reason: active ? '' : '地上的石板裂了。把下面的材料凑齐，工匠就能修好传送阵。' };
 }
 
 function contributeArray(state, id, count, kit) {
   const local = arrayView(state, state.region, kit);
   if (!local) return kit.refuse('这里没有州阵。');
   if (local.active) return kit.refuse('这座州阵已经修好。');
-  if (!Object.hasOwn(local.limits, id)) return kit.refuse('这件东西不是补阵所需。');
-  if (!Number.isSafeInteger(count) || count < 1 || count > local.limits[id]) return kit.refuse('这次交付超过了所缺或随身能交的数量。');
+  if (!Object.hasOwn(local.limits, id)) return kit.refuse('修这座传送阵用不上这件东西。');
+  if (!Number.isSafeInteger(count) || count < 1 || count > local.limits[id]) return kit.refuse('这次能交的数量有限，请看修阵清单。');
   const contribution = (state.world.arrays[state.region] ??= { goods: {}, coins: 0 });
   if (id === 'coins') {
     state.coins -= count;
@@ -192,14 +192,14 @@ function contributeArray(state, id, count, kit) {
     contribution.goods[id] = (contribution.goods[id] ?? 0) + count;
   }
   const active = arrayView(state, state.region, kit).active;
-  return kit.say(state, `交进${id === 'coins' ? `${count}枚灵钱` : `${kit.nameOf(id)}×${count}`}。${active ? '阵纹沿新梁走了一圈。州阵接通了。' : '匠人把这批添在州阵的工账上。'}`);
+  return kit.say(state, `交给工匠${id === 'coins' ? `${count}枚灵钱` : `${kit.nameOf(id)}×${count}`}。${active ? '光沿新铺的石板亮起来。传送阵修好了。' : '工匠收下这一批，划掉清单上相应的数。'}`);
 }
 
 function arrayQuote(state, id, kit) {
   if (id === state.region) return '你已经在这座州阵。';
-  if (!arrayPlan(kit.data, id) || !marked(state, id)) return '还不知道那一州的阵址。';
-  if (!arrayView(state, state.region, kit)?.active) return '此地州阵尚未启用。';
-  if (!arrayView(state, id, kit).active) return '对面的州阵也须修通。';
+  if (!arrayPlan(kit.data, id) || !marked(state, id)) return '还不知道那一州的传送阵在哪儿。';
+  if (!arrayView(state, state.region, kit)?.active) return '这里的传送阵还没修好。';
+  if (!arrayView(state, id, kit).active) return '对面的传送阵也要修好。';
   if (state.coins < transportRules.arrayPrice) return `还差${transportRules.arrayPrice - state.coins}枚灵钱。`;
   return '';
 }
@@ -209,7 +209,7 @@ function jumpArray(state, id, kit) {
   if (reason) return kit.refuse(reason);
   state.coins -= transportRules.arrayPrice;
   arrive(state, id, transportRules.arrayDays, kit, true);
-  return kit.say(state, `跨州阵连起两边的引纹。你在${kit.records.regions[id].name}走下阵台。`);
+  return kit.say(state, `脚下的石板闪过一道光。你已经到了${kit.records.regions[id].name}。`);
 }
 
 function shopStock(state, id, offer) {
@@ -308,13 +308,13 @@ function sectView(state, kit) {
   if (!sect) return null;
   const membership = pledge(state, sect);
   const joined = state.world.affiliation === sect.id;
-  const joinReason = joined ? '' : state.world.affiliation ? '须先向原师门告退。' :
+  const joinReason = joined ? '' : state.world.affiliation ? '先回原来的师门辞行，再来拜师。' :
     membership ? '' : kit.homeRequirements(state, sect.join?.coins ?? 0, sect.join?.need) || '';
   const credit = membership?.credit ?? 0;
   const jobs = sect.jobs.map((job) => {
     const nextAt = membership?.jobs[job.id] ?? 0;
-    const reason = !joined ? '入门后才能领差。' : nextAt > state.day ? `上次交付仍在整理，第${Math.ceil(nextAt)}日可再领。` :
-      kit.homeRequirements(state, 0, job.need) || (!kit.hasRoom(state, job.reward ?? {}, kit.homeBagSpend(state, job.need)) ? '行囊装不下这班的回礼。' : '');
+    const reason = !joined ? '这桩活只交给本门弟子。' : nextAt > state.day ? `管事还在忙上次的活，第${Math.ceil(nextAt)}日再来。` :
+      kit.homeRequirements(state, 0, job.need) || (!kit.hasRoom(state, job.reward ?? {}, kit.homeBagSpend(state, job.need)) ? '行囊腾出些地方，就能带走回礼。' : '');
     return { ...job, nextAt, available: !reason && !state.event && !state.combat, reason };
   });
   const ranks = sect.ranks.map((rank, index) => ({ ...rank, id: String(index), claimed: membership?.ranks.includes(index) ?? false,
@@ -333,12 +333,12 @@ function actSect(state, action, id, kit) {
       state.world.memberships[local.id] = { credit: 0, jobs: {}, ranks: [] };
     }
     state.world.affiliation = local.id;
-    return kit.say(state, local.join?.text ?? `${local.name}的管事把你的名录进门簿。`);
+    return kit.say(state, local.join?.text ?? `${local.name}的管事翻开册子，写下你的名字。`);
   }
-  if (!view.joined) return kit.refuse('你还没有在此拜门。');
+  if (!view.joined) return kit.refuse('你还没加入这个师门。');
   if (action === 'sectLeave') {
     state.world.affiliation = null;
-    return kit.say(state, `你向${local.name}告退。管事留着旧簿上的功劳。`);
+    return kit.say(state, `你向${local.name}辞行。管事合上册子，说哪天你再回来，从前的功劳还算数。`);
   }
   const member = pledge(state, local);
   if (action === 'sectWork') {
@@ -359,7 +359,7 @@ function actSect(state, action, id, kit) {
   if (rank.art && !state.knownArts.includes(rank.art)) state.knownArts.push(rank.art);
   const gifts = kit.goodsText(rank.reward);
   const art = rank.art ? kit.records.arts[rank.art]?.name : '';
-  return kit.say(state, `${rank.text ?? ''}管事在门簿上给你记了「${rank.name}」。${gifts ? `领到${gifts}。` : ''}${art ? `受授「${art}」。` : ''}`);
+  return kit.say(state, `${rank.text ?? ''}管事在名册上给你写了「${rank.name}」。${gifts ? `领到${gifts}。` : ''}${art ? `学会「${art}」。` : ''}`);
 }
 
 function targetSummary(region, data, reason, extra = {}) {

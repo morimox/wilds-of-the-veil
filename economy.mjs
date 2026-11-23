@@ -9,7 +9,7 @@ const facilities = [
   },
   {
     id: 'garden', name: '药畦', start: 0, reveal: 'millet_seed',
-    desc: '后墙下有两道蓄雨的浅沟，正好翻成畦安置粟种。下种后可以出门，等熟时再来收。',
+    desc: '后墙根有一块土，挖两道沟就能留住雨水。谷子和灵草可以种在这儿，等长成了再回来收。',
     upgrades: [
       { need: { wood: 8, reed: 6 }, cost: 5, days: 1 },
       { need: { wood: 18, kiln_clay: 10 }, cost: 14, days: 2 },
@@ -18,7 +18,7 @@ const facilities = [
   },
   {
     id: 'hearth', name: '备粮灶', start: 0, reveal: 'millet_grain', alternateReveal: 'beast_meat',
-    desc: '院角还留着旧火眼。砌好灶眼能支锅炖兽肉，架上蒸屉也能烘干新收的谷子。',
+    desc: '院角还留着旧灶。修好就能支锅炖兽肉，也能蒸熟谷子，烘成干粮。',
     upgrades: [
       { need: { wood: 8, reed: 6 }, cost: 5, days: 1 },
       { need: { wood: 16, ore: 8, kiln_clay: 6 }, cost: 12, days: 2 },
@@ -26,7 +26,7 @@ const facilities = [
   },
   {
     id: 'furnace', name: '炼丹炉', start: 0, reveal: 'kiln_manual', alternateReveal: 'furnace_sketch',
-    desc: '在背风墙下留一道低风口。摊开丹方投药点火，封过炉便可留它慢慢温养。',
+    desc: '炉子靠着背风的墙，底下留口进风。按丹方放药、点火，再盖上炉盖，让药慢慢炼。',
     upgrades: [
       { need: { wood: 12, ore: 5, reed: 6 }, cost: 12, days: 1.5 },
       { need: { kiln_clay: 10, ore: 8, wood: 10 }, cost: 24, days: 2.5 },
@@ -35,7 +35,7 @@ const facilities = [
   },
   {
     id: 'forge', name: '锻炉', start: 0, reveal: 'ore',
-    desc: '有了寒铁，可以用铁箍固定炉口，挨着干墙搭起锻炉。炉体越稳，一回能接下的活越多。',
+    desc: '做个铁圈固定炉口，就能靠干墙搭炉打铁。炉子越牢，同时能做的活越多。',
     upgrades: [
       { need: { wood: 14, ore: 8 }, cost: 14, days: 2 },
       { need: { ore: 10, kiln_clay: 8, black_iron: 6 }, cost: 28, days: 3 },
@@ -46,32 +46,32 @@ const facilities = [
 
 const projects = [
   {
-    id: 'sow_millet', name: '下种育粟', facility: 'garden', level: 1,
-    description: '在浅沟上拢些灵草的长茎保湿，留下一穗作下回的种。',
+    id: 'sow_millet', name: '种一畦谷子', facility: 'garden', level: 1,
+    description: '种下谷子，用灵草茎盖住土保湿。收的时候留一穗作下回的种。',
     need: { millet_seed: 1, reed: 1 }, loot: { millet_grain: 6, millet_seed: 1 }, days: 6, cost: 0,
   },
   {
-    id: 'root_spirit_leaf', name: '压茎培灵草', facility: 'garden', level: 2,
+    id: 'root_spirit_leaf', name: '压枝种灵草', facility: 'garden', level: 2,
     description: '用松木支起遮阴架，把灵草带芽的茎压进湿土，等茎节生根。',
     need: { reed: 2, wood: 2 }, loot: { reed: 6 }, days: 9, cost: 0, reveal: 'reed',
   },
   {
-    id: 'winter_spirit_leaf', name: '暖畦育灵草', facility: 'garden', level: 3,
-    description: '把兽革盖住新苗，松木在畦边慢烧保温。一次能育满一畦，等得也久。',
+    id: 'winter_spirit_leaf', name: '给灵草苗保温', facility: 'garden', level: 3,
+    description: '用兽皮盖住新苗，在边上烧松木保温。一次能种满一块地，得多等几天。',
     need: { reed: 4, hide: 1, wood: 3 }, loot: { reed: 14 }, days: 15, cost: 3, reveal: 'hide',
   },
   {
-    id: 'steam_millet', name: '蒸粟烘干粮', facility: 'hearth', level: 1, reveal: 'millet_grain',
-    description: '蒸熟的粟米摊在苇席上烘干，再拿油纸分包。',
+    id: 'steam_millet', name: '蒸谷子做干粮', facility: 'hearth', level: 1, reveal: 'millet_grain',
+    description: '蒸熟的谷子摊在苇席上烘干，再拿油纸分包。',
     need: { millet_grain: 3, wood: 1 }, loot: { ration: 6 }, days: 1.5, cost: 0,
   },
   {
-    id: 'cook_travel_cakes', name: '烘一匣行粮', facility: 'hearth', level: 2, reveal: 'millet_grain',
-    description: '炉炕能铺两张苇席，天还亮着先把下一趟路的粮做起来。',
+    id: 'cook_travel_cakes', name: '多烘一批干粮', facility: 'hearth', level: 2, reveal: 'millet_grain',
+    description: '热灶能同时烘两张苇席。趁天还亮，先备好下一趟路的粮。',
     need: { millet_grain: 8, wood: 2, reed: 1 }, loot: { ration: 18 }, days: 3, cost: 2,
   },
   {
-    id: 'simmer_meat_broth', name: '煨山炉肉汤', facility: 'hearth', level: 1, reveal: 'beast_meat',
+    id: 'simmer_meat_broth', name: '炖山炉肉汤', facility: 'hearth', level: 1, reveal: 'beast_meat',
     description: '剔去生兽肉上的筋膜，炖熟后连浓汤一并封好。',
     need: { beast_meat: 1, wood: 1 }, loot: { meat_broth: 1 }, days: 0.5, cost: 0,
   },
@@ -94,8 +94,8 @@ const projects = [
 
 const merchantOrders = {
   ration: {
-    units: 6, regularText: '「你几趟都来我这儿包干粮。柜后还压着能下种的谷子。你肯收拾院子的话，试着种一畦。」',
-    name: '给粮摊补两张蒸席', text: '拣灵草的干净长茎编成垫蒸笼的席，陶嫂答应分你发得好的粟种。',
+    units: 6, regularText: '陶嫂包着干粮，回头看了眼柜顶。「你这几趟买的不少。我还有袋留种的谷子，你院里要是有地，也能自己种。」',
+    name: '拿灵草跟陶嫂换谷种', text: '陶嫂掀开蒸笼，垫粮饼的草席破了两个洞。「拿干净的灵草茎来吧，我请人编两张新的，再给你一包粟种。」',
     need: { reed: 6 }, reward: { millet_seed: 3, millet_grain: 4 },
     outcome: '陶嫂把灵草交给编席的人，捧出一包饱满粟种。「收的时候留一穗，冬前用得上。」',
     repeat: {
@@ -106,7 +106,7 @@ const merchantOrders = {
   },
   wood: {
     units: 5, regularText: '「你拣柴跟买柴都舍得费工。我以前沿石脊去割过松脂，有条小路，别人容易踩过去。」',
-    name: '缚稳木客的柴担', text: '木客要借晾韧了的灵草长茎捆柴，也愿把自己走过的一道旧路说给你。',
+    name: '帮木贩捆好柴担', text: '木贩想用晾过的灵草茎捆柴，也愿把自己走过的一条旧路告诉你。',
     need: { reed: 8 }, reward: { pine_ledge_note: 1 },
     outcome: '木客挨根试过柴绳，从挑担夹层抽出一张旧纸。青崖一侧，石脊背后标着一线细路。',
   },
@@ -128,16 +128,16 @@ const merchantOrders = {
     outcome: '药商煨好两小锅膏，分出四罐，把未用的两块松木一并还给你。',
   },
   qi_powder: {
-    units: 4, regularText: '「你要的多，我也得天天碾。旧碾槽裂了，撑得住寒铁的才能再开。」',
-    name: '重钉药碾', text: '用寒铁给药碾做紧箍，再给下一磨备几束灵草。',
+    units: 4, regularText: '「你买得多，我天天磨药。碾药的槽裂了，得拿寒铁做个圈子箍牢。」',
+    name: '给药商送材料修药碾', text: '寒铁用来固定碾药的槽，再带几束灵草给他试磨。',
     need: { ore: 5, reed: 8 }, reward: { qi_powder: 5 },
     outcome: '药商推了推修紧的碾轮，粉从缝里落进布袋。他晾开一半，另一半称给你。',
   },
   reed_arrow: {
     units: 12, regularText: '「你拿走的苇箭够插一圈靶了。木头会削，不妨看看铁箭头是怎么收口的。」',
-    name: '替箭匠凑齐一扎箭坯', text: '箭匠用松木试直度，也要一点寒铁示范套上箭头的做法。',
+    name: '给箭匠送木料和寒铁', text: '箭匠要用松木做直箭杆，再用寒铁演示怎么套上铁箭头。',
     need: { wood: 8, ore: 4 }, reward: { arrow_pattern: 1 },
-    outcome: '锥子在箭头后面转了一圈，寒铁刚好套稳。箭匠把开料寸路画给你，顺手搁下一枝样箭。',
+    outcome: '箭匠在箭头后面钻了个孔，把箭杆套牢。他把毛料怎么削、铁头怎么装画给你看，又留下一支样箭。',
   },
   millet_seed: {
     units: 4, regularText: '「你买这么些种，看来要种好几轮。晒些谷子拿来，我看看哪畦留种最好。」',
@@ -389,7 +389,7 @@ function startProject(state, id, kit) {
   };
   economy.jobs.push(job);
   kit.advance(state, setupDays);
-  return kit.say(state, `${project.name}已经起手，过些时候来收。`);
+  return kit.say(state, `${project.name}已经开始了。过些时候再来收。`);
 }
 
 function collectProject(state, id, kit) {
@@ -397,7 +397,7 @@ function collectProject(state, id, kit) {
   const index = economy.jobs.findIndex((job) => job.id === id);
   if (index < 0) return kit.refuse('这炉或这一畦已经收过了。');
   const job = economy.jobs[index];
-  if (job.readyDay - state.day > 1e-9) return kit.refuse('火候还没到，等一回再看。');
+  if (job.readyDay - state.day > 1e-9) return kit.refuse('还没做完，过些时候再来收。');
   const blocked = collectionBlocker(state, job, kit);
   if (blocked) return kit.refuse(blocked);
   economy.jobs.splice(index, 1);

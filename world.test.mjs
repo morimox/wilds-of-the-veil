@@ -45,11 +45,12 @@ test('three provinces expose only situationally known points and roads with exac
   state.discovered.push('ford');
   walk(state, 'ford');
   assert.equal(view(state).world.points.some(({ id }) => id === 'zhao_city'), false);
-  assert.match(view(state).world.crossings[0].reason, /旧渡复航/);
+  const crossingHint = /旧渡.*开船.*货单.*商船/;
+  assert.match(view(state).world.crossings[0].reason, crossingHint);
   state.discovered.push('zhao_city');
   const closed = view(state).world.roads.find(({ id }) => id === 'zhao_city');
   assert.equal(closed.available, false);
-  deniedWithoutChanges(state, 'travel', { id: 'zhao_city' }, /旧渡复航/);
+  deniedWithoutChanges(state, 'travel', { id: 'zhao_city' }, crossingHint);
 
   state.knownItems.push('ferry_manifest');
   const day = state.day;
@@ -260,7 +261,7 @@ test('a gate needs attunement, scrolls work from an idle scene, and the cheapest
   state.inventory.gate_scroll = 2;
   play(state, 'attuneGate');
   deniedWithoutChanges(state, 'attuneGate');
-  deniedWithoutChanges(state, 'gateScroll', { id: 'willow_post' }, /没.*亲手/);
+  deniedWithoutChanges(state, 'gateScroll', { id: 'willow_post' }, /先到.*点亮传送门/);
   reachWillow(state);
   play(state, 'attuneGate');
   const local = view(state).world.gates.find(({ id }) => id === 'village');
@@ -272,7 +273,7 @@ test('a gate needs attunement, scrolls work from an idle scene, and the cheapest
 
   reachZhao(state, 'last_lantern');
   play(state, 'attuneGate');
-  deniedWithoutChanges(state, 'gateJump', { id: 'willow_post' }, /州界/);
+  deniedWithoutChanges(state, 'gateJump', { id: 'willow_post' }, /传送门.*只能.*本州/);
   assert.equal(view(state).world.localArray.active, false);
   play(state, 'gateScroll', { id: 'village' });
   assert.equal(state.world.lastSettlement, 'village');
@@ -303,8 +304,8 @@ test('array installments are persistent and require both states to repair their 
   play(state, 'arrayContribute', { id: 'wood', count: 5 });
   play(state, 'arrayContribute', { id: 'coins', count: 11 });
   assert.equal(view(state).world.localArray.paid.wood, 5);
-  deniedWithoutChanges(state, 'arrayContribute', { id: 'wood', count: cost.need.wood }, /超过/);
-  deniedWithoutChanges(state, 'arrayContribute', { id: 'wood', count: -1 }, /超过/);
+  deniedWithoutChanges(state, 'arrayContribute', { id: 'wood', count: cost.need.wood }, /数量.*修阵清单/);
+  deniedWithoutChanges(state, 'arrayContribute', { id: 'wood', count: -1 }, /数量.*修阵清单/);
 
   function finishArray() {
     const { remaining, coins, coinsPaid } = view(state).world.localArray;
@@ -315,7 +316,7 @@ test('array installments are persistent and require both states to repair their 
 
   finishArray();
   reachZhao(state);
-  deniedWithoutChanges(state, 'arrayJump', { id: 'village' }, /此地.*启用/);
+  deniedWithoutChanges(state, 'arrayJump', { id: 'village' }, /这里的传送阵.*没修好/);
   const coin = state.coins;
   finishArray();
   assert.equal(state.coins, coin - transportRules.arrayPlans.zhaoyuan.coins);
@@ -376,7 +377,7 @@ test('sect admission, contributions, cooldowns and a master reward form an optio
   const job = view(state).sect.jobs.find(({ id }) => id === 'lantern_heel');
   play(state, 'sectWork', { id: job.id });
   assert.equal(view(state).affiliation.credit, job.credit);
-  deniedWithoutChanges(state, 'sectWork', { id: job.id }, /仍在整理/);
+  deniedWithoutChanges(state, 'sectWork', { id: job.id }, /还在忙上次的活.*再来/);
   while (view(state).affiliation.credit < master.credit) {
     const ready = view(state).sect.jobs.find(({ available }) => available);
     if (ready) play(state, 'sectWork', { id: ready.id });

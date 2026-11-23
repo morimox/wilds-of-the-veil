@@ -13,7 +13,7 @@
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=15" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=16" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -25,7 +25,7 @@
       <div id="player-status" aria-label="角色状态"></div>
       <main id="main" aria-label="游戏操作区"></main>
       <nav class="navigation" aria-label="其他操作">
-        <button type="button" data-tab="journey" hidden>回行旅</button>
+        <button type="button" data-tab="journey" hidden>回到当前地点</button>
         <button type="button" data-tab="village" hidden>村务</button>
         <button type="button" data-tab="atlas" hidden>山河图</button>
         <button type="button" data-tab="deduction" hidden>沙盘</button>
@@ -49,11 +49,11 @@
   <div id="notices" class="notices" role="status" aria-live="polite" aria-relevant="additions"></div>
   <dialog id="help" aria-labelledby="guide-title">
     <div class="dialog-head"><h2 id="guide-title">行旅菜单</h2><button type="button" data-close aria-label="关闭菜单">×</button></div>
-    <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习账</button></div>
+    <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习进度</button></div>
     <ol>
-      <li>经过时间就会变饿。打开行囊里的干粮可以吃饭，空腹也能回村。</li>
+      <li>时间久了会饿。可以吃行囊里的干粮，空着肚子也能慢慢走回歇脚点。</li>
       <li>点开状态名可以查看它的用途。拿到路图后可以试着走新路。</li>
-      <li>把指针放到物品上可看词条，点一下可使用或整理。</li>
+      <li>把鼠标放在物品上可以看用途，点一下可以使用或整理。</li>
     </ol>
     <button type="button" class="text-danger" data-reset>开始新行程</button>
   </dialog>
