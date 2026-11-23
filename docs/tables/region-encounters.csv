@@ -45,41 +45,41 @@
 沉钟岭（ridge）,foundation_duel,背钟试剑亭,,,得知物品 背钟亭借卷帖（foundation_letter）,3,,2＝桌上的墨迹还没干。守书人走到亭边，把刚才挪开的草垫铺回原处。,,foundation_duelist＝present＝守书人把长剑靠在柱边。桌角摆着一枚缺了一角的印章。、absent＝守书人收起长剑，伸手取桌角的印章。
 云炉石谷（kiln_valley）,foundation_kiln,旧丹窑内壁,,,得知物品 丹窑移灰牌（foundation_delivery）,3,,2＝立板的浅槽空了，只留下一圈旧印压过的黑边。,,foundation_kiln_echo＝present＝炉影每次掠过挡板，便用手遮住立板后那道缺半的金光。、absent＝窑影已经散了。灰不再贴着窑口倒吹。
 碎云雪关（snow_pass）,foundation_court,封石验药室,,,得知物品 封石之约（foundation_snow_order）,3,,2＝文案上压着冷掉的温盏，护炉人已经去换火口。,,foundation_warden＝present＝矮墙后炉火烧得很稳。护炉人示意你把封石之约压在灯盏下。、absent＝护炉人走到桌边，伸手抬起灯盏。
-蒲湾圩田（reed_meadows）,meadow_channel,姚六的弯渠,,,,3、4,,2＝姚六抄了两份修渠凭据，留给儿子的那份还在晒。田边有两道浅沟，漂来的枯木常在外沟口卡住。、3＝野雁飞走了。太阳落山前，姚六放水冲去田泥。两道浅沟露了出来，渠口时常能拦住漂木。,,
+蒲湾圩田（reed_meadows）,meadow_channel,姚六的弯渠,,,,3、4,,,,
 蒲湾圩田（reed_meadows）,meadow_ruts,雁脚泥垄,,,,,,,,reed_fox＝present＝狐狸顺着雁的脚印钻进堤下，留了两行新脚印。、absent＝泥垄上只剩让日头晒干的旧脚印。
-灰鹭矶（pale_shoal）,shoal_baskets,灰鹭晒篮处,,,,3,,2＝补鞋的白宜蹲在浅石上晾篮子。她把鞋口重新缠好了，篮底原有一处补布也换了新片。,,
+灰鹭矶（pale_shoal）,shoal_baskets,灰鹭晒篮处,,,,3,,2＝白宜缝好了鞋，把篮子倒扣在石上晾。浅石边是鹭草扎根的地方，往下游几步还有一排容易积砂的石缝。,,
 跃鱼旧渠（fish_ladder）,ladder_drop,第三级闸口,,,,,,,,river_gateback＝present＝水里那条横脊每次摆尾，最下一级的阶都被掩住。、absent＝水阶落出一截，能踩去有铁屑的水槽。
-折水驿（willow_post）,willow_yard,卸货后院,,,,1、2,,1＝驿卒把修好的雨槽推到瓦檐下。挑担人靠着门柱等水开，没人再去搬那捆沉木。,,
+折水驿（willow_post）,willow_yard,卸货后院,,,,1、2,,1＝雨水顺着新木槽淌到院外。檐下的行李没再淋湿，门房手边那两块名牌也挪到了干处。,,
 校潮亭（gauge_tower）,gauge_piles,刻尺水桩,,,,1、2,,,,
 晒盘坡（screen_slope）,slope_sieves,断壁筛架,,,,4,,,,stone_badger＝present＝筛架下有个滚圆的东西在磨石头，碎砂直落到外侧。、absent＝架下没有磨石声。从绳结处够得到旧筛。
 系灯院（lantern_court）,lantern_term,夜灯廊,,,,1、2,,1＝挂灯人已把碎护皮换下。廊口的横凳留给巡夜回来的人，右侧还有一条访堂的石路。,,
-回潮母洞（undertow_grotto）,undertow_bed,退水石脊,,,,2,,1＝取走两份伏潮息泥后，中央的坑积着清水。沿石脊还能绕去有灵晶的侧洞。,,undertow_moundback＝present＝泥脊忽然抬起整整一尺。粗鳞下挂着河砂，露出的角挡住了泥床。、absent＝泥脊慢慢塌下去，床面留下三圈未被河潮搅散的黑泥。
+回潮母洞（undertow_grotto）,undertow_bed,退水石脊,,,,2,,1＝中央多了个积着清水的坑。侧洞的石壁上还挂着几道晶砂留下的细痕。,负丘虺（undertow_moundback）：泥脊塌下去，床面留下三圈未被潮水搅散的黑泥。角原来挡着的那条路能通到侧洞。,undertow_moundback＝present＝泥脊忽然抬起一截。河砂从一排粗鳞上掉下来，一对角堵住了去侧洞的路。、absent＝
 反声钟窟（counter_bell）,counter_bell_score,信架与钟枢,,,,2、4,,1＝信架底只剩抄图时用过的一块墨。钟脚外沿还嵌着几片暗金。,,river_copper_echo＝present＝钟声一响，铜影便挡在信架前，把钟槌横在膝前。、absent＝铜影散去了，古钟旁的信架没人守。
 照原城（zhao_city）,zhao_flood_office,城门水尺档,,,,1、2,,,,
-青埂（green_dyke）,zhao_dyke_bend,两面低埂,,,,3,,,,
-杨木水栈（flood_market）,zhao_float_goods,三姓木码头,,,,1,,,,
-守尺观（measuring_hall）,zhao_bamboo_duel,竹尺庭,是,,,1,,,,
-蛙背塘（frog_pond）,zhao_frog_shelf,斜萍石窝,,,,,,,,
+青埂（green_dyke）,zhao_dyke_bend,两面低埂,,,,3,,,,dyke_marten＝present＝低埂背后有两道新抓痕，旁边散着刚咬开的蚌壳。、absent＝低埂背后的抓痕已经晒干，水边没什么动静。
+杨木水栈（flood_market）,zhao_float_goods,三姓木码头,,,,1、3,,0＝新木撑稳了晒架。余节正收另一张齐肩高的干网，往腰间的布袋里一送，网全进去了。那袋才一掌宽，仍旧瘪着。、2＝余节束起布袋口，拍掉新木撑上的木屑。木台下有两根横梁，上游的漂枝常卡在缝里。,,
+守尺观（measuring_hall）,zhao_bamboo_duel,竹尺庭,是,,,1,,,,zhao_spar＝present＝砖圈旁立着几根待客的竹尺。、absent＝砖圈已经扫净，竹尺收回架上。傅澄坐在廊下歇手。
+蛙背塘（frog_pond）,zhao_frog_shelf,斜萍石窝,,,,,,,,glass_frog＝present＝石窝里接连冒出几串大气泡。、absent＝浅窝里只漂着薄薄一层浮萍。
 没顶刻碑（old_marker）,zhao_retreat_marks,倒行刻碑,,,,1,,,,
 斜漏水驿（zhao_hermit）,zhao_leak_bench,斜漏驿棚,,,,1、2,,,,
 连环浅洲（ring_isles）,zhao_isle_reeds,浮洲松根,,,,,,,,
-藻鳞泥浜（scale_bog）,zhao_scales,青膜硬埂,,,,,,,,
-白鹤粮仓（crane_granary）,zhao_grain_ladder,高脚粮仓,,,,1,,,,
-叠石驿关（zhao_pass）,zhao_ridge_permit,青瓦验牒房,,,,1、2,,,,
+藻鳞泥浜（scale_bog）,zhao_scales,青膜硬埂,,,,,,,,mud_shrike＝present＝埂上的芦梗勾着一绺湿毛，泥上还有新鲜的爪印。、absent＝埂顶的旧足印已经晒硬，水藻里没见动静。
+白鹤粮仓（crane_granary）,zhao_grain_ladder,高脚粮仓,,,,1,,0＝梯脚两边新加了木撑，何绢踩着梯子去收上层的粮袋。仓门后仍是削木的地方，檐下一坐就能看见。,,
+叠石驿关（zhao_pass）,zhao_ridge_permit,青瓦验牒房,,,,1、2,,0＝两副绳架已靠回檐下，破绳卷在门边。柯伯给牵骡的人让开路，关那头不时传来铃声。,,
 缺轮磨台（jade_mill）,zhao_old_wheel,横卧的半边磨轮,,,,2,,,,
-挂炭坳（charcoal_ridge）,zhao_firedoor,斜封窑棚,,,,1,,,,
-沉水量站（sunken_lab）,zhao_submerged_table,占着量槽的石背,,,,2,,,槽背水魁（lab_crawler）：低挂的导灯亮起两点。传水的槽终于能抬起铜边，水魁已经退进再深些的岩裂。,
-烧黑的伏火坑（night_pit）,zhao_bank_fire,赤泥横穴,,,,3,,,,ember_yak＝present＝挨着窑脚传来踏炭声。、absent＝窑脚只有被扒短的灰垄。
-碎琉璃滩（glass_bank）,zhao_glass_net,六角晒网,,,,1,,,,
-错水湖底（fault_lake）,zhao_deep_pillars,分水三柱,,,,2,,,分柱水君（fault_warden）：断裂的柱子渐渐沉下去，石台露了出来。台上有道夹文书的暗槽，一侧的盖子还钉着。,
-拴绳沙洼（rope_sands）,zhao_rope_sound,沙坠顺风线,,,,,,,,
+挂炭坳（charcoal_ridge）,zhao_firedoor,斜封窑棚,,,,1,,0＝马荻挂稳了湿帘，窑口的火苗没再贴地蹿出来。外头的晾棚晒着炭，棚角散着窑工削下的枝头。,,
+沉水量站（sunken_lab）,zhao_submerged_table,铜槽旁,,,,2,,1＝铜板已经印过，插销被你搁回槽边。水顺出水口落下，靠入口的台子还干着。,槽背水魁（lab_crawler）：那团石甲退进岩缝，出水口空了。铜板侧面的插销露在外面，入口边仍有块干台。,
+烧黑的伏火坑（night_pit）,zhao_bank_fire,赤泥横穴,,,,3,,,,ember_yak＝present＝挨着窑脚传来踏炭声，灰堆上偶尔扫过一道尾影。、absent＝窑脚只有踩散的灰垄，里面没有脚步声。
+碎琉璃滩（glass_bank）,zhao_glass_net,六角晒网,,,,1,,0＝章老把旧灯座收回晒网，搁在他修补渔具的篮筐旁。几块带刻度的碎琉璃还晾在日光下。,,
+错水湖底（fault_lake）,zhao_deep_pillars,分水三柱,,,,2,,1＝石台上的窄槽空了，一边盖子斜敞着。水绕开半沉的断柱，缓缓流向远处。,分柱水君（fault_warden）：水君退进湖底的石缝，水面渐渐平了。石台露出来，台上有道窄槽，槽盖只有一头还被钉着。,
+拴绳沙洼（rope_sands）,zhao_rope_sound,沙坠顺风线,,,,,,,,dyke_marten＝present＝有几撮细根被翻到地面，足印一直伸到背阴处。、absent＝翻开的细根晒在地上，旧脚印给风填去大半。
 断齿内堰（burnt_weir）,zhao_broken_rake,三口相背的堰齿,,,,2,,,,
 望船排礁（beacon_reefs）,zhao_ferry_hook,长礁灯脚,,,,2,,,,
 斜漏水驿（zhao_hermit）,zhao_assay_tubs,回水试槽,,,,1,,,,
 鸣沙城（mingsha_city）,sand_city_registry,鸣沙井籍房,,,,1,,,,
 炭篷驿（cinder_inn）,sand_cinder_kitchen,炭篷边炉,,,,1,,,,
 叩石院（sand_bell_cloister）,sand_cloister_trial,对簧石台,是,,,1、3,,,,
-叩石院（sand_bell_cloister）,sand_ring_maker,梁弦的工坊,,对簧石台（sand_cloister_trial） · 给梁弦材料，帮他修挂石板的架子、对簧石台（sand_cloister_trial） · 向袁息讨这场的评语,,1,,,,
+叩石院（sand_bell_cloister）,sand_ring_maker,梁弦的工坊,,对簧石台（sand_cloister_trial） · 给梁弦材料，帮他修挂石板的架子、对簧石台（sand_cloister_trial） · 向袁息讨这场的评语,,1、2,,,,
 断纬帐道（silk_tent_road）,sand_tent_watch,晾绳矮帐,,,,1,,,,
 断纬帐道（silk_tent_road）,sand_crossing_rail,连鞍岔牌,,,,1,,,,
 担盐岗（salt_ledger_barrows）,sand_salt_ledger,井边老秤,,,,1,,,,
@@ -92,13 +92,14 @@
 空音桥（dry_sound_bridge）,sand_bridge_rail,晃铜的桥栏,,,,2,,,,sand_rattle_viper＝present＝桥钉旁有一线新蛇蜕，阴处的铜结微动。、absent＝铜片垂在平直的桥栏上，下面没人声或兽声。
 架风板（wind_slate）,sand_wind_work,风楔架,,,,,,,,
 空籴仓（hollow_silo）,sand_silo_door,关了一半的仓门,,,,2,,,,sand_silo_marten＝present＝卸谷洞口挤出两道细爪印。、absent＝仓沿落住了浮灰，暂没有新爪痕。
-落琉洼（glass_hail_sink）,sand_hail_floor,断琉棱,,,,3,,2＝晶石底下的弹片已经取走，原处只剩一道空缝。沿上方的石边还能退出洼地。,,sand_glass_lynx＝present＝深处有高阶修士留下的火光。光照着石壁，几道爪痕比手掌还大。、absent＝石屑遮住半截爪印，晶石下面渐渐没了动静。
+落琉洼（glass_hail_sink）,sand_hail_floor,断琉棱,,,,3,,2＝晶石底下的弹片已经取走，原处只剩一道空缝。沿上方的石边还能退出洼地。,,sand_glass_lynx＝present＝深处的碎晶被翻了个面。几道新爪痕比手掌还长，有一道一直划到岩壁上。、absent＝石屑遮住半截爪印，晶石下面渐渐没了动静。
 横生脉（hanging_vein）,sand_hanging_support,贴壁支木,,,,,,,,sand_vein_jackal＝present＝矿绳里面传出磨齿般的声响，有只金眼从夹层探出来。、absent＝旧支木没再被挤动，绳后空了。
 伏兔草丘（camel_grass_dunes）,sand_dune_grass,伏草沙坎,,,,,,,,sand_dune_hare＝present＝沙面一点点鼓起，小耳朵探出草根。、absent＝伏草旁零散着几条浅沟，没见兔子探头。
 并磨坊（guest_mill）,sand_guest_miller,栾火的并磨盘,,,,1、2,,,,
 覆瓦旱畦（kiln_roof_farm）,sand_rooftile_patch,留阴瓦畦,,,,2,,,,
 砾盘浅沟（bone_dry_rill）,sand_gravel_rill,搁木的浅弯,,,,,,,,
-琉脊天室（glass_rotunda）,sand_glass_chamber,三面落光的室心,,,,2,,1＝邢既横坐回角柱边。旧舵已顺过一次，石缝只出清风，不再吐灰。,照壁刀师邢既横（sand_sundial_master）：邢既横把真刀插回鞘中，用脚尖把旧舵的拉环提起来。,
+砾盘浅沟（bone_dry_rill）,sand_basket_shed,岸边竹棚,是,,,1、2、3、5,,0＝箩筐稳稳立在凳上。老人把手边一截剩下的竹篾往里折，脚边那根竹杖已经磨白了。、1＝老人低着头，继续把竹篾压进筐沿。门边有几截没用完的竹料。、2＝箩筐已挪到棚里。老人拄着竹杖站在棚外，鞋边有一道刚画的圆圈。、4＝老人把编好的箩筐倒过来拍了拍，招呼你下回进棚喝水。,,
+琉脊天室（glass_rotunda）,sand_glass_chamber,铜轮前,,,,2,,1＝邢既横坐回石柱边。铜轮下的暗格开着，石缝里吹来的风也散了沙尘。,照壁刀师邢既横（sand_sundial_master）：邢既横收刀入鞘，把手搭在铜轮上。「你拉那只铁环，我从这边推。」,
 校潮亭（gauge_tower）,puzzle_gauge_pin,胥婉的旧水尺,,刻尺水桩（gauge_piles） · 替胥婉按住纸，印下水尺刻痕,,1,,,,
 跃鱼旧渠（fish_ladder）,puzzle_joint_gates,旧渠的分水闸,,,,1,,,,
 照原城（zhao_city）,puzzle_scale_register,挑秤人的砖柜,,,,1,,,,

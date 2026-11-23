@@ -51,10 +51,10 @@ const markers = [
   { id: 'kiln_roof_farm', name: '覆瓦旱畦', tier: 0, travel: 0.75, x: 28, y: 87,
     links: ['cinder_inn', 'bone_dry_rill', 'camel_grass_dunes'], desc: '人把旧炉瓦沿畦排了几层。太阳晒过瓦面，瓦底的土仍潮。' },
   { id: 'bone_dry_rill', name: '砾盘浅沟', tier: 0, travel: 0.75, x: 19, y: 90,
-    links: ['cinder_inn', 'kiln_roof_farm'], desc: '雨停后这条沟只流水半天。两道石子堆成的弯拦住了漂来的碎木。' },
+    links: ['cinder_inn', 'kiln_roof_farm'], desc: '雨停后这条沟只流水半天。石弯拦住了漂来的碎木，岸上还有座用竹帘挡风的小棚。' },
   { id: 'glass_rotunda', name: '琉脊天室', tier: 8, travel: 1.5, x: 87, y: 48,
     links: ['glass_hail_sink'], secret: true, reveal: { item: 'sand_glass_pass' },
-    desc: '三面岩壁的微光铺进来，投在一盘老舵上。外头的风声音小了，沙还从缝里簌簌漏进来。' },
+    desc: '光从岩缝里透进来，照着石座上嵌着的铜轮。外面的风声轻了，细沙还顺着石缝往下漏。' },
 ];
 
 const regionDetails = Object.fromEntries(markers.map(({ id, x, y, links, settlement, portal, array }) => [id, {
@@ -78,7 +78,7 @@ const sites = [
   { id: 'sand_cinder_kitchen', region: 'cinder_inn', name: '炭篷边炉', once: [0] },
   { id: 'sand_cloister_trial', region: 'sand_bell_cloister', name: '对簧石台', once: [0, 2], protectedArena: true,
     creatures: { sand_tuner: { start: 1, cap: 1 } } },
-  { id: 'sand_ring_maker', region: 'sand_bell_cloister', name: '梁弦的工坊', once: [0],
+  { id: 'sand_ring_maker', region: 'sand_bell_cloister', name: '梁弦的工坊', once: [0, 1],
     afterChoices: ['sand_cloister_trial:0', 'sand_cloister_trial:2'] },
   { id: 'sand_tent_watch', region: 'silk_tent_road', name: '晾绳矮帐', once: [0],
     stocks: { reed: { label: '湿帐沿的灵草', start: 4, cap: 6, interval: 4, growth: 2, choices: [1] } } },
@@ -116,7 +116,7 @@ const sites = [
       core_inner: { item: 'core', label: '断棱底下的灵晶', start: 5, cap: 8, interval: 8, growth: 2, choices: [3] } },
     creatures: { sand_glass_lynx: { start: 1, cap: 2, interval: 13, growth: 1, depletedFactor: 1.15, curve: 'wild' } },
     afterOnceText: { 2: '晶石底下的弹片已经取走，原处只剩一道空缝。沿上方的石边还能退出洼地。' },
-    creatureText: { sand_glass_lynx: { present: '深处有高阶修士留下的火光。光照着石壁，几道爪痕比手掌还大。', absent: '石屑遮住半截爪印，晶石下面渐渐没了动静。' } } },
+    creatureText: { sand_glass_lynx: { present: '深处的碎晶被翻了个面。几道新爪痕比手掌还长，有一道一直划到岩壁上。', absent: '石屑遮住半截爪印，晶石下面渐渐没了动静。' } } },
   { id: 'sand_hanging_support', region: 'hanging_vein', name: '贴壁支木',
     stocks: { ore: { label: '坡角露出的寒铁', start: 4, cap: 7, interval: 5, growth: 2, choices: [0] },
       black_iron: { label: '支架后的暗金', start: 4, cap: 8, interval: 6, growth: 2, choices: [2] } },
@@ -133,10 +133,18 @@ const sites = [
   { id: 'sand_gravel_rill', region: 'bone_dry_rill', name: '搁木的浅弯',
     stocks: { wood: { label: '沟弯搁下的松木', start: 5, cap: 7, interval: 4, growth: 2, choices: [0] },
       ore: { label: '砾盘底的寒铁', start: 2, cap: 4, interval: 5, growth: 1, choices: [1] } } },
-  { id: 'sand_glass_chamber', region: 'glass_rotunda', name: '三面落光的室心', once: [1],
+  { id: 'sand_basket_shed', region: 'bone_dry_rill', name: '岸边竹棚', once: [0, 1, 2, 4], protectedArena: true,
+    creatures: { sand_basket_mender: { start: 1, cap: 1 } },
+    afterOnceText: {
+      0: '箩筐稳稳立在凳上。老人把手边一截剩下的竹篾往里折，脚边那根竹杖已经磨白了。',
+      1: '老人低着头，继续把竹篾压进筐沿。门边有几截没用完的竹料。',
+      2: '箩筐已挪到棚里。老人拄着竹杖站在棚外，鞋边有一道刚画的圆圈。',
+      4: '老人把编好的箩筐倒过来拍了拍，招呼你下回进棚喝水。',
+    } },
+  { id: 'sand_glass_chamber', region: 'glass_rotunda', name: '铜轮前', once: [1],
     creatures: { sand_sundial_master: { start: 1, cap: 1 } },
-    afterWinText: { sand_sundial_master: '邢既横把真刀插回鞘中，用脚尖把旧舵的拉环提起来。' },
-    afterOnceText: { 1: '邢既横坐回角柱边。旧舵已顺过一次，石缝只出清风，不再吐灰。' } },
+    afterWinText: { sand_sundial_master: '邢既横收刀入鞘，把手搭在铜轮上。「你拉那只铁环，我从这边推。」' },
+    afterOnceText: { 1: '邢既横坐回石柱边。铜轮下的暗格开着，石缝里吹来的风也散了沙尘。' } },
 ];
 
 const events = [
@@ -157,9 +165,11 @@ const events = [
     { label: '向袁息讨这场的评语', afterFight: 'sand_tuner', days: 0.25, insight: 4,
       outcome: '袁息将木片敲在你刚站过的石板上，回声清清楚楚。「这一步落得轻。我去给梁师傅递个话，他想托个脚步稳的人带件东西出州。你到工坊找他。」' },
   ] },
-  { id: 'sand_ring_maker', name: '梁弦的工坊', text: '工坊里挂着几片拨动会响的薄铜。梁弦给其中一片装了木把手，柄尾刻着两道山纹。', choices: [
+  { id: 'sand_ring_maker', name: '梁弦的工坊', text: '工坊里挂着几片拨动会响的薄铜。梁弦刚装好一只木把手，又从腰间的布袋里抽出一块比门板还宽的毡子。', choices: [
     { label: '接过梁弦留下的铜片', days: 0.25, insight: 5, loot: { echo_tuning_key: 1 },
       outcome: '梁弦拿铜片碰了碰石板，尾音半晌才消。「我从沉钟岭带回来时就缺这一角。你到岭上听钟，找找哪块石头上有和它对得上的凹口。」' },
+    { label: '问梁弦那块大毡子是怎么塞进去的', days: 0.25, loot: { qiankun_fold_pattern: 1 },
+      outcome: '梁弦把袋口翻出来。里头的布一层压一层，针脚都藏在折里。「这只原是装井绳的。」他找出一截旧布递给你。「带回去，照这道折缝量。」' },
   ] },
   { id: 'sand_tent_watch', name: '晾绳矮帐', text: '荀霜收卷晾过的粗绳，帐角的水滴一路落到残席的草根。', choices: [
     { label: '问荀霜商队为何绕开石洼', days: 0.25, insight: 2,
@@ -259,11 +269,22 @@ const events = [
     { label: '沿里弯把干松木拖上岸', days: 0.5, loot: { wood: 3 }, insight: 2, outcome: '木头晒裂了一点，折齐还能作炉料。' },
     { label: '扒开外弯的石子，找寒铁', days: 0.5, loot: { ore: 1 }, insight: 2, outcome: '大石块挪不动，石子堆下面倒剩了一块厚铁。' },
   ] },
-  { id: 'sand_glass_chamber', name: '三面落光的室心', text: '强修邢既横在角柱边磨开了刃口，守着带暗格的旧舵。脚边的碎石给刀尖劈掉了一角。门口还有一线可沿原路退走的亮光。', choices: [
-    { label: '拔出兵器，向邢既横讨旧舵', desc: '邢既横起身堵在旧舵前，手里已经拿了真刀。门口还留着退路。', days: 0.5, enemy: 'sand_sundial_master',
-      outcome: '邢既横将刀鞘扫向柱脚，提真刀向你逼近。' },
-    { label: '和邢既横一起转舵开暗格', days: 0.5, afterFight: 'sand_sundial_master', loot: { black_iron: 5, core: 8 }, insight: 8,
-      outcome: '两人把旧舵推到原来的刻度。暗格开了，邢既横从里面取出几块还干燥的灵晶和暗金，替你用布包好。' },
+  { id: 'sand_basket_shed', name: '岸边竹棚', text: '一个老人坐在竹帘后补箩筐。凳腿陷进沙里，箩筐一点点向沟那边歪过去。', choices: [
+    { label: '帮老人扶稳箩筐', days: 0.125, outcome: '他伸脚把矮凳拖回来，又往你这边让了半块空地。「风从沟里来，坐里头些。」' },
+    { label: '问老人愿不愿意试两招', afterChoice: 0, days: 0.125,
+      outcome: '「要找人过招，去院里才热闹。」他低头用指甲把翘起来的竹篾压回去。' },
+    { label: '拿一截闲竹比划两下，再请老人指点', afterChoice: 1, days: 0.125,
+      outcome: '老人看完，先把箩筐搬进棚，再用拐杖在沙上画了个圈。「只在圈里试。撑不住就抬手，我会停。」' },
+    { label: '走进圈里和老人试招', afterChoice: 2, desc: '老人手里还是那根旧竹杖。', days: 0.125, enemy: 'sand_basket_mender',
+      outcome: '你刚抬手，竹杖已经贴上手腕。老人脚下那双旧布鞋连位置都没挪。' },
+    { label: '请老人讲讲方才那一步', afterFight: 'sand_basket_mender', days: 0.25, insight: 7,
+      outcome: '他拿竹杖指了指你刚踩过的石子。「脚下那颗会滚。下回动手之前，先知道自己站在哪儿。」' },
+  ] },
+  { id: 'sand_glass_chamber', name: '铜轮前', text: '石柱旁坐着一个人。他拿脚边的石头试刀，随手削下一角。听见脚步，他站了起来，正好挡在铜轮前。你回头还能看见来时的石缝。', choices: [
+    { label: '拔出兵器，走向铜轮', desc: '那人把刀一横，刀刃上还沾着石粉。', days: 0.5, enemy: 'sand_sundial_master',
+      outcome: '那人把刀鞘往柱边一抛，提刀迎了上来。' },
+    { label: '拉住铁环，和邢既横一起转动铜轮', days: 0.5, afterFight: 'sand_sundial_master', loot: { black_iron: 5, core: 8, qiankun_inner_pattern: 1 }, insight: 8,
+      outcome: '铜轮底下响了一声，露出个暗格。邢既横倒空灰布袋，里头滚出灵晶和暗金。他翻过袋底，细细的针脚还在。「袋子划破了，这几针倒没散。拿去，让会缝的人照着试试。」' },
   ] },
 ];
 
@@ -295,6 +316,10 @@ const enemies = [
     intents: [{ name: '牵锁扫地', kind: 'attack', mult: 1 }, { name: '急收印锁', kind: 'drain', mult: 0.66 },
       { name: '柱背压锁', kind: 'heavy', mult: 1.64 }, { name: '绕梁抱臂', kind: 'guard', mult: 1.45 }],
     loot: { gold_core: 2 }, desc: '越过旧影先落地的位置，锁链会在回声传到前先扑到。' },
+  { id: 'sand_basket_mender', name: '补箩老人', tags: ['human'], tier: 7, hp: 121, atk: 22, def: 9, insight: 0, sparring: true,
+    intents: [{ name: '竹杖贴向手腕', kind: 'attack', mult: 1 }, { name: '横过竹杖挡招', kind: 'guard', mult: 1.35 },
+      { name: '竹杖斜着扫来', kind: 'heavy', mult: 1.5 }, { name: '竹尖挑向肘弯', kind: 'attack', mult: 1.13 }],
+    loot: {}, desc: '他手里那根竹杖平平无奇，转到你身侧时，杖头却一点声响都没有。' },
   { id: 'sand_sundial_master', name: '照壁刀师邢既横', tags: ['human'], tier: 8, hp: 128, atk: 25, def: 10, insight: 13,
     intents: [{ name: '平靠石影拖刀', kind: 'attack', mult: 1 }, { name: '横刀顺气', kind: 'guard', mult: 1.48 },
       { name: '伏角横刀', kind: 'heavy', mult: 1.6 }, { name: '连拖三步', kind: 'drain', mult: 0.7 }, { name: '急挑返光', kind: 'attack', mult: 1.15 }],

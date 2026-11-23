@@ -106,6 +106,7 @@ function quoteRoad(state, id, kit) {
   const blockedCrossing = crossBlocker(state, road.cross);
   if (blockedCrossing) return { ...road, reason: blockedCrossing };
   if (state.satiety === 0) {
+    if (road.cross) return { ...road, reason: '腹中空空，先回住处吃些东西，再走跨州路。' };
     if (!settlementOf(kit.data, id)?.inn) return { ...road, reason: '腹中空空，先吃些东西。' };
     return { ...road, days: road.days + kit.rules.emptyReturnDays, rescue: true, reason: '' };
   }
@@ -243,8 +244,20 @@ function salePrice(place, item, kit) {
   return Math.min(...offered);
 }
 
-function localSellable(state, id, kit) {
-  return Object.values(state.equipment).includes(id) ? 0 : kit.homeBagAvailable(state, id);
+function localSaleTerms(state, id, kit, requested = 1) {
+  const equipped = Object.values(state.equipment).includes(id);
+  const count = equipped ? 0 : kit.homeBagAvailable(state, id);
+  const reason = kit.owns(state, id) < requested ? '手头没有这么多货。' :
+    equipped ? '先卸下这件装备。' : count < requested ? '救济的干粮只供自用。' : '';
+  return { count, reason };
+}
+
+function localPurchaseBlocker(state, id, kit, count, inStock, price) {
+  if (count > inStock) return inStock ? '摊上没有这么多货。' : '这批货已经卖完。';
+  if (state.coins < price * count) return '手头的灵钱不够。';
+  if (kit.records.gear[id] && (count !== 1 || kit.gearReserved(state, id))) return '同名装备只能留一件。';
+  if (!kit.hasRoom(state, { [id]: count })) return '行囊装不下这笔货。';
+  return '';
 }
 
 function localMarket(state, kit) {
@@ -253,14 +266,14 @@ function localMarket(state, kit) {
   const offers = Object.entries(localGoods(place)).filter(([id]) => kit.records.items[id] && !kit.isEvidence(kit.records.items[id])).map(([id, offer]) => {
     const { count } = shopStock(state, id, offer);
     const price = localPrice(kit.records.items[id], offer);
-    let maximum = kit.records.gear[id] && kit.gearReserved(state, id) ? 0 :
-      Math.min(kit.rules.maxTradeCount, count, price > 0 ? Math.floor(state.coins / price) : count);
+    const reason = localPurchaseBlocker(state, id, kit, 1, count, price);
+    let maximum = reason ? 0 : Math.min(kit.rules.maxTradeCount, count, price > 0 ? Math.floor(state.coins / price) : count);
     if (kit.records.gear[id]) maximum = Math.min(maximum, 1);
-    while (maximum && !kit.hasRoom(state, { [id]: maximum })) maximum--;
-    return { id, count, price, maximum };
+    while (maximum > 1 && !kit.hasRoom(state, { [id]: maximum })) maximum--;
+    return { id, count, price, maximum, reason };
   });
   const buys = kit.data.items.filter((item) => kit.owns(state, item.id) > 0).map((item) => ({ id: item.id,
-    price: salePrice(place, item, kit), count: localSellable(state, item.id, kit) })).filter(({ price }) => price > 0);
+    price: salePrice(place, item, kit), ...localSaleTerms(state, item.id, kit) })).filter(({ price }) => price > 0);
   return { offers, buys, talk: place.talk ? { label: place.talk.label, heard: known(state, place.talk.lead) } : null };
 }
 
@@ -280,7 +293,9 @@ function localTrade(state, id, count, kit, buying) {
   if (!place || !record || !Number.isSafeInteger(count) || count < 1 || count > kit.rules.maxTradeCount) return kit.refuse('这桩买卖办不成。');
   if (!buying) {
     const price = salePrice(place, record, kit);
-    if (!price || localSellable(state, id, kit) < count) return kit.refuse('这里不能收下这么多。');
+    if (!price) return kit.refuse('这件东西不能卖。');
+    const sale = localSaleTerms(state, id, kit, count);
+    if (sale.reason) return kit.refuse(sale.reason);
     kit.removeItem(state, id, count);
     state.coins += price * count;
     return kit.say(state, `卖出${record.name}×${count}，收了${price * count}枚灵钱。`);
@@ -288,10 +303,10 @@ function localTrade(state, id, count, kit, buying) {
   const offer = localGoods(place)[id];
   if (!offer || kit.isEvidence(record)) return kit.refuse('这个摊位没卖那件东西。');
   const stock = shopStock(state, id, offer);
-  if (count > stock.count) return kit.refuse('摊上的货没这么多。');
-  const cost = localPrice(record, offer) * count;
-  if (state.coins < cost) return kit.refuse('手头的灵钱不够。');
-  if ((kit.records.gear[id] && (count !== 1 || kit.gearReserved(state, id))) || !kit.hasRoom(state, { [id]: count })) return kit.refuse('行囊装不下这笔货。');
+  const price = localPrice(record, offer);
+  const reason = localPurchaseBlocker(state, id, kit, count, stock.count, price);
+  if (reason) return kit.refuse(reason);
+  const cost = price * count;
   const remaining = stock.count - count;
   const nextAt = offer.interval > 0 ? stock.nextAt ?? state.day + offer.interval : null;
   (state.world.shops[state.region] ??= {})[id] = { count: remaining, nextAt };

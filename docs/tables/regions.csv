@@ -57,5 +57,5 @@ hanging_vein,横生脉,鸣沙州（mingsha）,61,64,叩石院（sand_bell_cloist
 camel_grass_dunes,伏兔草丘,鸣沙州（mingsha）,39,82,断纬帐道（silk_tent_road）、覆瓦旱畦（kiln_roof_farm）,,否,否,0,炼气初期,1,,草根伏在流沙下面，一长段沙脊把阳光挡在矮坎外。,
 guest_mill,并磨坊,鸣沙州（mingsha）,47,63,叩石院（sand_bell_cloister）、断纬帐道（silk_tent_road）,,否,否,0,炼气初期,0.75,,两帮客商共用一盘石磨，空隙里插着水钱分摊竹签。,
 kiln_roof_farm,覆瓦旱畦,鸣沙州（mingsha）,28,87,炭篷驿（cinder_inn）、砾盘浅沟（bone_dry_rill）、伏兔草丘（camel_grass_dunes）,,否,否,0,炼气初期,0.75,,人把旧炉瓦沿畦排了几层。太阳晒过瓦面，瓦底的土仍潮。,
-bone_dry_rill,砾盘浅沟,鸣沙州（mingsha）,19,90,炭篷驿（cinder_inn）、覆瓦旱畦（kiln_roof_farm）,,否,否,0,炼气初期,0.75,,雨停后这条沟只流水半天。两道石子堆成的弯拦住了漂来的碎木。,
-glass_rotunda,琉脊天室,鸣沙州（mingsha）,87,48,落琉洼（glass_hail_sink）,,否,否,8,金丹后期,1.5,得知物品 落琉洼的弹片（sand_glass_pass）,三面岩壁的微光铺进来，投在一盘老舵上。外头的风声音小了，沙还从缝里簌簌漏进来。,是
+bone_dry_rill,砾盘浅沟,鸣沙州（mingsha）,19,90,炭篷驿（cinder_inn）、覆瓦旱畦（kiln_roof_farm）,,否,否,0,炼气初期,0.75,,雨停后这条沟只流水半天。石弯拦住了漂来的碎木，岸上还有座用竹帘挡风的小棚。,
+glass_rotunda,琉脊天室,鸣沙州（mingsha）,87,48,落琉洼（glass_hail_sink）,,否,否,8,金丹后期,1.5,得知物品 落琉洼的弹片（sand_glass_pass）,光从岩缝里透进来，照着石座上嵌着的铜轮。外面的风声轻了，细沙还顺着石缝往下漏。,是

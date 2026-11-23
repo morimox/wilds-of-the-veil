@@ -71,9 +71,9 @@ return { initialMechanisms, mechanismView, mechanismAction };
 })();
 const economyModule = (() => {
 ${moduleBody(economy)}
-return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo };
+return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName };
 })();
-const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo } = economyModule;
+const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName } = economyModule;
 const { alchemyData, initialAlchemyState, alchemyView, alchemyAction } = (() => {
 ${moduleBody(alchemy)}
 return { alchemyData, initialAlchemyState, alchemyView, alchemyAction };

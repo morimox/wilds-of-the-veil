@@ -181,11 +181,25 @@ const stockSources = {
 
 const warehouseStack = 40;
 const warehouseCap = [0, 16, 32, 56];
+const backpackExpansions = [
+  { capacity: 16, name: '加缝侧袋的行囊', lead: 'hide', source: '出门带回兽革', need: { hide: 6, wood: 4 }, cost: 12, days: 0.5,
+    label: '请皮匠加缝侧袋', desc: '皮匠把兽革对折了一下。「这皮够结实。拿几截松木给袋底撑住，就能再缝一对侧袋。」',
+    outcome: '皮匠把两只侧袋缝进旧行囊，削了松木给袋底加了两道撑条。' },
+  { capacity: 28, name: '乾坤袋', lead: 'qiankun_pattern', source: '杨木水栈的余节', need: { hide: 10, black_iron: 3, core: 4 }, cost: 28, days: 1,
+    label: '照袋样缝一只乾坤袋', desc: '皮匠顺着样布摸到袋角。「原来这道缝要往里折，才量得出多出来的那一层。」',
+    outcome: '皮匠把你的物件倒进缝好的小袋。松木一截截滑了进去，袋底看着还是原来的大小。' },
+  { capacity: 44, name: '双层乾坤袋', lead: 'qiankun_fold_pattern', source: '鸣沙叩石院', need: { hide: 12, black_iron: 5, core: 8, foundation_core: 2 }, cost: 46, days: 2,
+    label: '照叠缝样缝一只双层乾坤袋', desc: '皮匠把两道缝一上一下叠在桌面。「得先让两层的袋口错开，伸手才摸得准。」',
+    outcome: '皮匠把袋口翻给你看。手沿左边摸进去是干粮，沿右边摸进去是那几件铁器。' },
+  { capacity: 64, name: '深底乾坤袋', lead: 'qiankun_inner_pattern', source: '琉脊天室', need: { hide: 16, black_iron: 8, core: 12, gold_core: 2 }, cost: 72, days: 3,
+    label: '照旧袋底纹缝一只深底乾坤袋', desc: '皮匠把袋底铺开，沿旧线一寸寸量过去。「先把底线走完，再回来收口。」',
+    outcome: '皮匠把一整捆备用兽革推进袋口，松手后连背带都没往下一沉。' },
+];
 const setupDays = 0.25;
 const collectDays = 0.25;
 
 export const economyData = {
-  facilities, projects, merchantOrders, warehouseStack, warehouseCap,
+  facilities, projects, merchantOrders, warehouseStack, warehouseCap, backpackExpansions,
   setupDays, collectDays, jobSlots: '等于设施等级',
 };
 
@@ -199,6 +213,15 @@ export function initialEconomyState() {
     merchants: {},
     stock: {},
   };
+}
+
+export function backpackCapacity(state, initialCapacity) {
+  return state.economy?.backpackSize ?? initialCapacity;
+}
+
+export function backpackName(state, initialCapacity) {
+  const capacity = backpackCapacity(state, initialCapacity);
+  return backpackExpansions.find((step) => step.capacity === capacity)?.name ?? '行囊';
 }
 
 function normalizeEconomy(state) {
@@ -334,6 +357,29 @@ function projectView(state, job, kit) {
   };
 }
 
+function backpackView(state, kit) {
+  const base = kit.rules.backpackCapacity;
+  const capacity = backpackCapacity(state, base);
+  const saw = (id) => state.knownItems.includes(id) || kit.homeSupplies(state, id) > 0;
+  const upgrades = backpackExpansions.filter((step) => step.capacity > capacity && saw(step.lead))
+    .map((step) => ({ ...step, reason: kit.homeRequirements(state, step.cost, step.need) }));
+  if (capacity === base && !upgrades.length) return null;
+  const name = backpackName(state, base);
+  const desc = '皮匠在后院靠墙坐下，翻开案上的针线盒。';
+  return { capacity, name, desc, upgrades, upgrade: upgrades[0] ?? null };
+}
+
+function expandBackpack(state, capacity, kit) {
+  const step = backpackView(state, kit)?.upgrades.find((row) => String(capacity) === String(row.capacity));
+  if (!step) return kit.refuse('皮匠眼下办不了这道活。');
+  if (step.reason) return kit.refuse(step.reason);
+  kit.spendHome(state, step.cost, step.need);
+  const economy = normalizeEconomy(state);
+  economy.backpackSize = step.capacity;
+  kit.advance(state, step.days);
+  return kit.say(state, `${step.outcome}行囊扩到${step.capacity}格。`);
+}
+
 export function economyView(state, kit) {
   if (!kit.atHome(state)) return { facilities: [], warehouse: { used: 0, capacity: 0, stored: [], carried: [] } };
   const localFacilities = facilities.filter((facility) => knowsFacility(state, facility, kit)).map((facility) => {
@@ -360,7 +406,7 @@ export function economyView(state, kit) {
       return row(id, count, (quantity) => depositReason(state, id, quantity, kit));
     }).filter(({ count }) => count > 0),
   };
-  return { facilities: localFacilities, warehouse };
+  return { facilities: localFacilities, warehouse, backpack: backpackView(state, kit) };
 }
 
 function buildFacility(state, id, kit) {
@@ -504,6 +550,7 @@ export function economyAction(state, action, { id, count = 1 }, kit) {
     econBuild: () => buildFacility(state, id, kit),
     econStart: () => startProject(state, id, kit),
     econCollect: () => collectProject(state, id, kit),
+    econExpandPack: () => expandBackpack(state, id, kit),
     merchantTalk: () => merchantTalk(state, id, kit),
     merchantOrder: () => fulfillOrder(state, id, kit),
   };

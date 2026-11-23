@@ -41,6 +41,7 @@ sand_vein_jackal,负砂豺,4,筑基中期,63,15,15,5,beast、furred,,5,生兽肉
 sand_well_basilisk,静井伏鳞,5,筑基后期,79,17,17 / 19,5,beast、scaled,,9,生兽肉（beast_meat）×4、兽革（hide）×3、妖目（beast_eye）×1、筑基期妖丹（foundation_core）×2,鳞片上挂满白盐。尾巴在井壁上刮出刺耳的声响，声音一停，它便会抬尾重砸。
 sand_glass_lynx,三痕琉狮,6,金丹初期,110,22,22,8,beast、furred,,11,生兽肉（beast_meat）×5、兽革（hide）×4、妖目（beast_eye）×1、金丹期妖丹（gold_core）×1,肩背和鬃毛间嵌满晶片。每次把眼睛藏进鬃毛，它都会用肩膀撞向附近的晶石。
 sand_inverted_keeper,倒驿锁影,7,金丹中期,122,24,24,9,spirit,,12,金丹期妖丹（gold_core）×2,越过旧影先落地的位置，锁链会在回声传到前先扑到。
+sand_basket_mender,补箩老人,7,金丹中期,121,22,22 / 25,9,human,是,0,,他手里那根竹杖平平无奇，转到你身侧时，杖头却一点声响都没有。
 sand_sundial_master,照壁刀师邢既横,8,金丹后期,128,25,25 / 29,10,human,,13,,刀刃借石壁返光藏住一半。等看清伏角的横刀再架招，石门边仍有一线退路。
 terrace_stride,量步客陆黍,1,炼气中期,34,10,10,3,human,是,3,,擅长用小步挤人离尺线，蓄势时前脚会踩得格外深。
 terrace_crossbeam,斜梁手田素功,3,筑基初期,57,14,15 / 14,5,human,是,5,,他常把尺横在身前挡招。对手一动，他就转身换到另一侧。

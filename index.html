@@ -109,6 +109,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .bag-slots { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; margin: 4px 0 5px; }
 .bag-slots i { height: 6px; border: 1px solid #64766a; border-radius: 2px; }
 .bag-slots i.filled { border-color: #8eae97; background: #8eae97; }
+.pack-meter { display: block; width: 100%; height: 7px; margin: 4px 0 6px; accent-color: #8eae97; }
 .item-row {
   position: relative;
   display: grid;
@@ -466,7 +467,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=16" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=17" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -564,20 +565,19 @@ const animal = (start, cap, interval, growth, curve) => ({ start, cap, interval,
 
 const sites = [
   { id: 'meadow_channel', region: 'reed_meadows', name: '姚六的弯渠', once: [2, 3],
-    stocks: { reed: stock('田边灵草', 4, 7, 4, 2, 0), wood: stock('堵住水渠的枯木', 4, 5, 4, 2, 1) },
-    afterOnceText: { 2: '姚六抄了两份修渠凭据，留给儿子的那份还在晒。田边有两道浅沟，漂来的枯木常在外沟口卡住。', 3: '野雁飞走了。太阳落山前，姚六放水冲去田泥。两道浅沟露了出来，渠口时常能拦住漂木。' } },
+    stocks: { reed: stock('田边灵草', 4, 7, 4, 2, 0), wood: stock('沟口漂木', 4, 5, 4, 2, 1) } },
   { id: 'meadow_ruts', region: 'reed_meadows', name: '雁脚泥垄',
     creatures: { reed_fox: animal(2, 4, 4, 1, 'wild') },
     creatureText: { reed_fox: { present: '狐狸顺着雁的脚印钻进堤下，留了两行新脚印。', absent: '泥垄上只剩让日头晒干的旧脚印。' } } },
   { id: 'shoal_baskets', region: 'pale_shoal', name: '灰鹭晒篮处', once: [2],
     stocks: { reed: stock('鹭草根', 3, 6, 4.5, 2, 0), core: stock('石缝灵晶', 2, 4, 5, 1, 1) },
-    afterOnceText: { 2: '补鞋的白宜蹲在浅石上晾篮子。她把鞋口重新缠好了，篮底原有一处补布也换了新片。' } },
+    afterOnceText: { 2: '白宜缝好了鞋，把篮子倒扣在石上晾。浅石边是鹭草扎根的地方，往下游几步还有一排容易积砂的石缝。' } },
   { id: 'ladder_drop', region: 'fish_ladder', name: '第三级闸口',
     stocks: { wood: stock('闸梁上的枯枝', 4, 7, 4, 2, 0), ore: stock('槽底寒铁', 4, 7, 5, 2, 2) },
     creatures: { river_gateback: animal(1, 2, 6, 1, 'wild') },
     creatureText: { river_gateback: { present: '水里那条横脊每次摆尾，最下一级的阶都被掩住。', absent: '水阶落出一截，能踩去有铁屑的水槽。' } } },
   { id: 'willow_yard', region: 'willow_post', name: '卸货后院', once: [0, 1],
-    afterOnceText: { 1: '驿卒把修好的雨槽推到瓦檐下。挑担人靠着门柱等水开，没人再去搬那捆沉木。' } },
+    afterOnceText: { 1: '雨水顺着新木槽淌到院外。檐下的行李没再淋湿，门房手边那两块名牌也挪到了干处。' } },
   { id: 'gauge_piles', region: 'gauge_tower', name: '刻尺水桩', once: [0, 1],
     stocks: { core: stock('水尺旁的灵晶', 2, 5, 6, 1, 2) } },
   { id: 'slope_sieves', region: 'screen_slope', name: '断壁筛架', once: [3],
@@ -589,8 +589,9 @@ const sites = [
   { id: 'undertow_bed', region: 'undertow_grotto', name: '退水石脊', once: [1],
     stocks: { core: stock('侧洞灵晶', 5, 9, 7, 2, 2) },
     creatures: { undertow_moundback: animal(1, 1, 0, 0) },
-    creatureText: { undertow_moundback: { present: '泥脊忽然抬起整整一尺。粗鳞下挂着河砂，露出的角挡住了泥床。', absent: '泥脊慢慢塌下去，床面留下三圈未被河潮搅散的黑泥。' } },
-    afterOnceText: { 1: '取走两份伏潮息泥后，中央的坑积着清水。沿石脊还能绕去有灵晶的侧洞。' } },
+    creatureText: { undertow_moundback: { present: '泥脊忽然抬起一截。河砂从一排粗鳞上掉下来，一对角堵住了去侧洞的路。', absent: '' } },
+    afterWinText: { undertow_moundback: '泥脊塌下去，床面留下三圈未被潮水搅散的黑泥。角原来挡着的那条路能通到侧洞。' },
+    afterOnceText: { 1: '中央多了个积着清水的坑。侧洞的石壁上还挂着几道晶砂留下的细痕。' } },
   { id: 'counter_bell_score', region: 'counter_bell', name: '信架与钟枢', once: [1, 3],
     stocks: { black_iron: stock('钟座暗金', 4, 8, 7, 2, 2) },
     creatures: { river_copper_echo: animal(1, 1, 0, 0) },
@@ -599,10 +600,10 @@ const sites = [
 ];
 
 const events = [
-  { id: 'meadow_channel', name: '姚六的弯渠', text: '近处的水刚退，田边冒了些嫩草。外沟口堵着几根枯木。姚六从上游扛着耙子回来，手里还攥着张湿纸。', choices: [
-    { label: '采田边的灵草', days: 0.5, insight: 1, loot: { reed: 3 }, outcome: '姚六指了指外沟边的嫩草，你顺着他指的地方采了几束。' },
-    { label: '搬开堵住水渠的枯木', days: 0.5, insight: 1, loot: { wood: 2 }, outcome: '枯木挪开后，浑水沿外沟慢慢流了下去。' },
-    { label: '拿松木帮姚六修水槽', desc: '姚六说：「拿两片直木把这个口子撑住，两户田都能过水。修完去驿站报个名。」', need: { wood: 2 }, consume: true, days: 0.5, coins: 7, insight: 2, loot: { river_field_stamp: 1 }, outcome: '水槽修好后，姚六从袖里数出几枚钱，又在修渠凭据背面写上名字，画了去驿站的路。' },
+  { id: 'meadow_channel', name: '姚六的弯渠', text: '田坎边并排两道浅沟。内沟边是灵草生根的地方，外沟口窄，最容易卡住上游漂来的枯木。姚六扛着耙子在水槽边歇脚。', choices: [
+    { label: '采田边的灵草', days: 0.5, insight: 1, loot: { reed: 3 }, outcome: '姚六指了指内沟边的嫩草，你顺着他指的地方采了几束。' },
+    { label: '搬开沟口卡住的枯木', days: 0.5, insight: 1, loot: { wood: 2 }, outcome: '枯木挪开后，浑水沿外沟慢慢流了下去。' },
+    { label: '拿松木帮姚六修水槽', desc: '水槽边的木板向外翘着。姚六说：「拿两片直木把这个口子撑住，两户田都能过水。修完去驿站报个名。」', need: { wood: 2 }, consume: true, days: 0.5, coins: 7, insight: 2, loot: { river_field_stamp: 1 }, outcome: '水槽修好后，姚六从袖里数出几枚钱，又在修渠凭据背面写上名字，画了去驿站的路。' },
     { label: '把困在水里的野雁托上岸', desc: '芦叶下面有只湿透的雁，只剩一只脚能站稳。', days: 0.25, insight: 1, loot: {}, outcome: '野雁在泥边晃了两步才飞走。姚六把外沟的水放浅一些，免得再有鸟陷进去。' },
   ] },
   { id: 'meadow_ruts', name: '雁脚泥垄', text: '水口封住后，泥地晒出一层硬壳，雀儿落下来一啄就碎。深处有个长条形的土坑。', choices: [
@@ -612,15 +613,15 @@ const events = [
   { id: 'shoal_baskets', name: '灰鹭晒篮处', text: '岸边水浅，鹭草露着细根。下游的石缝里常积些水冲上来的灵晶。白宜坐在两处中间，拿针给旧鞋补眼。', choices: [
     { label: '拔岸边露根的鹭草', days: 0.5, insight: 1, loot: { reed: 2 }, outcome: '抓住露头的草叶轻轻一拽，草根上成团的白泥落回水边。' },
     { label: '拨开浅石捡晶砂', days: 0.625, insight: 2, loot: { core: 1 }, outcome: '阳光照进浅滩，洗过的砂里有些灵晶能捡。' },
-    { label: '问白宜为何把鞋朝岸上摆', days: 0.25, insight: 1, loot: {}, outcome: '白宜说旧渡还有艘商船给人送补船的木料。她年轻时走进白苇滩的一道石缝，走着走着又回了原岸。「照原有个管水的来过。他说潮水会倒流，进去了还可能被送回来。」' },
+    { label: '问白宜哪边的滩好走', days: 0.25, insight: 1, loot: {}, outcome: '白宜把鞋上的线咬断。「沿干石走。白苇后有人高的石缝，我年轻时进去过，潮一转，人又被挤回原岸。照原有个管水的也去看过。」她指了指旧渡，说那边还有给人送木料的商船。' },
   ] },
-  { id: 'ladder_drop', name: '第三级闸口', text: '最上一道木梁缠着滚来的枝条。下一阶只到膝头，最下一级才接排矿渣的水槽。钓客岑响把脚缩到了石凳上。', choices: [
+  { id: 'ladder_drop', name: '第三级闸口', text: '上头的木梁低，涨水时漂来的枝条容易挂在上面。第二级阶没在及膝的水里，再往下才是排矿渣的槽。钓客岑响坐在水边的石凳上。', choices: [
     { label: '取上层木梁上的枯枝', days: 0.75, insight: 1, loot: { wood: 3 }, outcome: '枝条一松，露出木梁被水泡深的纹路。' },
     { label: '走到中间的台阶，引开水里的兽', days: 0.375, enemy: 'river_gateback', outcome: '岑响抄起鱼篓往上退。横脊闸兽甩动背鳍，重重打在闸梁上。' },
     { label: '到最下面的水槽筛寒铁', guardedBy: 'river_gateback', days: 0.875, insight: 3, loot: { ore: 3 }, outcome: '筛掉浮砂，较沉的铁粒留在布里。' },
     { label: '问岑响为何守着坏掉的水闸', days: 0.125, insight: 1, outcome: '岑响抖了抖鱼篓底的泥。「闸坏了，岸边的鱼游不上来。等找人修好了，总还会回来。」' },
   ] },
-  { id: 'willow_yard', name: '卸货后院', text: '门房把近岸见过的人分开记在两片木牌上。檐下的雨槽倾着，水冲进原本用来搁行李的石板地。', choices: [
+  { id: 'willow_yard', name: '卸货后院', text: '门房从钩上摘下两块名牌，一块写着系灯院，一块写着白苇滩。檐下的雨槽歪向了院里，水顺着石板流到行李旁。', choices: [
     { label: '问门房这两块名牌是谁的', days: 0.125, insight: 1, loot: {}, outcome: '门房把系灯院的牌子挂回钩上，留下写着「白苇滩，封乔」的那块。「咱们夜里只托熟人送货。你若在木台上赢过封乔，他给你木签，我这儿就认得你了。」' },
     { label: '替门房补好接雨水的木槽', desc: '门房瞧了一眼天色。「手头若有三片木，我出八钱。再漏一晚，来歇脚的人都睡不好。」', days: 0.5, need: { wood: 3 }, consume: true, coins: 8, insight: 1, loot: {}, outcome: '木槽接住檐下的水。门房用麻绳固定好，从茶桌下取出约定的钱。' },
   ] },
@@ -629,11 +630,11 @@ const events = [
     { label: '问最下面那两道深刻痕', desc: '尺脚有两道格外深的痕，湿纸压上去，边沿都翘了起来。', days: 0.125, insight: 1, outcome: '胥婉把短尺翻给你看。那两道痕照的是反潮石门上固定绳子的槽。东边的测水人来试过槽里的铁楔，走时把铁楔也带过了渡。' },
     { label: '筛废铁盘外沿的晶砂', days: 0.625, insight: 1, loot: { core: 2 }, outcome: '细筛晃过几下，晶砂留在旧铁盘的外沿。' },
   ] },
-  { id: 'slope_sieves', name: '断壁筛架', text: '坡下是矿盘，浅些的铁粒滚到筛口。石架往上一层只悬着条工作绳，绳头结里嵌着较深色的碎石。', choices: [
+  { id: 'slope_sieves', name: '断壁筛架', text: '坡下摆着筛寒铁的旧盘，盘沿能翻过来看。坡上的筛架靠两根木柱撑着，攀上去得抓住柱间垂下来的绳。', choices: [
     { label: '用坡下的筛盘筛寒铁', days: 0.75, insight: 2, loot: { ore: 3 }, outcome: '铁粒滚到筛盘底部，你拨开盖在上面的石粉。' },
     { label: '走近上坡那两根木柱', days: 0.5, enemy: 'stone_badger', outcome: '石甲獾从第一根木柱后挤出来，转身直顶你的脚踝。' },
     { label: '抓着绳子，到高处筛暗金', guardedBy: 'stone_badger', days: 1, insight: 2, loot: { black_iron: 2 }, outcome: '深色颗粒很沉，顺着筛底落进矿工挂的布袋。' },
-    { label: '翻看筛盘背面的小孔', days: 0.25, insight: 1, loot: {}, outcome: '一宽一窄两个孔，和沉钟岭那堵石墙后的一样。从前的矿工用这种记号标出能绕回地面的路。' },
+    { label: '翻看筛盘背面', days: 0.25, insight: 1, loot: {}, outcome: '筛盘背面留了一宽一窄两个孔，旁边刻着几级向上的台阶。有人拿炭笔写了个「回」字，笔画快给手磨平了。' },
   ] },
   { id: 'lantern_term', name: '夜灯廊', text: '弟子裴见抱着一条用来护住过路人的粗绳。身旁串着几盏灯，门外长凳上还留着给行人歇脚的位置。', choices: [
     { label: '问裴见这几盏灯是给谁的', days: 0.125, insight: 1, loot: {}, outcome: '裴见一盏盏翻给你看。采药人去旧渠，拉货的车去松场，也有人挑担去西岸。各人都认得自己的那盏，走到多晚也能认路。' },
@@ -671,7 +672,7 @@ const extendSites = [
 
 const extendEvents = [
   { id: 'undertow_door', name: '反潮石门', text: '芦苇后露出半扇厚重的石门，门边有道空槽。水从石门两侧往不同方向流，外侧的台阶还露在水面上。', choices: [
-    { label: '沿露出水面的台阶绕一圈', desc: '墙外还有一排露出水面的石阶，一直连回岸边。', days: 0.25, insight: 1, outcome: '你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮时，门两边的水都换了方向。旧槽里少了固定绳子的铁件。' },
+    { label: '沿外侧石阶绕一圈', desc: '墙外还有一排露出水面的石阶，一直连回岸边。', days: 0.25, insight: 1, outcome: '你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮，门两边的水都换了方向。水势一变，只有靠里的高阶还露在外头。' },
     { label: '把倒浪楔卡进石槽，固定绳子', desc: '施荀给的铁楔刚好对得上石槽。潮水倒流时，可以抓着绳子找高处的台阶。', hidden: true, need: { undertow_wedge: 1 }, days: 0.5, insight: 3, loot: { undertow_entry: 1 }, outcome: '第二股潮水打过来，铁楔才牢牢卡住。你沿绳摸到上方的石阶，找到了去回潮母洞的路。' },
     { label: '用校潮亭的印纸对照潮水方向', desc: '石槽边的浅痕正对着倒流的潮水，和印纸最下面几道痕同向。', hidden: true, need: { river_gauge_copy: 1 }, days: 0.25, insight: 2, outcome: '印纸贴在槽边，最后两道线只从内侧湿起。绳子会随水换方向，固定它的铁件得同时卡住槽的两头。' },
   ] },
@@ -681,7 +682,7 @@ const extendEvents = [
     { label: '接过封乔的试杆签', desc: '封乔放下短杆，取了一支先前用红布系好的木签。', afterFight: 'river_spar_captain', days: 0.125, insight: 4, loot: { river_trial_writ: 1 }, outcome: '封乔在木签上按了手印。「夜里水响，赶路靠脚稳。折水驿要托人带急信，你肯帮忙，就拿这个给他们看。」' },
   ] },
   { id: 'counter_bell_door', name: '倒钟后的反声门', text: '倒钟最矮处留着一枚没有字的石阶。石阶后有两个不同宽窄的孔，一长声一短声从里面撞回来。', choices: [
-    { label: '贴着石壁敲三下', days: 0.125, insight: 1, outcome: '前两声沿石阶传了回来，第三声却从宽孔传进地底。孔里没有东西卡住石阶，踏上去会转回原处。' },
+    { label: '贴着石壁敲三下', days: 0.125, insight: 1, outcome: '前两声沿石阶传回来，第三声却顺宽孔往下传。弯下腰细听，石阶底下还有一处空腔。' },
     { label: '把听矿铜簧斜卡进两个石孔', desc: '那块铜片宽端抵住外面的孔，缺角的一端斜着能卡进里面的凹口。', hidden: true, need: { echo_tuning_key: 1 }, days: 0.5, insight: 3, loot: { counter_bell_entry: 1 }, outcome: '第三声在窄孔里没了回音。下方石阶却落稳了，宽孔的回声从脚底传来。那是通往反声钟窟的路。' },
   ] },
   { id: 'ford_packet_boat', name: '外桩商船', text: '闸外有条窄船拴在缓水里。船家夏狄翻起一块裂开的木板，指给船工看船侧的缺口。', choices: [
@@ -793,7 +794,7 @@ const regionDetails = Object.fromEntries(landmarks.map(([id, , x, y, , , links, 
 
 const key = (id, name, desc) => ({ id, name, desc, kind: 'key', price: 0, sell: 0 });
 const items = [
-  key('return_tide_note', '倒行水痕拓样', '从旧碑背面印下来的水纹，记的是往西退的潮。斜漏水驿的桌角也有一道相似的裂缝，里头压着块铁。'),
+  key('return_tide_note', '倒行水痕拓样', '从旧碑背面取下的拓样，记的是一路向西退去的潮水。纸角写着「斜漏水驿，施荀收」。'),
   key('zhao_sand_chit', '漏潮货签', '余节从秋天的货账上取下的签条。叠石关的柯伯认得正面的签名，签尾另有省潮司留下的缺口。'),
   key('lab_beacon', '靠岩导灯', '量水司借出的小灯。挂低些，通往旧量水站的那排岩壁上会反出两点光。'),
   key('fire_cloth', '浸炭湿帘', '炭工用草汁泡过的短帘。在旧窑口找铁钩把帘挂下，就能挡住贴地窜来的暗火。'),
@@ -852,32 +853,39 @@ scene('zhao_city', 'zhao_flood_office', '城门水尺档', '一排尺杆挂在�
     outcome: '杜椿看得很慢。「同一晚，雾梁涨了水，鸣沙退了水，照原的水却往地下渗。账没错。施荀那儿有只试水槽，能用一碗水试出那晚怎么回事。」' },
 ], { once: [0, 1] });
 
-scene('green_dyke', 'zhao_dyke_bend', '两面低埂', '晒席垂在靠水一面，低埂后有新鲜的抓土。老堤工把看涨水的石碑指出来，才发现碑已经歪了。', [
+scene('green_dyke', 'zhao_dyke_bend', '两面低埂', '晒席垂在靠水一面，水线贴着席子的下沿。老堤工站在低埂上，手边是一根挂晴雨旗的杆。', [
   gather('掐浅水白芽', '贴席的水不及鞋面。', 'reed', 4, 0.5, '从还没伸叶的老根上掐下了几束白芽。'),
   { label: '到抓痕处守一阵', desc: '泥土下面有厚实的碎蚌壳，咬一口的痕迹还新。', days: 0.125, enemy: 'dyke_marten' },
   { label: '扶堤工把晴雨旗拉起来', days: 0.5, insight: 3, coins: 8, outcome: '雨旗刚拉高，河工停下手头的活指向青埂北边。「那面碑刻过旧汛线，常有人来找。」他把埂工钱与你分了。' },
-], { stocks: { reed: stock('白芽', 6, 9, 4, 3, 0) }, creatures: { dyke_marten: { start: 1, cap: 3, interval: 4, growth: 1, curve: 'wild' } }, once: [2] });
+], { stocks: { reed: stock('白芽', 6, 9, 4, 3, 0) }, creatures: { dyke_marten: { start: 1, cap: 3, interval: 4, growth: 1, curve: 'wild' } },
+  creatureText: { dyke_marten: { present: '低埂背后有两道新抓痕，旁边散着刚咬开的蚌壳。', absent: '低埂背后的抓痕已经晒干，水边没什么动静。' } }, once: [2] });
 
-scene('flood_market', 'zhao_float_goods', '三姓木码头', '船腹贴着木台，案板上压着断开的账签。管晒网的余节翻着旧簿找去鸣沙的号码。', [
+scene('flood_market', 'zhao_float_goods', '三姓木码头', '船腹贴着木台，案板上压着写有各家姓氏的货签。余节扶着半边晒网架，另一头已经垂到了船里。', [
   offer('帮余节换掉撑渔网的断木', '撑木一断，晒到一半的网又搭回湿船板。余节拎起网角，水还顺着手肘往下淌。', { wood: 5 }, { zhao_sand_chit: 1 }, 0,
-    '余节把网重新支起来，见你往关口的方向望，便解下腰间的货签。「过叠石关给柯伯看这个。我替他捎了几年鱼，他认得我的印。」'),
+    '余节递来货签。「过叠石关给柯伯看这个。他认得我的印。」他收起架上的一卷干网，往腰间巴掌大的布袋里一塞。'),
   gather('捡码头木台下的松枝', '撞断的枝条在台下随水摇晃。', 'wood', 4, 0.5, '你抽出还能用的松枝，掰掉泡烂的皮。'),
-], { once: [0], stocks: { wood: stock('晒台松枝', 5, 9, 4, 3, 1) } });
+  { label: '问余节那只布袋怎么装得下渔网', afterChoice: 0, days: 0.125, loot: { qiankun_pattern: 1 },
+    outcome: '余节解开袋口，翻出一截里衬。「这叫乾坤袋。我上一只给鱼钩划烂了，袋底还在。你带去给会缝皮子的人看看。」他从木箱里取出那块旧袋底递给你。' },
+], { once: [0, 2], stocks: { wood: stock('晒台松枝', 5, 9, 4, 3, 1) },
+  afterOnceText: { 0: '新木撑稳了晒架。余节正收另一张齐肩高的干网，往腰间的布袋里一送，网全进去了。那袋才一掌宽，仍旧瘪着。', 2: '余节束起布袋口，拍掉新木撑上的木屑。木台下有两根横梁，上游的漂枝常卡在缝里。' } });
 
-scene('measuring_hall', 'zhao_bamboo_duel', '竹尺庭', '傅澄闭眼用竹尺轻拨一粒石珠。外来的访客也能拿木棍进砖圈切磋，圈外有弟子看着。', [
-  { label: '请傅澄讲练尺的事', days: 0.125, insight: 3, loot: { body_breath_note: 1 },
+scene('measuring_hall', 'zhao_bamboo_duel', '竹尺庭', '砖圈外的弟子喊了声「傅师父」。那人双脚没挪，竹尺一挑，滚到背后的石珠便落进他左手。他把珠子搁回窗台，示意你进来说话。', [
+  { label: '请持尺人讲练尺的事', days: 0.125, insight: 3, loot: { body_breath_note: 1 },
     outcome: '他把竹尺靠回台沿。「刚来的人先稳脚。」他教你从低木凳扶膝起身，再把沾了汗渍的讲义给你。「想学站得稳的法子，得先给庭里添一袋压脚石。」' },
-  { label: '进砖圈和傅澄切磋', desc: '只要有人跪倒，圈外的弟子就会上前叫停。', days: 0.125, enemy: 'zhao_spar', outcome: '弟子把身后的木门合上。傅澄换了根没钉铜片的竹尺。' },
-], { once: [0], protectedArena: true, creatures: { zhao_spar: { start: 1, cap: 1, interval: 6, growth: 1 } } });
+  { label: '进砖圈切磋', desc: '只要有人跪倒，圈外的弟子就会上前叫停。', days: 0.125, enemy: 'zhao_spar', outcome: '弟子把身后的木门合上。傅澄换了根没钉铜片的竹尺。' },
+], { once: [0], protectedArena: true, creatures: { zhao_spar: { start: 1, cap: 1, interval: 6, growth: 1 } },
+  creatureText: { zhao_spar: { present: '砖圈旁立着几根待客的竹尺。', absent: '砖圈已经扫净，竹尺收回架上。傅澄坐在廊下歇手。' } } });
 
-scene('frog_pond', 'zhao_frog_shelf', '斜萍石窝', '塘边低石凹成半面锅，火斑蛙喜欢离浅水不远的那一坑。外圈几条水藻缠着细枝。', [
-  { label: '踩上低石，看看水里的蛙', desc: '水面冒着比平常大得多的气泡。', days: 0.125, enemy: 'glass_frog' },
+scene('frog_pond', 'zhao_frog_shelf', '斜萍石窝', '塘边的低石围出一口浅窝。沿外圈的踏脚石走，伸手便能碰到水边。', [
+  { label: '踩上低石，看看水下的动静', desc: '齐脚深的水里，有一团红斑贴着石壁挪。', days: 0.125, enemy: 'glass_frog',
+    outcome: '两只鼓胀的腮帮先冒出水。你还没看清，红斑便跃上了石头。' },
   gather('采池边的灵草', '几块踏脚石之间挤着几丛新芽。', 'reed', 5, 0.75, '把根上的泥抖进水里，叶片在风里晾了一会儿。'),
-], { stocks: { reed: stock('外圈灵草', 7, 11, 5, 3, 1) }, creatures: { glass_frog: { start: 2, cap: 4, interval: 4.5, growth: 1, curve: 'wild' } } });
+], { stocks: { reed: stock('外圈灵草', 7, 11, 5, 3, 1) }, creatures: { glass_frog: { start: 2, cap: 4, interval: 4.5, growth: 1, curve: 'wild' } },
+  creatureText: { glass_frog: { present: '石窝里接连冒出几串大气泡。', absent: '浅窝里只漂着薄薄一层浮萍。' } } });
 
 scene('old_marker', 'zhao_retreat_marks', '倒行刻碑', '碑上正面向河，刻的一律是涨水，背面朝着另一头，斜刀口里有水从低往高爬的线。', [
   { label: '揭开碑背垫着的湿纸', days: 0.5, loot: { return_tide_note: 1 }, insight: 4,
-    outcome: '碑角钉着施荀的名字，纸上的折线从照原一直退回白苇。你把递给他的那份取了下来。' },
+    outcome: '纸上的折线从照原一路往白苇退去，纸角写着「斜漏水驿，施荀收」。你把湿纸平平揭了下来。' },
   gather('从碑脚的泥里淘寒铁', '细铁砂从台阶缝落下来，积在碑脚的泥坑里。', 'ore', 4, 0.75, '把细砂搓掉，铁粒像米一样粘在掌心。'),
 ], { once: [0], stocks: { ore: stock('碑脚寒铁砂', 7, 11, 5, 3, 1) } });
 
@@ -893,25 +901,27 @@ scene('ring_isles', 'zhao_isle_reeds', '浮洲松根', '打弯的浅水只冲倒
   gather('掏水下亮晶', '踩稳裸根，泥泡下面还粘着一些晶粒。', 'core', 4, 1, '把沾泥的晶粒冲到粗布上去。'),
 ], { stocks: { wood: stock('洲上老松', 7, 11, 5, 3, 0), core: stock('沉根灵晶', 5, 8, 6, 3, 1) } });
 
-scene('scale_bog', 'zhao_scales', '青膜硬埂', '硬埂上的毛在绿水外一绺一绺。泥砂顺两边都往低处聚，旁边有一条小浅湾。', [
-  { label: '踩着硬土堤找鬃犬', desc: '脚下稳得住，土堤下的水藻却有东西窜过。', days: 0.25, enemy: 'mud_shrike' },
+scene('scale_bog', 'zhao_scales', '青膜硬埂', '一条硬埂把浅水和泥坑隔开。往左能踏上埂顶，贴右侧水湾也能站稳。铁砂大半埋在水藻底下。', [
+  { label: '踩上土堤，循爪印往前找', desc: '两行带蹼的足印进了水藻，再往外就断了。', days: 0.25, enemy: 'mud_shrike' },
   { ...gather('挖浅水边的铁砂', '站在岸边，弯腰就够得着泥。', 'ore', 6, 1, '你淘出不少裹在水藻里的寒铁。'),
     ambush: { enemy: 'mud_shrike', chance: 0.3, outcome: '水藻下面突然溅起一脸泥。一只鬃犬跳上浅岸，挡了过来。' } },
-], { stocks: { ore: stock('藻下铁砂', 8, 12, 5, 4, 1) }, creatures: { mud_shrike: { start: 1, cap: 3, interval: 7, growth: 1, curve: 'wild' } } });
+], { stocks: { ore: stock('藻下铁砂', 8, 12, 5, 4, 1) }, creatures: { mud_shrike: { start: 1, cap: 3, interval: 7, growth: 1, curve: 'wild' } },
+  creatureText: { mud_shrike: { present: '埂上的芦梗勾着一绺湿毛，泥上还有新鲜的爪印。', absent: '埂顶的旧足印已经晒硬，水藻里没见动静。' } } });
 
 scene('crane_granary', 'zhao_grain_ladder', '高脚粮仓', '木梯有一只脚开裂了。何绢坐在谷壳里等人修，旁边晒着一堆短木，短得做不了接头。', [
   offer('给何绢松木和兽革，修好梯脚', '何绢抬起梯脚给你看，裂缝进了两节指头。「头两级还能踩，背袋米上去就难说了。」', { hide: 2, wood: 2 }, { ration: 6 }, 12,
     '何绢自己提了袋米上梯，落脚时梯子没再晃。她从仓里包了粮饼下来。「水一涨，总有人背着湿谷来求地方。你帮我腾出这几格，饼就劳你吃了吧。」'),
   gather('捡粮仓后门的碎松木', '掉在门外的碎木片已经晒干。', 'wood', 5, 0.75, '你把松木拢进臂弯，粮仓的人又把一堆削下来的短木耙到檐下。'),
-], { once: [0], stocks: { wood: stock('粮仓碎松', 8, 12, 6, 4, 1) } });
+], { once: [0], stocks: { wood: stock('粮仓碎松', 8, 12, 6, 4, 1) },
+  afterOnceText: { 0: '梯脚两边新加了木撑，何绢踩着梯子去收上层的粮袋。仓门后仍是削木的地方，檐下一坐就能看见。' } });
 
 scene('zhao_pass', 'zhao_ridge_permit', '青瓦验牒房', '柯伯翻看手里的通行木牌。雨刚停，上一队人弄坏了两副绳架。验牌房的铃响起来，鸣沙那头也听得见。', [
   offer('出示余节的货签，替柯伯补绳架', '柯伯指着檐下两条磨起毛的绳，说木架也得补。', { zhao_sand_chit: 1, hide: 3, wood: 4 },
     { sand_writ: 1 }, -11, '柯伯换好绳架，把两州都认的通行牌交给你。「过了浅石滩就没多少水了。跟紧下一趟带铃的骡车。」'),
   { label: '隔关听骡铃', days: 0.125, insight: 2, outcome: '一声铃从石隙深处转出来。柯伯说鸣沙城把新绳价写在城门，冲坏的井也还等人修。' },
-], { once: [0, 1] });
+], { once: [0, 1], afterOnceText: { 0: '两副绳架已靠回檐下，破绳卷在门边。柯伯给牵骡的人让开路，关那头不时传来铃声。' } });
 
-scene('jade_mill', 'zhao_old_wheel', '横卧的半边磨轮', '磨眼横着，底下有一条水流不过去的弯。老浮石挤在屋脚，两枚硬晶夹在石缝。', [
+scene('jade_mill', 'zhao_old_wheel', '横卧的半边磨轮', '半只磨轮躺在屋脚。水进不了底下的转弯，那里堆着被水推来的浮石。磨轮背后压着一块木牌。', [
   gather('把石脚的灵晶抠出来', '街外磨台已经没人轮值，脚下的水也很慢。', 'core', 5, 1,
     '你撬裂了两块浮石，夹在其中的灵晶正好随水滚下来。'),
   { label: '看看磨轮背后写了什么', days: 0.25, insight: 3, outcome: '牌上写着，把灯挂在磨轮下面，靠岩壁的一边会反出两点光。卖竹筐的人把灯连同坏器具带去了碎琉璃滩，搁在晒网上。' },
@@ -919,43 +929,50 @@ scene('jade_mill', 'zhao_old_wheel', '横卧的半边磨轮', '磨眼横着，�
 
 scene('charcoal_ridge', 'zhao_firedoor', '斜封窑棚', '窑主马荻在洞口挂湿帘。余火会贴地窜出来，先有浸过草汁的湿帘护身，才能靠近窑口。', [
   offer('给马荻材料，换一面湿帘', '帘绳断了，帘下的接缝被烤得发红。马荻要补泥、皮料和灵草。', { kiln_clay: 5, hide: 3, reed: 5 }, { fire_cloth: 1 }, -8,
-    '马荻抹泥封住侧面的缝，抛给你另一面湿帘。「里面那只会抓着炭往上一窜。真要进去，别站在它和洞口之间。」'),
+    '马荻抹泥封住侧面的缝，抛给你另一面湿帘。「里面那东西受惊就踩着炭堆扑。真要进去，先看看哪边能退出去。」'),
   gather('捡晾棚的松枝头', '被雨打湿的整炭仍在袋里，棚外松尖晾得干。', 'wood', 5, 0.75, '轻推棚角，掉下来一些没熏透的松尖。'),
-], { once: [0], stocks: { wood: stock('炭棚松枝', 7, 12, 5, 4, 1) } });
+], { once: [0], stocks: { wood: stock('炭棚松枝', 7, 12, 5, 4, 1) },
+  afterOnceText: { 0: '马荻挂稳了湿帘，窑口的火苗没再贴地蹿出来。外头的晾棚晒着炭，棚角散着窑工削下的枝头。' } });
 
-scene('sunken_lab', 'zhao_submerged_table', '占着量槽的石背', '低挂的灯在岩壁上照出两点光。铜水槽一头溅水，另一头有东西用肩顶住出水孔。侧边还固定着一块刻图的铜板。', [
-  { label: '沿灯照亮的石槽走近水魁', days: 0.25, enemy: 'lab_crawler' },
+scene('sunken_lab', 'zhao_submerged_table', '铜槽旁', '低挂的灯在岩壁上照出两点光。铜水槽一头还在溅水，另一头有东西用肩抵住出水孔。侧边钉着刻了图的铜板，入口附近还有一块够不到水的台子。', [
+  { label: '提灯沿水槽走到深处', days: 0.25, enemy: 'lab_crawler',
+    outcome: '灯一晃，湿漉漉的石甲从槽里拱起来。堵在出水孔里的东西侧过身，水打湿了你半条裤腿。' },
   { label: '拔掉铜板的插销，印下刻图', afterFight: 'lab_crawler', days: 0.75, loot: { phase_chart: 1 }, insight: 6,
     outcome: '水魁退进岩缝，水槽另一头终于能抬起来。铜板背面刻着水滴该隔多久落下。你把图印到纸上，原板留在旧站。' },
   gather('在外围收晶屑', '灯旁有一块高台，槽里的水挤不到这边。', 'core', 7, 1.25, '干台的一层短晶透过水汽露出了棱。'),
 ], { once: [1], stocks: { core: stock('量槽外晶屑', 9, 15, 8, 4, 2) }, creatures: { lab_crawler: { start: 1, cap: 1, interval: 0, growth: 0 } },
-  afterWinText: { lab_crawler: '低挂的导灯亮起两点。传水的槽终于能抬起铜边，水魁已经退进再深些的岩裂。' } });
+  afterWinText: { lab_crawler: '那团石甲退进岩缝，出水口空了。铜板侧面的插销露在外面，入口边仍有块干台。' },
+  afterOnceText: { 1: '铜板已经印过，插销被你搁回槽边。水顺出水口落下，靠入口的台子还干着。' } });
 
-scene('night_pit', 'zhao_bank_fire', '赤泥横穴', '湿帘从洞边垂下，贴地黑火退到帘底。深处有什么踩着暗炭来回蹚，外缘凹坑里磨着黑砂。', [
+scene('night_pit', 'zhao_bank_fire', '赤泥横穴', '湿帘贴住地面，帘脚下有一小堆发亮的黑砂。往里两步，左壁并排开着两个透风孔。', [
   { label: '越过湿帘，向灰里投一颗石子', days: 0.25, enemy: 'ember_yak' },
   { ...gather('沿帘脚扫出暗金', '靠近时能看到黑砂发亮，别碰帘后舔木的暗火。', 'black_iron', 6, 1.25, '刮起不烧手的一层重砂，余炭重新盖过坑沿。'),
     guardedBy: 'ember_yak' },
   { label: '看看没冒烟的两个风孔', days: 0.25, insight: 5, outcome: '有人曾把测温的纸签挂在这里。一大一小两个孔离得很近，同时打开，下面的暗火就会停住。' },
 ], { once: [2], stocks: { black_iron: stock('帘脚的暗金', 9, 14, 10, 4, 1) }, creatures: { ember_yak: { start: 1, cap: 1, interval: 19, growth: 1 } },
-  creatureText: { ember_yak: { present: '挨着窑脚传来踏炭声。', absent: '窑脚只有被扒短的灰垄。' } } });
+  creatureText: { ember_yak: { present: '挨着窑脚传来踏炭声，灰堆上偶尔扫过一道尾影。', absent: '窑脚只有踩散的灰垄，里面没有脚步声。' } } });
 
 scene('glass_bank', 'zhao_glass_net', '六角晒网', '网上晾着带刻度的碎琉璃和一盏浸水也不灭的旧灯。章老把几块轻的碎片摆在外头，看风往哪边吹。', [
   offer('修好灯座，向章老借灯', '灯座搁在网上，撑灯的横木已经开裂。', { ore: 5, wood: 5, core: 2 }, { lab_beacon: 1 }, -16,
     '章老拿撑渔网的杆子压了压新灯座。「去缺轮磨台，过了磨轮后站到岩壁边。哪条路反出两点光，就沿哪条去沉水量站。」'),
   gather('从碎琉璃中挑灵晶', '晒网旁的碎片里也有清澈的灵晶。', 'core', 4, 0.75, '你一片片挑出来，把表面的盐洗掉。'),
-], { once: [0], stocks: { core: stock('滩中灵晶', 6, 10, 6, 3, 1) } });
+], { once: [0], stocks: { core: stock('滩中灵晶', 6, 10, 6, 3, 1) },
+  afterOnceText: { 0: '章老把旧灯座收回晒网，搁在他修补渔具的篮筐旁。几块带刻度的碎琉璃还晾在日光下。' } });
 
-scene('fault_lake', 'zhao_deep_pillars', '分水三柱', '水下石柱露出半截，第三柱的剑痕贴住石缝。有人反复在中柱掀起波，试图让两线水重新走到一起。', [
-  { label: '从分水柱跳上残台', desc: '剑痕将石柱劈成两片，裂面是新的。', days: 0.25, enemy: 'fault_warden' },
+scene('fault_lake', 'zhao_deep_pillars', '分水三柱', '三根石柱并排露在水上。中间有人用剑尖挑起水流，两边的浪跟着拐了个弯。最外头那根柱已经断成两半，裂口泛白。', [
+  { label: '踏过断柱，往对面的石台去', desc: '你刚把脚搭上断柱，那人就横过了剑。退回岸上的路还在。', days: 0.25, enemy: 'fault_warden',
+    outcome: '他在水上让开半步，一道浪却贴着他的剑锋扫到石台边。' },
   { label: '打开石台上的暗槽，取出旧文书', afterFight: 'fault_warden', days: 0.75, loot: { fault_receipt: 1 }, insight: 7,
-    outcome: '水君退进湖底的石缝，水面安静下来。纸上记了三州的水位，也记了被淹过田的人家第二年怎么通船。' },
+    outcome: '你抬起暗槽一侧还能活动的盖，里头压着一份旧约。纸上除了三州的水位，还记着田地淹过以后，三户船家分头把船送到了哪儿。' },
 ], { once: [1], creatures: { fault_warden: { start: 1, cap: 1, interval: 0, growth: 0 } },
-  afterWinText: { fault_warden: '断裂的柱子渐渐沉下去，石台露了出来。台上有道夹文书的暗槽，一侧的盖子还钉着。' } });
+  afterWinText: { fault_warden: '水君退进湖底的石缝，水面渐渐平了。石台露出来，台上有道窄槽，槽盖只有一头还被钉着。' },
+  afterOnceText: { 1: '石台上的窄槽空了，一边盖子斜敞着。水绕开半沉的断柱，缓缓流向远处。' } });
 
-scene('rope_sands', 'zhao_rope_sound', '沙坠顺风线', '有深有浅的石坠摆在沙洼外，每根探绳向下能拧出黑砂。一只水貂在背阴处翻刨细根。', [
+scene('rope_sands', 'zhao_rope_sound', '沙坠顺风线', '石坠沉在几处沙坑里，探绳从坑口伸出来。晒得干的两根颜色浅，背阴那根摸起来还湿。', [
   gather('牵出旧绳上的重砂', '挑那根还裹着水迹的，黑粒挂得密。', 'black_iron', 4, 1, '你把两段绳搓干，重砂从毛边筛了下来。'),
   { label: '顺足印去背阴处', days: 0.125, enemy: 'dyke_marten' },
-], { stocks: { black_iron: stock('绳结里的暗金', 6, 11, 7, 3, 0) }, creatures: { dyke_marten: { start: 1, cap: 3, interval: 5, growth: 1, curve: 'wild' } } });
+], { stocks: { black_iron: stock('绳结里的暗金', 6, 11, 7, 3, 0) }, creatures: { dyke_marten: { start: 1, cap: 3, interval: 5, growth: 1, curve: 'wild' } },
+  creatureText: { dyke_marten: { present: '有几撮细根被翻到地面，足印一直伸到背阴处。', absent: '翻开的细根晒在地上，旧脚印给风填去大半。' } } });
 
 scene('burnt_weir', 'zhao_broken_rake', '三口相背的堰齿', '三根断石柱露在水面外。管水坝的楚棱扶着两根水尺，一边的水退到柱脚，他就抬尺读数。', [
   gather('从外侧石柱旁铲灵晶', '通向里面的路断了，外侧石柱边的白晶还够得着。', 'core', 6, 1.25, '铲下的灵晶沿水坝滑到浅滩，薄片之间还滴着水。'),
@@ -969,7 +986,7 @@ scene('beacon_reefs', 'zhao_ferry_hook', '长礁灯脚', '清点货物的人往�
   { label: '问什么货最等不得开渡', days: 0.125, insight: 3, outcome: '点货人把返潮的盐罐挪到一边。「湿谷多放一天就多坏几袋。先找好船工，哪条路能走，也给后来的船留句话。」' },
 ], { once: [1], stocks: { wood: stock('灯礁松木', 8, 13, 6, 4, 0) } });
 
-scene('zhao_hermit', 'zhao_assay_tubs', '回水试槽', '两根管子往浅槽里滴水。一边有让水漫出去的矮口，另一边放着滤泥的罐。施荀把调水的木柄交给你，小陶罐还倒扣在桌上。', [
+scene('zhao_hermit', 'zhao_assay_tubs', '回水试槽', '两根管子正往浅槽里滴水。一边有道低缺口，水满了能漫出去。施荀手边搁着调水的木柄，两只小陶罐倒扣在桌上。', [
   { label: '看看桌边陶罐上的盐痕', days: 0.125, insight: 3, outcome: '两个罐底各留了一撮盐。施荀轻叩左边，盐早沿底边结成细圈，再一碰右边，整团滚了出来。「同样的盐，两个罐一个刚温过，一个放了一夜。要验那张方，我还得见见三州留下的东西。」' },
 ], { once: [0] }, {
   id: 'gold_assay', desc: '你把带来的泥、盐和旧册放在槽边。施荀递来一根调水的小杆，坐到一旁铺纸等结果。',
@@ -999,9 +1016,9 @@ const sects = [{ id: 'water_gauge', region: 'measuring_hall', name: '守尺观',
 }];
 
 const quests = [
-  { id: 'zhao_sealed_load', region: 'zhao_city', name: '修好省潮司的水位尺', desc: '杜椿要固定秋天防涨水的那根高尺。两道寒铁箍和三个松木支脚都得换。',
+  { id: 'zhao_sealed_load', region: 'zhao_city', name: '修好省潮司的水位尺', desc: '城门旁水尺的支脚已泡烂。杜椿想在秋汛前换上松木支脚，用寒铁把尺身重新箍紧。',
     need: { wood: 6, ore: 4 }, reward: { ration: 4, salve: 2 }, coins: 23, insight: 5, requiresKnownMaterials: false,
-    outcome: '你将支脚卸在城门尺档。杜椿说这一次先歇口气，真大水来，三个州的刻度迟早要一起结账。' },
+    outcome: '杜椿扶住尺身，等工匠把铁箍敲紧，才试着松手。「这根倒不了。水真涨起来，也得看看上游那把尺怎么量。」' },
   { id: 'zhao_joint_measure', region: 'zhao_city', name: '校准三州的水尺', reveal: { item: 'fault_receipt' },
     desc: '杜椿在等那份给三州分水的旧约。施荀要做三副铜夹，用同一股水把各州的刻度对齐。',
     need: { fault_receipt: 1, core: 10, ore: 12, wood: 8 }, reward: { gold_salve: 4 }, coins: 81, insight: 14,
@@ -1066,10 +1083,10 @@ const markers = [
   { id: 'kiln_roof_farm', name: '覆瓦旱畦', tier: 0, travel: 0.75, x: 28, y: 87,
     links: ['cinder_inn', 'bone_dry_rill', 'camel_grass_dunes'], desc: '人把旧炉瓦沿畦排了几层。太阳晒过瓦面，瓦底的土仍潮。' },
   { id: 'bone_dry_rill', name: '砾盘浅沟', tier: 0, travel: 0.75, x: 19, y: 90,
-    links: ['cinder_inn', 'kiln_roof_farm'], desc: '雨停后这条沟只流水半天。两道石子堆成的弯拦住了漂来的碎木。' },
+    links: ['cinder_inn', 'kiln_roof_farm'], desc: '雨停后这条沟只流水半天。石弯拦住了漂来的碎木，岸上还有座用竹帘挡风的小棚。' },
   { id: 'glass_rotunda', name: '琉脊天室', tier: 8, travel: 1.5, x: 87, y: 48,
     links: ['glass_hail_sink'], secret: true, reveal: { item: 'sand_glass_pass' },
-    desc: '三面岩壁的微光铺进来，投在一盘老舵上。外头的风声音小了，沙还从缝里簌簌漏进来。' },
+    desc: '光从岩缝里透进来，照着石座上嵌着的铜轮。外面的风声轻了，细沙还顺着石缝往下漏。' },
 ];
 
 const regionDetails = Object.fromEntries(markers.map(({ id, x, y, links, settlement, portal, array }) => [id, {
@@ -1093,7 +1110,7 @@ const sites = [
   { id: 'sand_cinder_kitchen', region: 'cinder_inn', name: '炭篷边炉', once: [0] },
   { id: 'sand_cloister_trial', region: 'sand_bell_cloister', name: '对簧石台', once: [0, 2], protectedArena: true,
     creatures: { sand_tuner: { start: 1, cap: 1 } } },
-  { id: 'sand_ring_maker', region: 'sand_bell_cloister', name: '梁弦的工坊', once: [0],
+  { id: 'sand_ring_maker', region: 'sand_bell_cloister', name: '梁弦的工坊', once: [0, 1],
     afterChoices: ['sand_cloister_trial:0', 'sand_cloister_trial:2'] },
   { id: 'sand_tent_watch', region: 'silk_tent_road', name: '晾绳矮帐', once: [0],
     stocks: { reed: { label: '湿帐沿的灵草', start: 4, cap: 6, interval: 4, growth: 2, choices: [1] } } },
@@ -1131,7 +1148,7 @@ const sites = [
       core_inner: { item: 'core', label: '断棱底下的灵晶', start: 5, cap: 8, interval: 8, growth: 2, choices: [3] } },
     creatures: { sand_glass_lynx: { start: 1, cap: 2, interval: 13, growth: 1, depletedFactor: 1.15, curve: 'wild' } },
     afterOnceText: { 2: '晶石底下的弹片已经取走，原处只剩一道空缝。沿上方的石边还能退出洼地。' },
-    creatureText: { sand_glass_lynx: { present: '深处有高阶修士留下的火光。光照着石壁，几道爪痕比手掌还大。', absent: '石屑遮住半截爪印，晶石下面渐渐没了动静。' } } },
+    creatureText: { sand_glass_lynx: { present: '深处的碎晶被翻了个面。几道新爪痕比手掌还长，有一道一直划到岩壁上。', absent: '石屑遮住半截爪印，晶石下面渐渐没了动静。' } } },
   { id: 'sand_hanging_support', region: 'hanging_vein', name: '贴壁支木',
     stocks: { ore: { label: '坡角露出的寒铁', start: 4, cap: 7, interval: 5, growth: 2, choices: [0] },
       black_iron: { label: '支架后的暗金', start: 4, cap: 8, interval: 6, growth: 2, choices: [2] } },
@@ -1148,10 +1165,18 @@ const sites = [
   { id: 'sand_gravel_rill', region: 'bone_dry_rill', name: '搁木的浅弯',
     stocks: { wood: { label: '沟弯搁下的松木', start: 5, cap: 7, interval: 4, growth: 2, choices: [0] },
       ore: { label: '砾盘底的寒铁', start: 2, cap: 4, interval: 5, growth: 1, choices: [1] } } },
-  { id: 'sand_glass_chamber', region: 'glass_rotunda', name: '三面落光的室心', once: [1],
+  { id: 'sand_basket_shed', region: 'bone_dry_rill', name: '岸边竹棚', once: [0, 1, 2, 4], protectedArena: true,
+    creatures: { sand_basket_mender: { start: 1, cap: 1 } },
+    afterOnceText: {
+      0: '箩筐稳稳立在凳上。老人把手边一截剩下的竹篾往里折，脚边那根竹杖已经磨白了。',
+      1: '老人低着头，继续把竹篾压进筐沿。门边有几截没用完的竹料。',
+      2: '箩筐已挪到棚里。老人拄着竹杖站在棚外，鞋边有一道刚画的圆圈。',
+      4: '老人把编好的箩筐倒过来拍了拍，招呼你下回进棚喝水。',
+    } },
+  { id: 'sand_glass_chamber', region: 'glass_rotunda', name: '铜轮前', once: [1],
     creatures: { sand_sundial_master: { start: 1, cap: 1 } },
-    afterWinText: { sand_sundial_master: '邢既横把真刀插回鞘中，用脚尖把旧舵的拉环提起来。' },
-    afterOnceText: { 1: '邢既横坐回角柱边。旧舵已顺过一次，石缝只出清风，不再吐灰。' } },
+    afterWinText: { sand_sundial_master: '邢既横收刀入鞘，把手搭在铜轮上。「你拉那只铁环，我从这边推。」' },
+    afterOnceText: { 1: '邢既横坐回石柱边。铜轮下的暗格开着，石缝里吹来的风也散了沙尘。' } },
 ];
 
 const events = [
@@ -1172,9 +1197,11 @@ const events = [
     { label: '向袁息讨这场的评语', afterFight: 'sand_tuner', days: 0.25, insight: 4,
       outcome: '袁息将木片敲在你刚站过的石板上，回声清清楚楚。「这一步落得轻。我去给梁师傅递个话，他想托个脚步稳的人带件东西出州。你到工坊找他。」' },
   ] },
-  { id: 'sand_ring_maker', name: '梁弦的工坊', text: '工坊里挂着几片拨动会响的薄铜。梁弦给其中一片装了木把手，柄尾刻着两道山纹。', choices: [
+  { id: 'sand_ring_maker', name: '梁弦的工坊', text: '工坊里挂着几片拨动会响的薄铜。梁弦刚装好一只木把手，又从腰间的布袋里抽出一块比门板还宽的毡子。', choices: [
     { label: '接过梁弦留下的铜片', days: 0.25, insight: 5, loot: { echo_tuning_key: 1 },
       outcome: '梁弦拿铜片碰了碰石板，尾音半晌才消。「我从沉钟岭带回来时就缺这一角。你到岭上听钟，找找哪块石头上有和它对得上的凹口。」' },
+    { label: '问梁弦那块大毡子是怎么塞进去的', days: 0.25, loot: { qiankun_fold_pattern: 1 },
+      outcome: '梁弦把袋口翻出来。里头的布一层压一层，针脚都藏在折里。「这只原是装井绳的。」他找出一截旧布递给你。「带回去，照这道折缝量。」' },
   ] },
   { id: 'sand_tent_watch', name: '晾绳矮帐', text: '荀霜收卷晾过的粗绳，帐角的水滴一路落到残席的草根。', choices: [
     { label: '问荀霜商队为何绕开石洼', days: 0.25, insight: 2,
@@ -1274,11 +1301,22 @@ const events = [
     { label: '沿里弯把干松木拖上岸', days: 0.5, loot: { wood: 3 }, insight: 2, outcome: '木头晒裂了一点，折齐还能作炉料。' },
     { label: '扒开外弯的石子，找寒铁', days: 0.5, loot: { ore: 1 }, insight: 2, outcome: '大石块挪不动，石子堆下面倒剩了一块厚铁。' },
   ] },
-  { id: 'sand_glass_chamber', name: '三面落光的室心', text: '强修邢既横在角柱边磨开了刃口，守着带暗格的旧舵。脚边的碎石给刀尖劈掉了一角。门口还有一线可沿原路退走的亮光。', choices: [
-    { label: '拔出兵器，向邢既横讨旧舵', desc: '邢既横起身堵在旧舵前，手里已经拿了真刀。门口还留着退路。', days: 0.5, enemy: 'sand_sundial_master',
-      outcome: '邢既横将刀鞘扫向柱脚，提真刀向你逼近。' },
-    { label: '和邢既横一起转舵开暗格', days: 0.5, afterFight: 'sand_sundial_master', loot: { black_iron: 5, core: 8 }, insight: 8,
-      outcome: '两人把旧舵推到原来的刻度。暗格开了，邢既横从里面取出几块还干燥的灵晶和暗金，替你用布包好。' },
+  { id: 'sand_basket_shed', name: '岸边竹棚', text: '一个老人坐在竹帘后补箩筐。凳腿陷进沙里，箩筐一点点向沟那边歪过去。', choices: [
+    { label: '帮老人扶稳箩筐', days: 0.125, outcome: '他伸脚把矮凳拖回来，又往你这边让了半块空地。「风从沟里来，坐里头些。」' },
+    { label: '问老人愿不愿意试两招', afterChoice: 0, days: 0.125,
+      outcome: '「要找人过招，去院里才热闹。」他低头用指甲把翘起来的竹篾压回去。' },
+    { label: '拿一截闲竹比划两下，再请老人指点', afterChoice: 1, days: 0.125,
+      outcome: '老人看完，先把箩筐搬进棚，再用拐杖在沙上画了个圈。「只在圈里试。撑不住就抬手，我会停。」' },
+    { label: '走进圈里和老人试招', afterChoice: 2, desc: '老人手里还是那根旧竹杖。', days: 0.125, enemy: 'sand_basket_mender',
+      outcome: '你刚抬手，竹杖已经贴上手腕。老人脚下那双旧布鞋连位置都没挪。' },
+    { label: '请老人讲讲方才那一步', afterFight: 'sand_basket_mender', days: 0.25, insight: 7,
+      outcome: '他拿竹杖指了指你刚踩过的石子。「脚下那颗会滚。下回动手之前，先知道自己站在哪儿。」' },
+  ] },
+  { id: 'sand_glass_chamber', name: '铜轮前', text: '石柱旁坐着一个人。他拿脚边的石头试刀，随手削下一角。听见脚步，他站了起来，正好挡在铜轮前。你回头还能看见来时的石缝。', choices: [
+    { label: '拔出兵器，走向铜轮', desc: '那人把刀一横，刀刃上还沾着石粉。', days: 0.5, enemy: 'sand_sundial_master',
+      outcome: '那人把刀鞘往柱边一抛，提刀迎了上来。' },
+    { label: '拉住铁环，和邢既横一起转动铜轮', days: 0.5, afterFight: 'sand_sundial_master', loot: { black_iron: 5, core: 8, qiankun_inner_pattern: 1 }, insight: 8,
+      outcome: '铜轮底下响了一声，露出个暗格。邢既横倒空灰布袋，里头滚出灵晶和暗金。他翻过袋底，细细的针脚还在。「袋子划破了，这几针倒没散。拿去，让会缝的人照着试试。」' },
   ] },
 ];
 
@@ -1310,6 +1348,10 @@ const enemies = [
     intents: [{ name: '牵锁扫地', kind: 'attack', mult: 1 }, { name: '急收印锁', kind: 'drain', mult: 0.66 },
       { name: '柱背压锁', kind: 'heavy', mult: 1.64 }, { name: '绕梁抱臂', kind: 'guard', mult: 1.45 }],
     loot: { gold_core: 2 }, desc: '越过旧影先落地的位置，锁链会在回声传到前先扑到。' },
+  { id: 'sand_basket_mender', name: '补箩老人', tags: ['human'], tier: 7, hp: 121, atk: 22, def: 9, insight: 0, sparring: true,
+    intents: [{ name: '竹杖贴向手腕', kind: 'attack', mult: 1 }, { name: '横过竹杖挡招', kind: 'guard', mult: 1.35 },
+      { name: '竹杖斜着扫来', kind: 'heavy', mult: 1.5 }, { name: '竹尖挑向肘弯', kind: 'attack', mult: 1.13 }],
+    loot: {}, desc: '他手里那根竹杖平平无奇，转到你身侧时，杖头却一点声响都没有。' },
   { id: 'sand_sundial_master', name: '照壁刀师邢既横', tags: ['human'], tier: 8, hp: 128, atk: 25, def: 10, insight: 13,
     intents: [{ name: '平靠石影拖刀', kind: 'attack', mult: 1 }, { name: '横刀顺气', kind: 'guard', mult: 1.48 },
       { name: '伏角横刀', kind: 'heavy', mult: 1.6 }, { name: '连拖三步', kind: 'drain', mult: 0.7 }, { name: '急挑返光', kind: 'attack', mult: 1.15 }],
@@ -1372,16 +1414,16 @@ const lateContent = {
   items: [
     item('ferry_manifest', '商船货单', 'key', '夏狄给你的货单，背面写着你的名字。照原外港的人认得她的签名，可以凭这张随船过去。'),
     item('sand_writ', '叠石驿牒', 'key', '叠石关的木通行牌，两头都盖了驿站的印。去鸣沙时交给关口的人查验。'),
-    item('undertow_wedge', '倒浪楔', 'key', '铁楔背面开着三道朝外的凹槽。水尺先生照着退水时卡住的铁楔刻了一块。'),
-    item('echo_tuning_key', '听矿铜簧', 'key', '一片缺了角的薄铜，贴住薄岩就会响。缺口贴合钟岭的石钮。'),
+    item('undertow_wedge', '倒浪楔', 'key', '施荀给你的铁楔，背面开着三道凹槽。他说白苇滩那扇石门遇到退潮才往里开。'),
+    item('echo_tuning_key', '听矿铜簧', 'key', '一片缺角的薄铜片。宽的一端有横纹，缺角的一端留下了斜着磨过的痕。'),
     item('gate_scroll_formula', '传送卷轴图纸', 'key', '图上画出怎么用薄木片夹住符纸。照这个式样便能制作传送卷轴。'),
-    item('gate_scroll', '传送卷轴', 'object', '展开后可去亲自到过的传送门。符纸只能用一次，传走时墨迹就会散去。'),
+    item('gate_scroll', '传送卷轴', 'object', '展开后可去自己点亮过的传送门。符纸只能用一次，传走时墨迹就会散去。'),
     item('heart_silt', '伏潮息泥', 'key', '挖自白苇滩深处一洼从不起波纹的泥。泥一挖起来就要收好，湿泥能留住退潮时的一点凉意。'),
     item('stillwell_salt', '井心水盐', 'key', '从最深的井壁刮下来的薄盐霜。尝起来先淡后咸，遇到静水会结成一圈。'),
-    item('cold_kiln_record', '冷炉验火册', 'key', '阮杪核过井票才抄下来的记录。上面写着放盐时陶罐要温热，末尾还能看见三枚印。'),
-    item('phase_chart', '伏潮漏图', 'key', '从照原水下的铜板上印下来的图。两边的水槽一高一低，纸背写着两边都要滴得匀。'),
+    item('cold_kiln_record', '冷炉验火册', 'key', '阮杪对过井票才抄下的记录。写到熄火的那一行，旁边描了几滴水和一圈细细的盐。隔夜那行只画了几团盐块。末页还盖着三枚印。'),
+    item('phase_chart', '伏潮漏图', 'key', '从照原水下的铜板印下来的图。两串水滴并排刻在槽上，每一滴都和另一边的点对齐，槽底的泥画得很平。'),
     item('gold_formula', '结丹散丹方', 'key', '在照原用陶罐和两股水验证过的丹方。炼制时要用到伏潮息泥和井心水盐。'),
-    item('gold_powder', '结丹散', 'key', '从筑基后期突破到金丹时服用。服下药后，连裹药的纸也投入炉中。', { breakthrough: true }),
+    item('gold_powder', '结丹散', 'key', '新出炉的药散，凉了也留着一股苦香。从筑基后期冲击金丹时服用。', { breakthrough: true }),
     item('gold_core', '金丹期妖丹', 'material', '金丹期妖物的内丹，沉甸甸的一颗。炼丹、炼器和金丹期修行都用得上。', { sell: 37 }),
     item('weir_knife', '迎岸横刀', 'gear', '照原护堤人常带的宽背刀。刀一横，便能挡下沉重的来招。', { sell: 37 }),
     item('coil_pole', '回烟长杖', 'gear', '木杖里包着一层层打孔的玄铁片。握住杖能稳住真气，也挡得住迎面的招。', { sell: 45 }),
@@ -1444,7 +1486,7 @@ const lateContent = {
       cost: 20, need: { reed: 7, hide: 3, core: 4, foundation_core: 1 }, days: 3 },
   ],
   deductions: [{ id: 'gold_assay', name: '两股不同的水', tier: 0, reveal: { item: 'cold_kiln_record' },
-    desc: '冷炉的旧册子说得先留住一点凉意，照原那张图的两条水槽又一高一低。师傅们当年在等什么？' }],
+    desc: '冷炉旧册在熄火那行描了圈盐，照原铜板上画着两股水。这两样东西怎么放到一处验？' }],
 };
 
 return lateContent;
@@ -1813,6 +1855,12 @@ const items = [
   { id: 'qi_core', name: '炼气期妖丹', kind: 'material', price: 0, sell: 7, desc: '炼气妖兽或精怪体内凝出的丹核。收货的人肯出钱，丹方也有用它稳火的做法。' },
   { id: 'foundation_core', name: '筑基期妖丹', kind: 'material', price: 0, sell: 21, desc: '筑基期妖兽体内凝成的硬珠。高级丹方会用到，也能卖个好价。' },
   { id: 'beast_eye', name: '妖目', kind: 'material', price: 0, sell: 0, desc: '妖兽的眼珠，离体后还有灵力。能入药，也能做成帮助稳住气息的饰物。' },
+  { id: 'qiankun_pattern', name: '旧行商的袋样', kind: 'key', price: 0, sell: 0,
+    desc: '一块照着旧乾坤袋裁下的样布。一边留了个朝里翻的袋角，可以拿给落灯村的皮匠看。' },
+  { id: 'qiankun_fold_pattern', name: '鸣沙的叠缝样', kind: 'key', price: 0, sell: 0,
+    desc: '两片样布缝在一处，两个袋口上下错开。落灯村的皮匠能照着缝出双层乾坤袋。' },
+  { id: 'qiankun_inner_pattern', name: '旧布袋的底纹', kind: 'key', price: 0, sell: 0,
+    desc: '铜轮下找到的旧布样。顺着底边的针脚捋一圈，能摸到埋在折缝里的线头。可拿给落灯村的皮匠看。' },
   { id: 'meat_broth', name: '山炉肉汤', kind: 'food', price: 0, sell: 0, desc: '装在粗陶罐里的一碗浓汤，比干粮耐饿，还能缓一缓轻伤。' },
   { id: 'herb_stew', name: '灵草炖肉', kind: 'food', price: 0, sell: 0, desc: '用灵草慢煨到酥烂的兽肉，适合走一趟山路再吃。' },
   { id: 'crystal_feast', name: '禾香封肉', kind: 'food', price: 0, sell: 0, desc: '炖好的兽肉裹上熟粟封好。够顶远路的饥饿，也能补回一些气血。' },
@@ -2856,6 +2904,7 @@ function quoteRoad(state, id, kit) {
   const blockedCrossing = crossBlocker(state, road.cross);
   if (blockedCrossing) return { ...road, reason: blockedCrossing };
   if (state.satiety === 0) {
+    if (road.cross) return { ...road, reason: '腹中空空，先回住处吃些东西，再走跨州路。' };
     if (!settlementOf(kit.data, id)?.inn) return { ...road, reason: '腹中空空，先吃些东西。' };
     return { ...road, days: road.days + kit.rules.emptyReturnDays, rescue: true, reason: '' };
   }
@@ -2993,8 +3042,20 @@ function salePrice(place, item, kit) {
   return Math.min(...offered);
 }
 
-function localSellable(state, id, kit) {
-  return Object.values(state.equipment).includes(id) ? 0 : kit.homeBagAvailable(state, id);
+function localSaleTerms(state, id, kit, requested = 1) {
+  const equipped = Object.values(state.equipment).includes(id);
+  const count = equipped ? 0 : kit.homeBagAvailable(state, id);
+  const reason = kit.owns(state, id) < requested ? '手头没有这么多货。' :
+    equipped ? '先卸下这件装备。' : count < requested ? '救济的干粮只供自用。' : '';
+  return { count, reason };
+}
+
+function localPurchaseBlocker(state, id, kit, count, inStock, price) {
+  if (count > inStock) return inStock ? '摊上没有这么多货。' : '这批货已经卖完。';
+  if (state.coins < price * count) return '手头的灵钱不够。';
+  if (kit.records.gear[id] && (count !== 1 || kit.gearReserved(state, id))) return '同名装备只能留一件。';
+  if (!kit.hasRoom(state, { [id]: count })) return '行囊装不下这笔货。';
+  return '';
 }
 
 function localMarket(state, kit) {
@@ -3003,14 +3064,14 @@ function localMarket(state, kit) {
   const offers = Object.entries(localGoods(place)).filter(([id]) => kit.records.items[id] && !kit.isEvidence(kit.records.items[id])).map(([id, offer]) => {
     const { count } = shopStock(state, id, offer);
     const price = localPrice(kit.records.items[id], offer);
-    let maximum = kit.records.gear[id] && kit.gearReserved(state, id) ? 0 :
-      Math.min(kit.rules.maxTradeCount, count, price > 0 ? Math.floor(state.coins / price) : count);
+    const reason = localPurchaseBlocker(state, id, kit, 1, count, price);
+    let maximum = reason ? 0 : Math.min(kit.rules.maxTradeCount, count, price > 0 ? Math.floor(state.coins / price) : count);
     if (kit.records.gear[id]) maximum = Math.min(maximum, 1);
-    while (maximum && !kit.hasRoom(state, { [id]: maximum })) maximum--;
-    return { id, count, price, maximum };
+    while (maximum > 1 && !kit.hasRoom(state, { [id]: maximum })) maximum--;
+    return { id, count, price, maximum, reason };
   });
   const buys = kit.data.items.filter((item) => kit.owns(state, item.id) > 0).map((item) => ({ id: item.id,
-    price: salePrice(place, item, kit), count: localSellable(state, item.id, kit) })).filter(({ price }) => price > 0);
+    price: salePrice(place, item, kit), ...localSaleTerms(state, item.id, kit) })).filter(({ price }) => price > 0);
   return { offers, buys, talk: place.talk ? { label: place.talk.label, heard: known(state, place.talk.lead) } : null };
 }
 
@@ -3030,7 +3091,9 @@ function localTrade(state, id, count, kit, buying) {
   if (!place || !record || !Number.isSafeInteger(count) || count < 1 || count > kit.rules.maxTradeCount) return kit.refuse('这桩买卖办不成。');
   if (!buying) {
     const price = salePrice(place, record, kit);
-    if (!price || localSellable(state, id, kit) < count) return kit.refuse('这里不能收下这么多。');
+    if (!price) return kit.refuse('这件东西不能卖。');
+    const sale = localSaleTerms(state, id, kit, count);
+    if (sale.reason) return kit.refuse(sale.reason);
     kit.removeItem(state, id, count);
     state.coins += price * count;
     return kit.say(state, `卖出${record.name}×${count}，收了${price * count}枚灵钱。`);
@@ -3038,10 +3101,10 @@ function localTrade(state, id, count, kit, buying) {
   const offer = localGoods(place)[id];
   if (!offer || kit.isEvidence(record)) return kit.refuse('这个摊位没卖那件东西。');
   const stock = shopStock(state, id, offer);
-  if (count > stock.count) return kit.refuse('摊上的货没这么多。');
-  const cost = localPrice(record, offer) * count;
-  if (state.coins < cost) return kit.refuse('手头的灵钱不够。');
-  if ((kit.records.gear[id] && (count !== 1 || kit.gearReserved(state, id))) || !kit.hasRoom(state, { [id]: count })) return kit.refuse('行囊装不下这笔货。');
+  const price = localPrice(record, offer);
+  const reason = localPurchaseBlocker(state, id, kit, count, stock.count, price);
+  if (reason) return kit.refuse(reason);
+  const cost = price * count;
   const remaining = stock.count - count;
   const nextAt = offer.interval > 0 ? stock.nextAt ?? state.day + offer.interval : null;
   (state.world.shops[state.region] ??= {})[id] = { count: remaining, nextAt };
@@ -3604,11 +3667,25 @@ const stockSources = {
 
 const warehouseStack = 40;
 const warehouseCap = [0, 16, 32, 56];
+const backpackExpansions = [
+  { capacity: 16, name: '加缝侧袋的行囊', lead: 'hide', source: '出门带回兽革', need: { hide: 6, wood: 4 }, cost: 12, days: 0.5,
+    label: '请皮匠加缝侧袋', desc: '皮匠把兽革对折了一下。「这皮够结实。拿几截松木给袋底撑住，就能再缝一对侧袋。」',
+    outcome: '皮匠把两只侧袋缝进旧行囊，削了松木给袋底加了两道撑条。' },
+  { capacity: 28, name: '乾坤袋', lead: 'qiankun_pattern', source: '杨木水栈的余节', need: { hide: 10, black_iron: 3, core: 4 }, cost: 28, days: 1,
+    label: '照袋样缝一只乾坤袋', desc: '皮匠顺着样布摸到袋角。「原来这道缝要往里折，才量得出多出来的那一层。」',
+    outcome: '皮匠把你的物件倒进缝好的小袋。松木一截截滑了进去，袋底看着还是原来的大小。' },
+  { capacity: 44, name: '双层乾坤袋', lead: 'qiankun_fold_pattern', source: '鸣沙叩石院', need: { hide: 12, black_iron: 5, core: 8, foundation_core: 2 }, cost: 46, days: 2,
+    label: '照叠缝样缝一只双层乾坤袋', desc: '皮匠把两道缝一上一下叠在桌面。「得先让两层的袋口错开，伸手才摸得准。」',
+    outcome: '皮匠把袋口翻给你看。手沿左边摸进去是干粮，沿右边摸进去是那几件铁器。' },
+  { capacity: 64, name: '深底乾坤袋', lead: 'qiankun_inner_pattern', source: '琉脊天室', need: { hide: 16, black_iron: 8, core: 12, gold_core: 2 }, cost: 72, days: 3,
+    label: '照旧袋底纹缝一只深底乾坤袋', desc: '皮匠把袋底铺开，沿旧线一寸寸量过去。「先把底线走完，再回来收口。」',
+    outcome: '皮匠把一整捆备用兽革推进袋口，松手后连背带都没往下一沉。' },
+];
 const setupDays = 0.25;
 const collectDays = 0.25;
 
 const economyData = {
-  facilities, projects, merchantOrders, warehouseStack, warehouseCap,
+  facilities, projects, merchantOrders, warehouseStack, warehouseCap, backpackExpansions,
   setupDays, collectDays, jobSlots: '等于设施等级',
 };
 
@@ -3622,6 +3699,15 @@ function initialEconomyState() {
     merchants: {},
     stock: {},
   };
+}
+
+function backpackCapacity(state, initialCapacity) {
+  return state.economy?.backpackSize ?? initialCapacity;
+}
+
+function backpackName(state, initialCapacity) {
+  const capacity = backpackCapacity(state, initialCapacity);
+  return backpackExpansions.find((step) => step.capacity === capacity)?.name ?? '行囊';
 }
 
 function normalizeEconomy(state) {
@@ -3757,6 +3843,29 @@ function projectView(state, job, kit) {
   };
 }
 
+function backpackView(state, kit) {
+  const base = kit.rules.backpackCapacity;
+  const capacity = backpackCapacity(state, base);
+  const saw = (id) => state.knownItems.includes(id) || kit.homeSupplies(state, id) > 0;
+  const upgrades = backpackExpansions.filter((step) => step.capacity > capacity && saw(step.lead))
+    .map((step) => ({ ...step, reason: kit.homeRequirements(state, step.cost, step.need) }));
+  if (capacity === base && !upgrades.length) return null;
+  const name = backpackName(state, base);
+  const desc = '皮匠在后院靠墙坐下，翻开案上的针线盒。';
+  return { capacity, name, desc, upgrades, upgrade: upgrades[0] ?? null };
+}
+
+function expandBackpack(state, capacity, kit) {
+  const step = backpackView(state, kit)?.upgrades.find((row) => String(capacity) === String(row.capacity));
+  if (!step) return kit.refuse('皮匠眼下办不了这道活。');
+  if (step.reason) return kit.refuse(step.reason);
+  kit.spendHome(state, step.cost, step.need);
+  const economy = normalizeEconomy(state);
+  economy.backpackSize = step.capacity;
+  kit.advance(state, step.days);
+  return kit.say(state, `${step.outcome}行囊扩到${step.capacity}格。`);
+}
+
 function economyView(state, kit) {
   if (!kit.atHome(state)) return { facilities: [], warehouse: { used: 0, capacity: 0, stored: [], carried: [] } };
   const localFacilities = facilities.filter((facility) => knowsFacility(state, facility, kit)).map((facility) => {
@@ -3783,7 +3892,7 @@ function economyView(state, kit) {
       return row(id, count, (quantity) => depositReason(state, id, quantity, kit));
     }).filter(({ count }) => count > 0),
   };
-  return { facilities: localFacilities, warehouse };
+  return { facilities: localFacilities, warehouse, backpack: backpackView(state, kit) };
 }
 
 function buildFacility(state, id, kit) {
@@ -3927,6 +4036,7 @@ function economyAction(state, action, { id, count = 1 }, kit) {
     econBuild: () => buildFacility(state, id, kit),
     econStart: () => startProject(state, id, kit),
     econCollect: () => collectProject(state, id, kit),
+    econExpandPack: () => expandBackpack(state, id, kit),
     merchantTalk: () => merchantTalk(state, id, kit),
     merchantOrder: () => fulfillOrder(state, id, kit),
   };
@@ -3935,9 +4045,9 @@ function economyAction(state, action, { id, count = 1 }, kit) {
   return actions[action]();
 }
 
-return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo };
+return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName };
 })();
-const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo } = economyModule;
+const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName } = economyModule;
 const { alchemyData, initialAlchemyState, alchemyView, alchemyAction } = (() => {
 const town = {
   name: '丹师安蒲',
@@ -4223,7 +4333,7 @@ function backpackSlots(state, inventory = state.inventory) {
 function fittingItems(state, resources, spent = {}) {
   const inventory = { ...state.inventory };
   for (const [id, count] of resourceEntries(spent)) inventory[id] = Math.max(0, (inventory[id] ?? 0) - count);
-  let available = Math.max(0, rules.backpackCapacity - backpackSlots(state, inventory));
+  let available = Math.max(0, backpackCapacity(state, rules.backpackCapacity) - backpackSlots(state, inventory));
   const accepted = {};
   const spilled = {};
   const stackSize = rules.backpackStackSize;
@@ -4499,7 +4609,8 @@ function siteWins(state, site, enemy) {
 }
 
 function knowsChoice(state, choice, site) {
-  return (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
+  return (choice.afterChoice === undefined || state.seenChoices.includes(`${site?.id}:${choice.afterChoice}`)) &&
+    (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
     (!choice.hidden || hasChoiceNeeds(state, choice));
 }
 
@@ -4655,7 +4766,8 @@ function view(state) {
     region: regionOf(state),
     services,
     backpackUsed: backpackSlots(state),
-    backpackCapacity: rules.backpackCapacity,
+    backpackCapacity: backpackCapacity(state, rules.backpackCapacity),
+    backpackName: backpackName(state, rules.backpackCapacity),
     groundLoot,
     groundPickup: Object.fromEntries(resourceEntries(groundLoot).map(([id, count]) => [id, groundPickupLimit(state, id, count)])),
     sites: currentSites(state).map((site) => viewSite(state, site)),
@@ -4906,10 +5018,11 @@ function choose(state, { index, itemId, count }) {
   const gatheredGoods = goodsText(gathered);
   leaveOnGround(state, gathered);
   const enemy = ambush?.enemy ?? choice.enemy;
+  const continuesHere = event.choices.some((next) => next.afterChoice === index);
   if (enemy && records.enemies[enemy]) {
     state.event = null;
     startCombat(state, enemy, site?.id);
-  } else if (!stocks.length && !Object.keys(spilled).length) {
+  } else if (!continuesHere && !stocks.length && !Object.keys(spilled).length) {
     state.event = null;
   }
   const loot = goodsText(accepted);
@@ -5270,7 +5383,7 @@ function equip(state, id, inCombat = false) {
 
 function unequip(state, slot) {
   if (!slots.includes(slot) || !state.equipment[slot]) return refuse('这个位置没有装备。');
-  if (backpackSlots(state) >= rules.backpackCapacity) return refuse('行囊已满，收不下这件装备。');
+  if (backpackSlots(state) >= backpackCapacity(state, rules.backpackCapacity)) return refuse('行囊已满，收不下这件装备。');
   const id = state.equipment[slot];
   state.equipment[slot] = null;
   normalize(state);
@@ -5780,6 +5893,7 @@ let activeFacility = "warehouse";
 let openingTimer;
 let transferTimer;
 let selectedItem = null;
+const kitSectionOpen = new Map();
 let activeDeduction = null;
 let atlasProvince = null;
 let atlasPoint = null;
@@ -6244,16 +6358,27 @@ function pack(s) {
       <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
     </div>`;
   }) : [];
-  const meter = Array.from({ length: s.backpackCapacity }, (_, i) => `<i${i < s.backpackUsed ? ' class="filled"' : ""}></i>`).join("");
+  const capacityLabel = `已用${s.backpackUsed}格，共${s.backpackCapacity}格`;
+  const useProgress = s.backpackCapacity > 20;
+  const meter = useProgress
+    ? `<progress class="pack-meter" max="${s.backpackCapacity}" value="${s.backpackUsed}" aria-label="${capacityLabel}"></progress>`
+    : `<div class="bag-slots" role="img" aria-label="${capacityLabel}">${Array.from({ length: s.backpackCapacity }, (_, i) => `<i${i < s.backpackUsed ? ' class="filled"' : ""}></i>`).join("")}</div>`;
   const room = s.backpackUsed >= s.backpackCapacity ? "已满" : s.backpackUsed >= s.backpackCapacity - 2 ? "快满了" : "有空位";
   return `<section class="kit-section"><h2>装备</h2>${worn.join("") || '<p class="fine">空</p>'}</section>
-    <section class="kit-section"><div class="kit-head"><h2>行囊</h2><span class="fine">${room}</span></div>
-      <div class="bag-slots" role="img" aria-label="行囊容量${room}">${meter}</div>
+    <section class="kit-section"><div class="kit-head"><h2>${escape(s.backpackName)}</h2><span class="fine" title="${capacityLabel}">${useProgress ? `${s.backpackUsed}/${s.backpackCapacity} 格` : room}</span></div>
+      ${meter}
       ${inventory.join("") || '<p class="fine">空</p>'}
     </section>
-    ${clues.length ? `<section class="kit-section"><h2>线索</h2>${clues.join("")}</section>` : ""}
-    ${formulae.length ? `<details class="kit-section formula-kit"><summary>丹方 · ${formulae.length}</summary>${formulae.join("")}</details>` : ""}
+    ${kitDetails("clues", "线索", clues, clues.length <= 5)}
+    ${kitDetails("formulae", "丹方", formulae)}
     ${ground.length ? `<section class="kit-section"><h2>脚边</h2>${ground.join("")}</section>` : ""}`;
+}
+
+function kitDetails(id, label, rows, defaultOpen = false) {
+  if (!rows.length) return "";
+  return `<details class="kit-section formula-kit"${(kitSectionOpen.get(id) ?? defaultOpen) ? " open" : ""}>
+    <summary data-kit-section="${id}">${label} · ${rows.length}</summary>${rows.join("")}
+  </details>`;
 }
 
 function villageServices(s) {
@@ -6348,16 +6473,26 @@ function productionScreen(facility) {
 }
 
 function yard(s) {
-  const { facilities, warehouse } = s.economy;
-  const current = facilities.find(facility => facility.id === activeFacility) ?? facilities[0];
+  const { facilities, warehouse, backpack } = s.economy;
+  const options = backpack ? [...facilities, { id: "backpack", name: "皮匠", desc: backpack.desc }] : facilities;
+  const current = options.find(facility => facility.id === activeFacility) ?? options[0];
   if (!current) return panel("后院", "");
-  const entrances = facilities.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
+  const entrances = options.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
     data-facility="${escape(facility.id)}" aria-pressed="${facility.id === current.id}">${escape(facility.name)}</button>`).join("");
-  const inside = current.id === "warehouse"
-    ? warehouseScreen(warehouse) + productionScreen(current)
-    : productionScreen(current);
+  const inside = current.id === "backpack" ? backpackScreen(backpack) : (
+    (current.id === "warehouse" ? warehouseScreen(warehouse) : "") + productionScreen(current));
   return panel("后院", `<div class="actions facility-tabs">${entrances}</div>
     <p class="intro facility-intro">${escape(current.desc)}</p>${inside}`, current.level > 0 ? tag(`${current.name} · ${current.level} 级`) : "");
+}
+
+function backpackScreen(backpack) {
+  const upgrades = backpack.upgrades.map((row) => card(row.name, row.desc, tag(`${row.capacity} 格`),
+    `<span class="fine">${row.cost} 枚灵钱 · ${row.days} 日</span>` +
+      linkButton(row.label, "econExpandPack", row.capacity, "", Boolean(row.reason)) +
+      (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : ""),
+    "", row.need)).join("");
+  return `<p class="fine">随身用的是${escape(backpack.name)}，共 ${backpack.capacity} 格。</p>
+    ${upgrades ? `<div class="card-grid">${upgrades}</div>` : ""}`;
 }
 
 function marketItem(s, entry, selling) {
@@ -6417,7 +6552,7 @@ function localMarketItem(entry, selling) {
   const maximum = selling ? Math.min(entry.count, rules.maxTradeCount) : entry.maximum;
   const label = selling ? "卖出" : "购入";
   const action = selling ? "localSell" : "localBuy";
-  const reason = selling ? "暂不能出手" : entry.count ? "眼下买不了" : "已卖完";
+  const reason = entry.reason || (selling ? "暂不能出手" : entry.count ? "眼下买不了" : "已卖完");
   const buttons = linkButton(maximum ? label : reason, action, item.id, "", !maximum) +
     (maximum > 1 ? linkButton(`${label} ×${maximum}`, action, item.id, "quiet", false, maximum) : "");
   const stock = `<span class="fine">${selling ? "可卖" : "在摊"} ×${entry.count}</span>`;
@@ -6773,6 +6908,8 @@ document.addEventListener("submit", event => {
 });
 
 document.addEventListener("click", event => {
+  const summary = event.target.closest("summary[data-kit-section]");
+  if (summary) kitSectionOpen.set(summary.dataset.kitSection, !summary.parentElement.open);
   const button = event.target.closest("button");
   if (!button) return;
   if (button.hasAttribute("data-skip-opening")) {
@@ -6805,6 +6942,7 @@ document.addEventListener("click", event => {
     screen = "journey";
     marketMode = "buy";
     activeFacility = "warehouse";
+    kitSectionOpen.clear();
     atlasProvince = null;
     atlasPoint = null;
     selectedItem = null;

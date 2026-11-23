@@ -25,6 +25,7 @@ let activeFacility = "warehouse";
 let openingTimer;
 let transferTimer;
 let selectedItem = null;
+const kitSectionOpen = new Map();
 let activeDeduction = null;
 let atlasProvince = null;
 let atlasPoint = null;
@@ -489,16 +490,27 @@ function pack(s) {
       <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
     </div>`;
   }) : [];
-  const meter = Array.from({ length: s.backpackCapacity }, (_, i) => `<i${i < s.backpackUsed ? ' class="filled"' : ""}></i>`).join("");
+  const capacityLabel = `已用${s.backpackUsed}格，共${s.backpackCapacity}格`;
+  const useProgress = s.backpackCapacity > 20;
+  const meter = useProgress
+    ? `<progress class="pack-meter" max="${s.backpackCapacity}" value="${s.backpackUsed}" aria-label="${capacityLabel}"></progress>`
+    : `<div class="bag-slots" role="img" aria-label="${capacityLabel}">${Array.from({ length: s.backpackCapacity }, (_, i) => `<i${i < s.backpackUsed ? ' class="filled"' : ""}></i>`).join("")}</div>`;
   const room = s.backpackUsed >= s.backpackCapacity ? "已满" : s.backpackUsed >= s.backpackCapacity - 2 ? "快满了" : "有空位";
   return `<section class="kit-section"><h2>装备</h2>${worn.join("") || '<p class="fine">空</p>'}</section>
-    <section class="kit-section"><div class="kit-head"><h2>行囊</h2><span class="fine">${room}</span></div>
-      <div class="bag-slots" role="img" aria-label="行囊容量${room}">${meter}</div>
+    <section class="kit-section"><div class="kit-head"><h2>${escape(s.backpackName)}</h2><span class="fine" title="${capacityLabel}">${useProgress ? `${s.backpackUsed}/${s.backpackCapacity} 格` : room}</span></div>
+      ${meter}
       ${inventory.join("") || '<p class="fine">空</p>'}
     </section>
-    ${clues.length ? `<section class="kit-section"><h2>线索</h2>${clues.join("")}</section>` : ""}
-    ${formulae.length ? `<details class="kit-section formula-kit"><summary>丹方 · ${formulae.length}</summary>${formulae.join("")}</details>` : ""}
+    ${kitDetails("clues", "线索", clues, clues.length <= 5)}
+    ${kitDetails("formulae", "丹方", formulae)}
     ${ground.length ? `<section class="kit-section"><h2>脚边</h2>${ground.join("")}</section>` : ""}`;
+}
+
+function kitDetails(id, label, rows, defaultOpen = false) {
+  if (!rows.length) return "";
+  return `<details class="kit-section formula-kit"${(kitSectionOpen.get(id) ?? defaultOpen) ? " open" : ""}>
+    <summary data-kit-section="${id}">${label} · ${rows.length}</summary>${rows.join("")}
+  </details>`;
 }
 
 function villageServices(s) {
@@ -593,16 +605,26 @@ function productionScreen(facility) {
 }
 
 function yard(s) {
-  const { facilities, warehouse } = s.economy;
-  const current = facilities.find(facility => facility.id === activeFacility) ?? facilities[0];
+  const { facilities, warehouse, backpack } = s.economy;
+  const options = backpack ? [...facilities, { id: "backpack", name: "皮匠", desc: backpack.desc }] : facilities;
+  const current = options.find(facility => facility.id === activeFacility) ?? options[0];
   if (!current) return panel("后院", "");
-  const entrances = facilities.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
+  const entrances = options.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
     data-facility="${escape(facility.id)}" aria-pressed="${facility.id === current.id}">${escape(facility.name)}</button>`).join("");
-  const inside = current.id === "warehouse"
-    ? warehouseScreen(warehouse) + productionScreen(current)
-    : productionScreen(current);
+  const inside = current.id === "backpack" ? backpackScreen(backpack) : (
+    (current.id === "warehouse" ? warehouseScreen(warehouse) : "") + productionScreen(current));
   return panel("后院", `<div class="actions facility-tabs">${entrances}</div>
     <p class="intro facility-intro">${escape(current.desc)}</p>${inside}`, current.level > 0 ? tag(`${current.name} · ${current.level} 级`) : "");
+}
+
+function backpackScreen(backpack) {
+  const upgrades = backpack.upgrades.map((row) => card(row.name, row.desc, tag(`${row.capacity} 格`),
+    `<span class="fine">${row.cost} 枚灵钱 · ${row.days} 日</span>` +
+      linkButton(row.label, "econExpandPack", row.capacity, "", Boolean(row.reason)) +
+      (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : ""),
+    "", row.need)).join("");
+  return `<p class="fine">随身用的是${escape(backpack.name)}，共 ${backpack.capacity} 格。</p>
+    ${upgrades ? `<div class="card-grid">${upgrades}</div>` : ""}`;
 }
 
 function marketItem(s, entry, selling) {
@@ -662,7 +684,7 @@ function localMarketItem(entry, selling) {
   const maximum = selling ? Math.min(entry.count, rules.maxTradeCount) : entry.maximum;
   const label = selling ? "卖出" : "购入";
   const action = selling ? "localSell" : "localBuy";
-  const reason = selling ? "暂不能出手" : entry.count ? "眼下买不了" : "已卖完";
+  const reason = entry.reason || (selling ? "暂不能出手" : entry.count ? "眼下买不了" : "已卖完");
   const buttons = linkButton(maximum ? label : reason, action, item.id, "", !maximum) +
     (maximum > 1 ? linkButton(`${label} ×${maximum}`, action, item.id, "quiet", false, maximum) : "");
   const stock = `<span class="fine">${selling ? "可卖" : "在摊"} ×${entry.count}</span>`;
@@ -1018,6 +1040,8 @@ document.addEventListener("submit", event => {
 });
 
 document.addEventListener("click", event => {
+  const summary = event.target.closest("summary[data-kit-section]");
+  if (summary) kitSectionOpen.set(summary.dataset.kitSection, !summary.parentElement.open);
   const button = event.target.closest("button");
   if (!button) return;
   if (button.hasAttribute("data-skip-opening")) {
@@ -1050,6 +1074,7 @@ document.addEventListener("click", event => {
     screen = "journey";
     marketMode = "buy";
     activeFacility = "warehouse";
+    kitSectionOpen.clear();
     atlasProvince = null;
     atlasPoint = null;
     selectedItem = null;

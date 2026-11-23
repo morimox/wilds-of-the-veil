@@ -376,6 +376,13 @@ const tables = [
     ['stack', '仓库每格堆叠上限'], ['reveal', '看见设施需实际取得的物件', ref], ['alternateReveal', '另一件可引出设施的物件', ref],
     'need', ['cost', '搭建扩建费用（灵钱）'], 'days', 'desc',
   ], { note: '起始仓库已经可用。等级 0 的生产设施需要先搭建。生产工位数与等级相等，仓库单列实际格数。' }),
+  table('backpack-expansions', '行囊和乾坤袋', [
+    { name: '行囊', capacity: rules.backpackCapacity, source: '初来落灯村' },
+    ...economyData.backpackExpansions,
+  ], [
+    'name', ['capacity', '容量（格）'], ['source', '来历'], ['lead', '实际发现的材料或袋样', ref],
+    'need', ['cost', '制作费用（灵钱）'], 'days',
+  ], { note: '每档同种物品每格可放 20 件。落灯村皮匠照袋样制作，新袋容量较大时自动使用，所携物件直接随身。' }),
   table('yard-projects', '后院种植与备粮', economyData.projects, [
     'id', 'name', ['facility', '使用设施', facilityRef], ['level', '所需设施等级'],
     'need', 'loot', ['cost', '费用（灵钱）'], ['days', '等待成熟天数'],
@@ -476,7 +483,8 @@ const tables = [
   table('event-choices', '事件选项', choices, [
     ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days',
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
-    'need', 'consume', 'hidden', 'loot', 'enemy', ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
+    'need', 'consume', 'hidden', 'loot', 'enemy', ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
+    ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
     ['guardedBy', '在场会挡住选择的对手', ref], ['ambush', '有对手时每批采集伏击', ({ enemy, chance }) => `${ref(enemy)} · ${percent(chance)}`],
     ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
   ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排。每点一次、完成一批，所得先放在当前具体地点。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),

@@ -48,20 +48,19 @@ const animal = (start, cap, interval, growth, curve) => ({ start, cap, interval,
 
 const sites = [
   { id: 'meadow_channel', region: 'reed_meadows', name: '姚六的弯渠', once: [2, 3],
-    stocks: { reed: stock('田边灵草', 4, 7, 4, 2, 0), wood: stock('堵住水渠的枯木', 4, 5, 4, 2, 1) },
-    afterOnceText: { 2: '姚六抄了两份修渠凭据，留给儿子的那份还在晒。田边有两道浅沟，漂来的枯木常在外沟口卡住。', 3: '野雁飞走了。太阳落山前，姚六放水冲去田泥。两道浅沟露了出来，渠口时常能拦住漂木。' } },
+    stocks: { reed: stock('田边灵草', 4, 7, 4, 2, 0), wood: stock('沟口漂木', 4, 5, 4, 2, 1) } },
   { id: 'meadow_ruts', region: 'reed_meadows', name: '雁脚泥垄',
     creatures: { reed_fox: animal(2, 4, 4, 1, 'wild') },
     creatureText: { reed_fox: { present: '狐狸顺着雁的脚印钻进堤下，留了两行新脚印。', absent: '泥垄上只剩让日头晒干的旧脚印。' } } },
   { id: 'shoal_baskets', region: 'pale_shoal', name: '灰鹭晒篮处', once: [2],
     stocks: { reed: stock('鹭草根', 3, 6, 4.5, 2, 0), core: stock('石缝灵晶', 2, 4, 5, 1, 1) },
-    afterOnceText: { 2: '补鞋的白宜蹲在浅石上晾篮子。她把鞋口重新缠好了，篮底原有一处补布也换了新片。' } },
+    afterOnceText: { 2: '白宜缝好了鞋，把篮子倒扣在石上晾。浅石边是鹭草扎根的地方，往下游几步还有一排容易积砂的石缝。' } },
   { id: 'ladder_drop', region: 'fish_ladder', name: '第三级闸口',
     stocks: { wood: stock('闸梁上的枯枝', 4, 7, 4, 2, 0), ore: stock('槽底寒铁', 4, 7, 5, 2, 2) },
     creatures: { river_gateback: animal(1, 2, 6, 1, 'wild') },
     creatureText: { river_gateback: { present: '水里那条横脊每次摆尾，最下一级的阶都被掩住。', absent: '水阶落出一截，能踩去有铁屑的水槽。' } } },
   { id: 'willow_yard', region: 'willow_post', name: '卸货后院', once: [0, 1],
-    afterOnceText: { 1: '驿卒把修好的雨槽推到瓦檐下。挑担人靠着门柱等水开，没人再去搬那捆沉木。' } },
+    afterOnceText: { 1: '雨水顺着新木槽淌到院外。檐下的行李没再淋湿，门房手边那两块名牌也挪到了干处。' } },
   { id: 'gauge_piles', region: 'gauge_tower', name: '刻尺水桩', once: [0, 1],
     stocks: { core: stock('水尺旁的灵晶', 2, 5, 6, 1, 2) } },
   { id: 'slope_sieves', region: 'screen_slope', name: '断壁筛架', once: [3],
@@ -73,8 +72,9 @@ const sites = [
   { id: 'undertow_bed', region: 'undertow_grotto', name: '退水石脊', once: [1],
     stocks: { core: stock('侧洞灵晶', 5, 9, 7, 2, 2) },
     creatures: { undertow_moundback: animal(1, 1, 0, 0) },
-    creatureText: { undertow_moundback: { present: '泥脊忽然抬起整整一尺。粗鳞下挂着河砂，露出的角挡住了泥床。', absent: '泥脊慢慢塌下去，床面留下三圈未被河潮搅散的黑泥。' } },
-    afterOnceText: { 1: '取走两份伏潮息泥后，中央的坑积着清水。沿石脊还能绕去有灵晶的侧洞。' } },
+    creatureText: { undertow_moundback: { present: '泥脊忽然抬起一截。河砂从一排粗鳞上掉下来，一对角堵住了去侧洞的路。', absent: '' } },
+    afterWinText: { undertow_moundback: '泥脊塌下去，床面留下三圈未被潮水搅散的黑泥。角原来挡着的那条路能通到侧洞。' },
+    afterOnceText: { 1: '中央多了个积着清水的坑。侧洞的石壁上还挂着几道晶砂留下的细痕。' } },
   { id: 'counter_bell_score', region: 'counter_bell', name: '信架与钟枢', once: [1, 3],
     stocks: { black_iron: stock('钟座暗金', 4, 8, 7, 2, 2) },
     creatures: { river_copper_echo: animal(1, 1, 0, 0) },
@@ -83,10 +83,10 @@ const sites = [
 ];
 
 const events = [
-  { id: 'meadow_channel', name: '姚六的弯渠', text: '近处的水刚退，田边冒了些嫩草。外沟口堵着几根枯木。姚六从上游扛着耙子回来，手里还攥着张湿纸。', choices: [
-    { label: '采田边的灵草', days: 0.5, insight: 1, loot: { reed: 3 }, outcome: '姚六指了指外沟边的嫩草，你顺着他指的地方采了几束。' },
-    { label: '搬开堵住水渠的枯木', days: 0.5, insight: 1, loot: { wood: 2 }, outcome: '枯木挪开后，浑水沿外沟慢慢流了下去。' },
-    { label: '拿松木帮姚六修水槽', desc: '姚六说：「拿两片直木把这个口子撑住，两户田都能过水。修完去驿站报个名。」', need: { wood: 2 }, consume: true, days: 0.5, coins: 7, insight: 2, loot: { river_field_stamp: 1 }, outcome: '水槽修好后，姚六从袖里数出几枚钱，又在修渠凭据背面写上名字，画了去驿站的路。' },
+  { id: 'meadow_channel', name: '姚六的弯渠', text: '田坎边并排两道浅沟。内沟边是灵草生根的地方，外沟口窄，最容易卡住上游漂来的枯木。姚六扛着耙子在水槽边歇脚。', choices: [
+    { label: '采田边的灵草', days: 0.5, insight: 1, loot: { reed: 3 }, outcome: '姚六指了指内沟边的嫩草，你顺着他指的地方采了几束。' },
+    { label: '搬开沟口卡住的枯木', days: 0.5, insight: 1, loot: { wood: 2 }, outcome: '枯木挪开后，浑水沿外沟慢慢流了下去。' },
+    { label: '拿松木帮姚六修水槽', desc: '水槽边的木板向外翘着。姚六说：「拿两片直木把这个口子撑住，两户田都能过水。修完去驿站报个名。」', need: { wood: 2 }, consume: true, days: 0.5, coins: 7, insight: 2, loot: { river_field_stamp: 1 }, outcome: '水槽修好后，姚六从袖里数出几枚钱，又在修渠凭据背面写上名字，画了去驿站的路。' },
     { label: '把困在水里的野雁托上岸', desc: '芦叶下面有只湿透的雁，只剩一只脚能站稳。', days: 0.25, insight: 1, loot: {}, outcome: '野雁在泥边晃了两步才飞走。姚六把外沟的水放浅一些，免得再有鸟陷进去。' },
   ] },
   { id: 'meadow_ruts', name: '雁脚泥垄', text: '水口封住后，泥地晒出一层硬壳，雀儿落下来一啄就碎。深处有个长条形的土坑。', choices: [
@@ -96,15 +96,15 @@ const events = [
   { id: 'shoal_baskets', name: '灰鹭晒篮处', text: '岸边水浅，鹭草露着细根。下游的石缝里常积些水冲上来的灵晶。白宜坐在两处中间，拿针给旧鞋补眼。', choices: [
     { label: '拔岸边露根的鹭草', days: 0.5, insight: 1, loot: { reed: 2 }, outcome: '抓住露头的草叶轻轻一拽，草根上成团的白泥落回水边。' },
     { label: '拨开浅石捡晶砂', days: 0.625, insight: 2, loot: { core: 1 }, outcome: '阳光照进浅滩，洗过的砂里有些灵晶能捡。' },
-    { label: '问白宜为何把鞋朝岸上摆', days: 0.25, insight: 1, loot: {}, outcome: '白宜说旧渡还有艘商船给人送补船的木料。她年轻时走进白苇滩的一道石缝，走着走着又回了原岸。「照原有个管水的来过。他说潮水会倒流，进去了还可能被送回来。」' },
+    { label: '问白宜哪边的滩好走', days: 0.25, insight: 1, loot: {}, outcome: '白宜把鞋上的线咬断。「沿干石走。白苇后有人高的石缝，我年轻时进去过，潮一转，人又被挤回原岸。照原有个管水的也去看过。」她指了指旧渡，说那边还有给人送木料的商船。' },
   ] },
-  { id: 'ladder_drop', name: '第三级闸口', text: '最上一道木梁缠着滚来的枝条。下一阶只到膝头，最下一级才接排矿渣的水槽。钓客岑响把脚缩到了石凳上。', choices: [
+  { id: 'ladder_drop', name: '第三级闸口', text: '上头的木梁低，涨水时漂来的枝条容易挂在上面。第二级阶没在及膝的水里，再往下才是排矿渣的槽。钓客岑响坐在水边的石凳上。', choices: [
     { label: '取上层木梁上的枯枝', days: 0.75, insight: 1, loot: { wood: 3 }, outcome: '枝条一松，露出木梁被水泡深的纹路。' },
     { label: '走到中间的台阶，引开水里的兽', days: 0.375, enemy: 'river_gateback', outcome: '岑响抄起鱼篓往上退。横脊闸兽甩动背鳍，重重打在闸梁上。' },
     { label: '到最下面的水槽筛寒铁', guardedBy: 'river_gateback', days: 0.875, insight: 3, loot: { ore: 3 }, outcome: '筛掉浮砂，较沉的铁粒留在布里。' },
     { label: '问岑响为何守着坏掉的水闸', days: 0.125, insight: 1, outcome: '岑响抖了抖鱼篓底的泥。「闸坏了，岸边的鱼游不上来。等找人修好了，总还会回来。」' },
   ] },
-  { id: 'willow_yard', name: '卸货后院', text: '门房把近岸见过的人分开记在两片木牌上。檐下的雨槽倾着，水冲进原本用来搁行李的石板地。', choices: [
+  { id: 'willow_yard', name: '卸货后院', text: '门房从钩上摘下两块名牌，一块写着系灯院，一块写着白苇滩。檐下的雨槽歪向了院里，水顺着石板流到行李旁。', choices: [
     { label: '问门房这两块名牌是谁的', days: 0.125, insight: 1, loot: {}, outcome: '门房把系灯院的牌子挂回钩上，留下写着「白苇滩，封乔」的那块。「咱们夜里只托熟人送货。你若在木台上赢过封乔，他给你木签，我这儿就认得你了。」' },
     { label: '替门房补好接雨水的木槽', desc: '门房瞧了一眼天色。「手头若有三片木，我出八钱。再漏一晚，来歇脚的人都睡不好。」', days: 0.5, need: { wood: 3 }, consume: true, coins: 8, insight: 1, loot: {}, outcome: '木槽接住檐下的水。门房用麻绳固定好，从茶桌下取出约定的钱。' },
   ] },
@@ -113,11 +113,11 @@ const events = [
     { label: '问最下面那两道深刻痕', desc: '尺脚有两道格外深的痕，湿纸压上去，边沿都翘了起来。', days: 0.125, insight: 1, outcome: '胥婉把短尺翻给你看。那两道痕照的是反潮石门上固定绳子的槽。东边的测水人来试过槽里的铁楔，走时把铁楔也带过了渡。' },
     { label: '筛废铁盘外沿的晶砂', days: 0.625, insight: 1, loot: { core: 2 }, outcome: '细筛晃过几下，晶砂留在旧铁盘的外沿。' },
   ] },
-  { id: 'slope_sieves', name: '断壁筛架', text: '坡下是矿盘，浅些的铁粒滚到筛口。石架往上一层只悬着条工作绳，绳头结里嵌着较深色的碎石。', choices: [
+  { id: 'slope_sieves', name: '断壁筛架', text: '坡下摆着筛寒铁的旧盘，盘沿能翻过来看。坡上的筛架靠两根木柱撑着，攀上去得抓住柱间垂下来的绳。', choices: [
     { label: '用坡下的筛盘筛寒铁', days: 0.75, insight: 2, loot: { ore: 3 }, outcome: '铁粒滚到筛盘底部，你拨开盖在上面的石粉。' },
     { label: '走近上坡那两根木柱', days: 0.5, enemy: 'stone_badger', outcome: '石甲獾从第一根木柱后挤出来，转身直顶你的脚踝。' },
     { label: '抓着绳子，到高处筛暗金', guardedBy: 'stone_badger', days: 1, insight: 2, loot: { black_iron: 2 }, outcome: '深色颗粒很沉，顺着筛底落进矿工挂的布袋。' },
-    { label: '翻看筛盘背面的小孔', days: 0.25, insight: 1, loot: {}, outcome: '一宽一窄两个孔，和沉钟岭那堵石墙后的一样。从前的矿工用这种记号标出能绕回地面的路。' },
+    { label: '翻看筛盘背面', days: 0.25, insight: 1, loot: {}, outcome: '筛盘背面留了一宽一窄两个孔，旁边刻着几级向上的台阶。有人拿炭笔写了个「回」字，笔画快给手磨平了。' },
   ] },
   { id: 'lantern_term', name: '夜灯廊', text: '弟子裴见抱着一条用来护住过路人的粗绳。身旁串着几盏灯，门外长凳上还留着给行人歇脚的位置。', choices: [
     { label: '问裴见这几盏灯是给谁的', days: 0.125, insight: 1, loot: {}, outcome: '裴见一盏盏翻给你看。采药人去旧渠，拉货的车去松场，也有人挑担去西岸。各人都认得自己的那盏，走到多晚也能认路。' },
@@ -155,7 +155,7 @@ export const extendSites = [
 
 export const extendEvents = [
   { id: 'undertow_door', name: '反潮石门', text: '芦苇后露出半扇厚重的石门，门边有道空槽。水从石门两侧往不同方向流，外侧的台阶还露在水面上。', choices: [
-    { label: '沿露出水面的台阶绕一圈', desc: '墙外还有一排露出水面的石阶，一直连回岸边。', days: 0.25, insight: 1, outcome: '你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮时，门两边的水都换了方向。旧槽里少了固定绳子的铁件。' },
+    { label: '沿外侧石阶绕一圈', desc: '墙外还有一排露出水面的石阶，一直连回岸边。', days: 0.25, insight: 1, outcome: '你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮，门两边的水都换了方向。水势一变，只有靠里的高阶还露在外头。' },
     { label: '把倒浪楔卡进石槽，固定绳子', desc: '施荀给的铁楔刚好对得上石槽。潮水倒流时，可以抓着绳子找高处的台阶。', hidden: true, need: { undertow_wedge: 1 }, days: 0.5, insight: 3, loot: { undertow_entry: 1 }, outcome: '第二股潮水打过来，铁楔才牢牢卡住。你沿绳摸到上方的石阶，找到了去回潮母洞的路。' },
     { label: '用校潮亭的印纸对照潮水方向', desc: '石槽边的浅痕正对着倒流的潮水，和印纸最下面几道痕同向。', hidden: true, need: { river_gauge_copy: 1 }, days: 0.25, insight: 2, outcome: '印纸贴在槽边，最后两道线只从内侧湿起。绳子会随水换方向，固定它的铁件得同时卡住槽的两头。' },
   ] },
@@ -165,7 +165,7 @@ export const extendEvents = [
     { label: '接过封乔的试杆签', desc: '封乔放下短杆，取了一支先前用红布系好的木签。', afterFight: 'river_spar_captain', days: 0.125, insight: 4, loot: { river_trial_writ: 1 }, outcome: '封乔在木签上按了手印。「夜里水响，赶路靠脚稳。折水驿要托人带急信，你肯帮忙，就拿这个给他们看。」' },
   ] },
   { id: 'counter_bell_door', name: '倒钟后的反声门', text: '倒钟最矮处留着一枚没有字的石阶。石阶后有两个不同宽窄的孔，一长声一短声从里面撞回来。', choices: [
-    { label: '贴着石壁敲三下', days: 0.125, insight: 1, outcome: '前两声沿石阶传了回来，第三声却从宽孔传进地底。孔里没有东西卡住石阶，踏上去会转回原处。' },
+    { label: '贴着石壁敲三下', days: 0.125, insight: 1, outcome: '前两声沿石阶传回来，第三声却顺宽孔往下传。弯下腰细听，石阶底下还有一处空腔。' },
     { label: '把听矿铜簧斜卡进两个石孔', desc: '那块铜片宽端抵住外面的孔，缺角的一端斜着能卡进里面的凹口。', hidden: true, need: { echo_tuning_key: 1 }, days: 0.5, insight: 3, loot: { counter_bell_entry: 1 }, outcome: '第三声在窄孔里没了回音。下方石阶却落稳了，宽孔的回声从脚底传来。那是通往反声钟窟的路。' },
   ] },
   { id: 'ford_packet_boat', name: '外桩商船', text: '闸外有条窄船拴在缓水里。船家夏狄翻起一块裂开的木板，指给船工看船侧的缺口。', choices: [

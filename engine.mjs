@@ -1,5 +1,5 @@
 import * as moduleData from './data.mjs';
-import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo } from './economy.mjs';
+import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName } from './economy.mjs';
 import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
 import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement } from './world.mjs';
 import { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead } from './training.mjs';
@@ -137,7 +137,7 @@ function backpackSlots(state, inventory = state.inventory) {
 function fittingItems(state, resources, spent = {}) {
   const inventory = { ...state.inventory };
   for (const [id, count] of resourceEntries(spent)) inventory[id] = Math.max(0, (inventory[id] ?? 0) - count);
-  let available = Math.max(0, rules.backpackCapacity - backpackSlots(state, inventory));
+  let available = Math.max(0, backpackCapacity(state, rules.backpackCapacity) - backpackSlots(state, inventory));
   const accepted = {};
   const spilled = {};
   const stackSize = rules.backpackStackSize;
@@ -413,7 +413,8 @@ function siteWins(state, site, enemy) {
 }
 
 function knowsChoice(state, choice, site) {
-  return (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
+  return (choice.afterChoice === undefined || state.seenChoices.includes(`${site?.id}:${choice.afterChoice}`)) &&
+    (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
     (!choice.hidden || hasChoiceNeeds(state, choice));
 }
 
@@ -569,7 +570,8 @@ export function view(state) {
     region: regionOf(state),
     services,
     backpackUsed: backpackSlots(state),
-    backpackCapacity: rules.backpackCapacity,
+    backpackCapacity: backpackCapacity(state, rules.backpackCapacity),
+    backpackName: backpackName(state, rules.backpackCapacity),
     groundLoot,
     groundPickup: Object.fromEntries(resourceEntries(groundLoot).map(([id, count]) => [id, groundPickupLimit(state, id, count)])),
     sites: currentSites(state).map((site) => viewSite(state, site)),
@@ -820,10 +822,11 @@ function choose(state, { index, itemId, count }) {
   const gatheredGoods = goodsText(gathered);
   leaveOnGround(state, gathered);
   const enemy = ambush?.enemy ?? choice.enemy;
+  const continuesHere = event.choices.some((next) => next.afterChoice === index);
   if (enemy && records.enemies[enemy]) {
     state.event = null;
     startCombat(state, enemy, site?.id);
-  } else if (!stocks.length && !Object.keys(spilled).length) {
+  } else if (!continuesHere && !stocks.length && !Object.keys(spilled).length) {
     state.event = null;
   }
   const loot = goodsText(accepted);
@@ -1184,7 +1187,7 @@ function equip(state, id, inCombat = false) {
 
 function unequip(state, slot) {
   if (!slots.includes(slot) || !state.equipment[slot]) return refuse('这个位置没有装备。');
-  if (backpackSlots(state) >= rules.backpackCapacity) return refuse('行囊已满，收不下这件装备。');
+  if (backpackSlots(state) >= backpackCapacity(state, rules.backpackCapacity)) return refuse('行囊已满，收不下这件装备。');
   const id = state.equipment[slot];
   state.equipment[slot] = null;
   normalize(state);
