@@ -1,6 +1,10 @@
 import * as moduleData from './data.mjs';
 import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo } from './economy.mjs';
 import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
+import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement } from './world.mjs';
+import { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead } from './training.mjs';
+import { initialMechanisms, mechanismView, mechanismAction } from './mechanisms.mjs';
+import { tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution } from './tournament.mjs';
 
 const data = { ...moduleData.default, ...moduleData };
 
@@ -73,7 +77,9 @@ const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 const realmOf = (state) => records.realms[state.realm];
 const regionOf = (state) => records.regions[state.region];
 const enemyOf = (state) => state.combat ? records.enemies[state.combat.id] : null;
+const inProtectedBout = (state) => Boolean(enemyOf(state)?.sparring && records.sites[state.combat.siteId]?.protectedArena);
 const atHome = (state) => state.region === hub;
+const isSettlement = (state) => Boolean(settlementOf(data, state.region));
 const nameOf = (id) => records.items[id]?.name ?? id;
 const goodsText = (resources) => resourceEntries(resources)
   .filter(([, count]) => count > 0).map(([id, count]) => `${nameOf(id)}×${count}`).join('、');
@@ -86,12 +92,13 @@ function activeGear(state) {
 function stats(state) {
   const realm = realmOf(state);
   const worn = activeGear(state);
+  const trained = trainingStats(state);
   const sum = (key) => worn.reduce((total, entry) => total + (entry[key] ?? 0), 0);
   return {
-    maxHp: Math.max(1, realm.hp + sum('hp') - rules.woundPenalty * state.wounds),
-    maxQi: Math.max(1, realm.qi + sum('qi')),
+    maxHp: Math.max(1, realm.hp + sum('hp') + trained.hp - rules.woundPenalty * state.wounds),
+    maxQi: Math.max(1, realm.qi + sum('qi') + trained.qi),
     attack: realm.atk + sum('atk'),
-    defense: realm.def + sum('def'),
+    defense: realm.def + sum('def') + trained.def,
     retreat: sum('retreat'),
   };
 }
@@ -192,7 +199,7 @@ function addItems(state, resources, found = false) {
     state.inventory[id] = owns(state, id) + count;
     if (!state.knownItems.includes(id)) state.knownItems.push(id);
     if (gear) state.durability[id] = gear.durability;
-    if (found && !atHome(state)) state.expeditionLoot[id] = (state.expeditionLoot[id] ?? 0) + count;
+    if (found && !isSettlement(state)) state.expeditionLoot[id] = (state.expeditionLoot[id] ?? 0) + count;
   }
   return result;
 }
@@ -256,11 +263,13 @@ function isRevealed(state, reveal) {
 
 function refreshDiscovery(state) {
   for (const region of data.regions) {
-    if (isRevealed(state, region.reveal) && !state.discovered.includes(region.id)) {
+    const knowsRoute = region.reveal ? isRevealed(state, region.reveal) : alwaysKnownRegion(region.id);
+    if (knowsRoute && !state.discovered.includes(region.id)) {
       state.discovered.push(region.id);
       if (region.reveal) say(state, `你找到了通往${region.name}的路。`);
     }
   }
+  if (state.world.arrived) learnAdjacentRegions(state, economyKit);
 }
 
 function knowsService(state, id) {
@@ -292,6 +301,10 @@ function knowsRecipe(state, recipe) {
       : knowsMaterials(state, recipe.need));
 }
 
+function canCraftScroll(state) {
+  return data.recipes.some((recipe) => recipe.result === 'gate_scroll' && !recipe.facility && knowsRecipe(state, recipe));
+}
+
 function knowsItem(state, item) {
   if (state.knownItems.includes(item.id)) return true;
   const object = records.gear[item.id] ?? records.pills[item.id] ?? records.talismans[item.id];
@@ -314,6 +327,10 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     day: 1,
     realm: 0,
     region: hub,
+    world: initialWorld(),
+    training: initialTraining(),
+    mechanisms: initialMechanisms(),
+    tournament: initialTournament(),
     hp: 0,
     satiety: clamp(settings.satiety ?? rules.maxSatiety, 0, rules.maxSatiety),
     didEat: false,
@@ -329,7 +346,7 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     reliefRations: 0,
     equipment: { weapon: null, armor: null, charm: null },
     durability: {},
-    knownArts: [...(settings.arts ?? data.arts.filter((entry) => entry.tier === 0 && !entry.price)
+    knownArts: [...(settings.arts ?? data.arts.filter((entry) => entry.tier === 0 && !entry.price && !entry.prizeOnly)
       .slice(0, 1).map((entry) => entry.id))],
     completedQuests: [],
     economy: initialEconomyState(),
@@ -500,7 +517,7 @@ function availableExperiment(state, event) {
 }
 
 function revisitableEvents(state) {
-  if (atHome(state) || state.event || state.combat) return [];
+  if (state.event || state.combat) return [];
   return (state.eventsSeen[state.region] ?? []).map((id) => records.events[id]).filter((event) =>
     availableExperiment(state, event) || (event.revisit && event.choices.some((choice, index) =>
       choice.hidden && hasChoiceNeeds(state, choice) && !state.seenChoices.includes(`${event.id}:${index}`))));
@@ -509,14 +526,18 @@ function revisitableEvents(state) {
 export function view(state) {
   const enemy = enemyOf(state);
   const intent = currentIntent(state);
-  const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.event ? 'event' : atHome(state) ? 'village' : 'field';
-  const services = data.services.filter(({ id }) => knowsService(state, id)).map(({ id }) => id);
-  const discoveredQuests = services.includes('quests') ? data.quests.filter((quest) => knowsQuest(state, quest)) : [];
+  const inSettlement = isSettlement(state);
+  const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.event ? 'event' : inSettlement ? 'village' : 'field';
+  const questLocation = inSettlement ? state.region : hub;
+  const discoveredQuests = data.quests.filter((quest) => (quest.region ?? hub) === questLocation && knowsQuest(state, quest));
+  const services = data.services.filter(({ id }) => knowsService(state, id) && (!inSettlement || atHome(state) ||
+    id === 'cultivate' || (id === 'quests' && discoveredQuests.length) || (id === 'workshop' && canCraftScroll(state)))).map(({ id }) => id);
   const currentEvent = state.event ? records.events[state.event] : null;
   const currentSite = currentEvent && records.sites[currentEvent.id];
   const experiment = availableExperiment(state, currentEvent);
   const nextRealm = services.includes('cultivate') ? records.realms[state.realm + 1] ?? null : null;
   const groundLoot = { ...groundAt(state) };
+  const studies = trainingView(state, economyKit);
   const visibleChoices = (currentEvent?.choices ?? []).map((choice, index) => {
     const blocker = choiceBlocker(state, choice, currentSite, index);
     const { label, desc, hidden } = choice;
@@ -528,6 +549,11 @@ export function view(state) {
   return {
     ...state,
     ...stats(state),
+    ...worldView(state, economyKit),
+    training: studies.rows,
+    mechanism: mechanismView(state, economyKit),
+    spiritSense: studies.spiritSense,
+    tournament: tournamentView(state, economyKit),
     maxSatiety: rules.maxSatiety,
     mode,
     day: state.day,
@@ -558,20 +584,21 @@ export function view(state) {
       })),
     } : null,
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
-    currentEnemy: enemy ? { ...enemy, maxHp: enemy.hp, hp: state.combat.hp } : null,
+    currentEnemy: enemy ? { ...enemy, sparring: inProtectedBout(state), maxHp: enemy.hp, hp: state.combat.hp } : null,
     combatWeapon: weaponView(state),
     intent,
     intentDamage: enemy && intent ? estimatedHit(enemy, intent) : 0,
     discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
-      (services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
-    discoveredRecipes: services.includes('workshop') ? data.recipes.filter((recipe) => !recipe.facility && knowsRecipe(state, recipe)).map(({ id }) => id) : [],
+      (!art.prizeOnly && (!inSettlement || atHome(state)) && services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
+    discoveredRecipes: services.includes('workshop') ? data.recipes.filter((recipe) => !recipe.facility &&
+      (!inSettlement || atHome(state) || recipe.result === 'gate_scroll') && knowsRecipe(state, recipe)).map(({ id }) => id) : [],
     discoveredQuests: discoveredQuests.map(({ id }) => id),
     discoveredItems: data.items.filter((item) => knowsItem(state, item)).map(({ id }) => id),
-    market: marketView(state),
+    market: !inSettlement || atHome(state) ? marketView(state) : { stalls: [], sales: [] },
     economy: economyView(state, economyKit),
     alchemy: alchemyView(state, economyKit),
-    homeMaterials: atHome(state) ? Object.fromEntries(data.items.map(({ id }) => [id, homeSupplies(state, id)]).filter(([, count]) => count > 0)) : {},
-    evidence: data.items.filter((item) => item.id !== 'foundation_pill' && isEvidence(item) && owns(state, item.id) > 0)
+    homeMaterials: inSettlement ? Object.fromEntries(data.items.map(({ id }) => [id, homeSupplies(state, id)]).filter(([, count]) => count > 0)) : {},
+    evidence: data.items.filter((item) => !item.breakthrough && isEvidence(item) && owns(state, item.id) > 0)
       .map(({ id, name, desc }) => ({ id, name, desc, count: owns(state, id) })),
     deductions: (data.deductions ?? []).filter((entry) => knowsDeduction(state, entry)).map((entry) => {
       const { id, name, desc } = entry;
@@ -591,25 +618,10 @@ export function view(state) {
 }
 
 function travel(state, id) {
-  const destination = records.regions[id];
-  if (!destination) return refuse('找不到这条路。');
-  if (!state.discovered.includes(id)) return refuse('你还没有找到那条路。');
-  if (state.region === id) return refuse('你已经在这里。');
-  if (id !== hub && state.satiety === 0) return refuse('腹中空空，先吃些东西。');
-  const route = id === hub ? regionOf(state) : destination;
-  const hungryReturn = id === hub && state.satiety === 0;
-  advance(state, (route.travel ?? 0) + (hungryReturn ? rules.emptyReturnDays : 0));
-  state.region = id;
-  if (id === hub) {
-    state.expeditionLoot = {};
-    state.pressure = 0;
-  }
-  const delay = hungryReturn ? '腹中没了力气，回程走得慢些。' : '';
-  return say(state, `抵达${destination.name}。${delay}`);
+  return travelRoad(state, id, economyKit);
 }
 
 function visit(state, id) {
-  if (atHome(state)) return refuse('先选一处去向。');
   const site = records.sites[id];
   if (!site || site.region !== state.region || !knowsSite(state, site)) return refuse('你还不知道怎么去那里。');
   if (state.satiety === 0) return refuse('腹中空空，先吃些东西。');
@@ -623,7 +635,7 @@ function revisit(state, id) {
 }
 
 function wait(state) {
-  if (!atHome(state) && state.satiety === 0) return refuse('腹中空空，先吃些东西，或回村歇脚。');
+  if (!isSettlement(state) && state.satiety === 0) return refuse('腹中空空，先吃些东西，或退回住处歇脚。');
   advance(state, rules.waitDays);
   return say(state, '等了半日。');
 }
@@ -690,6 +702,7 @@ function gatherOptions(state, choice, site, index) {
 
 function choiceBlocker(state, choice, site, index) {
   if (completedSiteChoice(state, site, index)) return { reason: '这件事已经办过了。' };
+  if ((state.world.recovery[`${site?.id}:${choice.enemy}`] ?? 0) > state.day) return { reason: '教习收了练兵，先歇一歇再来。' };
   if (site?.creatures?.[choice.enemy] && poolAt(state, site, 'creatures', choice.enemy).count === 0) {
     return { reason: '眼下没有可追的对手。', depleted: true };
   }
@@ -830,7 +843,23 @@ function choose(state, { index, itemId, count }) {
   };
 }
 
+function endSparring(state, enemy) {
+  const combat = state.combat;
+  const siteId = combat?.siteId;
+  state.event = siteId ?? null;
+  state.combat = null;
+  state.focus = 0;
+  state.hp = Math.max(1, Math.floor(stats(state).maxHp * 0.25));
+  advance(state, 0.5);
+  const tournament = tournamentResolution(state, combat, false);
+  if (tournament) state.event = null;
+  else if (siteId) state.world.recovery[`${siteId}:${enemy.id}`] = state.day + 0.5;
+  return say(state, `${enemy.name}在最后一式收手。你坐到场边歇过半日，这场试招输了。${tournament}`);
+}
+
 function fall(state) {
+  const enemy = enemyOf(state);
+  if (inProtectedBout(state)) return endSparring(state, enemy);
   const coinsLost = Math.min(rules.fallMaxCoinLoss, Math.ceil(state.coins * rules.fallCoinLossFactor));
   const lostGoods = Object.fromEntries(Object.entries(state.expeditionLoot).filter(([id]) =>
     records.items[id]?.kind !== 'key' && !records.items[id]?.keepOnFall));
@@ -838,7 +867,7 @@ function fall(state) {
   for (const [id, count] of Object.entries(lostGoods)) removeItem(state, id, Math.min(owns(state, id), count));
   state.expeditionLoot = {};
   state.coins -= coinsLost;
-  state.region = hub;
+  state.region = rescueSettlement(state, economyKit);
   state.event = null;
   state.gathering = null;
   state.combat = null;
@@ -849,28 +878,39 @@ function fall(state) {
   advance(state, rules.fallDays);
   state.hp = Math.ceil(stats(state).maxHp * rules.fallHpFactor);
   state.qi = Math.min(rules.fallQi, stats(state).maxQi);
-  return say(state, `村人把你捎了回来。${coinsLost ? `药费${coinsLost}枚灵钱。` : ''}${dropped ? `路上遗落${dropped}。` : ''}可在村内歇息。`);
+  return say(state, `路人把你送回${regionOf(state).name}。${coinsLost ? `药费${coinsLost}枚灵钱。` : ''}${dropped ? `路上遗落${dropped}。` : ''}可在此歇息。`);
+}
+
+function mechanismFailure(state, { damage = 0, fatal = false }, cause) {
+  const amount = fatal ? state.hp : Math.min(damage, state.hp);
+  if (!amount) return say(state, cause);
+  state.hp -= amount;
+  const fell = state.hp === 0;
+  return { ...(fell ? fall(state) : say(state, cause)), injury: { cause, amount }, fell };
 }
 
 function finishCombat(state, enemy) {
-  const site = records.sites[state.combat.siteId];
+  const combat = state.combat;
+  const site = records.sites[combat.siteId];
+  const protectedBout = inProtectedBout(state);
   if (site?.creatures?.[enemy.id]) {
     spendPool(state, site, 'creatures', enemy.id, 1);
     const wins = (state.siteVictories[site.id] ??= {});
     wins[enemy.id] = (wins[enemy.id] ?? 0) + 1;
   }
+  const tournament = tournamentResolution(state, combat, true);
   state.combat = null;
-  state.event = site?.id ?? null;
+  state.event = tournament ? null : site?.id ?? null;
   const first = !state.defeated.includes(enemy.id);
   if (first) state.defeated.push(enemy.id);
   const insight = first ? (enemy.insight ?? 0) : 0;
   state.insight += insight;
   recordPractice(state);
-  const gathered = { ...enemy.loot };
+  const gathered = protectedBout ? {} : { ...enemy.loot };
   leaveOnGround(state, gathered);
   const loot = goodsText(gathered);
   return {
-    message: `击退${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}`,
+    message: `${protectedBout ? '试招中胜过' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${tournament}`,
     ...(loot ? { gathered, gatheredRegion: state.region, gatheredSite: site?.id } : {}),
   };
 }
@@ -934,6 +974,7 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
   const enemy = enemyOf(state);
   const intent = currentIntent(state);
   const { defense } = stats(state);
+  const training = trainingPerks(state, enemy, intent);
   const traits = combatTraits([
     ...activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), ammo?.trait, ...(ammo?.traits ?? []),
   ], enemy, intent);
@@ -943,9 +984,9 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
     ? Math.max(enemy.def + rules.enemyGuardBonus, Math.ceil(enemy.def * (intent.mult ?? 1)))
     : enemy.def;
   const hunger = hungerAffected && state.satiety === 0 ? rules.emptyAttackMultiplier : 1;
-  const effectiveDamage = Math.floor((damage + weaponDamageBonus + (ammo?.atk ?? 0)) * hunger * crossRealmFactor(state, enemy));
+  const effectiveDamage = Math.floor((damage + weaponDamageBonus + training.damage + (ammo?.atk ?? 0)) * hunger * crossRealmFactor(state, enemy));
   const dealt = damage > 0
-    ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - weaponPierceBonus - (ammo?.pierce ?? 0))) : 0;
+    ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - weaponPierceBonus - training.pierce - (ammo?.pierce ?? 0))) : 0;
   const damageDealt = Math.min(state.combat.hp, dealt + counter);
   const healthBefore = state.hp;
   state.combat.hp -= dealt + counter;
@@ -965,7 +1006,8 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
   } else {
-    const received = Math.max(0, estimatedHit(enemy, intent) - defense - guard - traits.guard - interrupt);
+    const received = Math.max(0, estimatedHit(enemy, intent) - defense - guard - traits.guard - training.guard - interrupt);
+    delete state.combat.spiritGuard;
     if (intent.kind === 'drain') {
       const lostQi = Math.min(state.qi, received);
       state.qi -= lostQi;
@@ -986,22 +1028,25 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
 }
 
 function retreat(state, bonus = 0, lead = '', guard = 0) {
+  if (state.combat?.tournament === tournamentData.id) return tournamentAction(state, 'tournamentWithdraw', economyKit);
   const enemy = enemyOf(state);
   const intent = currentIntent(state);
   const { defense, retreat: retreatBonus } = stats(state);
+  const training = trainingPerks(state, enemy, intent);
   const reduction = clamp(retreatBonus + state.combat.escapeBonus + bonus, 0, 1);
   const received = Math.max(0, Math.ceil(estimatedHit(enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
-    - defense - guard);
+    - defense - guard - training.guard);
   advance(state, rules.retreatDays);
   const charmDamage = retreatBonus > 0 ? wear(state, 'charm') : '';
   const armorDamage = received ? wear(state, 'armor') : '';
   const healthBefore = state.hp;
   state.hp -= received;
-  state.combat = null;
   normalize(state);
   const damageTaken = Math.max(0, healthBefore - state.hp);
   const summary = `${lead}你退出了与${enemy.name}的交手，仍在${regionOf(state).name}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
   say(state, summary);
+  if (state.hp === 0 && inProtectedBout(state)) return { ...endSparring(state, enemy), damageDealt: 0, damageTaken };
+  state.combat = null;
   return { ...(state.hp === 0 ? fall(state) : { ok: true, message: summary }), damageDealt: 0, damageTaken };
 }
 
@@ -1069,7 +1114,7 @@ function inspectBasket(state) {
 function unpackBasket(state) {
   const basket = data.basket;
   if (!basket || !owns(state, basket.item)) return refuse('手边没有药篓。');
-  if (!atHome(state) && state.satiety === 0) return refuse('腹中空空，先吃些东西。');
+  if (!isSettlement(state) && state.satiety === 0) return refuse('腹中空空，先吃些东西。');
   removeItem(state, basket.item, 1);
   state.basketDisposition = 'unpacked';
   advance(state, rules.unpackBasketDays);
@@ -1080,7 +1125,7 @@ function unpackBasket(state) {
 function use(state, id, inCombat) {
   if (records.foods[id] || id === 'beast_meat') return eat(state, inCombat, id);
   if (!owns(state, id)) return refuse('行囊里没有这件物品。');
-  if (id === 'foundation_pill') return refuse('筑基丹要在闭关突破时服下。');
+  if (records.items[id]?.breakthrough) return refuse(`${nameOf(id)}要在闭关突破时服下。`);
   const pill = records.pills[id];
   const talisman = records.talismans[id];
   const entry = pill ?? talisman;
@@ -1112,12 +1157,14 @@ function use(state, id, inCombat) {
     };
   }
   const message = `你催动${nameOf(id)}。`;
-  if (talisman.retreat > 0 && !talisman.damage) return retreat(state, talisman.retreat, message, talisman.guard);
+  const training = trainingPerks(state);
+  const guard = talisman.guard > 0 ? talisman.guard + training.sealGuard : 0;
+  if (talisman.retreat > 0 && !talisman.damage) return retreat(state, talisman.retreat, message, guard);
   state.combat.escapeBonus += talisman.retreat ?? 0;
   return combatTurn(state, {
-    damage: talisman.damage,
+    damage: talisman.damage > 0 ? talisman.damage + training.sealDamage : 0,
     pierce: Infinity,
-    guard: talisman.guard,
+    guard,
     message,
   });
 }
@@ -1178,7 +1225,8 @@ function takeFromGround(state, id, requested) {
 }
 
 function rest(state) {
-  const needsRest = state.hp < stats(state).maxHp || state.qi < stats(state).maxQi || state.wounds || state.toxin || state.pressure;
+  const { maxHp, maxQi } = stats(state);
+  const needsRest = state.hp < maxHp || state.qi < maxQi || state.wounds || state.toxin || state.pressure || needsSenseRest(state);
   const relief = Math.max(0, rules.reliefRations - owns(state, supply));
   if (!needsRest && !relief) return refuse('你已经歇足了。');
   const granted = fittingItems(state, { [supply]: relief }).accepted[supply] ?? 0;
@@ -1188,18 +1236,20 @@ function rest(state) {
   state.toxin -= rules.restToxin;
   state.pressure = 0;
   state.hp += rules.restHp;
-  state.qi += rules.restQi;
+  state.qi += rules.restQi + trainingPerks(state).restQi;
+  const recoveredSense = restoreTrainingSense(state);
   normalize(state);
   if (granted) {
     state.reliefRations += granted;
     addItems(state, { [supply]: granted });
   }
-  return say(state, `在村里歇了半日。${granted ? `灶上匀给你${granted}份${nameOf(supply)}。` : relief ? '行囊已满，拿不了干粮。' : ''}`);
+  return say(state, `在${regionOf(state).name}歇了半日。${recoveredSense ? '神识也养回来了。' : ''}${granted ? `灶上匀给你${granted}份${nameOf(supply)}。` : relief ? '行囊已满，拿不了干粮。' : ''}`);
 }
 
 function learn(state, id) {
   const art = records.arts[id];
   if (!art) return refuse('坊市没有这部术诀。');
+  if (art.prizeOnly && !state.knownArts.includes(id)) return refuse('这门术要由传习人亲自教授。');
   if (!isRevealed(state, art.reveal)) return refuse('你还没有这门术的传承线索。');
   if (state.knownArts.includes(id)) return refuse('你已经掌握了这门术。');
   if (art.tier > state.realm) return refuse('这门术需要更高境界。');
@@ -1421,7 +1471,7 @@ function questBlocker(state, quest) {
 
 function handin(state, id) {
   const quest = records.quests[id];
-  if (!quest || !knowsQuest(state, quest)) return refuse('找不到这份委托。');
+  if (!quest || (quest.region ?? hub) !== state.region || !knowsQuest(state, quest)) return refuse('这里找不到这份委托。');
   if (state.completedQuests.includes(id)) return refuse('这份委托已经交付。');
   const reason = questBlocker(state, quest);
   if (reason) return refuse(reason);
@@ -1489,10 +1539,18 @@ function tryExperiment(state, { id, settings }) {
 }
 
 const economyKit = {
-  data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem,
+  data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem, startCombat,
   missingItems, payItems, hasRoom, backpackSlots, leaveOnGround, groundAt, nameOf, goodsText, normalize,
-  isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend,
+  isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure,
 };
+
+function canUseVillageAction(state, action, payload) {
+  if (action === 'rest') return settlementOf(data, state.region)?.inn;
+  if (atHome(state)) return true;
+  if (!isSettlement(state)) return false;
+  return action === 'breakthrough' || action === 'research' || action === 'handin' ||
+    (action === 'craft' && records.recipes[payload.id]?.result === 'gate_scroll');
+}
 
 const villageActions = {
   rest: (state) => rest(state),
@@ -1531,6 +1589,8 @@ const generalActions = {
 
 const combatActions = {
   attack,
+  tournamentWithdraw: (state) => tournamentAction(state, 'tournamentWithdraw', economyKit),
+  readSpirit: (state) => recordTrainingRead(state, economyKit),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   combatEquip: (state, { id }) => equip(state, id, true),
   guard: (state) => {
@@ -1564,7 +1624,12 @@ function takeTurn(state, action, payload) {
     if (Object.hasOwn(combatActions, action)) return combatActions[action](state, payload);
     return refuse('先处理眼前的对手。');
   }
+  if (action === 'gateScroll') return worldAction(state, action, payload, economyKit);
+  const tournament = tournamentAction(state, action, economyKit);
+  if (tournament) return tournament;
   if (state.event) {
+    const mechanism = mechanismAction(state, action, payload, economyKit);
+    if (mechanism) return mechanism;
     if (action === 'eat') return eat(state, false, payload.id || supply);
     if (action === 'use') return use(state, payload.id, false);
     if (action === 'equip') return equip(state, payload.id);
@@ -1584,13 +1649,13 @@ function takeTurn(state, action, payload) {
     return refuse('先决定如何处理眼前的事。');
   }
   if (Object.hasOwn(villageActions, action)) {
-    if (!atHome(state)) return refuse('这件事要回村办理。');
+    if (!canUseVillageAction(state, action, payload)) return refuse('这个地方办不了这件事。');
     const service = serviceForAction[action];
     if (service && !knowsService(state, service)) return refuse('你还没有找到这个门路。');
     return villageActions[action](state, payload);
   }
   if (Object.hasOwn(generalActions, action)) return generalActions[action](state, payload);
-  return economyAction(state, action, payload, economyKit) ?? alchemyAction(state, action, payload, economyKit) ??
+  return trainingAction(state, action, payload, economyKit) ?? worldAction(state, action, payload, economyKit) ?? economyAction(state, action, payload, economyKit) ?? alchemyAction(state, action, payload, economyKit) ??
     refuse('眼下无法这样做。');
 }
 

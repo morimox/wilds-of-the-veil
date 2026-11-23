@@ -130,6 +130,7 @@ test('foundation payments reveal only the next earned site and the final charge 
   play(state, 'breakthrough');
   assert.equal(view(state).realm.name, '筑基初期');
   assert.equal(state.inventory.foundation_pill, undefined);
-  assert.equal(view(state).nextRealm, null);
+  assert.equal(view(state).nextRealm.name, '筑基中期');
+  assert.ok(view(state).progression.pending.length > 0);
   deny(state, 'econStart', { id: 'r_foundation' });
 });

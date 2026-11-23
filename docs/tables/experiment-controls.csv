@@ -22,3 +22,7 @@
 三圈偏影（align_axis）,偏影观星梁（old_observatory）,shadow,等到梁影,north,压住梁脚,否,反光还差一段才接触到圈心。
 三圈偏影（align_axis）,偏影观星梁（old_observatory）,shadow,等到梁影,center,缩成一线,是,
 三圈偏影（align_axis）,偏影观星梁（old_observatory）,shadow,等到梁影,east,越过第三圈,否,亮斑从梁脚外滚过，三道刻圈仍各在一边。
+两股相背的水（gold_assay）,回水试槽（zhao_assay_tubs）,fall,调落水,pulse,一股推得急些,否,急水从溢口抽进第二道槽，把石泥卷起来。原本要分开的两道浊、清水反而混了。
+两股相背的水（gold_assay）,回水试槽（zhao_assay_tubs）,fall,调落水,even,两侧匀着滴,是,
+两股相背的水（gold_assay）,回水试槽（zhao_assay_tubs）,salt,何时下井盐,cool,瓦胆凉透再下,否,水已经稳了。碰上凉透的瓦胆，井盐只剩一坨小晶，接触到的那一圈水没能凝住。
+两股相背的水（gold_assay）,回水试槽（zhao_assay_tubs）,salt,何时下井盐,warm,趁瓦胆还温便下,是,

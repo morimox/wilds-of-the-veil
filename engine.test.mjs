@@ -101,7 +101,7 @@ function uncoverFerryman(state) {
   return chooseAt(state, 'bank_watch', 1);
 }
 
-const marshLandmarks = ['reed_banks', 'sunk_pack', 'mud_track', 'bank_watch'];
+const marshLandmarks = ['reed_banks', 'sunk_pack', 'mud_track', 'bank_watch', 'undertow_door', 'marsh_pole_lesson'];
 const siteIds = (state) => view(state).sites.map(({ id }) => id);
 const marketStock = (state) => view(state).market.stalls.flatMap(({ offers }) => offers.map(({ id }) => id));
 
@@ -712,7 +712,7 @@ test('the boatman and village smith trade maps that open travel for a beginning 
   feed(reloaded, 70);
   walk(reloaded, 'ridge');
   assert.equal(view(reloaded).realmIndex, 0);
-  assert.deepEqual(siteIds(reloaded), ['ore_rain', 'empty_oven', 'miner_echo', 'rope_run']);
+  assert.deepEqual(siteIds(reloaded), ['ore_rain', 'empty_oven', 'miner_echo', 'rope_run', 'counter_bell_door']);
   assert.equal(act(reloaded, 'travel', { id: 'ford' }).ok, false);
   chooseAt(reloaded, 'ore_rain', 0);
   assert.equal(siteIds(reloaded).includes('stone_niche'), false);
@@ -736,7 +736,7 @@ test('the boatman and village smith trade maps that open travel for a beginning 
   feed(reloaded, 65);
   walk(reloaded, 'ford');
   assert.equal(view(reloaded).realmIndex, 0);
-  assert.deepEqual(siteIds(reloaded), ['low_tide', 'boat_shade', 'flood_lines', 'lock_deck']);
+  assert.deepEqual(siteIds(reloaded), ['low_tide', 'boat_shade', 'flood_lines', 'lock_deck', 'ford_packet_boat', 'ford_below_steps']);
 });
 
 test('the opponent hands over the map and agreed blade only after the spar at that site', () => {
@@ -1622,9 +1622,11 @@ test('a prepared ford expedition opens each later region through field contacts,
   gather('cloud_scree', 'core', 8);
 
   provision();
-  assert.deepEqual(view(state).discovered.filter(id => id !== 'village' && id !== 'hidden'), data.regions.filter(({ id }) => id !== 'village' && id !== 'hidden').map(({ id }) => id));
-  assert.equal(data.regions.filter(({ id }) => id !== 'village').length, 10);
-  assert.ok(data.regions.filter(({ id }) => id !== 'village').every(({ id }) => data.sites.filter(({ region }) => region === id).length >= 3));
+  const legacyRoute = ['marsh', 'ridge', 'ford', 'pine_ridge', 'kiln_valley', 'herb_basin', 'black_mine', 'snow_pass', 'sky_terrace'];
+  assert.deepEqual(view(state).discovered.filter((id) => legacyRoute.includes(id)), legacyRoute);
+  assert.ok(legacyRoute.every((id) => data.sites.filter(({ region }) => region === id).length >= 3));
+  assert.ok(view(state).discovered.includes('zhao_city'));
+  assert.ok(!view(state).discovered.includes('undertow_grotto') && !view(state).discovered.includes('counter_bell'));
   assert.equal(view(state).quests.some(({ id }) => id === 'sky_treaty'), false);
   workForge(state, 'r_snow_halberd');
   play(state, 'equip', { id: 'snow_halberd' });
@@ -1646,7 +1648,7 @@ test('a prepared ford expedition opens each later region through field contacts,
   assert.ok(state.defeated.includes('snow_warden'));
 
   provision();
-  const realm = data.realms.at(-1);
+  const realm = data.realms.find(({ id }) => id === 3);
   state.coins = Math.max(state.coins, realm.cost + 20);
   assert.ok(state.insight >= realm.insight);
   assert.ok(state.practice[2] >= realm.practice);
@@ -1657,7 +1659,7 @@ test('a prepared ford expedition opens each later region through field contacts,
   play(state, 'breakthrough');
   assert.equal(state.realm, 3);
   assert.equal(state.inventory.foundation_pill, undefined);
-  assert.equal(view(state).nextRealm, null);
+  assert.equal(view(state).nextRealm.name, '筑基中期');
 
   for (const id of ['r_sky_bow', 'r_cloud_arrow', 'r_sky_cloak']) workForge(state, id);
   play(state, 'equip', { id: 'sky_bow' });

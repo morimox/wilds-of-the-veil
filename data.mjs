@@ -1,3 +1,10 @@
+import { riverContent, extendSites, extendEvents } from './river-content.mjs';
+import { zhaoContent } from './zhao-content.mjs';
+import { sandContent } from './sand-content.mjs';
+import { lateContent } from './late-content.mjs';
+import { puzzleContent } from './puzzle-content.mjs';
+import { tournamentContent, tournamentData } from './tournament.mjs';
+
 const realms = [
   { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
   { id: 1, name: '炼气中期', hp: 35, qi: 15, atk: 9, def: 3, insight: 14, practice: 5, cost: 18, need: { reed: 6, hide: 2 }, pressure: 0.97, days: 1.5 },
@@ -10,7 +17,7 @@ const items = [
   { id: 'ration', name: '干粮', kind: 'food', price: 3, sell: 1, desc: '用油纸分包的粮饼，饿了就拆一包吃。' },
   { id: 'wood', name: '松木', kind: 'material', price: 3, sell: 1, desc: '干透的松枝和松片。带脂的能引火，削去树皮后可做杆、柄和屋里的架子。' },
   { id: 'reed', name: '灵草', kind: 'material', price: 6, sell: 2, desc: '滩边采的白苇芯或内山长的银脉叶，拣紧实的留下。煎药、炼丹和育苗都用得上。' },
-  { id: 'hide', name: '兽革', kind: 'material', price: 0, sell: 0, desc: '妖物的皮和厚实的雪蜥蜕。带回村处理后可以衬甲、裁绳或搓成弓弦。' },
+  { id: 'hide', name: '兽革', kind: 'material', price: 0, sell: 3, desc: '妖物的皮和厚实的雪蜥蜕。带回据点处理后可以衬甲、裁绳或搓成弓弦，也可卖给收皮商。' },
   { id: 'beast_meat', name: '生兽肉', kind: 'material', price: 0, sell: 0, desc: '刚剖下来的兽肉。带回村用灶煮熟就能做成顶饿的行粮。' },
   { id: 'qi_core', name: '炼气期妖丹', kind: 'material', price: 0, sell: 7, desc: '炼气妖兽或精怪体内凝出的丹核。收货的人肯出钱，丹方也有用它稳火的做法。' },
   { id: 'foundation_core', name: '筑基期妖丹', kind: 'material', price: 0, sell: 21, desc: '筑基妖物的凝成内核。安蒲用它起高阶炉，这一枚也能换不少盘缠。' },
@@ -85,7 +92,7 @@ const items = [
   { id: 'foundation_snow_order', name: '封石之约', kind: 'key', price: 0, sell: 0, desc: '安蒲送来的覆印约。两印相合时才照见碎云雪关短栈外的验药室门缝。' },
   { id: 'foundation_warden_proof', name: '验药室的留火印', kind: 'key', price: 0, sell: 0, desc: '护炉人考过持瓶人之后交出的信物。印背的凹线和另外两印接起来才完整。' },
   { id: 'foundation_charge', name: '封炉药引', kind: 'key', price: 0, sell: 0, desc: '安蒲依三印验出的唯一一剂引火料，在炉里会与其余材料一并耗尽。' },
-  { id: 'foundation_pill', name: '筑基丹', kind: 'key', price: 0, sell: 0, desc: '三火合炼所得的一丸。闭关突破时服用，药力会随吐纳逐步散入经脉。' },
+  { id: 'foundation_pill', name: '筑基丹', kind: 'key', price: 0, sell: 0, breakthrough: true, desc: '三火合炼所得的一丸。闭关突破时服用，药力会随吐纳逐步散入经脉。' },
   { id: 'reed_arrow', name: '削苇箭', kind: 'ammo', price: 2, sell: 1, desc: '苇杆身轻，木镞入不了太厚的甲。' },
   { id: 'iron_arrow', name: '包铁箭', kind: 'ammo', price: 0, sell: 2, desc: '箭镞外面箍了一层薄铁，容易从鳞缝切进去。' },
   { id: 'black_bolt', name: '暗金短矢', kind: 'ammo', price: 0, sell: 2, desc: '矢身比寻常箭短，重心贴着窄镞。专用机弩发射。' },
@@ -391,7 +398,7 @@ const sites = [
   { id: 'pine_ledges', region: 'pine_ridge', name: '背阴的断肩崖', reveal: { item: 'pine_ledge_note' },
     stocks: { wood: { start: 4, cap: 6, interval: 8, growth: 2, depletedFactor: 1.5, choices: [0] } },
     emptyText: '靠里的几道脂槽见底了。石面还有旧挖凿的横痕。' },
-  { id: 'pine_spar', region: 'pine_ridge', name: '索棚拳场',
+  { id: 'pine_spar', region: 'pine_ridge', name: '索棚拳场', protectedArena: true,
     creatures: { road_sparrer: { start: 1, cap: 1, interval: 8, growth: 1 } },
     creatureText: { road_sparrer: { present: '守索人站在草蒲边，把一把奖给胜者的习刀摆在架上。', absent: '这班守索人把钝刀插回门边，等下一班人来换手。' } } },
 
@@ -515,7 +522,7 @@ const events = [
   { id: 'bank_watch', name: '矮石堤', text: '有人在堤边歇脚，腰间别着一张折图，身边的石面上搁着一把钩刃。', choices: [
     { label: '跟拦滩客过招', desc: '「想借图？跟我过两招，赢了连这把备刀也拿去。」', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'bank_runner', outcome: '拦滩客把折图往腰带里紧了紧，横着木杖站稳。' },
     { label: '问他渡工在哪儿', desc: '他顺口提起那张图是河弯的渡工画的。', days: 0, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '他朝木桩浅汊那头一抬下巴。「拐过弯就是刨木滩。他给断桨接新柄呢。」' },
-    { label: '等拦滩客兑现比试的约定', desc: '他解开腰间缚住折图的细绳，招手让你过去。', afterFight: 'bank_runner', days: 0, loot: { ridge_rubbing: 1, hook_blade: 1 }, outcome: '拦滩客把折图和备刀一起推过来。「说过的算数。走到北边倒钟下，细看图上那道岔。」' },
+    { label: '等拦滩客兑现交手的约定', desc: '他解开腰间缚住折图的细绳，招手让你过去。', afterFight: 'bank_runner', days: 0, loot: { ridge_rubbing: 1, hook_blade: 1 }, outcome: '拦滩客把折图和备刀一起推过来。「说过的算数。走到北边倒钟下，细看图上那道岔。」' },
   ] },
   { id: 'drowned_mast', name: '沉桅高埂', text: '断桅斜在桩外。从高埂上往下看，露出水面的石背把浅水分成两股。', choices: [
     { label: '踏上断桅近看', desc: '桅木从高埂斜伸到水面，走到上头能俯看桅根。', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'mast_beast', outcome: '你刚踩上桅杆，缠住桅根的水兽便张开头侧两道鳍。' },
@@ -813,7 +820,7 @@ const enemies = [
   { id: 'mirror_warden', name: '持衡镜灵', tags: ['spirit', 'stoneborn'], tier: 3, hp: 92, atk: 18, def: 7,
     intents: [{ name: '抬印收影', kind: 'guard', mult: 1.45 }, { name: '左影探腕', kind: 'attack', mult: 1.08 }, { name: '梁影横压', kind: 'heavy', mult: 1.65 }, { name: '抽气归镜', kind: 'drain', mult: 0.62 }, { name: '借右影回手', kind: 'attack', mult: 1.14 }],
     insight: 14, loot: { foundation_core: 2 }, desc: '它守印的时候两道影子贴在一起。影子分开以后先试探，再借梁影出重招。' },
-  { id: 'road_sparrer', name: '松场巡索人', tags: ['human'], tier: 1, hp: 40, atk: 10, def: 4,
+  { id: 'road_sparrer', name: '松场巡索人', tags: ['human'], tier: 1, hp: 40, atk: 10, def: 4, sparring: true,
     intents: [{ name: '轻砍试手', kind: 'attack', mult: 1 }, { name: '反腕遮刀', kind: 'guard', mult: 1.3 }, { name: '扣索猛拉', kind: 'heavy', mult: 1.55 }],
     insight: 4, loot: {},
     desc: '在索棚与行人切磋，也得换班巡绳。收住刀锋后还会抄袖内的短索向前猛拉。' },
@@ -922,7 +929,27 @@ const basket = {
 };
 const victoryQuest = 'last_lantern';
 const finalQuest = 'sky_treaty';
-const data = { realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests, services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest };
+const provinces = [
+  { id: 'wuliang', name: '雾梁州', arrival: '芦滩和旧矿岭隔水相望，沿途多渔猎与木工。' },
+  { id: 'zhaoyuan', name: '照原州', arrival: '低堤绕着农田和水市，各家共用一套汛尺。' },
+  { id: 'mingsha', name: '鸣沙州', arrival: '驿道串起盐井和石炉，迎风的山壁会回响。' },
+];
+const regionDetails = { ...riverContent.regionDetails, ...zhaoContent.regionDetails, ...sandContent.regionDetails };
+const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => content.sects ?? []);
+const mechanisms = puzzleContent.mechanisms;
 
-export { data, realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests, services, market, deductions, starting, basket, victoryQuest, finalQuest };
+for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent]) {
+  for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
+    regions, sites, events, enemies, quests, deductions })) {
+    entries.push(...(content[key] ?? []));
+  }
+}
+sites.push(...extendSites);
+events.push(...extendEvents);
+
+const data = { realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
+  services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms, tournament: tournamentData };
+
+export { data, realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
+  services, market, deductions, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms };
 export default data;

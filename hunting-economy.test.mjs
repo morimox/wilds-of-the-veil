@@ -71,10 +71,11 @@ test('a fresh hunt leaves anatomy outside the bag until the player picks what to
   assert.equal(readyHearth(state).level, 0);
   assert.deepEqual(readyHearth(state).projects.map(({ id }) => id), ['simmer_meat_broth']);
   deny(state, 'sell', { id: 'beast_meat' });
-  deny(state, 'sell', { id: 'hide' });
+  play(state, 'sell', { id: 'hide' });
+  assert.equal(state.inventory.hide, 1);
   deny(state, 'buy', { id: 'qi_core' });
   play(state, 'sell', { id: 'qi_core' });
-  assert.equal(state.coins, openingCoins + 7);
+  assert.equal(state.coins, openingCoins + 10);
   assert.equal(state.inventory.qi_core, undefined);
 });
 

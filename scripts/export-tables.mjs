@@ -2,9 +2,11 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import data from '../data.mjs';
-import { createGame, rules } from '../engine.mjs';
+import { createGame, rules, view } from '../engine.mjs';
 import { economyData } from '../economy.mjs';
 import { alchemyData } from '../alchemy.mjs';
+import { localGoods, settlementOf, transportRules } from '../world.mjs';
+import { trainingData } from '../training.mjs';
 
 const output = fileURLToPath(new URL('../docs/tables/', import.meta.url));
 const names = new Map();
@@ -270,7 +272,7 @@ const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMa
     };
   }),
 ]).map((row) => ({ ...row, weapon: name(row.id) }));
-const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay', 'beast_meat', 'qi_core', 'foundation_core', 'beast_eye'].map((id) => ({
+const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay', 'beast_meat', 'qi_core', 'foundation_core', 'gold_core', 'beast_eye'].map((id) => ({
   id, name: name(id),
   pools: worldPools.filter((pool) => pool.kind === '资源' && pool.object === id && pool.growth > 0)
     .map(({ site, label }) => label ? `${siteRef(site)} · ${label}` : siteRef(site)).join('、'),
@@ -280,14 +282,17 @@ const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_c
   projects: economyData.projects.filter(({ need }) => need?.[id]).length,
   exchanges: choices.filter(({ consume, need }) => consume && need?.[id]).length,
   breakthrough: data.realms.filter(({ need }) => need?.[id]).length,
+  training: trainingData.flatMap(({ ranks }) => ranks).filter(({ need }) => need?.[id]).length,
 }));
 const alchemyFormulae = data.recipes.filter(({ formula }) => formula).map((recipe) => {
   const offer = alchemyData.offers.find(({ id }) => id === recipe.formula);
   const step = alchemyData.inquiry.find(({ reward }) => reward?.[recipe.formula]);
   const found = choices.filter(({ loot }) => loot?.[recipe.formula]);
   const handins = data.quests.filter(({ reward }) => reward?.[recipe.formula]).map(({ name }) => name);
+  const fieldTests = experiments.filter(({ reward }) => reward?.[recipe.formula]).map(({ site }) => siteRef(site));
+  const sects = data.sects.filter(({ ranks }) => ranks.some(({ reward }) => reward?.[recipe.formula])).map(({ name }) => name);
   return { id: recipe.formula, name: name(recipe.formula), result: recipe.result, recipe: recipe.id, need: recipe.need,
-    source: offer ? alchemyData.town.name : step?.label ?? [...found.map(({ event, order }) => describeChoice(`${event}:${order - 1}`)), ...handins].join('、'),
+    source: offer ? alchemyData.town.name : step?.label ?? [...found.map(({ event, order }) => describeChoice(`${event}:${order - 1}`)), ...handins, ...fieldTests, ...sects].join('、'),
     price: offer?.price, reveal: offer?.reveal };
 });
 const ruleRows = Object.entries({ ...data.rules, ...rules })
@@ -303,6 +308,43 @@ const foodRows = described(data.foods).map((meal) => {
   const project = meal.grade > 0 ? economyData.projects.find((row) => row.loot?.[meal.id]) : undefined;
   return { ...meal, need: project?.need, level: project?.level, cost: project?.cost, days: project?.days, count: project?.loot[meal.id] };
 });
+const regionRows = data.regions.map((region) => {
+  const { province, x, y, links, portal, array } = data.regionDetails[region.id];
+  return { ...region, province, x, y, links, portal: Boolean(portal), array: Boolean(array),
+    town: settlementOf(data, region.id)?.type };
+});
+const towns = regionRows.filter(({ town }) => town);
+const marketProbe = createGame(15);
+marketProbe.inventory = Object.fromEntries(data.items.map(({ id }) => [id, 1]));
+const localOfferRows = towns.flatMap(({ id: region }) => Object.entries(localGoods(settlementOf(data, region)))
+  .map(([id, offer]) => ({ region, id, name: name(id), ...offer })));
+const localSaleRows = towns.flatMap(({ id: region }) => {
+  marketProbe.region = region;
+  return view(marketProbe).localMarket.buys.map(({ id, price }) => ({ region, id, name: name(id), price }));
+});
+const sectJobs = data.sects.flatMap((sect) => sect.jobs.map((job) => ({ region: sect.region, sect: sect.name, ...job })));
+const sectRanks = data.sects.flatMap((sect) => sect.ranks.map((rank) => ({ region: sect.region, sect: sect.name, ...rank })));
+const trainingRows = trainingData.flatMap(({ ranks, ...track }) => ranks.map((rank, index) => ({ ...track, ...rank, level: index + 1 })));
+const transportRows = [
+  ...transportRules.crossings.map(({ a, b, label, days, item, quest, reason }) => ({ label, a, b, days, item, quest, reason })),
+  { label: '州内门至门', price: transportRules.gatePrice, days: transportRules.gateDays, reason: '亲自认下两端传送门。' },
+  { label: '传送卷轴', days: transportRules.scrollDays, item: 'gate_scroll', reason: '每次使用一张，从任意安全停靠点传往已认门。' },
+  { label: '跨州阵至阵', price: transportRules.arrayPrice, days: transportRules.arrayDays, reason: '两端州阵已修通。' },
+];
+const arrayRows = regionRows.filter(({ array }) => array).map(({ id: region, province }) => ({
+  region, province, ...transportRules.arrayPlans[province],
+}));
+const mechanismRows = (data.mechanisms ?? []).map(({ lead, failure, moves, dials, rewardOnGround, ...record }) => ({
+  ...record, lead: lead?.item, leadText: lead?.text, damage: failure?.damage ?? 0, fatal: failure?.fatal ?? false,
+  moves: moves.map(({ label }) => label), dials: dials?.map(({ name, states }) => `${name}（${states.join('／')}）`),
+}));
+const marketTalkRows = towns.flatMap(({ id: region }) => {
+  const talk = settlementOf(data, region).talk;
+  return talk ? [{ region, ...talk }] : [];
+});
+const matchRows = data.tournament.matches.map((match, index) => ({ ...match, order: index + 1, region: data.tournament.region,
+  lead: data.tournament.lead, fee: data.tournament.fee, days: data.tournament.boutDays, cooldown: data.tournament.cooldown }));
+const tournamentPrizes = data.tournament.prizes.map((prize, wins) => ({ ...prize, wins }));
 
 const tables = [
   table('realms', '境界与突破', data.realms, [
@@ -316,7 +358,7 @@ const tables = [
   table('common-materials', '常用原料跨系统用途', stapleRows, [
     'id', 'name', ['pools', '可回生的现场'], ['enemySources', '解取的对手'],
     ['recipes', '用到的配方数'], ['projects', '用到的后院项目数'], ['facilities', '用到的设施升级数'],
-    ['exchanges', '野外交付选择数'], ['breakthrough', '直接用于突破的境数'],
+    ['exchanges', '野外交付选择数'], ['breakthrough', '直接用于突破的境数'], ['training', '用到的修习级数'],
   ]),
   table('market-offers', '坊市货单', marketOffers, [
     ['stallId', '摊位标识'], ['stallName', '摊位'], 'id', 'name', 'price',
@@ -380,11 +422,34 @@ const tables = [
     ['requiresShownHide', '需给工匠看过兽革'], ['formula', '所需丹方', ref],
     ['facility', '生产设施', facilityRef], ['facilityLevel', '设施最低等级'],
   ]),
-  table('regions', '地区', gated(data.regions), [
-    'id', 'name', ['tier', '威胁参考阶'], ['realmName', '威胁参考境界'], 'travel', 'reveal', 'hint', 'desc',
-  ], { omit: ['draws', 'food'], note: '拿到对应路图或通行信物即可前往。威胁标记只用于内容参考。行走消耗游戏时间和饱腹。' }),
+  table('regions', '三州大地图点位', gated(regionRows), [
+    'id', 'name', ['province', '州', ref], ['x', '横坐标'], ['y', '纵坐标'], ['links', '标定邻路', (ids) => ids.map(ref).join('、')],
+    ['town', '定居点类型'], ['portal', '有普通传送门'], ['array', '有州阵'], ['tier', '威胁参考阶'], ['realmName', '威胁参考境界'], 'travel', 'reveal', 'desc',
+  ], { omit: ['draws', 'food'], note: '图上显示已知道的点。实际可走路线、要花的时间和道具限制由引擎按所在点结算。威胁标记只用于内容参考。' }),
+  table('world-transport', '长程道路、传送门与卷轴', transportRows, [
+    ['label', '交通'], ['a', '起点', ref], ['b', '终点', ref], 'price', 'days', ['item', '道具或凭证', ref], ['quest', '另一路由', ref], ['reason', '使用条件'],
+  ]),
+  table('world-arrays', '州阵修复', arrayRows, ['region', ['province', '州', ref], ['coins', '总需灵钱'], 'need'],
+    { note: '可分批交钱和材料。两端全部修通即可通行。修好后传送时另计路费。' }),
+  table('settlement-goods', '各定居点本地买进货单', localOfferRows, ['region', 'id', 'name', 'price', ['start', '初始存货'], ['cap', '存货上限'], ['interval', '补货间隔（天）'], ['growth', '每次补货量']],
+    { note: '未标每次补货数量时为一件。落灯村的具名货架另见坊市货单。' }),
+  table('settlement-buyback', '各定居点通用卖出价', localSaleRows, ['region', 'id', 'name', ['price', '卖得灵钱（每件）']],
+    { note: '关键物品、装备中的物品与救济干粮的收取限制另行校验。旧坊市专门商人的实际报价见对应表。' }),
+  table('market-talk', '摊上的线索', marketTalkRows, ['region', ['label', '交谈动作'], ['lead', '交付的线索', ref], ['outcome', '摊主所说']]),
+  table('sect-admission', '宗门和入门物资', data.sects.map(({ jobs, ranks, join, ...sect }) => ({ ...sect, ...join })), ['region', 'id', 'name', 'desc', 'need', ['coins', '入门灵钱']]),
+  table('sect-jobs', '宗门差事', sectJobs, ['region', ['sect', '宗门'], 'id', 'name', 'desc', 'need', 'reward', ['coins', '灵钱报酬'], ['credit', '增加功劳'], ['cooldown', '下一单间隔（天）']]),
+  table('sect-awards', '宗门功劳与回报', sectRanks, ['region', ['sect', '宗门'], 'name', ['credit', '功劳门槛'], 'reward', ['art', '传授术诀', ref]]),
+  table('tournament', '守尺观大比', matchRows, ['region', ['order', '场次'], 'name', 'enemy', ['lead', '认得赛帖的证物', ref],
+    ['fee', '每届报名费'], 'days', ['cooldown', '下次报名间隔（天）'], ['note', '对手介绍']],
+    { note: '各轮均由裁判护场。散修也可报名，符合领取条件的奖品可稍后领。' }),
+  table('tournament-prizes', '会比名次回礼', tournamentPrizes, [['wins', '胜场'], 'name', 'reward', ['art', '授予术诀', ref]]),
+  table('training', '修习项目、每阶成本和战力效果', trainingRows, [
+    'id', 'name', ['level', '阶次'], 'region', ['teacher', '传授人物'], ['lead', '发现所需线索', ref], 'need', ['coins', '灵钱'], 'days', ['effect', '本阶效果'],
+    ['hp', '气血上限加成'], ['def', '防御加成'], ['qi', '真气上限加成'], ['restQi', '歇息额外真气'],
+    ['sealDamage', '符伤加成'], ['sealGuard', '符护加成'], ['element', '对应五行单项增量'], ['senseMax', '神识上限'], ['senseGuard', '读势减伤'],
+  ], { note: '同一修习的各阶段效果不叠加，以当前最高一阶为准。消费当前一级所列材料和时间。当地导师才可升级。' }),
   table('region-encounters', '地区内的可选地点', data.sites, [
-    'region', 'id', 'name',
+    'region', 'id', 'name', ['protectedArena', '有人主持并护场'],
     ['afterChoices', '发现路线的具体动作', (keys) => keys.map(describeChoice).join('、')],
     'reveal', ['once', '一次性选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
     ['emptyText', '地点耗尽时可见情形'], ['afterOnceText', '一次性行动后的场景'],
@@ -414,19 +479,23 @@ const tables = [
     'need', 'consume', 'hidden', 'loot', 'enemy', ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
     ['guardedBy', '在场会挡住选择的对手', ref], ['ambush', '有对手时每批采集伏击', ({ enemy, chance }) => `${ref(enemy)} · ${percent(chance)}`],
     ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
-  ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排，指定份数时按所需批次结算。收益先放在原处。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),
+  ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排。每点一次、完成一批，所得先放在当前具体地点。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),
+  table('mechanisms', '现场机关与试错', mechanismRows, [
+    'id', ['site', '现场', siteRef], ['title', '机关'], ['mode', '形式'], 'desc', ['lead', '实际需携带的线索物', ref], ['leadText', '线索内容'],
+    ['moves', '可操作的部件'], ['dials', '实际状态'], ['solution', '开发验收用解法'], ['miss', '误试结果'], ['damage', '误试气血伤害'], ['fatal', '误试是否直接倒下'], 'reward', ['success', '解开的结果'],
+  ]),
   table('basket', '药篓物件操作', basketOptions, [
     ['action', '操作'], 'days', ['spent', '消耗物件', resources], 'loot', ['note', '执行后反馈'],
   ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
   table('enemies', '敌人', enemyRows, [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
-    'def', ['tags', '装备克制标签'], ['insight', '首胜修为'], ['loot', '实际身体掉落', resources], 'desc',
+    'def', ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'], ['loot', '实际身体掉落', resources], 'desc',
   ], { omit: ['intents'], note: '每个普攻取基础攻击乘招式倍率后向上取整。重招另列于意图表。对手守着的草药、矿物、文书与奖品需要在现场另行取得。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
-    'id', 'name', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
+    'id', 'name', 'region', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),
   table('services', '村务发现条件', data.services, [
     'id', 'name', ['public', '开局已有入口'], ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],

@@ -41,3 +41,14 @@ r_resin_pill,温枝丸（resin_pill）,3,1,炼气中期,6,松木（wood）×3、
 r_leaf_pill,清脉饮（leaf_pill）,3,2,炼气后期,10,灵草（reed）×4、耐火泥（kiln_clay）×2、松木（wood）×2、炼气期妖丹（qi_core）×2,3,,,清脉饮丹方（formula_leaf）,炼丹炉（furnace）,2
 r_jade_pill,照心露（jade_pill）,3,3,筑基初期,16,灵草（reed）×5、灵晶（core）×2、松木（wood）×2、筑基期妖丹（foundation_core）×1、妖目（beast_eye）×1,4,,,照心露丹方（formula_jade）,炼丹炉（furnace）,3
 r_foundation,筑基丹（foundation_pill）,1,2,炼气后期,45,封炉药引（foundation_charge）×1、灵草（reed）×8、灵晶（core）×8、暗金（black_iron）×4,4,,,筑基丹方（formula_foundation）,炼丹炉（furnace）,2
+r_gate_scroll,传送卷轴（gate_scroll）,2,0,炼气初期,5,松木（wood）×1、灵草（reed）×1、灵晶（core）×1,0.5,,,导门卷式（gate_scroll_formula）,,
+r_gold_powder,结丹散（gold_powder）,1,5,筑基后期,118,伏潮息泥（heart_silt）×1、井心水盐（stillwell_salt）×1、灵草（reed）×28、灵晶（core）×24、暗金（black_iron）×15、筑基期妖丹（foundation_core）×5,9,,,结丹散合方（gold_formula）,炼丹炉（furnace）,3
+r_weir_knife,迎岸横刀（weir_knife）,,1,炼气中期,29,寒铁（ore）×10、松木（wood）×6、兽革（hide）×3,3,得知物品 倒浪楔（undertow_wedge）,,,锻炉（forge）,2
+r_coil_pole,回烟长杖（coil_pole）,,4,筑基中期,46,寒铁（ore）×12、暗金（black_iron）×8、松木（wood）×10、灵晶（core）×3,5,得知物品 听矿铜簧（echo_tuning_key）,,,锻炉（forge）,2
+r_foil_sword,霜缝剑（foil_sword）,,5,筑基后期,67,寒铁（ore）×17、暗金（black_iron）×12、灵晶（core）×9、筑基期妖丹（foundation_core）×2,6,得知物品 冷炉验火册（cold_kiln_record）,,,锻炉（forge）,3
+r_lake_bow,回湖弓（lake_bow）,,5,筑基后期,60,松木（wood）×16、兽革（hide）×9、灵晶（core）×11、筑基期妖丹（foundation_core）×1,5,得知物品 伏潮漏图（phase_chart）,,,锻炉（forge）,3
+r_gauze_armor,水绡札甲（gauze_armor）,,4,筑基中期,48,兽革（hide）×12、寒铁（ore）×11、灵晶（core）×5,5,得知物品 倒浪楔（undertow_wedge）,,,锻炉（forge）,2
+r_fault_coat,横渊雨衣（fault_coat）,,6,金丹初期,78,兽革（hide）×16、寒铁（ore）×14、暗金（black_iron）×17、金丹期妖丹（gold_core）×2,7,得知物品 结丹散合方（gold_formula）,,,锻炉（forge）,3
+r_coal_tassel,焦灯剑穗（coal_tassel）,,5,筑基后期,58,灵草（reed）×14、松木（wood）×12、灵晶（core）×11、暗金（black_iron）×7,5,得知物品 冷炉验火册（cold_kiln_record）,,,锻炉（forge）,2
+r_clear_needle,照水重矢（clear_needle）,9,3,筑基初期,5,松木（wood）×2、寒铁（ore）×2、灵晶（core）×1,1,得知物品 伏潮漏图（phase_chart）,,,锻炉（forge）,2
+r_gold_salve,缓脉丹（gold_salve）,4,4,筑基中期,20,灵草（reed）×7、兽革（hide）×3、灵晶（core）×4、筑基期妖丹（foundation_core）×1,3,,,缓脉丹方（formula_gold_salve）,炼丹炉（furnace）,3

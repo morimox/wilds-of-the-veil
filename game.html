@@ -13,20 +13,21 @@
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=14" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=15" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
       <header class="topbar">
         <h1>雾渡山河</h1>
         <span class="clock" id="clock"></span>
-        <button type="button" class="top-button" data-help aria-label="帮助">?</button>
+        <button type="button" class="top-button" data-help aria-label="行旅菜单">菜单</button>
       </header>
       <div id="player-status" aria-label="角色状态"></div>
       <main id="main" aria-label="游戏操作区"></main>
       <nav class="navigation" aria-label="其他操作">
         <button type="button" data-tab="journey" hidden>回行旅</button>
         <button type="button" data-tab="village" hidden>村务</button>
+        <button type="button" data-tab="atlas" hidden>山河图</button>
         <button type="button" data-tab="deduction" hidden>沙盘</button>
       </nav>
     </div>
@@ -40,9 +41,15 @@
     <h1 class="intro-title">雾渡山河</h1>
     <button type="button" class="intro-skip" data-skip-opening>跳过</button>
   </section>
+  <section id="transfer" class="transfer" hidden aria-label="传送落点">
+    <div class="transfer-light" aria-hidden="true"></div>
+    <div class="transfer-caption" role="status"><h2></h2><p></p></div>
+    <button type="button" class="intro-skip" data-skip-transfer>跳过</button>
+  </section>
   <div id="notices" class="notices" role="status" aria-live="polite" aria-relevant="additions"></div>
   <dialog id="help" aria-labelledby="guide-title">
-    <div class="dialog-head"><h2 id="guide-title">行旅指南</h2><button type="button" data-close aria-label="关闭指南">×</button></div>
+    <div class="dialog-head"><h2 id="guide-title">行旅菜单</h2><button type="button" data-close aria-label="关闭菜单">×</button></div>
+    <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习账</button></div>
     <ol>
       <li>经过时间就会变饿。打开行囊里的干粮可以吃饭，空腹也能回村。</li>
       <li>点开状态名可以查看它的用途。拿到路图后可以试着走新路。</li>
