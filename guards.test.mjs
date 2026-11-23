@@ -46,6 +46,7 @@ function enter(state, id) {
 }
 
 function defeat(state, index, enemy) {
+  const site = view(state).currentEvent.id;
   feed(state);
   play(state, 'choose', { index });
   assert.equal(view(state).currentEnemy.id, enemy);
@@ -55,7 +56,12 @@ function defeat(state, index, enemy) {
     else if (state.qi >= 4) play(state, 'art', { id: 'bell_strike' });
     else play(state, 'attack');
   }
-  assert.equal(view(state).mode, 'field', state.log.slice(-5).join('\n'));
+  assert.equal(view(state).currentEvent?.id, site, state.log.slice(-5).join('\n'));
+}
+
+function gather(state, index) {
+  play(state, 'beginGather', { index });
+  return play(state, 'finishGather');
 }
 
 function waitUntil(state, day) {
@@ -74,19 +80,17 @@ test('guarded ore stays closed until the last sentry falls, then reopens for a f
   assert.doesNotMatch(choice(state, 3).lockedReason, /持锤矿煞/);
   assert.equal(choice(state, 1).available, true);
   defeat(state, 0, enemy);
-  enter(state, site);
   assert.equal(field(state, site).creatures[enemy], 1);
   assert.match(choice(state, 3).lockedReason, /还有\s*1\s*只/);
-  assert.equal(act(state, 'choose', { index: 3, itemId: 'ore', count: 1 }).ok, false);
+  assert.equal(act(state, 'beginGather', { index: 3 }).ok, false);
   const pendingSpawn = state.localPools[site].creatures[enemy].nextAt;
   defeat(state, 0, enemy);
   const returnTime = state.localPools[site].creatures[enemy].nextAt;
   assert(returnTime > pendingSpawn);
   assert.equal(returnTime - state.day, definition(site).creatures[enemy].interval);
-  enter(state, site);
   assert.equal(choice(state, 3).available, true);
-  play(state, 'choose', { index: 3, itemId: 'ore', count: 1 });
-  enter(state, site);
+  const { gathered } = gather(state, 3);
+  assert.ok(gathered.ore > 0);
   assert.equal(choice(state, 3).available, true);
   play(state, 'leave');
   waitUntil(state, returnTime);
@@ -94,9 +98,8 @@ test('guarded ore stays closed until the last sentry falls, then reopens for a f
   assert.equal(field(state, site).creatures[enemy], 1);
   assert.equal(choice(state, 3).available, false);
   assert.equal(choice(state, 1).available, true);
-  play(state, 'leave');
-  assert.equal(view(state).groundLoot.ore, 1);
-  play(state, 'take', { id: 'ore', count: 1 });
+  assert.equal(view(state).groundLoot.ore, gathered.ore);
+  play(state, 'take', { id: 'ore' });
 });
 
 test('an unguarded shallow pile has independent stock from the deeper deposit', () => {
@@ -112,12 +115,13 @@ test('an unguarded shallow pile has independent stock from the deeper deposit', 
     assert.equal(before[deep], definition(site).stocks[deep].cap);
     assert.equal(choice(state, deepIndex).available, !needsClearance);
     assert.equal(choice(state, openIndex).available, true);
-    play(state, 'choose', { index: openIndex, itemId: material, count: 1 });
-    assert.equal(view(state).mode, 'field');
+    const { gathered } = gather(state, openIndex);
+    assert.ok(gathered[material] > 0);
+    assert.equal(view(state).currentEvent.id, site);
     assert.equal(state.encounterSeed, 0);
-    assert.equal(stocks()[safe], before[safe] - 1);
+    assert.equal(stocks()[safe], before[safe] - gathered[material]);
     assert.equal(stocks()[deep], before[deep]);
-    assert.equal(view(state).groundLoot[material], 1);
+    assert.equal(view(state).groundLoot[material], gathered[material]);
   }
 });
 
@@ -130,17 +134,16 @@ test('a returning kiln hound does not replenish the finite clay in the cabinet',
   assert(guards > 0);
   for (let i = 0; i < guards; i += 1) {
     defeat(state, 0, enemy);
-    enter(state, site);
   }
   const carriedClay = field(state, site).stocks.kiln_clay;
   assert(carriedClay > 0);
-  play(state, 'choose', { index: 4, itemId: 'kiln_clay', count: carriedClay });
+  assert.deepEqual(gather(state, 4).gathered, { kiln_clay: carriedClay });
+  play(state, 'leave');
   waitUntil(state, state.localPools[site].creatures[enemy].nextAt);
   enter(state, site);
   assert.equal(field(state, site).creatures[enemy], 1);
   assert.equal(field(state, site).stocks.kiln_clay, 0);
   defeat(state, 0, enemy);
-  enter(state, site);
   assert.equal(choice(state, 4)?.available ?? false, false);
   assert.equal(field(state, site).stocks.kiln_clay, 0);
 });
@@ -154,13 +157,13 @@ test('a confirmed sentry returning during collection stops the next batch', () =
   state.localPools[site] = { creatures: { [enemy]: { count: 0, nextAt: state.day + 1 } } };
   assert.equal(field(state, site).creatures[enemy], 0);
   assert.equal(choice(state, 3).available, true);
-  const result = play(state, 'choose', { index: 3, itemId: 'ore', count: 4 });
-  assert.deepEqual(result.gathered, { ore: 3 });
+  const result = gather(state, 3);
+  assert.deepEqual(result.gathered, { ore: 3, core: 2 });
   assert.equal(view(state).groundLoot.ore, 3);
   assert.equal(field(state, site).stocks.ore_wall, 1);
   assert.equal(field(state, site).creatures[enemy], 1);
-  enter(state, site);
   assert.equal(choice(state, 3).available, false);
+  assert.equal(act(state, 'beginGather', { index: 3 }).ok, false);
 });
 
 test('encounter-prone harvesting can succeed, get interrupted, or be safe when the population is empty', () => {
@@ -173,7 +176,7 @@ test('encounter-prone harvesting can succeed, get interrupted, or be safe when t
     assert(field(hit, site).creatures[enemy] > 0);
     assert.equal(choice(hit, index).available, true);
     const before = { day: hit.day, insight: hit.insight, stock: field(hit, site).stocks[stock] };
-    const interrupted = play(hit, 'choose', { index, itemId: item, count: 1 });
+    const interrupted = gather(hit, index);
     assert.equal(interrupted.ambush, enemy);
     assert.equal(interrupted.gathered, undefined);
     assert.equal(hit.day - before.day, rules.harvestEncounterDays);
@@ -192,16 +195,17 @@ test('encounter-prone harvesting can succeed, get interrupted, or be safe when t
     const miss = expedition(site, 500);
     enter(miss, site);
     assert(field(miss, site).creatures[enemy] > 0);
-    assert.deepEqual(play(miss, 'choose', { index, itemId: item, count: 1 }).gathered, { [item]: 1 });
-    assert.equal(view(miss).mode, 'field');
+    const normalYield = data.events.find(({ id }) => id === site).choices[index].loot[item];
+    assert.deepEqual(gather(miss, index).gathered, { [item]: normalYield });
+    assert.equal(view(miss).currentEvent.id, site);
 
     const empty = expedition(site, 0);
     enter(empty, site);
     empty.localPools[site] = { creatures: { [enemy]: { count: 0, nextAt: empty.day + 3 } } };
     const initialSeed = empty.encounterSeed;
-    assert.deepEqual(play(empty, 'choose', { index, itemId: item, count: 1 }).gathered, { [item]: 1 });
+    assert.deepEqual(gather(empty, index).gathered, { [item]: normalYield });
     assert.equal(empty.encounterSeed, initialSeed);
-    assert.equal(view(empty).mode, 'field');
+    assert.equal(view(empty).currentEvent.id, site);
   }
 });
 
@@ -212,9 +216,10 @@ test('an ambush in a later batch leaves the first batch on the ground', () => {
   const stock = field(state, site).stocks.reed;
   assert(stock >= 6);
   const started = state.day;
-  const result = play(state, 'choose', { index: 2, itemId: 'reed', count: 6 });
+  assert.deepEqual(gather(state, 2).gathered, { reed: 4 });
+  const result = gather(state, 2);
   assert.equal(result.ambush, 'vine_stag');
-  assert.deepEqual(result.gathered, { reed: 4 });
+  assert.equal(result.gathered, undefined);
   assert.equal(state.day - started, 0.75 + rules.harvestEncounterDays);
   assert.equal(field(state, site).stocks.reed, stock - 4);
   assert.equal(view(state).groundLoot.reed, 4);
@@ -231,7 +236,6 @@ test('wild foxes return slowly at the edges and faster around half full', () => 
   assert.equal(field(state, site).creatures[enemy], pool.cap);
   for (let attempt = 0; field(state, site).creatures[enemy] > 0 && attempt < pool.cap * 2; attempt += 1) {
     defeat(state, 2, enemy);
-    if (field(state, site).creatures[enemy] > 0) enter(state, site);
   }
   assert.equal(field(state, site).creatures[enemy], 0);
   const countAt = (day) => {
@@ -262,16 +266,19 @@ test('the upper grove has a unique leader while the usual deer do not block the 
   assert.equal(choice(state, 2).available, true);
   assert.equal(choice(state, 4), undefined);
   assert.equal(field(state, site).stockDetails.some(({ id }) => id === 'reed_upper'), false);
-  assert.equal(act(state, 'choose', { index: 4, itemId: 'reed', count: 1 }).ok, false);
+  assert.equal(act(state, 'beginGather', { index: 4 }).ok, false);
   assert.equal(field(state, site).creatures.vine_king, 1);
   defeat(state, 3, 'vine_king');
-  enter(state, site);
   assert.equal(field(state, site).creatures.vine_king, 0);
   assert(field(state, site).creatures.vine_stag > 0);
   assert.equal(choice(state, 4).available, true);
   assert(field(state, site).stockDetails.some(({ id }) => id === 'reed_upper'));
   const upper = field(state, site).stocks.reed_upper;
-  assert.deepEqual(play(state, 'choose', { index: 4, itemId: 'reed', count: upper }).gathered, { reed: upper });
+  const first = gather(state, 4).gathered.reed;
+  feed(state);
+  const second = gather(state, 4).gathered.reed;
+  assert.equal(first + second, upper);
+  play(state, 'leave');
   waitUntil(state, state.day + 20);
   enter(state, site);
   assert.equal(field(state, site).creatures.vine_king, 0);
@@ -301,7 +308,6 @@ test('one defeated sentry opens the one-time tool locker even when others remain
   assert.equal(field(state, site).creatures[enemy], 2);
   assert.equal(choice(state, 2), undefined);
   defeat(state, 0, enemy);
-  enter(state, site);
   assert.equal(field(state, site).creatures[enemy], 1);
   assert.equal(choice(state, 2).available, true);
   assert.equal(choice(state, 3).available, false);

@@ -158,8 +158,12 @@ function combinedResources(...lists) {
   return combined;
 }
 
-function groundAt(state) {
-  return state.ground?.[state.region] ?? {};
+function groundPlace(state) {
+  return state.event ?? state.combat?.siteId ?? state.region;
+}
+
+function groundAt(state, place = groundPlace(state)) {
+  return state.ground?.[place] ?? {};
 }
 
 function groundPickupLimit(state, id, available = groundAt(state)[id]) {
@@ -168,13 +172,14 @@ function groundPickupLimit(state, id, available = groundAt(state)[id]) {
 }
 
 function leaveOnGround(state, resources, durability = {}) {
+  const place = groundPlace(state);
   if (Object.keys(resources).length) {
-    (state.ground ??= {})[state.region] = combinedResources(groundAt(state), resources);
+    (state.ground ??= {})[place] = combinedResources(groundAt(state, place), resources);
   }
   for (const [id, count] of resourceEntries(resources)) {
     const gear = records.gear[id];
     if (!gear) continue;
-    const worn = ((state.groundDurability ??= {})[state.region] ??= {});
+    const worn = ((state.groundDurability ??= {})[place] ??= {});
     (worn[id] ??= []).push(...Array(count).fill(durability[id] ?? gear.durability));
   }
 }
@@ -348,6 +353,7 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     practice: {},
     practicedOn: {},
     event: null,
+    gathering: null,
     combat: null,
     selectedAmmo: null,
     expeditionLoot: {},
@@ -470,6 +476,7 @@ function viewSite(state, site) {
         return { id, item, label: pool.label ?? nameOf(item), count, renewable: pool.interval > 0 && pool.growth > 0 };
       }) } : {}),
     ...(visited && site.creatures ? { creatures: poolCounts(state, site, 'creatures') } : {}),
+    hasGroundLoot: Object.keys(groundAt(state, site.id)).length > 0,
   };
 }
 
@@ -574,11 +581,11 @@ export function view(state) {
         ...(completed ? { observation: experiments[id]?.outcome } : {}),
       };
     }),
-    quests: discoveredQuests.map((quest) => ({
-      ...quest,
-      completed: state.completedQuests.includes(quest.id),
-      ready: !homeRequirements(state, 0, quest.need),
-    })),
+    quests: discoveredQuests.map((quest) => {
+      const completed = state.completedQuests.includes(quest.id);
+      const blockedReason = completed ? '' : questBlocker(state, quest);
+      return { ...quest, completed, ready: !completed && !blockedReason, blockedReason };
+    }),
     lastMessage: state.log.at(-1) ?? '',
   };
 }
@@ -693,7 +700,8 @@ function choiceBlocker(state, choice, site, index) {
   }
   const guards = remainingGuards(state, site, choice);
   if (guards > 0) return { reason: `还有 ${guards} 只挡着这条路。` };
-  if (choice.perWin && Object.keys(choice.loot ?? {}).some((id) => records.gear[id] && (gearReserved(state, id) || groundAt(state)[id]))) {
+  if (choice.perWin && Object.keys(choice.loot ?? {}).some((id) => records.gear[id] &&
+      (gearReserved(state, id) || Object.values(state.ground).some((pile) => pile[id])))) {
     return { reason: '同样的奖品已有一份。' };
   }
   if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy)) return { reason: '腹中空空，先吃些东西。' };
@@ -702,6 +710,19 @@ function choiceBlocker(state, choice, site, index) {
   if (Object.keys(missing).length) return { reason: `还缺${goodsText(missing)}。` };
   if (state.coins + coins < 0) return { reason: `还需${-coins}枚灵钱。` };
   return null;
+}
+
+function beginGather(state, index) {
+  const event = records.events[state.event];
+  const site = records.sites[state.event];
+  const choice = event.choices[index];
+  if (!Number.isInteger(index) || !choice || !knowsChoice(state, choice, site) || !choiceStocks(site, choice, index).length) {
+    return refuse('请选择眼前能采的东西。');
+  }
+  const blocker = choiceBlocker(state, choice, site, index);
+  if (blocker) return refuse(blocker.reason);
+  state.gathering = { siteId: site.id, index, days: choice.days };
+  return { ok: true };
 }
 
 function choose(state, { index, itemId, count }) {
@@ -741,7 +762,6 @@ function choose(state, { index, itemId, count }) {
   let ambush = null;
   let completedBatches = 0;
   const coins = choice.coins ?? 0;
-  state.event = null;
   const healthBefore = state.hp;
   for (let batch = 0; batch < batches; batch += 1) {
     if (remainingGuards(state, site, choice) > 0) {
@@ -787,7 +807,12 @@ function choose(state, { index, itemId, count }) {
   const gatheredGoods = goodsText(gathered);
   leaveOnGround(state, gathered);
   const enemy = ambush?.enemy ?? choice.enemy;
-  if (enemy && records.enemies[enemy]) startCombat(state, enemy, site?.id);
+  if (enemy && records.enemies[enemy]) {
+    state.event = null;
+    startCombat(state, enemy, site?.id);
+  } else if (!stocks.length && !Object.keys(spilled).length) {
+    state.event = null;
+  }
   const loot = goodsText(accepted);
   const ambushText = ambush ? ambush.outcome ?? '你正在采集，有东西忽然扑了过来。' : null;
   const outcome = ambushText ?? choice.outcome;
@@ -801,7 +826,7 @@ function choose(state, { index, itemId, count }) {
     injury,
     spilled,
     ...(ambush ? { ambush: ambush.enemy } : {}),
-    ...(gatheredGoods ? { gathered, gatheredRegion } : {}),
+    ...(gatheredGoods ? { gathered, gatheredRegion, gatheredSite: site.id } : {}),
   };
 }
 
@@ -815,6 +840,7 @@ function fall(state) {
   state.coins -= coinsLost;
   state.region = hub;
   state.event = null;
+  state.gathering = null;
   state.combat = null;
   state.pressure = 0;
   state.focus = 0;
@@ -834,6 +860,7 @@ function finishCombat(state, enemy) {
     wins[enemy.id] = (wins[enemy.id] ?? 0) + 1;
   }
   state.combat = null;
+  state.event = site?.id ?? null;
   const first = !state.defeated.includes(enemy.id);
   if (first) state.defeated.push(enemy.id);
   const insight = first ? (enemy.insight ?? 0) : 0;
@@ -844,7 +871,7 @@ function finishCombat(state, enemy) {
   const loot = goodsText(gathered);
   return {
     message: `击退${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}`,
-    ...(loot ? { gathered, gatheredRegion: state.region } : {}),
+    ...(loot ? { gathered, gatheredRegion: state.region, gatheredSite: site?.id } : {}),
   };
 }
 
@@ -1060,6 +1087,7 @@ function use(state, id, inCombat) {
   if (!entry) return refuse('这件物品不能直接使用。');
   if (entry.tier > state.realm) return refuse('你目前承受不了这件物品的效力。');
   if (talisman && !inCombat) return refuse('遇敌时才可催动这道符。');
+  if (pill?.satiety && state.satiety >= rules.maxSatiety) return refuse('你还很饱。');
   removeItem(state, id, 1);
   if (pill) {
     state.hp += pill.hp ?? 0;
@@ -1067,7 +1095,10 @@ function use(state, id, inCombat) {
     state.toxin += pill.toxin ?? 0;
     state.wounds -= pill.wound ?? 0;
     state.focus += pill.focus ?? 0;
-    const { spilled } = addItems(state, { [supply]: pill.food ?? 0 });
+    if (pill.satiety > 0) {
+      state.satiety = Math.min(rules.maxSatiety, state.satiety + pill.satiety);
+      state.didEat = true;
+    }
     normalize(state);
     const toxic = state.toxin >= rules.toxinThreshold;
     const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
@@ -1078,7 +1109,6 @@ function use(state, id, inCombat) {
     return {
       ...result,
       injury: toxinDamage ? { cause: '丹毒发作。', amount: toxinDamage } : undefined,
-      spilled: combinedResources(spilled, result.spilled),
     };
   }
   const message = `你催动${nameOf(id)}。`;
@@ -1124,22 +1154,27 @@ function discard(state, id, count = owns(state, id)) {
   return say(state, `把${nameOf(id)}放到地上。`);
 }
 
-function takeFromGround(state, id, count = groundAt(state)[id]) {
+function takeFromGround(state, id, requested) {
   const ground = groundAt(state);
-  if (!records.items[id] || !Number.isSafeInteger(count) || count < 1 || count > (ground[id] ?? 0)) return refuse('这里没有这么多东西可捡。');
+  const available = ground[id] ?? 0;
+  if (!records.items[id] || available < 1 || (requested !== undefined &&
+      (!Number.isSafeInteger(requested) || requested < 1 || requested > available))) return refuse('这里没有这么多东西可捡。');
   const gear = records.gear[id];
   if (gear && gearReserved(state, id)) return refuse('同名装备已在手上、仓里或锻炉里。');
   const maximum = groundPickupLimit(state, id);
+  const count = requested ?? maximum;
   if (count > maximum) return refuse(maximum ? `行囊只装得下${maximum}份。` : '行囊已满。');
+  if (!count) return refuse('行囊已满。');
   ground[id] -= count;
   if (!ground[id]) delete ground[id];
   const picked = { [id]: count };
   addItems(state, picked, true);
   if (gear) {
-    const worn = state.groundDurability?.[state.region]?.[id];
+    const worn = state.groundDurability?.[groundPlace(state)]?.[id];
     state.durability[id] = worn?.shift() ?? gear.durability;
   }
-  return say(state, `拾起${goodsText(picked)}。`);
+  return { ...say(state, `拾起${goodsText(picked)}。`),
+    ...(requested === undefined && ground[id] ? { leftOnGround: { [id]: ground[id] } } : {}) };
 }
 
 function rest(state) {
@@ -1375,13 +1410,21 @@ function repair(state, id) {
   return say(state, `修好${nameOf(id)}，耐久已满。`);
 }
 
+function questBlocker(state, quest) {
+  if (quest.requireQuest && !state.completedQuests.includes(quest.requireQuest)) {
+    return quest.waitForQuest ?? `先办完「${records.quests[quest.requireQuest].name}」。`;
+  }
+  const missing = homeRequirements(state, 0, quest.need);
+  if (missing) return missing;
+  return hasRoom(state, quest.reward, homeBagSpend(state, quest.need)) ? '' : '行囊已满，放不下回礼。';
+}
+
 function handin(state, id) {
   const quest = records.quests[id];
   if (!quest || !knowsQuest(state, quest)) return refuse('找不到这份委托。');
   if (state.completedQuests.includes(id)) return refuse('这份委托已经交付。');
-  const missing = homeRequirements(state, 0, quest.need);
-  if (missing) return refuse(missing);
-  if (!hasRoom(state, quest.reward, homeBagSpend(state, quest.need))) return refuse('行囊已满，放不下回礼。');
+  const reason = questBlocker(state, quest);
+  if (reason) return refuse(reason);
   spendHome(state, 0, quest.need);
   addItems(state, quest.reward);
   state.coins += quest.coins ?? 0;
@@ -1505,6 +1548,13 @@ const combatActions = {
 };
 
 function takeTurn(state, action, payload) {
+  if (state.gathering) {
+    if (action !== 'finishGather') return refuse('这次采集还没结束。');
+    const { siteId, index } = state.gathering;
+    state.gathering = null;
+    if (state.event !== siteId) return refuse('已经离开这处采集点。');
+    return choose(state, { index });
+  }
   if (state.victoryPending) {
     if (action !== 'resume') return refuse('收好这段游记，即可继续出门。');
     state.victoryPending = false;
@@ -1516,7 +1566,15 @@ function takeTurn(state, action, payload) {
   }
   if (state.event) {
     if (action === 'eat') return eat(state, false, payload.id || supply);
+    if (action === 'use') return use(state, payload.id, false);
+    if (action === 'equip') return equip(state, payload.id);
+    if (action === 'unequip') return unequip(state, payload.slot);
+    if (action === 'inspectBasket') return inspectBasket(state);
+    if (action === 'unpackBasket') return unpackBasket(state);
     if (action === 'selectAmmo') return selectAmmo(state, payload.id);
+    if (action === 'take') return takeFromGround(state, payload.id, payload.count);
+    if (action === 'discard') return discard(state, payload.id, payload.count);
+    if (action === 'beginGather') return beginGather(state, payload.index);
     if (action === 'choose') return choose(state, payload);
     if (action === 'experiment') return tryExperiment(state, payload);
     if (action === 'leave') {

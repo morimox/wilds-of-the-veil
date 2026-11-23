@@ -53,19 +53,6 @@ function linkButton(label, action, value = "", tone = "", disabled = false, coun
   return `<button type="button" class="button ${tone}" data-action="${action}" data-value="${escape(value)}"${count > 1 ? ` data-count="${count}"` : ""}${disabled ? " disabled" : ""}>${escape(label)}</button>`;
 }
 
-function quantityForm(action, value, item, label, { maximum, suggested = 1, showLimit = false, disabled = false }) {
-  const gathering = action === "choose";
-  const locked = disabled || maximum < 1;
-  const initial = locked ? 0 : Math.min(suggested, maximum);
-  const inputLabel = gathering ? `${label}的采集数量` : `拾取${item.name}的数量`;
-  return `<form class="quantity-action" data-quantity="${action}" data-value="${escape(value)}" data-item-id="${escape(item.id)}">
-    <label class="quantity-label">${gathering ? '<span class="fine">数量</span>' : ""}
-      <input type="number" name="count" aria-label="${escape(inputLabel)}" inputmode="numeric" min="1" max="${Math.max(1, maximum)}" step="1" value="${initial}" required${locked ? " disabled" : ""}>
-    </label>
-    ${showLimit && !locked ? `<span class="fine quantity-limit">最多 ${maximum}</span>` : ""}
-    <button type="submit" class="button${gathering ? "" : " quiet"}"${locked ? " disabled" : ""}>${escape(label)}</button>
-  </form>`;
-}
 
 function tabButton(label, tab) {
   return `<button type="button" class="button quiet" data-tab="${tab}">${escape(label)}</button>`;
@@ -191,7 +178,7 @@ function siteResources(s, site) {
 
 function siteList(s) {
   return `<div class="site-list">${(s.sites ?? []).map(site => {
-    const stateText = siteResources(s, site);
+    const stateText = [siteResources(s, site), site.hasGroundLoot && "留有物品"].filter(Boolean).join(" · ");
     return `<div class="site-row">${linkButton(site.name, "visit", site.id, "", s.satiety <= 0)}${stateText ? `<span class="fine">${escape(stateText)}</span>` : ""}</div>`;
   }).join("")}</div>`;
 }
@@ -227,17 +214,16 @@ function eventScreen(s) {
   const local = (s.sites ?? []).find(site => site.id === event.id);
   const painted = ["marsh", "ridge", "ford", "hidden"].includes(s.region.id);
   const resources = siteResources(s, local);
+  const gathering = s.gathering;
   const choices = s.visibleChoices.map(choice => {
     const cue = publicText(choice.desc);
     const blocker = choice.lockedReason;
-    const gathers = choice.gather ?? [];
-    const controls = choice.available && gathers.length ? gathers.map(item => quantityForm("choose", choice.index, item,
-      gathers.length === 1 ? choice.label : `${choice.label} · ${item.name}`,
-      { ...item, showLimit: true })).join("") :
-      linkButton(choice.label, "choose", choice.index, "", choice.available === false);
+    const active = gathering?.index === choice.index;
+    const button = linkButton(choice.label, choice.gather?.length ? "beginGather" : "choose", choice.index, "", Boolean(gathering) || !choice.available);
     return `<div class="choice">
       ${cue ? `<p class="choice-cue">${escape(cue)}</p>` : ""}
-      ${controls}
+      ${button}
+      ${active ? '<div class="gather-progress"><span aria-live="polite">采集中…</span><progress max="1" value="0" aria-label="采集进度" data-gather-progress tabindex="-1"></progress></div>' : ""}
       ${blocker ? `<p class="choice-blocker">${escape(blocker)}</p>` : ""}
     </div>`;
   }).join("");
@@ -245,8 +231,8 @@ function eventScreen(s) {
     <p class="intro">${escape(publicText(event.text))}</p>
     ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
     <div class="choice-list">${choices}</div>
-    ${s.experiment ? experimentForm(s.experiment) : ""}
-    <div class="actions">${linkButton("离开", "leave", "", "quiet")}</div>`, tag(s.region.name));
+    ${s.experiment ? `<fieldset class="event-experiment"${gathering ? " disabled" : ""}>${experimentForm(s.experiment)}</fieldset>` : ""}
+    <div class="actions">${linkButton("离开", "leave", "", "quiet", Boolean(gathering))}</div>`, tag(s.region.name));
 }
 
 function thoughtDetails(thought) {
@@ -336,9 +322,9 @@ function itemSlot(item, location, description, actions = "", label = "", count =
 }
 
 function pack(s) {
-  const canEquip = inVillage(s) || s.mode === "field";
+  const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event";
   const canUse = canEquip || s.mode === "combat";
-  const canEat = canUse || s.mode === "event";
+  const canEat = canUse;
   const canRepair = inVillage(s) && s.services?.includes("workshop");
   const worn = Object.entries(s.equipment).filter(([, id]) => id).map(([slot, id]) => {
     const gear = data.gear.find(row => row.id === id);
@@ -383,9 +369,11 @@ function pack(s) {
     const item = itemRows[id];
     const gear = data.gear.find(row => row.id === id);
     const maximum = s.groundPickup?.[id] ?? 0;
+    const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
+    const cue = maximum ? `${label} · ${item.name}` : gear ? `${item.name}暂时拿不了` : `${item.name} · 行囊已满`;
     return `<div class="ground-row">
       ${itemSlot(item, "ground", gear ? gearDescription(item, gear) : item.desc, "", "", count)}
-      ${quantityForm("take", id, item, maximum ? "拾起" : "拿不了", { maximum, showLimit: maximum < count })}
+      <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
     </div>`;
   }) : [];
   const meter = Array.from({ length: s.backpackCapacity }, (_, i) => `<i${i < s.backpackUsed ? ' class="filled"' : ""}></i>`).join("");
@@ -584,10 +572,10 @@ function questBoard(s) {
   const list = visibleQuests(s);
   return panel("委托", `<div class="card-grid">${list.map(row => {
     const done = questDone(s, row);
-    const unmet = !hasSupply(s, row.need);
-    return card(row.name, row.desc,
+    const note = !done && row.blockedReason ? ` ${row.blockedReason}` : "";
+    return card(row.name, row.desc + note,
       done ? tag("已交付", "off") : "",
-      done ? "" : linkButton(unmet ? "材料不足" : row.id === "lost_basket_return" ? "交还药篓" : "交付", "handin", row.id, "primary", unmet), "", row.need);
+      done ? "" : linkButton(row.ready ? "交付" : "暂不能交付", "handin", row.id, "primary", !row.ready), "", row.need);
   }).join("")}</div>`);
 }
 
@@ -639,6 +627,9 @@ function render() {
   document.querySelector("#clock").textContent = `第${Math.floor(s.day)}日 · ${s.day % 1 < 0.5 ? "白昼" : "夜里"}`;
   document.querySelector("#player-status").innerHTML = stats(s);
   kit.innerHTML = pack(s);
+  for (const button of document.querySelectorAll("#player-status [data-action], #kit [data-action]")) {
+    if (s.gathering) button.disabled = true;
+  }
   for (const button of document.querySelectorAll(".navigation button")) {
     button.hidden = inEncounter || button.dataset.tab === tab || !available[button.dataset.tab];
   }
@@ -719,19 +710,21 @@ function feedback(before, after, result, action) {
   narrative = publicText(narrative).replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
   if (gathered) {
-    const region = result.gatheredRegion && result.gatheredRegion !== after.region
-      ? data.regions.find(({ id }) => id === result.gatheredRegion)?.name
+    const place = result.gatheredRegion && result.gatheredRegion !== after.region
+      ? data.sites.find(({ id }) => id === result.gatheredSite)?.name ?? data.regions.find(({ id }) => id === result.gatheredRegion)?.name
       : "脚边";
-    lines.push(`${action === "choose" ? "采到" : "战利品"}${gathered}，留在${region ?? "原处"}。`);
+    lines.push(`${["choose", "finishGather"].includes(action) ? "采到" : "战利品"}${gathered}，留在${place ?? "原处"}。`);
   }
   if (goods.length) lines.push(`${picking ? "拾起" : "获得"}${goods.map(item => `${item.name} ×${after.inventory[item.id] - (before.inventory[item.id] ?? 0)}`).join("、")}。`);
+  if (result.leftOnGround) lines.push(`行囊装不下剩下的，${supplies(result.leftOnGround)}留在脚边。`);
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
   const didRecover = ["choose", "eat", "use", "rest"].includes(action) && after.hp > before.hp && !result.injury;
   const changes = [
     didRecover && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
     after.qi > before.qi && ["choose", "use", "rest"].includes(action) && !narrative.includes("真气") && "真气恢复",
     after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
-    after.satiety > before.satiety && action === "eat" && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
+    after.satiety > before.satiety && ["eat", "use"].includes(action) && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
+    action === "finishGather" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     action === "travel" && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
     after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",
     after.coins < before.coins && ["alchemyBuyFormula", "alchemyAdvance"].includes(action) && `付出 ${before.coins - after.coins} 灵钱`,
@@ -754,9 +747,36 @@ function performAction(action, payload) {
   if (["travel", "visit", "choose", "leave", "revisit", "resume"].includes(action)) screen = "journey";
   if (action === "travel" || action === "discard" || action === "take" || action === "equip" || action === "unequip") selectedItem = null;
   render();
+  if (action === "beginGather" && result.ok) {
+    runGatherProgress(state.gathering);
+    return;
+  }
   const lines = feedback(before, state, result, action);
   showNotice(lines, Boolean(result.injury || result.damageTaken || !result.ok));
   if (["travel", "visit", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
+}
+
+function runGatherProgress(job) {
+  const bar = main.querySelector("[data-gather-progress]");
+  const duration = Math.max(750, job.days * 2000);
+  const startedAt = performance.now();
+  bar.focus({ preventScroll: true });
+  function tick(now) {
+    if (state.gathering !== job) return;
+    bar.value = Math.min(1, (now - startedAt) / duration);
+    if (bar.value < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+  setTimeout(() => {
+    if (state.gathering !== job) return;
+    const restoreFocus = document.activeElement === bar;
+    performAction("finishGather");
+    if (restoreFocus && state.event === job.siteId) {
+      const next = main.querySelector(`[data-action="beginGather"][data-value="${job.index}"]:enabled`) ??
+        main.querySelector('[data-action="leave"]');
+      next?.focus({ preventScroll: true });
+    }
+  }, duration);
 }
 
 function readDeduction(form) {
@@ -777,15 +797,8 @@ document.addEventListener("input", event => {
 
 document.addEventListener("submit", event => {
   const form = event.target;
-  if (!form.matches("[data-deduction], [data-experiment], [data-quantity]")) return;
+  if (!form.matches("[data-deduction], [data-experiment]")) return;
   event.preventDefault();
-  if (form.dataset.quantity) {
-    const { quantity: action, value, itemId } = form.dataset;
-    const count = Number(new FormData(form).get("count"));
-    const payload = action === "choose" ? { index: Number(value), itemId, count } : { id: value, count };
-    performAction(action, payload);
-    return;
-  }
   if (form.dataset.deduction) {
     const guess = readDeduction(form);
     activeDeduction = guess.id;
@@ -863,8 +876,8 @@ document.addEventListener("click", event => {
   const action = button.dataset.action;
   if (!action) return;
   const value = button.dataset.value;
-  const payload = action === "choose" ? { index: Number(value) } :
-    action === "unequip" ? { slot: value } : { id: value, count: Number(button.dataset.count ?? 1) };
+  const payload = ["choose", "beginGather"].includes(action) ? { index: Number(value) } :
+    action === "unequip" ? { slot: value } : action === "take" ? { id: value } : { id: value, count: Number(button.dataset.count ?? 1) };
   performAction(action, payload);
 });
 

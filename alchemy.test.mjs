@@ -30,10 +30,12 @@ test('bringing a real herb to the apprentice introduces the alchemist and a boug
   assert.equal(view(state).alchemy, null);
   deny(state, 'alchemyBuyFormula', { id: 'formula_qi' });
   play(state, 'travel', { id: 'marsh' });
-  enter(state, 'reed_banks', 0);
-  closeScene(state);
+  play(state, 'visit', { id: 'reed_banks' });
+  play(state, 'beginGather', { index: 0 });
+  play(state, 'finishGather');
   assert.equal(state.inventory.reed, undefined);
-  play(state, 'take', { id: 'reed', count: 1 });
+  play(state, 'take', { id: 'reed' });
+  closeScene(state);
   play(state, 'travel', { id: 'village' });
   play(state, 'handin', { id: 'reed_salve' });
   assert.ok(view(state).alchemy.offers.some((offer) => offer.id === 'formula_qi'));

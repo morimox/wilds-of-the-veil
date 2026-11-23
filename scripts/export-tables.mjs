@@ -19,7 +19,7 @@ const titles = {
   desc: '说明', hp: '气血', qi: '真气', atk: '攻击', def: '防御', insight: '修为',
   cost: '费用', need: '所需物品', days: '时间（天）', kind: '类别', slot: '装备部位',
   retreat: '脱身减伤加成', durability: '最大耐久', repair: '修理费（灵钱）',
-  food: '干粮', toxin: '丹毒变化', wound: '消除伤势', focus: '定息层数', damage: '固定伤害',
+  toxin: '丹毒变化', wound: '消除伤势', focus: '定息层数', damage: '固定伤害',
   guard: '额外防御', power: '攻击修正', pierce: '破甲', break: '削减重招伤害',
   reveal: '发现条件', result: '产物', count: '数量', travel: '行程（天）',
   hint: '线索提示', text: '正文', label: '选项', coins: '灵钱', loot: '所得物品',
@@ -357,9 +357,9 @@ const tables = [
     'id', 'name', ['grade', '料理档次'], ['satiety', '食用恢复饱腹'], ['hp', '食用恢复气血'],
     ['level', '备粮灶等级'], 'need', 'count', ['cost', '每批费用（灵钱）'], 'days',
   ], { note: '生兽肉须带回备粮灶。恢复值按角色当下上限封顶。干粮也可向摊主买，备粮灶的两种干粮制法列于后院项目。' }),
-  table('pills', '丹药', gated(described(data.pills)), [
-    'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['food', '获得干粮'], 'toxin', 'wound', 'focus',
-  ], { note: '筑基丹用于突破，实际制作配方和各阶段成本见筑基丹访查及制作用方。' }),
+  table('pills', '丹药', gated(described(data.pills.map((pill) => ({ satiety: 0, ...pill })))), [
+    'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['satiety', '食用恢复饱腹'], 'toxin', 'wound', 'focus',
+  ], { note: '暖谷丸吃下后直接补饱腹，饱腹按上限封顶。筑基丹用于突破，实际制作配方和各阶段成本见筑基丹访查及制作用方。' }),
   table('alchemy-formulas', '丹方与取得方式', alchemyFormulae, [
     'id', 'name', 'result', ['recipe', '制法标识'], ['source', '来源'], ['price', '丹方买价（灵钱）'],
     ['reveal', '丹师愿出示前提', ref], 'need',
@@ -426,7 +426,7 @@ const tables = [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
-    'id', 'name', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '前置委托', ref], 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
+    'id', 'name', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),
   table('services', '村务发现条件', data.services, [
     'id', 'name', ['public', '开局已有入口'], ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],

@@ -30,6 +30,7 @@ function hunt(state, site, foe, art) {
   }
   assert.equal(state.combat, null);
   assert.ok(state.defeated.includes(foe));
+  assert.equal(view(state).currentEvent?.id, site);
 }
 
 function readyHearth(state) {
@@ -60,10 +61,11 @@ test('a fresh hunt leaves anatomy outside the bag until the player picks what to
   assert.equal(view(state).groundLoot.beast_meat, 1);
   assert.equal(state.expeditionLoot.beast_meat, 1);
   assert.equal(state.inventory.qi_core, undefined);
-  play(state, 'take', { id: 'qi_core', count: 1 });
-  play(state, 'take', { id: 'hide', count: 2 });
+  play(state, 'take', { id: 'qi_core' });
+  play(state, 'take', { id: 'hide' });
   deny(state, 'use', { id: 'beast_meat' });
 
+  play(state, 'leave');
   play(state, 'travel', { id: 'village' });
   assert.deepEqual(view(state).groundLoot, {});
   assert.equal(readyHearth(state).level, 0);
@@ -98,10 +100,11 @@ test('the renewable snow beast yields two foundation cores that sell for 21 each
   assert.equal(state.coins, openingCoins);
   assert.deepEqual(state.inventory, { ration: 14, sky_sword: 1, sky_cloak: 1, jade_pendant: 1 });
   assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4, beast_eye: 1, foundation_core: 2 });
-  play(state, 'take', { id: 'foundation_core', count: 2 });
-  play(state, 'take', { id: 'beast_eye', count: 1 });
+  play(state, 'take', { id: 'foundation_core' });
+  play(state, 'take', { id: 'beast_eye' });
   assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4 });
 
+  play(state, 'leave');
   const population = () => view(state).sites.find(({ id }) => id === 'white_ravine').creatures.snow_warden;
   const interval = data.sites.find(({ id }) => id === 'white_ravine').creatures.snow_warden.interval;
   const dayWon = state.day;
