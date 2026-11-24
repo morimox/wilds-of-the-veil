@@ -24,9 +24,9 @@ export const explorerKitContent = {
     { id: 'side_hook', slot: 'offhand', weaponClass: 'blade', tier: 0, sideAtk: 4, sidePierce: 1, sideGuard: 2, durability: 30, repair: 5,
       entry: '副手握住短钩，交手时可以单独出钩，主兵不用换下。钩尖能探进护甲的接缝，回钩时也能顺手护住手腕。' },
     { id: 'anvil_hammer', slot: 'weapon', weaponClass: 'hammer', tier: 2, atk: 7, chargeRequired: true, chargePierce: 2, durability: 46, repair: 12,
-      entry: '单手使的重锤。得先沉肩蓄势才能出锤。铁角砸得实，有机会砸开坚硬的护甲。' },
+      entry: '单手使的重锤。第一回合沉肩蓄势，下一回合才能出锤。用另一只手出招前得先收势；挨上一记够重的来招也会散劲。铁角砸得实，有机会砸开硬甲。' },
     { id: 'scale_chisel', slot: 'offhand', weaponClass: 'blade', tier: 4, sideAtk: 7, sidePierce: 3, chargeRequired: true, durability: 42, repair: 10,
-      entry: '副手持凿。要先扎稳蓄势，再把窄刃送进甲缝，主兵仍留在另一只手上。' },
+      entry: '副手持凿。第一回合扎稳蓄势，下一回合再把窄刃送进甲缝。想改用主兵要先收势；挨上一记够重的来招也会散劲。' },
   ],
   recipes: [
     { id: 'r_reed_hat', result: 'reed_hat', tier: 0, reveal: { item: 'reed' },

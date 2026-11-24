@@ -73,17 +73,19 @@ test('a perceptive weapon changes a real first draw without exposing or rerollin
 });
 
 test('a read gives a human the actual chosen action, and persistent attacks still draw replies', () => {
-  const state = staged('sand_basket_mender', { realm: 7, items: ['tide_coat'], seed: seedBetween(0.05, 0.09) });
+  const seed = seedBetween(0.05, 0.09);
+  const state = staged('sand_basket_mender', { realm: 7, items: ['tide_coat', 'anvil_hammer'], seed });
   assert.equal(act(state, 'selectAmmo', { id: 'bad_ammo' }).ok, false);
   assert.equal(view(state).combatRead, 'enemy');
   assert.equal(view(state).intent, null);
   assert.equal(view(state).retreatRisk, null);
-  const wards = structuredClone(state);
-  const charging = play(state, 'focus');
+  const charging = play(state, 'attack');
   assert.match(charging.message, /看破了你的起手/);
   assert.ok(['attack', 'heavy'].includes(charging.enemyMove.kind));
-  assert.equal(view(state).combatCharge, false);
+  assert.equal(charging.damageDealt, charging.reflectedDamage);
+  assert.equal(view(state).chargingWeapon, null);
 
+  const wards = staged('sand_basket_mender', { realm: 7, items: ['tide_coat'], seed });
   const replies = [];
   for (let turn = 0; wards.combat && turn < 16; turn++) {
     const result = play(wards, 'attack');
@@ -117,21 +119,29 @@ test('opponents with the same observations answer the same action even when the 
   assert.notEqual(first, strong.combat.observedHits[1].damage);
 });
 
-test('a safe charge spends time and strengthens exactly the next damaging attack', () => {
-  const state = staged('ford_shale_crab');
+test('a safe charge takes two turns and wears the selected weapon only on release', () => {
+  const state = staged('ford_shale_crab', { realm: 2, items: ['anvil_hammer'] });
   const start = state.day;
-  const result = play(state, 'focus');
+  const durability = state.durability.anvil_hammer;
+  const result = play(state, 'attack');
   assert.equal(result.enemyMove.kind, 'guard');
   assert.equal(state.day - start, rules.battleDays);
-  assert.equal(view(state).combatCharge, true);
-  const seed = state.combatSeed;
-  assert.equal(act(state, 'focus').ok, false);
-  assert.equal(state.combatSeed, seed);
-  const plain = structuredClone(state);
-  plain.combat.playerCharged = false;
-  const bonus = Math.max(rules.combatChargeFloor, Math.ceil(view(state).attack * rules.combatChargeFactor));
-  assert.equal(play(state, 'attack').damageDealt - play(plain, 'attack').damageDealt, bonus);
-  assert.equal(view(state).combatCharge, false);
+  assert.equal(result.damageDealt, 0);
+  assert.equal(state.durability.anvil_hammer, durability);
+  assert.deepEqual(view(state).chargingWeapon, { slot: 'weapon', id: 'anvil_hammer', name: '短柄砧锤' });
+  const release = play(state, 'attack');
+  assert.ok(release.damageDealt > 0);
+  assert.equal(state.day - start, 2 * rules.battleDays);
+  assert.equal(state.durability.anvil_hammer, durability - 1);
+  assert.equal(view(state).chargingWeapon, null);
+
+  const ordinary = staged('ford_shale_crab', { realm: 2, items: ['iron_sword'] });
+  const ordinaryStart = ordinary.day;
+  const hit = play(ordinary, 'attack');
+  assert.ok(hit.damageDealt > 0);
+  assert.equal(ordinary.day - ordinaryStart, rules.battleDays);
+  assert.equal(ordinary.durability.iron_sword, gear.iron_sword.durability - 1);
+  assert.equal(view(ordinary).chargingWeapon, null);
 });
 
 test('reflection requires a successful close hit and works through the normal victory settlement', () => {
@@ -204,26 +214,96 @@ test('both ordinary and charge-only weapons can be paired and selected in either
   assert.equal(view(hammer).combatOffhand.name, '系绳短钩');
   assert.equal(view(hammer).combatWeapon.chargeRequired, true);
   assert.equal(view(hammer).fogTolerance, rules.pressureThreshold + 1);
-  const start = hammer.day;
-  assert.equal(act(hammer, 'attack').ok, false);
-  assert.equal(hammer.day, start);
   const prepared = structuredClone(hammer);
   const quick = play(hammer, 'offhandAttack');
   assert.ok(quick.damageDealt > 0);
   assert.equal(hammer.durability.anvil_hammer, gear.anvil_hammer.durability);
   assert.equal(hammer.durability.side_hook, gear.side_hook.durability - 1);
-  play(prepared, 'focus');
+  assert.equal(play(prepared, 'attack').damageDealt, 0);
+  const pending = structuredClone(prepared);
+  assert.equal(act(prepared, 'offhandAttack').ok, false);
+  assert.deepEqual(prepared, pending);
   const heavy = play(prepared, 'attack');
   assert.ok(heavy.damageDealt > quick.damageDealt);
-  assert.equal(view(prepared).combatCharge, false);
+  assert.equal(view(prepared).chargingWeapon, null);
 
   const chisel = staged('ford_shale_crab', { realm: 4, items: ['iron_sword', 'scale_chisel'] });
   assert.equal(view(chisel).combatOffhand.chargeRequired, true);
-  assert.equal(act(chisel, 'offhandAttack').ok, false);
   const plain = structuredClone(chisel);
   assert.ok(play(plain, 'attack').damageDealt > 0);
-  play(chisel, 'focus');
+  assert.equal(play(chisel, 'offhandAttack').damageDealt, 0);
+  assert.deepEqual(view(chisel).chargingWeapon, { slot: 'offhand', id: 'scale_chisel', name: '翻鳞凿' });
   assert.ok(play(chisel, 'offhandAttack').damageDealt > 0);
-  assert.equal(view(chisel).combatCharge, false);
+  assert.equal(view(chisel).chargingWeapon, null);
   assert.equal(chisel.durability.iron_sword, gear.iron_sword.durability);
+
+  const quickPair = staged('ford_shale_crab', { realm: 2, items: ['iron_sword', 'side_hook'] });
+  play(quickPair, 'attack');
+  play(quickPair, 'offhandAttack');
+  assert.equal(quickPair.durability.iron_sword, gear.iron_sword.durability - 1);
+  assert.equal(quickPair.durability.side_hook, gear.side_hook.durability - 1);
+  assert.equal(view(quickPair).chargingWeapon, null);
+});
+
+test('two charged hands keep separate preparations; manually letting go costs no time', () => {
+  const state = staged('ford_shale_crab', { realm: 4, items: ['anvil_hammer', 'scale_chisel'] });
+  const start = state.day;
+  play(state, 'attack');
+  assert.equal(view(state).chargingWeapon.slot, 'weapon');
+  assert.equal(act(state, 'offhandAttack').ok, false);
+  const seed = state.combatSeed;
+  play(state, 'cancelCharge');
+  assert.equal(state.combatSeed, seed);
+  assert.equal(state.day - start, rules.battleDays);
+  assert.equal(state.durability.anvil_hammer, gear.anvil_hammer.durability);
+  assert.equal(view(state).chargingWeapon, null);
+  assert.equal(play(state, 'offhandAttack').damageDealt, 0);
+  assert.equal(view(state).chargingWeapon.slot, 'offhand');
+  assert.equal(state.durability.scale_chisel, gear.scale_chisel.durability);
+  assert.ok(play(state, 'offhandAttack').damageDealt > 0);
+  assert.equal(state.durability.scale_chisel, gear.scale_chisel.durability - 1);
+  assert.equal(state.day - start, 3 * rules.battleDays);
+});
+
+test('guarding abandons preparation and a strong hit scatters it before the next turn', () => {
+  const defended = staged('ford_shale_crab', { realm: 2, items: ['anvil_hammer'] });
+  play(defended, 'attack');
+  play(defended, 'guard');
+  assert.equal(view(defended).chargingWeapon, null);
+  assert.equal(defended.durability.anvil_hammer, gear.anvil_hammer.durability);
+
+  const struck = staged('sand_spine_lizard', { realm: 4, items: ['iron_sword', 'scale_chisel'] });
+  const foeIntent = enemies.sand_spine_lizard.intents.find(({ kind }) => kind === 'heavy');
+  struck.combat.plan = { round: 0, reader: null, intent: foeIntent };
+  const preparing = play(struck, 'offhandAttack');
+  assert.equal(preparing.damageDealt, 0);
+  assert.ok(preparing.damageTaken >= rules.chargeBreakDamage);
+  assert.equal(view(struck).chargingWeapon, null);
+  assert.equal(struck.durability.scale_chisel, gear.scale_chisel.durability);
+});
+
+test('a weapon technique needs its own charged weapon and a bare-handed technique abandons the charge', () => {
+  const state = staged('ford_shale_crab', { realm: 4, items: ['anvil_hammer', 'scale_chisel'] });
+  state.knownArts.push('reed_cleave', 'tide_part');
+  const start = structuredClone(state);
+  assert.equal(act(state, 'art', { id: 'reed_cleave' }).ok, false);
+  assert.equal(state.day, start.day);
+  assert.equal(state.qi, start.qi);
+  assert.deepEqual(state.durability, start.durability);
+
+  const offhand = structuredClone(state);
+  play(offhand, 'offhandAttack');
+  const pending = structuredClone(offhand);
+  assert.equal(act(offhand, 'art', { id: 'reed_cleave' }).ok, false);
+  assert.deepEqual(offhand, pending);
+  assert.ok(play(offhand, 'art', { id: 'tide_part' }).damageDealt > 0);
+  assert.equal(view(offhand).chargingWeapon, null);
+  assert.equal(offhand.durability.scale_chisel, gear.scale_chisel.durability);
+  assert.equal(offhand.durability.anvil_hammer, gear.anvil_hammer.durability);
+
+  play(state, 'attack');
+  assert.ok(play(state, 'art', { id: 'reed_cleave' }).damageDealt > 0);
+  assert.equal(state.day - start.day, 2 * rules.battleDays);
+  assert.equal(view(state).chargingWeapon, null);
+  assert.equal(state.durability.anvil_hammer, gear.anvil_hammer.durability - 1);
 });

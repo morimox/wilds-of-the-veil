@@ -413,10 +413,14 @@ function combatScreen(s) {
   </div>` : "";
   const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
   const openingShot = intent && s.openingShotReady;
-  const chargeMain = weapon?.chargeRequired && !s.combatCharge;
-  const chargeSide = side?.chargeRequired && !s.combatCharge;
-  const attackLabel = chargeMain ? "主武器 · 先蓄势" : weapon?.chargeRequired ? `用${weapon.name}出手`
+  const charging = s.chargingWeapon;
+  const mainCharged = charging?.slot === "weapon" && charging.id === weapon?.id;
+  const sideCharged = charging?.slot === "offhand" && charging.id === side?.id;
+  const mainBlocked = Boolean(charging && !mainCharged);
+  const sideBlocked = Boolean(charging && !sideCharged);
+  const attackLabel = weapon?.chargeRequired ? `用${weapon.name}${mainCharged ? "打出" : "蓄力"}`
     : openingShot ? "抢先放箭" : weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : side ? "主武器出手" : "出手";
+  const sideLabel = side?.chargeRequired ? `用${side.name}${sideCharged ? "打出" : "蓄力"}` : side && `用${side.name}出手`;
   const guardLabel = intent?.kind === "heavy" ? "挡住重招" : intent?.kind === "guard" && s.breathingQi ? "收势调息" : "防御";
   const flight = intent && s.retreatRisk;
   const retreatLabel = enemy.sparring ? "认输" : flight?.wouldFall ? "撤退会倒下"
@@ -427,7 +431,7 @@ function combatScreen(s) {
   const openingNote = openingShot ? "对方还隔着一段路。这一回合放箭，能拦住它的头一扑。"
     : !intent && s.openingShotPossible ? "还隔着一段路。对方若冲来，首箭能拦一下。" : "";
   const chargeNote = [
-    s.combatCharge && "你已经蓄势，下一击更重。",
+    charging && `${charging.name}已经蓄好力。可以用它打出。防御、用药或换兵器会让这次蓄力散掉。`,
     s.enemyCharged && "对方已经攒足了劲。",
   ].filter(Boolean).join("");
   const spiritLabel = intent || s.combatRead === "enemy" ? "凝神护身" : "凝神看招";
@@ -435,21 +439,22 @@ function combatScreen(s) {
   const techniques = arts.map(row => {
     const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" :
       weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽"
-        : chargeMain && row.weaponBased !== false ? "兵器须先蓄势" : "";
+        : mainBlocked && row.weaponBased !== false ? "先取消蓄力"
+          : weapon?.chargeRequired && !mainCharged && row.weaponBased !== false ? "兵器须先蓄力" : "";
     const action = intent?.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
     return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), row.desc);
   });
   return panel(enemy.name, `
     ${intentLine}
     ${openingNote ? `<p class="fine">${openingNote}</p>` : ""}
-    ${chargeNote ? `<p class="fine">${chargeNote}</p>` : ""}
+    ${chargeNote ? `<p class="fine">${escape(chargeNote)}</p>` : ""}
     ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
-    <div class="actions">${linkButton(attackLabel, "attack", "", "primary", Boolean(chargeMain))}
-      ${side ? linkButton(chargeSide ? "副武器 · 先蓄势" : `用${side.name}出手`, "offhandAttack", "", "", Boolean(chargeSide)) : ""}
+    <div class="actions">${linkButton(attackLabel, "attack", "", "primary", mainBlocked)}
+      ${side ? linkButton(sideLabel, "offhandAttack", "", "", sideBlocked) : ""}
       ${linkButton(guardLabel, "guard")}
-      ${linkButton(s.combatCharge ? "已蓄势" : "蓄势", "focus", "", "quiet", s.combatCharge)}
+      ${charging ? linkButton("取消蓄力", "cancelCharge", "", "quiet") : ""}
       ${linkButton(retreatLabel, "retreat", "", !enemy.sparring && flight?.damage ? "danger" : "quiet")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
       ${s.spiritSense ? linkButton(spiritLabel, "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}

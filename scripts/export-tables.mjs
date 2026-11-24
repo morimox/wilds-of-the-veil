@@ -487,7 +487,7 @@ const tables = [
     ({ ...item, effects: [trait, ...traits].filter(Boolean) })))), [
     'id', 'name', 'slot', ['weaponClass', '兵刃类别', (id) => weaponClass[id] ?? id],
     ['hands', '用几只手'], ['brace', '主动架重招减伤'],
-    ['chargeRequired', '出招前须蓄势'], ['chargePierce', '主武器蓄势时穿甲'],
+    ['chargeRequired', '蓄力与出招共占两回合'], ['chargePierce', '主武器完成蓄力时穿甲'],
     ['sideAtk', '副武器出手攻击修正'], ['sidePierce', '副武器出手穿甲'], ['sideGuard', '副武器出手护持'],
     ['ammo', '适用弹药', (ids) => ids.map(ref).join('、')],
     'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'], ['perception', '洞察加成'],

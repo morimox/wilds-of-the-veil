@@ -471,7 +471,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=26" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=27" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -3310,9 +3310,9 @@ const explorerKitContent = {
     { id: 'side_hook', slot: 'offhand', weaponClass: 'blade', tier: 0, sideAtk: 4, sidePierce: 1, sideGuard: 2, durability: 30, repair: 5,
       entry: '副手握住短钩，交手时可以单独出钩，主兵不用换下。钩尖能探进护甲的接缝，回钩时也能顺手护住手腕。' },
     { id: 'anvil_hammer', slot: 'weapon', weaponClass: 'hammer', tier: 2, atk: 7, chargeRequired: true, chargePierce: 2, durability: 46, repair: 12,
-      entry: '单手使的重锤。得先沉肩蓄势才能出锤。铁角砸得实，有机会砸开坚硬的护甲。' },
+      entry: '单手使的重锤。第一回合沉肩蓄势，下一回合才能出锤。用另一只手出招前得先收势；挨上一记够重的来招也会散劲。铁角砸得实，有机会砸开硬甲。' },
     { id: 'scale_chisel', slot: 'offhand', weaponClass: 'blade', tier: 4, sideAtk: 7, sidePierce: 3, chargeRequired: true, durability: 42, repair: 10,
-      entry: '副手持凿。要先扎稳蓄势，再把窄刃送进甲缝，主兵仍留在另一只手上。' },
+      entry: '副手持凿。第一回合扎稳蓄势，下一回合再把窄刃送进甲缝。想改用主兵要先收势；挨上一记够重的来招也会散劲。' },
   ],
   recipes: [
     { id: 'r_reed_hat', result: 'reed_hat', tier: 0, reveal: { item: 'reed' },
@@ -6989,7 +6989,8 @@ function view(state) {
     openingShotReady: canInterceptOpening(state, intent) && Boolean(combatWeapon.selectedAmmo),
     openingShotPossible: Boolean(combat?.openingRange && combat.round === 0 && combatWeapon.selectedAmmo),
     combatRead,
-    combatCharge: Boolean(combat?.playerCharged),
+    combatCharge: Boolean(combat?.playerCharge),
+    chargingWeapon: combat?.playerCharge ? { ...combat.playerCharge, name: nameOf(combat.playerCharge.id) } : null,
     enemyCharged: Boolean(combat?.enemyCharged),
     lastEnemyIntent: combat?.lastEnemyIntent ?? null,
     intent,
@@ -7522,7 +7523,7 @@ function combatEffects(state, enemy, intent, move) {
   const counter = heavyBrace ? rules.guardCounter : 0;
   const guard = (move.guard ?? 0) + (brace ? rules.guardBonus + (heavyBrace ? rules.heavyGuardBonus : 0) : 0);
   const interrupt = ['heavy', 'heal', 'focus'].includes(intent.kind) ? move.interrupt ?? 0 : 0;
-  const charge = move.chargeable && damage > 0 && state.combat.playerCharged
+  const charge = move.releaseCharge && damage > 0
     ? Math.max(rules.combatChargeFloor, Math.ceil((move.chargeBase ?? force) * rules.combatChargeFactor)) : 0;
   const training = trainingPerks(state, enemy, intent);
   const traits = combatTraits([
@@ -7589,8 +7590,8 @@ function combatTurn(state, move) {
     if (observed.length > rules.observedHitLimit) observed.shift();
   }
   state.combat.hp -= dealt + counter;
-  if (charge) state.combat.playerCharged = false;
-  if (kind === 'focus') state.combat.playerCharged = true;
+  const abandoned = state.combat.playerCharge && !move.releaseCharge;
+  state.combat.playerCharge = move.prepareWeapon ?? null;
   const recovered = brace && intent.kind === 'guard' ? breathingQi(state) : 0;
   state.qi += recovered;
   advance(state, rules.battleDays);
@@ -7598,7 +7599,7 @@ function combatTurn(state, move) {
   if (ammo) removeItem(state, ammo.id, 1);
   const playerMove = brace ? counter ? '你挡住重招，趁对手还没收招打了回去。'
     : recovered ? `你趁对手守势回了${recovered}点真气。` : '你收回手，挡在身前。' : message;
-  let summary = `${read}${playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
+  let summary = `${read}${abandoned ? '你收住了方才蓄着的劲。' : ''}${playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
   if (state.combat.hp <= 0) {
     if (counter) summary += `「${intent.name}」被你截住了。`;
     return combatVictory(state, enemy, summary, { damageDealt, damageTaken: 0, ...(counter ? { enemyMove } : {}) });
@@ -7637,8 +7638,8 @@ function combatTurn(state, move) {
     } else {
       summary += damageToPlayer ? `你受了${damageToPlayer}点伤。${armorDamage}` : '你挡下了这一招。';
     }
-    if (state.combat.playerCharged && damageToPlayer >= rules.chargeBreakDamage) {
-      state.combat.playerCharged = false;
+    if (state.combat.playerCharge && damageToPlayer >= rules.chargeBreakDamage) {
+      state.combat.playerCharge = null;
       summary += '你蓄着的劲被打散了。';
     }
     if (reflect > 0) {
@@ -7702,14 +7703,17 @@ function cast(state, id) {
   const { weapon, compatible, ammo } = weaponLoadout(state);
   const weaponBased = art.weaponBased !== false;
   if (weaponBased && compatible.length && !ammo) return refuse('这门术要借兵器出手，先备上弹药。');
-  if (weaponBased && weapon?.chargeRequired && !state.combat.playerCharged) return refuse('这件兵器得先蓄势。');
+  const pending = state.combat.playerCharge;
+  if (weaponBased && pending && pending.id !== weapon?.id) return refuse('先放下另一件兵器的蓄力。');
+  if (weaponBased && weapon?.chargeRequired && !pending) return refuse('先用这件主武器蓄力。');
+  const releaseCharge = weaponBased && Boolean(weapon?.chargeRequired);
   state.qi -= cost;
   const focus = state.focus >= 1 ? 1 : 0;
   state.focus -= focus;
   return combatTurn(state, {
-    kind: 'strike', chargeable: true,
+    kind: 'strike', releaseCharge,
     damage: stats(state).attack - (weaponBased ? 0 : weapon?.atk ?? 0) + (art.power ?? 0) + focus * rules.focusDamage,
-    pierce: (art.pierce ?? 0) + (weaponBased && state.combat.playerCharged ? weapon?.chargePierce ?? 0 : 0),
+    pierce: (art.pierce ?? 0) + (releaseCharge ? weapon.chargePierce ?? 0 : 0),
     guard: art.guard,
     interrupt: art.break,
     wearWeapon: weaponBased && Boolean(weapon),
@@ -7719,29 +7723,42 @@ function cast(state, id) {
   });
 }
 
+function prepareWeaponAttack(state, weapon) {
+  const pending = state.combat.playerCharge;
+  if (pending) return pending.id === weapon?.id ? null : refuse('先放下另一件兵器的蓄力。');
+  if (!weapon?.chargeRequired) return null;
+  return combatTurn(state, {
+    kind: 'focus', prepareWeapon: { slot: weapon.slot, id: weapon.id },
+    message: `你握住${nameOf(weapon.id)}，沉肩蓄力。`,
+  });
+}
+
 function attack(state) {
   const { weapon, compatible, ammo } = weaponLoadout(state);
   const unarmed = !weapon || (compatible.length > 0 && !ammo);
-  if (!unarmed && weapon.chargeRequired && !state.combat.playerCharged) return refuse('这件兵器得先蓄势。');
+  const preparation = prepareWeaponAttack(state, unarmed ? null : weapon);
+  if (preparation) return preparation;
+  const releaseCharge = !unarmed && Boolean(weapon.chargeRequired);
   return combatTurn(state, {
-    kind: 'strike', chargeable: true,
+    kind: 'strike', releaseCharge,
     damage: stats(state).attack - (unarmed ? weapon?.atk ?? 0 : 0),
-    pierce: !unarmed && state.combat.playerCharged ? weapon.chargePierce : 0,
+    pierce: releaseCharge ? weapon.chargePierce : 0,
     wearWeapon: !unarmed,
     hungerAffected: true,
     ammo,
-    message: unarmed ? '你空手出招。' : '你抢先出手。',
+    message: unarmed ? '你空手出招。' : releaseCharge ? `你挥动${nameOf(weapon.id)}出手。` : '你抢先出手。',
   });
 }
 
 function offhandAttack(state) {
   const side = sideWeapon(state);
   if (!side) return refuse('手边没有可出招的副兵器。');
-  if (side.chargeRequired && !state.combat.playerCharged) return refuse('这件副兵器得先蓄势。');
+  const preparation = prepareWeaponAttack(state, side);
+  if (preparation) return preparation;
   const { weapon } = weaponLoadout(state);
   const damage = stats(state).attack - (weapon?.atk ?? 0) + side.sideAtk;
   return combatTurn(state, {
-    kind: 'strike', chargeable: true, hungerAffected: true, wearSlot: 'offhand',
+    kind: 'strike', releaseCharge: Boolean(side.chargeRequired), hungerAffected: true, wearSlot: 'offhand',
     damage, chargeBase: damage, pierce: side.sidePierce, guard: side.sideGuard,
     message: `你用${nameOf(side.id)}出手。`,
   });
@@ -8327,8 +8344,11 @@ const combatActions = {
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   combatEquip: (state, { id }) => equip(state, id, true),
   guard: (state) => combatTurn(state, { kind: 'brace', brace: true }),
-  focus: (state) => state.combat.playerCharged ? refuse('你已经蓄好劲了。')
-    : combatTurn(state, { kind: 'focus', message: '你沉肩蓄力。' }),
+  cancelCharge: (state) => {
+    if (!state.combat.playerCharge) return refuse('眼下没有正在蓄力的兵器。');
+    state.combat.playerCharge = null;
+    return say(state, '你停下蓄力。');
+  },
   art: (state, { id }) => cast(state, id),
   use: (state, { id }) => use(state, id, true),
   eat: (state, { id }) => eat(state, true, id || supply),
@@ -8816,10 +8836,14 @@ function combatScreen(s) {
   </div>` : "";
   const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
   const openingShot = intent && s.openingShotReady;
-  const chargeMain = weapon?.chargeRequired && !s.combatCharge;
-  const chargeSide = side?.chargeRequired && !s.combatCharge;
-  const attackLabel = chargeMain ? "主武器 · 先蓄势" : weapon?.chargeRequired ? `用${weapon.name}出手`
+  const charging = s.chargingWeapon;
+  const mainCharged = charging?.slot === "weapon" && charging.id === weapon?.id;
+  const sideCharged = charging?.slot === "offhand" && charging.id === side?.id;
+  const mainBlocked = Boolean(charging && !mainCharged);
+  const sideBlocked = Boolean(charging && !sideCharged);
+  const attackLabel = weapon?.chargeRequired ? `用${weapon.name}${mainCharged ? "打出" : "蓄力"}`
     : openingShot ? "抢先放箭" : weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : side ? "主武器出手" : "出手";
+  const sideLabel = side?.chargeRequired ? `用${side.name}${sideCharged ? "打出" : "蓄力"}` : side && `用${side.name}出手`;
   const guardLabel = intent?.kind === "heavy" ? "挡住重招" : intent?.kind === "guard" && s.breathingQi ? "收势调息" : "防御";
   const flight = intent && s.retreatRisk;
   const retreatLabel = enemy.sparring ? "认输" : flight?.wouldFall ? "撤退会倒下"
@@ -8830,7 +8854,7 @@ function combatScreen(s) {
   const openingNote = openingShot ? "对方还隔着一段路。这一回合放箭，能拦住它的头一扑。"
     : !intent && s.openingShotPossible ? "还隔着一段路。对方若冲来，首箭能拦一下。" : "";
   const chargeNote = [
-    s.combatCharge && "你已经蓄势，下一击更重。",
+    charging && `${charging.name}已经蓄好力。可以用它打出。防御、用药或换兵器会让这次蓄力散掉。`,
     s.enemyCharged && "对方已经攒足了劲。",
   ].filter(Boolean).join("");
   const spiritLabel = intent || s.combatRead === "enemy" ? "凝神护身" : "凝神看招";
@@ -8838,21 +8862,22 @@ function combatScreen(s) {
   const techniques = arts.map(row => {
     const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" :
       weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽"
-        : chargeMain && row.weaponBased !== false ? "兵器须先蓄势" : "";
+        : mainBlocked && row.weaponBased !== false ? "先取消蓄力"
+          : weapon?.chargeRequired && !mainCharged && row.weaponBased !== false ? "兵器须先蓄力" : "";
     const action = intent?.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
     return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), row.desc);
   });
   return panel(enemy.name, `
     ${intentLine}
     ${openingNote ? `<p class="fine">${openingNote}</p>` : ""}
-    ${chargeNote ? `<p class="fine">${chargeNote}</p>` : ""}
+    ${chargeNote ? `<p class="fine">${escape(chargeNote)}</p>` : ""}
     ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
-    <div class="actions">${linkButton(attackLabel, "attack", "", "primary", Boolean(chargeMain))}
-      ${side ? linkButton(chargeSide ? "副武器 · 先蓄势" : `用${side.name}出手`, "offhandAttack", "", "", Boolean(chargeSide)) : ""}
+    <div class="actions">${linkButton(attackLabel, "attack", "", "primary", mainBlocked)}
+      ${side ? linkButton(sideLabel, "offhandAttack", "", "", sideBlocked) : ""}
       ${linkButton(guardLabel, "guard")}
-      ${linkButton(s.combatCharge ? "已蓄势" : "蓄势", "focus", "", "quiet", s.combatCharge)}
+      ${charging ? linkButton("取消蓄力", "cancelCharge", "", "quiet") : ""}
       ${linkButton(retreatLabel, "retreat", "", !enemy.sparring && flight?.damage ? "danger" : "quiet")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
       ${s.spiritSense ? linkButton(spiritLabel, "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
