@@ -801,7 +801,7 @@ test('the boatman and village smith trade maps that open travel for a beginning 
   play(detour, 'leave');
   assert.equal(siteIds(detour).includes('stone_niche'), false);
   feed(detour, 35);
-  assert.match(chooseAt(detour, 'miner_echo', 2).outcome, /石龛/);
+  assert.match(chooseAt(detour, 'miner_echo', 2).outcome, /回声石洞/);
   assert.equal(siteIds(detour).includes('stone_niche'), true);
   assert.equal(siteIds(detour).includes('cracked_bell'), false);
   feed(detour, 30);

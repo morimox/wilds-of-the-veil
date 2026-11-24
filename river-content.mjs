@@ -6,7 +6,7 @@ const regions = [
   { id: 'gauge_tower', name: '校潮亭', tier: 1, travel: 1.5, desc: '亭外立着一把量水位的长尺，尺脚伸进深水。人们上下台阶，把边上的平石踩得发亮。' },
   { id: 'screen_slope', name: '晒盘坡', tier: 2, travel: 1.5, desc: '山风穿过倒伏的木架。坡下晒着矿盘和草根，最上方的筛架还挂在一面断壁上。' },
   { id: 'lantern_court', name: '系灯院', tier: 1, travel: 1.5, desc: '院中有井有灶。日落后有人给运货的山路挂灯，通行帖就搁在院门的长凳上。' },
-  { id: 'undertow_grotto', name: '回潮母洞', tier: 6, travel: 0.5, secret: true, reveal: { item: 'undertow_entry' }, desc: '薄薄的岩壁两侧各流过一股水。洞里隆起一道石脊，潮水淹不到。贴着洞顶的路比脚下的泥地稳。' },
+  { id: 'undertow_grotto', name: '回潮洞', tier: 6, travel: 0.5, secret: true, reveal: { item: 'undertow_entry' }, desc: '薄薄的岩壁两侧各流过一股水。洞里隆起一道石脊，潮水淹不到。贴着洞顶的路比脚下的泥地稳。' },
   { id: 'counter_bell', name: '反声钟窟', tier: 5, travel: 0.75, secret: true, reveal: { item: 'counter_bell_entry' }, desc: '倒钟下是一条窄通道。墙边干燥的地方架着一排信，两侧的小孔还能听见地面传来的响声。' },
 ];
 
@@ -39,13 +39,13 @@ const regionDetails = {
 const items = [
   { id: 'undertow_entry', name: '回潮洞引线', kind: 'key', price: 0, sell: 0, desc: '你在白苇滩的石门旁固定了一根引路绳。潮水倒流时，顺着绳就能摸到高处的石阶。' },
   { id: 'counter_bell_entry', name: '反声孔通路', kind: 'key', price: 0, sell: 0, desc: '从鸣沙带来的铜片卡住石孔，钟声便落向地下。石孔后有楼梯，进洞后也能沿原路返回。' },
-  { id: 'river_field_stamp', name: '蒲湾渠契', kind: 'key', price: 0, sell: 0, desc: '姚六签了名的修渠凭据。田户和折水驿照着它分摊修水渠的木料。' },
-  { id: 'river_gauge_copy', name: '校潮亭抄尺', kind: 'key', price: 0, sell: 0, desc: '竹纸上印着亭下三段水尺的刻痕。最下面一段记的是潮水倒流的时辰。' },
-  { id: 'river_trial_writ', name: '封乔的试杆签', kind: 'key', price: 0, sell: 0, desc: '护堤人封乔把系红布的木签递给你。折水驿的人认这道手印。' },
+  { id: 'river_field_stamp', name: '蒲湾水渠的旧账', kind: 'key', price: 0, sell: 0, desc: '姚六签了名的修渠凭据。田户和折水驿照着它分摊修水渠的木料。' },
+  { id: 'river_gauge_copy', name: '校潮亭的水尺印纸', kind: 'key', price: 0, sell: 0, desc: '竹纸上印着亭下三段水尺的刻痕。最下面一段记的是潮水倒流的时辰。' },
+  { id: 'river_trial_writ', name: '封乔按印的木签', kind: 'key', price: 0, sell: 0, desc: '护堤人封乔把系红布的木签递给你。折水驿的人认这道手印。' },
   { id: 'lantern_route_copy', name: '裴见画的旧灯图', kind: 'key', price: 0, sell: 0, desc: '图上画着晒盘坡的两盏灯。高处的灯照给背矿的人，低处那盏留给在坡下走的药担。' },
   { id: 'lantern_clasp', name: '停风处捡到的铜扣', kind: 'key', price: 0, sell: 0, desc: '油布里裹着一枚能用的旧铜扣。找根平木就能把一盏灯扣在低处。要往高处挂，还得用铁挡住割绳的石角，再拿皮把绳裹严。' },
-  { id: 'lantern_low_note', name: '低路试点回条', kind: 'key', price: 0, sell: 0, desc: '药农在回条上摁了指印。低石墩上的灯已经试过，踩石沟过坡的药担不会再走岔。' },
-  { id: 'lantern_high_note', name: '双灯复挂回条', kind: 'key', price: 0, sell: 0, desc: '矿夫在回条上划了两道短线。高低两盏灯都能照见脚下的横木，他愿走旧路运矿了。' },
+  { id: 'lantern_low_note', name: '石沟点灯回条', kind: 'key', price: 0, sell: 0, desc: '药农在回条上摁了指印。低石墩上的灯已经试过，踩石沟过坡的药担不会再走岔。' },
+  { id: 'lantern_high_note', name: '两盏灯的回条', kind: 'key', price: 0, sell: 0, desc: '矿夫在回条上划了两道短线。高低两盏灯都能照见脚下的横木，他愿走旧路运矿了。' },
 ];
 
 const stock = (label, start, cap, interval, growth, choice) => ({ label, start, cap, interval, growth, choices: [choice] });
@@ -86,7 +86,7 @@ const sites = [
     creatures: { stone_badger: animal(1, 3, 6, 1, 'wild') },
     creatureText: { stone_badger: { present: '筛架下有个滚圆的东西在磨石头，碎砂直落到外侧。', absent: '架下没有磨石声。从绳结处够得到旧筛。' } } },
   { id: 'lantern_term', region: 'lantern_court', name: '夜灯廊', once: [0, 1, 2],
-    afterOnceText: { 1: '挂灯人已把碎护皮换下。廊口的横凳留给巡夜回来的人，右侧还有一条访堂的石路。' },
+    afterOnceText: { 1: '挂灯人已把磨破的绳套换下。廊口的横凳留给巡夜回来的人，右侧还有一条访堂的石路。' },
     choiceText: { 2: { before: '廊壁上空着两个灯钩，下头还挂着一段磨开了的麻绳。' } } },
   { id: 'slope_lantern_gap', region: 'screen_slope', name: '背风处的断灯', reveal: { item: 'lantern_route_copy' }, once: [0, 1, 2],
     afterOnceText: {
@@ -108,7 +108,7 @@ const sites = [
     creatureText: { undertow_moundback: { present: '泥脊忽然抬起一截。河砂从一排粗鳞上掉下来，一对角堵住了去侧洞的路。', absent: '' } },
     afterWinText: { undertow_moundback: '泥脊塌下去，床面留下三圈未被潮水搅散的黑泥。角原来挡着的那条路能通到侧洞。' },
     afterOnceText: { 1: '中央多了个积着清水的坑。侧洞的石壁上还挂着几道晶砂留下的细痕。' } },
-  { id: 'counter_bell_score', region: 'counter_bell', name: '信架与钟枢', once: [1, 3],
+  { id: 'counter_bell_score', region: 'counter_bell', name: '古钟旁的信架', once: [1, 3],
     stocks: { black_iron: stock('钟座暗金', 4, 8, 7, 2, 2) },
     stockText: { black_iron: { present: '钟座下还露着几片松动的暗金。', absent: '钟座外沿的砂都筛过了，眼下没有松动的暗金。' } },
     creatures: { river_copper_echo: animal(1, 1, 0, 0) },
@@ -156,7 +156,7 @@ const events = [
     { label: '抓着绳子，到高处筛暗金', guardedBy: 'stone_badger', days: 1, insight: 2, loot: { black_iron: 2 }, outcome: '深色颗粒很沉，顺着筛底落进矿工挂的布袋。' },
     { label: '翻看筛盘背面', days: 0.25, insight: 1, loot: {}, outcome: '筛盘背面留了一宽一窄两个孔，旁边刻着几级向上的台阶。有人拿炭笔写了个「回」字，笔画快给手磨平了。' },
   ] },
-  { id: 'lantern_term', name: '夜灯廊', text: '弟子裴见抱着一条用来护住过路人的粗绳。身旁串着几盏灯，门外长凳上还留着给行人歇脚的位置。', choices: [
+  { id: 'lantern_term', name: '夜灯廊', text: '负责巡夜交班的执事弟子裴见抱着一条粗绳，正要发给巡路的人。身旁串着几盏灯，门外长凳上还留着给行人歇脚的位置。', choices: [
     { label: '问裴见这几盏灯是给谁的', days: 0.125, insight: 1, loot: {}, outcome: '裴见一盏盏翻给你看。采药人去旧渠，拉货的车去松场，也有人挑担去西岸。各人都认得自己的那盏，走到多晚也能认路。' },
     { label: '给裴见兽革，补好安全绳', desc: '裴见拉过绳头。擦着山石的地方本来包了皮，如今连里面的麻丝都磨出来了。', need: { hide: 2 }, consume: true, days: 0.5, insight: 1, loot: { iron_talisman: 1, ration: 2 }, outcome: '裴见缝好皮，自己先拽了两把。「这样才敢叫别人抓。」他顺手把一张符夹进两包干粮，趁热递给你。' },
     { label: '问裴见墙上是哪两盏灯空着', days: 0.125, loot: { lantern_route_copy: 1 },
@@ -188,14 +188,14 @@ const events = [
       outcome: '绳套没有再碰岩尖，你能腾出一只手把石缝里的暗金拨进布袋。' },
   ] },
   { id: 'undertow_bed', name: '退水石脊', text: '两股潮水都漫不过中间的石脊。顺绳下来，前面是一片平泥地，侧洞的口就在外侧。', choices: [
-    { label: '沿石脊走近那片泥地', days: 0.5, enemy: 'undertow_moundback', outcome: '负丘虺从水里顶起整片泥地，侧身把你逼到石脊尽头。' },
-    { label: '挖泥地正中的黑泥', afterFight: 'undertow_moundback', days: 0.625, insight: 6, loot: { heart_silt: 2 }, outcome: '潮水还在石脊两边响，泥心却不起一丝水纹。你挖出两份伏潮息泥，包好时指尖还凉着。' },
+    { label: '沿石脊走近那片泥地', days: 0.5, enemy: 'undertow_moundback', outcome: '驮泥大蛇从水里顶起整片泥地，侧身把你逼到石脊尽头。' },
+    { label: '挖泥地正中的黑泥', afterFight: 'undertow_moundback', days: 0.625, insight: 6, loot: { heart_silt: 2 }, outcome: '潮水还在石脊两边响，黑泥表面却不起一丝水纹。你挖出两份回潮洞的黑泥，包好时指尖还凉着。' },
     { label: '沿石脊绕去侧洞，采灵晶', guardedBy: 'undertow_moundback', days: 1, insight: 3, loot: { core: 4 }, outcome: '晶砂从岩壁落进筛里。侧洞的水来得慢，你还能循这条路回到高处。' },
   ] },
-  { id: 'counter_bell_score', name: '信架与钟枢', text: '你停下了，脚步声还从钟里多回来一下。墙上擦痕高过肩头，一直伸到古钟后面。角落的信架歪着，底下压了几页厚纸。', choices: [
+  { id: 'counter_bell_score', name: '古钟旁的信架', text: '你停下了，脚步声还从钟里多回来一下。墙上擦痕高过肩头，一直伸到古钟后面。角落的信架歪着，底下压了几页厚纸。', choices: [
     { label: '顺着钟槌留下的擦痕去看古钟', days: 0.375, enemy: 'river_copper_echo', outcome: '铜影从墙边抬起手臂，挤进窄缝，一槌砸向通道正中。' },
     { label: '取出信架下的传送卷轴图纸', afterFight: 'river_copper_echo', days: 0.375, insight: 5, loot: { gate_scroll_formula: 1 }, outcome: '图上写着怎样做传送卷轴，用的是薄木、草浆和少量灵晶砂。卷轴只通向自己认过的门。' },
-    { label: '移开挂片，筛钟座下的暗金', guardedBy: 'river_copper_echo', days: 0.875, insight: 2, loot: { black_iron: 3 }, outcome: '大块暗金压在钟脚下。你挑松动的小片筛进布里。' },
+    { label: '挪开钟座边垂着的铁片，筛底下的暗金', guardedBy: 'river_copper_echo', days: 0.875, insight: 2, loot: { black_iron: 3 }, outcome: '大块暗金压在钟脚下。你挑松动的小片筛进布里。' },
     { label: '看看旧送信人走过哪些门', days: 0.25, insight: 1, loot: {}, outcome: '折水驿、系灯院和落灯村的门写在同一页。送信人先徒步去认过这些门，往后的账上就很少再报脚钱。' },
   ] },
 ];
@@ -207,7 +207,7 @@ export const extendSites = [
   { id: 'marsh_pole_lesson', region: 'marsh', name: '封乔的护堤木台', once: [0, 2], protectedArena: true,
     creatures: { river_spar_captain: animal(1, 1, 5, 1) },
     creatureText: { river_spar_captain: { present: '封乔正拿杆尖朝练手台上点，不时让渔人过桥，手和眼睛都没乱。', absent: '封乔退到了灯影下。他把红布搁到台边，让手腕缓一缓再陪来客切磋。' } },
-    afterOnceText: { 2: '领过试杆签，封乔把另一支短杆扶直，台角还有供照看的安全绳。' } },
+    afterOnceText: { 2: '封乔把按过手印的木签交给你，又扶直另一支短杆。台角还拴着让人扶稳的安全绳。' } },
   { id: 'counter_bell_door', region: 'ridge', name: '倒钟后的反声门', once: [1],
     afterOnceText: { 1: '铜片斜卡在一宽一窄两个孔之间。第一层台阶已经落下，脚步声顺着台阶传进地下。' } },
   { id: 'ford_packet_boat', region: 'ford', name: '外桩商船', once: [0],
@@ -223,17 +223,17 @@ export const extendSites = [
 export const extendEvents = [
   { id: 'undertow_door', name: '反潮石门', text: '芦苇后露出半扇厚重的石门，门边有道空槽。水从石门两侧往不同方向流，外侧的台阶还露在水面上。', choices: [
     { label: '沿外侧石阶绕一圈', desc: '墙外还有一排露出水面的石阶，一直连回岸边。', days: 0.25, insight: 1, outcome: '你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮，门两边的水都换了方向。水势一变，只有靠里的高阶还露在外头。' },
-    { label: '把倒浪楔卡进石槽，固定绳子', desc: '施荀给的铁楔刚好对得上石槽。潮水倒流时，可以抓着绳子找高处的台阶。', hidden: true, need: { undertow_wedge: 1 }, days: 0.5, insight: 3, loot: { undertow_entry: 1 }, outcome: '第二股潮水打过来，铁楔才牢牢卡住。你沿绳摸到上方的石阶，找到了去回潮母洞的路。' },
+    { label: '把带槽铁楔卡进门边的石槽，固定绳子', desc: '施荀给的铁楔刚好对得上石槽。潮水倒流时，可以抓着绳子找高处的台阶。', hidden: true, need: { undertow_wedge: 1 }, days: 0.5, insight: 3, loot: { undertow_entry: 1 }, outcome: '第二股潮水打过来，铁楔才牢牢卡住。你沿绳摸到上方的石阶，找到了去回潮洞的路。' },
     { label: '用校潮亭的印纸对照潮水方向', desc: '石槽边的浅痕正对着倒流的潮水，和印纸最下面几道痕同向。', hidden: true, need: { river_gauge_copy: 1 }, days: 0.25, insight: 2, outcome: '印纸贴在槽边，最后两道线只从内侧湿起。绳子会随水换方向，固定它的铁件得同时卡住槽的两头。' },
   ] },
   { id: 'marsh_pole_lesson', name: '封乔的护堤木台', text: '护堤人封乔常年领村里的河工。他把湿麻绳拴在矮台外，留下近处一截给练手的人扶。台边立着长杆和软头杆。', choices: [
     { label: '问封乔河里出了什么事', days: 0.125, insight: 1, outcome: '封乔指着台下被卷碎的苇筏。「沿岸过第三丛高苇，浅石后就是石门。里头有条大兽，浅岸它倒不来。我守的是河工，你别顺深水去追。」' },
     { label: '拿练习杆，和封乔切磋', desc: '他把麻绳放松一截。「站不稳就叫停，别跌进水里。」', days: 0.25, enemy: 'river_spar_captain', outcome: '河工守在台边。封乔换了根软头短杆，朝你让出几步。' },
-    { label: '接过封乔的试杆签', desc: '封乔放下短杆，取了一支先前用红布系好的木签。', afterFight: 'river_spar_captain', days: 0.125, insight: 4, loot: { river_trial_writ: 1 }, outcome: '封乔在木签上按了手印。「夜里水响，赶路靠脚稳。折水驿要托人带急信，你肯帮忙，就拿这个给他们看。」' },
+    { label: '接过封乔按印的木签', desc: '封乔放下短杆，取了一支先前用红布系好的木签。', afterFight: 'river_spar_captain', days: 0.125, insight: 4, loot: { river_trial_writ: 1 }, outcome: '封乔在木签上按了手印。「夜里水响，赶路靠脚稳。折水驿要托人带急信，你肯帮忙，就拿这个给他们看。」' },
   ] },
   { id: 'counter_bell_door', name: '倒钟后的反声门', text: '倒钟最矮处留着一枚没有字的石阶。石阶后有两个不同宽窄的孔，一长声一短声从里面撞回来。', choices: [
     { label: '贴着石壁敲三下', days: 0.125, insight: 1, outcome: '前两声沿石阶传回来，第三声却顺宽孔往下传。弯下腰细听，石阶底下还有一处空腔。' },
-    { label: '把听矿铜簧斜卡进两个石孔', desc: '那块铜片宽端抵住外面的孔，缺角的一端斜着能卡进里面的凹口。', hidden: true, need: { echo_tuning_key: 1 }, days: 0.5, insight: 3, loot: { counter_bell_entry: 1 }, outcome: '第三声在窄孔里没了回音。下方石阶却落稳了，宽孔的回声从脚底传来。那是通往反声钟窟的路。' },
+    { label: '把缺角铜片斜卡进一宽一窄两个石孔', desc: '那块铜片宽端抵住外面的孔，缺角的一端斜着能卡进里面的凹口。', hidden: true, need: { echo_tuning_key: 1 }, days: 0.5, insight: 3, loot: { counter_bell_entry: 1 }, outcome: '第三声在窄孔里没了回音。下方石阶却落稳了，宽孔的回声从脚底传来。那是通往反声钟窟的路。' },
   ] },
   { id: 'ford_packet_boat', name: '外桩商船', text: '闸外有条窄船拴在缓水里。船家夏狄翻起一块裂开的木板，指给船工看船侧的缺口。', choices: [
     { label: '给夏狄修船料，领去照原的货单', desc: '夏狄认得外港的水路。船边要用四份松木、两份寒铁修补，添上七钱船费，她就把你写进货单。', need: { wood: 4, ore: 2 }, consume: true, coins: -7, days: 0.75, insight: 3, loot: { ferry_manifest: 1 }, outcome: '夏狄换掉磨薄的船板，把新木钉牢。「大渡口关着也能从外港走。坐船里侧，看见照原那三把高水尺就到了。」她在商船货单背面写下你的名字。' },
@@ -254,22 +254,22 @@ export const extendEvents = [
 
 const enemies = [
   { id: 'river_spar_captain', name: '护堤人封乔', tags: ['human'], tier: 6, hp: 128, atk: 25, def: 10, sparring: true,
-    intents: [{ name: '软杆点踝', kind: 'attack', mult: 0.95 }, { name: '横杆拉住退处', kind: 'heavy', mult: 1.52 }, { name: '杆尾触台', kind: 'guard', mult: 1.35 }, { name: '换握压袖', kind: 'attack', mult: 1.1 }],
+    intents: [{ name: '用软杆点向脚踝', kind: 'attack', mult: 0.95 }, { name: '横起短杆挡住来招', kind: 'heavy', mult: 1.52 }, { name: '杆尾贴着木台扫来', kind: 'guard', mult: 1.35 }, { name: '换手用杆压向袖口', kind: 'attack', mult: 1.1 }],
     insight: 8, loot: {}, desc: '他拿的是裹了软布的杆子，台边有人照看。看他双手握近杆头，就要下重手了。' },
   { id: 'river_gateback', name: '横脊闸兽', tags: ['beast', 'scaled'], tier: 2, hp: 60, atk: 13, def: 5,
-    intents: [{ name: '顺水甩鳍', kind: 'attack', mult: 1.0 }, { name: '压低脊鳍', kind: 'guard', mult: 1.4 }, { name: '沿闸梁冲横', kind: 'heavy', mult: 1.55 }, { name: '贴闸游回', kind: 'attack', mult: 1.09 }],
-    insight: 5, loot: { beast_meat: 3, hide: 2, qi_core: 2 }, desc: '游在最小的宽面上。后脊一倒下，尾巴便会顺闸向外冲扫。' },
+    intents: [{ name: '顺水甩鳍', kind: 'attack', mult: 1.0 }, { name: '压低脊鳍', kind: 'guard', mult: 1.4 }, { name: '沿闸梁冲来横扫', kind: 'heavy', mult: 1.55 }, { name: '贴闸游回', kind: 'attack', mult: 1.09 }],
+    insight: 5, loot: { beast_meat: 3, hide: 2, qi_core: 2 }, desc: '常贴着最窄的闸道游。它把背鳍压低时，便会用尾巴沿闸梁横扫。' },
   { id: 'river_cliff_kite', name: '石鹞', tags: ['beast'], tier: 2, hp: 48, atk: 11, def: 4,
     intents: [{ name: '贴梁掠爪', kind: 'attack', mult: 1 }, { name: '收翅抱石', kind: 'guard', mult: 1.35 }, { name: '振翼俯冲', kind: 'heavy', mult: 1.55 }],
     insight: 4, loot: { beast_meat: 1, qi_core: 1 }, desc: '翼尖有两道磨白的羽缘。脚爪收拢时，它会贴着石梁冲下来。' },
-  { id: 'undertow_moundback', name: '负丘虺', tags: ['beast', 'scaled'], tier: 6, hp: 115, atk: 23, def: 9,
+  { id: 'undertow_moundback', name: '驮泥大蛇', tags: ['beast', 'scaled'], tier: 6, hp: 115, atk: 23, def: 9,
     intents: [{ name: '抖落泥团', kind: 'attack', mult: 1.0 }, { name: '低头用角护身', kind: 'guard', mult: 1.45 }, { name: '顶起泥浪冲上石脊', kind: 'heavy', mult: 1.62 }, { name: '掀来倒流的潮水', kind: 'drain', mult: 0.55 }, { name: '用尖角扫向膝盖', kind: 'attack', mult: 1.05 }],
     insight: 18, loot: { beast_meat: 6, hide: 4, beast_eye: 1, gold_core: 1 }, desc: '它在石门里翻泥为窝，外潮能把它送到高脊。负起整层泥之前，两角会先收成一线。' },
   { id: 'river_copper_echo', name: '屈膝铜影', tags: ['spirit', 'stoneborn'], tier: 5, hp: 100, atk: 21, def: 9,
     intents: [{ name: '拖着铜槌上前试探', kind: 'attack', mult: 1.0 }, { name: '背靠石钟护住身子', kind: 'guard', mult: 1.5 }, { name: '借钟的回声挥出重槌', kind: 'heavy', mult: 1.58 }, { name: '踩着回声迫近', kind: 'attack', mult: 1.1 }],
-    insight: 13, loot: { foundation_core: 3 }, desc: '旧守门人的半副铜影。槌头顶上钟背时会借第二响落重手。' },
-  { id: 'ford_lower_spirit', name: '悬梯堰影', tags: ['spirit'], tier: 4, hp: 83, atk: 18, def: 7,
-    intents: [{ name: '扯旗杆试重', kind: 'attack', mult: 1.0 }, { name: '携梯翻水', kind: 'heavy', mult: 1.62 }, { name: '借堰石掩身', kind: 'guard', mult: 1.4 }, { name: '压暗灯罩', kind: 'drain', mult: 0.58 }],
+    insight: 13, loot: { foundation_core: 3 }, desc: '古钟边有一道守门人的影子。它把铜槌搁在钟背时，会等第二声回响才落下重槌。' },
+  { id: 'ford_lower_spirit', name: '拖梯水影', tags: ['spirit'], tier: 4, hp: 83, atk: 18, def: 7,
+    intents: [{ name: '扯动旗杆，借力探手', kind: 'attack', mult: 1.0 }, { name: '拖着铁梯掀起水浪', kind: 'heavy', mult: 1.62 }, { name: '缩到水坝石背后', kind: 'guard', mult: 1.4 }, { name: '压暗灯罩', kind: 'drain', mult: 0.58 }],
     insight: 10, loot: { foundation_core: 2 }, desc: '旧堰和暗灯之间来回游。它先绷住铁栏，再甩开贴门的深水。' },
 ];
 
@@ -282,11 +282,11 @@ const quests = [
     desc: '门房认出封乔的木签，从后院叫来个正绑货的脚夫。脚夫掀开背篓让你看。「明早上坡修水槽，绳子总在石沿磨断。还差三张整皮包住绳头。」',
     need: { river_trial_writ: 1, hide: 3 }, reward: { iron_talisman: 2, ration: 5 }, coins: 24, insight: 4,
     outcome: '驿站把兽革扎好留给送货人，挂起封乔的木签，又从巡夜人的符袋里拿出两张符，和工钱一起递给你。' },
-  { id: 'lantern_low_report', region: 'lantern_court', name: '把低路试点回条交给裴见', reveal: { item: 'lantern_low_note' },
+  { id: 'lantern_low_report', region: 'lantern_court', name: '把石沟点灯回条交给裴见', reveal: { item: 'lantern_low_note' },
     desc: '裴见把两条旧挂灯绳留在廊下，等人来信。回条上有药农的指印，低处那盏灯已经照得见浅沟。',
     need: { lantern_low_note: 1 }, reward: {}, coins: 10, insight: 2,
     outcome: '裴见把通往浅沟的灯号画上木牌。来歇脚的药农抄了一份。他收好指印回条，把工钱递给你。' },
-  { id: 'lantern_high_report', region: 'lantern_court', name: '把双灯复挂回条交给裴见', reveal: { item: 'lantern_high_note' },
+  { id: 'lantern_high_report', region: 'lantern_court', name: '把两盏灯的回条交给裴见', reveal: { item: 'lantern_high_note' },
     desc: '裴见摊开晒盘坡的旧灯图。矿夫在回条上画的两道墨，正落在图上两只灯的位置。',
     need: { lantern_high_note: 1 }, reward: {}, coins: 17, insight: 3,
     outcome: '裴见照着回条重画了两盏灯的位置，让下一班顺路摸一摸护绳磨到了哪。他当面结清这趟的工钱。' },
@@ -295,18 +295,24 @@ const quests = [
 const sects = [
   { id: 'lantern_tenders', region: 'lantern_court', name: '系灯院',
     desc: '系灯院沿山路挂灯，给夜里送货的人照路。裴见会带新人巡路，也请过路人帮忙检查磨破的绳。',
-    join: { need: { wood: 5, hide: 2 }, coins: 16, text: '裴见用你带来的木和护革又做两盏灯。你在一段夜路的名簿上写下自己的名字。' },
+    join: { need: { wood: 5, hide: 2 }, coins: 16, text: '裴见用你带来的松木和兽革又做两盏灯。你在一段夜路的名簿上写下自己的名字。' },
     jobs: [
       { id: 'lantern_shift', name: '交明夜要用的干灯芯', desc: '晒架下只够挂几束干灯芯，等上一班的筐空下来才接新的。', need: { reed: 6, wood: 2 }, credit: 3, coins: 10, cooldown: 7, reward: { ration: 3 }, text: '裴见擦干六束草芯，把新木夹和灯一起发下去。' },
       { id: 'lantern_heel', name: '给山路的安全绳换皮和铁扣', desc: '绳子常磨到山石，旧皮遇雨一软就更不耐用。巡灯人还得一并换下磨坏的铁扣。', need: { hide: 4, ore: 3 }, credit: 5, coins: 18, cooldown: 11, reward: { salve: 1 }, text: '裴见把旧铁扣送修，让人带上新皮和铁扣去换安全绳上的两处磨损。' },
-      { id: 'lantern_spare_watch', name: '试点备用灯，再给夜班留灯芯', desc: '晒盘坡那趟的回条还压在名册上。裴见让接班的人在院墙根逐盏试灯，挑出沉到油里的灯芯，换成干的。',
+      { id: 'lantern_spare_watch', name: '试一试备用灯，再给夜班留灯芯', desc: '晒盘坡那趟的回条还压在名册上。裴见让接班的人在院墙根逐盏试灯，挑出沉到油里的灯芯，换成干的。',
         afterQuests: ['lantern_low_report', 'lantern_high_report'], days: 0.5, need: { reed: 3, wood: 1 }, credit: 2, coins: 8, cooldown: 5,
         reward: { ration: 2 }, text: '你同裴见守在院墙边，换掉歪芯。最后一盏烧稳了，他把备用灯交给来换班的人。' },
+      { id: 'lantern_rain_inspection', name: '清点暴雨后送回来的灯', desc: '前一夜下了大雨，巡路人把歪了的灯架和几只浸水的灯提回廊下。逐盏试过，再告诉下一班哪条路少了灯。',
+        minCredit: 18, rankReason: '裴见让知道各段灯位的执事弟子核对巡夜名册，再决定哪些灯该先补。',
+        days: 0.5, need: { wood: 3, ore: 2, core: 1 }, credit: 4, coins: 20, cooldown: 10, reward: { ration: 3 },
+        text: '你换掉变形的灯架，试出两只漏油的灯暂不能用。裴见照你点的次序把干灯发给夜班，让他们先去补没有岔路牌的那一段。' },
     ],
     ranks: [
-      { id: 'lantern_watch', credit: 0, name: '候灯人' },
-      { id: 'lantern_patrol', credit: 8, name: '巡灯人', reward: { iron_talisman: 2, ration: 6 }, text: '两段驮道终于都有稳灯。裴见把旧符和一袋耐放的粮给你。' },
-      { id: 'lantern_keeper', credit: 18, name: '掌灯人', reward: { jade_pill: 1, core: 4 }, art: 'stone_brace', text: '裴见把守灯人的脚架教给你，也留了上一趟多带回的方晶和一丸稳气丹。' },
+      { id: 'lantern_watch', credit: 0, name: '候灯人', disciple: '外门弟子', role: '在夜灯廊备灯芯、补绳套，跟熟手走一段夜路。' },
+      { id: 'lantern_patrol', credit: 8, name: '巡灯人', disciple: '内门弟子', role: '能把近处的灯路走熟，回来指出哪盏灯灭了、哪处绳子磨破了。',
+        reward: { iron_talisman: 2, ration: 6 }, text: '两段驮道终于都有稳灯。裴见把旧符和一袋耐放的粮给你。' },
+      { id: 'lantern_keeper', credit: 18, name: '掌灯人', disciple: '执事弟子', role: '核对各段灯位和巡夜名册，给回来交班的人分配备用灯。',
+        reward: { jade_pill: 1, core: 4 }, art: 'stone_brace', text: '裴见把守灯人站稳脚跟的法子教给你，也留了上一趟多带回的方晶和一丸稳气丹。' },
     ],
     sparSite: 'marsh_pole_lesson',
   },

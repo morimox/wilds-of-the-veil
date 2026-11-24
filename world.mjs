@@ -495,6 +495,16 @@ function localTrade(state, id, count, kit, buying) {
 const localSect = (state, kit) => kit.data.sects?.find(({ region }) => region === state.region);
 const pledge = (state, sect) => state.world.memberships[sect.id];
 
+function discipleStanding(sect, credit) {
+  let standing = { name: '外门弟子', role: sect.entryRole ?? '', credit: 0 };
+  for (const rank of sect.ranks) {
+    if (rank.disciple && rank.credit <= credit && rank.credit >= standing.credit) {
+      standing = { name: rank.disciple, role: rank.role ?? '', credit: rank.credit };
+    }
+  }
+  return standing;
+}
+
 function sectView(state, kit) {
   const sect = localSect(state, kit);
   if (!sect) return null;
@@ -505,11 +515,14 @@ function sectView(state, kit) {
   const joinReason = joined ? '' : state.world.affiliation ? '先回原来的师门辞行，再来拜师。' :
     kit.homeRequirements(state, admission?.coins ?? 0, admission?.need) || '';
   const credit = membership?.credit ?? 0;
+  const disciple = joined ? discipleStanding(sect, credit) : null;
   const jobs = sect.jobs.filter((job) => !job.afterQuests || job.afterQuests.some((id) => state.completedQuests.includes(id))).map((job) => {
     const nextAt = membership?.jobs[job.id] ?? 0;
     const remaining = Number((nextAt - state.day).toFixed(3));
-    const reason = !joined ? '这桩活只交给本门弟子。' : nextAt > state.day ? `管事还在忙上次的活，${remaining}日后再来。` :
-      job.days > 0 && state.satiety <= 0 ? '先吃些东西，再去守灯。' :
+    const rankBlocked = credit < (job.minCredit ?? 0);
+    const rankReason = job.rankReason ?? '管事还要你先办几桩别的差事。';
+    const reason = !joined ? '这桩活只交给本门弟子。' : rankBlocked ? rankReason :
+      nextAt > state.day ? `管事还在忙上次的活，${remaining}日后再来。` : job.days > 0 && state.satiety <= 0 ? '先吃些东西，再去办差。' :
       kit.homeRequirements(state, 0, job.need) || (!kit.hasRoom(state, job.reward ?? {}, kit.homeBagSpend(state, job.need)) ? '行囊腾出些地方，就能带走回礼。' : '');
     return { ...job, nextAt, available: !reason && !state.event && !state.combat, reason };
   });
@@ -520,7 +533,7 @@ function sectView(state, kit) {
       honorary ? '你的名字已经记在册上了。' : !claimed && !kit.hasRoom(state, rank.reward ?? {}) ? '行囊装不下这笔回礼。' : '';
     return { ...rank, id: String(index), claimed, honorary, available: !claimed && !reason, reason };
   });
-  return { ...sect, join: { ...admission, returning, available: !joined && !joinReason, reason: joinReason }, joined, credit, jobs, ranks };
+  return { ...sect, join: { ...admission, returning, available: !joined && !joinReason, reason: joinReason }, joined, credit, disciple, jobs, ranks };
 }
 
 function actSect(state, action, id, kit) {
@@ -552,7 +565,9 @@ function actSect(state, action, id, kit) {
     member.credit += job.credit;
     if (job.days) kit.advance(state, job.days);
     member.jobs[id] = state.day + job.cooldown;
-    return kit.say(state, `${job.text ?? ''}办完「${job.name}」，得${job.credit}份功劳${job.coins ? `和${job.coins}枚灵钱` : ''}。`);
+    const newDisciple = discipleStanding(local, member.credit);
+    const promotion = newDisciple.name !== view.disciple.name ? `管事把你记入${newDisciple.name}的名册。` : '';
+    return kit.say(state, `${job.text ?? ''}办完「${job.name}」，得${job.credit}份功劳${job.coins ? `和${job.coins}枚灵钱` : ''}。${promotion}`);
   }
   const rank = view.ranks.find((entry) => entry.id === String(id));
   if (!rank?.available) return kit.refuse(rank?.reason || '这笔门中回礼现在领不了。');
@@ -561,7 +576,8 @@ function actSect(state, action, id, kit) {
   if (rank.art && !state.knownArts.includes(rank.art)) state.knownArts.push(rank.art);
   const gifts = kit.goodsText(rank.reward);
   const art = rank.art ? kit.records.arts[rank.art]?.name : '';
-  return kit.say(state, `${rank.text ?? ''}管事在名册上给你写了「${rank.name}」。${gifts ? `领到${gifts}。` : ''}${art ? `学会「${art}」。` : ''}`);
+  const register = rank.disciple ? '' : `管事在名册上给你写了「${rank.name}」。`;
+  return kit.say(state, `${rank.text ?? ''}${register}${gifts ? `领到${gifts}。` : ''}${art ? `学会「${art}」。` : ''}`);
 }
 
 function targetSummary(region, data, reason, extra = {}) {
@@ -609,8 +625,9 @@ export function worldView(state, kit) {
       current: region.id === state.region, travelable: Boolean(roadsById[region.id]?.available) };
   });
   const affiliation = kit.data.sects?.find(({ id }) => state.world.affiliation === id);
+  const credit = affiliation ? pledge(state, affiliation)?.credit ?? 0 : 0;
   return { settlement: settlementOf(kit.data, state.region), localMarket: localMarket(state, kit), sect: sectView(state, kit),
-    affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit: pledge(state, affiliation).credit } : null,
+    affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit, disciple: discipleStanding(affiliation, credit) } : null,
     world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, edges: knownEdges, journeys, crossings: closedSidePaths,
       here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: here.x, y: here.y, description: here.description ?? actual.desc },
       scrollCount: kit.owns(state, 'gate_scroll'), gates, localGate: here.portal ? { attuned: state.world.gates.includes(state.region) } : null,

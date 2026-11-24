@@ -1,6 +1,6 @@
 const manuals = [
   {
-    id: 'reed_hand_manual', name: '苇岸抱拳谱', grade: '凡品', tier: 0,
+    id: 'reed_hand_manual', name: '苇岸拳谱', grade: '凡品', tier: 0,
     carried: '几张薄纸用苇叶包着。上面画的都是空手招式，每张纸的下角还画了握桨的样子。',
     desc: '白苇滩的渡工用这套手法护住手指和腕子。拳收得住，照样能推开贴身的对手。',
     specialty: ['fist'],
@@ -92,22 +92,22 @@ const manuals = [
       { base: { atk: 1, qi: 1 }, focus: { atk: 2, pierce: 1 }, effect: '空手或戴指虎出拳时，更容易打进硬甲的缝。' },
       { tier: 3, cost: 32, days: 1.5, need: { core: 3, battle_sinew: 3, foundation_core: 1 },
         base: { atk: 1, qi: 1 }, focus: { atk: 3, pierce: 1 },
-        fistCharge: { name: '沉炉贯拳', power: 9, pierce: 5, qi: 4 },
-        effect: '练成沉炉贯拳。用空手或指虎先蓄一回合，下一回合再贯出一拳。出拳耗真气，能打进硬甲。' },
+        fistCharge: { name: '沉炉重拳', power: 9, pierce: 5, qi: 4 },
+        effect: '练成沉炉重拳。用空手或指虎先蓄一回合，下一回合再打出这一拳。出拳耗真气，能打进硬甲。' },
       { tier: 5, cost: 54, days: 2.5, need: { black_iron: 5, core: 4, hard_scale: 4, foundation_core: 3 },
         base: { atk: 1, qi: 2 }, focus: { atk: 4, pierce: 1 },
-        fistCharge: { name: '沉炉贯拳', power: 11, pierce: 6, qi: 4 },
-        effect: '普通拳更重，沉炉贯拳也更能撼动厚甲。' },
+        fistCharge: { name: '沉炉重拳', power: 11, pierce: 6, qi: 4 },
+        effect: '普通拳更重，沉炉重拳也更能撼动厚甲。' },
       { tier: 7, cost: 78, days: 3.5, need: { hard_scale: 6, battle_sinew: 8, gold_core: 3 },
         base: { atk: 2, qi: 2 }, focus: { atk: 4, pierce: 2 },
-        fistCharge: { name: '沉炉贯拳', power: 13, pierce: 7, qi: 5 },
-        effect: '沉炉贯拳的劲更足，耗的真气也更多。惯用拳脚的人仍可随时打普通拳。' },
+        fistCharge: { name: '沉炉重拳', power: 13, pierce: 7, qi: 5 },
+        effect: '沉炉重拳的劲更足，耗的真气也更多。惯用拳脚的人仍可随时打普通拳。' },
     ],
   },
   {
     id: 'stone_shoulder_manual', name: '石肩诀', grade: '玄品', tier: 5,
     carried: '极薄的册子用旧竹片作封。竹片背上划着深浅不同的两道手掌印。',
-    desc: '岸边补箩老人所授。脚跟既已踏实，肩可以跟着杖头转，连短柄重锤都能借到这股力。',
+    desc: '岸边补竹筐的老人所授。脚跟既已踏实，肩可以跟着杖头转，连短柄重锤都能借到这股力。',
     specialty: ['staff', 'hammer'],
     ranks: [
       { base: { hp: 2, perception: 2 }, focus: { atk: 2, guard: 1 },
@@ -157,25 +157,25 @@ const sites = [
   { id: forgeBench, name: '挡风墙下的石墩', region: 'sand_bell_cloister', afterChoices: ['sand_cloister_trial:0'],
     once: [0, 1, 2],
     afterOnceText: {
-      0: '第一只石墩端正搁在托木上。柯醒伸指弹去拳垫上的石灰，示意你把手伸过去。',
-      1: '拳垫上留下浅浅一个凹印。柯醒擦去垫边石粉，翻过磨破一角的搬石护手。',
-      2: '两只石墩都落回托木上。柯醒把要送去试脚力的石墩用麻布裹好，拳垫仍靠墙立着。',
+      0: '第一只石墩端正搁在垫木上。柯醒伸指弹去拳垫上的石灰，示意你把手伸过去。',
+      1: '拳垫上留下浅浅一个凹印。柯醒擦去垫边石粉，翻过磨破一角的搬石头用的护手。',
+      2: '两只石墩都落回垫木上。柯醒把要送去试脚力的石墩用麻布裹好，拳垫仍靠墙立着。',
     } },
 ];
 
 const events = [
   {
     id: forgeBench, name: '挡风墙下的石墩',
-    text: '挡风墙下有两只炼脚劲的石墩。一只翻倒时把垫脚的木块压劈了。石工柯醒用裹布的手扶着石墩，脚尖却腾不出来去踩托木。墙上挂着一块让人试拳的软垫。',
+    text: '挡风墙下有两只炼脚劲的石墩。一只翻倒时把垫脚的木块压劈了。石工柯醒用裹布的手扶着石墩，脚尖却腾不出来去踩垫木。墙上挂着一块让人试拳的软垫。',
     choices: [
-      { label: '帮柯醒把托木移到石墩底下', days: 0.25, stay: true,
-        outcome: '你把托木送进石墩底下，柯醒慢慢松手。石墩坐稳了。他把裹手的布解开一层，指腹全是灰。「愿意学的话，去那垫子上打一拳，我看看你的手腕。」' },
+      { label: '帮柯醒把垫木移到石墩底下', days: 0.25, stay: true,
+        outcome: '你把垫木送进石墩底下，柯醒慢慢松手。石墩坐稳了。他把裹手的布解开一层，指腹全是灰。「愿意学的话，去那垫子上打一拳，我看看你的手腕。」' },
       { label: '在软垫上打一拳给柯醒看', afterChoice: 0, days: 0.25, stay: true, loot: { forge_fist_manual: 1 },
         outcome: '柯醒拿虎口在你的腕后托了一下，再让你打。垫里的砂从上到下响了一遍。他从石墩底下取出一叠拓纸。「前几页就够你练一阵。合上了腕，再去看留在后头的那一拳。」' },
-      { label: '给柯醒厚甲片和坚韧兽筋，修好他的搬石护手', afterChoice: 1,
+      { label: '给柯醒厚甲片和坚韧兽筋，修好他的搬石头用的护手', afterChoice: 1,
         desc: '他抬起护手，指尖那块甲片已经磕出缺口，穿甲的旧筋一拉便散。',
         days: 0.5, stay: true, need: { hard_scale: 1, battle_sinew: 1 }, consume: true, loot: { [forgeSample]: 1 },
-        outcome: '柯醒用兽筋缝紧甲片，戴着修好的护手接住你递来的石墩。在你临走时，他递来一对留着钳口的铁环。「这是打拳护手的铁样。你回去找个锻铁的，叫他照打时把内缘磨圆。」' },
+        outcome: '柯醒用兽筋缝紧甲片，戴着修好的护手接住你递来的石墩。在你临走时，他递来一对留着钳口的铁环。「这是打拳护手用的铁环样件。你回去找个锻铁的，叫他照打时把内缘磨圆。」' },
     ],
   },
 ];
@@ -210,8 +210,8 @@ function extendScenes(sites, events, allGear, enemies) {
   }, '卓缨把接好的试弓搁在架背。弦下垫着一片新兽革。');
 
   appendChoice(sites, events, 'zhao_bamboo_duel', {
-    label: '给砖圈补两根练杆，请傅澄讲撑杆的法子', afterVisitChoice: 0,
-    desc: '砖圈边还剩一根短竹尺。两只练杆的套头搁在廊柱下，换上两截松木，再镶一道铁箍就能接牢。',
+    label: '给练武场修两根木杆，请傅澄教怎么借长杆发力', afterVisitChoice: 0,
+    desc: '砖圈边还剩一根短竹尺。两根木杆的铁套搁在廊柱下，换上两截松木，再镶一道铁箍就能接牢。',
     days: 0.375, need: { wood: 2, ore: 1 }, consume: true, stay: true, loot: { levee_pole_manual: 1 },
     outcome: '傅澄拿修好的杆抵过你两次。第一次劲都压在两手，第二次却像从肩背滑到了脚下。「沿堤救船就靠这一手。」他让弟子去廊下取来一摞抄本。',
   }, '两根练杆都靠回砖圈外。新箍上还沾着一些铁屑。');
@@ -265,7 +265,7 @@ export const innerStyleContent = {
       id, name, kind: 'manual', price: 0, sell: 0, keepOnFall: true, desc: carried,
     })),
     ...gearItems,
-    { id: forgeSample, name: '叩石指虎铁样', kind: 'key', price: 0, sell: 0,
+    { id: forgeSample, name: '叩石指虎的样件', kind: 'key', price: 0, sell: 0,
       desc: '柯醒留给匠人的铁样。铁环内沿的毛边还在，旁边的钳印指明了应该从哪边收口。' },
   ],
   gear,

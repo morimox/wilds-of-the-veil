@@ -28,14 +28,14 @@ export const hazardContent = {
     id: trace, name: '结着盐壳的苇梗', kind: 'key', price: 0, sell: 0,
     desc: '苇梗卡在草丘的石缝里，湿的一头还带着井泥。炭篷驿的杨芹常在这一带饮马。',
   }],
-  sites: [{ id: site, region: dunes, name: '沙脊下的兽迹', once: [0],
+  sites: [{ id: site, region: dunes, name: '沙坡下的兽迹', once: [0],
     choiceText: { 0: {
       before: '旁边石缝里卡着一截苇梗，露在外头的一端结着白壳。',
       after: '取过苇梗的石缝里，仍有一条浅浅的盐渍。',
     } },
   }],
   events: [{
-    id: site, name: '沙脊下的兽迹',
+    id: site, name: '沙坡下的兽迹',
     text: '沙脊背面踩出一片新蹄印。印子全往炭篷驿那边去，边上还有股咸水味。',
     choices: [{
       label: '取出石缝里卡着的苇梗', days: 0.125, loot: { [trace]: 1 },
@@ -46,9 +46,9 @@ export const hazardContent = {
     id: enemy, name: '盐泥豺', tags: ['beast', 'furred'], tier: 2, hp: 43, atk: 9, def: 3, insight: 4,
     desc: '后腿沾了一层干盐泥，落地时不大使力。它先压低肩脊，接着才从低处猛扑。',
     intents: [
-      { name: '贴沙试咬', kind: 'attack', mult: 1 },
+      { name: '贴着沙地咬过来', kind: 'attack', mult: 1 },
       { name: '缩头护住伤腿', kind: 'guard', mult: 1.4 },
-      { name: '压肩扑来', kind: 'heavy', mult: 1.7 },
+      { name: '低下肩头扑过来', kind: 'heavy', mult: 1.7 },
     ],
     loot: { beast_meat: 2, hide: 2, qi_core: 2 },
   }],

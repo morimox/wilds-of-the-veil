@@ -249,6 +249,16 @@ test('upgrading a real book checks the location, materials and payment before ch
   play(state, 'take', { id: reedManual });
   assert.equal(manual(state, reedManual).rank, 2);
   assert.equal(view(state).innerStyle.active, null);
+
+  play(state, 'equipManual', { id: reedManual });
+  play(state, 'econDeposit', { id: reedManual });
+  assert.equal(state.economy.warehouse[reedManual], 1);
+  assert.equal(view(state).innerStyle, null);
+  assert.equal(state.activeManual, null);
+  play(state, 'econWithdraw', { id: reedManual });
+  assert.equal(state.economy.warehouse[reedManual], undefined);
+  assert.equal(manual(state, reedManual).rank, 2);
+  assert.equal(view(state).innerStyle.active, null);
 });
 
 function forgeFighter(rank, enemy = 'ford_shale_crab', intent = 'guard') {

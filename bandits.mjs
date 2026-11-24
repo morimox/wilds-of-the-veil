@@ -8,9 +8,11 @@ export const banditRules = Object.freeze({
   richGearChance: 0.75,
   recruitDelay: 18,
   recruitInterval: 6,
-  leaderlessDelay: 36,
-  leaderlessInterval: 12,
-  leaderlessPatrol: 0.55,
+  fatalDefeatBase: 0.16,
+  fatalDefeatPerTier: 0.02,
+  fatalDefeatCap: 0.32,
+  fatalChiefDefeat: 0.30,
+  ignoreUnarmedChance: 0.65,
 });
 
 export const roadKey = (a, b) => [a, b].sort().join('|');
@@ -48,8 +50,7 @@ function lostLeader(state, crew, kit) {
   return boss && (state.siteVictories[crew.den]?.[boss] ?? 0) > 0;
 }
 
-function recruitmentTerms(state, crew, kit) {
-  if (lostLeader(state, crew, kit)) return { delay: banditRules.leaderlessDelay, interval: banditRules.leaderlessInterval };
+function recruitmentTerms(crew) {
   return crew.recruit ?? { delay: banditRules.recruitDelay, interval: banditRules.recruitInterval };
 }
 
@@ -57,23 +58,12 @@ function recruitsByNow(state, id, kit) {
   const record = state.banditCrews[id];
   if (!record?.defeated.length || record.nextRecruitDay == null || state.day < record.nextRecruitDay) return record;
   const crew = kit.data.roadBandits.crews[id];
-  const { interval } = recruitmentTerms(state, crew, kit);
+  const { interval } = recruitmentTerms(crew);
   const amount = Math.min(record.defeated.length, Math.floor((state.day - record.nextRecruitDay) / interval) + 1);
   const recruits = { ...record.recruits };
   for (const key of record.defeated.slice(0, amount)) recruits[key] = (recruits[key] ?? 0) + 1;
   const defeated = record.defeated.slice(amount);
   return { ...record, defeated, recruits, nextRecruitDay: defeated.length ? record.nextRecruitDay + amount * interval : null };
-}
-
-export function deferBanditRecruits(state, siteId, enemyId, kit) {
-  if (kit.data.roadBandits.dens[siteId]?.boss !== enemyId) return;
-  for (const [id, crew] of Object.entries(kit.data.roadBandits.crews)) {
-    if (crew.den !== siteId) continue;
-    const record = recruitsByNow(state, id, kit);
-    if (!record) continue;
-    state.banditCrews[id] = record;
-    if (record.defeated.length) record.nextRecruitDay = Math.max(record.nextRecruitDay ?? 0, state.day + banditRules.leaderlessDelay);
-  }
 }
 
 function unresolvedBandit(crewId, enemies, state) {
@@ -107,22 +97,22 @@ export function roadBanditRisk(state, leg, kit) {
   const profile = kit.data.roadBandits.roads.find(({ a, b }) => roadKey(a, b) === leg.key);
   if (!profile) return null;
   const crew = kit.data.roadBandits.crews[profile.crew];
+  if (lostLeader(state, crew, kit)) {
+    return { chance: 0, crew: profile.crew, riskText: '寨主倒了，沿路已无人敢伸手收钱。' };
+  }
   const den = kit.data.roadBandits.dens[crew.den];
-  const leaderless = lostLeader(state, crew, kit);
   const livingGuards = den ? (kit.banditDenPopulation?.(state, crew.den) ?? den.heads) : 0;
   const routed = den ? Math.max(0, den.heads - livingGuards) : 0;
   const population = crew.members.reduce((sum, number) => sum + number, 0);
   const defeated = recruitsByNow(state, profile.crew, kit)?.defeated.length ?? 0;
   const remaining = Math.max(0, population - defeated);
-  const maximumPatrol = leaderless ? banditRules.leaderlessPatrol : 1;
-  const patrol = den ? den.minFactor + (maximumPatrol - den.minFactor) * Math.min(1, livingGuards / den.heads) : 1;
+  const patrol = den ? den.minFactor + (1 - den.minFactor) * Math.min(1, livingGuards / den.heads) : 1;
   const avoidance = kit.activeGear(state)
     .flatMap(({ trait, traits = [] }) => [trait, ...traits])
     .reduce((sum, trait) => sum + (trait?.kind === 'dodge' ? trait.bonus : 0), 0);
   const concealment = Math.min(banditRules.maxConcealment, avoidance * banditRules.concealmentFactor);
   return { chance: profile.chance * (remaining / population) * patrol * (1 - concealment), crew: profile.crew,
     riskText: !remaining ? '近来已看不见守路伸手的人。'
-      : leaderless ? '坡寨换了人看门，路边的贼哨稀了。'
       : defeated >= population / 2 ? '这一带拦路的人已经少多了。'
       : routed ? '路边的贼哨少了。' : profile.riskText };
 }
@@ -152,9 +142,9 @@ function stopForBandit(state, leg, crewId, kit) {
   const member = fixed ? null : pickBandit(state, grade, crewId, kit);
   if (!fixed && !member) return null;
   const pool = member && kit.data.roadBandits.pools.find(({ tier }) => tier === member.tier);
-  const enemy = fixed?.enemy ?? pool.enemy;
-  const stage = Math.floor(kit.records.enemies[enemy].tier / 3);
-  const nonThreat = Boolean(fixed && fixed.fee != null && stage !== grade);
+  const enemy = fixed ? fixed.enemy : pool.enemy;
+  const stage = enemy ? Math.floor(kit.records.enemies[enemy].tier / 3) : grade;
+  const nonThreat = Boolean(fixed && (fixed.allowFight === false || (fixed.fee != null && stage !== grade)));
   const fee = fixed ? (nonThreat ? null : fixed.fee ?? null)
     : range({ roadSeed: memberLootSeed(state, { crew: crewId, member: member.key }) ^ 0x85a3ef1f }, pool.fee);
   const onStoryRoad = fixed && roadKey(fixed.a, fixed.b) === leg.key;
@@ -162,12 +152,16 @@ function stopForBandit(state, leg, crewId, kit) {
     ? '他先打量你背光的一侧，伸手时并没看清护具的纹样。'
     : '路边的人本像是在等别的旅客。见你到了近处，他才挪身拦住。';
   const message = fixed
-    ? (nonThreat ? fixed.nonThreatIntro : onStoryRoad ? fixed.intro : fixed.crewIntro ?? fixed.intro)
+    ? ((nonThreat && fixed.nonThreatIntro) || (onStoryRoad ? fixed.intro : fixed.crewIntro ?? fixed.intro))
     : (stage === grade ? '他横着兵器挡住路，朝你的行囊抬了抬下巴。' : unexpected);
-  state.roadBandit = { enemy, fixed: fixed?.id, crew: crewId, member: member?.key,
-    fee, paid: 0, intro: message, nonThreat };
   (state.roadTrip.banditsMet ??= []).push(fixed?.id ?? `${crewId}/${member.key}`);
   crewRecord(state, crewId).encounters++;
+  if (!fixed && Object.values(state.equipment).every((id) => !id) && draw(state) < banditRules.ignoreUnarmedChance) {
+    return { ...kit.say(state, '强盗上下看了你一眼。「连件像样的行头都没有，走吧。」他挥挥手，让开了路。'),
+      roadInterrupted: true, banditDismissed: true };
+  }
+  state.roadBandit = { enemy, fixed: fixed?.id, crew: crewId, member: member?.key,
+    fee, intro: message, nonThreat };
   return { ...kit.say(state, message), roadInterrupted: true };
 }
 
@@ -189,8 +183,9 @@ function demands(state, kit) {
   return Object.entries(state.inventory).flatMap(([id]) => {
     const item = kit.records.items[id];
     const count = kit.saleTerms(state, id).count;
-    return item?.sell > 0 && count > 0 && !kit.isEvidence(item) && !item.keepOnFall && item.kind !== 'manual'
-      ? [{ id, name: item.name, count, price: item.sell }] : [];
+    if (!(item?.sell > 0) || count <= 0 || kit.isEvidence(item) || item.keepOnFall || item.kind === 'manual') return [];
+    const price = item.price > 0 ? Math.round((item.price + item.sell) / 2) : item.sell;
+    return [{ id, name: item.name, count, price }];
   });
 }
 
@@ -210,17 +205,32 @@ function plotReason(state, option, kit) {
   return Object.keys(missing).length ? `手边还缺${kit.goodsText(missing)}。` : '';
 }
 
+function tollOffer(state, bandit, kit) {
+  const { coins = 0, goods = {} } = bandit.offer ?? {};
+  const saleable = demands(state, kit);
+  const offered = saleable.filter(({ id }) => goods[id] > 0)
+    .map((item) => ({ ...item, count: Math.min(goods[item.id], item.count) }));
+  const offerCoins = Math.min(coins, state.coins);
+  const value = offerCoins + offered.reduce((sum, item) => sum + item.count * item.price, 0);
+  return { saleable, offered, offerCoins, value, remaining: Math.max(0, bandit.fee - value),
+    allValue: state.coins + saleable.reduce((sum, item) => sum + item.count * item.price, 0) };
+}
+
 export function roadBanditView(state, kit) {
   const bandit = state.roadBandit;
   if (!bandit || state.combat) return null;
   const story = storyOf(state, kit);
-  const remaining = bandit.fee === null ? null : bandit.fee - bandit.paid;
-  const offers = remaining === null ? [] : demands(state, kit);
-  return { name: kit.records.enemies[bandit.enemy].name,
+  const quote = bandit.fee === null ? null : tollOffer(state, bandit, kit);
+  return { name: story?.name ?? kit.records.enemies[bandit.enemy].name,
     intro: bandit.intro,
-    fee: bandit.fee, remaining, coins: state.coins,
-    offers: offers.map(({ count, price, ...goods }) => ({ ...goods, held: count, count: Math.min(count, Math.ceil(remaining / price)), price })),
-    allValue: state.coins + offers.reduce((sum, { count, price }) => sum + count * price, 0),
+    fee: bandit.fee, remaining: quote?.remaining ?? null, coins: state.coins,
+    offerCoins: quote?.offerCoins ?? 0, offerValue: quote?.value ?? 0, offeredGoods: quote?.offered ?? [],
+    offers: (quote?.saleable ?? []).flatMap(({ count, price, ...goods }) => {
+      const selected = quote.offered.find(({ id }) => id === goods.id)?.count ?? 0;
+      const held = count - selected;
+      return held && quote.remaining > 0 ? [{ ...goods, held, count: Math.min(held, Math.ceil(quote.remaining / price)), price }] : [];
+    }),
+    allValue: quote?.allValue ?? state.coins,
     aftermath: Boolean(bandit.aftermath),
     passAllowed: bandit.nonThreat && !bandit.aftermath,
     fightAllowed: !bandit.nonThreat && !bandit.aftermath,
@@ -250,7 +260,78 @@ function payAndPass(state, story, message, kit) {
   return resolveBandit(state, story, aftermath, message + (aftermath?.outcome ?? ''), kit);
 }
 
-const roadActions = new Set(['banditFight', 'banditPlot', 'banditPass', 'banditPay', 'banditPayCoins', 'banditPayItem', 'banditSurrender']);
+function settleToll(state, story, coins, goods, kit) {
+  for (const [id, count] of Object.entries(goods)) kit.removeItem(state, id, count, false);
+  state.coins -= coins;
+  const contents = [coins && `${coins}枚灵钱`, kit.goodsText(goods)].filter(Boolean).join('、');
+  return { ...payAndPass(state, story, contents
+    ? `你交出${contents}。他侧过身让出路。`
+    : '你把空钱袋翻给他看。他嘟囔了一声，转进草里。', kit), paidGoods: goods, paidCoins: coins };
+}
+
+function spoilsOwner(state, siteId) {
+  const road = state.roadBandit;
+  if (!siteId && road) {
+    return road.fixed ? `story:${road.fixed}` : `crew:${road.crew}/${road.member}`;
+  }
+  return siteId ? `den:${siteId}` : null;
+}
+
+function confiscate(state, siteId, kit, otherGoods = {}) {
+  const gear = Object.keys(state.inventory).filter((id) => kit.records.gear[id])
+    .map((id) => ({ id, durability: state.durability[id] }));
+  const coins = state.coins;
+  const goods = { ...otherGoods, ...Object.fromEntries(gear.map(({ id }) => [id, 1])) };
+  const owner = spoilsOwner(state, siteId);
+  if (owner && (coins || Object.keys(goods).length)) {
+    const hold = (state.banditSpoils[owner] ??= { coins: 0, gear: [], goods: {} });
+    hold.coins += coins;
+    hold.gear.push(...gear);
+    for (const [id, count] of Object.entries(otherGoods)) hold.goods[id] = (hold.goods[id] ?? 0) + count;
+  }
+  state.coins = 0;
+  for (const [id, count] of Object.entries(goods)) kit.removeItem(state, id, count, false);
+  return { goods, coins };
+}
+
+export function banditDefeat(state, enemy, kit) {
+  const siteId = state.combat.siteId;
+  const chief = kit.data.roadBandits.dens[siteId]?.boss === enemy.id;
+  const chance = chief ? banditRules.fatalChiefDefeat
+    : Math.min(banditRules.fatalDefeatCap, banditRules.fatalDefeatBase + enemy.tier * banditRules.fatalDefeatPerTier);
+  state.banditLossSeed = (Math.imul(state.banditLossSeed, 1664525) + 1013904223) >>> 0;
+  return { ...confiscate(state, siteId, kit), deadly: state.banditLossSeed / 0x100000000 < chance };
+}
+
+export function recoverBanditSpoils(state, siteId, kit, chiefFell = false) {
+  const owners = [spoilsOwner(state, siteId)];
+  if (chiefFell) {
+    const crews = Object.entries(kit.data.roadBandits.crews).filter(([, crew]) => crew.den === siteId).map(([id]) => id);
+    const stories = kit.data.roadBandits.fixed.filter(({ crew }) => crews.includes(crew)).map(({ id }) => `story:${id}`);
+    owners.push(...Object.keys(state.banditSpoils).filter((key) => stories.includes(key) ||
+      crews.some((id) => key.startsWith(`crew:${id}/`))));
+  }
+  const goods = {};
+  let coins = 0;
+  for (const owner of owners) {
+    const hold = state.banditSpoils[owner];
+    if (!hold) continue;
+    delete state.banditSpoils[owner];
+    coins += hold.coins;
+    kit.leaveOnGround(state, hold.goods);
+    for (const [id, count] of Object.entries(hold.goods)) goods[id] = (goods[id] ?? 0) + count;
+    for (const { id, durability } of hold.gear) {
+      kit.leaveOnGround(state, { [id]: 1 }, { [id]: durability });
+      goods[id] = (goods[id] ?? 0) + 1;
+    }
+  }
+  state.coins += coins;
+  const recovered = [coins && `${coins}枚灵钱`, kit.goodsText(goods)].filter(Boolean).join('、');
+  return recovered ? `先前被强盗拿走的${recovered}找回来了。${Object.keys(goods).length ? '物件留在脚边。' : ''}` : '';
+}
+
+const roadActions = new Set(['banditFight', 'banditPlot', 'banditPass', 'banditPay', 'banditPayCoins', 'banditPayItem',
+  'banditSurrender', 'banditSettle', 'banditClearOffer']);
 
 export function banditAction(state, action, { id, count = 1 }, kit) {
   if (!state.roadBandit || !roadActions.has(action)) return null;
@@ -259,10 +340,11 @@ export function banditAction(state, action, { id, count = 1 }, kit) {
   if (bandit.aftermath && action !== 'banditPlot') return kit.refuse('他还在等你答话。');
   if (action === 'banditPass') {
     if (!bandit.nonThreat) return kit.refuse('眼下他还挡在路上。');
-    return resolveBandit(state, null, null, '他扶着车板退开一步，你沿路往前走。', kit);
+    return resolveBandit(state, null, null, story?.passOutcome ?? '他侧过身让出路，你沿路往前走。', kit);
   }
   if (action === 'banditFight') {
     if (bandit.nonThreat) return kit.refuse('他已经把兵器收起，让开了路。');
+    delete bandit.offer;
     kit.startCombat(state, bandit.enemy);
     state.combat.roadBandit = true;
     return kit.say(state, '你把行囊拢到身后，摆开架势。');
@@ -277,47 +359,53 @@ export function banditAction(state, action, { id, count = 1 }, kit) {
     return resolveBandit(state, story, option, option.outcome, kit);
   }
   if (bandit.fee === null) return kit.refuse('他并未开口讨钱。');
-  const remaining = bandit.fee - bandit.paid;
+  const { saleable, offered, offerCoins, remaining, allValue } = tollOffer(state, bandit, kit);
+  if (action === 'banditPay') {
+    if (state.coins < bandit.fee) return kit.refuse('手头的灵钱还不够。');
+    return settleToll(state, story, bandit.fee, {}, kit);
+  }
+  if (action === 'banditClearOffer') {
+    if (!bandit.offer) return kit.refuse('你还没挑东西。');
+    delete bandit.offer;
+    return kit.say(state, '你把挑出的钱物收回，重新打量他。');
+  }
+  if (action === 'banditSettle') {
+    if (remaining) return kit.refuse(`还差${remaining}枚灵钱。`);
+    return settleToll(state, story, offerCoins, Object.fromEntries(offered.map(({ id, count }) => [id, count])), kit);
+  }
   if (action === 'banditSurrender') {
-    const offers = demands(state, kit);
-    if (state.coins + offers.reduce((sum, item) => sum + item.count * item.price, 0) >= remaining) {
+    if (allValue >= bandit.fee) {
       return kit.refuse('手里的东西还凑得齐，挑几样给他就能过去。');
     }
-    const paid = { ...Object.fromEntries(offers.map((item) => [item.id, item.count])) };
-    for (const item of offers) kit.removeItem(state, item.id, item.count, false);
-    const coins = state.coins;
-    state.coins = 0;
-    const contents = [coins && `${coins}枚灵钱`, kit.goodsText(paid)].filter(Boolean).join('、');
-    return { ...payAndPass(state, story, contents
-      ? `你交出${contents}。他掂了掂，侧过身让出路。`
-      : '你把空钱袋翻给他看。他嘟囔了一声，转进草里。', kit), paidGoods: paid, paidCoins: coins };
+    const others = Object.fromEntries(saleable.filter(({ id }) => !kit.records.gear[id]).map(({ id, count }) => [id, count]));
+    const paid = confiscate(state, null, kit, others);
+    const message = paid.coins || Object.keys(paid.goods).length ? '你交出能抵价的财物和随身行装。强盗拿上东西，放你过去。'
+      : '你摊开手。他踢了一脚空钱袋，挥手让你过去。';
+    return { ...payAndPass(state, story, message, kit),
+      paidGoods: paid.goods, paidCoins: paid.coins };
   }
-  if (action === 'banditPay' || action === 'banditPayCoins') {
-    const coins = Math.min(state.coins, remaining);
-    if (!coins || (action === 'banditPay' && coins < remaining)) return kit.refuse('手头的灵钱还不够。');
-    state.coins -= coins;
-    bandit.paid += coins;
-    const message = `你递给他${coins}枚灵钱。`;
-    return { ...(coins === remaining ? payAndPass(state, story, message + '他让开了路。', kit)
-      : kit.say(state, message + `他还要${remaining - coins}枚。`)), paidCoins: coins };
+  if (action === 'banditPayCoins') {
+    const coins = Math.min(state.coins - offerCoins, remaining);
+    if (!coins) return kit.refuse('手边没有更多散钱可添。');
+    (bandit.offer ??= { coins: 0, goods: {} }).coins = offerCoins + coins;
+    return kit.say(state, `打算添上${coins}枚灵钱。`);
   }
-  const quote = demands(state, kit).find((item) => item.id === id);
-  if (!quote || !Number.isSafeInteger(count) || count < 1 || count > Math.min(quote.count, Math.ceil(remaining / quote.price))) {
+  const quote = saleable.find((item) => item.id === id);
+  const selected = bandit.offer?.goods[id] ?? 0;
+  if (!quote || !Number.isSafeInteger(count) || count < 1 ||
+      count > Math.min(quote.count - selected, Math.ceil(remaining / quote.price))) {
     return kit.refuse('挑一样他肯收的物件，再看看数量。');
   }
-  kit.removeItem(state, id, count, false);
-  const value = count * quote.price;
-  bandit.paid += value;
-  const message = `你交了${quote.name}×${count}，抵${value}枚灵钱。`;
-  return { ...(value >= remaining ? payAndPass(state, story, message + '他让开了路。', kit)
-    : kit.say(state, message + `他还要${remaining - value}枚。`)), paidGoods: { [id]: count } };
+  (bandit.offer ??= { coins: 0, goods: {} }).goods[id] = selected + count;
+  return kit.say(state, `挑出${quote.name}×${count}，可抵${count * quote.price}枚灵钱。`);
 }
 
 export function winRoadBandit(state, enemy, kit) {
   const bandit = state.roadBandit;
   const story = storyOf(state, kit);
   const pool = kit.data.roadBandits.pools.find(({ enemy: id }) => id === enemy.id);
-  const lead = `你击退了${enemy.name}。`;
+  const recovered = recoverBanditSpoils(state, null, kit);
+  const lead = story ? `你击退了${enemy.name}。${recovered}` : `你击杀了${enemy.name}。${recovered}`;
   if (story?.afterWin?.actions?.length) {
     bandit.aftermath = true;
     bandit.fee = null;
@@ -330,7 +418,7 @@ export function winRoadBandit(state, enemy, kit) {
   record.defeated.push(bandit.member);
   if (record.nextRecruitDay == null) {
     const crew = kit.data.roadBandits.crews[bandit.crew];
-    const { delay } = recruitmentTerms(state, crew, kit);
+    const { delay } = recruitmentTerms(crew);
     record.nextRecruitDay = state.day + delay;
   }
   const lootRoll = { roadSeed: memberLootSeed(state, bandit) };
@@ -338,7 +426,8 @@ export function winRoadBandit(state, enemy, kit) {
   const coins = range(lootRoll, rich ? pool.richCash : pool.cash);
   const candidate = draw(lootRoll) < (rich ? banditRules.richGearChance : banditRules.ordinaryGearChance)
     ? chooseWeighted(lootRoll, rich ? pool.richGear : pool.gear, ({ weight }) => weight) : null;
-  const item = candidate && !kit.gearReserved(state, candidate.id) ? kit.records.gear[candidate.id] : null;
+  const item = candidate && !kit.groundAt(state)[candidate.id] && !kit.gearReserved(state, candidate.id)
+    ? kit.records.gear[candidate.id] : null;
   const goods = item ? { [item.id]: 1 } : {};
   const wear = item ? { [item.id]: Math.ceil(item.durability * range(lootRoll, rich ? [65, 87] : [34, 65]) / 100) } : {};
   kit.leaveOnGround(state, goods, wear);

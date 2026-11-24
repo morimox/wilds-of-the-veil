@@ -17,18 +17,24 @@ const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterl
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
 const guide = document.querySelector("#help");
+const guideAffiliation = document.createElement("p");
+guideAffiliation.className = "fine sect-affiliation";
+guideAffiliation.hidden = true;
+guide.querySelector(".dialog-head").after(guideAffiliation);
 const kit = document.querySelector("#kit");
 const notices = document.querySelector("#notices");
 const opening = document.querySelector("#opening");
 const transfer = document.querySelector("#transfer");
 const instantRoutes = ["gateJump", "gateScroll", "arrayJump"];
 const roadTravelActions = ["travel", "roadContinue", "roadBack"];
-const banditPaymentActions = ["banditPay", "banditPayCoins", "banditPayItem", "banditSurrender"];
+const banditPaymentActions = ["banditPay", "banditSettle", "banditSurrender"];
+const banditOfferActions = ["banditPayCoins", "banditPayItem", "banditClearOffer"];
 let state = freshGame();
 let screen = "journey";
 let marketMode = "buy";
 let activeFacility = "warehouse";
 let openingTimer;
+let restartNotice = false;
 let transferTimer;
 let selectedItem = null;
 let combatObservation = null;
@@ -46,6 +52,10 @@ function dismissOpening() {
   opening.hidden = true;
   app.inert = false;
   main.querySelector("button")?.focus({ preventScroll: true });
+  if (restartNotice) {
+    restartNotice = false;
+    showNotice(["新的行程开始了。"], false);
+  }
 }
 
 function showOpening() {
@@ -246,26 +256,40 @@ function roadPosition(road) {
 }
 
 function banditOffers(bandit) {
+  if (bandit.remaining <= 0) return "";
   const offers = (bandit.offers ?? []).filter(offer => offer.count > 0 && offer.price > 0);
   if (!offers.length) return "";
   const expanded = main.querySelector("[data-road-offers]")?.open;
   const rows = offers.map(({ id, name, held, count, price }) => {
     const quantity = Math.min(count, Math.ceil(bandit.remaining / price));
     const entry = `road-offer-${id}`;
-    const first = linkButton("交 1 件", "banditPayItem", id, "quiet", false, 1, entry);
-    const batch = quantity > 1 ? linkButton(`交 ${quantity} 件`, "banditPayItem", id, "quiet", false, quantity, entry) : "";
+    const first = linkButton("选 1 件", "banditPayItem", id, "quiet", false, 1, entry);
+    const batch = quantity > 1 ? linkButton(`选 ${quantity} 件`, "banditPayItem", id, "quiet", false, quantity, entry) : "";
     return `<div class="road-offer"><span id="${escape(entry)}">${escape(name)} <small class="fine">×${held ?? count} · 每件抵 ${price} 灵钱</small></span><div class="actions">${first}${batch}</div></div>`;
   });
   return `<details class="road-offers" data-road-offers${expanded ? " open" : ""}><summary>拿东西抵价</summary>${rows.join("")}</details>`;
 }
 
+function banditDraft(bandit) {
+  if (!bandit.offerValue) return "";
+  const goods = (bandit.offeredGoods ?? []).map(({ name, count }) => `${name} ×${count}`);
+  const contents = [bandit.offerCoins > 0 && `${bandit.offerCoins} 灵钱`, ...goods].filter(Boolean).join("、");
+  return `<div class="road-draft">
+    <p>准备交出${escape(contents)}</p>
+    <p class="fine">合计抵 ${bandit.offerValue} 灵钱${bandit.remaining > 0 ? ` · 还差 ${bandit.remaining} 灵钱` : ""}</p>
+    <div class="actions">${linkButton("确认交付", "banditSettle", "", "primary", bandit.remaining > 0)}
+      ${linkButton("重新选", "banditClearOffer", "", "quiet")}</div></div>`;
+}
+
 function banditScreen(bandit) {
   const remaining = bandit.remaining;
   const askingForMoney = !bandit.aftermath && remaining != null;
-  const pay = !askingForMoney ? "" : bandit.coins >= remaining ? linkButton(`付 ${remaining} 灵钱`, "banditPay", "", "primary")
-    : bandit.coins > 0 ? linkButton(`先付 ${bandit.coins} 灵钱`, "banditPayCoins") : "";
-  const surrender = askingForMoney && bandit.allValue < remaining
-    ? linkButton(bandit.allValue ? "交出所有能抵价的东西" : "亮出空钱袋，请他放行", "banditSurrender", "", "quiet") : "";
+  const directCash = askingForMoney && !bandit.offerValue && bandit.coins >= bandit.fee;
+  const cashToOffer = askingForMoney ? Math.min(remaining, bandit.coins - (bandit.offerCoins ?? 0)) : 0;
+  const pay = directCash ? linkButton(`付 ${bandit.fee} 灵钱`, "banditPay", "", "primary")
+    : cashToOffer > 0 ? linkButton(`选 ${cashToOffer} 灵钱`, "banditPayCoins") : "";
+  const surrender = askingForMoney && bandit.allValue < bandit.fee
+    ? linkButton("交出行装，求他放行", "banditSurrender", "", "quiet", false, 1, "road-surrender-note") : "";
   const fight = !bandit.aftermath && bandit.fightAllowed !== false ? linkButton("动手闯过去", "banditFight", "", "danger") : "";
   const pass = bandit.passAllowed ? `<div class="actions">${linkButton("从旁边过去", "banditPass", "", "quiet")}</div>` : "";
   const ask = bandit.actions ?? [];
@@ -273,9 +297,10 @@ function banditScreen(bandit) {
     ${desc ? `<p>${escape(desc)}</p>` : ""}${linkButton(label, "banditPlot", id, "quiet", available === false)}
     ${reason ? `<p class="choice-blocker">${escape(reason)}</p>` : ""}</div>`).join("");
   return panel(bandit.aftermath ? "交手之后" : bandit.name, `<p class="intro">${escape(bandit.intro)}</p>
-    ${askingForMoney ? `<p class="road-demand">开价 ${bandit.fee} 灵钱${remaining !== bandit.fee ? ` · 还差 ${remaining} 灵钱` : ""}<span class="fine">钱袋 ${bandit.coins} 灵钱</span></p>` : ""}
+    ${askingForMoney ? `<p class="road-demand">开价 ${bandit.fee} 灵钱<span class="fine">钱袋 ${bandit.coins} 灵钱</span></p>` : ""}
     ${pay || surrender || fight ? `<div class="actions">${pay}${surrender}${fight}</div>` : ""}
-    ${askingForMoney ? banditOffers(bandit) : ""}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
+    ${surrender ? '<p class="fine road-surrender" id="road-surrender-note">他会拿走灵钱、能抵价的东西，以及身上和包里的装备。</p>' : ""}
+    ${askingForMoney ? banditDraft(bandit) + banditOffers(bandit) : ""}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
 }
 
 function roadScreen(s) {
@@ -286,7 +311,15 @@ function roadScreen(s) {
     ${linkButton(turnBack, "roadBack", "", "quiet")}</div>`);
 }
 
+function deathScreen(s) {
+  const death = s.banditDeath;
+  return panel("行程结束", `<p class="intro">${escape(death?.desc ?? "你倒在了路上。")}</p>
+    <div class="actions"><button type="button" class="button primary" data-reset="death">重新开始</button></div>`,
+    death?.name ? tag(death.name, "warn") : "");
+}
+
 function journey(s) {
+  if (s.mode === "death") return deathScreen(s);
   if (s.mode === "event") return eventScreen(s);
   if (s.mode === "combat") return combatScreen(s);
   if (s.mode === "road") return roadScreen(s);
@@ -932,19 +965,22 @@ function localMarketScreen(s) {
 function sectScreen(s) {
   const sect = s.sect;
   const joining = sect.join;
+  const disciple = sect.disciple;
   const jobs = sect.joined ? sect.jobs.map(job => card(job.name, job.desc, tag(`${job.credit} 功劳`),
     linkButton(job.reason || "交这班差事", "sectWork", job.id, "", !job.available), "", job.need)).join("") : "";
   const ranks = sect.joined ? sect.ranks.map(rank => {
     const art = data.arts.find(({ id }) => id === rank.art);
-    return card(rank.name, [supplies(rank.reward), art?.name].filter(Boolean).join(" · "), tag(`${rank.credit} 功劳`),
+    const role = rank.disciple === disciple?.name && rank.credit === disciple?.credit ? "" : rank.role;
+    return card(rank.disciple ?? rank.name, [role, supplies(rank.reward), art?.name].filter(Boolean).join(" · "), tag(`${rank.credit} 功劳`),
       rank.claimed || rank.honorary ? "" : linkButton(rank.reason || "领门中回礼", "sectClaim", rank.id, "", !rank.available));
   }).join("") : "";
   const invitation = sect.joined ? "" : joining.returning ? '<p class="fine">退门前的功劳还在。</p>' :
     `<p class="fine">入门 ${joining.coins} 灵钱 · ${escape(supplies(joining.need))}</p>`;
   const button = sect.joined ? linkButton("向管事辞行", "sectLeave", "", "quiet") :
     linkButton(joining.reason || (joining.returning ? "回师门" : "向管事投帖"), "sectJoin", "", "", !joining.available);
-  return panel(sect.name, `<p class="intro">${escape(sect.desc)}</p>${invitation}<div class="actions">${button}</div>
-    ${jobs ? `<div class="card-grid">${jobs}${ranks}</div>` : ""}`, sect.joined ? tag(`${sect.credit} 功劳`) : "");
+  return panel(sect.name, `<p class="intro">${escape(sect.desc)}</p>${disciple?.role ? `<p class="fine sect-affiliation">${escape(disciple.role)}</p>` : ""}
+    ${invitation}<div class="actions">${button}</div>${jobs || ranks ? `<div class="card-grid">${jobs}${ranks}</div>` : ""}`,
+    disciple ? tag(`${disciple.name} · ${sect.credit} 功劳`) : "");
 }
 
 function tournamentScreen(s) {
@@ -979,7 +1015,7 @@ function trainingScreen(s) {
       ${next ? `<p class="fine">下一阶 ${escape(next.effect)}</p><p class="fine">${escape(payment)}</p>` : ""}
       ${button ? `<div class="actions">${button}</div>` : ""}</article>`;
   }).join("");
-  const affiliation = s.affiliation ? tag(`${s.affiliation.name} · ${s.affiliation.credit} 功劳`) : "";
+  const affiliation = s.affiliation ? tag(`${s.affiliation.name} · ${s.affiliation.disciple.name}`) : "";
   return panel("修习进度", `<div class="card-grid">${contents}</div>`, affiliation);
 }
 
@@ -1065,14 +1101,16 @@ function keyboardFocus() {
   if (!area) return null;
   const keys = focusKeys.filter(key => control.hasAttribute(key))
     .map(key => `[${key}="${CSS.escape(control.getAttribute(key))}"]`).join("");
-  return { area, keys };
+  return { area, keys, action: control.dataset.action };
 }
 
 function restoreKeyboardFocus(focus) {
   if (!focus) return;
   const candidates = focus.keys ? [...focus.area.querySelectorAll(`button${focus.keys}:enabled`)] : [];
   const inspected = focus.area === kit && selectedItem ? kit.querySelector(`[data-item="${CSS.escape(selectedItem)}"]`) : null;
-  const chosen = candidates.find(control => control.getClientRects().length) ?? inspected ??
+  const offerFollowUp = focus.area === main && banditOfferActions.includes(focus.action)
+    ? main.querySelector('[data-action="banditSettle"]:enabled') ?? main.querySelector('[data-road-offers] summary') : null;
+  const chosen = candidates.find(control => control.getClientRects().length) ?? inspected ?? offerFollowUp ??
     [...main.querySelectorAll("button:enabled")].find(control => control.getClientRects().length);
   if (chosen) {
     chosen.focus({ preventScroll: true });
@@ -1089,8 +1127,9 @@ function render() {
   const focus = keyboardFocus();
   const s = view(state);
   if (s.mode !== "combat") combatObservation = null;
+  const dead = s.mode === "death";
   const inEvent = s.mode === "event";
-  const inEncounter = s.mode === "combat" || s.mode === "victory" || s.mode === "road" || Boolean(s.gathering);
+  const inEncounter = dead || s.mode === "combat" || s.mode === "victory" || s.mode === "road" || Boolean(s.gathering);
   const services = inVillage(s) ? villageServices(s) : [];
   const originalHome = atLanding(s);
   const knowMap = s.region.id !== "village" || s.discovered.length > 2 || Object.keys(s.eventsSeen).length > 0;
@@ -1106,8 +1145,13 @@ function render() {
   const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, yard, alchemy, quests: questBoard,
     deduction: deductionBoard, atlas, localMarket: localMarketScreen, sect: sectScreen, tournament: tournamentScreen, training: trainingScreen };
   document.querySelector("#clock").textContent = `第${Math.floor(s.day)}日 · ${s.day % 1 < 0.5 ? "白昼" : "夜里"}`;
-  document.querySelector("#player-status").innerHTML = stats(s);
-  kit.innerHTML = pack(s);
+  const playerStatus = document.querySelector("#player-status");
+  playerStatus.hidden = dead;
+  playerStatus.innerHTML = dead ? "" : stats(s);
+  kit.hidden = dead;
+  kit.innerHTML = dead ? "" : pack(s);
+  app.querySelector("[data-help]").hidden = dead;
+  if (dead && guide.open) guide.close();
   for (const button of document.querySelectorAll("#player-status [data-action], #kit [data-action]")) {
     if (s.gathering) button.disabled = true;
   }
@@ -1116,8 +1160,11 @@ function render() {
     button.hidden = inEncounter || id === tab || !available[id] || (inEvent && !["journey", "atlas"].includes(id));
   }
   guide.querySelector('[data-tab="training"]').hidden = !available.training || inEncounter || inEvent;
-  main.innerHTML = roadPosition(s.roadTrip) + content[tab](s);
+  guideAffiliation.hidden = !s.affiliation;
+  guideAffiliation.textContent = s.affiliation ? `${s.affiliation.name} · ${s.affiliation.disciple.name}` : "";
+  main.innerHTML = (dead ? "" : roadPosition(s.roadTrip)) + content[tab](s);
   restoreKeyboardFocus(focus);
+  return s;
 }
 
 function selectItem(key) {
@@ -1144,7 +1191,8 @@ function showNotice(lines, warning) {
   setTimeout(() => toast.remove(), 4400);
 }
 
-function feedback(before, after, result, action) {
+function feedback(before, after, result, action, presentation) {
+  if (result.ok && banditOfferActions.includes(action)) return [];
   const ate = action === "eat" || action === "batchEat";
   const rested = action === "rest" || action === "restUntilRecovered";
   if (result.ok && ["buy", "sell", "localBuy", "localSell"].includes(action)) {
@@ -1165,6 +1213,11 @@ function feedback(before, after, result, action) {
   if (result.ok && banditPaymentActions.includes(action)) {
     const cost = [result.paidCoins > 0 && `${result.paidCoins} 灵钱`, supplies(result.paidGoods)].filter(Boolean).join("、");
     if (cost) lines.push(`交出${cost}。`);
+  }
+  const banditLoss = result.banditLoss;
+  if (banditLoss && !banditLoss.deadly) {
+    const lost = [banditLoss.coins > 0 && `${banditLoss.coins} 灵钱`, supplies(banditLoss.goods)].filter(Boolean).join("、");
+    if (lost) lines.push(`强盗拿走了${lost}。`);
   }
   if (result.roadCoins > 0) lines.push(`从路上捡到 ${result.roadCoins} 灵钱。`);
   if (result.ok && (action === "attack" || action === "art")) {
@@ -1188,6 +1241,14 @@ function feedback(before, after, result, action) {
   const picking = result.ok && action === "take";
   const gathered = supplies(result.gathered);
   let narrative = result.message ?? "";
+  const roadEncounter = result.ok && before.roadBandit !== after.roadBandit && presentation.roadTrip?.bandit;
+  if (roadEncounter) {
+    lines.push(`路上遇见${roadEncounter.name}。`);
+    if (roadEncounter.intro) narrative = narrative.replace(roadEncounter.intro, "");
+  }
+  const enemy = result.ok && before.combat !== after.combat && presentation.currentEnemy;
+  if (enemy && !narrative.includes(enemy.name)) lines.push(`和${enemy.name}交手。`);
+  if (action === "banditFight" && enemy) narrative = narrative.replace(/^你把行囊拢到身后，摆开架势。/, "");
   if (result.paidCoins || Object.keys(result.paidGoods ?? {}).length) {
     narrative = narrative.replace(/^你(?:递给他|交出|交了)[^。]+。/, "").replace(/他还要\d+枚。/, "");
   }
@@ -1237,12 +1298,20 @@ function feedback(before, after, result, action) {
   for (const id of after.discovered) {
     if (!before.discovered.includes(id)) lines.push(`找到去${data.regions.find(region => region.id === id).name}的路。`);
   }
-  return lines;
+  for (const id of after.banditLeads ?? []) {
+    if (before.banditLeads.includes(id)) continue;
+    const site = data.sites.find(entry => entry.id === id);
+    const region = data.regions.find(entry => entry.id === site?.region);
+    const cue = site && region && `从${region.name}可以去「${site.name}」了。`;
+    if (cue && !narrative.includes(cue)) lines.push(cue);
+  }
+  return [...new Set(lines)];
 }
 
 function performAction(action, payload) {
   const before = {
     inventory: { ...state.inventory }, discovered: [...state.discovered],
+    banditLeads: [...(state.banditLeads ?? [])], roadBandit: state.roadBandit, combat: state.combat,
     hp: state.hp, qi: state.qi, satiety: state.satiety, coins: state.coins,
   };
   const result = act(state, action, payload);
@@ -1255,13 +1324,14 @@ function performAction(action, payload) {
   if ([...roadTravelActions, "discard", "take", "equip", "unequip"].includes(action)) selectedItem = null;
   if (result.ok && action === "equipManual") selectedItem = `worn-${payload.id}`;
   if (result.ok && action === "unequipManual") selectedItem = `held-${payload.id}`;
-  render();
+  const presentation = render();
   if (action === "beginGather" && result.ok) {
     runGatherProgress(state.gathering);
     return;
   }
-  const lines = feedback(before, state, result, action);
-  showNotice(lines, Boolean(result.injury || result.damageTaken || !result.ok));
+  const lines = feedback(before, state, result, action, presentation);
+  const newThreat = before.roadBandit !== state.roadBandit && presentation.roadTrip?.bandit?.fightAllowed;
+  showNotice(lines, Boolean(result.injury || result.damageTaken || result.banditLoss || presentation.mode === "death" || newThreat || !result.ok));
   if (transferred) showTransfer();
   if ([...roadTravelActions, "visit", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
 }
@@ -1355,7 +1425,7 @@ document.addEventListener("click", event => {
     return;
   }
   if (button.hasAttribute("data-reset")) {
-    if (!window.confirm("重新开始这一局？")) return;
+    if (button.dataset.reset !== "death" && !window.confirm("重新开始这一局？")) return;
     state = freshGame();
     screen = "journey";
     marketMode = "buy";
@@ -1371,6 +1441,7 @@ document.addEventListener("click", event => {
     notices.replaceChildren();
     guide.close();
     render();
+    restartNotice = true;
     showOpening();
     return;
   }

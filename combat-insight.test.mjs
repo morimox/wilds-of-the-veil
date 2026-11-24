@@ -129,7 +129,7 @@ test('a safe charge takes two turns and wears the selected weapon only on releas
   assert.equal(state.day - start, rules.battleDays);
   assert.equal(result.damageDealt, 0);
   assert.equal(state.durability.anvil_hammer, durability);
-  assert.deepEqual(view(state).chargingWeapon, { slot: 'weapon', id: 'anvil_hammer', name: '短柄砧锤' });
+  assert.deepEqual(view(state).chargingWeapon, { slot: 'weapon', id: 'anvil_hammer', name: '短柄铁锤' });
   const release = play(state, 'attack');
   assert.ok(release.damageDealt > 0);
   assert.equal(state.day - start, 2 * rules.battleDays);
@@ -249,7 +249,7 @@ test('both ordinary and charge-only weapons can be paired and selected in either
   const plain = structuredClone(chisel);
   assert.ok(play(plain, 'attack').damageDealt > 0);
   assert.equal(play(chisel, 'offhandAttack').damageDealt, 0);
-  assert.deepEqual(view(chisel).chargingWeapon, { slot: 'offhand', id: 'scale_chisel', name: '翻鳞凿' });
+  assert.deepEqual(view(chisel).chargingWeapon, { slot: 'offhand', id: 'scale_chisel', name: '破鳞短凿' });
   assert.ok(play(chisel, 'offhandAttack').damageDealt > 0);
   assert.equal(view(chisel).chargingWeapon, null);
   assert.equal(chisel.durability.iron_sword, gear.iron_sword.durability);

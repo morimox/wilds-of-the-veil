@@ -13,7 +13,7 @@ export const trainingData = [
       { coins: 26, days: 2, need: { ore: 3, core: 2 }, qi: 6, restQi: 2, effect: '真气上限加 6，在歇脚处每次多恢复 2 点真气。' },
       { coins: 40, days: 3, need: { qi_core: 2, core: 4 }, qi: 9, restQi: 3, effect: '真气上限加 9，在歇脚处每次多恢复 3 点真气。' },
     ] },
-  { id: 'body', name: '炼体', region: 'measuring_hall', teacher: '掌尺人傅澄', lead: 'body_breath_note',
+  { id: 'body', name: '炼体', region: 'measuring_hall', teacher: '教尺法的傅澄', lead: 'body_breath_note',
     desc: '傅澄把两块压秤的大石头搬来。他让你先站稳，再一点点把重量接到自己手里。',
     ranks: [
       { coins: 16, days: 1, need: { hide: 2, wood: 3 }, hp: 4, def: 0, effect: '气血上限加 4。' },
@@ -23,11 +23,11 @@ export const trainingData = [
   { id: 'elements', name: '五行', region: 'mingsha_city', teacher: '阮杪', lead: 'cold_kiln_record',
     desc: '阮杪带着冷炉验火册来登记。她翻出一页，让你换几种材料试一试。同样的力用在石头和兽皮上，效果并不一样。',
     ranks: [
-      { coins: 32, days: 2, need: { core: 4, ore: 4 }, element: 1, effect: '金更容易打穿石甲和鳞甲，木少受野兽的普通攻击，水抵抗吸取真气的招式，火打阴灵更疼，土能挡石妖的重击。遇上对应情况时，加成是 1 点。' },
+      { coins: 32, days: 2, need: { core: 4, ore: 4 }, element: 1, effect: '金有助于打穿石甲和鳞甲，木能卸去野兽扑咬的力，水能少失些真气，火对阴灵更有效，土能挡住石妖的重招。遇上对应情况时，加成是 1 点。' },
       { coins: 52, days: 3, need: { core: 6, black_iron: 4, foundation_core: 1 }, element: 2, effect: '遇上相应的敌人或招式时，五行加成提高到 2 点。' },
       { coins: 80, days: 4, need: { core: 9, black_iron: 7, foundation_core: 2 }, element: 3, effect: '遇上相应的敌人或招式时，五行加成提高到 3 点。' },
     ] },
-  { id: 'spirit', name: '神识', region: 'zhao_city', teacher: '水师杜椿', lead: 'phase_chart',
+  { id: 'spirit', name: '神识', region: 'zhao_city', teacher: '教看水势的杜椿', lead: 'phase_chart',
     desc: '水还没漫过铜板边缘，杜椿就让你闭眼听它涨上来。交手时，你也能用这个法子提前察觉对方的动作。',
     ranks: [
       { coins: 30, days: 2, need: { core: 3, qi_core: 2 }, senseMax: 2, senseGuard: 2, effect: '神识上限 2。花 1 点观这一招并少受 2 点伤害。对方还在等你先动时，只能护身。' },

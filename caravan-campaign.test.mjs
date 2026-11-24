@@ -223,7 +223,7 @@ test('the full expedition clears both guard groups and collects its cargo proof 
   choose(state, 0);
   assert.match(view(state).currentEvent.text, /已经搬进船舱/);
   assert.equal(act(state, 'choose', { index: 0 }).ok, false);
-  context.diagnostic(`追货 7 场 ${rounds} 回合，首领 ${bossRounds} 回合，连取水图并到渡口 ${state.day - start} 游戏日。主线收益 70 灵钱、5 妖丹、压雾车铃；本段用了 ${startingSalve + 1 - (state.inventory.salve ?? 0)} 份松脂膏。`);
+  context.diagnostic(`追货 7 场 ${rounds} 回合，首领 ${bossRounds} 回合，连取水图并到渡口 ${state.day - start} 游戏日。主线收益 70 灵钱、5 妖丹、驱雾车铃；本段用了 ${startingSalve + 1 - (state.inventory.salve ?? 0)} 份松脂膏。`);
 });
 
 test('retreat and defeat leave the guards in place and preserve the reopened side door', () => {

@@ -18,7 +18,7 @@ const markers = [
     settlement: { type: '宗门', inn: '外客石房', goods: { ration: { price: 4, start: 7, cap: 12, interval: 3 } },
       repair: { name: '梁弦的外院修具台', description: '梁弦让弟子在外院修井镐、皮绳和兵器。皮料要从别处运来，给外客补东西也照台前的工钱算。', surcharge: 3 },
       buys: { ore: 4, core: 5, qi_core: 7 } }, desc: '学徒敲着两块吊起来的石头听回声。外院有客房，门外有铺着旧毡的修具台。' },
-  { id: 'silk_tent_road', name: '断纬帐道', tier: 1, travel: 1, x: 26, y: 69,
+  { id: 'silk_tent_road', name: '断帐旧道', tier: 1, travel: 1, x: 26, y: 69,
     links: ['mingsha_city', 'guest_mill', 'camel_grass_dunes'], desc: '剪掉半幅的旧帐挂在路标上。行队在帐的阴影里翻晒湿绳。' },
   { id: 'salt_ledger_barrows', name: '担盐岗', tier: 1, travel: 1, x: 27, y: 43,
     links: ['mingsha_city', 'stillwell_mouth', 'chalk_hoof_trail'], desc: '看秤的人把旧井票夹在带蹄印的石头下面。坡脚还搁着挑盐的旧扁担，木面晒出一层白霜。' },
@@ -39,7 +39,7 @@ const markers = [
     links: ['stillwell_mouth', 'cold_kiln', 'wind_slate'], desc: '桥北已没水。有人把修桥工具用乱响的薄铜片拴在栏上。' },
   { id: 'wind_slate', name: '架风板', tier: 3, travel: 1.25, x: 52, y: 54,
     links: ['sand_bell_cloister', 'dry_sound_bridge', 'cold_kiln'], desc: '几块灰石板迎风立着。压得紧的地方磨出了白印，松动的板子随风翻动。' },
-  { id: 'hollow_silo', name: '空籴仓', tier: 0, travel: 1, x: 65, y: 24,
+  { id: 'hollow_silo', name: '空粮仓', tier: 0, travel: 1, x: 65, y: 24,
     links: ['cold_kiln'], desc: '粮仓已经空了，墙上还刻着称谷子的记号。卸粮的小门被拆了，日光照在仓里的沙地上。' },
   { id: 'glass_hail_sink', name: '落琉洼', tier: 6, travel: 1.5, x: 73, y: 46,
     links: ['cold_kiln', 'hanging_vein', 'glass_rotunda'], desc: '洼地边散着薄薄的亮石片。深处整片晶石被掀了起来，旁边有几道深得惊人的爪印。' },
@@ -67,17 +67,17 @@ const regions = markers.map(({ id, name, tier, travel, reveal, secret, desc }) =
 }));
 
 const items = [
-  { id: 'sand_watch_register', name: '换井役簿', kind: 'key', price: 0, sell: 0, desc: '鸣沙盐井的换班记录。背面盖着旧印，拿去担盐岗找看秤的邢茧核对。' },
-  { id: 'sand_well_chit', name: '静井准入票', kind: 'key', price: 0, sell: 0, desc: '邢茧盖过两道斜印的进井凭证。一角画着卷绳的石轮，轮边有个半月形缺口。' },
+  { id: 'sand_watch_register', name: '盐井换班册', kind: 'key', price: 0, sell: 0, desc: '鸣沙盐井的换班记录。背面盖着旧印，拿去担盐岗找看秤的邢茧核对。' },
+  { id: 'sand_well_chit', name: '静盐井的井票', kind: 'key', price: 0, sell: 0, desc: '邢茧盖过两道斜印的进井凭证。一角画着卷绳的石轮，轮边有个半月形缺口。' },
   { id: 'sand_well_open', name: '井梯铜扣', kind: 'key', price: 0, sell: 0, desc: '从细井绳上取下的半块黄铜。把它卡进井口的铁框，下井的梯子就不会滑落。' },
-  { id: 'sand_archive_trace', name: '逆驿关痕', kind: 'key', price: 0, sell: 0, desc: '从马蹄石上取下的小铜楔。翻到背面，可以看见白廊深处的柱影。' },
-  { id: 'sand_glass_pass', name: '落琉洼的弹片', kind: 'key', price: 0, sell: 0, desc: '在落琉洼的晶石下取出的金属弹片。按平它，风就会把灰吹向后方的一道暗缝。' },
+  { id: 'sand_archive_trace', name: '马蹄石上的铜楔', kind: 'key', price: 0, sell: 0, desc: '从马蹄石上取下的小铜楔。翻到背面，可以看见白廊深处的柱影。' },
+  { id: 'sand_glass_pass', name: '落琉洼的薄铁片', kind: 'key', price: 0, sell: 0, desc: '在落琉洼的晶石下取出的金属弹片。按平它，风就会把灰吹向后方的一道暗缝。' },
 ];
 
 const sites = [
-  { id: 'sand_city_registry', region: 'mingsha_city', name: '鸣沙井籍房', once: [0] },
+  { id: 'sand_city_registry', region: 'mingsha_city', name: '登记井票的屋子', once: [0] },
   { id: 'sand_cinder_kitchen', region: 'cinder_inn', name: '炭篷边炉', once: [0] },
-  { id: 'sand_cloister_trial', region: 'sand_bell_cloister', name: '对簧石台', once: [0, 2], protectedArena: true,
+  { id: 'sand_cloister_trial', region: 'sand_bell_cloister', name: '试声石台', once: [0, 2], protectedArena: true,
     creatures: { sand_tuner: { start: 1, cap: 1 } },
     afterOnceText: { 0: '新铁脚撑住了石板架。梁弦试敲了一块，石架很稳。袁息仍在麻绳围出的场地边，巡井人也在。' } },
   { id: 'sand_ring_maker', region: 'sand_bell_cloister', name: '梁弦的工坊', once: [0, 1],
@@ -87,7 +87,7 @@ const sites = [
     } },
   { id: 'sand_tent_watch', region: 'silk_tent_road', name: '晾绳矮帐', once: [0],
     stocks: { reed: { label: '湿帐沿的灵草', start: 4, cap: 6, interval: 4, growth: 2, choices: [1] } } },
-  { id: 'sand_crossing_rail', region: 'silk_tent_road', name: '连鞍岔牌', once: [0],
+  { id: 'sand_crossing_rail', region: 'silk_tent_road', name: '岔路口的木牌', once: [0],
     afterOnceText: { 0: '新皮缝在鞍带上。马掌匠曾微把手里的旧线卷好，牵骡的人已过了岔牌。' } },
   { id: 'sand_salt_ledger', region: 'salt_ledger_barrows', name: '井边老秤', once: [0],
     stocks: { wood: { label: '坡脚挑盐用的旧木', start: 4, cap: 7, interval: 5, growth: 2, choices: [1] } } },
@@ -102,19 +102,19 @@ const sites = [
     stockText: { core: { present: '浅槽里还有伸手够得着的晶角。', absent: '浅槽已翻过一遍，只剩松散的盐泥。' } } },
   { id: 'sand_cold_kiln_house', region: 'cold_kiln', name: '阮杪的档房', once: [0, 1],
     afterOnceText: { 1: '阮杪已经抄了一份冷炉旧册。原件还挂在墙上，由一段盐井的旧绳压着折痕。' } },
-  { id: 'sand_approach_hoof', region: 'chalk_hoof_trail', name: '逆纹马蹄石', once: [1],
+  { id: 'sand_approach_hoof', region: 'chalk_hoof_trail', name: '刻着反向蹄印的白石', once: [1],
     stocks: { ore: { label: '白石下的寒铁片', start: 3, cap: 5, interval: 5, growth: 1, choices: [2] } },
     stockText: { ore: { present: '石坡上还有几片被风吹到浅处的寒铁。', absent: '碎寒铁暂时取完了。嵌在白石上的铁尖还牢牢钉着。' } } },
   { id: 'sand_archive_guard', region: 'chalk_archive', name: '倒挂的驿印', once: [1],
     creatures: { sand_inverted_keeper: { start: 1, cap: 1 } },
     afterOnceText: { 1: '倒挂的货柜空出一格。柜边歪斜的货牌反着光，照出来时那条路。' } },
-  { id: 'sand_bridge_rail', region: 'dry_sound_bridge', name: '晃铜的桥栏', once: [1],
+  { id: 'sand_bridge_rail', region: 'dry_sound_bridge', name: '铜扣松动的桥栏', once: [1],
     afterOnceText: { 1: '新木顶住了桥板，踩过去也没再跷起来。黄桥匠还在数栏上的铜扣。' },
     stocks: { wood: { label: '桥板旁的旧松木', start: 4, cap: 7, interval: 4, growth: 2, choices: [2] } },
     stockText: { wood: { present: '外侧石台边能看到废槽里的松木。', absent: '外侧废槽暂时取空了。' } },
     creatures: { sand_rattle_viper: { start: 1, cap: 3, interval: 4.5, growth: 1, curve: 'wild' } },
     creatureText: { sand_rattle_viper: { present: '桥钉旁有一线新蛇蜕，阴处的铜结微动。', absent: '铜片垂在平直的桥栏上，下面没人声或兽声。' } } },
-  { id: 'sand_wind_work', region: 'wind_slate', name: '风楔架',
+  { id: 'sand_wind_work', region: 'wind_slate', name: '石板间的铁楔',
     stocks: { ore: { label: '岩缝里的寒铁', start: 4, cap: 7, interval: 5, growth: 2, choices: [0] },
       core: { label: '沙槽里的灵晶', start: 3, cap: 6, interval: 6, growth: 2, choices: [1] } },
     stockText: {
@@ -126,7 +126,7 @@ const sites = [
     stockText: { reed: { present: '滑槽底下几蓬灵草还可以拔。', absent: '滑槽底下留着几个拔草的小坑。' } },
     creatures: { sand_silo_marten: { start: 2, cap: 4, interval: 4, growth: 1, curve: 'wild' } },
     creatureText: { sand_silo_marten: { present: '卸谷洞口挤出两道细爪印。', absent: '仓沿落住了浮灰，暂没有新爪痕。' } } },
-  { id: 'sand_hail_floor', region: 'glass_hail_sink', name: '断琉棱', once: [2],
+  { id: 'sand_hail_floor', region: 'glass_hail_sink', name: '断开的晶石', once: [2],
     stocks: { core: { label: '洼沿散下的灵晶', start: 3, cap: 6, interval: 6, growth: 2, choices: [0] },
       core_inner: { item: 'core', label: '断棱底下的灵晶', start: 5, cap: 8, interval: 8, growth: 2, choices: [3] } },
     stockText: {
@@ -136,7 +136,7 @@ const sites = [
     creatures: { sand_glass_lynx: { start: 1, cap: 2, interval: 13, growth: 1, depletedFactor: 1.15, curve: 'wild' } },
     afterOnceText: { 2: '晶石底下的弹片已经取走，原处只剩一道空缝。沿上方的石边还能退出洼地。' },
     creatureText: { sand_glass_lynx: { present: '深处的碎晶被翻了个面。几道新爪痕比手掌还长，有一道一直划到岩壁上。', absent: '石屑遮住半截爪印，晶石下面渐渐没了动静。' } } },
-  { id: 'sand_hanging_support', region: 'hanging_vein', name: '贴壁支木',
+  { id: 'sand_hanging_support', region: 'hanging_vein', name: '贴着矿壁的木架',
     stocks: { ore: { label: '坡角露出的寒铁', start: 4, cap: 7, interval: 5, growth: 2, choices: [0] },
       black_iron: { label: '支架后的暗金', start: 4, cap: 8, interval: 6, growth: 2, choices: [2] } },
     stockText: {
@@ -151,7 +151,7 @@ const sites = [
       sand_vein_jackal: { present: '矿绳里面传出磨齿般的声响，有只金眼从夹层探出来。', absent: '旧支木没再被挤动，绳后空了。' },
       sand_iron_skink: { present: '外侧晒暖的石面上，一只鳞背花斑的蜥正趴着。', absent: '外侧晒石留着一截薄薄的蜕皮。' },
     } },
-  { id: 'sand_dune_grass', region: 'camel_grass_dunes', name: '伏草沙坎',
+  { id: 'sand_dune_grass', region: 'camel_grass_dunes', name: '沙坎下的背阴草沟',
     stocks: { reed: { label: '沙坎背面的灵草', start: 4, cap: 7, interval: 4, growth: 2, choices: [0] } },
     creatures: {
       sand_dune_hare: { start: 2, cap: 4, interval: 3.5, growth: 1, depletedFactor: 1.1, curve: 'wild' },
@@ -165,9 +165,9 @@ const sites = [
       sand_salt_fox: { present: '灌木背风处有新踩出的梅花脚印，一撮厚毛挂在刺梢。', absent: '灌木外的细沙已经抚平，没见新脚印。' },
       sand_root_boar: { present: '沟底的湿土让獠牙翻了过来，草根底下还传出拱土声。', absent: '沟底留着翻过的土块，拱土声停了。' },
     } },
-  { id: 'sand_guest_miller', region: 'guest_mill', name: '栾火的并磨盘', once: [0, 1],
+  { id: 'sand_guest_miller', region: 'guest_mill', name: '栾火的磨盘', once: [0, 1],
     afterOnceText: { 0: '栾火从缝上捻掉一截冒出来的苇芯，又用小杯舀起谷子。这回杯子没再漏。他把杯递给等在磨盘旁的人。' } },
-  { id: 'sand_rooftile_patch', region: 'kiln_roof_farm', name: '留阴瓦畦', once: [1],
+  { id: 'sand_rooftile_patch', region: 'kiln_roof_farm', name: '瓦片遮着的药田', once: [1],
     stocks: { reed: { label: '上畦灵草', start: 5, cap: 8, interval: 5, growth: 2, choices: [0] },
       millet_grain: { label: '瓦棚下打过的谷子', start: 3, cap: 4, interval: 5, growth: 1, choices: [2] } },
     stockText: {
@@ -196,7 +196,7 @@ const sites = [
 ];
 
 const events = [
-  { id: 'sand_city_registry', name: '鸣沙井籍房', text: '鲁勤正把去年的井票分成两叠。摆在案角的两张，去的都是担盐岗。', choices: [
+  { id: 'sand_city_registry', name: '登记井票的屋子', text: '鲁勤正把去年的井票分成两叠。摆在案角的两张，去的都是担盐岗。', choices: [
     { label: '问鲁勤桌角的换班记录', days: 0.25, insight: 3, loot: { sand_watch_register: 1 },
       outcome: '鲁勤把盐井的换班记录翻给你。「担盐岗的邢茧等着核对旧井票。你肯跑一趟，就拿这份给他看。」' },
   ] },
@@ -207,19 +207,19 @@ const events = [
       need: { beast_meat: 2, reed: 1, wood: 1 }, consume: true, stay: true, coins: -5, days: 0.5, loot: { herb_stew: 2 },
       outcome: '杨芹切开炖透的肉，把锅底的灵草汁舀进去。她拿叶子裹紧两包，放在炉边晾凉。' },
   ] },
-  { id: 'sand_cloister_trial', name: '对簧石台', text: '梁弦在棚下逐块敲石板，听回音。袁息守着少了一块石板的空架，旁边用麻绳围出练手的位置。两位巡井的人坐在圈外照看。', choices: [
+  { id: 'sand_cloister_trial', name: '试声石台', text: '管工坊的执事梁弦在棚下敲石板听回声。教剑的内门师姐袁息站在空了一格的石架边，招呼来练手的人往绳圈里走。两位巡井的人在圈外照看。', choices: [
     { label: '给梁弦材料，帮他修挂石板的架子', desc: '两块寒铁能打新的支脚，一枚灵晶用来听清回声。',
       days: 0.5, coins: -12, need: { ore: 2, core: 1 }, consume: true, insight: 4,
       outcome: '梁弦把新铁片垫在架脚下，再敲石板，架子没晃。「省得我再拿膝盖顶着。来，随我去工坊。有片外州来的铜，我想托人送回山里。」' },
     { label: '进绳圈和袁息切磋', desc: '袁息说好用钝剑，谁退到圈外就收手。', days: 0.25, enemy: 'sand_tuner',
       outcome: '袁息压低钝剑。「听见石响就换步，站不住可以自行退到绳外。」' },
-    { label: '向袁息讨这场的评语', afterFight: 'sand_tuner', days: 0.25, insight: 4,
+    { label: '请袁息指点方才的步法', afterFight: 'sand_tuner', days: 0.25, insight: 4,
       outcome: '袁息将木片敲在你刚站过的石板上，回声清清楚楚。「这一步落得轻。我去给梁师傅递个话，他想托个脚步稳的人带件东西出州。你到工坊找他。」' },
   ] },
-  { id: 'sand_ring_maker', name: '梁弦的工坊', text: '工坊里挂着几片拨动会响的薄铜。梁弦正在案边削木把手。', choices: [
+  { id: 'sand_ring_maker', name: '梁弦的工坊', text: '工坊里挂着几片拨动会响的薄铜。梁弦正在案边削木把手。桌角有只巴掌大的布袋，袋口却露出一角厚毡。', choices: [
     { label: '接过梁弦留下的铜片', days: 0.25, insight: 5, loot: { echo_tuning_key: 1 },
       outcome: '梁弦拿铜片碰了碰石板，尾音半晌才消。「我从沉钟岭带回来时就缺这一角。你到岭上听钟，找找哪块石头上有和它对得上的凹口。」' },
-    { label: '问梁弦那块大毡子是怎么塞进去的', days: 0.25, loot: { qiankun_fold_pattern: 1 },
+    { label: '问梁弦怎么把厚毡塞进小布袋', days: 0.25, loot: { qiankun_fold_pattern: 1 },
       outcome: '梁弦把袋口翻出来。里头的布一层压一层，针脚都藏在折里。「这只原是装井绳的。」他找出一截旧布递给你。「带回去，照这道折缝量。」' },
   ] },
   { id: 'sand_tent_watch', name: '晾绳矮帐', text: '荀霜收卷晾过的粗绳，帐角的水滴一路落到残席的草根。', choices: [
@@ -227,7 +227,7 @@ const events = [
       outcome: '「晶石发光那几晚，上坡的人都先低头看有没有爪印。要往深处走，就带能打穿硬甲的家伙。在外沿歇脚倒没事。」' },
     { label: '从滴水的帐沿挖灵草', days: 0.25, loot: { reed: 2 }, insight: 2, outcome: '帐绳顺水往地上滴，根部灵气比沙上看着稳。' },
   ] },
-  { id: 'sand_crossing_rail', name: '连鞍岔牌', text: '商队陆续下坡。马掌匠曾微伸腿压住一截松脱的驮绳，摸了摸被绳磨起的毛边。', choices: [
+  { id: 'sand_crossing_rail', name: '岔路口的木牌', text: '木牌立在两条商道之间。商队正陆续下坡，马掌匠曾微伸腿压住一截松脱的驮绳，摸了摸被绳磨起的毛边。', choices: [
     { label: '给曾微两份兽革缝鞍带', days: 0.5, need: { hide: 2 }, consume: true, coins: 12, insight: 4, loot: { ration: 2 },
       outcome: '曾微收紧鞍带，扯了两下才撒手。「井梯也一样，差半边就会滑。拿井票给静盐井的守井人看，他有卡梯子的铜扣。别自个儿往下爬。」他把工钱塞给你。' },
   ] },
@@ -242,8 +242,8 @@ const events = [
       outcome: '闻銮对过印，把固定铁梯的半块铜扣塞给你。「沿铁梯下去，鞋带系紧。井壁挂着一只陶罐，绕过那头大兽才够得着。」' },
   ] },
   { id: 'sand_stillwell_vault', name: '挂陶罐的井壁', text: '井底白得像雪。一只长满粗鳞的兽伏在踏脚坑旁，井壁上的陶罐用铜钉挂得很高。', choices: [
-    { label: '踩着井壁的凹坑过去，引开伏鳞', days: 0.5, enemy: 'sand_well_basilisk',
-      outcome: '伏鳞抬头时盐壳簌簌落下，粗尾已绕到你身后。' },
+    { label: '踩着井壁的凹坑过去，引开那头鳞兽', days: 0.5, enemy: 'sand_well_basilisk',
+      outcome: '井里的鳞兽抬头时盐壳簌簌落下，粗尾已绕到你身后。' },
     { label: '解下铜钉上挂着的陶罐', days: 0.25, afterFight: 'sand_well_basilisk', insight: 8, loot: { stillwell_salt: 1 },
       outcome: '罐解下来了，没漏出一点水。井底的盐整整齐齐封在里面，盖上还压着旧炉房的印。' },
   ] },
@@ -257,10 +257,10 @@ const events = [
       insight: 8, loot: { cold_kiln_record: 1 },
       outcome: '阮杪对过井票，从罐口刮下一点盐霜，又盖好还给你。她抄完原来的记录，把纸翻到末页。「瞧见照原那个印了么？这炉火是他们和咱们一块儿试的。」' },
   ] },
-  { id: 'sand_approach_hoof', name: '逆纹马蹄石', text: '蹄纹踩向山下，嵌在白石上的铁尖都朝山上。从白石左边走，只会绕回起步处。', choices: [
+  { id: 'sand_approach_hoof', name: '刻着反向蹄印的白石', text: '蹄纹踩向山下，嵌在白石上的铁尖都朝山上。从白石左边走，只会绕回起步处。', choices: [
     { label: '循马蹄白石往前试走', days: 0.5, outcome: '背风的地方又露出刚才那块白石。你认得来路，只把鞋上粘灰拍掉。' },
-    { label: '从伏潮息泥上蘸水去试反向蹄印', hidden: true, need: { heart_silt: 1 }, days: 0.5, insight: 6,
-      outcome: '你用一滴从伏潮息泥上蘸下的水试了几处。只有朝反方向的蹄印把水聚成一线，流下旧路的坡。坡下有块白石能抬起来，石缝里传出门销松动的声音。' },
+    { label: '从回潮洞的黑泥上蘸水去试反向蹄印', hidden: true, need: { heart_silt: 1 }, days: 0.5, insight: 6,
+      outcome: '你用一滴从回潮洞的黑泥上蘸下的水试了几处。只有朝反方向的蹄印把水聚成一线，流下旧路的坡。坡下有块白石能抬起来，石缝里传出门销松动的声音。' },
     { label: '拣白石边冒出的寒铁片', days: 0.75, loot: { ore: 2 }, insight: 3, outcome: '铁片下面只是被沙磨开的铁锈。' },
   ] },
   { id: 'sand_archive_guard', name: '倒挂的驿印', text: '正前方有个挂着旧驿印的货柜。白柱后透出两点微光，脚步声过了一会儿才回来。', choices: [
@@ -268,7 +268,7 @@ const events = [
     { label: '按货牌上的记号打开货柜', days: 0.5, afterFight: 'sand_inverted_keeper', insight: 8, loot: { black_iron: 8, core: 6 },
       outcome: '守影一散，倒挂的货柜慢慢垂了下来。丢失多年的矿货还裹在驿站的旧布里。' },
   ] },
-  { id: 'sand_bridge_rail', name: '晃铜的桥栏', text: '黄桥匠在数栏上松脱的铜扣。手旁有块桥板没卡紧，下面还伸出几片垫桥板的松木。', choices: [
+  { id: 'sand_bridge_rail', name: '铜扣松动的桥栏', text: '黄桥匠在数栏上松脱的铜扣。手旁有块桥板没卡紧，下面还伸出几片垫桥板的松木。', choices: [
     { label: '拨开晃响的铜扣，看看栏下', days: 0.25, enemy: 'sand_rattle_viper', outcome: '蛇绕过铜扣，从栏杆另一侧垂了下来。' },
     { label: '给黄桥匠两块松木撑稳桥板', days: 0.5, need: { wood: 2 }, consume: true, coins: 8, insight: 4,
       outcome: '黄桥匠架稳桥板。北边冷炉院以前和这里共用水尺，阮杪手里多半还留着借还水尺的旧账。' },
@@ -276,7 +276,7 @@ const events = [
       ambush: { enemy: 'sand_rattle_viper', chance: 0.25, outcome: '你的手刚搭上松木，铜片一晃，桥蝰从缝里探下头。' },
       outcome: '绕过栏杆留空的地方，就能从废槽抽出几段无主的松木。' },
   ] },
-  { id: 'sand_wind_work', name: '风楔架', text: '石板一块靠一块，朝阳和背阴的岩缝各通到一头。', choices: [
+  { id: 'sand_wind_work', name: '石板间的铁楔', text: '石板一块靠一块，朝阳和背阴的岩缝各通到一头。', choices: [
     { label: '取朝阳岩缝里的寒铁', days: 0.75, loot: { ore: 3 }, insight: 3, outcome: '松砂里撬出来几片碎铁，卡住石板的楔子还在原位。' },
     { label: '顺小槽筛出灵晶', days: 0.75, loot: { core: 2 }, insight: 3, outcome: '细砂被风扫走，底板上几块亮石没有动。' },
   ] },
@@ -286,16 +286,16 @@ const events = [
       outcome: '「先前专给驻桥人磨粮，改了官路就没人用。」蒋芨收好粮，「落琉洼边的旧订单是送给测风的人，里头还有未缴回的器械。」' },
     { label: '从滑槽外沿拔灵草', days: 0.25, loot: { reed: 2 }, insight: 2, outcome: '仓墙背后日晒少，草在旧木板下面还绿着。' },
   ] },
-  { id: 'sand_hail_floor', name: '断琉棱', text: '断开的晶石反出一线光，照着石脊下原先安弹片的位置。', choices: [
+  { id: 'sand_hail_floor', name: '断开的晶石', text: '断开的晶石反出一线光，照出石脊下一角翘起的金属。', choices: [
     { label: '留在洼地边上筛灵晶', days: 0.5, loot: { core: 2 }, insight: 3, outcome: '你在边上收了几枚灵晶。下面风响个不停，沿来路还能退出去。' },
     { label: '翻过断晶，往爪声传来的地方走', days: 0.5, enemy: 'sand_glass_lynx',
       outcome: '三痕琉狮压折前爪下的碎晶，先扬起一层花白的尘雪。' },
     { label: '取出卡在晶石底下的金属片', days: 0.5, afterFight: 'sand_glass_lynx', guardedBy: 'sand_glass_lynx', loot: { sand_glass_pass: 1 }, insight: 7,
-      outcome: '你把弹片向下压平。迎面一阵风卷走石粉，晶石后露出一道窄缝。' },
+      outcome: '你把翘起的金属片按平。迎面一阵风卷走石粉，晶石后露出一道窄缝。' },
     { label: '挖断晶下面的大块灵晶', days: 1, guardedBy: 'sand_glass_lynx', loot: { core: 4 }, insight: 4,
       outcome: '断晶下面看不见新脚印了。你沿细槽撬出了几块没碎的灵晶。' },
   ] },
-  { id: 'sand_hanging_support', name: '贴壁支木', text: '风顺着矮梁下的矿缝穿过去。往里还有一座用绳和坠石拉住的旧架子。', choices: [
+  { id: 'sand_hanging_support', name: '贴着矿壁的木架', text: '风顺着矮梁下的矿缝穿过去。往里还有一座用绳和坠石拉住的旧架子。', choices: [
     { label: '捡支架前的寒铁碎料', days: 0.75, loot: { ore: 2 }, insight: 3, outcome: '几块粗铁还能拿来打新的支脚。' },
     { label: '靠近绳架，看看暗处那双金眼', days: 0.5, enemy: 'sand_vein_jackal', outcome: '负砂豺咬住绳边的坠石。石粉从你的脚边簌簌滑下。' },
     { label: '钻进绳架后淘暗金', days: 1, loot: { black_iron: 3 }, guardedBy: 'sand_vein_jackal', insight: 4,
@@ -303,7 +303,7 @@ const events = [
     { label: '翻到外侧晒石上，从侧面堵住花斑蜥', days: 0.25, enemy: 'sand_iron_skink',
       outcome: '花斑蜥闪向暖石的边沿。见缝被你堵住，它把尾巴高高弓起来。' },
   ] },
-  { id: 'sand_dune_grass', name: '伏草沙坎', text: '伏草沿小坎连起一条阴沟。两段草根往外分，风过的时候响得不同。', choices: [
+  { id: 'sand_dune_grass', name: '沙坎下的背阴草沟', text: '沙坎下的草沿着阴沟长开。两段草根往外分，风过的时候响得不同。', choices: [
     { label: '挖阴沟两侧的灵草', days: 0.25, loot: { reed: 2 }, insight: 2, outcome: '把带露的根束扎好，干沙自行抖掉了。' },
     { label: '去看草根边跳动的耳朵', days: 0.25, enemy: 'sand_dune_hare', outcome: '沙丘野兔穿出湿草，歪头朝近处扑了两步。' },
     { label: '沿坡顶的草响找褐翅山雉', days: 0.25, enemy: 'sand_ridge_pheasant',
@@ -313,13 +313,13 @@ const events = [
     { label: '顺着翻开的湿土找伏沟野猪', days: 0.5, enemy: 'sand_root_boar',
       outcome: '伏沟野猪挖得满鼻子土。你刚踏进洼地，它便把嘴边的湿泥连同草根一并甩开。' },
   ] },
-  { id: 'sand_guest_miller', name: '栾火的并磨盘', text: '栾火拿杯子量谷，脚边的磨盘有一半快转歪了。杯壁开了缝，计用水多少的木签也掉了一角。', choices: [
+  { id: 'sand_guest_miller', name: '栾火的磨盘', text: '栾火拿杯子量谷，脚边的磨盘有一半快转歪了。杯壁开了缝，计用水多少的木签也掉了一角。', choices: [
     { label: '给栾火两份灵草，补杯子的缝', days: 0.5, need: { reed: 2 }, consume: true, coins: 7, insight: 3, loot: { ration: 2 },
       outcome: '栾火用泡软的苇芯填住杯缝，再摇也不漏谷。他分了些磨好的干粮，又给了你一半工钱。' },
     { label: '问栾火是谁定的共用磨盘规矩', days: 0.25, insight: 2,
       outcome: '「关山师兄下山没少替人分磨钱。」栾火抬抬手，「院里也一样，帮得上忙才有账记，跟你是哪的人无关。」' },
   ] },
-  { id: 'sand_rooftile_patch', name: '留阴瓦畦', text: '田户骆椿伏在瓦畦里修剪枯茎。西边一个瓦棚挡着日头，她刚从棚下一条小路绕过来。', choices: [
+  { id: 'sand_rooftile_patch', name: '瓦片遮着的药田', text: '种药的骆椿蹲在一排旧瓦旁修剪枯茎。西边一个瓦棚挡着日头，她刚从棚下一条小路绕过来。', choices: [
     { label: '捡田边剪下的灵草', days: 0.25, loot: { reed: 2 }, insight: 2, outcome: '骆椿留足下一茬的草根，剩下的嫩草晒一晒就能带走。' },
     { label: '问骆椿为何用瓦盖住湿土', days: 0.25, insight: 3, outcome: '骆椿翻过一片旧瓦给你看。「拿瓦晒盐也得看背面的纹。向阳一面太烫，冷炉那种背面留粗纹的瓦才能反复用。」' },
     { label: '收瓦棚下散开的谷子', days: 0.5, loot: { millet_grain: 2 }, insight: 2, outcome: '旧箩筛尽了干砂，只剩适合煮粥的碎谷。' },
@@ -367,8 +367,8 @@ const enemies = [
     intents: [{ name: '绕过铜扣探头咬', kind: 'attack', mult: 1 }, { name: '盘身抬起蛇头', kind: 'heavy', mult: 1.6 }, { name: '把头缩回铜扣后', kind: 'guard', mult: 1.35 }],
     loot: { beast_meat: 2, hide: 1, qi_core: 2 }, desc: '桥栏的铜结为它遮住半个头，须提防从高处伸下的毒牙。' },
   { id: 'sand_tuner', name: '叩石师姐袁息', tags: ['human'], sparring: true, tier: 3, hp: 52, atk: 13, def: 4, insight: 5,
-    intents: [{ name: '钝剑试步', kind: 'attack', mult: 1 }, { name: '压剑听石', kind: 'guard', mult: 1.5 }, { name: '踏钉斜斩', kind: 'heavy', mult: 1.55 }],
-    loot: {}, desc: '叩石院的授习师姐，使用钝剑。摆剑守势后会跟半步斜斩。' },
+    intents: [{ name: '钝剑试步', kind: 'attack', mult: 1 }, { name: '压低剑，听脚下石响', kind: 'guard', mult: 1.5 }, { name: '踩实石板斜着斩来', kind: 'heavy', mult: 1.55 }],
+    loot: {}, desc: '在叩石院教剑的师姐。她使的是钝剑，架住一招后常跟半步斜斩。' },
   { id: 'sand_vein_jackal', name: '负砂豺', tags: ['beast', 'furred'], tier: 4, hp: 63, atk: 15, def: 5, insight: 5,
     intents: [{ name: '踩着木架扑来', kind: 'attack', mult: 1 }, { name: '躲到木梁后', kind: 'guard', mult: 1.45 }, { name: '顶落梁上的重物', kind: 'heavy', mult: 1.62 }],
     loot: { beast_meat: 3, hide: 3, foundation_core: 2 }, desc: '一只耳朵曾被矿架夹伤。它在架子下面一转身，固定木梁的重物就开始摇晃。' },
@@ -384,32 +384,39 @@ const enemies = [
       { name: '撞倒一大块晶石', kind: 'heavy', mult: 1.68 }, { name: '扬起呛人的晶尘', kind: 'drain', mult: 0.7 }, { name: '抖回脱落的晶片', kind: 'heal', mult: 0.45 }],
     loot: { beast_meat: 5, hide: 4, beast_eye: 1, gold_core: 2, battle_sinew: 2 }, desc: '肩背和鬃毛间嵌满晶片。每次把眼睛藏进鬃毛，它都会用肩膀撞向附近的晶石。' },
   { id: 'sand_inverted_keeper', name: '倒驿锁影', tags: ['spirit'], tier: 7, hp: 122, atk: 24, def: 9, insight: 12,
-    intents: [{ name: '牵锁扫地', kind: 'attack', mult: 1 }, { name: '急收印锁', kind: 'drain', mult: 0.66 },
-      { name: '柱背压锁', kind: 'heavy', mult: 1.64 }, { name: '绕梁抱臂', kind: 'guard', mult: 1.45 }],
-    loot: { gold_core: 2 }, desc: '越过旧影先落地的位置，锁链会在回声传到前先扑到。' },
+    intents: [{ name: '牵锁扫地', kind: 'attack', mult: 1 }, { name: '收紧锁链护身', kind: 'drain', mult: 0.66 },
+      { name: '从石柱后甩链砸来', kind: 'heavy', mult: 1.64 }, { name: '护着胸口绕过石梁', kind: 'guard', mult: 1.45 }],
+    loot: { gold_core: 2 }, desc: '它的脚步声总晚半拍。等听见回声，锁链已经从柱边扫过来了。' },
   { id: 'sand_basket_mender', name: '补箩老人', tags: ['human'], tier: 7, hp: 121, atk: 22, def: 9, insight: 0, sparring: true,
     intents: [{ name: '竹杖贴向手腕', kind: 'attack', mult: 1 }, { name: '横过竹杖挡招', kind: 'guard', mult: 1.35 },
       { name: '竹杖斜着扫来', kind: 'heavy', mult: 1.5 }, { name: '竹尖挑向肘弯', kind: 'attack', mult: 1.13 }],
     loot: {}, desc: '他手里那根竹杖平平无奇，转到你身侧时，杖头却一点声响都没有。' },
   { id: 'sand_sundial_master', name: '照壁刀师邢既横', tags: ['human'], tier: 8, hp: 128, atk: 25, def: 10, insight: 13,
-    intents: [{ name: '平靠石影拖刀', kind: 'attack', mult: 1 }, { name: '横刀顺气', kind: 'guard', mult: 1.48 },
-      { name: '伏角横刀', kind: 'heavy', mult: 1.6 }, { name: '连拖三步', kind: 'drain', mult: 0.7 }, { name: '急挑返光', kind: 'attack', mult: 1.15 }],
-    loot: {}, desc: '刀刃借石壁返光藏住一半。等看清伏角的横刀再架招，石门边仍有一线退路。' },
+    intents: [{ name: '沿石壁拖刀逼近', kind: 'attack', mult: 1 }, { name: '横刀顺气', kind: 'guard', mult: 1.48 },
+      { name: '从墙角里猛挥一刀', kind: 'heavy', mult: 1.6 }, { name: '连拖三步', kind: 'drain', mult: 0.7 }, { name: '借石光从下往上挑刀', kind: 'attack', mult: 1.15 }],
+    loot: {}, desc: '刀刃借石壁返光藏住一半。看清他从墙角横挥的那刀再架招，石门边仍有一线退路。' },
 ];
 
 const sects = [
   { id: 'echo_foundry', region: 'sand_bell_cloister', name: '叩石院',
     desc: '梁弦教访客辨认矿脉，袁息教弟子守井。有人只来卖矿，也有人拜入院中，学着巡井。',
     join: { need: { ore: 2, wood: 2 }, coins: 7 },
+    entryRole: '在外院帮着换石架和井绳上的旧件，听师姐讲井边哪里容易打滑。',
     jobs: [
       { id: 'ring_hollow', name: '给挂石板的架子换支脚', desc: '低处的支脚松了，换好以后，干活的人就不用冒险在下面扶住整座架子。', need: { ore: 3, wood: 2 }, credit: 3, coins: 9, cooldown: 3 },
       { id: 'ring_braces', name: '给井绳换两个铁扣', desc: '守井人要给安全绳添两个扣子，旧扣还能拿回去重打。', need: { hide: 2, ore: 2 }, credit: 4, coins: 12, cooldown: 5 },
-      { id: 'ring_assay', name: '给量回声的石槽补材料', desc: '高处的料槽空了。梁弦想要分量相近的灵晶和暗金，好把那边的回声调回来。', need: { core: 3, black_iron: 2 }, credit: 6, coins: 16, cooldown: 7 },
+      { id: 'ring_assay', name: '给试回声的石槽补材料', desc: '高处的石槽缺料。梁弦想要分量相近的灵晶和暗金，好把那边的回声调回来。',
+        minCredit: 9, rankReason: '内门弟子先跟梁弦听过石板的回声，才知道石槽还差多少料。',
+        need: { core: 3, black_iron: 2 }, credit: 6, coins: 16, cooldown: 7 },
+      { id: 'ring_hoist_check', name: '带两名弟子试一遍井梯的吊绳', desc: '几段旧井梯拆下来修过。趁还没送回井口，先在院里试吊，把会滑动的梯脚都挑出来。',
+        minCredit: 18, rankReason: '试吊时有人摇轮、有人扶梯。执事弟子负责叫停，也得验过每一截绳。',
+        days: 0.625, need: { wood: 4, black_iron: 2, battle_sinew: 3 }, credit: 5, coins: 24, cooldown: 12, reward: { ore: 2 },
+        text: '弟子慢慢松开石轮，左边那截旧绳先滑了一寸。你喊人停下，把梯脚重新捆牢，再试一遍才叫人送回井口。梁弦把剩下的两块寒铁递给你。' },
     ],
     ranks: [
-      { credit: 3, name: '拾音客', reward: { salve: 2 } },
-      { credit: 9, name: '听脉弟子', reward: { core: 3, iron_talisman: 2 } },
-      { credit: 18, name: '巡井匠', reward: { heal_pill: 2, black_iron: 4 } },
+      { credit: 3, name: '拾音客', disciple: '外门弟子', role: '跟师姐学巡井，备齐当班的人要用的井绳和铁扣。', reward: { salve: 2 } },
+      { credit: 9, name: '听脉弟子', disciple: '内门弟子', role: '听得出石板回声的变化，可以进试声棚帮梁弦调整石槽。', reward: { core: 3, iron_talisman: 2 } },
+      { credit: 18, name: '巡井匠', disciple: '执事弟子', role: '带两名弟子试吊井梯，亲自检过绳扣才让人把梯子送回井口。', reward: { heal_pill: 2, black_iron: 4 } },
     ],
   },
 ];

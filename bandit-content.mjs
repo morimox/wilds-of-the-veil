@@ -17,8 +17,8 @@ const commonEnemies = [
     '矛杆有两处握出来的光。把手挪到后头，就会迎面送出一矛。',
     [cut('短矛推向肩头'), slam('跨步直刺', 1.45), cover('拽回矛杆挡身')]),
   roadEnemy('road_bow_robber', '绳肩劫弓手', 2, 38, 10, 3, 15, 'duelist',
-    '弓把有一道用麻绳缠好的裂口。指头压住弦扣时，他还望着你脚下的位置。',
-    [shoot('朝脚边试一箭'), cover('退开捻弓弦'), { ...slam('搭硬箭射来', 1.45), ranged: true }, evade('贴着树身往侧面一闪')], 0.11),
+    '弓把有一道用麻绳缠好的裂口。把箭搭在弓弦上时，他还望着你脚下的位置。',
+    [shoot('朝脚边试一箭'), cover('退开半步，举弓护身'), { ...slam('搭硬箭射来', 1.45), ranged: true }, evade('贴着树身往侧面一闪')], 0.11),
   roadEnemy('road_salt_cutter', '盐袋刀手', 3, 51, 12, 5, 19, 'duelist',
     '他把旧盐袋折厚垫在左肩，刀顺着衣摆拖，手上没有多余的动作。',
     [cut('平刀抵到臂侧'), cover('以厚肩偏开半步'), slam('反手提刀斩下')]),
@@ -33,7 +33,7 @@ const commonEnemies = [
     [cut('递剑点向手肘'), cover('回剑守肋'), slam('贴身旋剑回斩', 1.54), evade('收剑错开一步')], 0.1),
   roadEnemy('road_black_bowist', '冷弦夺货人', 7, 87, 20, 7, 30, 'schemer',
     '他的弩搁在肩窝，指腹只按着一枚短矢。看见你靠近，他会反向让开半步把弩抬平。',
-    [shoot('抬弩放出短矢'), cover('借石影上弦'), { ...slam('扣弦压出一支硬矢', 1.55), ranged: true }], 0.09),
+    [shoot('抬弩射出短箭'), cover('躲到石后拉紧弩弦'), { ...slam('扣动扳机，射出一支重箭', 1.55), ranged: true }], 0.09),
   roadEnemy('road_sandal_halberd', '沉靴劫道客', 8, 104, 22, 9, 33, 'predator',
     '短靴裹了几层硬皮，一步踩下几乎没有声响。他把短戟立在身侧，尖刃只露出一截。',
     [cut('挑戟向膝下扫'), slam('沉肩挑起短戟', 1.62), cover('立戟压住地面', 1.5)]),
@@ -42,8 +42,10 @@ const commonEnemies = [
 const den = 'bandit_slope_den';
 const scout = 'bandit_den_scout';
 const sentry = 'bandit_den_sentry';
-const carpenter = 'bandit_den_carpenter';
+const bodyguard = 'bandit_den_bodyguard';
 const leader = 'bandit_den_leader';
+const denResidents = [scout, sentry, bodyguard, leader];
+const kingBlade = 'gully_king_blade';
 const sleeve = 'road_sleeve_manual';
 const roadsideCart = 'bandit_marsh_lamp';
 const greyGully = 'grey_gully';
@@ -51,7 +53,7 @@ const greyGully = 'grey_gully';
 const crews = {
   [greyGully]: { name: '灰沟坡寨', members: [16, 12, 8, 5, 4, 2, 0, 0, 0], den,
     headquarters: { region: 'screen_slope', name: '灰沟坡寨' } },
-  ferryHills: { name: '桥索边的抬木帮', members: [16, 14, 10, 0, 0, 0, 0, 0, 0],
+  ferryHills: { name: '吊桥边的搬木帮', members: [16, 14, 10, 0, 0, 0, 0, 0, 0],
     headquarters: { region: 'pine_ridge', name: '断桥下的挡雨棚' }, recruit: { delay: 16, interval: 6 } },
   quarryTracks: { name: '旧矿道的散伙矿客', members: [2, 2, 3, 4, 5, 5, 10, 8, 5],
     headquarters: { region: 'black_mine', name: '废绞车后屋' } },
@@ -166,22 +168,25 @@ const pools = [
 const specialEnemies = [
   roadEnemy('road_slate_boss', '灰褂拦路人', 1, 35, 9, 3, 14, 'duelist',
     '他把左脚踩在板车侧沿，右手提一把削薄的刀。左臂绕着肉眼可见的血布。',
-    [cut('用右手带刀横削'), cover('将刀收到伤臂旁边'), slam('借车沿蹬出一刀', 1.43), evade('挨着车辕退开')], 0.05),
+    [cut('用右手带刀横削'), cover('将刀收到伤臂旁边'), slam('借车沿蹬出一刀', 1.43), evade('贴着车侧让开')], 0.05),
   roadEnemy('road_ferry_tollman', '系红绳的篙手', 3, 55, 12, 4, 20, 'predator',
     '草鞋浸透了水，手上仍稳。等篙脚一松，他就有地方从横杆旁扎出一篙。',
     [cut('傍石斜刺一篙'), slam('抬高篙尾扫下来', 1.55), cover('退守横杆背面')], 0.06),
   roadEnemy('road_wind_cutman', '拨桥扣的刀客', 5, 73, 16, 7, 25, 'schemer',
     '正面看去只露出一段刀柄。等桥扣晃响，他会借着响动从遮风石旁露刀。',
     [cut('趁铜扣响时出刀'), cover('闪回石板阴影'), slam('退半步扬腕劈下', 1.58), evade('沿风板迅速让开')], 0.1),
-  roadEnemy(scout, '坡寨放哨人', 1, 33, 9, 3, 13, 'predator',
-    '短矛靠在哨绳旁。出手前他总会看向沟口，像在等谁来接班。',
+  { ...roadEnemy(scout, '外寨哨兵', 1, 33, 9, 3, 13, 'predator',
+    '短矛靠在哨绳旁。他出手前总看向沟口，像在等接班的人。腰绳上有个装饼的油纸袋。',
     [cut('矛尖挑向鞋头'), slam('借高坎扎出一矛', 1.45), cover('把矛柄竖在胸前')]),
-  roadEnemy(sentry, '守棚的箍刀手', 2, 43, 11, 4, 16, 'bulwark',
-    '他握刀那只袖子缝了铁箍。把刀压低时，铁箍也会迎着对手的手腕。',
-    [cut('抬铁箍压向前腕'), cover('举袖护住半身'), slam('架开来手后重劈', 1.57)]),
-  roadEnemy(carpenter, '货廊的抬木手', 3, 54, 12, 5, 18, 'duelist',
-    '他从货架后的窄道挤出来，手里提着一根削平的扁担。手一换，扁担两头都能打人。',
-    [cut('扁担低头扫腿'), cover('扁担横过胸口'), slam('抬扁担纵劈', 1.54)]),
+    chanceLoot: { ration: { count: 1, chance: 0.34 } } },
+  { ...roadEnemy(sentry, '巡寨刀客', 2, 43, 11, 4, 16, 'bulwark',
+    '他握刀的那只手戴着铁护腕，另一边挂着个沾了松脂的布袋。刀一压低，铁护腕便迎向你的手腕。',
+    [cut('抬起铁护腕，撞向你的手腕'), cover('举袖护住半身'), slam('架开来手后重劈', 1.57)]),
+    chanceLoot: { salve: { count: 1, chance: 0.23 } } },
+  { ...roadEnemy(bodyguard, '黑巾近卫', 3, 54, 12, 5, 18, 'duelist',
+    '这一队都在左臂系黑巾，平日替许涧看里屋。他用带裂口的厚刀从货架之间逼近。腰袋上露着一截留来补刀的寒铁。',
+    [cut('压低刀刃扫向膝下'), cover('横刀护住胸腹'), slam('踩近一步，扬刀重劈', 1.54)]),
+    chanceLoot: { ore: { count: 1, chance: 0.28 } } },
   { ...roadEnemy(leader, '灰沟贼王许涧', 3, 76, 14, 6, 22, 'schemer',
     '许涧平时隔着长桌点货，出刀也紧贴桌角。见他将空凳拨到身前，先留心凳脚后扬起的刀。',
     [cut('贴着桌沿递刀'), cover('贴住桌角，以刀护身'),
@@ -194,9 +199,9 @@ const fixed = [
   {
     id: 'road_slate_peg', a: 'marsh', b: 'ridge', crew: greyGully, forceAt: 3,
     enemy: 'road_slate_boss', chance: 0.6, fee: 5,
-    intro: '板车歪在道上，只留下车辕边一线窄路。一个灰褂人握着短刀，左臂上裹了层透红的布。他叫你丢五枚钱到车板上。',
-    nonThreatIntro: '板车歪在道上。灰褂人打量一眼你的兵器，把短刀连鞘搁在车板上。他用右手托着车辕，左袖的布透着血。「劳驾扶一下，别让车再倒过来。」',
-    nonThreatActions: [{ id: 'ask_cart_road', label: '帮他扶住车辕，问他从哪儿下来',
+    intro: '板车歪在道上，只留下车前木杆旁的一线窄路。一个灰褂人握着短刀，左臂上裹了层透红的布。他叫你丢五枚钱到车板上。',
+    nonThreatIntro: '板车歪在道上。灰褂人打量一眼你的兵器，把短刀连鞘搁在车板上。他用右手托着车前伸出的木杆，左袖的布透着血。「劳驾扶一下，别让车再倒过来。」',
+    nonThreatActions: [{ id: 'ask_cart_road', label: '帮他扶稳板车，问他从哪儿下来',
       desc: '他一个人扶不住板车。车底夹着半张送货图。', revealSite: den,
       outcome: '车身一正，灰褂人从底下抽出货图。「我是从晒盘坡逃下来的。筛盘后头有条灰沟，矮栅脚下扣着木盆，往里就是那伙人的寨子。」说完他把板车推到路边。' }],
     actions: [{ id: 'bind_road_arm', label: '拿出药膏，替灰褂人裹住左臂',
@@ -204,7 +209,7 @@ const fixed = [
       loot: { [sleeve]: 1 }, revealSite: den,
       outcome: '你给他上了药。灰褂人用右手扶着车，替你腾开窄路。「这伤是晒盘坡背后的寨里留的。走筛盘旁的灰沟，认倒扣的木盆。」他让你从车板下抽本薄册。「原先护车时拿它保命。下回看清谁先出手，再伸手。」' }],
     afterPay: { revealSite: den,
-      outcome: '车辕挪开时落出一张旧货图。图上的山路从晒盘坡筛盘拐进灰沟。沟尽头画着矮栅，栅脚倒扣着一只木盆。' },
+      outcome: '扶正板车时掉出一张旧送货图。图上的山路从晒盘坡筛盘拐进灰沟。沟尽头画着矮栅，栅脚倒扣着一只木盆。' },
     afterWin: {
       intro: '短刀掉进车底。灰褂人靠住车轮，右手抓紧渗血的左袖。「我本是替寨里赶车的。上回他们叫我把押货的小孩捆进棚，我没下手，回头就挨了这一刀。拦你是想凑点看伤的钱。放我一回，我往山下走，再不上这条道。」',
       actions: [
@@ -223,7 +228,7 @@ const fixed = [
     actions: [{ id: 'repair_raft_bar', label: '给两截松木，帮他接住脱开的浮杆',
       desc: '横杆是旧榫，用两截结实的木头平撑住，船就不必一直停在急水边。', need: { wood: 2 },
       loot: { ration: 1 }, outcome: '篙手把旧榫从水里勾起，接住你递下的松木。两边的船终于能靠紧。他朝船主招手。「先拢船。今天这趟不用给钱了。」等船的人塞给你一包干粮。' }],
-    afterPay: { outcome: '篙手把横杆朝旧桩一挂，招呼等着的两条船往浅处并拢，一起补上榫头。' },
+    afterPay: { outcome: '篙手把横杆朝旧桩一挂，招呼等着的两条船往浅处并拢，一起加木条固定松动的地方。' },
     afterWin: { loot: { ration: 1, wood: 1 },
       outcome: '篙手松开红绳，从侧边浅滩游开。船客剪去横杆上的私绳，把两条船靠到同一侧。一位船客让你带包干粮，另一位从舱里抽了一截干松木。' },
   },
@@ -238,22 +243,26 @@ const fixed = [
   },
 ];
 
-const resident = (start, interval = 0) => ({ start, cap: start, interval, growth: interval > 0 ? 1 : 0, fixedPopulation: true });
+const resident = (start, interval = 0) => ({ start, cap: start, interval, growth: interval > 0 ? 1 : 0,
+  fixedPopulation: true, ...(interval > 0 ? { depletedFactor: 1 } : {}) });
 const sites = [
   { id: roadsideCart, name: '北堤歇车处', region: 'marsh' },
-  { id: den, name: '灰沟坡寨', region: 'screen_slope', afterBandit: den, once: [4, 5, 6, 7],
-    creatures: { [scout]: resident(8, 28), [sentry]: resident(8, 32), [carpenter]: resident(6, 36), [leader]: resident(1) },
+  { id: den, name: '灰沟坡寨', region: 'screen_slope', afterBandit: den, once: [1, 2, 3, 4],
+    creatures: { [scout]: resident(8, 28), [sentry]: resident(8, 32), [bodyguard]: resident(6, 36), [leader]: resident(1) },
     creatureText: {
       [scout]: { present: '外栅的哨绳轻轻抖动，灰沟深处传来短矛碰石的声音。', absent: '栅外哨绳垂在地上，站在灰沟能看见棚门。' },
-      [sentry]: { present: '棚里有几道火光，门前的平石被铁箍磕出新痕。', absent: '棚门已经推开，露出后头搭了木架的货廊。' },
-      [carpenter]: { present: '长货廊的木架后有脚步声，扁担偶尔擦过木柱。', absent: '木架间没了脚步声。贴着廊边就能走到原先掌账的里屋。' },
-      [leader]: { present: '挂货签的里间还有人翻账。方才有人隔门喊过一声「许爷」，里头只响了一下刀鞘。', absent: '里间已经静下来，桌上的断凳腿横在地上。' },
+      [sentry]: { present: '棚里有几道火光，门前的平石上有护腕撞过的新痕。', absent: '棚门已经推开，露出后头搭了木架的货廊。' },
+      [bodyguard]: { present: '从里屋出来的人左臂都系着黑巾。两名巡寨的刀客一见他们就往墙边让。', absent: '里屋外的黑巾近卫已经退开，门边剩下一道新刀痕。' },
+      [leader]: { present: '长桌旁有只空凳常被踢开。棚里时不时有人高声喊「许爷」。', absent: '桌前横着一条断凳腿，棚里再没人喊许爷。' },
+    },
+    afterWinText: {
+      [leader]: '许涧倒下后，没散的人退到前棚。巡山人绕至货廊背坡，把一块宽木板搭在沟上。从那块板能直接接到柜边，和前棚隔着一堵墙。',
     },
     afterOnceText: {
-      4: '外栅边那只倒扣的木盆还在。从那里往里能看见长长的货廊。',
-      5: '先前跟巡山人下去的伤号已经离开。棚门后还留着他们解下的旧哨绳。',
+      1: '外栅边那只倒扣的木盆还在。绕到背坡，还能看见巡山人搭过木板的两道压痕。',
+      2: '先前跟巡山人下去的伤号已经离开。墙根还压着他们解下的旧哨绳。',
     },
-    choiceText: { 4: { after: '货柜和钱匣早已搬下山。廊下那几块方方的柜脚印里落了新砂。' } },
+    choiceText: { 1: { after: '货柜和钱匣早已搬下山。廊下那几块方方的柜脚印里落了新砂。' } },
   },
 ];
 
@@ -265,26 +274,23 @@ const events = [
         outcome: '「过了北堤，有人专在山道上等。先看你穿的甲，再看腰里挂的刀。披亮甲的，出来讨钱的往往也更不好惹。村口和驿站有人巡，他们少往那边凑。我上山总留几枚散钱，包里也放点救急的料。上回给了两截松木，那人就挪开了绳。」' },
     ],
   },
-  { id: den, name: '灰沟坡寨', text: '旧筛盘后的灰沟一路窄下去，绕到半人高的外栅。倒扣的木盆就在栅脚。栅内是排开数间的换哨棚，后头一溜货廊尽头才是掌账的里屋。',
+  { id: den, name: '灰沟坡寨', text: '旧筛盘后的灰沟绕到半人高的外栅，栅脚倒扣着一只木盆。棚门和货架都朝着中间的空地，寨里的人来回从这儿过。',
     choices: [
-      { label: '翻过外栅，截住换哨人', desc: '外栅这头落脚平稳，另一头是两道刚绑好的哨绳。', days: 0.25, enemy: scout,
-        outcome: '灰沟里的细铁响了一声，放哨人提着短矛翻过栅脚。' },
-      { label: '沿棚门的平石进去', guardedBy: scout, days: 0.25, enemy: sentry,
-        outcome: '火盆就在门内，带铁箍的袖子伸过火光，将你往门外逼。' },
-      { label: '贴着货架穿过长廊', desc: '廊两边排着几架粗木货架，中间只够一人过。', guardedBy: [scout, sentry], days: 0.25, enemy: carpenter,
-        outcome: '木架背后挤出一个抬货人。他抄起扁担，逼你退回廊口。' },
-      { label: '推开挂货签的里屋门', guardedBy: [scout, sentry, carpenter], days: 0.25, enemy: leader,
-        outcome: '许涧把门边插着的货签折断，又用脚把空凳拨到桌前。「叫我许涧的多，叫我贼王的也有。货在廊下，想搬，得先过这张桌。」他才把长刀从桌底抽出来。' },
-      { label: '把藏赃的货柜拖出棚门', afterFight: leader, guardedBy: [scout, sentry, carpenter], days: 0.375, stay: true, coins: 180,
-        loot: { ration: 4, ore: 6, core: 3, hide: 2 },
-        outcome: '晒盘坡的矿户照货签领走失物。货柜夹层还有一只铁匣，账上只写着「寨里公用」。巡山人当场清点，把无人认领的一百八十枚灵钱和几份余货给了你，随后把空匣和货柜一道抬下山。' },
-      { label: '给伤号留一包干粮，叫他们下坡见巡山人', afterFight: leader, guardedBy: [scout, sentry, carpenter], days: 0.25, stay: true,
+      { label: '翻过外栅，走进寨里的空地', desc: '站在外栅只能看见棚顶和货架，看不清是谁先走出来。', days: 0.25,
+        encounter: denResidents, outcome: '你踩到栅内的平地。有人回身抄起兵器，迎上来堵住去路。' },
+      { label: '从背坡拖出货柜，清点许涧留下的东西', afterFight: leader, days: 0.375, stay: true, coins: 180,
+        desc: '巡山人准备从宽板接手。柜上搁着许涧的刀，夹层里还卡着一只铁匣。',
+        loot: { ration: 4, ore: 6, core: 3, hide: 2, [kingBlade]: 1 },
+        outcome: '晒盘坡的矿户照货签领走失物。铁匣在账上只写着「寨里公用」。巡山人点过钱，把无人认领的一百八十枚灵钱、几份余货和许涧的宽背刀交给你，再将空匣和货柜从背坡抬下山。' },
+      { label: '给伤号留一包干粮，叫他们下坡见巡山人', afterFight: leader, days: 0.25, stay: true,
         need: { ration: 1 }, consume: true,
-        outcome: '几个躲在棚后的伤号拿走干粮，交出换哨的细绳。巡山人叫他们沿外栅慢慢走，一个个领下了坡。' },
-      { label: '查看哨位旁的粮袋', desc: '矮凳下有一个敞口粮袋，看样子是给换哨的人备的。', guardedBy: scout, days: 0.125, stay: true,
-        loot: { ration: 3 }, outcome: '粮袋里还留着三包没启封的干粮。' },
-      { label: '把棚门内的药匣拎出来', desc: '几团用过的布旁有只小木匣，匣盖上压着一片干药渣。', guardedBy: [scout, sentry], days: 0.125, stay: true,
-        loot: { salve: 2 }, outcome: '你把里头干净的两包松脂膏拣出来。' },
+        desc: '两个人扶着背坡的墙，没往前棚走。巡山人肯从外头接他们。',
+        outcome: '伤号交出换哨的细绳，拿着干粮沿背坡下去。巡山人在宽板外接住他们。' },
+      { label: '查看外栅边的粮袋', desc: '有人把敞口粮袋放在外栅旁的石墩上，伸手就够。', days: 0.125, stay: true,
+        loot: { ration: 3 }, outcome: '你把粮袋提到石墩背面，取出三包没启封的干粮。' },
+      { label: '把棚门边的药匣拎出来', afterFight: sentry,
+        desc: '方才退进棚的刀手撞开门扇，门边露出一只小木匣，匣盖上还压着片干药渣。', days: 0.125, stay: true,
+        loot: { salve: 2 }, outcome: '门边没人伸手。你用脚把药匣勾出来，拣了两包干净的松脂膏。' },
     ],
   },
 ];
@@ -292,6 +298,14 @@ const events = [
 const items = [
   { id: sleeve, name: '守车短袖诀', kind: 'manual', price: 0, sell: 0, keepOnFall: true,
     desc: '灰褂人的护车薄册，封面抹过一层油。纸角压得很平，翻开就看见几笔将刀拢在半臂之内的画。' },
+  { id: kingBlade, name: '许涧的宽背刀', kind: 'gear', price: 0, sell: 0, keepOnFall: true,
+    desc: '刀背厚，刀尖收得窄。前半截磨得雪亮，靠护手那段却全是长年蹭在木头上的细痕。' },
+];
+
+const gear = [
+  { id: kingBlade, slot: 'weapon', weaponClass: 'blade', tier: 3, atk: 7, perception: 3, retreat: 0.10, durability: 52, repair: 12,
+    trait: { kind: 'accuracy', bonus: 0.12 }, traits: [{ kind: 'pierce', intent: 'guard', bonus: 2 }],
+    entry: '筑基初期可握稳的宽背刀。刀尖跟得上错步的对手，也能探进他收紧的护身架。看准空当，还容易收刀抽身。' },
 ];
 
 const innerStyles = [
@@ -311,6 +325,6 @@ const innerStyles = [
 ];
 
 export const banditContent = {
-  items, sites, events, enemies: [...commonEnemies, ...specialEnemies], innerStyles,
+  items, gear, sites, events, enemies: [...commonEnemies, ...specialEnemies], innerStyles,
   roadBandits: { roads, pools, fixed, crews, dens: { [den]: { heads: 23, minFactor: 0.13, boss: leader } } },
 };

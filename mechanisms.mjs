@@ -52,7 +52,7 @@ export function mechanismView(state, kit) {
     canMove: !blocked && !full,
     canReset: !blocked && !equalSetting(setting, original),
     canTry: !blocked,
-    reason: complete ? '' : blocked || (full ? '步骤已经排满。可以试一次，或恢复原样再来。' : ''),
+    reason: complete ? '' : blocked || (full ? '这几步都选好了。可以试一次，也可以重来。' : ''),
   };
 }
 
@@ -70,9 +70,9 @@ export function mechanismAction(state, action, { id }, kit) {
 
   if (action === 'mechanismMove') {
     const move = mechanism.moves.find((entry) => entry.id === id);
-    if (!move) return kit.refuse('这里没有这一步可做。');
+    if (!move) return kit.refuse('这时候做不了这个动作。');
     const inSequence = mechanism.mode === 'sequence';
-    if (inSequence && setting.length >= (mechanism.maxLength ?? 8)) return kit.refuse('步骤已经排满。');
+    if (inSequence && setting.length >= (mechanism.maxLength ?? 8)) return kit.refuse('这几步都选好了。');
     const next = inSequence ? [...setting, move.id] : mechanism.dials.map(({ states }, index) => {
       const shifted = (setting[index] + (move.shift?.[index] ?? 0)) % states.length;
       return (shifted + states.length) % states.length;

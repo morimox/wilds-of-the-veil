@@ -57,7 +57,7 @@ test('water gauze softens the shell scrape after timed gathering without changin
     assert.equal(state.hp, before - expectedInjury);
     assert.match(result.injury.cause, /碎蚌壳/);
     assert.equal(result.injury.amount, expectedInjury);
-    assert.equal(/水绡札甲卸掉/.test(result.message), mode === 'worn');
+    assert.equal(/水纹护甲卸掉/.test(result.message), mode === 'worn');
     assert.deepEqual(result.gathered, { reed: 3 });
     assert.equal(state.event, 'reed_banks');
   }

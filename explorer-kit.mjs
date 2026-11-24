@@ -1,6 +1,6 @@
 export const explorerKitContent = {
   items: [
-    { id: 'reed_hat', name: '叠芦帽', kind: 'gear', price: 0, sell: 3,
+    { id: 'reed_hat', name: '宽檐苇帽', kind: 'gear', price: 0, sell: 3,
       desc: '芦片一层压着一层，帽檐垫了一圈软皮。雾珠挂在檐外，不往眼前流。' },
     { id: 'reed_boots', name: '踏苇鞋', kind: 'gear', price: 0, sell: 4,
       desc: '细芦编成底，足弓和脚踝各系一道皮条。鞋底浸湿了也不打滑。' },
@@ -8,9 +8,9 @@ export const explorerKitContent = {
       desc: '韧皮带内侧嵌着小片灵晶，两孔用兽筋穿紧，收腰时带身仍能微微伸开。' },
     { id: 'side_hook', name: '系绳短钩', kind: 'gear', price: 0, sell: 6,
       desc: '船工用来挑索的小钩，内缘磨成窄刃，木柄用细皮包紧。' },
-    { id: 'anvil_hammer', name: '短柄砧锤', kind: 'gear', price: 0, sell: 12,
+    { id: 'anvil_hammer', name: '短柄铁锤', kind: 'gear', price: 0, sell: 12,
       desc: '厚实的铁锤。敲面的方棱收得硬，柄却只够一手握实。' },
-    { id: 'scale_chisel', name: '翻鳞凿', kind: 'gear', price: 0, sell: 16,
+    { id: 'scale_chisel', name: '破鳞短凿', kind: 'gear', price: 0, sell: 16,
       desc: '凿身窄短，暗金边磨得很薄。皮握和凿颈之间压着一小环厚甲。' },
   ],
   gear: [

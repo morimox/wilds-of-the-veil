@@ -66,7 +66,7 @@ function visit(state, id) {
 
 function watchBriefing(state) {
   visit(state, 'border_watch_desk');
-  assert.match(choose(state, 0).outcome, /白蹄旧道.*断纬帐道.*担盐岗/);
+  assert.match(choose(state, 0).outcome, /白蹄旧道.*断帐旧道.*担盐岗/);
 }
 
 function shift(state, trail, id) {

@@ -292,7 +292,8 @@ function storedItems(state) {
 
 function depositable(state, id, kit) {
   const item = kit.records.items[id];
-  if (!item || item.kind === 'key' || item.keepOnFall || Object.values(state.equipment).includes(id)) return 0;
+  if (!item || item.kind === 'key' || (item.keepOnFall && item.kind !== 'manual') ||
+      Object.values(state.equipment).includes(id)) return 0;
   return Math.max(0, kit.owns(state, id) - (id === 'ration' ? (state.reliefRations ?? 0) : 0));
 }
 

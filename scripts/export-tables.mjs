@@ -377,6 +377,11 @@ const alchemyFormulae = data.recipes.filter(({ formula }) => formula).map((recip
 const ruleRows = Object.entries({ ...data.rules, ...rules })
   .map(([id, value]) => ({ id, value, desc: ruleDescriptions[id] ?? '' }));
 ruleRows.push(
+  { id: 'banditFatalDefeatBase', value: banditRules.fatalDefeatBase, desc: '战败于强盗的基础死亡概率' },
+  { id: 'banditFatalDefeatPerTier', value: banditRules.fatalDefeatPerTier, desc: '强盗每高一小境的死亡概率加值' },
+  { id: 'banditFatalDefeatCap', value: banditRules.fatalDefeatCap, desc: '普通强盗战败后死亡概率上限' },
+  { id: 'banditFatalChiefDefeat', value: banditRules.fatalChiefDefeat, desc: '战败于灰沟贼王时的死亡概率' },
+  { id: 'banditIgnoreUnarmedChance', value: banditRules.ignoreUnarmedChance, desc: '普通拦路人直接放过无穿戴旅客的概率' },
   { id: 'setupDays', value: economyData.setupDays, desc: '每次开启生产的操作耗时（日）' },
   { id: 'collectDays', value: economyData.collectDays, desc: '每次领取成品的操作耗时（日）' },
   { id: 'consumableBatchLimit', value: economyData.consumableBatchLimit, desc: '常用消耗品每单合批数上限；材料、灵钱和工期照批数累加' },
@@ -437,17 +442,17 @@ const crewRows = Object.entries(data.roadBandits.crews).map(([id, crew]) => ({
   roads: data.roadBandits.roads.filter(({ crew: owner }) => owner === id).map(({ a, b }) => `${name(a)} 至 ${name(b)}`).join('、'),
   delay: crew.recruit?.delay ?? banditRules.recruitDelay, interval: crew.recruit?.interval ?? banditRules.recruitInterval,
   inside: data.roadBandits.dens[crew.den]?.heads, minFactor: data.roadBandits.dens[crew.den]?.minFactor,
-  leaderlessDelay: crew.den && banditRules.leaderlessDelay, leaderlessInterval: crew.den && banditRules.leaderlessInterval,
+  boss: data.roadBandits.dens[crew.den]?.boss,
 }));
 const banditRanges = ([min, max]) => `${min}–${max}`;
 const rollList = (pool) => pool.map(({ id, weight }) => `${ref(id)} × ${weight}`).join('、');
-const fixedBanditRows = data.roadBandits.fixed.flatMap(({ id, a, b, chance, intro, enemy, fee, actions, afterPay, afterWin, crew, forceAt, nonThreatActions }) => [
+const fixedBanditRows = data.roadBandits.fixed.flatMap(({ id, a, b, name, chance, intro, enemy, fee, actions, afterPay, afterWin, crew, forceAt, nonThreatActions }) => [
   ...actions.map(({ id: action, ...choice }) => ({ action, ...choice })),
   ...(nonThreatActions ?? []).map(({ id: action, ...choice }) => ({ action, ...choice })),
   ...(fee != null ? [{ action: 'pay', label: '交过路钱', ...afterPay }] : []),
   ...(afterWin?.actions?.length ? afterWin.actions.map(({ id: action, ...choice }) => ({ action, ...choice, intro: afterWin.intro }))
-    : [{ action: 'victory', label: '胜后', ...afterWin }]),
-].map((row) => ({ id, a, b, chance, intro, enemy, fee, crew, forceAt, ...row })));
+    : afterWin ? [{ action: 'victory', label: '胜后', ...afterWin }] : []),
+].map((row) => ({ id, a, b, name, chance, intro, enemy, fee, crew, forceAt, ...row })));
 const arrayRows = regionRows.filter(({ array }) => array).map(({ id: region, province }) => ({
   region, province, ...transportRules.arrayPlans[province],
 }));
@@ -608,17 +613,17 @@ const tables = [
     'id', 'name', ['roads', '共享当场人数的路段'], ['count', '初始外出人数'],
     ['members', '炼气初期至金丹后期各小境人数', (counts) => counts.join(' / ')],
     ['hideout', '据点位置'], ['baseRegion', '所处区域', ref], ['den', '可进的藏身处', siteRef],
-    ['inside', '寨内人数'], ['minFactor', '寨内守卫清空后的路段概率倍率', percent],
+    ['inside', '寨内人数'], ['minFactor', '寨主仍在时，巡路概率的下限倍率', percent],
     ['delay', '首个空缺补员用时（日）'], ['interval', '之后补一人用时（日）'],
-    ['leaderlessDelay', '首领败退后首个空缺等待（日）'], ['leaderlessInterval', '首领败退后补一人用时（日）'],
-  ], { note: '进不了的窝也有实际名单。管辖路每步先乘剩余人数比例，可进山寨按当下活跃守卫再另乘一项。寨主被击败后，巡路倍率上限为 55%。' }),
+    ['boss', '击败后永久清空关联道路', ref],
+  ], { note: '每个窝都有人手名册。子路段概率按实际外出人数调整，灰沟还受寨内守卫存量影响。许涧败退后灰沟五条道路概率永久归零。' }),
   table('bandit-pools', '拦路要价、财物和装备', gated(data.roadBandits.pools), [
     'tier', tier, ['enemy', '对手', ref], ['fee', '索要灵钱范围', banditRanges], ['cash', '一般胜后灵钱范围', banditRanges],
     ['richChance', '富裕成员概率', percent], ['richCash', '富裕成员灵钱范围', banditRanges],
     ['gear', '一般成员装备及权重', rollList], ['richGear', '富裕成员装备及权重', rollList],
-  ], { note: '一般与富裕成员分别有 24% 和 75% 的概率带一件可缴装备。款物随本局的成员固定；玩家已持有或占用同名装备时，该件无第二份。' }),
+  ], { note: '一般与富裕成员分别有 24% 和 75% 的概率带一件可缴装备。款物随本局的成员固定。混付抵价使用买卖均价，无买价时使用常规收购价。' }),
   table('bandit-stories', '拦路人物与一次性结局', fixedBanditRows, [
-    'id', ['a', '通常出现的一端', ref], ['b', '通常出现的另一端', ref], ['crew', '提前遇见的计数范围'],
+    'id', 'name', ['a', '通常出现的一端', ref], ['b', '通常出现的另一端', ref], ['crew', '提前遇见的计数范围'],
     ['forceAt', '未解决时保底遭遇'], ['chance', '普通遇见后转为此人的概率', percent], 'enemy', ['fee', '开价（灵钱）'],
     ['intro', '初遇场景'], ['action', '动作标识'], 'label', 'desc', 'need', 'loot', ['revealSite', '可发现的藏身处', siteRef], ['outcome', '结果'],
   ]),
@@ -641,8 +646,10 @@ const tables = [
   table('market-talk', '摊上的线索', marketTalkRows, ['region', ['label', '交谈动作'], ['lead', '交付的线索', ref], ['outcome', '摊主所说']]),
   table('sect-admission', '宗门和入门物资', data.sects.map(({ jobs, ranks, join, ...sect }) => ({ ...sect, ...join })), ['region', 'id', 'name', 'desc', 'need', ['coins', '入门灵钱']]),
   table('sect-jobs', '宗门差事', sectJobs, ['region', ['sect', '宗门'], 'id', 'name', 'desc', 'need', 'reward', ['coins', '灵钱报酬'], ['credit', '增加功劳'],
-    ['afterQuests', '做完任一委托后出现', (ids) => ids.map(ref).join('、')], 'days', ['cooldown', '下一单间隔（天）']]),
-  table('sect-awards', '宗门功劳与回报', sectRanks, ['region', ['sect', '宗门'], 'name', ['credit', '功劳门槛'], 'reward', ['art', '传授术诀', ref]]),
+    ['afterQuests', '做完任一委托后出现', (ids) => ids.map(ref).join('、')], ['minCredit', '差事最低功劳'],
+    ['rankReason', '资格说明'], 'days', ['cooldown', '下一单间隔（天）']]),
+  table('sect-awards', '宗门身份、职责及奖赏', sectRanks, ['region', ['sect', '宗门'], 'name', ['credit', '功劳门槛'],
+    ['disciple', '弟子身份'], ['role', '当值工作'], 'reward', ['art', '传授术诀', ref]]),
   table('tournament', '守尺观大比', matchRows, ['region', ['order', '场次'], 'name', 'enemy', ['lead', '认得赛帖的证物', ref],
     ['fee', '每届报名费'], 'days', ['cooldown', '下次报名间隔（天）'], ['note', '对手介绍']],
     { note: '各轮均由裁判护场。散修也可报名，符合领取条件的奖品可稍后领。' }),

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { banditRules, roadBanditRisk } from './bandits.mjs';
 import { data } from './data.mjs';
-import { act, createGame, view } from './engine.mjs';
+import { act, createGame, rules, view } from './engine.mjs';
 import { roadGraph } from './world.mjs';
 
 const crewId = 'grey_gully';
@@ -84,6 +84,24 @@ function finishFight(state) {
   for (let turn = 0; state.combat && turn < 14; turn++) result = play(state, 'attack');
   assert.equal(state.combat, null);
   return result;
+}
+
+function stageDen() {
+  const den = data.roadBandits.crews[crewId].den;
+  const site = data.sites.find(({ id }) => id === den);
+  const event = data.events.find(({ id }) => id === den);
+  const state = readyTraveler();
+  state.region = site.region;
+  state.banditLeads.push(den);
+  play(state, 'visit', { id: den });
+  return { den, site, event, state };
+}
+
+function encounterInDen(state, seed) {
+  state.encounterSeed = seed;
+  play(state, 'choose', { index: 0 });
+  assert.ok(state.combat);
+  return state.combat.id;
 }
 
 test('all hazardous edges belong to populated crews with a headquarters and most trails stay safe', () => {
@@ -248,88 +266,141 @@ test('road wins temporarily empty the shared patrol and recruits arrive one at a
   assert.ok(crewState(state).recruits[twoRecruits.member]);
 });
 
-test('the camp can rebuild its patrol but never its leader or paid treasury', () => {
-  const state = readyTraveler();
-  state.realm = 8;
-  state.hp = view(state).maxHp;
-  state.resolvedBandits.push('road_slate_peg');
-  nextThreat(state, 'ridge', lowGradeEncounterSeed);
-  winRoadFight(state);
-  const originalRecruitDay = crewState(state).nextRecruitDay;
-  finishRoad(state, 'ridge');
-  nextThreat(state, 'ford', lowGradeEncounterSeed);
-  winRoadFight(state);
-  finishRoad(state, 'ford');
+test('every live den defender has one ticket in the first draw, including the leader', () => {
+  const { event, site, state } = stageDen();
+  const assault = event.choices[0];
+  const expected = Object.fromEntries(Object.entries(site.creatures).map(([id, { start }]) => [id, start]));
+  const headcount = Object.values(expected).reduce((sum, amount) => sum + amount, 0);
+  assert.ok(headcount >= 20);
+  assert.equal(expected[greyLeader], 1);
+  assert.deepEqual([...assault.encounter].sort(), [...Object.keys(expected)].sort());
+  assert.ok(Object.values(assault.encounterWeights ?? {}).every((weight) => weight === 1));
+  const sampled = {};
+  for (let ticket = 0; ticket < headcount; ticket++) {
+    const seed = seedFor([(ticket + 0.25) / headcount, (ticket + 0.75) / headcount]);
+    const target = encounterInDen(structuredClone(state), seed);
+    sampled[target] = (sampled[target] ?? 0) + 1;
+  }
+  assert.deepEqual(sampled, expected);
+});
 
-  const den = data.roadBandits.crews[crewId].den;
-  const camp = data.sites.find(({ id }) => id === den);
-  const event = data.events.find(({ id }) => id === den);
-  const treasury = event.choices.findIndex(({ afterFight, coins }) => afterFight === greyLeader && coins >= 150);
-  assert.ok(treasury >= 0);
-  state.banditLeads.push(den);
+test('a first-fight leader win opens the one-time cache and ends linked road threats even after ordinary guards return', () => {
+  const { den, event, site, state } = stageDen();
+  const treasury = 1;
+  const blade = 'gully_king_blade';
+  const related = data.roadBandits.roads.filter(({ crew }) => crew === crewId);
+  const otherRoad = map.find(({ key }) => key === 'ford|marsh');
+  const linkedEdges = related.map(({ a, b }) => map.find(({ key }) => key === [a, b].sort().join('|')));
+  const unaffectedRisk = risk(state, otherRoad);
+  assert.ok(unaffectedRisk > 0);
+  assert.ok(linkedEdges.every((edge) => risk(state, edge) > 0));
+  assert.equal(act(state, 'choose', { index: treasury }).ok, false);
+  state.realm = 8;
   equip(state, 'fault_coat');
   equip(state, 'foil_sword');
-  state.inventory.ration = 15;
-  play(state, 'travel', { id: camp.region });
-  play(state, 'visit', { id: den });
-  for (const [id, { start }] of Object.entries(camp.creatures)) {
-    const index = event.choices.findIndex(({ enemy }) => enemy === id);
-    assert.ok(index >= 0);
-    if (id === greyLeader) {
-      const afterDueRecruit = structuredClone(state);
-      afterDueRecruit.day = originalRecruitDay;
-      play(afterDueRecruit, 'choose', { index });
-      finishFight(afterDueRecruit);
-      assert.equal(Object.values(crewState(afterDueRecruit).recruits).reduce((sum, count) => sum + count, 0), 1);
-      assert.equal(crewState(afterDueRecruit).defeated.length, 1);
-      assert.equal(crewState(afterDueRecruit).nextRecruitDay, afterDueRecruit.day + banditRules.leaderlessDelay);
-    }
-    for (let round = 0; round < start; round++) {
-      if (state.satiety < 40) play(state, 'eat', { id: 'ration' });
-      play(state, 'choose', { index });
-      assert.equal(state.combat.id, id);
-      finishFight(state);
-    }
-  }
+  state.hp = view(state).maxHp;
+  const linkedSpoils = `crew:${crewId}/0:0`;
+  const otherSpoils = 'crew:elsewhere/0:0';
+  state.banditSpoils[linkedSpoils] = { coins: 7, goods: { wood: 1 }, gear: [{ id: 'knife', durability: 8 }] };
+  state.banditSpoils[otherSpoils] = { coins: 6, goods: {}, gear: [] };
+  const coinsBeforeBoss = state.coins;
+  const bossSeed = seedFor([1 - 0.5 / data.roadBandits.dens[den].heads, 1]);
+  assert.equal(encounterInDen(state, bossSeed), greyLeader);
+  finishFight(state);
+  assert.equal(state.coins, coinsBeforeBoss + 7);
+  assert.equal(state.banditSpoils[linkedSpoils], undefined);
+  assert.equal(state.banditSpoils[otherSpoils].coins, 6);
+  assert.deepEqual(view(state).groundLoot, { wood: 1, knife: 1 });
+  play(state, 'take', { id: 'knife' });
+  assert.equal(state.durability.knife, 8);
+  assert.deepEqual(state.siteVictories[den], { [greyLeader]: 1 });
+  assert.ok(linkedEdges.every((edge) => risk(state, edge) === 0));
+  assert.equal(risk(state, otherRoad), unaffectedRisk);
 
-  assert.equal(state.siteVictories[den][greyLeader], 1);
-  const leaderFallDay = state.day;
-  assert.ok(originalRecruitDay > leaderFallDay);
-  const deferredRecruitDay = leaderFallDay + banditRules.leaderlessDelay;
-  assert.equal(crewState(state).nextRecruitDay, deferredRecruitDay);
-  const pocket = state.coins;
+  const full = structuredClone(state);
+  const pack = view(full);
+  const existingRationSlots = Math.ceil(full.inventory.ration / rules.backpackStackSize);
+  const roomForRations = pack.backpackCapacity - pack.backpackUsed + existingRationSlots;
+  full.inventory.ration = roomForRations * rules.backpackStackSize;
+  assert.equal(view(full).backpackUsed, pack.backpackCapacity);
+  play(full, 'choose', { index: treasury });
+  assert.equal(view(full).groundLoot[blade], 1);
+  assert.equal(act(full, 'take', { id: blade }).ok, false);
+  play(full, 'discard', { id: 'ration', count: rules.backpackStackSize });
+  play(full, 'take', { id: blade });
+  assert.equal(full.inventory[blade], 1);
+
+  const beforeCache = state.coins;
   play(state, 'choose', { index: treasury });
-  assert.equal(state.coins, pocket + event.choices[treasury].coins);
-  const leaderless = structuredClone(state);
-  leaderless.day = deferredRecruitDay;
-  play(leaderless, 'leave');
-  play(leaderless, 'equip', { id: 'straw_cape' });
-  play(leaderless, 'equip', { id: 'cudgel' });
-  nextThreat(leaderless, 'ridge', lowGradeEncounterSeed);
-  assert.ok(crewState(leaderless).defeated.length > 0);
-  assert.equal(crewState(leaderless).nextRecruitDay, deferredRecruitDay + banditRules.leaderlessInterval);
-
-  const liveCamp = () => view(state).sites.find(({ id }) => id === den).creatures;
-  const { [greyLeader]: ignored, ...ordinary } = camp.creatures;
-  const [firstReturning] = Object.keys(ordinary).sort((a, b) =>
-    state.localPools[den].creatures[a].nextAt - state.localPools[den].creatures[b].nextAt);
-  const ordinaryRejoin = state.localPools[den].creatures[firstReturning].nextAt;
-  assert.ok(ordinaryRejoin > state.day);
-  state.day = ordinaryRejoin - 0.001;
-  assert.equal(liveCamp()[firstReturning], 0);
-  state.day = ordinaryRejoin;
-  assert.equal(liveCamp()[firstReturning], ordinary[firstReturning].growth);
-  assert.equal(liveCamp()[greyLeader], 0);
-
-  state.day += 365;
-  for (const [id, { cap }] of Object.entries(ordinary)) assert.equal(liveCamp()[id], cap);
-  assert.equal(liveCamp()[greyLeader], 0);
-  assert.ok(risk(state, firstRoad) < 0.055);
+  assert.equal(state.coins, beforeCache + event.choices[treasury].coins);
+  assert.ok(event.choices[treasury].coins >= 150);
+  assert.equal(state.inventory[blade], 1);
   const total = state.coins;
-  play(state, 'leave');
-  play(state, 'visit', { id: den });
+  const liveCamp = () => view(state).sites.find(({ id }) => id === den).creatures;
+  assert.equal(liveCamp()[greyLeader], 0);
+  const survivor = encounterInDen(state, bossSeed);
+  assert.notEqual(survivor, greyLeader);
+  finishFight(state);
+  const ordinary = site.creatures[survivor];
+  const returnDay = state.localPools[den].creatures[survivor].nextAt;
+  assert.ok(returnDay > state.day);
+  state.day = returnDay - 0.001;
+  assert.equal(liveCamp()[survivor], ordinary.start - 1);
+  state.day = returnDay;
+  assert.equal(liveCamp()[survivor], ordinary.start);
+  state.day += 365;
+  assert.equal(liveCamp()[greyLeader], 0);
   assert.equal(act(state, 'choose', { index: treasury }).ok, false);
   assert.equal(state.coins, total);
+  assert.ok(linkedEdges.every((edge) => risk(state, edge) === 0));
+
+  for (const { a, b } of related) {
+    const journey = structuredClone(state);
+    play(journey, 'leave');
+    journey.region = a;
+    journey.discovered = [a, b];
+    journey.roadSeed = chargedRiskSeed;
+    journey.satiety = 96;
+    assert.equal(play(journey, 'travel', { id: b }).roadInterrupted, undefined);
+    assert.equal(journey.region, b);
+    assert.equal(journey.roadSeed, chargedRiskSeed);
+  }
+});
+
+test('a survivor can recover the camp stash from a different defender in the same den', () => {
+  const { den, event, site, state } = stageDen();
+  const first = encounterInDen(state, seedFor([0, 0.01]));
+  const fighter = data.enemies.find(({ id }) => id === first);
+  state.combat.plan = { round: 0, reader: null, intent: fighter.intents.find(({ kind }) => kind === 'attack') };
+  state.coins = 37;
+  state.hp = 1;
+  state.banditLossSeed = 1500;
+  state.durability.cudgel = 9;
+  play(state, 'attack');
+  assert.equal(state.combat, null);
+  assert.equal(state.region, 'village');
+  assert.equal(state.coins, 0);
+  assert.equal(state.inventory.cudgel, undefined);
+
+  state.day += rules.mixedTrackDays;
+  state.realm = 8;
+  state.hp = view(state).maxHp;
+  state.satiety = 96;
+  state.roadSeed = quietSeed;
+  play(state, 'travel', { id: site.region });
+  assert.equal(state.region, site.region);
+  play(state, 'visit', { id: den });
+  const second = event.choices[0].encounter[1];
+  const heads = data.roadBandits.dens[den].heads;
+  const firstTickets = site.creatures[first].start;
+  const secondSeed = seedFor([(firstTickets + 0.25) / heads, (firstTickets + 0.75) / heads]);
+  assert.notEqual(first, second);
+  assert.equal(encounterInDen(state, secondSeed), second);
+  finishFight(state);
+  assert.equal(state.coins, 37);
+  for (const id of ['cudgel', 'straw_cape']) assert.equal(view(state).groundLoot[id], 1);
+  play(state, 'take', { id: 'cudgel' });
+  assert.equal(state.durability.cudgel, 8);
 });
 
 test('a paid member can meet another traveler but cannot collect twice in the same trip', () => {

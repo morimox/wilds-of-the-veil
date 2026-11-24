@@ -207,21 +207,48 @@ test('the main grade comes from the visible armor, independent of true realm and
   }
 });
 
-test('payment mixes real items and coins, preserves the remaining walk, and leaves a fixed local lead', () => {
+test('a mixed toll transfers goods and coins together on confirmation, then the walk can continue', () => {
   const state = interrupted();
   assert.equal(state.roadBandit.fixed, 'road_slate_peg');
   const firstStop = state.roadTrip.progress;
+  const arrivalAtStop = state.day;
   state.coins = 6;
   state.inventory.wood = 2;
   assert.equal(act(state, 'roadContinue').ok, false);
   assert.equal(act(state, 'banditPayItem', { id: 'wood', count: 3 }).ok, false);
   assert.equal(act(state, 'banditPayItem', { id: 'cudgel' }).ok, false);
-  assert.deepEqual(act(state, 'banditPayItem', { id: 'wood', count: 2 }).paidGoods, { wood: 2 });
-  assert.equal(view(state).roadTrip.bandit.remaining, 3);
-  assert.equal(act(state, 'banditPay').paidCoins, 3);
-  assert.equal(state.coins, 3);
+  assert.equal(view(state).roadTrip.bandit.offers.find(({ id }) => id === 'wood').price, 2);
+  assert.ok(act(state, 'banditPayItem', { id: 'wood', count: 2 }).ok);
+  assert.equal(view(state).roadTrip.bandit.remaining, 1);
+  assert.equal(act(state, 'banditSettle').ok, false);
+  assert.equal(state.coins, 6);
+  assert.equal(state.inventory.wood, 2);
+  assert.ok(act(state, 'banditPayCoins').ok);
+  assert.equal(state.coins, 6);
+  assert.equal(state.inventory.wood, 2);
+  assert.equal(state.roadTrip.progress, firstStop);
+  assert.equal(state.day, arrivalAtStop);
+  assert.ok(state.roadBandit);
+  assert.equal(act(state, 'roadContinue').ok, false);
+
+  const allCash = structuredClone(state);
+  const cashOnly = act(allCash, 'banditPay');
+  assert.ok(cashOnly.ok, cashOnly.message);
+  assert.equal(cashOnly.paidCoins, state.roadBandit.fee);
+  assert.equal(allCash.inventory.wood, 2);
+  assert.equal(allCash.roadBandit, null);
+
+  const confirmed = act(state, 'banditSettle');
+  assert.ok(confirmed.ok, confirmed.message);
+  assert.deepEqual(confirmed.paidGoods, { wood: 2 });
+  assert.equal(confirmed.paidCoins, 1);
+  assert.equal(state.coins, 5);
+  assert.equal(state.inventory.wood, undefined);
+  assert.equal(state.equipment.weapon, 'cudgel');
+  assert.equal(state.equipment.armor, 'straw_cape');
   assert.equal(state.roadTrip.progress, firstStop);
   assert.equal(state.roadBandit, null);
+  assert.equal(act(state, 'banditSettle').ok, false);
   assert.ok(state.banditLeads.includes('bandit_slope_den'));
   assert.equal(state.inventory.road_sleeve_manual, undefined);
   assert.ok(state.resolvedBandits.includes('road_slate_peg'));
@@ -232,26 +259,73 @@ test('payment mixes real items and coins, preserves the remaining walk, and leav
   assert.equal(state.day, dayAtStop + 0.5);
 });
 
-test('a traveler short of money hands over all eligible possessions and keeps worn or essential items', () => {
+test('a traveler short of money hands over gear and collateral together and keeps protected supplies', () => {
   const state = interrupted();
   state.coins = 1;
-  state.inventory.wood = 2;
+  state.inventory.wood = 1;
+  state.inventory.quarry_spear = 1;
+  state.durability.quarry_spear = allGear.quarry_spear.durability;
   state.inventory.road_sleeve_manual = 1;
   state.inventory.ridge_rubbing = 1;
   state.reliefRations = state.inventory.ration;
   const coinsBefore = view(state).roadTrip.bandit.allValue;
   assert.equal(coinsBefore, 3);
+  assert.ok(act(state, 'banditPayCoins').ok);
+  assert.ok(act(state, 'banditPayItem', { id: 'wood', count: 1 }).ok);
+  assert.equal(state.coins, 1);
+  assert.equal(state.inventory.wood, 1);
   const paid = act(state, 'banditSurrender');
   assert.ok(paid.ok);
-  assert.deepEqual(paid.paidGoods, { wood: 2 });
+  assert.equal(paid.paidCoins, 1);
+  assert.deepEqual(paid.paidGoods, { wood: 1, quarry_spear: 1, cudgel: 1, straw_cape: 1 });
+  for (const id of Object.keys(paid.paidGoods)) assert.equal(state.inventory[id], undefined);
+  assert.ok(Object.values(state.equipment).every((item) => item === null));
   assert.equal(state.coins, 0);
-  for (const id of ['ration', 'road_sleeve_manual', 'ridge_rubbing', 'cudgel', 'straw_cape']) {
+  for (const id of ['ration', 'road_sleeve_manual', 'ridge_rubbing']) {
     assert.ok(state.inventory[id]);
   }
   assert.equal(state.roadBandit, null);
 });
 
-test('helping the wounded road bandit teaches the manual once; the revealed den is a one-time protected source of relief', () => {
+test('a bandit can dismiss the stripped traveler without asking for another payment or dropping anything', () => {
+  const state = interrupted();
+  state.coins = 0;
+  state.reliefRations = state.inventory.ration;
+  assert.ok(act(state, 'banditSurrender').ok);
+  assert.ok(Object.values(state.equipment).every((id) => id === null));
+  state.roadSeed = 2300;
+  assert.ok(act(state, 'roadContinue').ok);
+  assert.equal(state.region, 'ridge');
+
+  const inventory = structuredClone(state.inventory);
+  const lootSeed = state.banditLootSeed;
+  const encounters = state.banditCrews.grey_gully.encounters;
+  state.roadSeed = seedWith(0.05, 0.55, 0.5, 0.6);
+  let afterDismissal = state.roadSeed;
+  for (let draw = 0; draw < 4; draw++) afterDismissal = (Math.imul(afterDismissal, 1664525) + 1013904223) >>> 0;
+  const result = act(state, 'travel', { id: 'marsh' });
+  assert.equal(result.banditDismissed, true);
+  assert.equal(result.roadInterrupted, true);
+  assert.equal(state.roadBandit, null);
+  assert.equal(state.combat, null);
+  assert.equal(view(state).roadTrip.bandit, null);
+  assert.equal(state.banditCrews.grey_gully.encounters, encounters + 1);
+  assert.deepEqual(view(state).groundLoot, {});
+  assert.deepEqual(state.inventory, inventory);
+  assert.equal(state.coins, 0);
+  assert.equal(state.banditLootSeed, lootSeed);
+  assert.equal(state.roadSeed, afterDismissal);
+
+  for (const action of ['banditPay', 'banditSurrender', 'banditFight']) {
+    assert.equal(act(state, action).ok, false);
+    assert.equal(state.roadSeed, afterDismissal);
+  }
+  state.roadSeed = 2300;
+  assert.ok(act(state, 'roadContinue').ok);
+  assert.equal(state.region, 'marsh');
+});
+
+test('helping the wounded road bandit teaches the manual once and the den leader controls linked road danger', () => {
   const state = interrupted();
   assert.equal(act(state, 'banditPlot', { id: 'bind_road_arm' }).ok, false);
   state.inventory.salve = 1;
@@ -265,9 +339,8 @@ test('helping the wounded road bandit teaches the manual once; the revealed den 
   state.siteVictories[den.id] = { bandit_den_scout: 1 };
   const firstChance = roadBanditRisk(state, riskyLeg, roadPolicyKit).chance;
   assert.ok(firstChance < 0.055 && firstChance > 0.052);
-  state.siteVictories[den.id] = Object.fromEntries(Object.entries(den.creatures).map(([id, { start }]) => [id, start]));
-  const finalChance = roadBanditRisk(state, riskyLeg, roadPolicyKit).chance;
-  assert.ok(finalChance > 0 && finalChance < 0.008);
+  state.siteVictories[den.id].bandit_den_leader = 1;
+  assert.equal(roadBanditRisk(state, riskyLeg, roadPolicyKit).chance, 0);
 });
 
 test('intact normal dodge gear reduces road risk without changing the fixed road distance', () => {
@@ -328,4 +401,136 @@ test('road battle rewards stay at one reversible roadside coordinate and never b
     assert.ok(act(state, 'take', { id }).ok);
   }
   assert.equal(act(state, 'banditFight').ok, false);
+});
+
+test('clearing a draft, negotiating separately, or fighting leaves the unconfirmed toll in hand', () => {
+  const state = interrupted();
+  state.realm = 6;
+  state.hp = view(state).maxHp;
+  state.coins = 1;
+  state.inventory.iron_sword = 1;
+  state.equipment.weapon = 'iron_sword';
+  state.durability.iron_sword = 38;
+  state.durability.cudgel = 9;
+  assert.equal(view(state).roadTrip.bandit.offers.find(({ id }) => id === 'cudgel').price, 4);
+  assert.ok(act(state, 'banditPayCoins').ok);
+  assert.ok(act(state, 'banditPayItem', { id: 'cudgel' }).ok);
+  assert.equal(state.coins, 1);
+  assert.equal(state.inventory.cudgel, 1);
+  assert.equal(state.durability.cudgel, 9);
+  assert.equal(view(state).roadTrip.bandit.remaining, 0);
+
+  const cleared = structuredClone(state);
+  assert.ok(act(cleared, 'banditClearOffer').ok);
+  assert.equal(view(cleared).roadTrip.bandit.remaining, cleared.roadBandit.fee);
+  assert.equal(cleared.coins, 1);
+  assert.equal(cleared.inventory.cudgel, 1);
+
+  const helped = structuredClone(state);
+  helped.inventory.salve = 1;
+  assert.ok(act(helped, 'banditPlot', { id: 'bind_road_arm' }).ok);
+  assert.equal(helped.inventory.salve, undefined);
+  assert.equal(helped.inventory.road_sleeve_manual, 1);
+  assert.equal(helped.coins, 1);
+  assert.equal(helped.inventory.cudgel, 1);
+  assert.equal(helped.roadBandit, null);
+
+  assert.ok(act(state, 'banditFight').ok);
+  assert.equal(state.coins, 1);
+  assert.equal(state.inventory.cudgel, 1);
+  for (let i = 0; state.combat && i < 12; i++) assert.ok(act(state, 'attack').ok);
+  assert.ok(state.roadBandit?.aftermath);
+  assert.equal(state.coins, 1);
+  assert.equal(view(state).groundLoot.cudgel, undefined);
+  assert.ok(act(state, 'banditPlot', { id: 'spare_slate_robber' }).ok);
+  assert.equal(state.inventory.cudgel, 1);
+  assert.equal(state.durability.cudgel, 9);
+  assert.equal(state.coins, 1);
+});
+
+function loseRoadFight(state, lossSeed) {
+  assert.ok(act(state, 'banditFight').ok);
+  const enemy = data.enemies.find(({ id }) => id === state.combat.id);
+  const intent = enemy.intents.find(({ kind }) => kind === 'attack');
+  state.combat.plan = { round: 0, reader: null, intent };
+  state.banditLossSeed = lossSeed;
+  state.hp = 1;
+  const defeat = act(state, 'attack');
+  assert.ok(defeat.ok, defeat.message);
+  assert.equal(state.combat, null);
+  return defeat;
+}
+
+test('a fatal bandit defeat ends the run and refuses all later actions', () => {
+  const state = interrupted({ fixed: false });
+  loseRoadFight(state, seedWith(0.01));
+  assert.equal(view(state).mode, 'death');
+  const death = structuredClone(state);
+  for (const action of ['travel', 'rest', 'take', 'attack', 'banditPay']) {
+    assert.equal(act(state, action, { id: 'ridge' }).ok, false);
+    assert.deepEqual(state, death);
+  }
+});
+
+test('a surviving bandit defeat loses carried gear and cash and the same attacker can be fought for them', () => {
+  const state = interrupted({ fixed: false });
+  const mugger = state.roadBandit.member;
+  const startingRations = state.inventory.ration;
+  assert.ok(mugger);
+  state.coins = 41;
+  state.inventory.ridge_rubbing = 1;
+  state.inventory.salve = 1;
+  state.inventory.reed_hand_manual = 1;
+  state.inventory.knife = 1;
+  state.durability.knife = 18;
+  state.durability.cudgel = 9;
+  loseRoadFight(state, 1500);
+  assert.equal(state.region, 'village');
+  assert.equal(view(state).mode, 'village');
+  assert.equal(state.roadTrip, null);
+  assert.equal(state.roadBandit, null);
+  assert.equal(state.coins, 0);
+  assert.ok(Object.values(state.equipment).every((item) => item === null));
+  assert.equal(state.inventory.cudgel, undefined);
+  assert.equal(state.inventory.straw_cape, undefined);
+  assert.equal(state.inventory.knife, undefined);
+  assert.equal(state.inventory.ration, startingRations);
+  assert.equal(state.inventory.ridge_rubbing, 1);
+  assert.equal(state.inventory.salve, 1);
+  assert.equal(state.inventory.reed_hand_manual, 1);
+
+  state.realm = 8;
+  state.hp = view(state).maxHp;
+  state.satiety = 96;
+  assert.ok(act(state, 'travel', { id: 'marsh' }).ok);
+  state.banditLootSeed = 3;
+  const sameMemberSeed = seedWith(0.05, 0.55, 0.5);
+  const other = structuredClone(state);
+  other.roadSeed = sameMemberSeed + 1;
+  assert.equal(act(other, 'travel', { id: 'ridge' }).roadInterrupted, true);
+  assert.ok(other.roadBandit.member);
+  assert.notEqual(other.roadBandit.member, mugger);
+  assert.ok(act(other, 'banditFight').ok);
+  for (let turn = 0; other.combat && turn < 12; turn++) assert.ok(act(other, 'attack').ok);
+  assert.equal(other.combat, null);
+  assert.equal(view(other).groundLoot.cudgel, undefined);
+  assert.ok(other.coins < 41);
+
+  state.roadSeed = sameMemberSeed;
+  assert.equal(act(state, 'travel', { id: 'ridge' }).roadInterrupted, true);
+  assert.equal(state.roadBandit.member, mugger);
+  assert.ok(act(state, 'banditFight').ok);
+  let victory;
+  for (let turn = 0; state.combat && turn < 12; turn++) victory = act(state, 'attack');
+  assert.ok(victory?.ok);
+  assert.equal(state.combat, null);
+  assert.equal(state.roadBandit, null);
+  assert.ok(state.coins >= 41);
+  assert.match(victory.message, /击杀|杀死|杀了/);
+  for (const id of ['cudgel', 'straw_cape', 'knife']) {
+    assert.equal(view(state).groundLoot[id], 1);
+    assert.ok(act(state, 'take', { id }).ok);
+  }
+  assert.equal(state.durability.cudgel, 8);
+  assert.equal(state.durability.knife, 18);
 });

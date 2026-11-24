@@ -7,7 +7,7 @@ import { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, ne
 import { initialMechanisms, mechanismView, mechanismAction } from './mechanisms.mjs';
 import { tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution } from './tournament.mjs';
 import { chooseEnemyIntent } from './combat-tactics.mjs';
-import { checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, deferBanditRecruits } from './bandits.mjs';
+import { checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, banditDefeat, recoverBanditSpoils } from './bandits.mjs';
 
 const data = { ...moduleData.default, ...moduleData };
 
@@ -441,10 +441,13 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     enemyEvadeSeed: (seed ^ 0x27d4eb2f) >>> 0,
     roadSeed: (seed ^ 0xc2b2ae35) >>> 0,
     banditLootSeed: (seed ^ 0x76f1c043) >>> 0,
+    banditLossSeed: (seed ^ 0x0c53d24f) >>> 0,
     escapeSeed: (seed ^ 0x165667b1) >>> 0,
     roadTrip: null,
     roadBandit: null,
     banditCrews: {},
+    banditSpoils: {},
+    banditDeath: null,
     resolvedBandits: [],
     banditLeads: [],
     basketInspected: false,
@@ -596,7 +599,7 @@ function spendPool(state, site, kind, id, amount) {
     const wild = kind === 'creatures' && pool.curve === 'wild';
     const recovery = recoveryDays(pool, count, wild);
     const holdsPassage = kind === 'creatures' && records.events[site.id]?.choices.some((choice) => choiceGuards(choice).includes(id));
-    if (count === 0 && (pool.depletedFactor > 1 || holdsPassage || wild)) nextAt = state.day + recovery;
+    if (count === 0 && (pool.depletedFactor !== undefined || holdsPassage || wild)) nextAt = state.day + recovery;
     else if (nextAt === null) nextAt = state.day + recovery;
   }
   const local = (state.localPools[site.id] ??= {});
@@ -666,7 +669,8 @@ export function view(state) {
   const observed = combatRead === 'player' || (state.combat && state.combat.spiritReadRound === state.combat.round);
   const intent = observed ? readableIntent(state) : null;
   const inSettlement = isSettlement(state);
-  const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.roadTrip ? 'road' : state.event ? 'event' : inSettlement ? 'village' : 'field';
+  const mode = state.banditDeath ? 'death' : state.victoryPending ? 'victory' : state.combat ? 'combat'
+    : state.roadTrip ? 'road' : state.event ? 'event' : inSettlement ? 'village' : 'field';
   const questLocation = inSettlement ? state.region : hub;
   const discoveredQuests = data.quests.filter((quest) => (quest.region ?? hub) === questLocation && knowsQuest(state, quest));
   const services = data.services.filter(({ id }) => knowsService(state, id) && (!inSettlement || atHome(state) ||
@@ -695,8 +699,8 @@ export function view(state) {
       ...(gather.length ? { gather } : {}) };
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
     knowsChoice(state, currentEvent.choices[index], currentSite));
-  const { combatSeed, evadeSeed, enemyEvadeSeed, roadSeed, banditLootSeed, escapeSeed, combat, roadTrip, roadBandit,
-    banditCrews, resolvedBandits, banditLeads, ...visibleState } = state;
+  const { combatSeed, evadeSeed, enemyEvadeSeed, roadSeed, banditLootSeed, banditLossSeed, escapeSeed, combat, roadTrip,
+    roadBandit, banditCrews, banditSpoils, resolvedBandits, banditLeads, ...visibleState } = state;
   return {
     ...visibleState,
     ...stats(state),
@@ -1139,9 +1143,19 @@ function endSparring(state, enemy) {
 function fall(state, place = groundPlace(state)) {
   const enemy = enemyOf(state);
   if (inProtectedBout(state)) return endSparring(state, enemy);
+  const loss = enemy?.tags.includes('bandit') ? banditDefeat(state, enemy, economyKit) : null;
+  if (loss?.deadly) {
+    const desc = '强盗夺了行装和钱袋。你倒在原地，再也没能站起来。';
+    state.banditDeath = { name: enemy.name, desc };
+    state.combat = null;
+    state.event = null;
+    state.roadTrip = null;
+    state.roadBandit = null;
+    return { ...say(state, desc), banditLoss: loss, fell: true };
+  }
   saveHuntTrack(state);
   const coinsLost = Math.min(rules.fallMaxCoinLoss, Math.ceil(state.coins * rules.fallCoinLossFactor));
-  const lostGoods = Object.fromEntries(Object.entries(state.expeditionLoot)
+  const lostGoods = loss ? {} : Object.fromEntries(Object.entries(state.expeditionLoot)
     .map(([id, count]) => [id, Math.min(owns(state, id), count)])
     .filter(([id, count]) => count > 0 && records.items[id]?.kind !== 'key' && !records.items[id]?.keepOnFall));
   leaveOnGround(state, lostGoods, state.durability, place);
@@ -1163,6 +1177,8 @@ function fall(state, place = groundPlace(state)) {
   advance(state, rules.fallDays);
   state.hp = Math.ceil(stats(state).maxHp * rules.fallHpFactor);
   state.qi = Math.min(rules.fallQi, stats(state).maxQi);
+  if (loss) return { ...say(state, `强盗夺了行装和钱袋，留下你一条命。过路人扶你回到${regionOf(state).name}。`),
+    banditLoss: loss, fell: true };
   return say(state, `路人把你送回${regionOf(state).name}。${coinsLost ? `药费${coinsLost}枚灵钱。` : ''}${dropped ? `${dropped}落在${placeName}，还能回去找。` : ''}可在此歇息。`);
 }
 
@@ -1187,7 +1203,6 @@ function finishCombat(state, enemy) {
   if (site?.creatures?.[enemy.id]) {
     spendPool(state, site, 'creatures', enemy.id, 1);
     const wins = (state.siteVictories[site.id] ??= {});
-    deferBanditRecruits(state, site.id, enemy.id, economyKit);
     wins[enemy.id] = (wins[enemy.id] ?? 0) + 1;
     const tracks = state.huntTracks?.[site.id];
     for (const [index, track] of Object.entries(tracks ?? {})) {
@@ -1213,8 +1228,13 @@ function finishCombat(state, enemy) {
   leaveOnGround(state, gathered);
   const loot = goodsText(gathered);
   const hazard = hazardVictory(state, enemy.id, site?.id);
+  const isDenBattle = Boolean(data.roadBandits.dens[site?.id]);
+  const chiefFell = data.roadBandits.dens[site?.id]?.boss === enemy.id;
+  const rescuedGear = isDenBattle ? recoverBanditSpoils(state, site.id, economyKit, chiefFell) : '';
+  const roadNews = chiefFell
+    ? '守在岔路口的人拔了哨旗，退回坡寨。往后这一带的山道可以放心走了。' : '';
   return {
-    message: `${protectedBout ? '试招中胜过' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}`,
+    message: `${protectedBout ? '试招中胜过' : isDenBattle ? '击杀了' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}${roadNews}${rescuedGear}`,
     ...(loot ? { gathered, gatheredRegion: state.region, gatheredSite: site?.id } : {}),
   };
 }
@@ -2060,7 +2080,7 @@ function showHideToSmith(state) {
   if (!homeSupplies(state, 'hide')) return refuse('行囊和仓库里都没有兽革。');
   if (state.showedHideToSmith) return refuse('工匠已经看过兽革。');
   state.showedHideToSmith = true;
-  return say(state, '工匠拎起兽革，顺着纹路拽了拽。「两片够衬一件褂子。再攒一片，配松木和炉里的铁箍，还能包一面小盾。」');
+  return say(state, '工匠拎起兽革，顺着纹路拽了拽。「两片够衬一件褂子。再攒一片，配松木和炉里刚打好的铁圈，还能包一面小盾。」');
 }
 
 function stockedOffers(state, offers) {
@@ -2213,7 +2233,7 @@ function handin(state, id) {
 function deduce(state, { id, evidence, hypothesis }) {
   const deduction = records.deductions[id];
   if (!deduction || !knowsDeduction(state, deduction)) return refuse('你还没遇到这个疑点。');
-  if (state.completedDeductions.includes(id)) return refuse('这桩疑案已经在现场验过了。');
+  if (state.completedDeductions.includes(id)) return refuse('这件事已经在现场验过了。');
   const text = typeof hypothesis === 'string' ? hypothesis.trim() : '';
   if (!text || text.length > hypothesisLimit || !Array.isArray(evidence)) {
     return refuse(`请写下自己的猜想，最多${hypothesisLimit}字。`);
@@ -2332,6 +2352,7 @@ const combatActions = {
 };
 
 function takeTurn(state, action, payload) {
+  if (state.banditDeath) return refuse('这一局已经结束。');
   if (state.gathering) {
     if (action !== 'finishGather') return refuse('这次采集还没结束。');
     const { siteId, index } = state.gathering;
