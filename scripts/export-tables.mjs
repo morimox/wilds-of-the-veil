@@ -7,6 +7,7 @@ import { economyData } from '../economy.mjs';
 import { alchemyData } from '../alchemy.mjs';
 import { localGoods, settlementOf, transportRules } from '../world.mjs';
 import { trainingData } from '../training.mjs';
+import { hazardData } from '../hazards.mjs';
 
 const output = fileURLToPath(new URL('../docs/tables/', import.meta.url));
 const names = new Map();
@@ -91,7 +92,7 @@ const knownKinds = {
   gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药',
   attack: '普通攻势', heavy: '重招', guard: '防御', drain: '吸取真气', heal: '恢复',
 };
-const slotNames = { weapon: '武器', armor: '护具', charm: '饰物' };
+const slotNames = { weapon: '武器', offhand: '副手', armor: '身甲', charm: '法器' };
 const reveal = ({ item, quest } = {}) => [
   item && `得知物品 ${ref(item)}`,
   quest && `完成委托 ${ref(quest)}`,
@@ -322,6 +323,14 @@ const localSaleRows = towns.flatMap(({ id: region }) => {
   marketProbe.region = region;
   return view(marketProbe).localMarket.buys.map(({ id, price }) => ({ region, id, name: name(id), price }));
 });
+const localRepairRows = towns.flatMap(({ id: region }) => {
+  marketProbe.region = region;
+  const repair = view(marketProbe).repairService;
+  if (!repair) return [];
+  return Object.entries(repair.prices).map(([id, price]) => ({
+    region, service: repair.name, id, name: name(id), surcharge: repair.surcharge, price,
+  }));
+});
 const sectJobs = data.sects.flatMap((sect) => sect.jobs.map((job) => ({ region: sect.region, sect: sect.name, ...job })));
 const sectRanks = data.sects.flatMap((sect) => sect.ranks.map((rank) => ({ region: sect.region, sect: sect.name, ...rank })));
 const trainingRows = trainingData.flatMap(({ ranks, ...track }) => ranks.map((rank, index) => ({ ...track, ...rank, level: index + 1 })));
@@ -345,6 +354,8 @@ const marketTalkRows = towns.flatMap(({ id: region }) => {
 const matchRows = data.tournament.matches.map((match, index) => ({ ...match, order: index + 1, region: data.tournament.region,
   lead: data.tournament.lead, fee: data.tournament.fee, days: data.tournament.boutDays, cooldown: data.tournament.cooldown }));
 const tournamentPrizes = data.tournament.prizes.map((prize, wins) => ({ ...prize, wins }));
+const incidentJobNames = { report: '向杨芹报信', brace: '加固栏杆', move: '撤驮兽', look: '从草丘查水源',
+  divert: '给旧水槽分流', fight: '前往截住盐泥豺', repair: '善后修栏', settle: '结清工钱' };
 
 const tables = [
   table('realms', '境界与突破', data.realms, [
@@ -390,10 +401,16 @@ const tables = [
   ], { note: '炼丹和锻造的批次产量与投入见制作用方。操作后世界时间继续走，成熟后需要当面收取。' }),
   table('gear', '装备', gated(described(data.gear)), [
     'id', 'name', 'slot', ['weaponClass', '兵刃类别', (id) => weaponClass[id] ?? id],
+    ['hands', '用几只手'], ['brace', '主动架重招减伤'],
     ['ammo', '适用弹药', (ids) => ids.map(ref).join('、')],
     'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'],
     'retreat', 'durability', 'repair', ['entry', '玩家主动查读的词条'], ['trait', '特殊作用与具体数值', traitText],
-  ], { note: '装备耐久为 0 后失去加成。脱身加成为伤害减免系数，0.17 即减免 17%。' }),
+    ['field', '野外作用', (field) => [
+      field.fogTolerance && '开始耗气的雾压上限 +' + field.fogTolerance,
+      field.gatherPadding && '每批采集减伤 ' + field.gatherPadding + '，至少受 1 点伤',
+      field.roadSatiety && '鸣沙境内普通步行耗粮 −' + (field.roadSatiety.fraction * 100) + '%',
+    ].filter(Boolean).join('、')],
+  ], { note: '装备耐久为 0 后失去加成。双手兵刃与副手互斥。盾主动挡重招并确实缓冲时损耗耐久。脱身系数 0.17 即减免撤退伤害 17%。' }),
   table('weapon-acquisition', '武器获取渠道', acquisitionRows, [
     'id', ['weapon', '武器'], ['method', '获得方法'], ['source', '具体来源'], ['price', '单次成本（灵钱）'],
     'need', ['afterFight', '现场领取前需击败', ref], ['interval', '货源或对手恢复间隔（天）'],
@@ -442,9 +459,19 @@ const tables = [
     { note: '未标每次补货数量时为一件。落灯村的具名货架另见坊市货单。' }),
   table('settlement-buyback', '各定居点通用卖出价', localSaleRows, ['region', 'id', 'name', ['price', '卖得灵钱（每件）']],
     { note: '关键物品、装备中的物品与救济干粮的收取限制另行校验。旧坊市专门商人的实际报价见对应表。' }),
+  table('settlement-repairs', '接修地点与逐件工钱', localRepairRows,
+    ['region', ['service', '修具处'], 'id', 'name', ['surcharge', '异地加价（灵钱）'], ['price', '修满费用（灵钱）']],
+    { note: '只接修玩家随身或穿在身上的装备。报价按件，支付灵钱后立即修满。' }),
+  table('regional-incidents', '地方灾情与善后', Object.entries(hazardData.jobs).map(([id, job]) => ({
+    id, name: incidentJobNames[id], days: job.days, need: job.need, pay: job.reward,
+    warning: id === 'report' ? hazardData.warningDays : undefined,
+    surge: id === 'report' ? hazardData.surgeDays : undefined,
+  })), ['id', 'name', 'days', 'need', ['pay', '结工钱时获得（灵钱）'], ['warning', '示警期（游戏日）'], ['surge', '兽群经过（游戏日）']],
+  { note: '拿到兽迹后向炭篷驿报信才开始计时。兽潮可提前疏水结束，没赶上也能在事后回驿站看现场。工钱仅按实际完成的动作结一次。' }),
   table('market-talk', '摊上的线索', marketTalkRows, ['region', ['label', '交谈动作'], ['lead', '交付的线索', ref], ['outcome', '摊主所说']]),
   table('sect-admission', '宗门和入门物资', data.sects.map(({ jobs, ranks, join, ...sect }) => ({ ...sect, ...join })), ['region', 'id', 'name', 'desc', 'need', ['coins', '入门灵钱']]),
-  table('sect-jobs', '宗门差事', sectJobs, ['region', ['sect', '宗门'], 'id', 'name', 'desc', 'need', 'reward', ['coins', '灵钱报酬'], ['credit', '增加功劳'], ['cooldown', '下一单间隔（天）']]),
+  table('sect-jobs', '宗门差事', sectJobs, ['region', ['sect', '宗门'], 'id', 'name', 'desc', 'need', 'reward', ['coins', '灵钱报酬'], ['credit', '增加功劳'],
+    ['afterQuests', '做完任一委托后出现', (ids) => ids.map(ref).join('、')], 'days', ['cooldown', '下一单间隔（天）']]),
   table('sect-awards', '宗门功劳与回报', sectRanks, ['region', ['sect', '宗门'], 'name', ['credit', '功劳门槛'], 'reward', ['art', '传授术诀', ref]]),
   table('tournament', '守尺观大比', matchRows, ['region', ['order', '场次'], 'name', 'enemy', ['lead', '认得赛帖的证物', ref],
     ['fee', '每届报名费'], 'days', ['cooldown', '下次报名间隔（天）'], ['note', '对手介绍']],
@@ -487,6 +514,7 @@ const tables = [
     'need', 'consume', 'hidden', 'loot', 'enemy', ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
     ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
     ['guardedBy', '在场会挡住选择的对手', ref], ['ambush', '有对手时每批采集伏击', ({ enemy, chance }) => `${ref(enemy)} · ${percent(chance)}`],
+    ['phase', '昼夜要求', (phase) => phase === 'night' ? '入夜后' : phase], ['phaseReason', '未到时的提示'], ['stay', '执行后留在原地'],
     ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
   ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排。每点一次、完成一批，所得先放在当前具体地点。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),
   table('mechanisms', '现场机关与试错', mechanismRows, [

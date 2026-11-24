@@ -2,9 +2,10 @@ const province = 'zhaoyuan';
 
 const townStall = {
   type: '城池', inn: true,
+  repair: { name: '蒲霖的后炉', description: '蒲霖把护堤用的铁件靠墙码着，后炉接修过路人的兵器、衣甲和佩件。刃口和皮带都在这里补。', surcharge: 2 },
   goods: { ration: { price: 4, start: 12, cap: 12, interval: 3 }, wood: { price: 5, start: 8, cap: 10, interval: 4 },
     salve: { price: 13, start: 5, cap: 6, interval: 4 }, ore: { price: 12, start: 6, cap: 8, interval: 4 },
-    weir_knife: { price: 94, start: 1, cap: 1, interval: 18 } },
+    weir_knife: { price: 118, start: 1, cap: 1, interval: 18 } },
   buys: { reed: 2, ore: 5, core: 10, black_iron: 13, qi_core: 7, foundation_core: 21, gold_core: 37 },
   talk: { label: '问铁货商蒲霖柜上的旧秤', lead: 'market_scale_verse',
     outcome: '蒲霖把寒铁往柜里推，拎出两枚砝码。「守尺观那架老秤得两头摆平。右边有两个小盘，那两盘合起来还得正好六两。」他抽出垫在秤脚下的验货单，请你捎过去。' },
@@ -15,7 +16,7 @@ const hallStall = { type: '宗门', inn: true,
   buys: { reed: 2, hide: 3, qi_core: 7, foundation_core: 21, gold_core: 37 } };
 
 const landmarks = [
-  ['zhao_city', '照原城', 13, 48, 0, 1.25, ['ford', 'green_dyke', 'flood_market', 'measuring_hall'], '城砖半边泛白，是上一回洪峰留下的痕。城门内有粥铺与省潮司。', { settlement: townStall, portal: true, array: true }],
+  ['zhao_city', '照原城', 13, 48, 0, 1.25, ['ford', 'green_dyke', 'flood_market', 'measuring_hall'], '城砖半边泛白，是上一回洪峰留下的痕。粥铺挨着省潮司，铁货摊后传出磨刀声。', { settlement: townStall, portal: true, array: true }],
   ['green_dyke', '青埂', 25, 29, 0, 0.75, ['frog_pond', 'old_marker', 'ring_isles'], '田埂两侧都长着芦苇，只有一侧的苇叶被涨水淹过。'],
   ['flood_market', '杨木水栈', 26, 62, 0, 0.75, ['crane_granary', 'zhao_pass', 'glass_bank'], '接船的木台漂在水上，钉子上挂着写有各家姓氏的货签。'],
   ['measuring_hall', '守尺观', 32, 45, 1, 1, ['old_marker', 'charcoal_ridge'], '乌瓦院门晾着测水绳，来客和弟子在同一间灶房用饭。', { settlement: hallStall, portal: true }],
@@ -53,22 +54,40 @@ const items = [
   key('fault_receipt', '留水底印', '错水湖底藏着一页旧时分水的约定。落款写了沿途三户撑船人家的姓名。'),
   key('body_breath_note', '扶膝起身帖', '傅澄给访客的一页旧讲义。倒向地面时先稳住呼吸，起身用脚底与腰背一起发力。'),
   key('market_scale_verse', '秤下的验货单', '蒲霖从旧秤下抽出的验货单。上面写着守尺观的规矩：秤的两头要平，右边两个小盘里砝码的总重还得是六两。'),
+  key('zhao_porridge_order', '粥铺的领米条', '照原城粥铺的赊账条。昨日没来粮，姜婶托人拿它去白鹤粮仓问何绢。'),
+  key('zhao_grain_reply', '何绢按印的回条', '何绢在回条上写了两袋干谷留给照原粥铺。空船要从白鹤粮仓取货，别捎两袋湿谷进城。'),
+  key('zhao_gate_notice', '试水门悬赏', '省潮司盖印的告示。青埂旧水门连着几户水田，汛前得弄清是什么把门拽歪了。'),
+  key('zhao_gate_shaving', '带咬痕的旧门闩', '青埂的门闩断在中间。裂口有齿印和湿茸毛，附近的拖痕向蛙背塘去。'),
+  key('zhao_bank_receipt', '撤船的两枚竹签', '两名船户把自己的码头签交给你。他们已把空船挪去高岸，请省潮司给留在下游的人报平安。'),
+  key('zhao_gate_receipt', '省潮司的试闸回条', '老堤工亲眼见撞闩的塘獭倒下。试过青埂旧闸和蛙背塘便门后，他在回条上按了拇指印。'),
 ];
 
 const attack = (name, mult = 1) => ({ kind: 'attack', name, mult });
 const heavy = (name, mult = 1.55) => ({ kind: 'heavy', name, mult });
 const enemies = [
-  { id: 'dyke_marten', name: '黄沿水貂', tier: 0, hp: 22, atk: 7, def: 2, tags: ['furred'], insight: 2,
+  { id: 'dyke_marten', name: '黄沿水貂', tier: 0, hp: 22, atk: 7, def: 2, tags: ['beast', 'furred'], insight: 2,
     intents: [attack('贴着堤边撕咬'), heavy('朝腿上猛扑', 1.4)], loot: { beast_meat: 2, hide: 1, qi_core: 1 } },
+  { id: 'zhao_reed_duck', name: '灰苇灵鸭', tier: 0, hp: 19, atk: 6, def: 1, tags: ['beast'], insight: 2,
+    intents: [attack('甩翅扑脸'), attack('伸颈啄手', 1.1), heavy('蹬水飞起连啄', 1.45)],
+    desc: '常在蒲叶下拣螺。它先伸颈啄手，一双蹼掌踩住浅石时，才会振翅扑来。',
+    loot: { beast_meat: 2, qi_core: 1 } },
   { id: 'glass_frog', name: '火斑大蛙', tier: 1, hp: 33, atk: 10, def: 3, tags: ['beast'], insight: 3,
     intents: [attack('伸舌甩来泥点'), attack('鼓起两腮顶撞', 1.1), heavy('收腹蹬腿猛跳')], loot: { beast_meat: 3, beast_eye: 1, qi_core: 2 } },
   { id: 'mud_shrike', name: '泥鳞鬃犬', tier: 3, hp: 73, atk: 15, def: 7, tags: ['furred', 'beast'], insight: 4,
     intents: [attack('摆尾抽脚'), heavy('压低鬃毛'), { kind: 'guard', name: '尾巴卷作一环' }, attack('贴地扯咬', 1.12)],
     loot: { beast_meat: 5, hide: 3, foundation_core: 1 } },
+  { id: 'zhao_moss_turtle', name: '苔背泽鳖', tier: 2, hp: 54, atk: 13, def: 7, tags: ['beast', 'scaled'], insight: 4,
+    intents: [{ kind: 'guard', name: '缩颈顶起背甲', mult: 1.35 }, attack('侧转咬向脚腕'), heavy('抬甲掀开脚下的泥')],
+    desc: '远看像一截生了苔的浮石。它缩颈时背甲朝上，侧转探头咬人时，肩边会露一道甲缝。',
+    loot: { beast_meat: 4, beast_eye: 1, qi_core: 3 } },
+  { id: 'zhao_rush_eel', name: '缠藻泥鳗', tier: 1, hp: 36, atk: 11, def: 3, tags: ['beast', 'scaled'], insight: 3,
+    intents: [attack('从藻下叼住鞋边'), attack('翻尾把人拖进浅沟', 1.12), heavy('缠住脚后猛拽', 1.48)],
+    desc: '这鳗在水藻下贴泥而游。咬住东西就会把尾绕在石根上，借那一绕往回拖。',
+    loot: { beast_meat: 3, qi_core: 1 } },
   { id: 'lab_crawler', name: '槽背水魁', tier: 4, hp: 95, atk: 18, def: 8, tags: ['stoneborn'], insight: 8,
     intents: [attack('撑着水槽扬起砂子'), { kind: 'drain', name: '从铜槽喷出冷气', mult: 1.15 }, heavy('翻身用背甲压起水浪', 1.57), { kind: 'guard', name: '伏进两道石槽' }],
     loot: { beast_eye: 1, foundation_core: 3 } },
-  { id: 'ember_yak', name: '伏灰炭魈', tier: 6, hp: 119, atk: 24, def: 10, tags: ['furred'], insight: 9,
+  { id: 'ember_yak', name: '伏灰炭魈', tier: 6, hp: 119, atk: 24, def: 10, tags: ['beast', 'furred'], insight: 9,
     intents: [attack('踏碎灰层'), heavy('抱地窜起', 1.63), attack('甩尾卷火', 1.12), { kind: 'guard', name: '护住抱在胸前的灰团' }],
     loot: { beast_meat: 7, hide: 4, gold_core: 1 } },
   { id: 'fault_warden', name: '分柱水君', tier: 7, hp: 163, atk: 29, def: 13, tags: ['spirit'], insight: 16,
@@ -76,6 +95,10 @@ const enemies = [
       { kind: 'drain', name: '引来水流抽走真气', mult: 1.17 }, attack('顺着回潮斜劈', 1.1)], loot: { beast_eye: 2, gold_core: 4 } },
   { id: 'zhao_spar', name: '掌尺人傅澄', tier: 5, hp: 103, atk: 20, def: 8, tags: ['human'], insight: 6, sparring: true, loot: {},
     intents: [attack('朝前一步点腕'), { kind: 'guard', name: '竖起竹尺' }, heavy('向后一翻竹尺', 1.4), attack('转门横推')] },
+  { id: 'zhao_gate_otter', name: '撞闩塘獭', tier: 2, hp: 47, atk: 12, def: 4, tags: ['beast', 'furred'], insight: 5,
+    intents: [attack('扯着绳头撕咬'), { kind: 'guard', name: '伏身在门桩后', mult: 1.25 }, heavy('踩着门槛猛扑', 1.48)],
+    desc: '胸前沾了一片木屑。它伏在门桩后，一旦两条后腿踩住门槛，就会贴着水面跳过来。',
+    loot: { beast_meat: 3, hide: 2, qi_core: 2 } },
 ];
 
 const sites = [];
@@ -102,14 +125,34 @@ scene('zhao_city', 'zhao_flood_office', '城门水尺档', '一排尺杆挂在�
   { label: '问两本账的来历', days: 0.125, insight: 3, outcome: '杜椿用指头压着旧账上一行小字。「落灯去年停船。照这上头的水位，比眼下还低半尺，怎么就不能走了？」他翻了翻后一页，空的。「这一页是施荀量的。他如今在斜漏水驿，你若遇见，替我问一声。」' },
   { label: '把冷炉验火册给杜椿看', hidden: true, need: { cold_kiln_record: 1 }, days: 0.25, insight: 5,
     outcome: '杜椿看得很慢。「同一晚，雾梁涨了水，鸣沙退了水，照原的水却往地下渗。账没错。施荀那儿有只试水槽，能用一碗水试出那晚怎么回事。」' },
-], { once: [0, 1] });
+  { label: '取一张窗格下的悬赏告示', days: 0.125, loot: { zhao_gate_notice: 1 },
+    outcome: '杜椿往你手上的告示点了一下。「青埂报了三夜的撞门响。先问堤工，再去河边看。是谁碰了闩，别只凭一枚妖丹回来报。」' },
+], { once: [0, 1, 2], choiceText: { 2: { before: '窗格下压着几张新盖印的告示。', after: '窗格下还压着几张给过路人的告示。' } } });
+
+scene('zhao_city', 'zhao_porridge_shed', '城墙根的粥铺', '姜婶用铁勺刮了刮铜锅底，又给端碗的人添了一瓢水。门框上夹着一张等船脚带走的领米条。', [
+  { label: '替姜婶把领米条带去白鹤粮仓', days: 0.125, loot: { zhao_porridge_order: 1 },
+    outcome: '姜婶把纸条折好塞进你手里。「船行说雨大，昨儿没捎来米。你找看高脚粮仓的何绢问问，有货给我留两袋，空船路过就带。」' },
+], { once: [0], afterOnceText: { 0: '姜婶慢慢搅着火上的粥。沿墙有一排倒扣的青瓷碗，给刚下船的人用。' } });
 
 scene('green_dyke', 'zhao_dyke_bend', '两面低埂', '晒席垂在靠水一面，水线贴着席子的下沿。老堤工站在低埂上，手边是一根挂晴雨旗的杆。', [
   gather('掐浅水白芽', '贴席的水不及鞋面。', 'reed', 4, 0.5, '从还没伸叶的老根上掐下了几束白芽。'),
   { label: '到抓痕处守一阵', desc: '泥土下面有厚实的碎蚌壳，咬一口的痕迹还新。', days: 0.125, enemy: 'dyke_marten' },
   { label: '扶堤工把晴雨旗拉起来', days: 0.5, insight: 3, coins: 8, outcome: '雨旗刚拉高，河工停下手头的活指向青埂北边。「那面碑刻过旧汛线，常有人来找。」他把埂工钱与你分了。' },
-], { stocks: { reed: stock('白芽', 6, 9, 4, 3, 0) }, creatures: { dyke_marten: { start: 1, cap: 3, interval: 4, growth: 1, curve: 'wild' } },
-  creatureText: { dyke_marten: { present: '低埂背后有两道新抓痕，旁边散着刚咬开的蚌壳。', absent: '低埂背后的抓痕已经晒干，水边没什么动静。' } }, once: [2] });
+  { label: '绕到蒲叶外侧，等灰鸭游近', desc: '这里是浅湾，贴着晒席走就能避开。', days: 0.125, enemy: 'zhao_reed_duck',
+    outcome: '一只灰鸭抛开刚叼起的泥螺，踏着水面朝你扑来。' },
+], { stocks: { reed: stock('白芽', 6, 9, 4, 3, 0) },
+  creatures: { dyke_marten: { start: 1, cap: 3, interval: 4, growth: 1, curve: 'wild' }, zhao_reed_duck: { start: 2, cap: 4, interval: 5, growth: 1, curve: 'wild' } },
+  creatureText: {
+    dyke_marten: { present: '低埂背后有两道新抓痕，旁边散着刚咬开的蚌壳。', absent: '低埂背后的抓痕已经晒干，没见新咬开的蚌壳。' },
+    zhao_reed_duck: { present: '晒席外的蒲叶开了条缝，有灰鸭把脑袋埋进水里拣螺。', absent: '晒席外只浮着一片灰羽，蒲叶间没有拍水声。' },
+  },
+  choiceText: { 2: { after: '拉起的雨旗在杆顶卷了一下，顺着它指的方向能望见北边石碑。' } }, once: [2] });
+
+scene('green_dyke', 'zhao_shutter_tracks', '往田里放水的旧闸', '旧闸抬起后给田里放水。老堤工蹲在闸边，拿竹片戳了戳积泥上的一道长印。歪着的闸板下卡着半截门闩。', [
+  { label: '帮堤工从闸板下拔出断闩', days: 0.25, insight: 3, loot: { zhao_gate_shaving: 1 },
+    outcome: '断闩是从下边给咬的，齿缝里还塞着茸毛。老堤工用竹片指着长印。「一头在这里，一头往蛙背塘。塘边总有人晾船，你过去叫他们往高一点的地方挪。」' },
+], { reveal: { item: 'zhao_gate_notice' }, afterChoices: ['zhao_dyke_bend:2'], once: [0],
+  afterOnceText: { 0: '断闩已从闸板下拔出。老堤工留在岸上拉住闸板，水底那道拖印朝蛙背塘去。' } });
 
 scene('flood_market', 'zhao_float_goods', '三姓木码头', '船腹贴着木台，案板上压着写有各家姓氏的货签。余节扶着半边晒网架，另一头已经垂到了船里。', [
   offer('帮余节换掉撑渔网的断木', '撑木一断，晒到一半的网又搭回湿船板。余节拎起网角，水还顺着手肘往下淌。', { wood: 5 }, { zhao_sand_chit: 1 }, 0,
@@ -134,6 +177,18 @@ scene('frog_pond', 'zhao_frog_shelf', '斜萍石窝', '塘边的低石围出一�
 ], { stocks: { reed: stock('外圈灵草', 7, 11, 5, 3, 1) }, creatures: { glass_frog: { start: 2, cap: 4, interval: 4.5, growth: 1, curve: 'wild' } },
   creatureText: { glass_frog: { present: '石窝里接连冒出几串大气泡。', absent: '浅窝里只漂着薄薄一层浮萍。' } } });
 
+scene('frog_pond', 'zhao_pond_shutter', '塘背的旧便门', '浮木挤在旧便门上方，水里拖着半截青埂的门闩。岸边有条沿高石走的路。', [
+  { label: '沿高石喊船户解绳，把空船挪上去', days: 0.375, loot: { zhao_bank_receipt: 1 },
+    outcome: '你在高石边接住船头绳。两户避开浮木，把船一前一后拉到岸上。他们把写了名字的竹签交给你，托你给省潮司报个平安。' },
+  { label: '等船让开水面，踩上门桩引开塘獭', desc: '门闩又撞了一下。水上冒出一绺毛，嘴里咬着缠上门闩的麻绳。', afterChoice: 0, days: 0.125, enemy: 'zhao_gate_otter',
+    outcome: '塘獭撒开绳头，四爪拨水朝门桩来。高石仍能踏回去。' },
+  { label: '扶正小水门，请堤工当场验一遭', afterFight: 'zhao_gate_otter', days: 0.375, loot: { zhao_gate_receipt: 1 },
+    outcome: '老堤工扶着便门一头。「上游旧闸我已扶正，等这头回槽就能试水。」两人抬了抬闸板，水顺石渠流到田里。他在回条上按下拇指印，托你带回照原城。' },
+], { reveal: { item: 'zhao_gate_shaving' }, once: [0, 2], creatures: { zhao_gate_otter: { start: 1, cap: 1 } },
+  afterWinText: { zhao_gate_otter: '塘獭伏在泥里没了动静。老堤工从高石上攀下来，蹲下去察看槽里歪着的闸板。' },
+  afterOnceText: { 2: '便门已经扶正。水贴着石渠流进田里。' },
+  choiceText: { 0: { before: '两条空船拴在旧便门边，船尾的绳结在水面一沉一浮。', after: '塘边原先停着船的地方只剩一圈湿痕，两条空船都上了高岸。' } } });
+
 scene('old_marker', 'zhao_retreat_marks', '倒行刻碑', '碑上正面向河，刻的一律是涨水，背面朝着另一头，斜刀口里有水从低往高爬的线。', [
   { label: '揭开碑背垫着的湿纸', days: 0.5, loot: { return_tide_note: 1 }, insight: 4,
     outcome: '纸上的折线从照原一路往白苇退去，纸角写着「斜漏水驿，施荀收」。你把湿纸平平揭了下来。' },
@@ -152,25 +207,47 @@ scene('ring_isles', 'zhao_isle_reeds', '浮洲松根', '打弯的浅水只冲倒
   gather('掏水下亮晶', '踩稳裸根，泥泡下面还粘着一些晶粒。', 'core', 4, 1, '把沾泥的晶粒冲到粗布上去。'),
 ], { stocks: { wood: stock('洲上老松', 7, 11, 5, 3, 0), core: stock('沉根灵晶', 5, 8, 6, 3, 1) } });
 
-scene('scale_bog', 'zhao_scales', '青膜硬埂', '一条硬埂把浅水和泥坑隔开。往左能踏上埂顶，贴右侧水湾也能站稳。铁砂大半埋在水藻底下。', [
+scene('scale_bog', 'zhao_scales', '青膜硬埂', '一条硬埂把浅水和泥坑隔开。埂顶朝北接蛙背塘，朝水那边分出一道藻沟，铁砂大半埋在沟口。贴另一侧水湾的露石走也能站稳。', [
   { label: '踩上土堤，循爪印往前找', desc: '两行带蹼的足印进了水藻，再往外就断了。', days: 0.25, enemy: 'mud_shrike' },
   { ...gather('挖浅水边的铁砂', '站在岸边，弯腰就够得着泥。', 'ore', 6, 1, '你淘出不少裹在水藻里的寒铁。'),
     ambush: { enemy: 'mud_shrike', chance: 0.3, outcome: '水藻下面突然溅起一脸泥。一只鬃犬跳上浅岸，挡了过来。' } },
-], { stocks: { ore: stock('藻下铁砂', 8, 12, 5, 4, 1) }, creatures: { mud_shrike: { start: 1, cap: 3, interval: 7, growth: 1, curve: 'wild' } },
-  creatureText: { mud_shrike: { present: '埂上的芦梗勾着一绺湿毛，泥上还有新鲜的爪印。', absent: '埂顶的旧足印已经晒硬，水藻里没见动静。' } } });
+  { label: '沿水湾的露石去看浮起的背甲', desc: '那块生苔的背甲往深处沉了一寸，又抬起来。', days: 0.25, enemy: 'zhao_moss_turtle',
+    outcome: '背甲转了半圈，苔底先露出一双眼。泽鳖贴着脚下的泥扑了过来。' },
+  { label: '到北边浅滩寻火斑大蛙', desc: '蛙背塘流来的水刚没过碎石，踩在水里也看得到腿边。', days: 0.125, enemy: 'glass_frog',
+    outcome: '一团红斑从齐脚深的水里跃出来，两腮一鼓，就跳到了石脊上。' },
+  { label: '扒开沟边水藻找泥鳗', desc: '沟里的水混得看不到底，几片沉叶正被拖过沟口。', days: 0.125, enemy: 'zhao_rush_eel',
+    outcome: '一道细背紧贴着沟底拐弯，泥鳗嘴里的藻根刚松，就朝你脚边窜。' },
+], { stocks: { ore: stock('藻下铁砂', 8, 12, 5, 4, 1) },
+  creatures: {
+    mud_shrike: { start: 1, cap: 3, interval: 7, growth: 1, curve: 'wild' },
+    zhao_moss_turtle: { start: 2, cap: 4, interval: 8, growth: 1, curve: 'wild' },
+    glass_frog: { start: 4, cap: 8, interval: 5, growth: 2, curve: 'wild' },
+    zhao_rush_eel: { start: 5, cap: 9, interval: 5, growth: 2, curve: 'wild' },
+  },
+  creatureText: {
+    mud_shrike: { present: '埂上的芦梗勾着一绺湿毛，泥上还有新鲜的爪印。', absent: '埂顶的旧足印已经晒硬，泥坑也没有新爪痕。' },
+    zhao_moss_turtle: { present: '水湾边的苔背浮上来透气，水草随着它往两边倒。', absent: '水湾上的水草浮平了，原先露甲的几处只见水纹。' },
+    glass_frog: { present: '北边浅滩传来蛙叫，碎石间偶尔闪过一片红斑。', absent: '北边的碎石只听得见流水，蛙声已经退到塘那边。' },
+    zhao_rush_eel: { present: '藻沟里几缕沉叶向下游抖着，底下有细背贴泥摆动。', absent: '藻沟里的沉叶被水滞在石边，沟底没东西搅水。' },
+  } });
 
 scene('crane_granary', 'zhao_grain_ladder', '高脚粮仓', '木梯有一只脚开裂了。何绢坐在谷壳里等人修，旁边晒着一堆短木，短得做不了接头。', [
   offer('给何绢松木和兽革，修好梯脚', '何绢抬起梯脚给你看，裂缝进了两节指头。「头两级还能踩，背袋米上去就难说了。」', { hide: 2, wood: 2 }, { ration: 6 }, 12,
     '何绢自己提了袋米上梯，落脚时梯子没再晃。她从仓里包了粮饼下来。「水一涨，总有人背着湿谷来求地方。你帮我腾出这几格，饼就劳你吃了吧。」'),
   gather('捡粮仓后门的碎松木', '掉在门外的碎木片已经晒干。', 'wood', 5, 0.75, '你把松木拢进臂弯，粮仓的人又把一堆削下来的短木耙到檐下。'),
-], { once: [0], stocks: { wood: stock('粮仓碎松', 8, 12, 6, 4, 1) },
+  offer('把粥铺的领米条交给何绢', '何绢在低檐下晾清点粮袋的小竹牌，手边的干谷还够拨两袋。', { zhao_porridge_order: 1 }, { zhao_grain_reply: 1 }, 0,
+    '她对了对纸条末尾的花押，把门边两袋干谷用麻绳系在一起。「挪旁边的湿谷还得晾。等空船过来，先装这两袋。」她把按印的回条交给你。',
+    { hidden: true, insight: 0 }),
+], { once: [0, 2], stocks: { wood: stock('粮仓碎松', 8, 12, 6, 4, 1) },
+  choiceText: { 2: { after: '门里两袋干谷用同一根麻绳扎着，留给照原城的粥铺。' } },
   afterOnceText: { 0: '梯脚两边新加了木撑，何绢踩着梯子去收上层的粮袋。仓门后仍是削木的地方，檐下一坐就能看见。' } });
 
 scene('zhao_pass', 'zhao_ridge_permit', '青瓦验牒房', '柯伯翻看手里的通行木牌。雨刚停，上一队人弄坏了两副绳架。验牌房的铃响起来，鸣沙那头也听得见。', [
-  offer('出示余节的货签，替柯伯补绳架', '柯伯指着檐下两条磨起毛的绳，说木架也得补。', { zhao_sand_chit: 1, hide: 3, wood: 4 },
+  offer('凭水栈货签申领通行牌，帮柯伯补绳架', '柯伯指着檐下磨起毛的绳和散开的木架。水栈的货签、三份兽革和四份松木都得交，灵钱用来付新绳和验牌。', { zhao_sand_chit: 1, hide: 3, wood: 4 },
     { sand_writ: 1 }, -11, '柯伯换好绳架，把两州都认的通行牌交给你。「过了浅石滩就没多少水了。跟紧下一趟带铃的骡车。」'),
   { label: '隔关听骡铃', days: 0.125, insight: 2, outcome: '一声铃从石隙深处转出来。柯伯说鸣沙城把新绳价写在城门，冲坏的井也还等人修。' },
-], { once: [0, 1], afterOnceText: { 0: '两副绳架已靠回檐下，破绳卷在门边。柯伯给牵骡的人让开路，关那头不时传来铃声。' } });
+  { label: '问柯伯用哪家的货签验牌', days: 0.125, outcome: '柯伯扣了扣腰间的牌。「杨木水栈余节的货签就行，落款我认得。水路来的客人多，得凭本地货签把名字写进过关册。」' },
+], { once: [0, 1, 2], afterOnceText: { 0: '两副绳架已靠回檐下，破绳卷在门边。柯伯给牵骡的人让开路，关那头不时传来铃声。' } });
 
 scene('jade_mill', 'zhao_old_wheel', '横卧的半边磨轮', '半只磨轮躺在屋脚。水进不了底下的转弯，那里堆着被水推来的浮石。磨轮背后压着一块木牌。', [
   gather('把石脚的灵晶抠出来', '街外磨台已经没人轮值，脚下的水也很慢。', 'core', 5, 1,
@@ -199,8 +276,12 @@ scene('night_pit', 'zhao_bank_fire', '赤泥横穴', '湿帘贴住地面，帘�
   { label: '越过湿帘，向灰里投一颗石子', days: 0.25, enemy: 'ember_yak' },
   { ...gather('沿帘脚扫出暗金', '靠近时能看到黑砂发亮，别碰帘后舔木的暗火。', 'black_iron', 6, 1.25, '刮起不烧手的一层重砂，余炭重新盖过坑沿。'),
     guardedBy: 'ember_yak' },
-  { label: '看看没冒烟的两个风孔', days: 0.25, insight: 5, outcome: '有人曾把测温的纸签挂在这里。一大一小两个孔离得很近，同时打开，下面的暗火就会停住。' },
-], { once: [2], stocks: { black_iron: stock('帘脚的暗金', 9, 14, 10, 4, 1) }, creatures: { ember_yak: { start: 1, cap: 1, interval: 19, growth: 1 } },
+  { label: '看看没冒烟的两个风孔', days: 0.25, insight: 5, outcome: '有人曾把测温的纸签挂在这里。一大一小两个孔离得很近，同时举起挡板，风会把贴地的火引回炉嘴。孔边两支挡板都够得着。' },
+  { label: '站在帘外同时开风孔，扫出重砂', afterChoice: 2, desc: '热气贴着脚面走。两支挡板翻进槽里就能卡稳，帘外的砂不用踩进火道就够得着。', days: 0.375, loot: { black_iron: 2 },
+    outcome: '风贴着石壁往上卷，帘根不再冒火。原先烫手的两撮重砂现在能捡了。' },
+], { once: [2, 3], stocks: { black_iron: stock('帘内暗金', 9, 14, 10, 4, 1), vent_sand: { item: 'black_iron', ...stock('帘外重砂', 2, 2, 0, 0, 3) } },
+  creatures: { ember_yak: { start: 1, cap: 1, interval: 19, growth: 1 } },
+  afterOnceText: { 3: '两个挡板仍卡在风孔上。火光缩回炉嘴，帘脚能站人了。帘后通往暗金最多的那片坑沿。' },
   creatureText: { ember_yak: { present: '挨着窑脚传来踏炭声，灰堆上偶尔扫过一道尾影。', absent: '窑脚只有踩散的灰垄，里面没有脚步声。' } } });
 
 scene('glass_bank', 'zhao_glass_net', '六角晒网', '网上晾着带刻度的碎琉璃和一盏浸水也不灭的旧灯。章老把几块轻的碎片摆在外头，看风往哪边吹。', [
@@ -275,6 +356,18 @@ const quests = [
     desc: '杜椿在等那份给三州分水的旧约。施荀要做三副铜夹，用同一股水把各州的刻度对齐。',
     need: { fault_receipt: 1, core: 10, ore: 12, wood: 8 }, reward: { gold_salve: 4 }, coins: 81, insight: 14,
     outcome: '三把尺并排浸进水槽，水痕终于挨成一条线。来借尺的货郎问杜椿：「按这把量，下游庄子哪天能收粮？我好把船给他们留一趟。」' },
+  { id: 'zhao_porridge_reply', region: 'zhao_city', name: '给粥铺回个准话', reveal: { item: 'zhao_porridge_order' },
+    desc: '姜婶给船工留着下午的一锅粥。去白鹤粮仓找何绢问清有没有干谷，把她的回条带回照原。',
+    need: { zhao_grain_reply: 1 }, reward: { ration: 3 }, insight: 2, requiresKnownMaterials: false,
+    outcome: '姜婶看清回条上「干谷」两个字，转身去叫喝粥的船工。她把刚出笼的三块米饼包了给你。「明早这锅能熬稠些了。」' },
+  { id: 'zhao_bank_rescue', region: 'zhao_city', name: '给两户船家报平安', reveal: { item: 'zhao_bank_receipt' },
+    desc: '青埂下游还有人在等两户船家的消息。拿他们的竹签给杜椿，省得有人下水逐处去找。',
+    need: { zhao_bank_receipt: 1 }, reward: { ration: 2 }, coins: 9, insight: 3, requiresKnownMaterials: false,
+    outcome: '杜椿照着竹签上的名字勾了两笔，又让送信人顺道通知下游。他按码头出工的例给了你两份干粮和脚钱。' },
+  { id: 'zhao_gate_bounty', region: 'zhao_city', name: '照原悬赏 · 查验青埂旧闸', reveal: { item: 'zhao_gate_notice' },
+    desc: '省潮司要断闩和试闸回条。沿青埂闸下的拖痕去蛙背塘，等船离水再查撞门的东西。事后得让堤工亲手试一次闸。',
+    need: { zhao_gate_shaving: 1, zhao_gate_receipt: 1 }, reward: { salve: 2 }, coins: 31, insight: 7, requiresKnownMaterials: false,
+    outcome: '杜椿把断闩拿去和先前的齿印比对，再照回条给各家的引水册补上一页。他拆下已验的告示，依悬赏所写给你灵钱和药膏。' },
 ];
 
 export const zhaoContent = { regions, regionDetails, items, sites, events, enemies, sects, quests };

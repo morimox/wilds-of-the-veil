@@ -78,7 +78,8 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
         assert.ok(items.has(id), `${site.id}:${index}:${id}`);
         const stock = pools.filter(([key, pool]) => (pool.item ?? key) === id && pool.choices.includes(index));
         assert.ok(stock.length <= 1, `${site.id}:${index}:${id}`);
-        assert.ok(stock.length || site.once?.includes(index) || action.perWin, `${site.id}:${index}:${id}`);
+        const tradesMaterials = action.consume && Object.keys(action.need ?? {}).length > 0;
+        assert.ok(stock.length || site.once?.includes(index) || action.perWin || tradesMaterials, `${site.id}:${index}:${id}`);
       }
     }
     for (const [key, pool] of pools) {

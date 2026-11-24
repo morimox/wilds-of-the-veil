@@ -22,6 +22,7 @@
 落灯村（village）,hook_blade,渡口钩刃,15
 落灯村（village）,trail_cutter,松场习刀,11
 落灯村（village）,star_blade,暗星刀,29
+落灯村（village）,hide_shield,包革小盾,9
 落灯村（village）,coil_spear,绕脊枪,25
 落灯村（village）,reed_bow,苇弦弓,8
 落灯村（village）,iron_sword,寒铁剑,14
@@ -67,6 +68,7 @@
 落灯村（village）,gauze_armor,水绡札甲,48
 落灯村（village）,fault_coat,横渊雨衣,61
 落灯村（village）,coal_tassel,焦灯剑穗,44
+落灯村（village）,ferry_pole,渡工短篙,8
 折水驿（willow_post）,ration,干粮,1
 折水驿（willow_post）,wood,松木,1
 折水驿（willow_post）,reed,灵草,2
@@ -90,6 +92,7 @@
 折水驿（willow_post）,hook_blade,渡口钩刃,15
 折水驿（willow_post）,trail_cutter,松场习刀,11
 折水驿（willow_post）,star_blade,暗星刀,29
+折水驿（willow_post）,hide_shield,包革小盾,9
 折水驿（willow_post）,coil_spear,绕脊枪,25
 折水驿（willow_post）,reed_bow,苇弦弓,8
 折水驿（willow_post）,iron_sword,寒铁剑,14
@@ -135,6 +138,7 @@
 折水驿（willow_post）,gauze_armor,水绡札甲,48
 折水驿（willow_post）,fault_coat,横渊雨衣,61
 折水驿（willow_post）,coal_tassel,焦灯剑穗,44
+折水驿（willow_post）,ferry_pole,渡工短篙,8
 系灯院（lantern_court）,ration,干粮,1
 系灯院（lantern_court）,wood,松木,2
 系灯院（lantern_court）,reed,灵草,2
@@ -158,6 +162,7 @@
 系灯院（lantern_court）,hook_blade,渡口钩刃,15
 系灯院（lantern_court）,trail_cutter,松场习刀,11
 系灯院（lantern_court）,star_blade,暗星刀,29
+系灯院（lantern_court）,hide_shield,包革小盾,9
 系灯院（lantern_court）,coil_spear,绕脊枪,25
 系灯院（lantern_court）,reed_bow,苇弦弓,8
 系灯院（lantern_court）,iron_sword,寒铁剑,14
@@ -203,6 +208,7 @@
 系灯院（lantern_court）,gauze_armor,水绡札甲,48
 系灯院（lantern_court）,fault_coat,横渊雨衣,61
 系灯院（lantern_court）,coal_tassel,焦灯剑穗,44
+系灯院（lantern_court）,ferry_pole,渡工短篙,8
 照原城（zhao_city）,ration,干粮,1
 照原城（zhao_city）,wood,松木,1
 照原城（zhao_city）,reed,灵草,2
@@ -226,6 +232,7 @@
 照原城（zhao_city）,hook_blade,渡口钩刃,15
 照原城（zhao_city）,trail_cutter,松场习刀,11
 照原城（zhao_city）,star_blade,暗星刀,29
+照原城（zhao_city）,hide_shield,包革小盾,9
 照原城（zhao_city）,coil_spear,绕脊枪,25
 照原城（zhao_city）,reed_bow,苇弦弓,8
 照原城（zhao_city）,iron_sword,寒铁剑,14
@@ -271,6 +278,7 @@
 照原城（zhao_city）,gauze_armor,水绡札甲,48
 照原城（zhao_city）,fault_coat,横渊雨衣,61
 照原城（zhao_city）,coal_tassel,焦灯剑穗,44
+照原城（zhao_city）,ferry_pole,渡工短篙,8
 守尺观（measuring_hall）,ration,干粮,1
 守尺观（measuring_hall）,wood,松木,1
 守尺观（measuring_hall）,reed,灵草,2
@@ -294,6 +302,7 @@
 守尺观（measuring_hall）,hook_blade,渡口钩刃,15
 守尺观（measuring_hall）,trail_cutter,松场习刀,11
 守尺观（measuring_hall）,star_blade,暗星刀,29
+守尺观（measuring_hall）,hide_shield,包革小盾,9
 守尺观（measuring_hall）,coil_spear,绕脊枪,25
 守尺观（measuring_hall）,reed_bow,苇弦弓,8
 守尺观（measuring_hall）,iron_sword,寒铁剑,14
@@ -339,6 +348,7 @@
 守尺观（measuring_hall）,gauze_armor,水绡札甲,48
 守尺观（measuring_hall）,fault_coat,横渊雨衣,61
 守尺观（measuring_hall）,coal_tassel,焦灯剑穗,44
+守尺观（measuring_hall）,ferry_pole,渡工短篙,8
 鸣沙城（mingsha_city）,ration,干粮,1
 鸣沙城（mingsha_city）,wood,松木,1
 鸣沙城（mingsha_city）,reed,灵草,2
@@ -362,6 +372,7 @@
 鸣沙城（mingsha_city）,hook_blade,渡口钩刃,15
 鸣沙城（mingsha_city）,trail_cutter,松场习刀,11
 鸣沙城（mingsha_city）,star_blade,暗星刀,29
+鸣沙城（mingsha_city）,hide_shield,包革小盾,9
 鸣沙城（mingsha_city）,coil_spear,绕脊枪,25
 鸣沙城（mingsha_city）,reed_bow,苇弦弓,8
 鸣沙城（mingsha_city）,iron_sword,寒铁剑,14
@@ -407,6 +418,7 @@
 鸣沙城（mingsha_city）,gauze_armor,水绡札甲,48
 鸣沙城（mingsha_city）,fault_coat,横渊雨衣,61
 鸣沙城（mingsha_city）,coal_tassel,焦灯剑穗,44
+鸣沙城（mingsha_city）,ferry_pole,渡工短篙,8
 炭篷驿（cinder_inn）,ration,干粮,1
 炭篷驿（cinder_inn）,wood,松木,2
 炭篷驿（cinder_inn）,reed,灵草,2
@@ -430,6 +442,7 @@
 炭篷驿（cinder_inn）,hook_blade,渡口钩刃,15
 炭篷驿（cinder_inn）,trail_cutter,松场习刀,11
 炭篷驿（cinder_inn）,star_blade,暗星刀,29
+炭篷驿（cinder_inn）,hide_shield,包革小盾,9
 炭篷驿（cinder_inn）,coil_spear,绕脊枪,25
 炭篷驿（cinder_inn）,reed_bow,苇弦弓,8
 炭篷驿（cinder_inn）,iron_sword,寒铁剑,14
@@ -475,6 +488,7 @@
 炭篷驿（cinder_inn）,gauze_armor,水绡札甲,48
 炭篷驿（cinder_inn）,fault_coat,横渊雨衣,61
 炭篷驿（cinder_inn）,coal_tassel,焦灯剑穗,44
+炭篷驿（cinder_inn）,ferry_pole,渡工短篙,8
 叩石院（sand_bell_cloister）,ration,干粮,1
 叩石院（sand_bell_cloister）,wood,松木,1
 叩石院（sand_bell_cloister）,reed,灵草,2
@@ -498,6 +512,7 @@
 叩石院（sand_bell_cloister）,hook_blade,渡口钩刃,15
 叩石院（sand_bell_cloister）,trail_cutter,松场习刀,11
 叩石院（sand_bell_cloister）,star_blade,暗星刀,29
+叩石院（sand_bell_cloister）,hide_shield,包革小盾,9
 叩石院（sand_bell_cloister）,coil_spear,绕脊枪,25
 叩石院（sand_bell_cloister）,reed_bow,苇弦弓,8
 叩石院（sand_bell_cloister）,iron_sword,寒铁剑,14
@@ -543,3 +558,4 @@
 叩石院（sand_bell_cloister）,gauze_armor,水绡札甲,48
 叩石院（sand_bell_cloister）,fault_coat,横渊雨衣,61
 叩石院（sand_bell_cloister）,coal_tassel,焦灯剑穗,44
+叩石院（sand_bell_cloister）,ferry_pole,渡工短篙,8

@@ -19,7 +19,7 @@ screen_slope,晒盘坡,雾梁州（wuliang）,32,46,沉钟岭（ridge）、青�
 lantern_court,系灯院,雾梁州（wuliang）,86,34,青崖松场（pine_ridge）、跃鱼旧渠（fish_ladder）,宗门,是,否,1,炼气中期,1.5,,院中有井有灶。日落后有人给运货的山路挂灯，通行帖就搁在院门的长凳上。,
 undertow_grotto,回潮母洞,雾梁州（wuliang）,53,78,白苇滩（marsh）,,否,否,6,金丹初期,0.5,得知物品 回潮洞引线（undertow_entry）,薄薄的岩壁两侧各流过一股水。洞里隆起一道石脊，潮水淹不到。贴着洞顶的路比脚下的泥地稳。,是
 counter_bell,反声钟窟,雾梁州（wuliang）,52,49,沉钟岭（ridge）,,否,否,5,筑基后期,0.75,得知物品 反声孔通路（counter_bell_entry）,倒钟下是一条窄通道。墙边干燥的地方架着一排信，两侧的小孔还能听见地面传来的响声。,是
-zhao_city,照原城,照原州（zhaoyuan）,13,48,闭潮渡（ford）、青埂（green_dyke）、杨木水栈（flood_market）、守尺观（measuring_hall）,城池,是,是,0,炼气初期,1.25,,城砖半边泛白，是上一回洪峰留下的痕。城门内有粥铺与省潮司。,
+zhao_city,照原城,照原州（zhaoyuan）,13,48,闭潮渡（ford）、青埂（green_dyke）、杨木水栈（flood_market）、守尺观（measuring_hall）,城池,是,是,0,炼气初期,1.25,,城砖半边泛白，是上一回洪峰留下的痕。粥铺挨着省潮司，铁货摊后传出磨刀声。,
 green_dyke,青埂,照原州（zhaoyuan）,25,29,蛙背塘（frog_pond）、没顶刻碑（old_marker）、连环浅洲（ring_isles）,,否,否,0,炼气初期,0.75,,田埂两侧都长着芦苇，只有一侧的苇叶被涨水淹过。,
 flood_market,杨木水栈,照原州（zhaoyuan）,26,62,白鹤粮仓（crane_granary）、叠石驿关（zhao_pass）、碎琉璃滩（glass_bank）,,否,否,0,炼气初期,0.75,,接船的木台漂在水上，钉子上挂着写有各家姓氏的货签。,
 measuring_hall,守尺观,照原州（zhaoyuan）,32,45,没顶刻碑（old_marker）、挂炭坳（charcoal_ridge）,宗门,是,否,1,炼气中期,1,,乌瓦院门晾着测水绳，来客和弟子在同一间灶房用饭。,
@@ -41,7 +41,7 @@ burnt_weir,断齿内堰,照原州（zhaoyuan）,74,48,望船排礁（beacon_reef
 beacon_reefs,望船排礁,照原州（zhaoyuan）,72,86,,,否,否,1,炼气中期,1.25,,礁石上的灯快灭了，灯下拴着一支接货小船用的桨。,
 mingsha_city,鸣沙城,鸣沙州（mingsha）,16,58,叠石驿关（zhao_pass）、炭篷驿（cinder_inn）、叩石院（sand_bell_cloister）、断纬帐道（silk_tent_road）、担盐岗（salt_ledger_barrows）,州城,是,是,1,炼气中期,1,,城墙折了两道弯，挡住低处卷来的沙。进城就能看见登记用井的屋子、客店，以及用铁条封住的旧传送阵。,
 cinder_inn,炭篷驿,鸣沙州（mingsha）,13,74,鸣沙城（mingsha_city）、砾盘浅沟（bone_dry_rill）、覆瓦旱畦（kiln_roof_farm）,驿镇,是,否,0,炼气初期,0.75,,三口铁锅架在同一棚下。负责换马的杨芹在背风墙内收拾上下铺。,
-sand_bell_cloister,叩石院,鸣沙州（mingsha）,39,57,鸣沙城（mingsha_city）、架风板（wind_slate）、并磨坊（guest_mill）、横生脉（hanging_vein）,宗门,是,否,2,炼气后期,1,,学徒敲着两块吊起来的石头听回声。客人能在外院歇脚，里面还有一间做发声铜片的工坊。,
+sand_bell_cloister,叩石院,鸣沙州（mingsha）,39,57,鸣沙城（mingsha_city）、架风板（wind_slate）、并磨坊（guest_mill）、横生脉（hanging_vein）,宗门,是,否,2,炼气后期,1,,学徒敲着两块吊起来的石头听回声。外院有客房，门外有铺着旧毡的修具台。,
 silk_tent_road,断纬帐道,鸣沙州（mingsha）,26,69,鸣沙城（mingsha_city）、并磨坊（guest_mill）、伏兔草丘（camel_grass_dunes）,,否,否,1,炼气中期,1,,剪掉半幅的旧帐挂在路标上。行队在帐的阴影里翻晒湿绳。,
 salt_ledger_barrows,担盐岗,鸣沙州（mingsha）,27,43,鸣沙城（mingsha_city）、静盐井口（stillwell_mouth）、白蹄旧道（chalk_hoof_trail）,,否,否,1,炼气中期,1,,看秤的人把旧井票夹在带蹄印的石头下面。坡脚还搁着挑盐的旧扁担，木面晒出一层白霜。,
 stillwell_mouth,静盐井口,鸣沙州（mingsha）,36,37,担盐岗（salt_ledger_barrows）、静盐井心（stillwell_vault）、空音桥（dry_sound_bridge）,,否,否,1,炼气中期,1.25,,拱形的井口有两道半圆槽，空槽旁还剩几行开关井口的说明。井绳在卷绳的石轮上来回磨。,

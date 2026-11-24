@@ -113,8 +113,8 @@ function quoteRoad(state, id, kit) {
   return { ...road, reason: '' };
 }
 
-function arrive(state, id, days, kit, clearEvent = false) {
-  kit.advance(state, days);
+function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) {
+  kit.advance(state, days, satietyRate);
   state.region = id;
   state.world.arrived = true;
   if (clearEvent) state.event = null;
@@ -128,8 +128,14 @@ function arrive(state, id, days, kit, clearEvent = false) {
 export function travelRoad(state, id, kit) {
   const road = quoteRoad(state, id, kit);
   if (road.reason) return kit.refuse(road.reason);
-  arrive(state, id, road.days, kit);
-  return kit.say(state, `抵达${kit.records.regions[id].name}。${road.rescue ? '腹中没了力气，沿路慢走了一程。' : ''}`);
+  const protection = !road.cross && !road.rescue && kit.roadProtection(state, provinceOf(kit.data, id));
+  const baseRate = kit.rules.satietyDrainPerDay;
+  const satietyRate = protection ? baseRate * (1 - protection.field.roadSatiety.fraction) : baseRate;
+  const unprotectedSatiety = Math.max(0, state.satiety - road.days * baseRate);
+  arrive(state, id, road.days, kit, { satietyRate });
+  const travelText = road.rescue ? '腹中没了力气，沿路慢走了一程。'
+    : protection && state.satiety > unprotectedSatiety ? `裹紧${kit.nameOf(protection.id)}的衣襟挡住风沙，这一程没那么耗力。` : '';
+  return kit.say(state, `抵达${kit.records.regions[id].name}。${travelText}`);
 }
 
 function gateQuote(state, id, kit, scroll) {
@@ -154,7 +160,7 @@ function jumpGate(state, id, kit, scroll) {
   if (reason) return kit.refuse(reason);
   if (scroll) kit.removeItem(state, 'gate_scroll', 1);
   else state.coins -= transportRules.gatePrice;
-  arrive(state, id, scroll ? transportRules.scrollDays : transportRules.gateDays, kit, true);
+  arrive(state, id, scroll ? transportRules.scrollDays : transportRules.gateDays, kit, { clearEvent: true });
   return kit.say(state, scroll ? `卷轴化成灰。抬头已经到了${kit.records.regions[id].name}。` : `门框一亮，转眼已到${kit.records.regions[id].name}。`);
 }
 
@@ -209,7 +215,7 @@ function jumpArray(state, id, kit) {
   const reason = arrayQuote(state, id, kit);
   if (reason) return kit.refuse(reason);
   state.coins -= transportRules.arrayPrice;
-  arrive(state, id, transportRules.arrayDays, kit, true);
+  arrive(state, id, transportRules.arrayDays, kit, { clearEvent: true });
   return kit.say(state, `脚下的石板闪过一道光。你已经到了${kit.records.regions[id].name}。`);
 }
 
@@ -328,17 +334,20 @@ function sectView(state, kit) {
   const joinReason = joined ? '' : state.world.affiliation ? '先回原来的师门辞行，再来拜师。' :
     kit.homeRequirements(state, admission?.coins ?? 0, admission?.need) || '';
   const credit = membership?.credit ?? 0;
-  const jobs = sect.jobs.map((job) => {
+  const jobs = sect.jobs.filter((job) => !job.afterQuests || job.afterQuests.some((id) => state.completedQuests.includes(id))).map((job) => {
     const nextAt = membership?.jobs[job.id] ?? 0;
-    const reason = !joined ? '这桩活只交给本门弟子。' : nextAt > state.day ? `管事还在忙上次的活，第${Math.ceil(nextAt)}日再来。` :
+    const remaining = Number((nextAt - state.day).toFixed(3));
+    const reason = !joined ? '这桩活只交给本门弟子。' : nextAt > state.day ? `管事还在忙上次的活，${remaining}日后再来。` :
+      job.days > 0 && state.satiety <= 0 ? '先吃些东西，再去守灯。' :
       kit.homeRequirements(state, 0, job.need) || (!kit.hasRoom(state, job.reward ?? {}, kit.homeBagSpend(state, job.need)) ? '行囊腾出些地方，就能带走回礼。' : '');
     return { ...job, nextAt, available: !reason && !state.event && !state.combat, reason };
   });
   const ranks = sect.ranks.map((rank, index) => {
     const claimed = membership?.ranks.includes(index) ?? false;
+    const honorary = !rank.art && !Object.values(rank.reward ?? {}).some((count) => count > 0);
     const reason = !joined ? '先入门，再找管事领回礼。' : credit < rank.credit ? `尚需${rank.credit - credit}份门中功劳。` :
-      !claimed && !kit.hasRoom(state, rank.reward ?? {}) ? '行囊装不下这笔回礼。' : '';
-    return { ...rank, id: String(index), claimed, available: !claimed && !reason, reason };
+      honorary ? '你的名字已经记在册上了。' : !claimed && !kit.hasRoom(state, rank.reward ?? {}) ? '行囊装不下这笔回礼。' : '';
+    return { ...rank, id: String(index), claimed, honorary, available: !claimed && !reason, reason };
   });
   return { ...sect, join: { ...admission, returning, available: !joined && !joinReason, reason: joinReason }, joined, credit, jobs, ranks };
 }
@@ -370,6 +379,7 @@ function actSect(state, action, id, kit) {
     kit.addItems(state, job.reward ?? {});
     state.coins += job.coins ?? 0;
     member.credit += job.credit;
+    if (job.days) kit.advance(state, job.days);
     member.jobs[id] = state.day + job.cooldown;
     return kit.say(state, `${job.text ?? ''}办完「${job.name}」，得${job.credit}份功劳${job.coins ? `和${job.coins}枚灵钱` : ''}。`);
   }

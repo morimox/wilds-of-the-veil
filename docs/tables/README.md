@@ -120,8 +120,9 @@
 | short_spear | 摊市短矛 | 装备 | 27 | 10 | 重心挨着手，矛尾可顺势架一下来招。 |  |  |  |
 | hook_blade | 渡口钩刃 | 装备 | 0 | 15 | 拦滩客从路上带回的备刃。刀脊微弯，握柄大小刚合手。 |  |  |  |
 | trail_cutter | 松场习刀 | 装备 | 0 | 11 | 松场守索人给胜者备的短砍刀。护手做成一整圈。 |  |  |  |
-| star_blade | 暗星刀 | 装备 | 0 | 29 | 偏井锁柜里的护矿短刀。刃厚而短，寻常力道也能掌控。 |  |  |  |
-| star_blade_pattern | 暗星刀匣底图 | 线索 | 0 | 0 | 偏井护矿人用来配修暗星刀的寸图。刃底三处刻点与旧锁柜里那把刀相合。 |  |  |  |
+| star_blade | 暗星刀 | 装备 | 0 | 29 | 照偏井护矿人留下的旧图打成。刃厚而短，寻常力道也能掌控。 |  |  |  |
+| star_blade_pattern | 暗星刀匣底图 | 线索 | 0 | 0 | 偏井护矿人留下的锻打寸图。断刀的三处裂口旁注明了哪边该留厚。 |  |  |  |
+| hide_shield | 包革小盾 | 装备 | 0 | 9 | 用松木弯成的圆盾，外包两层兽革。 |  |  |  |
 | coil_spear | 绕脊枪 | 装备 | 0 | 25 | 用配重翻过的长枪。刃近手心，长柄仍能顺畅回收。 |  |  |  |
 | reed_bow | 苇弦弓 | 装备 | 0 | 8 | 将削薄的苇片贴在韧木上制成的猎弓。 |  |  |  |
 | iron_sword | 寒铁剑 | 装备 | 33 | 14 | 用沉钟岭的铁打成，兼顾出手和耐用。 |  |  |  |
@@ -164,6 +165,10 @@
 | river_field_stamp | 蒲湾渠契 | 线索 | 0 | 0 | 姚六签了名的修渠凭据。田户和折水驿照着它分摊修水渠的木料。 |  |  |  |
 | river_gauge_copy | 校潮亭抄尺 | 线索 | 0 | 0 | 竹纸上印着亭下三段水尺的刻痕。最下面一段记的是潮水倒流的时辰。 |  |  |  |
 | river_trial_writ | 封乔的试杆签 | 线索 | 0 | 0 | 护堤人封乔把系红布的木签递给你。折水驿的人认这道手印。 |  |  |  |
+| lantern_route_copy | 裴见画的旧灯图 | 线索 | 0 | 0 | 图上画着晒盘坡的两盏灯。高处的灯照给背矿的人，低处那盏留给在坡下走的药担。 |  |  |  |
+| lantern_clasp | 停风处捡到的铜扣 | 线索 | 0 | 0 | 油布里裹着一枚能用的旧铜扣。找根平木就能把一盏灯扣在低处。要往高处挂，还得用铁挡住割绳的石角，再拿皮把绳裹严。 |  |  |  |
+| lantern_low_note | 低路试点回条 | 线索 | 0 | 0 | 药农在回条上摁了指印。低石墩上的灯已经试过，踩石沟过坡的药担不会再走岔。 |  |  |  |
+| lantern_high_note | 双灯复挂回条 | 线索 | 0 | 0 | 矿夫在回条上划了两道短线。高低两盏灯都能照见脚下的横木，他愿走旧路运矿了。 |  |  |  |
 | return_tide_note | 倒行水痕拓样 | 线索 | 0 | 0 | 从旧碑背面取下的拓样，记的是一路向西退去的潮水。纸角写着「斜漏水驿，施荀收」。 |  |  |  |
 | zhao_sand_chit | 漏潮货签 | 线索 | 0 | 0 | 余节从秋天的货账上取下的签条。叠石关的柯伯认得正面的签名，签尾另有省潮司留下的缺口。 |  |  |  |
 | lab_beacon | 靠岩导灯 | 线索 | 0 | 0 | 量水司借出的小灯。挂低些，通往旧量水站的那排岩壁上会反出两点光。 |  |  |  |
@@ -172,6 +177,12 @@
 | fault_receipt | 留水底印 | 线索 | 0 | 0 | 错水湖底藏着一页旧时分水的约定。落款写了沿途三户撑船人家的姓名。 |  |  |  |
 | body_breath_note | 扶膝起身帖 | 线索 | 0 | 0 | 傅澄给访客的一页旧讲义。倒向地面时先稳住呼吸，起身用脚底与腰背一起发力。 |  |  |  |
 | market_scale_verse | 秤下的验货单 | 线索 | 0 | 0 | 蒲霖从旧秤下抽出的验货单。上面写着守尺观的规矩：秤的两头要平，右边两个小盘里砝码的总重还得是六两。 |  |  |  |
+| zhao_porridge_order | 粥铺的领米条 | 线索 | 0 | 0 | 照原城粥铺的赊账条。昨日没来粮，姜婶托人拿它去白鹤粮仓问何绢。 |  |  |  |
+| zhao_grain_reply | 何绢按印的回条 | 线索 | 0 | 0 | 何绢在回条上写了两袋干谷留给照原粥铺。空船要从白鹤粮仓取货，别捎两袋湿谷进城。 |  |  |  |
+| zhao_gate_notice | 试水门悬赏 | 线索 | 0 | 0 | 省潮司盖印的告示。青埂旧水门连着几户水田，汛前得弄清是什么把门拽歪了。 |  |  |  |
+| zhao_gate_shaving | 带咬痕的旧门闩 | 线索 | 0 | 0 | 青埂的门闩断在中间。裂口有齿印和湿茸毛，附近的拖痕向蛙背塘去。 |  |  |  |
+| zhao_bank_receipt | 撤船的两枚竹签 | 线索 | 0 | 0 | 两名船户把自己的码头签交给你。他们已把空船挪去高岸，请省潮司给留在下游的人报平安。 |  |  |  |
+| zhao_gate_receipt | 省潮司的试闸回条 | 线索 | 0 | 0 | 老堤工亲眼见撞闩的塘獭倒下。试过青埂旧闸和蛙背塘便门后，他在回条上按了拇指印。 |  |  |  |
 | sand_watch_register | 换井役簿 | 线索 | 0 | 0 | 鸣沙盐井的换班记录。背面盖着旧印，拿去担盐岗找看秤的邢茧核对。 |  |  |  |
 | sand_well_chit | 静井准入票 | 线索 | 0 | 0 | 邢茧盖过两道斜印的进井凭证。一角画着卷绳的石轮，轮边有个半月形缺口。 |  |  |  |
 | sand_well_open | 井梯铜扣 | 线索 | 0 | 0 | 从细井绳上取下的半块黄铜。把它卡进井口的铁框，下井的梯子就不会滑落。 |  |  |  |
@@ -204,23 +215,27 @@
 | zhao_weigh_note | 旧秤下的小木块 | 线索 | 0 | 0 | 高婆借给你的小木块，插进旧秤左盘底下就能稳住它。木块上刻着一架秤。同样的重量，放得离中间越远，越容易压低那一边。 |  |  |  |
 | sand_crossing_song | 桥工的铜环 | 线索 | 0 | 0 | 杨芹巡桥时用的铜环，正好能套进桥下那个木轮的槽里。环上系的小牌写着她怎么一路敲响信号，给守桥的人报平安。 |  |  |  |
 | tournament_citation | 朱线头名帖 | 线索 | 0 | 0 | 三场全胜才会拿到的名帖，上面有三位裁判的印和卫箬的签名。 |  |  |  |
+| ferry_watch_tag | 夜船的换班木牌 | 线索 | 0 | 0 | 木牌背面写着回灯埠几个字。闭潮渡今晚换班的船工请你亲手交给埠头守灯的人。 |  |  |  |
+| ferry_watch_reply | 守灯人的回条 | 线索 | 0 | 0 | 守灯人在纸角按了一点灯油，托你给闭潮渡的掌船人报个平安。 |  |  |  |
+| ferry_pole | 渡工短篙 | 装备 | 0 | 8 | 截短的竹篙，篙头磨得很钝。渡工立在窄船上也能横着用。 |  |  |  |
+| sand_saltwater_reed | 结着盐壳的苇梗 | 线索 | 0 | 0 | 苇梗卡在草丘的石缝里，湿的一头还带着井泥。炭篷驿的杨芹常在这一带饮马。 |  |  |  |
 
 ## 常用原料跨系统用途
 
 | 标识 | 名称 | 可回生的现场 | 解取的对手 | 用到的配方数 | 用到的后院项目数 | 用到的设施升级数 | 野外交付选择数 | 直接用于突破的境数 | 用到的修习级数 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| wood | 松木 | 碎石水眼（mud_track）、刮脂松架（pine_stand） · 架下松片、刮脂松架（pine_stand） · 树上枯枝、背阴的断肩崖（pine_ledges）、姚六的弯渠（meadow_channel） · 沟口漂木、第三级闸口（ladder_drop） · 闸梁上的枯枝、三姓木码头（zhao_float_goods） · 晒台松枝、浮洲松根（zhao_isle_reeds） · 洲上老松、高脚粮仓（zhao_grain_ladder） · 粮仓碎松、斜封窑棚（zhao_firedoor） · 炭棚松枝、长礁灯脚（zhao_ferry_hook） · 灯礁松木、井边老秤（sand_salt_ledger） · 坡脚挑盐用的旧木、晃铜的桥栏（sand_bridge_rail） · 桥板旁的旧松木、搁木的浅弯（sand_gravel_rill） · 沟弯搁下的松木 |  | 36 | 8 | 9 | 20 | 0 | 2 |
-| reed | 灵草 | 浅水苇丛（reed_banks） · 浅处苇芯、浅水苇丛（reed_banks） · 深处苇芯、渡工的刨木滩（reed_ferryman）、银脉水畦（herb_beds）、白藤塘（vine_pond） · 塘边银脉叶、白藤塘（vine_pond） · 上游银脉叶、姚六的弯渠（meadow_channel） · 田边灵草、灰鹭晒篮处（shoal_baskets） · 鹭草根、两面低埂（zhao_dyke_bend） · 白芽、斜萍石窝（zhao_frog_shelf） · 外圈灵草、晾绳矮帐（sand_tent_watch） · 湿帐沿的灵草、关了一半的仓门（sand_silo_door） · 卸谷洞边的灵草、伏草沙坎（sand_dune_grass） · 沙坎背面的灵草、留阴瓦畦（sand_rooftile_patch） · 上畦灵草 |  | 21 | 7 | 5 | 5 | 4 | 3 |
-| hide | 兽革 | 背风雪蜥径（silk_bough） · 石窝雪蜥蜕、背风雪蜥径（silk_bough） · 冰沿雪蜥蜕 | 泥鳞兽、苇尾狐、沉桅虺、石甲獾、灰脊松熊、白角藤鹿、白纹鹿王、雪脊兽、横脊闸兽、负丘虺、黄沿水貂、泥鳞鬃犬、伏灰炭魈、沙丘野兔、仓花貂、黄结桥蝰、负砂豺、静井伏鳞、三痕琉狮 | 19 | 1 | 3 | 6 | 1 | 3 |
-| ore | 寒铁 | 落矿的冲沟（ore_rain） · 沟边寒铁、落矿的冲沟（ore_rain） · 坡壁寒铁、有回声的矿道（miner_echo） · 旁孔寒铁、有回声的矿道（miner_echo） · 主道寒铁、第三级闸口（ladder_drop） · 槽底寒铁、断壁筛架（slope_sieves） · 坡下筛盘的寒铁、倒行刻碑（zhao_retreat_marks） · 碑脚寒铁砂、青膜硬埂（zhao_scales） · 藻下铁砂、逆纹马蹄石（sand_approach_hoof） · 白石下的寒铁片、风楔架（sand_wind_work） · 岩缝里的寒铁、贴壁支木（sand_hanging_support） · 坡角露出的寒铁、搁木的浅弯（sand_gravel_rill） · 砾盘底的寒铁 |  | 15 | 0 | 6 | 4 | 4 | 4 |
-| core | 灵晶 | 落矿的冲沟（ore_rain） · 砂槽灵晶、有回声的矿道（miner_echo）、闸外浅阶（low_tide） · 浅阶灵晶、闸外浅阶（low_tide） · 槽底灵晶、刻洪痕的石壁（flood_lines）、横肩偏井（deep_vein）、浮光晶坡（cloud_scree） · 坡边灵晶、浮光晶坡（cloud_scree） · 岩脊灵晶、灰鹭晒篮处（shoal_baskets） · 石缝灵晶、刻尺水桩（gauge_piles） · 水尺旁的灵晶、退水石脊（undertow_bed） · 侧洞灵晶、浮洲松根（zhao_isle_reeds） · 沉根灵晶、横卧的半边磨轮（zhao_old_wheel） · 磨轮灵晶、铜槽旁（zhao_submerged_table） · 量槽外晶屑、六角晒网（zhao_glass_net） · 滩中灵晶、三口相背的堰齿（zhao_broken_rake） · 断齿灵晶、井底隔水板（sand_stillwell_sill） · 盐痕下的灵晶、风楔架（sand_wind_work） · 沙槽里的灵晶、断琉棱（sand_hail_floor） · 洼沿散下的灵晶、断琉棱（sand_hail_floor） · 断棱底下的灵晶 |  | 24 | 0 | 2 | 2 | 5 | 10 |
-| black_iron | 暗金 | 废窑烟道（kiln_flue）、黑砂洗矿槽（mine_tailings） · 槽沿暗金、黑砂洗矿槽（mine_tailings） · 槽底暗金、横肩偏井（deep_vein）、断壁筛架（slope_sieves） · 高处筛盘的暗金、信架与钟枢（counter_bell_score） · 钟座暗金、赤泥横穴（zhao_bank_fire） · 帘脚的暗金、沙坠顺风线（zhao_rope_sound） · 绳结里的暗金、贴壁支木（sand_hanging_support） · 支架后的暗金 |  | 12 | 0 | 4 | 1 | 3 | 3 |
+| wood | 松木 | 碎石水眼（mud_track）、刮脂松架（pine_stand） · 架下松片、刮脂松架（pine_stand） · 树上枯枝、背阴的断肩崖（pine_ledges）、姚六的弯渠（meadow_channel） · 沟口漂木、第三级闸口（ladder_drop） · 闸梁上的枯枝、石沟下的灯棚（slope_lantern_low） · 水沟里的细木、三姓木码头（zhao_float_goods） · 晒台松枝、浮洲松根（zhao_isle_reeds） · 洲上老松、高脚粮仓（zhao_grain_ladder） · 粮仓碎松、斜封窑棚（zhao_firedoor） · 炭棚松枝、长礁灯脚（zhao_ferry_hook） · 灯礁松木、井边老秤（sand_salt_ledger） · 坡脚挑盐用的旧木、晃铜的桥栏（sand_bridge_rail） · 桥板旁的旧松木、搁木的浅弯（sand_gravel_rill） · 沟弯搁下的松木 |  | 37 | 8 | 9 | 24 | 0 | 2 |
+| reed | 灵草 | 浅水苇丛（reed_banks） · 浅处苇芯、浅水苇丛（reed_banks） · 深处苇芯、渡工的刨木滩（reed_ferryman）、银脉水畦（herb_beds）、白藤塘（vine_pond） · 塘边银脉叶、白藤塘（vine_pond） · 上游银脉叶、姚六的弯渠（meadow_channel） · 田边灵草、灰鹭晒篮处（shoal_baskets） · 鹭草根、石沟下的灯棚（slope_lantern_low） · 挡风石后的灵草、两面低埂（zhao_dyke_bend） · 白芽、斜萍石窝（zhao_frog_shelf） · 外圈灵草、晾绳矮帐（sand_tent_watch） · 湿帐沿的灵草、关了一半的仓门（sand_silo_door） · 卸谷洞边的灵草、伏草沙坎（sand_dune_grass） · 沙坎背面的灵草、留阴瓦畦（sand_rooftile_patch） · 上畦灵草 |  | 21 | 7 | 5 | 6 | 4 | 3 |
+| hide | 兽革 | 背风雪蜥径（silk_bough） · 石窝雪蜥蜕、背风雪蜥径（silk_bough） · 冰沿雪蜥蜕 | 黑纹蟹、泥鳞兽、苇尾狐、沉桅虺、石甲獾、灰脊松熊、白角藤鹿、白纹鹿王、雪脊兽、横脊闸兽、负丘虺、黄沿水貂、泥鳞鬃犬、伏灰炭魈、撞闩塘獭、沙丘野兔、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、负砂豺、铁斑蜥、静井伏鳞、三痕琉狮、盐泥豺 | 20 | 1 | 3 | 7 | 1 | 3 |
+| ore | 寒铁 | 落矿的冲沟（ore_rain） · 沟边寒铁、落矿的冲沟（ore_rain） · 坡壁寒铁、有回声的矿道（miner_echo） · 旁孔寒铁、有回声的矿道（miner_echo） · 主道寒铁、第三级闸口（ladder_drop） · 槽底寒铁、断壁筛架（slope_sieves） · 坡下筛盘的寒铁、倒行刻碑（zhao_retreat_marks） · 碑脚寒铁砂、青膜硬埂（zhao_scales） · 藻下铁砂、逆纹马蹄石（sand_approach_hoof） · 白石下的寒铁片、风楔架（sand_wind_work） · 岩缝里的寒铁、贴壁支木（sand_hanging_support） · 坡角露出的寒铁、搁木的浅弯（sand_gravel_rill） · 砾盘底的寒铁 |  | 16 | 0 | 6 | 5 | 4 | 4 |
+| core | 灵晶 | 落矿的冲沟（ore_rain） · 砂槽灵晶、有回声的矿道（miner_echo）、闸外浅阶（low_tide） · 浅阶灵晶、闸外浅阶（low_tide） · 槽底灵晶、刻洪痕的石壁（flood_lines）、横肩偏井（deep_vein）、浮光晶坡（cloud_scree） · 坡边灵晶、浮光晶坡（cloud_scree） · 岩脊灵晶、灰鹭晒篮处（shoal_baskets） · 石缝灵晶、刻尺水桩（gauge_piles） · 水尺旁的灵晶、双灯照到的旧吊板（slope_lantern_high） · 矿夫在灯下筛出的晶砂、退水石脊（undertow_bed） · 侧洞灵晶、浮洲松根（zhao_isle_reeds） · 沉根灵晶、横卧的半边磨轮（zhao_old_wheel） · 磨轮灵晶、铜槽旁（zhao_submerged_table） · 量槽外晶屑、六角晒网（zhao_glass_net） · 滩中灵晶、三口相背的堰齿（zhao_broken_rake） · 断齿灵晶、井底隔水板（sand_stillwell_sill） · 盐痕下的灵晶、风楔架（sand_wind_work） · 沙槽里的灵晶、断琉棱（sand_hail_floor） · 洼沿散下的灵晶、断琉棱（sand_hail_floor） · 断棱底下的灵晶 |  | 25 | 0 | 2 | 2 | 5 | 10 |
+| black_iron | 暗金 | 废窑烟道（kiln_flue）、黑砂洗矿槽（mine_tailings） · 槽沿暗金、黑砂洗矿槽（mine_tailings） · 槽底暗金、横肩偏井（deep_vein）、断壁筛架（slope_sieves） · 高处筛盘的暗金、双灯照到的旧吊板（slope_lantern_high） · 吊板尽头石缝里的暗金、信架与钟枢（counter_bell_score） · 钟座暗金、赤泥横穴（zhao_bank_fire） · 帘内暗金、沙坠顺风线（zhao_rope_sound） · 绳结里的暗金、贴壁支木（sand_hanging_support） · 支架后的暗金 |  | 13 | 0 | 4 | 1 | 3 | 3 |
 | kiln_clay | 耐火泥 | 白泥洗坯坡（clay_bank） · 坡根耐火泥、白泥洗坯坡（clay_bank） · 干泥带耐火泥 |  | 1 | 0 | 5 | 3 | 0 | 0 |
-| beast_meat | 生兽肉 |  | 泥鳞兽、苇尾狐、沉桅虺、石甲獾、缠舟兽、灰脊松熊、白角藤鹿、白纹鹿王、雪脊兽、横脊闸兽、负丘虺、黄沿水貂、火斑大蛙、泥鳞鬃犬、伏灰炭魈、沙丘野兔、仓花貂、黄结桥蝰、负砂豺、静井伏鳞、三痕琉狮 | 0 | 3 | 0 | 0 | 0 | 0 |
-| qi_core | 炼气期妖丹 |  | 泥鳞兽、苇尾狐、巡岸水鬼、沉桅虺、持锤矿煞、石甲獾、裂钟魄、缠舟兽、守潮灵、湿蓑灯蜕、灰脊松熊、炉渣犬、白角藤鹿、白纹鹿王、横肩矿傀、护印窑影、横脊闸兽、黄沿水貂、火斑大蛙、沙丘野兔、仓花貂、黄结桥蝰 | 2 | 0 | 0 | 0 | 1 | 3 |
-| foundation_core | 筑基期妖丹 |  | 雪脊兽、持衡镜灵、屈膝铜影、悬梯堰影、泥鳞鬃犬、槽背水魁、负砂豺、静井伏鳞 | 5 | 0 | 0 | 0 | 1 | 4 |
+| beast_meat | 生兽肉 |  | 白耳兔、银背鱼、黑纹蟹、泥鳞兽、苇尾狐、沉桅虺、石甲獾、缠舟兽、灰脊松熊、白角藤鹿、白纹鹿王、雪脊兽、横脊闸兽、石鹞、负丘虺、黄沿水貂、灰苇灵鸭、火斑大蛙、泥鳞鬃犬、苔背泽鳖、缠藻泥鳗、伏灰炭魈、撞闩塘獭、沙丘野兔、沙脊雉、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、负砂豺、铁斑蜥、静井伏鳞、三痕琉狮、盐泥豺 | 0 | 3 | 0 | 2 | 0 | 0 |
+| qi_core | 炼气期妖丹 |  | 白耳兔、银背鱼、黑纹蟹、泥鳞兽、苇尾狐、巡岸水鬼、沉桅虺、持锤矿煞、石甲獾、裂钟魄、缠舟兽、守潮灵、湿蓑灯蜕、灰脊松熊、炉渣犬、白角藤鹿、白纹鹿王、横肩矿傀、护印窑影、横脊闸兽、石鹞、黄沿水貂、灰苇灵鸭、火斑大蛙、苔背泽鳖、缠藻泥鳗、撞闩塘獭、沙丘野兔、沙脊雉、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、铁斑蜥、盐泥豺 | 2 | 0 | 0 | 0 | 1 | 3 |
+| foundation_core | 筑基期妖丹 |  | 雪脊兽、持衡镜灵、屈膝铜影、悬梯堰影、泥鳞鬃犬、槽背水魁、负砂豺、静井伏鳞 | 6 | 0 | 0 | 0 | 1 | 4 |
 | gold_core | 金丹期妖丹 |  | 负丘虺、伏灰炭魈、分柱水君、三痕琉狮、倒驿锁影 | 1 | 0 | 0 | 0 | 2 | 0 |
-| beast_eye | 妖目 |  | 沉桅虺、缠舟兽、白角藤鹿、白纹鹿王、雪脊兽、负丘虺、火斑大蛙、槽背水魁、分柱水君、静井伏鳞、三痕琉狮 | 3 | 0 | 0 | 0 | 0 | 2 |
+| beast_eye | 妖目 |  | 沉桅虺、缠舟兽、白角藤鹿、白纹鹿王、雪脊兽、负丘虺、火斑大蛙、苔背泽鳖、槽背水魁、分柱水君、静井伏鳞、三痕琉狮 | 3 | 0 | 0 | 0 | 0 | 2 |
 
 ## 坊市货单
 
@@ -319,46 +334,48 @@
 
 ## 装备
 
-装备耐久为 0 后失去加成。脱身加成为伤害减免系数，0.17 即减免 17%。
+装备耐久为 0 后失去加成。双手兵刃与副手互斥。盾主动挡重招并确实缓冲时损耗耐久。脱身系数 0.17 即减免撤退伤害 17%。
 
-| 标识 | 名称 | 装备部位 | 兵刃类别 | 适用弹药 | 境界要求 | 境界名 | 攻击 | 防御 | 气血上限修正 | 真气上限修正 | 脱身减伤加成 | 最大耐久 | 修理费（灵钱） | 玩家主动查读的词条 | 特殊作用与具体数值 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cudgel | 枣木杖 | 武器 | 杖 |  | 0 | 炼气初期 | 1 | 0 | 0 | 0 | 0 | 26 | 3 | 寻常行杖。出手稳当，力道偏轻，适合刚出门的散修。 |  |
-| knife | 割苇短刀 | 武器 | 刀 |  | 0 | 炼气初期 | 3 | 0 | 0 | 0 | 0 | 30 | 5 | 利落的凡制短刃。薄刃能从鳞缝里切进去，打披鳞的敌人时容易破防。 | 额外穿甲 · 敌人标签 scaled · 加成 2 |
-| split_axe | 劈柴小钺 | 武器 | 刀 |  | 0 | 炼气初期 | 4 | 0 | 0 | 0 | 0 | 38 | 4 | 下手有分量的厚刃，在常年劈柴的木户手里也经用。 |  |
-| short_spear | 摊市短矛 | 武器 | 长兵 |  | 0 | 炼气初期 | 4 | 1 | 0 | 0 | 0 | 27 | 7 | 村口巡守平日练的短矛。柄尾能架住近处来招，矛尖却薄，得时常修。 |  |
-| hook_blade | 渡口钩刃 | 武器 | 刀 |  | 0 | 炼气初期 | 5 | 0 | 0 | 0 | 0 | 31 | 6 | 拦滩客的备刀。分量略沉，寻常人也能劈得稳。 |  |
-| trail_cutter | 松场习刀 | 武器 | 刀 |  | 0 | 炼气初期 | 4 | 1 | 0 | 0 | 0 | 33 | 5 | 索棚比手的奖刀。护手宽，敢把刃从对手手边送过去。 |  |
-| star_blade | 暗星刀 | 武器 | 刀 |  | 0 | 炼气初期 | 6 | 0 | 0 | 0 | 0 | 37 | 11 | 落进矿傀深处的老刀，劈硬物分量十足。养气浅些也能握得稳。 |  |
-| coil_spear | 绕脊枪 | 武器 | 长兵 |  | 0 | 炼气初期 | 6 | 0 | 0 | 0 | 0 | 45 | 10 | 练得不深也能贯穿整段枪势的重兵。枪杆经用，锻造却要吃掉一匣硬料。 |  |
-| reed_bow | 苇弦弓 | 武器 | 弓 | 削苇箭（reed_arrow）、包铁箭（iron_arrow） | 0 | 炼气初期 | 3 | 0 | 0 | 0 | 0 | 28 | 4 | 寻常猎弓，弓力温和。可用削苇箭或包铁箭，射入厚毛不易滑脱。 | 额外伤害 · 敌人标签 furred · 加成 2 |
-| iron_sword | 寒铁剑 | 武器 | 剑 |  | 0 | 炼气初期 | 5 | 0 | 0 | 0 | 0 | 38 | 8 | 不挑修为的实用剑。厚脊让劈刺都稳，常年巡矿也不用总补剑身。 |  |
-| tide_spear | 分潮枪 | 武器 | 长兵 |  | 1 | 炼气中期 | 5 | 0 | 0 | 1 | 0 | 45 | 10 | 炼气中期能端稳的长枪。顺着对手蓄势的空当刺过去，常能穿薄些的护甲。 | 额外穿甲 · 重招 · 加成 2 |
-| straw_cape | 蓑衣 | 护具 |  |  | 0 | 炼气初期 | 0 | 1 | 3 | 0 | 0 | 24 | 3 | 渔人常穿的轻护具。能缓掉些寻常抓咬，遇到沉重来招仍须躲闪。 |  |
-| hide_coat | 泥蜕褂 | 护具 |  |  | 0 | 炼气初期 | 0 | 2 | 5 | 0 | 0 | 29 | 5 | 结实的凡制软甲。泥蜕织面咬不住，能额外卸掉野兽来招的力道。 | 额外护持 · 敌人标签 beast · 加成 2 |
-| iron_coat | 叠铁袍 | 护具 |  |  | 1 | 炼气中期 | 0 | 3 | 7 | 0 | 0 | 38 | 8 | 炼气中期用的重护具。叠铁护心能分散重击，接蓄势之后的重招更稳。 | 额外护持 · 重招 · 加成 2 |
-| tide_coat | 定潮甲 | 护具 |  |  | 2 | 炼气后期 | 0 | 5 | 9 | -1 | 0 | 46 | 12 | 炼气后期用的厚甲。甲下气息走得窄，穿着时体内少容些真气。 |  |
-| reed_charm | 苇哨结 | 饰物 |  |  | 0 | 炼气初期 | 0 | 0 | 0 | 2 | 0.05 | 25 | 3 | 小巧的凡制护符。苇声能帮助稳住真气，脱身时也能少挨些追击。 |  |
-| path_charm | 认路钱 | 饰物 |  |  | 0 | 炼气初期 | 0 | 0 | 2 | 0 | 0.17 | 28 | 5 | 旧渡工用的护身钱。擅长在混乱中辨来路，撤出战斗时能少受追击。 |  |
-| bell_charm | 定声铃 | 饰物 |  |  | 1 | 炼气中期 | 0 | 1 | 0 | 4 | 0.05 | 38 | 8 | 炼气中期可佩的无声小铃。能多存些真气，受击和撤退时也有一点保护。 |  |
-| tide_charm | 避潮玉 | 饰物 |  |  | 2 | 炼气后期 | 0 | 1 | 4 | 3 | 0.2 | 46 | 12 | 炼气后期可佩的玉坠。能护身、储存真气，撤退时还能挡掉身后的部分追击。 |  |
-| jetty_charm | 回灯坠 | 饰物 |  |  | 2 | 炼气后期 | 0 | 0 | 0 | 5 | 0.3 | 38 | 9 | 炼气后期可佩的旧渡口灯坠。能多存些真气，撤离险处时尤其能挡住追击。 |  |
-| pine_bow | 松筋长弓 | 武器 | 弓 | 削苇箭（reed_arrow）、包铁箭（iron_arrow） | 0 | 炼气初期 | 5 | 0 | 0 | 0 | 0 | 38 | 7 | 耐雨长弓。拉得稳又耐使，削苇箭和包铁箭都合弦。 |  |
-| resin_staff | 藏火杖 | 武器 | 杖 |  | 1 | 炼气中期 | 4 | 2 | 0 | 2 | 0 | 40 | 7 | 炉户用的厚杖。能架住来势，杖芯温热，持久行气时也趁手。 |  |
-| black_crossbow | 暗金机弩 | 武器 | 弩 | 暗金短矢（black_bolt） | 2 | 炼气后期 | 6 | 0 | 0 | 0 | 0 | 36 | 12 | 炼气后期才能拉开的弩。只能用暗金短矢，对付长着石甲的敌人尤其容易射穿。 | 额外穿甲 · 敌人标签 stoneborn · 加成 2 |
-| snow_halberd | 断雪戟 | 武器 | 长兵 |  | 2 | 炼气后期 | 6 | 1 | 0 | 0 | 0.06 | 42 | 12 | 炼气后期常使的长戟。重招来时能挑住外缘，再反钩卸去一股冲力。 | 额外护持 · 重招 · 加成 2 |
-| sky_sword | 归衡剑 | 武器 | 剑 |  | 3 | 筑基初期 | 6 | 1 | 0 | 2 | 0.04 | 48 | 15 | 筑基修士温养的衡剑。敌手收势防守时，剑会顺着中线钻进护身的缝。 | 额外穿甲 · 防御 · 加成 3 |
-| sky_bow | 鸣岳弓 | 武器 | 弓 | 包铁箭（iron_arrow）、凝光箭（cloud_arrow） | 3 | 筑基初期 | 7 | 0 | 0 | 1 | 0 | 44 | 15 | 筑基修士才能拉满的弓，按重箭的分量做成。只能用包铁箭或凝光箭。 |  |
-| frost_robe | 锁温袍 | 护具 |  |  | 2 | 炼气后期 | 0 | 4 | 7 | 2 | 0.1 | 43 | 13 | 炼气后期可穿的轻袍，能挡住对手抽走真气的招式，也便于脱身。 | 额外护持 · 吸取真气 · 加成 5 |
-| sky_cloak | 合纹披甲 | 护具 |  |  | 3 | 筑基初期 | 0 | 6 | 11 | 0 | 0.04 | 54 | 16 | 筑基修士可穿的厚甲。皮条和厚晶片分担冲力，最能挡住蓄力后的重击。 | 额外护持 · 重招 · 加成 3 |
-| jade_pendant | 照腕佩 | 饰物 |  |  | 3 | 筑基初期 | 0 | 1 | 3 | 7 | 0.14 | 51 | 16 | 筑基修士养气所用。手腕的浮光略闪，散掉的气便向内收。 |  |
-| weir_knife | 迎岸横刀 | 武器 | 剑 |  | 0 | 炼气初期 | 7 | 1 |  |  |  | 53 | 15 | 走水路的散修常带的宽背刀，入门便能用。用来挡对手蓄力后的重击，能卸掉一部分力道。 | 额外护持 · 重招 · 加成 2 |
-| coil_pole | 回烟长杖 | 武器 | 杖 |  | 4 | 筑基中期 | 8 | 2 |  | 4 |  | 62 | 22 | 筑基中期可用的长杖。杖里夹了铁片，既能挡招，也能存住更多真气。 |  |
-| foil_sword | 霜缝剑 | 武器 | 剑 |  | 5 | 筑基后期 | 10 | 1 |  | 3 |  | 66 | 25 | 筑基后期能用稳的细剑。对手摆出防守姿势时，剑尖反而更容易刺进护甲的缝里。 | 额外穿甲 · 防御 · 加成 4 |
-| lake_bow | 回湖弓 | 武器 | 弓 | 凝光箭（cloud_arrow）、照水重矢（clear_needle） | 5 | 筑基后期 | 9 |  |  |  |  | 59 | 23 | 筑基后期猎手用的湖弓，可以射凝光箭和照水重矢。对披毛的野兽伤害更高。 | 额外伤害 · 敌人标签 furred · 加成 3 |
-| gauze_armor | 水绡札甲 | 护具 |  |  | 4 | 筑基中期 |  | 8 | 12 | 4 |  | 70 | 25 | 筑基中期的护堤人常穿。胸口的甲片随呼吸开合，护身时也能存住更多真气。 |  |
-| fault_coat | 横渊雨衣 | 护具 |  |  | 6 | 金丹初期 |  | 10 | 16 | 6 |  | 76 | 33 | 金丹修士才穿得稳的雨衣。遇到会抽走真气的招式，能挡掉这招的一部分伤害。 | 额外护持 · 吸取真气 · 加成 5 |
-| coal_tassel | 焦灯剑穗 | 饰物 |  |  | 5 | 筑基后期 |  | 2 | 4 | 9 | 0.14 | 66 | 24 | 筑基后期可佩戴的旧剑穗。攥住它能稳住呼吸，也更容易抽身退开。 |  |
+| 标识 | 名称 | 装备部位 | 兵刃类别 | 用几只手 | 主动架重招减伤 | 适用弹药 | 境界要求 | 境界名 | 攻击 | 防御 | 气血上限修正 | 真气上限修正 | 脱身减伤加成 | 最大耐久 | 修理费（灵钱） | 玩家主动查读的词条 | 特殊作用与具体数值 | 野外作用 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| cudgel | 枣木杖 | 武器 | 杖 | 1 |  |  | 0 | 炼气初期 | 1 | 0 | 0 | 0 | 0 | 26 | 3 | 寻常行杖。出手稳当，力道偏轻，适合刚出门的散修。 |  |  |
+| knife | 割苇短刀 | 武器 | 刀 | 1 |  |  | 0 | 炼气初期 | 3 | 0 | 0 | 0 | 0 | 30 | 5 | 利落的凡制短刃。薄刃能从鳞缝里切进去，打披鳞的敌人时容易破防。 | 额外穿甲 · 敌人标签 scaled · 加成 2 |  |
+| split_axe | 劈柴小钺 | 武器 | 刀 | 1 |  |  | 0 | 炼气初期 | 4 | 0 | 0 | 0 | 0 | 38 | 4 | 下手有分量的厚刃，在常年劈柴的木户手里也经用。 |  |  |
+| short_spear | 摊市短矛 | 武器 | 长兵 | 1 |  |  | 0 | 炼气初期 | 4 | 1 | 0 | 0 | 0 | 27 | 7 | 村口巡守平日练的短矛。柄尾能架住近处来招，矛尖却薄，得时常修。 |  |  |
+| hook_blade | 渡口钩刃 | 武器 | 刀 | 1 |  |  | 0 | 炼气初期 | 5 | 0 | 0 | 0 | 0 | 31 | 6 | 拦滩客的备刀。分量略沉，寻常人也能劈得稳。 |  |  |
+| trail_cutter | 松场习刀 | 武器 | 刀 | 1 |  |  | 0 | 炼气初期 | 4 | 1 | 0 | 0 | 0 | 33 | 5 | 索棚比手的奖刀。护手宽，敢把刃从对手手边送过去。 |  |  |
+| star_blade | 暗星刀 | 武器 | 刀 | 1 |  |  | 0 | 炼气初期 | 6 | 0 | 0 | 0 | 0 | 37 | 11 | 照护矿人的旧式锻成，刀背厚，劈硬物时刃口容易吃住石缝。养气浅些也能握得稳。 | 额外穿甲 · 敌人标签 stoneborn · 加成 2 |  |
+| hide_shield | 包革小盾 | 副手 |  |  | 3 |  | 0 | 炼气初期 | 0 | 0 |  |  |  | 28 | 5 | 空出一只手便能用。防住蓄力后砸来的重招时，盾面能卸开一股力。 |  |  |
+| coil_spear | 绕脊枪 | 武器 | 长兵 | 2 |  |  | 0 | 炼气初期 | 6 | 0 | 0 | 0 | 0 | 45 | 10 | 练得不深也能贯穿整段枪势的重兵。枪杆经用，锻造却要吃掉一匣硬料。 |  |  |
+| reed_bow | 苇弦弓 | 武器 | 弓 | 2 |  | 削苇箭（reed_arrow）、包铁箭（iron_arrow） | 0 | 炼气初期 | 3 | 0 | 0 | 0 | 0 | 28 | 4 | 寻常猎弓，弓力温和。可用削苇箭或包铁箭，射入厚毛不易滑脱。 | 额外伤害 · 敌人标签 furred · 加成 2 |  |
+| iron_sword | 寒铁剑 | 武器 | 剑 | 1 |  |  | 0 | 炼气初期 | 5 | 0 | 0 | 0 | 0 | 38 | 8 | 不挑修为的实用剑。厚脊让劈刺都稳，常年巡矿也不用总补剑身。 |  |  |
+| tide_spear | 分潮枪 | 武器 | 长兵 | 2 |  |  | 1 | 炼气中期 | 5 | 0 | 0 | 1 | 0 | 45 | 10 | 炼气中期能端稳的长枪。顺着对手蓄势的空当刺过去，常能穿薄些的护甲。 | 额外穿甲 · 重招 · 加成 2 |  |
+| straw_cape | 蓑衣 | 身甲 |  |  |  |  | 0 | 炼气初期 | 0 | 1 | 3 | 0 | 0 | 24 | 3 | 渔人常穿的轻护具。能缓掉些寻常抓咬，遇到沉重来招仍须躲闪。 |  |  |
+| hide_coat | 泥蜕褂 | 身甲 |  |  |  |  | 0 | 炼气初期 | 0 | 2 | 5 | 0 | 0 | 29 | 5 | 结实的凡制软甲。泥蜕织面咬不住，能额外卸掉野兽来招的力道。 | 额外护持 · 敌人标签 beast · 加成 2 |  |
+| iron_coat | 叠铁袍 | 身甲 |  |  |  |  | 1 | 炼气中期 | 0 | 3 | 7 | 0 | 0 | 38 | 8 | 炼气中期用的重护具。叠铁护心能分散重击，接蓄势之后的重招更稳。 | 额外护持 · 重招 · 加成 2 |  |
+| tide_coat | 定潮甲 | 身甲 |  |  |  |  | 2 | 炼气后期 | 0 | 5 | 9 | -1 | 0 | 46 | 12 | 炼气后期用的厚甲。甲下气息走得窄，穿着时体内少容些真气。 |  |  |
+| reed_charm | 苇哨结 | 法器 |  |  |  |  | 0 | 炼气初期 | 0 | 0 | 0 | 2 | 0.05 | 25 | 3 | 小巧的凡制护符。苇声能帮助稳住真气，脱身时也能少挨些追击。 |  |  |
+| path_charm | 认路钱 | 法器 |  |  |  |  | 0 | 炼气初期 | 0 | 0 | 2 | 0 | 0.17 | 28 | 5 | 旧渡工用的护身钱。擅长在混乱中辨来路，撤出战斗时能少受追击。 |  |  |
+| bell_charm | 定声铃 | 法器 |  |  |  |  | 1 | 炼气中期 | 0 | 1 | 0 | 4 | 0.05 | 38 | 8 | 炼气中期可佩的无声小铃。能多存些真气，受击和撤退时也有一点保护。 |  |  |
+| tide_charm | 避潮玉 | 法器 |  |  |  |  | 2 | 炼气后期 | 0 | 1 | 4 | 3 | 0.2 | 46 | 12 | 炼气后期可佩的玉坠。能护身、储存真气，撤退时还能挡掉身后的部分追击。 |  |  |
+| jetty_charm | 回灯坠 | 法器 |  |  |  |  | 2 | 炼气后期 | 0 | 0 | 0 | 5 | 0.3 | 38 | 9 | 炼气后期可佩的旧渡口灯坠。能多存些真气，撤离险处时尤其能挡住追击。 |  |  |
+| pine_bow | 松筋长弓 | 武器 | 弓 | 2 |  | 削苇箭（reed_arrow）、包铁箭（iron_arrow） | 0 | 炼气初期 | 5 | 0 | 0 | 0 | 0 | 38 | 7 | 耐雨长弓。拉得稳又耐使，削苇箭和包铁箭都合弦。 |  |  |
+| resin_staff | 藏火杖 | 武器 | 杖 | 2 |  |  | 1 | 炼气中期 | 4 | 2 | 0 | 2 | 0 | 40 | 7 | 炉户用的厚杖。能架住来势，杖芯温热，持久行气时也趁手。 |  |  |
+| black_crossbow | 暗金机弩 | 武器 | 弩 | 2 |  | 暗金短矢（black_bolt） | 2 | 炼气后期 | 6 | 0 | 0 | 0 | 0 | 36 | 12 | 炼气后期才能拉开的弩。只能用暗金短矢，对付长着石甲的敌人尤其容易射穿。 | 额外穿甲 · 敌人标签 stoneborn · 加成 2 |  |
+| snow_halberd | 断雪戟 | 武器 | 长兵 | 2 |  |  | 2 | 炼气后期 | 6 | 1 | 0 | 0 | 0.06 | 42 | 12 | 炼气后期常使的长戟。重招来时能挑住外缘，再反钩卸去一股冲力。 | 额外护持 · 重招 · 加成 2 |  |
+| sky_sword | 归衡剑 | 武器 | 剑 | 1 |  |  | 3 | 筑基初期 | 6 | 1 | 0 | 2 | 0.04 | 48 | 15 | 筑基修士温养的衡剑。敌手收势防守时，剑会顺着中线钻进护身的缝。 | 额外穿甲 · 防御 · 加成 3 |  |
+| sky_bow | 鸣岳弓 | 武器 | 弓 | 2 |  | 包铁箭（iron_arrow）、凝光箭（cloud_arrow） | 3 | 筑基初期 | 7 | 0 | 0 | 1 | 0 | 44 | 15 | 筑基修士才能拉满的弓，按重箭的分量做成。只能用包铁箭或凝光箭。 |  |  |
+| frost_robe | 锁温袍 | 身甲 |  |  |  |  | 2 | 炼气后期 | 0 | 4 | 7 | 2 | 0.1 | 43 | 13 | 炼气后期可穿的轻袍，能挡住对手抽走真气的招式，也便于脱身。 | 额外护持 · 吸取真气 · 加成 5 |  |
+| sky_cloak | 合纹披甲 | 身甲 |  |  |  |  | 3 | 筑基初期 | 0 | 6 | 11 | 0 | 0.04 | 54 | 16 | 筑基修士可穿的厚甲。皮条和厚晶片分担冲力，最能挡住蓄力后的重击。 | 额外护持 · 重招 · 加成 3 |  |
+| jade_pendant | 照腕佩 | 法器 |  |  |  |  | 3 | 筑基初期 | 0 | 1 | 3 | 7 | 0.14 | 51 | 16 | 筑基修士养气所用。手腕的浮光略闪，散掉的气便向内收。 |  |  |
+| weir_knife | 迎岸横刀 | 武器 | 剑 | 1 |  |  | 0 | 炼气初期 | 7 | 1 |  |  |  | 53 | 15 | 走水路的散修常带的宽背刀，入门便能用。用来挡对手蓄力后的重击，能卸掉一部分力道。 | 额外护持 · 重招 · 加成 2 |  |
+| coil_pole | 回烟长杖 | 武器 | 杖 | 2 |  |  | 4 | 筑基中期 | 8 | 2 |  | 4 |  | 62 | 22 | 筑基中期可用的长杖。杖里的铁片能挡招、存真气。握着它走进雾里，能多探几处才开始消耗真气。 |  | 开始耗气的雾压上限 +2 |
+| foil_sword | 霜缝剑 | 武器 | 剑 | 1 |  |  | 5 | 筑基后期 | 10 | 1 |  | 3 |  | 66 | 25 | 筑基后期能用稳的细剑。对手摆出防守姿势时，剑尖反而更容易刺进护甲的缝里。 | 额外穿甲 · 防御 · 加成 4 |  |
+| lake_bow | 回湖弓 | 武器 | 弓 | 2 |  | 凝光箭（cloud_arrow）、照水重矢（clear_needle） | 5 | 筑基后期 | 9 |  |  |  |  | 59 | 23 | 筑基后期猎手用的湖弓，可以射凝光箭和照水重矢。对披毛的野兽伤害更高。 | 额外伤害 · 敌人标签 furred · 加成 3 |  |
+| gauze_armor | 水绡札甲 | 身甲 |  |  |  |  | 4 | 筑基中期 |  | 8 | 12 | 4 |  | 70 | 25 | 筑基中期的护堤人常穿。甲片随呼吸开合，能存住更多真气。护臂和裙甲也能减轻摸水采药、撬石时的撞擦。 |  | 每批采集减伤 3，至少受 1 点伤 |
+| fault_coat | 横渊雨衣 | 身甲 |  |  |  |  | 6 | 金丹初期 |  | 10 | 16 | 6 |  | 76 | 33 | 金丹修士才穿得稳的雨衣。能减轻抽取真气招式的伤害。在鸣沙州内走路时裹住衣襟挡沙，赶路也少耗些饱腹。 | 额外护持 · 吸取真气 · 加成 5 | 鸣沙境内普通步行耗粮 −25% |
+| coal_tassel | 焦灯剑穗 | 法器 |  |  |  |  | 5 | 筑基后期 |  | 2 | 4 | 9 | 0.14 | 66 | 24 | 筑基后期可佩戴的旧剑穗。攥住它能稳住呼吸，也更容易抽身退开。 |  |  |
+| ferry_pole | 渡工短篙 | 武器 | 杖 | 1 |  |  | 1 | 炼气中期 | 4 | 1 | 0 | 0 | 0.1 | 36 | 6 | 炼气中期使得稳的短篙。握得靠后能横架，想离开交手时也好借力退一步。 |  |  |
 
 ## 武器获取渠道
 
@@ -375,8 +392,7 @@
 | short_spear | 摊市短矛 | 制作 | r_short_spear | 9 | 寒铁（ore）×2、松木（wood）×4 |  |  | 是 |  |
 | hook_blade | 渡口钩刃 | 胜后另行领取 | 矮石堤（bank_watch） · 等拦滩客兑现交手的约定 |  |  | 拦滩客（bank_runner） |  | 否 |  |
 | trail_cutter | 松场习刀 | 胜后另行领取 | 索棚拳场（pine_spar） · 向轮值的守索人领试刀礼 |  |  | 松场巡索人（road_sparrer） | 8 | 是 |  |
-| star_blade | 暗星刀 | 制作 | r_star_blade | 24 | 暗金（black_iron）×6、灵晶（core）×3、松木（wood）×3 |  |  | 是 |  |
-| star_blade | 暗星刀 | 胜后另行领取 | 横肩偏井（deep_vein） · 翻开井外的旧工具柜 |  |  | 横肩矿傀（vein_sentinel） |  | 否 |  |
+| star_blade | 暗星刀 | 制作 | r_star_blade | 35 | 暗金（black_iron）×9、寒铁（ore）×5、灵晶（core）×4、松木（wood）×3 |  |  | 是 |  |
 | coil_spear | 绕脊枪 | 制作 | r_coil_spear | 28 | 暗金（black_iron）×5、松木（wood）×4、灵晶（core）×3 |  |  | 是 |  |
 | reed_bow | 苇弦弓 | 制作 | r_reed_bow | 4 | 松木（wood）×1、灵草（reed）×2 |  |  | 是 |  |
 | iron_sword | 寒铁剑 | 坊市 | 迟师傅·巡矿剑摊 | 33 |  |  | 12 | 是 | 拿寒铁换旧渡水图（sell_forging） |
@@ -388,10 +404,11 @@
 | snow_halberd | 断雪戟 | 制作 | r_snow_halberd | 28 | 暗金（black_iron）×6、松木（wood）×4、兽革（hide）×3 |  |  | 是 |  |
 | sky_sword | 归衡剑 | 制作 | r_sky_sword | 42 | 暗金（black_iron）×7、灵晶（core）×6、兽革（hide）×3 |  |  | 是 |  |
 | sky_bow | 鸣岳弓 | 制作 | r_sky_bow | 39 | 松木（wood）×8、灵晶（core）×6、兽革（hide）×6 |  |  | 是 |  |
-| weir_knife | 迎岸横刀 | 制作 | r_weir_knife | 29 | 寒铁（ore）×10、松木（wood）×6、兽革（hide）×3 |  |  | 是 |  |
-| coil_pole | 回烟长杖 | 制作 | r_coil_pole | 46 | 寒铁（ore）×12、暗金（black_iron）×8、松木（wood）×10、灵晶（core）×3 |  |  | 是 |  |
-| foil_sword | 霜缝剑 | 制作 | r_foil_sword | 67 | 寒铁（ore）×17、暗金（black_iron）×12、灵晶（core）×9、筑基期妖丹（foundation_core）×2 |  |  | 是 |  |
-| lake_bow | 回湖弓 | 制作 | r_lake_bow | 60 | 松木（wood）×16、兽革（hide）×9、灵晶（core）×11、筑基期妖丹（foundation_core）×1 |  |  | 是 |  |
+| weir_knife | 迎岸横刀 | 制作 | r_weir_knife | 36 | 寒铁（ore）×13、松木（wood）×6、兽革（hide）×4、灵晶（core）×2 |  |  | 是 |  |
+| coil_pole | 回烟长杖 | 制作 | r_coil_pole | 52 | 寒铁（ore）×12、暗金（black_iron）×10、松木（wood）×10、灵晶（core）×5、筑基期妖丹（foundation_core）×1 |  |  | 是 |  |
+| foil_sword | 霜缝剑 | 制作 | r_foil_sword | 74 | 寒铁（ore）×19、暗金（black_iron）×14、灵晶（core）×12、筑基期妖丹（foundation_core）×3 |  |  | 是 |  |
+| lake_bow | 回湖弓 | 制作 | r_lake_bow | 68 | 松木（wood）×16、兽革（hide）×10、灵晶（core）×13、暗金（black_iron）×4、筑基期妖丹（foundation_core）×2 |  |  | 是 |  |
+| ferry_pole | 渡工短篙 | 现场获得 | 背风灯台（wharf_lee_lamp） · 用松木给灯台补两只脚 |  |  |  |  | 否 |  |
 
 ## 弹药与命中效果
 
@@ -536,17 +553,18 @@
 | r_sky_bow | 鸣岳弓（sky_bow） | 1 | 3 | 筑基初期 | 39 | 松木（wood）×8、灵晶（core）×6、兽革（hide）×6 | 4 | 得知物品 落影调枢图（axis_tuning） |  |  | 锻炉（forge） | 3 |
 | r_sky_cloak | 合纹披甲（sky_cloak） | 1 | 3 | 筑基初期 | 36 | 兽革（hide）×8、灵晶（core）×5 | 4 | 得知物品 玉片披甲的接丝账（loom_tack） |  |  | 锻炉（forge） | 3 |
 | r_jade_pendant | 照腕佩（jade_pendant） | 1 | 3 | 筑基初期 | 26 | 灵晶（core）×5、兽革（hide）×3、妖目（beast_eye）×1 | 3 | 得知物品 落影调枢图（axis_tuning） |  |  | 锻炉（forge） | 2 |
-| r_star_blade | 暗星刀（star_blade） | 1 | 2 | 炼气后期 | 24 | 暗金（black_iron）×6、灵晶（core）×3、松木（wood）×3 | 3.5 | 得知物品 暗星刀匣底图（star_blade_pattern） |  |  | 锻炉（forge） | 2 |
+| r_star_blade | 暗星刀（star_blade） | 1 | 2 | 炼气后期 | 35 | 暗金（black_iron）×9、寒铁（ore）×5、灵晶（core）×4、松木（wood）×3 | 4 | 得知物品 暗星刀匣底图（star_blade_pattern） |  |  | 锻炉（forge） | 2 |
+| r_hide_shield | 包革小盾（hide_shield） | 1 | 0 | 炼气初期 | 8 | 松木（wood）×4、兽革（hide）×3 | 1.25 |  | 是 |  | 锻炉（forge） |  |
 | r_resin_pill | 温枝丸（resin_pill） | 3 | 1 | 炼气中期 | 6 | 松木（wood）×3、灵草（reed）×3、炼气期妖丹（qi_core）×1 | 2 |  |  | 温枝丸丹方（formula_resin） | 炼丹炉（furnace） |  |
 | r_leaf_pill | 清脉饮（leaf_pill） | 3 | 2 | 炼气后期 | 10 | 灵草（reed）×4、耐火泥（kiln_clay）×2、松木（wood）×2、炼气期妖丹（qi_core）×2 | 3 |  |  | 清脉饮丹方（formula_leaf） | 炼丹炉（furnace） | 2 |
 | r_jade_pill | 照心露（jade_pill） | 3 | 3 | 筑基初期 | 16 | 灵草（reed）×5、灵晶（core）×2、松木（wood）×2、筑基期妖丹（foundation_core）×1、妖目（beast_eye）×1 | 4 |  |  | 照心露丹方（formula_jade） | 炼丹炉（furnace） | 3 |
 | r_foundation | 筑基丹（foundation_pill） | 1 | 2 | 炼气后期 | 45 | 封炉药引（foundation_charge）×1、灵草（reed）×8、灵晶（core）×8、暗金（black_iron）×4 | 4 |  |  | 筑基丹方（formula_foundation） | 炼丹炉（furnace） | 2 |
 | r_gate_scroll | 传送卷轴（gate_scroll） | 2 | 0 | 炼气初期 | 5 | 松木（wood）×1、灵草（reed）×1、灵晶（core）×1 | 0.5 |  |  | 传送卷轴图纸（gate_scroll_formula） |  |  |
 | r_gold_powder | 结丹散（gold_powder） | 1 | 5 | 筑基后期 | 118 | 伏潮息泥（heart_silt）×1、井心水盐（stillwell_salt）×1、灵草（reed）×28、灵晶（core）×24、暗金（black_iron）×15、筑基期妖丹（foundation_core）×5 | 9 |  |  | 结丹散丹方（gold_formula） | 炼丹炉（furnace） | 3 |
-| r_weir_knife | 迎岸横刀（weir_knife） |  | 1 | 炼气中期 | 29 | 寒铁（ore）×10、松木（wood）×6、兽革（hide）×3 | 3 | 得知物品 倒浪楔（undertow_wedge） |  |  | 锻炉（forge） | 2 |
-| r_coil_pole | 回烟长杖（coil_pole） |  | 4 | 筑基中期 | 46 | 寒铁（ore）×12、暗金（black_iron）×8、松木（wood）×10、灵晶（core）×3 | 5 | 得知物品 听矿铜簧（echo_tuning_key） |  |  | 锻炉（forge） | 2 |
-| r_foil_sword | 霜缝剑（foil_sword） |  | 5 | 筑基后期 | 67 | 寒铁（ore）×17、暗金（black_iron）×12、灵晶（core）×9、筑基期妖丹（foundation_core）×2 | 6 | 得知物品 冷炉验火册（cold_kiln_record） |  |  | 锻炉（forge） | 3 |
-| r_lake_bow | 回湖弓（lake_bow） |  | 5 | 筑基后期 | 60 | 松木（wood）×16、兽革（hide）×9、灵晶（core）×11、筑基期妖丹（foundation_core）×1 | 5 | 得知物品 伏潮漏图（phase_chart） |  |  | 锻炉（forge） | 3 |
+| r_weir_knife | 迎岸横刀（weir_knife） |  | 1 | 炼气中期 | 36 | 寒铁（ore）×13、松木（wood）×6、兽革（hide）×4、灵晶（core）×2 | 4 | 得知物品 倒浪楔（undertow_wedge） |  |  | 锻炉（forge） | 2 |
+| r_coil_pole | 回烟长杖（coil_pole） |  | 4 | 筑基中期 | 52 | 寒铁（ore）×12、暗金（black_iron）×10、松木（wood）×10、灵晶（core）×5、筑基期妖丹（foundation_core）×1 | 6 | 得知物品 听矿铜簧（echo_tuning_key） |  |  | 锻炉（forge） | 2 |
+| r_foil_sword | 霜缝剑（foil_sword） |  | 5 | 筑基后期 | 74 | 寒铁（ore）×19、暗金（black_iron）×14、灵晶（core）×12、筑基期妖丹（foundation_core）×3 | 7 | 得知物品 冷炉验火册（cold_kiln_record） |  |  | 锻炉（forge） | 3 |
+| r_lake_bow | 回湖弓（lake_bow） |  | 5 | 筑基后期 | 68 | 松木（wood）×16、兽革（hide）×10、灵晶（core）×13、暗金（black_iron）×4、筑基期妖丹（foundation_core）×2 | 6 | 得知物品 伏潮漏图（phase_chart） |  |  | 锻炉（forge） | 3 |
 | r_gauze_armor | 水绡札甲（gauze_armor） |  | 4 | 筑基中期 | 48 | 兽革（hide）×12、寒铁（ore）×11、灵晶（core）×5 | 5 | 得知物品 倒浪楔（undertow_wedge） |  |  | 锻炉（forge） | 2 |
 | r_fault_coat | 横渊雨衣（fault_coat） |  | 6 | 金丹初期 | 78 | 兽革（hide）×16、寒铁（ore）×14、暗金（black_iron）×17、金丹期妖丹（gold_core）×2 | 7 | 得知物品 结丹散丹方（gold_formula） |  |  | 锻炉（forge） | 3 |
 | r_coal_tassel | 焦灯剑穗（coal_tassel） |  | 5 | 筑基后期 | 58 | 灵草（reed）×14、松木（wood）×12、灵晶（core）×11、暗金（black_iron）×7 | 5 | 得知物品 冷炉验火册（cold_kiln_record） |  |  | 锻炉（forge） | 2 |
@@ -579,7 +597,7 @@
 | lantern_court | 系灯院 | 雾梁州（wuliang） | 86 | 34 | 青崖松场（pine_ridge）、跃鱼旧渠（fish_ladder） | 宗门 | 是 | 否 | 1 | 炼气中期 | 1.5 |  | 院中有井有灶。日落后有人给运货的山路挂灯，通行帖就搁在院门的长凳上。 |  |
 | undertow_grotto | 回潮母洞 | 雾梁州（wuliang） | 53 | 78 | 白苇滩（marsh） |  | 否 | 否 | 6 | 金丹初期 | 0.5 | 得知物品 回潮洞引线（undertow_entry） | 薄薄的岩壁两侧各流过一股水。洞里隆起一道石脊，潮水淹不到。贴着洞顶的路比脚下的泥地稳。 | 是 |
 | counter_bell | 反声钟窟 | 雾梁州（wuliang） | 52 | 49 | 沉钟岭（ridge） |  | 否 | 否 | 5 | 筑基后期 | 0.75 | 得知物品 反声孔通路（counter_bell_entry） | 倒钟下是一条窄通道。墙边干燥的地方架着一排信，两侧的小孔还能听见地面传来的响声。 | 是 |
-| zhao_city | 照原城 | 照原州（zhaoyuan） | 13 | 48 | 闭潮渡（ford）、青埂（green_dyke）、杨木水栈（flood_market）、守尺观（measuring_hall） | 城池 | 是 | 是 | 0 | 炼气初期 | 1.25 |  | 城砖半边泛白，是上一回洪峰留下的痕。城门内有粥铺与省潮司。 |  |
+| zhao_city | 照原城 | 照原州（zhaoyuan） | 13 | 48 | 闭潮渡（ford）、青埂（green_dyke）、杨木水栈（flood_market）、守尺观（measuring_hall） | 城池 | 是 | 是 | 0 | 炼气初期 | 1.25 |  | 城砖半边泛白，是上一回洪峰留下的痕。粥铺挨着省潮司，铁货摊后传出磨刀声。 |  |
 | green_dyke | 青埂 | 照原州（zhaoyuan） | 25 | 29 | 蛙背塘（frog_pond）、没顶刻碑（old_marker）、连环浅洲（ring_isles） |  | 否 | 否 | 0 | 炼气初期 | 0.75 |  | 田埂两侧都长着芦苇，只有一侧的苇叶被涨水淹过。 |  |
 | flood_market | 杨木水栈 | 照原州（zhaoyuan） | 26 | 62 | 白鹤粮仓（crane_granary）、叠石驿关（zhao_pass）、碎琉璃滩（glass_bank） |  | 否 | 否 | 0 | 炼气初期 | 0.75 |  | 接船的木台漂在水上，钉子上挂着写有各家姓氏的货签。 |  |
 | measuring_hall | 守尺观 | 照原州（zhaoyuan） | 32 | 45 | 没顶刻碑（old_marker）、挂炭坳（charcoal_ridge） | 宗门 | 是 | 否 | 1 | 炼气中期 | 1 |  | 乌瓦院门晾着测水绳，来客和弟子在同一间灶房用饭。 |  |
@@ -601,7 +619,7 @@
 | beacon_reefs | 望船排礁 | 照原州（zhaoyuan） | 72 | 86 |  |  | 否 | 否 | 1 | 炼气中期 | 1.25 |  | 礁石上的灯快灭了，灯下拴着一支接货小船用的桨。 |  |
 | mingsha_city | 鸣沙城 | 鸣沙州（mingsha） | 16 | 58 | 叠石驿关（zhao_pass）、炭篷驿（cinder_inn）、叩石院（sand_bell_cloister）、断纬帐道（silk_tent_road）、担盐岗（salt_ledger_barrows） | 州城 | 是 | 是 | 1 | 炼气中期 | 1 |  | 城墙折了两道弯，挡住低处卷来的沙。进城就能看见登记用井的屋子、客店，以及用铁条封住的旧传送阵。 |  |
 | cinder_inn | 炭篷驿 | 鸣沙州（mingsha） | 13 | 74 | 鸣沙城（mingsha_city）、砾盘浅沟（bone_dry_rill）、覆瓦旱畦（kiln_roof_farm） | 驿镇 | 是 | 否 | 0 | 炼气初期 | 0.75 |  | 三口铁锅架在同一棚下。负责换马的杨芹在背风墙内收拾上下铺。 |  |
-| sand_bell_cloister | 叩石院 | 鸣沙州（mingsha） | 39 | 57 | 鸣沙城（mingsha_city）、架风板（wind_slate）、并磨坊（guest_mill）、横生脉（hanging_vein） | 宗门 | 是 | 否 | 2 | 炼气后期 | 1 |  | 学徒敲着两块吊起来的石头听回声。客人能在外院歇脚，里面还有一间做发声铜片的工坊。 |  |
+| sand_bell_cloister | 叩石院 | 鸣沙州（mingsha） | 39 | 57 | 鸣沙城（mingsha_city）、架风板（wind_slate）、并磨坊（guest_mill）、横生脉（hanging_vein） | 宗门 | 是 | 否 | 2 | 炼气后期 | 1 |  | 学徒敲着两块吊起来的石头听回声。外院有客房，门外有铺着旧毡的修具台。 |  |
 | silk_tent_road | 断纬帐道 | 鸣沙州（mingsha） | 26 | 69 | 鸣沙城（mingsha_city）、并磨坊（guest_mill）、伏兔草丘（camel_grass_dunes） |  | 否 | 否 | 1 | 炼气中期 | 1 |  | 剪掉半幅的旧帐挂在路标上。行队在帐的阴影里翻晒湿绳。 |  |
 | salt_ledger_barrows | 担盐岗 | 鸣沙州（mingsha） | 27 | 43 | 鸣沙城（mingsha_city）、静盐井口（stillwell_mouth）、白蹄旧道（chalk_hoof_trail） |  | 否 | 否 | 1 | 炼气中期 | 1 |  | 看秤的人把旧井票夹在带蹄印的石头下面。坡脚还搁着挑盐的旧扁担，木面晒出一层白霜。 |  |
 | stillwell_mouth | 静盐井口 | 鸣沙州（mingsha） | 36 | 37 | 担盐岗（salt_ledger_barrows）、静盐井心（stillwell_vault）、空音桥（dry_sound_bridge） |  | 否 | 否 | 1 | 炼气中期 | 1.25 |  | 拱形的井口有两道半圆槽，空槽旁还剩几行开关井口的说明。井绳在卷绳的石轮上来回磨。 |  |
@@ -656,7 +674,7 @@
 | 照原城（zhao_city） | wood | 松木 | 5 | 8 | 10 | 4 |  |
 | 照原城（zhao_city） | salve | 松脂膏 | 13 | 5 | 6 | 4 |  |
 | 照原城（zhao_city） | ore | 寒铁 | 12 | 6 | 8 | 4 |  |
-| 照原城（zhao_city） | weir_knife | 迎岸横刀 | 94 | 1 | 1 | 18 |  |
+| 照原城（zhao_city） | weir_knife | 迎岸横刀 | 118 | 1 | 1 | 18 |  |
 | 守尺观（measuring_hall） | ration | 干粮 | 4 | 8 | 10 | 4 |  |
 | 守尺观（measuring_hall） | heal_pill | 合络丹 | 27 | 3 | 4 | 6 |  |
 | 守尺观（measuring_hall） | leaf_pill | 清脉饮 | 37 | 2 | 3 | 7 |  |
@@ -699,6 +717,7 @@
 | 落灯村（village） | hook_blade | 渡口钩刃 | 15 |
 | 落灯村（village） | trail_cutter | 松场习刀 | 11 |
 | 落灯村（village） | star_blade | 暗星刀 | 29 |
+| 落灯村（village） | hide_shield | 包革小盾 | 9 |
 | 落灯村（village） | coil_spear | 绕脊枪 | 25 |
 | 落灯村（village） | reed_bow | 苇弦弓 | 8 |
 | 落灯村（village） | iron_sword | 寒铁剑 | 14 |
@@ -744,6 +763,7 @@
 | 落灯村（village） | gauze_armor | 水绡札甲 | 48 |
 | 落灯村（village） | fault_coat | 横渊雨衣 | 61 |
 | 落灯村（village） | coal_tassel | 焦灯剑穗 | 44 |
+| 落灯村（village） | ferry_pole | 渡工短篙 | 8 |
 | 折水驿（willow_post） | ration | 干粮 | 1 |
 | 折水驿（willow_post） | wood | 松木 | 1 |
 | 折水驿（willow_post） | reed | 灵草 | 2 |
@@ -767,6 +787,7 @@
 | 折水驿（willow_post） | hook_blade | 渡口钩刃 | 15 |
 | 折水驿（willow_post） | trail_cutter | 松场习刀 | 11 |
 | 折水驿（willow_post） | star_blade | 暗星刀 | 29 |
+| 折水驿（willow_post） | hide_shield | 包革小盾 | 9 |
 | 折水驿（willow_post） | coil_spear | 绕脊枪 | 25 |
 | 折水驿（willow_post） | reed_bow | 苇弦弓 | 8 |
 | 折水驿（willow_post） | iron_sword | 寒铁剑 | 14 |
@@ -812,6 +833,7 @@
 | 折水驿（willow_post） | gauze_armor | 水绡札甲 | 48 |
 | 折水驿（willow_post） | fault_coat | 横渊雨衣 | 61 |
 | 折水驿（willow_post） | coal_tassel | 焦灯剑穗 | 44 |
+| 折水驿（willow_post） | ferry_pole | 渡工短篙 | 8 |
 | 系灯院（lantern_court） | ration | 干粮 | 1 |
 | 系灯院（lantern_court） | wood | 松木 | 2 |
 | 系灯院（lantern_court） | reed | 灵草 | 2 |
@@ -835,6 +857,7 @@
 | 系灯院（lantern_court） | hook_blade | 渡口钩刃 | 15 |
 | 系灯院（lantern_court） | trail_cutter | 松场习刀 | 11 |
 | 系灯院（lantern_court） | star_blade | 暗星刀 | 29 |
+| 系灯院（lantern_court） | hide_shield | 包革小盾 | 9 |
 | 系灯院（lantern_court） | coil_spear | 绕脊枪 | 25 |
 | 系灯院（lantern_court） | reed_bow | 苇弦弓 | 8 |
 | 系灯院（lantern_court） | iron_sword | 寒铁剑 | 14 |
@@ -880,6 +903,7 @@
 | 系灯院（lantern_court） | gauze_armor | 水绡札甲 | 48 |
 | 系灯院（lantern_court） | fault_coat | 横渊雨衣 | 61 |
 | 系灯院（lantern_court） | coal_tassel | 焦灯剑穗 | 44 |
+| 系灯院（lantern_court） | ferry_pole | 渡工短篙 | 8 |
 | 照原城（zhao_city） | ration | 干粮 | 1 |
 | 照原城（zhao_city） | wood | 松木 | 1 |
 | 照原城（zhao_city） | reed | 灵草 | 2 |
@@ -903,6 +927,7 @@
 | 照原城（zhao_city） | hook_blade | 渡口钩刃 | 15 |
 | 照原城（zhao_city） | trail_cutter | 松场习刀 | 11 |
 | 照原城（zhao_city） | star_blade | 暗星刀 | 29 |
+| 照原城（zhao_city） | hide_shield | 包革小盾 | 9 |
 | 照原城（zhao_city） | coil_spear | 绕脊枪 | 25 |
 | 照原城（zhao_city） | reed_bow | 苇弦弓 | 8 |
 | 照原城（zhao_city） | iron_sword | 寒铁剑 | 14 |
@@ -948,6 +973,7 @@
 | 照原城（zhao_city） | gauze_armor | 水绡札甲 | 48 |
 | 照原城（zhao_city） | fault_coat | 横渊雨衣 | 61 |
 | 照原城（zhao_city） | coal_tassel | 焦灯剑穗 | 44 |
+| 照原城（zhao_city） | ferry_pole | 渡工短篙 | 8 |
 | 守尺观（measuring_hall） | ration | 干粮 | 1 |
 | 守尺观（measuring_hall） | wood | 松木 | 1 |
 | 守尺观（measuring_hall） | reed | 灵草 | 2 |
@@ -971,6 +997,7 @@
 | 守尺观（measuring_hall） | hook_blade | 渡口钩刃 | 15 |
 | 守尺观（measuring_hall） | trail_cutter | 松场习刀 | 11 |
 | 守尺观（measuring_hall） | star_blade | 暗星刀 | 29 |
+| 守尺观（measuring_hall） | hide_shield | 包革小盾 | 9 |
 | 守尺观（measuring_hall） | coil_spear | 绕脊枪 | 25 |
 | 守尺观（measuring_hall） | reed_bow | 苇弦弓 | 8 |
 | 守尺观（measuring_hall） | iron_sword | 寒铁剑 | 14 |
@@ -1016,6 +1043,7 @@
 | 守尺观（measuring_hall） | gauze_armor | 水绡札甲 | 48 |
 | 守尺观（measuring_hall） | fault_coat | 横渊雨衣 | 61 |
 | 守尺观（measuring_hall） | coal_tassel | 焦灯剑穗 | 44 |
+| 守尺观（measuring_hall） | ferry_pole | 渡工短篙 | 8 |
 | 鸣沙城（mingsha_city） | ration | 干粮 | 1 |
 | 鸣沙城（mingsha_city） | wood | 松木 | 1 |
 | 鸣沙城（mingsha_city） | reed | 灵草 | 2 |
@@ -1039,6 +1067,7 @@
 | 鸣沙城（mingsha_city） | hook_blade | 渡口钩刃 | 15 |
 | 鸣沙城（mingsha_city） | trail_cutter | 松场习刀 | 11 |
 | 鸣沙城（mingsha_city） | star_blade | 暗星刀 | 29 |
+| 鸣沙城（mingsha_city） | hide_shield | 包革小盾 | 9 |
 | 鸣沙城（mingsha_city） | coil_spear | 绕脊枪 | 25 |
 | 鸣沙城（mingsha_city） | reed_bow | 苇弦弓 | 8 |
 | 鸣沙城（mingsha_city） | iron_sword | 寒铁剑 | 14 |
@@ -1084,6 +1113,7 @@
 | 鸣沙城（mingsha_city） | gauze_armor | 水绡札甲 | 48 |
 | 鸣沙城（mingsha_city） | fault_coat | 横渊雨衣 | 61 |
 | 鸣沙城（mingsha_city） | coal_tassel | 焦灯剑穗 | 44 |
+| 鸣沙城（mingsha_city） | ferry_pole | 渡工短篙 | 8 |
 | 炭篷驿（cinder_inn） | ration | 干粮 | 1 |
 | 炭篷驿（cinder_inn） | wood | 松木 | 2 |
 | 炭篷驿（cinder_inn） | reed | 灵草 | 2 |
@@ -1107,6 +1137,7 @@
 | 炭篷驿（cinder_inn） | hook_blade | 渡口钩刃 | 15 |
 | 炭篷驿（cinder_inn） | trail_cutter | 松场习刀 | 11 |
 | 炭篷驿（cinder_inn） | star_blade | 暗星刀 | 29 |
+| 炭篷驿（cinder_inn） | hide_shield | 包革小盾 | 9 |
 | 炭篷驿（cinder_inn） | coil_spear | 绕脊枪 | 25 |
 | 炭篷驿（cinder_inn） | reed_bow | 苇弦弓 | 8 |
 | 炭篷驿（cinder_inn） | iron_sword | 寒铁剑 | 14 |
@@ -1152,6 +1183,7 @@
 | 炭篷驿（cinder_inn） | gauze_armor | 水绡札甲 | 48 |
 | 炭篷驿（cinder_inn） | fault_coat | 横渊雨衣 | 61 |
 | 炭篷驿（cinder_inn） | coal_tassel | 焦灯剑穗 | 44 |
+| 炭篷驿（cinder_inn） | ferry_pole | 渡工短篙 | 8 |
 | 叩石院（sand_bell_cloister） | ration | 干粮 | 1 |
 | 叩石院（sand_bell_cloister） | wood | 松木 | 1 |
 | 叩石院（sand_bell_cloister） | reed | 灵草 | 2 |
@@ -1175,6 +1207,7 @@
 | 叩石院（sand_bell_cloister） | hook_blade | 渡口钩刃 | 15 |
 | 叩石院（sand_bell_cloister） | trail_cutter | 松场习刀 | 11 |
 | 叩石院（sand_bell_cloister） | star_blade | 暗星刀 | 29 |
+| 叩石院（sand_bell_cloister） | hide_shield | 包革小盾 | 9 |
 | 叩石院（sand_bell_cloister） | coil_spear | 绕脊枪 | 25 |
 | 叩石院（sand_bell_cloister） | reed_bow | 苇弦弓 | 8 |
 | 叩石院（sand_bell_cloister） | iron_sword | 寒铁剑 | 14 |
@@ -1220,6 +1253,143 @@
 | 叩石院（sand_bell_cloister） | gauze_armor | 水绡札甲 | 48 |
 | 叩石院（sand_bell_cloister） | fault_coat | 横渊雨衣 | 61 |
 | 叩石院（sand_bell_cloister） | coal_tassel | 焦灯剑穗 | 44 |
+| 叩石院（sand_bell_cloister） | ferry_pole | 渡工短篙 | 8 |
+
+## 接修地点与逐件工钱
+
+只接修玩家随身或穿在身上的装备。报价按件，支付灵钱后立即修满。
+
+| 所属地区 | 修具处 | 标识 | 名称 | 异地加价（灵钱） | 修满费用（灵钱） |
+| --- | --- | --- | --- | --- | --- |
+| 落灯村（village） | 落灯村工坊 | cudgel | 枣木杖 | 0 | 3 |
+| 落灯村（village） | 落灯村工坊 | knife | 割苇短刀 | 0 | 5 |
+| 落灯村（village） | 落灯村工坊 | split_axe | 劈柴小钺 | 0 | 4 |
+| 落灯村（village） | 落灯村工坊 | short_spear | 摊市短矛 | 0 | 7 |
+| 落灯村（village） | 落灯村工坊 | hook_blade | 渡口钩刃 | 0 | 6 |
+| 落灯村（village） | 落灯村工坊 | trail_cutter | 松场习刀 | 0 | 5 |
+| 落灯村（village） | 落灯村工坊 | star_blade | 暗星刀 | 0 | 11 |
+| 落灯村（village） | 落灯村工坊 | hide_shield | 包革小盾 | 0 | 5 |
+| 落灯村（village） | 落灯村工坊 | coil_spear | 绕脊枪 | 0 | 10 |
+| 落灯村（village） | 落灯村工坊 | reed_bow | 苇弦弓 | 0 | 4 |
+| 落灯村（village） | 落灯村工坊 | iron_sword | 寒铁剑 | 0 | 8 |
+| 落灯村（village） | 落灯村工坊 | tide_spear | 分潮枪 | 0 | 10 |
+| 落灯村（village） | 落灯村工坊 | straw_cape | 蓑衣 | 0 | 3 |
+| 落灯村（village） | 落灯村工坊 | hide_coat | 泥蜕褂 | 0 | 5 |
+| 落灯村（village） | 落灯村工坊 | iron_coat | 叠铁袍 | 0 | 8 |
+| 落灯村（village） | 落灯村工坊 | tide_coat | 定潮甲 | 0 | 12 |
+| 落灯村（village） | 落灯村工坊 | reed_charm | 苇哨结 | 0 | 3 |
+| 落灯村（village） | 落灯村工坊 | path_charm | 认路钱 | 0 | 5 |
+| 落灯村（village） | 落灯村工坊 | bell_charm | 定声铃 | 0 | 8 |
+| 落灯村（village） | 落灯村工坊 | tide_charm | 避潮玉 | 0 | 12 |
+| 落灯村（village） | 落灯村工坊 | jetty_charm | 回灯坠 | 0 | 9 |
+| 落灯村（village） | 落灯村工坊 | pine_bow | 松筋长弓 | 0 | 7 |
+| 落灯村（village） | 落灯村工坊 | resin_staff | 藏火杖 | 0 | 7 |
+| 落灯村（village） | 落灯村工坊 | black_crossbow | 暗金机弩 | 0 | 12 |
+| 落灯村（village） | 落灯村工坊 | snow_halberd | 断雪戟 | 0 | 12 |
+| 落灯村（village） | 落灯村工坊 | sky_sword | 归衡剑 | 0 | 15 |
+| 落灯村（village） | 落灯村工坊 | sky_bow | 鸣岳弓 | 0 | 15 |
+| 落灯村（village） | 落灯村工坊 | frost_robe | 锁温袍 | 0 | 13 |
+| 落灯村（village） | 落灯村工坊 | sky_cloak | 合纹披甲 | 0 | 16 |
+| 落灯村（village） | 落灯村工坊 | jade_pendant | 照腕佩 | 0 | 16 |
+| 落灯村（village） | 落灯村工坊 | weir_knife | 迎岸横刀 | 0 | 15 |
+| 落灯村（village） | 落灯村工坊 | coil_pole | 回烟长杖 | 0 | 22 |
+| 落灯村（village） | 落灯村工坊 | foil_sword | 霜缝剑 | 0 | 25 |
+| 落灯村（village） | 落灯村工坊 | lake_bow | 回湖弓 | 0 | 23 |
+| 落灯村（village） | 落灯村工坊 | gauze_armor | 水绡札甲 | 0 | 25 |
+| 落灯村（village） | 落灯村工坊 | fault_coat | 横渊雨衣 | 0 | 33 |
+| 落灯村（village） | 落灯村工坊 | coal_tassel | 焦灯剑穗 | 0 | 24 |
+| 落灯村（village） | 落灯村工坊 | ferry_pole | 渡工短篙 | 0 | 6 |
+| 照原城（zhao_city） | 蒲霖的后炉 | cudgel | 枣木杖 | 2 | 5 |
+| 照原城（zhao_city） | 蒲霖的后炉 | knife | 割苇短刀 | 2 | 7 |
+| 照原城（zhao_city） | 蒲霖的后炉 | split_axe | 劈柴小钺 | 2 | 6 |
+| 照原城（zhao_city） | 蒲霖的后炉 | short_spear | 摊市短矛 | 2 | 9 |
+| 照原城（zhao_city） | 蒲霖的后炉 | hook_blade | 渡口钩刃 | 2 | 8 |
+| 照原城（zhao_city） | 蒲霖的后炉 | trail_cutter | 松场习刀 | 2 | 7 |
+| 照原城（zhao_city） | 蒲霖的后炉 | star_blade | 暗星刀 | 2 | 13 |
+| 照原城（zhao_city） | 蒲霖的后炉 | hide_shield | 包革小盾 | 2 | 7 |
+| 照原城（zhao_city） | 蒲霖的后炉 | coil_spear | 绕脊枪 | 2 | 12 |
+| 照原城（zhao_city） | 蒲霖的后炉 | reed_bow | 苇弦弓 | 2 | 6 |
+| 照原城（zhao_city） | 蒲霖的后炉 | iron_sword | 寒铁剑 | 2 | 10 |
+| 照原城（zhao_city） | 蒲霖的后炉 | tide_spear | 分潮枪 | 2 | 12 |
+| 照原城（zhao_city） | 蒲霖的后炉 | straw_cape | 蓑衣 | 2 | 5 |
+| 照原城（zhao_city） | 蒲霖的后炉 | hide_coat | 泥蜕褂 | 2 | 7 |
+| 照原城（zhao_city） | 蒲霖的后炉 | iron_coat | 叠铁袍 | 2 | 10 |
+| 照原城（zhao_city） | 蒲霖的后炉 | tide_coat | 定潮甲 | 2 | 14 |
+| 照原城（zhao_city） | 蒲霖的后炉 | reed_charm | 苇哨结 | 2 | 5 |
+| 照原城（zhao_city） | 蒲霖的后炉 | path_charm | 认路钱 | 2 | 7 |
+| 照原城（zhao_city） | 蒲霖的后炉 | bell_charm | 定声铃 | 2 | 10 |
+| 照原城（zhao_city） | 蒲霖的后炉 | tide_charm | 避潮玉 | 2 | 14 |
+| 照原城（zhao_city） | 蒲霖的后炉 | jetty_charm | 回灯坠 | 2 | 11 |
+| 照原城（zhao_city） | 蒲霖的后炉 | pine_bow | 松筋长弓 | 2 | 9 |
+| 照原城（zhao_city） | 蒲霖的后炉 | resin_staff | 藏火杖 | 2 | 9 |
+| 照原城（zhao_city） | 蒲霖的后炉 | black_crossbow | 暗金机弩 | 2 | 14 |
+| 照原城（zhao_city） | 蒲霖的后炉 | snow_halberd | 断雪戟 | 2 | 14 |
+| 照原城（zhao_city） | 蒲霖的后炉 | sky_sword | 归衡剑 | 2 | 17 |
+| 照原城（zhao_city） | 蒲霖的后炉 | sky_bow | 鸣岳弓 | 2 | 17 |
+| 照原城（zhao_city） | 蒲霖的后炉 | frost_robe | 锁温袍 | 2 | 15 |
+| 照原城（zhao_city） | 蒲霖的后炉 | sky_cloak | 合纹披甲 | 2 | 18 |
+| 照原城（zhao_city） | 蒲霖的后炉 | jade_pendant | 照腕佩 | 2 | 18 |
+| 照原城（zhao_city） | 蒲霖的后炉 | weir_knife | 迎岸横刀 | 2 | 17 |
+| 照原城（zhao_city） | 蒲霖的后炉 | coil_pole | 回烟长杖 | 2 | 24 |
+| 照原城（zhao_city） | 蒲霖的后炉 | foil_sword | 霜缝剑 | 2 | 27 |
+| 照原城（zhao_city） | 蒲霖的后炉 | lake_bow | 回湖弓 | 2 | 25 |
+| 照原城（zhao_city） | 蒲霖的后炉 | gauze_armor | 水绡札甲 | 2 | 27 |
+| 照原城（zhao_city） | 蒲霖的后炉 | fault_coat | 横渊雨衣 | 2 | 35 |
+| 照原城（zhao_city） | 蒲霖的后炉 | coal_tassel | 焦灯剑穗 | 2 | 26 |
+| 照原城（zhao_city） | 蒲霖的后炉 | ferry_pole | 渡工短篙 | 2 | 8 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | cudgel | 枣木杖 | 3 | 6 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | knife | 割苇短刀 | 3 | 8 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | split_axe | 劈柴小钺 | 3 | 7 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | short_spear | 摊市短矛 | 3 | 10 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | hook_blade | 渡口钩刃 | 3 | 9 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | trail_cutter | 松场习刀 | 3 | 8 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | star_blade | 暗星刀 | 3 | 14 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | hide_shield | 包革小盾 | 3 | 8 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | coil_spear | 绕脊枪 | 3 | 13 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | reed_bow | 苇弦弓 | 3 | 7 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | iron_sword | 寒铁剑 | 3 | 11 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | tide_spear | 分潮枪 | 3 | 13 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | straw_cape | 蓑衣 | 3 | 6 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | hide_coat | 泥蜕褂 | 3 | 8 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | iron_coat | 叠铁袍 | 3 | 11 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | tide_coat | 定潮甲 | 3 | 15 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | reed_charm | 苇哨结 | 3 | 6 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | path_charm | 认路钱 | 3 | 8 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | bell_charm | 定声铃 | 3 | 11 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | tide_charm | 避潮玉 | 3 | 15 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | jetty_charm | 回灯坠 | 3 | 12 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | pine_bow | 松筋长弓 | 3 | 10 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | resin_staff | 藏火杖 | 3 | 10 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | black_crossbow | 暗金机弩 | 3 | 15 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | snow_halberd | 断雪戟 | 3 | 15 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | sky_sword | 归衡剑 | 3 | 18 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | sky_bow | 鸣岳弓 | 3 | 18 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | frost_robe | 锁温袍 | 3 | 16 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | sky_cloak | 合纹披甲 | 3 | 19 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | jade_pendant | 照腕佩 | 3 | 19 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | weir_knife | 迎岸横刀 | 3 | 18 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | coil_pole | 回烟长杖 | 3 | 25 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | foil_sword | 霜缝剑 | 3 | 28 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | lake_bow | 回湖弓 | 3 | 26 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | gauze_armor | 水绡札甲 | 3 | 28 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | fault_coat | 横渊雨衣 | 3 | 36 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | coal_tassel | 焦灯剑穗 | 3 | 27 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | ferry_pole | 渡工短篙 | 3 | 9 |
+
+## 地方灾情与善后
+
+拿到兽迹后向炭篷驿报信才开始计时。兽潮可提前疏水结束，没赶上也能在事后回驿站看现场。工钱仅按实际完成的动作结一次。
+
+| 标识 | 名称 | 时间（天） | 所需物品 | 结工钱时获得（灵钱） | 示警期（游戏日） | 兽群经过（游戏日） |
+| --- | --- | --- | --- | --- | --- | --- |
+| report | 向杨芹报信 | 0.125 |  |  | 2.5 | 3.5 |
+| brace | 加固栏杆 | 0.375 | 松木（wood）×2、寒铁（ore）×1 | 9 |  |  |
+| move | 撤驮兽 | 0.5 |  | 3 |  |  |
+| look | 从草丘查水源 | 0.25 |  |  |  |  |
+| divert | 给旧水槽分流 | 0.375 |  | 7 |  |  |
+| fight | 前往截住盐泥豺 | 0.125 |  | 6 |  |  |
+| repair | 善后修栏 | 0.5 | 松木（wood）×1 | 4 |  |  |
+| settle | 结清工钱 | 0.125 |  |  |  |  |
 
 ## 摊上的线索
 
@@ -1237,16 +1407,17 @@
 
 ## 宗门差事
 
-| 所属地区 | 宗门 | 标识 | 名称 | 说明 | 所需物品 | 奖励物品 | 灵钱报酬 | 增加功劳 | 下一单间隔（天） | 正文 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 系灯院（lantern_court） | 系灯院 | lantern_shift | 交明夜要用的干灯芯 | 晒架下只够挂几束干灯芯，等上一班的筐空下来才接新的。 | 灵草（reed）×6、松木（wood）×2 | 干粮（ration）×3 | 10 | 3 | 7 | 裴见擦干六束草芯，把新木夹和灯一起发下去。 |
-| 系灯院（lantern_court） | 系灯院 | lantern_heel | 给山路的安全绳换皮和铁扣 | 绳子常磨到山石，旧皮遇雨一软就更不耐用。巡灯人还得一并换下磨坏的铁扣。 | 兽革（hide）×4、寒铁（ore）×3 | 松脂膏（salve）×1 | 18 | 5 | 11 | 裴见把旧铁扣送修，让人带上新皮和铁扣去换安全绳上的两处磨损。 |
-| 守尺观（measuring_hall） | 守尺观 | gauge_posts | 换掉量水绳的断桩 | 去量水的人踩断了两根木桩。换好木桩和铁扣，才能重新拉绳量水。 | 松木（wood）×6、寒铁（ore）×2 |  | 14 | 4 | 6 |  |
-| 守尺观（measuring_hall） | 守尺观 | gauge_pillbox | 修好外出用的药箱 | 弟子从暴雨里捞回药箱，得用兽革重新包好，再补些灵草。 | 灵草（reed）×7、兽革（hide）×3 |  | 22 | 6 | 9 |  |
-| 守尺观（measuring_hall） | 守尺观 | gauge_silt | 备齐试水槽的灵晶和妖丹 | 傅澄想试试妖丹能不能稳住漏水处的阵法。他每天都要把浸水的材料取出来看看。 | 灵晶（core）×5、筑基期妖丹（foundation_core）×1 |  | 29 | 10 | 12 |  |
-| 叩石院（sand_bell_cloister） | 叩石院 | ring_hollow | 给挂石板的架子换支脚 | 低处的支脚松了，换好以后，干活的人就不用冒险在下面扶住整座架子。 | 寒铁（ore）×3、松木（wood）×2 |  | 9 | 3 | 3 |  |
-| 叩石院（sand_bell_cloister） | 叩石院 | ring_braces | 给井绳换两个铁扣 | 守井人要给安全绳添两个扣子，旧扣还能拿回去重打。 | 兽革（hide）×2、寒铁（ore）×2 |  | 12 | 4 | 5 |  |
-| 叩石院（sand_bell_cloister） | 叩石院 | ring_assay | 给量回声的石槽补材料 | 高处的料槽空了。梁弦想要分量相近的灵晶和暗金，好把那边的回声调回来。 | 灵晶（core）×3、暗金（black_iron）×2 |  | 16 | 6 | 7 |  |
+| 所属地区 | 宗门 | 标识 | 名称 | 说明 | 所需物品 | 奖励物品 | 灵钱报酬 | 增加功劳 | 做完任一委托后出现 | 时间（天） | 下一单间隔（天） | 正文 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 系灯院（lantern_court） | 系灯院 | lantern_shift | 交明夜要用的干灯芯 | 晒架下只够挂几束干灯芯，等上一班的筐空下来才接新的。 | 灵草（reed）×6、松木（wood）×2 | 干粮（ration）×3 | 10 | 3 |  |  | 7 | 裴见擦干六束草芯，把新木夹和灯一起发下去。 |
+| 系灯院（lantern_court） | 系灯院 | lantern_heel | 给山路的安全绳换皮和铁扣 | 绳子常磨到山石，旧皮遇雨一软就更不耐用。巡灯人还得一并换下磨坏的铁扣。 | 兽革（hide）×4、寒铁（ore）×3 | 松脂膏（salve）×1 | 18 | 5 |  |  | 11 | 裴见把旧铁扣送修，让人带上新皮和铁扣去换安全绳上的两处磨损。 |
+| 系灯院（lantern_court） | 系灯院 | lantern_spare_watch | 试点备用灯，再给夜班留灯芯 | 晒盘坡那趟的回条还压在名册上。裴见让接班的人在院墙根逐盏试灯，挑出沉到油里的灯芯，换成干的。 | 灵草（reed）×3、松木（wood）×1 | 干粮（ration）×2 | 8 | 2 | 把低路试点回条交给裴见（lantern_low_report）、把双灯复挂回条交给裴见（lantern_high_report） | 0.5 | 5 | 你同裴见守在院墙边，换掉歪芯。最后一盏烧稳了，他把备用灯交给来换班的人。 |
+| 守尺观（measuring_hall） | 守尺观 | gauge_posts | 换掉量水绳的断桩 | 去量水的人踩断了两根木桩。换好木桩和铁扣，才能重新拉绳量水。 | 松木（wood）×6、寒铁（ore）×2 |  | 14 | 4 |  |  | 6 |  |
+| 守尺观（measuring_hall） | 守尺观 | gauge_pillbox | 修好外出用的药箱 | 弟子从暴雨里捞回药箱，得用兽革重新包好，再补些灵草。 | 灵草（reed）×7、兽革（hide）×3 |  | 22 | 6 |  |  | 9 |  |
+| 守尺观（measuring_hall） | 守尺观 | gauge_silt | 备齐试水槽的灵晶和妖丹 | 傅澄想试试妖丹能不能稳住漏水处的阵法。他每天都要把浸水的材料取出来看看。 | 灵晶（core）×5、筑基期妖丹（foundation_core）×1 |  | 29 | 10 |  |  | 12 |  |
+| 叩石院（sand_bell_cloister） | 叩石院 | ring_hollow | 给挂石板的架子换支脚 | 低处的支脚松了，换好以后，干活的人就不用冒险在下面扶住整座架子。 | 寒铁（ore）×3、松木（wood）×2 |  | 9 | 3 |  |  | 3 |  |
+| 叩石院（sand_bell_cloister） | 叩石院 | ring_braces | 给井绳换两个铁扣 | 守井人要给安全绳添两个扣子，旧扣还能拿回去重打。 | 兽革（hide）×2、寒铁（ore）×2 |  | 12 | 4 |  |  | 5 |  |
+| 叩石院（sand_bell_cloister） | 叩石院 | ring_assay | 给量回声的石槽补材料 | 高处的料槽空了。梁弦想要分量相近的灵晶和暗金，好把那边的回声调回来。 | 灵晶（core）×3、暗金（black_iron）×2 |  | 16 | 6 |  |  | 7 |  |
 
 ## 宗门功劳与回报
 
@@ -1310,9 +1481,9 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 白苇滩（marsh） | reed_banks | 浅水苇丛 |  |  |  |  |  |  |  | reed＝present＝几株能挖芯的白苇贴着踏石长。、absent＝踏石边翻过的泥里只剩还没长开的嫩芽。、reed_deep＝present＝回水湾里还有长实的苇芯。、absent＝回水湾那丛采过了，断茎贴着水面。 |  |  |
 | 白苇滩（marsh） | sunk_pack | 烂木桩浅汊 |  |  |  | 1、2 |  | 0＝木桩上还挂着一小截篓绳。桩内侧的石路绕向河弯，几片新削的木屑从那头漂过来。 |  |  |  |  |
-| 白苇滩（marsh） | mud_track | 碎石水眼 |  |  |  | 4、5 | 水眼没有动静，干埂只剩浅兽印和拾空的碎枝。另一头仍有几块排齐的石头伸进芦苇。 |  |  |  |  | mud_beast＝present＝近岸冒一溜水泡，几片硬鳞擦过露出水面的石头。、absent＝近岸平静，水面看不到鳞片。、reed_fox＝present＝干埂有新兽印，苇梗上还挂着短毛。、absent＝干埂只剩几道磨浅的旧兽印。 |
+| 白苇滩（marsh） | mud_track | 碎石水眼 |  |  |  | 4、5 | 水眼没有动静，干埂只剩浅兽印和拾空的碎枝。另一头仍有几块排齐的石头伸进芦苇。 |  |  |  |  | mud_beast＝present＝近岸冒一溜水泡，几片硬鳞擦过露出水面的石头。、absent＝近岸平静，水面看不到鳞片。、reed_fox＝present＝干埂有新兽印，苇梗上还挂着短毛。、absent＝干埂只剩几道磨浅的旧兽印。、reed_hare＝present＝背水坡的矮苇一簇簇晃动。有几对白耳贴着地面，从苇根间挪过去。、absent＝背水坡的苇根还留着浅浅的啃痕。 |
 | 白苇滩（marsh） | old_fire | 背雨石渠 |  | 碎石水眼（mud_track） · 踩着石头往苇后探 |  | 3、4 |  |  |  | wood＝present＝渠边石板下露出几截干柴。、absent＝遮柴的石板底下已经空了。 | 2＝before＝炉边的灰里露着一角破瓦。、after＝拿掉瓦角的地方还留着个浅印。、3＝before＝炉沿的缝里夹着一点纸边。、after＝抽走折纸的砖缝里留下一缕松灰。 |  |
-| 白苇滩（marsh） | reed_ferryman | 渡工的刨木滩 |  | 烂木桩浅汊（sunk_pack） · 沿木桩内侧的石路往前看、矮石堤（bank_watch） · 问他渡工在哪儿 |  | 1、3 |  | 0＝渡工把接上新柄的桨平码在石头上。他脚边另有把翻到背面的旧桨。对岸浅石围着一丛白苇。 |  |  |  | marsh_ghost＝present＝对岸的影子贴着白苇的浅滩来回走，把过水的石路挡住了。渡工停了刀，盯着它看。、absent＝对岸的石路空下来。水从白苇间流走。 |
+| 白苇滩（marsh） | reed_ferryman | 渡工的刨木滩 |  | 烂木桩浅汊（sunk_pack） · 沿木桩内侧的石路往前看、矮石堤（bank_watch） · 问他渡工在哪儿 |  | 1、3 |  | 0＝渡工把接上新柄的桨平码在石头上。他脚边另有把翻到背面的旧桨。对岸浅石围着一丛白苇。 |  |  |  | marsh_ghost＝present＝对岸的影子贴着白苇的浅滩来回走，把过水的石路挡住了。渡工停了刀，往对岸看。、absent＝对岸的石路空下来。水从白苇间流走。 |
 | 白苇滩（marsh） | bank_watch | 矮石堤 | 是 |  |  | 2、3 |  | 2＝拦滩客靠在堤上揉手腕，放折图和钩刃的石面空了。 | 拦滩客（bank_runner）：拦滩客把木杖靠在堤边，解开了系住折图的细绳。备刀还搁在石面上。 |  |  |  |
 | 白苇滩（marsh） | drowned_mast | 沉桅高埂 |  |  | 得知物品 旧桨上的靠岸图（oar_mark） | 2、3 |  | 2＝桅木底下露出一道空缝。水仍从高埂下那块露头石的两侧分开。 |  |  |  | mast_beast＝present＝桅下伏着一条有鳍的水兽，尾巴绕着桅根，木缝里透出一点铜色。、absent＝桅根只挂着断下的水草。 |
 | 沉钟岭（ridge） | ore_rain | 落矿的冲沟 |  |  |  | 3 | 沟底已翻过一遍，没有松动的矿块了。护篷下还坐着一位验矿的老人。 |  |  |  |  |  |
@@ -1321,7 +1492,7 @@
 | 沉钟岭（ridge） | rope_run | 断绳坡 |  |  |  | 1 |  | 0＝挑夫把车推回了山路。坡下两道车辙经过一堆松碎石，岩下有口能藏小兽的窄洞。 |  |  |  | stone_badger＝present＝碎石后传来爪尖蹭岩的声响。、absent＝碎石后空空荡荡。 |
 | 沉钟岭（ridge） | stone_niche | 回声石龛 |  | 有回声的矿道（miner_echo） · 贴着透光的石缝往外看、断绳坡（rope_run） · 从侧坡绕下去帮挑夫 |  | 1、2、3 |  |  |  |  | 0＝before＝铃底的岩石有道细缝，露出一角发白的纸。、after＝水图原先压着的石缝空了，撬松的石头搁在旁边。、1＝before＝一只破铃倒扣在石壁旁。、after＝提过的破铃靠在岩壁边。再往上是通到裂钟背后的石阶。、2＝after＝扣住铃舌的裂口只剩一圈擦痕。 |  |
 | 沉钟岭（ridge） | cracked_bell | 裂钟背面 |  | 回声石龛（stone_niche） · 提起洞口的破铃 |  | 3 |  | 2＝龛架铜钩空着。旧钟裂成的两瓣斜在坡上，背后的窄石脊还能绕回山坡。 |  |  |  | bell_wraith＝present＝钟腹里伏着一团灰影。它一缩身，脚下的窄脊就跟着颤。、absent＝钟腹已空，碎片散落在钟座周围。 |
-| 闭潮渡（ford） | low_tide | 闸外浅阶 |  |  |  |  | 浅阶已经扫净，下游的船绳浮着不动。只有浪沫漫过石缝。 |  |  |  |  | rope_eel＝present＝下游船绳时松时紧，深槽外的水不时打旋。、absent＝下游船绳浮在水上，无物牵动。 |
+| 闭潮渡（ford） | low_tide | 闸外浅阶 |  |  |  |  | 浅阶已经扫净，下游的船绳浮着不动。只有浪沫漫过石缝。 |  |  |  |  | rope_eel＝present＝下游船绳时松时紧，深槽外的水不时打旋。、absent＝下游船绳浮在水上，无物牵动。、ford_silver_dace＝present＝东边浅湾银光一闪，几条鱼贴着水面转了个弯。、absent＝东边湾底的沙已经澄清，水面没有鱼影。、ford_shale_crab＝present＝裸露的闸墩挂着几枚灰壳，石缝里又伸出一只带黑纹的钳。、absent＝闸墩的石缝里只挂着几枚旧灰壳。、mud_beast＝present＝外滩泥地有几道腹鳞拖出的长印，直没入芦根。、absent＝外滩的长印已经被水冲淡。 |
 | 闭潮渡（ford） | boat_shade | 没篷的渡舟 |  |  |  | 2、3 |  | 1＝柜子移走了，船底的铁带留下一道擦痕。船里的凳子还干，旧船绳挂在朝水的钩上。灯架熏黑了一半。 |  |  |  |  |
 | 闭潮渡（ford） | flood_lines | 刻洪痕的石壁 |  |  |  | 1 |  | 0＝石缝里只剩一道压痕。洪水在壁根留了薄薄的沙，水还够不到这里。 |  |  |  |  |
 | 闭潮渡（ford） | lock_deck | 悬锁木排 |  |  |  | 1、2 |  | 0＝铁环上只剩一圈湿绳痕。木排仍压着大半石阶，水从排边滴下去。、1＝挪开的木排歪倚在石上，石阶已露出。排边套着铁环，伸手就够得着。 |  |  |  |  |
@@ -1357,28 +1528,34 @@
 | 蒲湾圩田（reed_meadows） | meadow_channel | 姚六的弯渠 |  |  |  | 3、4 |  |  |  | reed＝present＝内沟边有一茬灵草。、absent＝内沟边的灵草只剩没长成的嫩芽。、wood＝present＝外沟的窄口卡着漂木。、absent＝外沟口的漂木已清开，水能流出去。 | 2＝before＝两户田之间的槽板向外翘着。、after＝新换的槽板撑稳了，两户的田都能过水。、3＝after＝先前放走野雁的岸边，还留着几枚浅脚印。 |  |
 | 蒲湾圩田（reed_meadows） | meadow_ruts | 雁脚泥垄 |  |  |  |  |  |  |  |  |  | reed_fox＝present＝狐狸顺着雁的脚印钻进堤下，留了两行新脚印。、absent＝泥垄上只剩让日头晒干的旧脚印。 |
 | 灰鹭矶（pale_shoal） | shoal_baskets | 灰鹭晒篮处 |  |  |  | 3 |  | 2＝白宜缝好了鞋，把篮子倒扣在石上晾。浅石边是鹭草扎根的地方，往下游几步还有一排容易积砂的石缝。 |  |  |  |  |
-| 跃鱼旧渠（fish_ladder） | ladder_drop | 第三级闸口 |  |  |  |  |  |  |  |  |  | river_gateback＝present＝水里那条横脊每次摆尾，最下一级的阶都被掩住。、absent＝水阶落出一截，能踩去有铁屑的水槽。 |
+| 跃鱼旧渠（fish_ladder） | ladder_drop | 第三级闸口 |  |  |  |  |  |  |  | ore＝present＝槽里的浅泥透出细碎的铁光。、absent＝槽底的铁砂筛光了，只剩些灰泥。 |  | river_gateback＝present＝水里那条横脊每次摆尾，最下一级的阶都被掩住。、absent＝水阶落出一截，能踩到底下的槽边。 |
 | 折水驿（willow_post） | willow_yard | 卸货后院 |  |  |  | 1、2 |  |  |  |  | 0＝before＝门房从钩上摘下两块名牌，一块写着系灯院，一块写着白苇滩。、after＝写着系灯院的木牌挂回了钩上，封乔的那一块压着门房手边的货单。、1＝before＝檐下的雨槽歪向院里，水顺着石板流到行李旁。、after＝雨水顺着新木槽淌到院外，檐下的行李没再淋湿。 |  |
-| 校潮亭（gauge_tower） | gauge_piles | 刻尺水桩 |  |  |  | 1、2 |  |  |  |  |  |  |
+| 校潮亭（gauge_tower） | gauge_piles | 刻尺水桩 |  |  |  | 1、2 |  |  |  | core＝present＝外侧的旧盘里还筛得出一点亮砂。、absent＝外侧的旧盘底下只荡着浑水。 |  |  |
 | 晒盘坡（screen_slope） | slope_sieves | 断壁筛架 |  |  |  | 4 |  |  |  |  |  | stone_badger＝present＝筛架下有个滚圆的东西在磨石头，碎砂直落到外侧。、absent＝架下没有磨石声。从绳结处够得到旧筛。 |
-| 系灯院（lantern_court） | lantern_term | 夜灯廊 |  |  |  | 1、2 |  | 1＝挂灯人已把碎护皮换下。廊口的横凳留给巡夜回来的人，右侧还有一条访堂的石路。 |  |  |  |  |
-| 回潮母洞（undertow_grotto） | undertow_bed | 退水石脊 |  |  |  | 2 |  | 1＝中央多了个积着清水的坑。侧洞的石壁上还挂着几道晶砂留下的细痕。 | 负丘虺（undertow_moundback）：泥脊塌下去，床面留下三圈未被潮水搅散的黑泥。角原来挡着的那条路能通到侧洞。 |  |  | undertow_moundback＝present＝泥脊忽然抬起一截。河砂从一排粗鳞上掉下来，一对角堵住了去侧洞的路。、absent＝ |
-| 反声钟窟（counter_bell） | counter_bell_score | 信架与钟枢 |  |  |  | 2、4 |  | 1＝信架底只剩抄图时用过的一块墨。钟脚外沿还嵌着几片暗金。 |  |  |  | river_copper_echo＝present＝钟声一响，铜影便挡在信架前，把钟槌横在膝前。、absent＝铜影散去了，古钟旁的信架没人守。 |
-| 照原城（zhao_city） | zhao_flood_office | 城门水尺档 |  |  |  | 1、2 |  |  |  |  |  |  |
-| 青埂（green_dyke） | zhao_dyke_bend | 两面低埂 |  |  |  | 3 |  |  |  |  |  | dyke_marten＝present＝低埂背后有两道新抓痕，旁边散着刚咬开的蚌壳。、absent＝低埂背后的抓痕已经晒干，水边没什么动静。 |
+| 系灯院（lantern_court） | lantern_term | 夜灯廊 |  |  |  | 1、2、3 |  | 1＝挂灯人已把碎护皮换下。廊口的横凳留给巡夜回来的人，右侧还有一条访堂的石路。 |  |  | 2＝before＝廊壁上空着两个灯钩，下头还挂着一段磨开了的麻绳。 |  |
+| 晒盘坡（screen_slope） | slope_lantern_gap | 背风处的断灯 |  |  | 得知物品 裴见画的旧灯图（lantern_route_copy） | 1、2、3 |  | 0＝凹窝里没了油布包。石缝分成上下两条路。岩尖磨过的旧绳在上方，下方有根扁石正好能垫一盏灯。、1＝铜扣已经铆进扁石，灯火刚好照清石沟里的脚窝。挑药担的人由此往下走，旧吊板那头仍旧很暗。、2＝两盏灯沿着岩缝一前一后亮起来。粗绳上的护皮抵住石角，走旧吊板的人能看清脚下。 |  |  |  |  |
+| 晒盘坡（screen_slope） | slope_lantern_low | 石沟下的灯棚 |  | 背风处的断灯（slope_lantern_gap） · 用松木把灯固定在低处的扁石上、背风处的断灯（slope_lantern_gap） · 修好护绳，把高低两盏灯挂回原处 |  | 3 |  | 2＝药农把空茶碗收进棚里，挑起药担。浅沟里亮着一盏灯，乱石间那排脚窝很清楚。 |  |  |  |  |
+| 晒盘坡（screen_slope） | slope_lantern_high | 双灯照到的旧吊板 |  | 背风处的断灯（slope_lantern_gap） · 修好护绳，把高低两盏灯挂回原处 |  |  |  |  |  |  |  | river_cliff_kite＝present＝旧吊板尽头堆着白羽和碎骨，有影子从石梁外绕回来。、absent＝吊板的尽头暂时没了扑翅声。 |
+| 回潮母洞（undertow_grotto） | undertow_bed | 退水石脊 |  |  |  | 2 |  | 1＝中央多了个积着清水的坑。侧洞的石壁上还挂着几道晶砂留下的细痕。 | 负丘虺（undertow_moundback）：泥脊塌下去，床面留下三圈未被潮水搅散的黑泥。角原来挡着的那条路能通到侧洞。 | core＝present＝侧洞的石壁上闪着灵晶。、absent＝侧洞壁上只剩晶砂刮过的细痕。 |  | undertow_moundback＝present＝泥脊忽然抬起一截。河砂从一排粗鳞上掉下来，一对角堵住了去侧洞的路。、absent＝ |
+| 反声钟窟（counter_bell） | counter_bell_score | 信架与钟枢 |  |  |  | 2、4 |  | 1＝信架底只剩抄图时用过的一块墨。 |  | black_iron＝present＝钟座下还露着几片松动的暗金。、absent＝钟座外沿的砂都筛过了，眼下没有松动的暗金。 |  | river_copper_echo＝present＝钟声一响，铜影便挡在信架前，把钟槌横在膝前。、absent＝铜影散去了，古钟旁的信架没人守。 |
+| 照原城（zhao_city） | zhao_flood_office | 城门水尺档 |  |  |  | 1、2、3 |  |  |  |  | 2＝before＝窗格下压着几张新盖印的告示。、after＝窗格下还压着几张给过路人的告示。 |  |
+| 照原城（zhao_city） | zhao_porridge_shed | 城墙根的粥铺 |  |  |  | 1 |  | 0＝姜婶慢慢搅着火上的粥。沿墙有一排倒扣的青瓷碗，给刚下船的人用。 |  |  |  |  |
+| 青埂（green_dyke） | zhao_dyke_bend | 两面低埂 |  |  |  | 3 |  |  |  |  | 2＝after＝拉起的雨旗在杆顶卷了一下，顺着它指的方向能望见北边石碑。 | dyke_marten＝present＝低埂背后有两道新抓痕，旁边散着刚咬开的蚌壳。、absent＝低埂背后的抓痕已经晒干，没见新咬开的蚌壳。、zhao_reed_duck＝present＝晒席外的蒲叶开了条缝，有灰鸭把脑袋埋进水里拣螺。、absent＝晒席外只浮着一片灰羽，蒲叶间没有拍水声。 |
+| 青埂（green_dyke） | zhao_shutter_tracks | 往田里放水的旧闸 |  | 两面低埂（zhao_dyke_bend） · 扶堤工把晴雨旗拉起来 | 得知物品 试水门悬赏（zhao_gate_notice） | 1 |  | 0＝断闩已从闸板下拔出。老堤工留在岸上拉住闸板，水底那道拖印朝蛙背塘去。 |  |  |  |  |
 | 杨木水栈（flood_market） | zhao_float_goods | 三姓木码头 |  |  |  | 1、3 |  | 0＝新木撑稳了晒架。余节正收另一张齐肩高的干网，往腰间的布袋里一送，网全进去了。那袋才一掌宽，仍旧瘪着。、2＝余节束起布袋口，拍掉新木撑上的木屑。木台下有两根横梁，上游的漂枝常卡在缝里。 |  |  |  |  |
 | 守尺观（measuring_hall） | zhao_bamboo_duel | 竹尺庭 | 是 |  |  | 1 |  |  |  |  |  | zhao_spar＝present＝砖圈旁立着几根待客的竹尺。、absent＝砖圈已经扫净，竹尺收回架上。傅澄坐在廊下歇手。 |
 | 蛙背塘（frog_pond） | zhao_frog_shelf | 斜萍石窝 |  |  |  |  |  |  |  |  |  | glass_frog＝present＝石窝里接连冒出几串大气泡。、absent＝浅窝里只漂着薄薄一层浮萍。 |
+| 蛙背塘（frog_pond） | zhao_pond_shutter | 塘背的旧便门 |  |  | 得知物品 带咬痕的旧门闩（zhao_gate_shaving） | 1、3 |  | 2＝便门已经扶正。水贴着石渠流进田里。 | 撞闩塘獭（zhao_gate_otter）：塘獭伏在泥里没了动静。老堤工从高石上攀下来，蹲下去察看槽里歪着的闸板。 |  | 0＝before＝两条空船拴在旧便门边，船尾的绳结在水面一沉一浮。、after＝塘边原先停着船的地方只剩一圈湿痕，两条空船都上了高岸。 |  |
 | 没顶刻碑（old_marker） | zhao_retreat_marks | 倒行刻碑 |  |  |  | 1 |  |  |  |  |  |  |
 | 斜漏水驿（zhao_hermit） | zhao_leak_bench | 斜漏驿棚 |  |  |  | 1、2 |  | 0＝两根松木斜撑住漏斗架。风掀了掀棚布，桌上的漏斗没动。架脚原先垫斜铁的地方已经空了。 |  |  |  |  |
 | 连环浅洲（ring_isles） | zhao_isle_reeds | 浮洲松根 |  |  |  |  |  |  |  |  |  |  |
-| 藻鳞泥浜（scale_bog） | zhao_scales | 青膜硬埂 |  |  |  |  |  |  |  |  |  | mud_shrike＝present＝埂上的芦梗勾着一绺湿毛，泥上还有新鲜的爪印。、absent＝埂顶的旧足印已经晒硬，水藻里没见动静。 |
-| 白鹤粮仓（crane_granary） | zhao_grain_ladder | 高脚粮仓 |  |  |  | 1 |  | 0＝梯脚两边新加了木撑，何绢踩着梯子去收上层的粮袋。仓门后仍是削木的地方，檐下一坐就能看见。 |  |  |  |  |
-| 叠石驿关（zhao_pass） | zhao_ridge_permit | 青瓦验牒房 |  |  |  | 1、2 |  | 0＝两副绳架已靠回檐下，破绳卷在门边。柯伯给牵骡的人让开路，关那头不时传来铃声。 |  |  |  |  |
+| 藻鳞泥浜（scale_bog） | zhao_scales | 青膜硬埂 |  |  |  |  |  |  |  |  |  | mud_shrike＝present＝埂上的芦梗勾着一绺湿毛，泥上还有新鲜的爪印。、absent＝埂顶的旧足印已经晒硬，泥坑也没有新爪痕。、zhao_moss_turtle＝present＝水湾边的苔背浮上来透气，水草随着它往两边倒。、absent＝水湾上的水草浮平了，原先露甲的几处只见水纹。、glass_frog＝present＝北边浅滩传来蛙叫，碎石间偶尔闪过一片红斑。、absent＝北边的碎石只听得见流水，蛙声已经退到塘那边。、zhao_rush_eel＝present＝藻沟里几缕沉叶向下游抖着，底下有细背贴泥摆动。、absent＝藻沟里的沉叶被水滞在石边，沟底没东西搅水。 |
+| 白鹤粮仓（crane_granary） | zhao_grain_ladder | 高脚粮仓 |  |  |  | 1、3 |  | 0＝梯脚两边新加了木撑，何绢踩着梯子去收上层的粮袋。仓门后仍是削木的地方，檐下一坐就能看见。 |  |  | 2＝after＝门里两袋干谷用同一根麻绳扎着，留给照原城的粥铺。 |  |
+| 叠石驿关（zhao_pass） | zhao_ridge_permit | 青瓦验牒房 |  |  |  | 1、2、3 |  | 0＝两副绳架已靠回檐下，破绳卷在门边。柯伯给牵骡的人让开路，关那头不时传来铃声。 |  |  |  |  |
 | 缺轮磨台（jade_mill） | zhao_old_wheel | 横卧的半边磨轮 |  |  |  | 2 |  |  |  |  |  |  |
 | 挂炭坳（charcoal_ridge） | zhao_firedoor | 斜封窑棚 |  |  |  | 1 |  | 0＝马荻挂稳了湿帘，窑口的火苗没再贴地蹿出来。外头的晾棚晒着炭，棚角散着窑工削下的枝头。 |  |  |  |  |
 | 沉水量站（sunken_lab） | zhao_submerged_table | 铜槽旁 |  |  |  | 2 |  | 1＝铜板已经印过，插销被你搁回槽边。水顺出水口落下，靠入口的台子还干着。 | 槽背水魁（lab_crawler）：那团石甲退进岩缝，出水口空了。铜板侧面的插销露在外面，入口边仍有块干台。 |  |  |  |
-| 烧黑的伏火坑（night_pit） | zhao_bank_fire | 赤泥横穴 |  |  |  | 3 |  |  |  |  |  | ember_yak＝present＝挨着窑脚传来踏炭声，灰堆上偶尔扫过一道尾影。、absent＝窑脚只有踩散的灰垄，里面没有脚步声。 |
+| 烧黑的伏火坑（night_pit） | zhao_bank_fire | 赤泥横穴 |  |  |  | 3、4 |  | 3＝两个挡板仍卡在风孔上。火光缩回炉嘴，帘脚能站人了。帘后通往暗金最多的那片坑沿。 |  |  |  | ember_yak＝present＝挨着窑脚传来踏炭声，灰堆上偶尔扫过一道尾影。、absent＝窑脚只有踩散的灰垄，里面没有脚步声。 |
 | 碎琉璃滩（glass_bank） | zhao_glass_net | 六角晒网 |  |  |  | 1 |  | 0＝晒网边原先搁灯的地方空了。章老在翻晾带刻度的碎琉璃。 |  | core＝present＝篮子旁还有没挑出来的灵晶。、absent＝篮子旁的灵晶已经挑完了。 |  |  |
 | 错水湖底（fault_lake） | zhao_deep_pillars | 分水三柱 |  |  |  | 2 |  | 1＝石台上的窄槽空了，一边盖子斜敞着。水绕开半沉的断柱，缓缓流向远处。 | 分柱水君（fault_warden）：水君退进湖底的石缝，水面渐渐平了。石台露出来，台上有道窄槽，槽盖只有一头还被钉着。 |  |  |  |
 | 拴绳沙洼（rope_sands） | zhao_rope_sound | 沙坠顺风线 |  |  |  |  |  |  |  |  |  | dyke_marten＝present＝有几撮细根被翻到地面，足印一直伸到背阴处。、absent＝翻开的细根晒在地上，旧脚印给风填去大半。 |
@@ -1394,19 +1571,19 @@
 | 担盐岗（salt_ledger_barrows） | sand_salt_ledger | 井边老秤 |  |  |  | 1 |  |  |  |  |  |  |
 | 静盐井口（stillwell_mouth） | sand_stillwell_mouth | 井口的两根绳 |  |  |  | 2 |  | 1＝细绳提上去后，井沿露出铁梯。挡路的铁销已挪开，卷绳的石轮还在轻轻颤动。 |  |  |  |  |
 | 静盐井心（stillwell_vault） | sand_stillwell_vault | 挂陶罐的井壁 |  |  |  | 2 |  | 1＝井壁露出一串取盐时踩过的凹坑，挂陶罐的长钉空了。 | 静井伏鳞（sand_well_basilisk）：守井兽的尾巴垂下去了。挂着陶罐的井壁旁露出一排踏脚的凹坑。 |  |  |  |
-| 静盐井心（stillwell_vault） | sand_stillwell_sill | 井底隔水板 |  |  |  |  |  |  |  |  |  |  |
+| 静盐井心（stillwell_vault） | sand_stillwell_sill | 井底隔水板 |  |  |  |  |  |  |  | core＝present＝浅槽里还有伸手够得着的晶角。、absent＝浅槽已翻过一遍，只剩松散的盐泥。 |  |  |
 | 冷炉院（cold_kiln） | sand_cold_kiln_house | 阮杪的档房 |  |  |  | 1、2 |  | 1＝阮杪已经抄了一份冷炉旧册。原件还挂在墙上，由一段盐井的旧绳压着折痕。 |  |  |  |  |
-| 白蹄旧道（chalk_hoof_trail） | sand_approach_hoof | 逆纹马蹄石 |  |  |  | 2 |  |  |  |  |  |  |
+| 白蹄旧道（chalk_hoof_trail） | sand_approach_hoof | 逆纹马蹄石 |  |  |  | 2 |  |  |  | ore＝present＝石坡上还有几片被风吹到浅处的寒铁。、absent＝碎寒铁暂时取完了。嵌在白石上的铁尖还牢牢钉着。 |  |  |
 | 倒驿白廊（chalk_archive） | sand_archive_guard | 倒挂的驿印 |  |  |  | 2 |  | 1＝倒挂的货柜空出一格。柜边歪斜的货牌反着光，照出来时那条路。 |  |  |  |  |
 | 空音桥（dry_sound_bridge） | sand_bridge_rail | 晃铜的桥栏 |  |  |  | 2 |  | 1＝新木顶住了桥板，踩过去也没再跷起来。黄桥匠还在数栏上的铜扣。 |  | wood＝present＝外侧石台边能看到废槽里的松木。、absent＝外侧废槽暂时取空了。 |  | sand_rattle_viper＝present＝桥钉旁有一线新蛇蜕，阴处的铜结微动。、absent＝铜片垂在平直的桥栏上，下面没人声或兽声。 |
-| 架风板（wind_slate） | sand_wind_work | 风楔架 |  |  |  |  |  |  |  |  |  |  |
-| 空籴仓（hollow_silo） | sand_silo_door | 关了一半的仓门 |  |  |  | 2 |  |  |  |  |  | sand_silo_marten＝present＝卸谷洞口挤出两道细爪印。、absent＝仓沿落住了浮灰，暂没有新爪痕。 |
-| 落琉洼（glass_hail_sink） | sand_hail_floor | 断琉棱 |  |  |  | 3 |  | 2＝晶石底下的弹片已经取走，原处只剩一道空缝。沿上方的石边还能退出洼地。 |  |  |  | sand_glass_lynx＝present＝深处的碎晶被翻了个面。几道新爪痕比手掌还长，有一道一直划到岩壁上。、absent＝石屑遮住半截爪印，晶石下面渐渐没了动静。 |
-| 横生脉（hanging_vein） | sand_hanging_support | 贴壁支木 |  |  |  |  |  |  |  |  |  | sand_vein_jackal＝present＝矿绳里面传出磨齿般的声响，有只金眼从夹层探出来。、absent＝旧支木没再被挤动，绳后空了。 |
-| 伏兔草丘（camel_grass_dunes） | sand_dune_grass | 伏草沙坎 |  |  |  |  |  |  |  |  |  | sand_dune_hare＝present＝沙面一点点鼓起，小耳朵探出草根。、absent＝伏草旁零散着几条浅沟，没见兔子探头。 |
+| 架风板（wind_slate） | sand_wind_work | 风楔架 |  |  |  |  |  |  |  | ore＝present＝朝阳的岩缝里还能看见铁色。、absent＝朝阳那道岩缝已经刮空了。、core＝present＝背风处的小槽里亮着几块细碎的灵晶。、absent＝背风处的小槽里只剩下沙。 |  |  |
+| 空籴仓（hollow_silo） | sand_silo_door | 关了一半的仓门 |  |  |  | 2 |  |  |  | reed＝present＝滑槽底下几蓬灵草还可以拔。、absent＝滑槽底下留着几个拔草的小坑。 |  | sand_silo_marten＝present＝卸谷洞口挤出两道细爪印。、absent＝仓沿落住了浮灰，暂没有新爪痕。 |
+| 落琉洼（glass_hail_sink） | sand_hail_floor | 断琉棱 |  |  |  | 3 |  | 2＝晶石底下的弹片已经取走，原处只剩一道空缝。沿上方的石边还能退出洼地。 |  | core＝present＝洼地边的浅土里还露着亮石片。、absent＝洼地边的浅土已经筛过，亮片暂时没了。、core_inner＝present＝断棱底下细槽里有几块颜色清透的灵晶。、absent＝断棱底下那道细槽已经采空了。 |  | sand_glass_lynx＝present＝深处的碎晶被翻了个面。几道新爪痕比手掌还长，有一道一直划到岩壁上。、absent＝石屑遮住半截爪印，晶石下面渐渐没了动静。 |
+| 横生脉（hanging_vein） | sand_hanging_support | 贴壁支木 |  |  |  |  |  |  |  | ore＝present＝风沙把寒铁碎料推到了外侧的支木前。、absent＝外侧的寒铁已拣空，支木前是刮松的砂。、black_iron＝present＝往里透过绳架能看见一堆混着暗金的积砂。、absent＝绳架后取过一轮暗金，积砂里暂时看不见黑点。 |  | sand_vein_jackal＝present＝矿绳里面传出磨齿般的声响，有只金眼从夹层探出来。、absent＝旧支木没再被挤动，绳后空了。、sand_iron_skink＝present＝外侧晒暖的石面上，一只鳞背花斑的蜥正趴着。、absent＝外侧晒石留着一截薄薄的蜕皮。 |
+| 伏兔草丘（camel_grass_dunes） | sand_dune_grass | 伏草沙坎 |  |  |  |  |  |  |  |  |  | sand_dune_hare＝present＝沙面一点点鼓起，小耳朵探出草根。、absent＝伏草旁零散着几条浅沟，没见兔子探头。、sand_ridge_pheasant＝present＝坡顶的干草沙沙响，露出几根褐翅的硬羽。、absent＝坡顶的干草垂了下来，底下只落着几个空谷壳。、sand_salt_fox＝present＝灌木背风处有新踩出的梅花脚印，一撮厚毛挂在刺梢。、absent＝灌木外的细沙已经抚平，没见新脚印。、sand_root_boar＝present＝沟底的湿土让獠牙翻了过来，草根底下还传出拱土声。、absent＝沟底留着翻过的土块，拱土声停了。 |
 | 并磨坊（guest_mill） | sand_guest_miller | 栾火的并磨盘 |  |  |  | 1、2 |  | 0＝栾火从缝上捻掉一截冒出来的苇芯，又用小杯舀起谷子。这回杯子没再漏。他把杯递给等在磨盘旁的人。 |  |  |  |  |
-| 覆瓦旱畦（kiln_roof_farm） | sand_rooftile_patch | 留阴瓦畦 |  |  |  | 2 |  |  |  |  |  |  |
-| 砾盘浅沟（bone_dry_rill） | sand_gravel_rill | 搁木的浅弯 |  |  |  |  |  |  |  |  |  |  |
+| 覆瓦旱畦（kiln_roof_farm） | sand_rooftile_patch | 留阴瓦畦 |  |  |  | 2 |  |  |  | reed＝present＝刚剪下的嫩尖搁在松土畦旁。、absent＝畦边的嫩尖刚捡净，新芽仍留在土里。、millet_grain＝present＝隔壁瓦棚下还摊着一小堆打过的碎谷。、absent＝隔壁瓦棚下的碎谷已经收完。 |  |  |
+| 砾盘浅沟（bone_dry_rill） | sand_gravel_rill | 搁木的浅弯 |  |  |  |  |  |  |  | wood＝present＝里弯有短木横过细砾。、absent＝里弯只剩原来拦木的几枚石子。、ore＝present＝一点铁灰从外侧砾盘边渗出来。、absent＝外侧翻好的石子间暂时找不到新铁片。 |  |  |
 | 砾盘浅沟（bone_dry_rill） | sand_basket_shed | 岸边竹棚 | 是 |  |  | 1、2、3、5 |  | 0＝箩筐稳稳立在凳上。老人把手边一截剩下的竹篾往里折，脚边那根竹杖已经磨白了。、1＝老人低着头，继续把竹篾压进筐沿。门边有几截没用完的竹料。、2＝箩筐已挪到棚里。老人拄着竹杖站在棚外，鞋边有一道刚画的圆圈。、4＝老人把编好的箩筐倒过来拍了拍，招呼你下回进棚喝水。 |  |  |  |  |
 | 琉脊天室（glass_rotunda） | sand_glass_chamber | 铜轮前 |  |  |  | 2 |  | 1＝邢既横坐回石柱边。铜轮下的暗格开着，石缝里吹来的风也散了沙尘。 | 照壁刀师邢既横（sand_sundial_master）：邢既横收刀入鞘，把手搭在铜轮上。「你拉那只铁环，我从这边推。」 |  |  |  |
 | 校潮亭（gauge_tower） | puzzle_gauge_pin | 胥婉的旧水尺 |  | 刻尺水桩（gauge_piles） · 替胥婉按住纸，印下水尺刻痕 |  | 1 |  | 0＝木尺顶上多了一截新木。胥婉扶着尺顶试着晃了晃，挂在旁边的小筒已经空了。 |  |  |  |  |
@@ -1417,8 +1594,11 @@
 | 空音桥（dry_sound_bridge） | puzzle_sound_relay | 桥下的传声筒 |  |  |  | 1 |  |  |  |  |  |  |
 | 蒲湾圩田（reed_meadows） | puzzle_spool_loom | 春衫织棚 |  |  |  | 1 |  |  |  |  |  |  |
 | 白鹤粮仓（crane_granary） | puzzle_granary_catch | 歪了的粮箱 |  |  |  | 1 |  |  |  |  |  |  |
-| 白蹄旧道（chalk_hoof_trail） | puzzle_hoof_markers | 三块刻着蹄印的石头 |  | 逆纹马蹄石（sand_approach_hoof） · 在朝反方向的蹄印旁放一点伏潮息泥 |  | 1 |  |  |  |  |  |  |
+| 白蹄旧道（chalk_hoof_trail） | puzzle_hoof_markers | 三块刻着蹄印的石头 |  | 逆纹马蹄石（sand_approach_hoof） · 从伏潮息泥上蘸水去试反向蹄印 |  | 1 |  |  |  |  |  |  |
 | 守尺观（measuring_hall） | zhao_terrace_arena | 观内朱线台 | 是 |  | 得知物品 扶膝起身帖（body_breath_note） |  |  |  |  |  |  |  |
+| 闭潮渡（ford） | ford_watch_lamp | 渡口换班灯 |  |  | 得知物品 伏流路引（secret_pass） | 1、3 |  |  |  |  | 0＝before＝栏边架着两盏灯，白日只用来晾灯芯。船工说，夜里两盏都亮，才轮到他送换班牌。、after＝两盏灯中间的木钩已经空了。、2＝after＝掌船人把收到的回条压在舱板下面。 |  |
+| 回灯埠（hidden） | wharf_lee_lamp | 背风灯台 |  |  | 得知物品 夜船的换班木牌（ferry_watch_tag） | 1、2 |  |  |  |  | 0＝before＝守灯人每隔一会儿就朝闭潮渡的方向望一眼。、after＝换班牌挂在背风的一侧，灯光照得到牌上的字。、1＝before＝灯架底下少了个木脚，灯罩一晃，火就要挨到边上。、after＝两截新木撑住灯架，火苗在灯罩中间直直立着。 |  |
+| 伏兔草丘（camel_grass_dunes） | sand_saltwater_tracks | 沙脊下的兽迹 |  |  |  | 1 |  |  |  |  | 0＝before＝旁边石缝里卡着一截苇梗，露在外头的一端结着白壳。、after＝取过苇梗的石缝里，仍有一条浅浅的盐渍。 |  |
 | 白苇滩（marsh） | undertow_door | 反潮石门 |  |  |  | 2、3 |  | 1＝新铁楔卡在旧槽里，绳子通向高处的石阶。外侧的潮水还会倒流，过洞口时可以抓住绳子。 |  |  |  |  |
 | 白苇滩（marsh） | marsh_pole_lesson | 封乔的护堤木台 | 是 |  |  | 1、3 |  | 2＝领过试杆签，封乔把另一支短杆扶直，台角还有供照看的安全绳。 |  |  |  | river_spar_captain＝present＝封乔正拿杆尖朝练手台上点，不时让渔人过桥，手和眼睛都没乱。、absent＝封乔退到了灯影下。他把红布搁到台边，让手腕缓一缓再陪来客切磋。 |
 | 沉钟岭（ridge） | counter_bell_door | 倒钟后的反声门 |  |  |  | 2 |  | 1＝铜片斜卡在一宽一窄两个孔之间。第一层台阶已经落下，脚步声顺着台阶传进地下。 |  |  |  |  |
@@ -1434,11 +1614,12 @@
 | 浅水苇丛（reed_banks） | 资源 | 灵草（reed） | reed | 浅处苇芯 | 2 | 3 | 5 | 1 |  | 1.5 | 1 |
 | 浅水苇丛（reed_banks） | 资源 | 灵草（reed） | reed_deep | 深处苇芯 | 3 | 5 | 5 | 1 |  | 1.5 | 2 |
 | 碎石水眼（mud_track） | 资源 | 松木（wood） | wood |  | 4 | 6 | 3 | 2 |  | 1.5 | 2 |
-| 碎石水眼（mud_track） | 种群 | 泥鳞兽（mud_beast） | mud_beast |  | 1 | 3 | 4 | 1 | 随种群密度变化 |  |  |
-| 碎石水眼（mud_track） | 种群 | 苇尾狐（reed_fox） | reed_fox |  | 2 | 4 | 4 | 1 | 随种群密度变化 |  |  |
+| 碎石水眼（mud_track） | 种群 | 泥鳞兽（mud_beast） | mud_beast |  | 2 | 5 | 4 | 1 | 随种群密度变化 |  |  |
+| 碎石水眼（mud_track） | 种群 | 苇尾狐（reed_fox） | reed_fox |  | 3 | 6 | 4 | 1 | 随种群密度变化 |  |  |
+| 碎石水眼（mud_track） | 种群 | 白耳兔（reed_hare） | reed_hare |  | 3 | 7 | 3.25 | 1 | 随种群密度变化 |  |  |
 | 背雨石渠（old_fire） | 资源 | 松木（wood） | wood |  | 6 | 6 | 0 | 0 |  |  | 2 |
 | 渡工的刨木滩（reed_ferryman） | 资源 | 灵草（reed） | reed |  | 3 | 5 | 5 | 2 |  |  | 4 |
-| 渡工的刨木滩（reed_ferryman） | 种群 | 巡岸水鬼（marsh_ghost） | marsh_ghost |  | 1 | 2 | 3 | 1 | 固定间隔 |  |  |
+| 渡工的刨木滩（reed_ferryman） | 种群 | 巡岸水鬼（marsh_ghost） | marsh_ghost |  | 2 | 3 | 5 | 1 | 固定间隔 |  |  |
 | 矮石堤（bank_watch） | 种群 | 拦滩客（bank_runner） | bank_runner |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 沉桅高埂（drowned_mast） | 种群 | 沉桅虺（mast_beast） | mast_beast |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 落矿的冲沟（ore_rain） | 资源 | 寒铁（ore） | ore | 沟边寒铁 | 3 | 4 | 3.5 | 1 |  |  | 1 |
@@ -1447,35 +1628,38 @@
 | 有回声的矿道（miner_echo） | 资源 | 寒铁（ore） | ore | 旁孔寒铁 | 1 | 2 | 3 | 1 |  |  | 2 |
 | 有回声的矿道（miner_echo） | 资源 | 寒铁（ore） | ore_wall | 主道寒铁 | 2 | 4 | 3 | 1 |  |  | 4 |
 | 有回声的矿道（miner_echo） | 资源 | 灵晶（core） | core |  | 2 | 4 | 5 | 1 |  |  | 4 |
-| 有回声的矿道（miner_echo） | 种群 | 持锤矿煞（ore_wight） | ore_wight |  | 1 | 2 | 3 | 1 | 固定间隔 |  |  |
-| 断绳坡（rope_run） | 种群 | 石甲獾（stone_badger） | stone_badger |  | 1 | 2 | 3 | 1 | 固定间隔 |  |  |
+| 有回声的矿道（miner_echo） | 种群 | 持锤矿煞（ore_wight） | ore_wight |  | 2 | 3 | 3 | 1 | 固定间隔 |  |  |
+| 断绳坡（rope_run） | 种群 | 石甲獾（stone_badger） | stone_badger |  | 2 | 4 | 3 | 1 | 固定间隔 |  |  |
 | 裂钟背面（cracked_bell） | 种群 | 裂钟魄（bell_wraith） | bell_wraith |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 闸外浅阶（low_tide） | 资源 | 灵晶（core） | core | 浅阶灵晶 | 2 | 3 | 2 | 1 |  |  | 1 |
 | 闸外浅阶（low_tide） | 资源 | 灵晶（core） | core_silt | 槽底灵晶 | 2 | 3 | 2 | 1 |  |  | 3 |
-| 闸外浅阶（low_tide） | 种群 | 缠舟兽（rope_eel） | rope_eel |  | 1 | 3 | 2.5 | 1 | 随种群密度变化 |  |  |
+| 闸外浅阶（low_tide） | 种群 | 缠舟兽（rope_eel） | rope_eel |  | 2 | 5 | 2.5 | 1 | 随种群密度变化 |  |  |
+| 闸外浅阶（low_tide） | 种群 | 银背鱼（ford_silver_dace） | ford_silver_dace |  | 4 | 7 | 3.25 | 1 | 随种群密度变化 |  |  |
+| 闸外浅阶（low_tide） | 种群 | 黑纹蟹（ford_shale_crab） | ford_shale_crab |  | 3 | 6 | 5 | 1 | 随种群密度变化 |  |  |
+| 闸外浅阶（low_tide） | 种群 | 泥鳞兽（mud_beast） | mud_beast |  | 2 | 5 | 6 | 1 | 随种群密度变化 |  |  |
 | 刻洪痕的石壁（flood_lines） | 资源 | 灵晶（core） | core |  | 3 | 4 | 2 | 1 |  |  | 2 |
 | 旧闸深槽（tide_keeper） | 种群 | 守潮灵（tide_spirit） | tide_spirit |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 低水船桩（sunken_mooring） | 种群 | 湿蓑灯蜕（wick_husk） | wick_husk |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 刮脂松架（pine_stand） | 资源 | 松木（wood） | wood | 架下松片 | 5 | 8 | 4 | 2 |  | 1.5 | 1 |
 | 刮脂松架（pine_stand） | 资源 | 松木（wood） | wood_branches | 树上枯枝 | 5 | 7 | 4 | 1 |  | 1.5 | 2 |
-| 翻车的松沟（pine_hollow） | 种群 | 灰脊松熊（pitch_bear） | pitch_bear |  | 1 | 2 | 7 | 1 | 固定间隔 | 1.5 |  |
+| 翻车的松沟（pine_hollow） | 种群 | 灰脊松熊（pitch_bear） | pitch_bear |  | 2 | 4 | 7 | 1 | 固定间隔 | 1.5 |  |
 | 背阴的断肩崖（pine_ledges） | 资源 | 松木（wood） | wood |  | 4 | 6 | 8 | 2 |  | 1.5 | 1 |
 | 索棚拳场（pine_spar） | 种群 | 松场巡索人（road_sparrer） | road_sparrer |  | 1 | 1 | 8 | 1 | 固定间隔 |  |  |
 | 白泥洗坯坡（clay_bank） | 资源 | 耐火泥（kiln_clay） | kiln_clay | 坡根耐火泥 | 3 | 4 | 6 | 1 |  | 1.5 | 1 |
 | 白泥洗坯坡（clay_bank） | 资源 | 耐火泥（kiln_clay） | clay_slope | 干泥带耐火泥 | 4 | 6 | 6 | 1 |  | 1.5 | 2 |
 | 废窑烟道（kiln_flue） | 资源 | 暗金（black_iron） | black_iron |  | 2 | 3 | 7 | 1 |  | 1.5 | 4 |
 | 废窑烟道（kiln_flue） | 资源 | 耐火泥（kiln_clay） | kiln_clay |  | 3 | 3 | 0 | 0 |  |  | 5 |
-| 废窑烟道（kiln_flue） | 种群 | 炉渣犬（cinder_hound） | cinder_hound |  | 1 | 2 | 8 | 1 | 固定间隔 | 1.5 |  |
+| 废窑烟道（kiln_flue） | 种群 | 炉渣犬（cinder_hound） | cinder_hound |  | 2 | 3 | 8 | 1 | 固定间隔 | 1.5 |  |
 | 银脉水畦（herb_beds） | 资源 | 灵草（reed） | reed |  | 8 | 12 | 6 | 2 |  | 1.5 | 1 |
 | 白藤塘（vine_pond） | 资源 | 灵草（reed） | reed | 塘边银脉叶 | 4 | 8 | 7 | 2 |  | 1.5 | 3 |
 | 白藤塘（vine_pond） | 资源 | 灵草（reed） | reed_upper | 上游银脉叶 | 5 | 6 | 10 | 2 |  |  | 5 |
-| 白藤塘（vine_pond） | 种群 | 白角藤鹿（vine_stag） | vine_stag |  | 1 | 4 | 8 | 1 | 随种群密度变化 | 1.5 |  |
+| 白藤塘（vine_pond） | 种群 | 白角藤鹿（vine_stag） | vine_stag |  | 2 | 6 | 8 | 1 | 随种群密度变化 | 1.5 |  |
 | 白藤塘（vine_pond） | 种群 | 白纹鹿王（vine_king） | vine_king |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 黑砂洗矿槽（mine_tailings） | 资源 | 暗金（black_iron） | black_iron | 槽沿暗金 | 4 | 5 | 7 | 1 |  | 1.5 | 1 |
 | 黑砂洗矿槽（mine_tailings） | 资源 | 暗金（black_iron） | black_iron_inner | 槽底暗金 | 4 | 7 | 7 | 1 |  | 1.5 | 2 |
 | 横肩偏井（deep_vein） | 资源 | 暗金（black_iron） | black_iron |  | 4 | 6 | 8 | 2 |  |  | 4 |
 | 横肩偏井（deep_vein） | 资源 | 灵晶（core） | core |  | 1 | 3 | 8 | 1 |  |  | 4 |
-| 横肩偏井（deep_vein） | 种群 | 横肩矿傀（vein_sentinel） | vein_sentinel |  | 1 | 2 | 9 | 1 | 固定间隔 | 1.7 |  |
+| 横肩偏井（deep_vein） | 种群 | 横肩矿傀（vein_sentinel） | vein_sentinel |  | 2 | 3 | 9 | 1 | 固定间隔 | 1.7 |  |
 | 背风雪蜥径（silk_bough） | 资源 | 兽革（hide） | hide | 石窝雪蜥蜕 | 3 | 4 | 8 | 1 |  | 1.8 | 1 |
 | 背风雪蜥径（silk_bough） | 资源 | 兽革（hide） | hide_ice | 冰沿雪蜥蜕 | 4 | 7 | 8 | 1 |  | 1.8 | 2 |
 | 露背的雪沟（white_ravine） | 种群 | 雪脊兽（snow_warden） | snow_warden |  | 1 | 1 | 18 | 1 | 固定间隔 |  |  |
@@ -1487,42 +1671,53 @@
 | 封石验药室（foundation_court） | 种群 | 封石护炉人（foundation_warden） | foundation_warden |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 姚六的弯渠（meadow_channel） | 资源 | 灵草（reed） | reed | 田边灵草 | 4 | 7 | 4 | 2 |  |  | 1 |
 | 姚六的弯渠（meadow_channel） | 资源 | 松木（wood） | wood | 沟口漂木 | 4 | 5 | 4 | 2 |  |  | 2 |
-| 雁脚泥垄（meadow_ruts） | 种群 | 苇尾狐（reed_fox） | reed_fox |  | 2 | 4 | 4 | 1 | 随种群密度变化 |  |  |
+| 雁脚泥垄（meadow_ruts） | 种群 | 苇尾狐（reed_fox） | reed_fox |  | 3 | 6 | 4 | 1 | 随种群密度变化 |  |  |
 | 灰鹭晒篮处（shoal_baskets） | 资源 | 灵草（reed） | reed | 鹭草根 | 3 | 6 | 4.5 | 2 |  |  | 1 |
 | 灰鹭晒篮处（shoal_baskets） | 资源 | 灵晶（core） | core | 石缝灵晶 | 2 | 4 | 5 | 1 |  |  | 2 |
 | 第三级闸口（ladder_drop） | 资源 | 松木（wood） | wood | 闸梁上的枯枝 | 4 | 7 | 4 | 2 |  |  | 1 |
 | 第三级闸口（ladder_drop） | 资源 | 寒铁（ore） | ore | 槽底寒铁 | 4 | 7 | 5 | 2 |  |  | 3 |
-| 第三级闸口（ladder_drop） | 种群 | 横脊闸兽（river_gateback） | river_gateback |  | 1 | 2 | 6 | 1 | 随种群密度变化 |  |  |
+| 第三级闸口（ladder_drop） | 种群 | 横脊闸兽（river_gateback） | river_gateback |  | 2 | 3 | 6 | 1 | 随种群密度变化 |  |  |
 | 刻尺水桩（gauge_piles） | 资源 | 灵晶（core） | core | 水尺旁的灵晶 | 2 | 5 | 6 | 1 |  |  | 3 |
 | 断壁筛架（slope_sieves） | 资源 | 寒铁（ore） | ore | 坡下筛盘的寒铁 | 5 | 8 | 5 | 2 |  |  | 1 |
 | 断壁筛架（slope_sieves） | 资源 | 暗金（black_iron） | black_iron | 高处筛盘的暗金 | 2 | 5 | 7 | 1 |  |  | 3 |
-| 断壁筛架（slope_sieves） | 种群 | 石甲獾（stone_badger） | stone_badger |  | 1 | 3 | 6 | 1 | 随种群密度变化 |  |  |
+| 断壁筛架（slope_sieves） | 种群 | 石甲獾（stone_badger） | stone_badger |  | 2 | 4 | 6 | 1 | 随种群密度变化 |  |  |
+| 石沟下的灯棚（slope_lantern_low） | 资源 | 灵草（reed） | reed | 挡风石后的灵草 | 4 | 6 | 7 | 2 |  |  | 1 |
+| 石沟下的灯棚（slope_lantern_low） | 资源 | 松木（wood） | wood | 水沟里的细木 | 3 | 5 | 7 | 2 |  |  | 2 |
+| 双灯照到的旧吊板（slope_lantern_high） | 资源 | 灵晶（core） | core | 矿夫在灯下筛出的晶砂 | 3 | 5 | 8 | 2 |  |  | 1 |
+| 双灯照到的旧吊板（slope_lantern_high） | 资源 | 暗金（black_iron） | black_iron | 吊板尽头石缝里的暗金 | 4 | 6 | 8 | 2 |  |  | 3 |
+| 双灯照到的旧吊板（slope_lantern_high） | 种群 | 石鹞（river_cliff_kite） | river_cliff_kite |  | 1 | 1 | 8 | 1 | 随种群密度变化 |  |  |
 | 退水石脊（undertow_bed） | 资源 | 灵晶（core） | core | 侧洞灵晶 | 5 | 9 | 7 | 2 |  |  | 3 |
 | 退水石脊（undertow_bed） | 种群 | 负丘虺（undertow_moundback） | undertow_moundback |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 信架与钟枢（counter_bell_score） | 资源 | 暗金（black_iron） | black_iron | 钟座暗金 | 4 | 8 | 7 | 2 |  |  | 3 |
 | 信架与钟枢（counter_bell_score） | 种群 | 屈膝铜影（river_copper_echo） | river_copper_echo |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 两面低埂（zhao_dyke_bend） | 资源 | 灵草（reed） | reed | 白芽 | 6 | 9 | 4 | 3 |  |  | 1 |
-| 两面低埂（zhao_dyke_bend） | 种群 | 黄沿水貂（dyke_marten） | dyke_marten |  | 1 | 3 | 4 | 1 | 随种群密度变化 |  |  |
+| 两面低埂（zhao_dyke_bend） | 种群 | 黄沿水貂（dyke_marten） | dyke_marten |  | 2 | 5 | 4 | 1 | 随种群密度变化 |  |  |
+| 两面低埂（zhao_dyke_bend） | 种群 | 灰苇灵鸭（zhao_reed_duck） | zhao_reed_duck |  | 3 | 6 | 5 | 1 | 随种群密度变化 |  |  |
 | 三姓木码头（zhao_float_goods） | 资源 | 松木（wood） | wood | 晒台松枝 | 5 | 9 | 4 | 3 |  |  | 2 |
 | 竹尺庭（zhao_bamboo_duel） | 种群 | 掌尺人傅澄（zhao_spar） | zhao_spar |  | 1 | 1 | 6 | 1 | 固定间隔 |  |  |
 | 斜萍石窝（zhao_frog_shelf） | 资源 | 灵草（reed） | reed | 外圈灵草 | 7 | 11 | 5 | 3 |  |  | 2 |
-| 斜萍石窝（zhao_frog_shelf） | 种群 | 火斑大蛙（glass_frog） | glass_frog |  | 2 | 4 | 4.5 | 1 | 随种群密度变化 |  |  |
+| 斜萍石窝（zhao_frog_shelf） | 种群 | 火斑大蛙（glass_frog） | glass_frog |  | 3 | 6 | 4.5 | 1 | 随种群密度变化 |  |  |
+| 塘背的旧便门（zhao_pond_shutter） | 种群 | 撞闩塘獭（zhao_gate_otter） | zhao_gate_otter |  | 1 | 1 |  |  | 不回补 |  |  |
 | 倒行刻碑（zhao_retreat_marks） | 资源 | 寒铁（ore） | ore | 碑脚寒铁砂 | 7 | 11 | 5 | 3 |  |  | 2 |
 | 浮洲松根（zhao_isle_reeds） | 资源 | 松木（wood） | wood | 洲上老松 | 7 | 11 | 5 | 3 |  |  | 1 |
 | 浮洲松根（zhao_isle_reeds） | 资源 | 灵晶（core） | core | 沉根灵晶 | 5 | 8 | 6 | 3 |  |  | 2 |
 | 青膜硬埂（zhao_scales） | 资源 | 寒铁（ore） | ore | 藻下铁砂 | 8 | 12 | 5 | 4 |  |  | 2 |
-| 青膜硬埂（zhao_scales） | 种群 | 泥鳞鬃犬（mud_shrike） | mud_shrike |  | 1 | 3 | 7 | 1 | 随种群密度变化 |  |  |
+| 青膜硬埂（zhao_scales） | 种群 | 泥鳞鬃犬（mud_shrike） | mud_shrike |  | 2 | 5 | 7 | 1 | 随种群密度变化 |  |  |
+| 青膜硬埂（zhao_scales） | 种群 | 苔背泽鳖（zhao_moss_turtle） | zhao_moss_turtle |  | 3 | 6 | 8 | 1 | 随种群密度变化 |  |  |
+| 青膜硬埂（zhao_scales） | 种群 | 火斑大蛙（glass_frog） | glass_frog |  | 5 | 10 | 5 | 2 | 随种群密度变化 |  |  |
+| 青膜硬埂（zhao_scales） | 种群 | 缠藻泥鳗（zhao_rush_eel） | zhao_rush_eel |  | 6 | 11 | 5 | 2 | 随种群密度变化 |  |  |
 | 高脚粮仓（zhao_grain_ladder） | 资源 | 松木（wood） | wood | 粮仓碎松 | 8 | 12 | 6 | 4 |  |  | 2 |
 | 横卧的半边磨轮（zhao_old_wheel） | 资源 | 灵晶（core） | core | 磨轮灵晶 | 8 | 12 | 6 | 4 |  |  | 1 |
 | 斜封窑棚（zhao_firedoor） | 资源 | 松木（wood） | wood | 炭棚松枝 | 7 | 12 | 5 | 4 |  |  | 2 |
 | 铜槽旁（zhao_submerged_table） | 资源 | 灵晶（core） | core | 量槽外晶屑 | 9 | 15 | 8 | 4 |  |  | 3 |
 | 铜槽旁（zhao_submerged_table） | 种群 | 槽背水魁（lab_crawler） | lab_crawler |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
-| 赤泥横穴（zhao_bank_fire） | 资源 | 暗金（black_iron） | black_iron | 帘脚的暗金 | 9 | 14 | 10 | 4 |  |  | 2 |
+| 赤泥横穴（zhao_bank_fire） | 资源 | 暗金（black_iron） | black_iron | 帘内暗金 | 9 | 14 | 10 | 4 |  |  | 2 |
+| 赤泥横穴（zhao_bank_fire） | 资源 | 暗金（black_iron） | vent_sand | 帘外重砂 | 2 | 2 | 0 | 0 |  |  | 4 |
 | 赤泥横穴（zhao_bank_fire） | 种群 | 伏灰炭魈（ember_yak） | ember_yak |  | 1 | 1 | 19 | 1 | 固定间隔 |  |  |
 | 六角晒网（zhao_glass_net） | 资源 | 灵晶（core） | core | 滩中灵晶 | 6 | 10 | 6 | 3 |  |  | 2 |
 | 分水三柱（zhao_deep_pillars） | 种群 | 分柱水君（fault_warden） | fault_warden |  | 1 | 1 | 0 | 0 | 不回补 |  |  |
 | 沙坠顺风线（zhao_rope_sound） | 资源 | 暗金（black_iron） | black_iron | 绳结里的暗金 | 6 | 11 | 7 | 3 |  |  | 1 |
-| 沙坠顺风线（zhao_rope_sound） | 种群 | 黄沿水貂（dyke_marten） | dyke_marten |  | 1 | 3 | 5 | 1 | 随种群密度变化 |  |  |
+| 沙坠顺风线（zhao_rope_sound） | 种群 | 黄沿水貂（dyke_marten） | dyke_marten |  | 2 | 5 | 5 | 1 | 随种群密度变化 |  |  |
 | 三口相背的堰齿（zhao_broken_rake） | 资源 | 灵晶（core） | core | 断齿灵晶 | 8 | 14 | 7 | 4 |  |  | 1 |
 | 长礁灯脚（zhao_ferry_hook） | 资源 | 松木（wood） | wood | 灯礁松木 | 8 | 13 | 6 | 4 |  |  | 1 |
 | 对簧石台（sand_cloister_trial） | 种群 | 叩石师姐袁息（sand_tuner） | sand_tuner |  | 1 | 1 |  |  | 不回补 |  |  |
@@ -1533,19 +1728,23 @@
 | 逆纹马蹄石（sand_approach_hoof） | 资源 | 寒铁（ore） | ore | 白石下的寒铁片 | 3 | 5 | 5 | 1 |  |  | 3 |
 | 倒挂的驿印（sand_archive_guard） | 种群 | 倒驿锁影（sand_inverted_keeper） | sand_inverted_keeper |  | 1 | 1 |  |  | 不回补 |  |  |
 | 晃铜的桥栏（sand_bridge_rail） | 资源 | 松木（wood） | wood | 桥板旁的旧松木 | 4 | 7 | 4 | 2 |  |  | 3 |
-| 晃铜的桥栏（sand_bridge_rail） | 种群 | 黄结桥蝰（sand_rattle_viper） | sand_rattle_viper |  | 1 | 3 | 4.5 | 1 | 随种群密度变化 |  |  |
+| 晃铜的桥栏（sand_bridge_rail） | 种群 | 黄结桥蝰（sand_rattle_viper） | sand_rattle_viper |  | 2 | 5 | 4.5 | 1 | 随种群密度变化 |  |  |
 | 风楔架（sand_wind_work） | 资源 | 寒铁（ore） | ore | 岩缝里的寒铁 | 4 | 7 | 5 | 2 |  |  | 1 |
 | 风楔架（sand_wind_work） | 资源 | 灵晶（core） | core | 沙槽里的灵晶 | 3 | 6 | 6 | 2 |  |  | 2 |
 | 关了一半的仓门（sand_silo_door） | 资源 | 灵草（reed） | reed | 卸谷洞边的灵草 | 3 | 6 | 4 | 2 |  |  | 3 |
-| 关了一半的仓门（sand_silo_door） | 种群 | 仓花貂（sand_silo_marten） | sand_silo_marten |  | 2 | 4 | 4 | 1 | 随种群密度变化 |  |  |
+| 关了一半的仓门（sand_silo_door） | 种群 | 仓花貂（sand_silo_marten） | sand_silo_marten |  | 3 | 6 | 4 | 1 | 随种群密度变化 |  |  |
 | 断琉棱（sand_hail_floor） | 资源 | 灵晶（core） | core | 洼沿散下的灵晶 | 3 | 6 | 6 | 2 |  |  | 1 |
 | 断琉棱（sand_hail_floor） | 资源 | 灵晶（core） | core_inner | 断棱底下的灵晶 | 5 | 8 | 8 | 2 |  |  | 4 |
-| 断琉棱（sand_hail_floor） | 种群 | 三痕琉狮（sand_glass_lynx） | sand_glass_lynx |  | 1 | 2 | 13 | 1 | 随种群密度变化 | 1.15 |  |
+| 断琉棱（sand_hail_floor） | 种群 | 三痕琉狮（sand_glass_lynx） | sand_glass_lynx |  | 2 | 3 | 13 | 1 | 随种群密度变化 | 1.15 |  |
 | 贴壁支木（sand_hanging_support） | 资源 | 寒铁（ore） | ore | 坡角露出的寒铁 | 4 | 7 | 5 | 2 |  |  | 1 |
 | 贴壁支木（sand_hanging_support） | 资源 | 暗金（black_iron） | black_iron | 支架后的暗金 | 4 | 8 | 6 | 2 |  |  | 3 |
-| 贴壁支木（sand_hanging_support） | 种群 | 负砂豺（sand_vein_jackal） | sand_vein_jackal |  | 1 | 2 | 8 | 1 | 随种群密度变化 | 1.25 |  |
+| 贴壁支木（sand_hanging_support） | 种群 | 负砂豺（sand_vein_jackal） | sand_vein_jackal |  | 2 | 3 | 8 | 1 | 随种群密度变化 | 1.25 |  |
+| 贴壁支木（sand_hanging_support） | 种群 | 铁斑蜥（sand_iron_skink） | sand_iron_skink |  | 2 | 5 | 5.5 | 1 | 随种群密度变化 |  |  |
 | 伏草沙坎（sand_dune_grass） | 资源 | 灵草（reed） | reed | 沙坎背面的灵草 | 4 | 7 | 4 | 2 |  |  | 1 |
-| 伏草沙坎（sand_dune_grass） | 种群 | 沙丘野兔（sand_dune_hare） | sand_dune_hare |  | 2 | 4 | 3.5 | 1 | 随种群密度变化 | 1.1 |  |
+| 伏草沙坎（sand_dune_grass） | 种群 | 沙丘野兔（sand_dune_hare） | sand_dune_hare |  | 3 | 6 | 3.5 | 1 | 随种群密度变化 | 1.1 |  |
+| 伏草沙坎（sand_dune_grass） | 种群 | 沙脊雉（sand_ridge_pheasant） | sand_ridge_pheasant |  | 2 | 5 | 5 | 1 | 随种群密度变化 |  |  |
+| 伏草沙坎（sand_dune_grass） | 种群 | 盐尾狐（sand_salt_fox） | sand_salt_fox |  | 2 | 5 | 6 | 1 | 随种群密度变化 | 1.15 |  |
+| 伏草沙坎（sand_dune_grass） | 种群 | 伏沟野猪（sand_root_boar） | sand_root_boar |  | 2 | 4 | 7 | 1 | 随种群密度变化 | 1.2 |  |
 | 留阴瓦畦（sand_rooftile_patch） | 资源 | 灵草（reed） | reed | 上畦灵草 | 5 | 8 | 5 | 2 |  |  | 1 |
 | 留阴瓦畦（sand_rooftile_patch） | 资源 | 新收的谷子（millet_grain） | millet_grain | 瓦棚下打过的谷子 | 3 | 4 | 5 | 1 |  |  | 3 |
 | 搁木的浅弯（sand_gravel_rill） | 资源 | 松木（wood） | wood | 沟弯搁下的松木 | 5 | 7 | 4 | 2 |  |  | 1 |
@@ -1553,7 +1752,7 @@
 | 岸边竹棚（sand_basket_shed） | 种群 | 补箩老人（sand_basket_mender） | sand_basket_mender |  | 1 | 1 |  |  | 不回补 |  |  |
 | 铜轮前（sand_glass_chamber） | 种群 | 照壁刀师邢既横（sand_sundial_master） | sand_sundial_master |  | 1 | 1 |  |  | 不回补 |  |  |
 | 封乔的护堤木台（marsh_pole_lesson） | 种群 | 护堤人封乔（river_spar_captain） | river_spar_captain |  | 1 | 1 | 5 | 1 | 固定间隔 |  |  |
-| 闸下无灯梯（ford_below_steps） | 种群 | 悬梯堰影（ford_lower_spirit） | ford_lower_spirit |  | 1 | 2 | 11 | 1 | 固定间隔 |  |  |
+| 闸下无灯梯（ford_below_steps） | 种群 | 悬梯堰影（ford_lower_spirit） | ford_lower_spirit |  | 2 | 4 | 11 | 1 | 固定间隔 |  |  |
 
 ## 守护采集、途中伏击与胜后领取
 
@@ -1561,47 +1760,49 @@
 
 | 地区 | 地点 | 对手 | 现场动作 | 放行条件 | 有活跃对手时每批触发几率 | 一批或一次所得 | 物品池 | 第1日对手数量 | 对手上限 | 基准补充间隔（游戏日） | 每次补充数量 | 种群回补规律 | 清场后首只回归（游戏日） | 再访条件 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 白苇滩（marsh） | 碎石水眼（mud_track） | 苇尾狐（reed_fox） | 捡起土路边的油纸包 | 获胜一次后可办理一次 |  | 干粮（ration）×1 |  | 2 | 4 | 4 | 1 | 随种群密度变化 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 白苇滩（marsh） | 渡工的刨木滩（reed_ferryman） | 巡岸水鬼（marsh_ghost） | 采下对岸的熟苇芯 | 清除本地全部看守 |  | 灵草（reed）×3 | 灵草（初始3、上限5、每5日补2） | 1 | 2 | 3 | 1 | 固定间隔 | 3 | 看守回来才须再清场，库存单独回生 |
+| 白苇滩（marsh） | 碎石水眼（mud_track） | 苇尾狐（reed_fox） | 捡起土路边的油纸包 | 获胜一次后可办理一次 |  | 干粮（ration）×1 |  | 3 | 6 | 4 | 1 | 随种群密度变化 |  | 已获胜便可回来办理，领取后关闭选项 |
+| 白苇滩（marsh） | 渡工的刨木滩（reed_ferryman） | 巡岸水鬼（marsh_ghost） | 采下对岸的熟苇芯 | 清除本地全部看守 |  | 灵草（reed）×3 | 灵草（初始3、上限5、每5日补2） | 2 | 3 | 5 | 1 | 固定间隔 | 5 | 看守回来才须再清场，库存单独回生 |
 | 白苇滩（marsh） | 矮石堤（bank_watch） | 拦滩客（bank_runner） | 等拦滩客兑现交手的约定 | 获胜一次后可办理一次 |  | 沉钟岭路图（ridge_rubbing）×1、渡口钩刃（hook_blade）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 白苇滩（marsh） | 沉桅高埂（drowned_mast） | 沉桅虺（mast_beast） | 拨开桅杆旁边的草 | 获胜一次后可办理一次 |  | 认路钱（path_charm）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 沉钟岭（ridge） | 有回声的矿道（miner_echo） | 持锤矿煞（ore_wight） | 去主道的矿壁撬松矿脉 | 清除本地全部看守 |  | 寒铁（ore）×3、灵晶（core）×2 | 主道寒铁（初始2、上限4、每3日补1）、灵晶（初始2、上限4、每5日补1） | 1 | 2 | 3 | 1 | 固定间隔 | 3 | 看守回来才须再清场，库存单独回生 |
+| 沉钟岭（ridge） | 有回声的矿道（miner_echo） | 持锤矿煞（ore_wight） | 去主道的矿壁撬松矿脉 | 清除本地全部看守 |  | 寒铁（ore）×3、灵晶（core）×2 | 主道寒铁（初始2、上限4、每3日补1）、灵晶（初始2、上限4、每5日补1） | 2 | 3 | 3 | 1 | 固定间隔 | 3 | 看守回来才须再清场，库存单独回生 |
 | 沉钟岭（ridge） | 裂钟背面（cracked_bell） | 裂钟魄（bell_wraith） | 取下铜钩上的小铃 | 获胜一次后可办理一次 |  | 定声铃（bell_charm）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 闭潮渡（ford） | 闸外浅阶（low_tide） | 缠舟兽（rope_eel） | 握着船绳扫出槽底的灵晶 | 可直接采，活跃对手可能打断每批采集 | 30% | 灵晶（core）×3 | 槽底灵晶（初始2、上限3、每2日补1） | 1 | 3 | 2.5 | 1 | 随种群密度变化 | 2.5 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
+| 闭潮渡（ford） | 闸外浅阶（low_tide） | 缠舟兽（rope_eel） | 握着船绳扫出槽底的灵晶 | 可直接采，活跃对手可能打断每批采集 | 30% | 灵晶（core）×3 | 槽底灵晶（初始2、上限3、每2日补1） | 2 | 5 | 2.5 | 1 | 随种群密度变化 | 2.5 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
 | 闭潮渡（ford） | 旧闸深槽（tide_keeper） | 守潮灵（tide_spirit） | 取出闸边石槽里的镇渡印 | 获胜一次后可办理一次 |  | 镇渡印（seal）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 回灯埠（hidden） | 低水船桩（sunken_mooring） | 湿蓑灯蜕（wick_husk） | 用松枝点亮桩灯 | 获胜一次后可办理一次 |  |  |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 青崖松场（pine_ridge） | 翻车的松沟（pine_hollow） | 灰脊松熊（pitch_bear） | 拾起小路边的木签 | 获胜一次后可办理一次 |  | 窑车辙样（kiln_tracks）×1 |  | 1 | 2 | 7 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
+| 青崖松场（pine_ridge） | 翻车的松沟（pine_hollow） | 灰脊松熊（pitch_bear） | 拾起小路边的木签 | 获胜一次后可办理一次 |  | 窑车辙样（kiln_tracks）×1 |  | 2 | 4 | 7 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 青崖松场（pine_ridge） | 索棚拳场（pine_spar） | 松场巡索人（road_sparrer） | 向轮值的守索人领试刀礼 | 每次获胜解锁本班奖品 |  | 松场习刀（trail_cutter）×1 |  | 1 | 1 | 8 | 1 | 固定间隔 |  | 换班后再胜可领取下一班奖品 |
-| 云炉石谷（kiln_valley） | 废窑烟道（kiln_flue） | 炉渣犬（cinder_hound） | 取石柜底未烧过的耐火泥 | 清除本地全部看守 |  | 耐火泥（kiln_clay）×3 | 耐火泥（初始3、上限3、存量有限） | 1 | 2 | 8 | 1 | 固定间隔 | 12 | 有余料且看守回来时须再清场，采尽后不再补充 |
-| 篁泽药谷（herb_basin） | 白藤塘（vine_pond） | 白角藤鹿（vine_stag） | 踩过浅水去剪银脉叶 | 可直接采，活跃对手可能打断每批采集 | 35% | 灵草（reed）×4 | 塘边银脉叶（初始4、上限8、每7日补2） | 1 | 4 | 8 | 1 | 随种群密度变化 | 12 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
+| 云炉石谷（kiln_valley） | 废窑烟道（kiln_flue） | 炉渣犬（cinder_hound） | 取石柜底未烧过的耐火泥 | 清除本地全部看守 |  | 耐火泥（kiln_clay）×3 | 耐火泥（初始3、上限3、存量有限） | 2 | 3 | 8 | 1 | 固定间隔 | 12 | 有余料且看守回来时须再清场，采尽后不再补充 |
+| 篁泽药谷（herb_basin） | 白藤塘（vine_pond） | 白角藤鹿（vine_stag） | 踩过浅水去剪银脉叶 | 可直接采，活跃对手可能打断每批采集 | 35% | 灵草（reed）×4 | 塘边银脉叶（初始4、上限8、每7日补2） | 2 | 6 | 8 | 1 | 随种群密度变化 | 12 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
 | 篁泽药谷（herb_basin） | 白藤塘（vine_pond） | 白纹鹿王（vine_king） | 到背水坡剪上游的银脉叶 | 击败看守后永久开放 |  | 灵草（reed）×4 | 上游银脉叶（初始5、上限6、每10日补2） | 1 | 1 | 0 | 0 | 不回补 |  | 取胜后有余料即可直接采，库存单独回生 |
-| 玄砂矿脉（black_mine） | 横肩偏井（deep_vein） | 横肩矿傀（vein_sentinel） | 翻开井外的旧工具柜 | 获胜一次后可办理一次 |  | 暗星刀（star_blade）×1、暗星刀匣底图（star_blade_pattern）×1 |  | 1 | 2 | 9 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 玄砂矿脉（black_mine） | 横肩偏井（deep_vein） | 横肩矿傀（vein_sentinel） | 顺碎车槽去剔松矿脉 | 清除本地全部看守 |  | 暗金（black_iron）×4、灵晶（core）×1 | 暗金（初始4、上限6、每8日补2）、灵晶（初始1、上限3、每8日补1） | 1 | 2 | 9 | 1 | 固定间隔 | 15.3 | 看守回来才须再清场，库存单独回生 |
+| 玄砂矿脉（black_mine） | 横肩偏井（deep_vein） | 横肩矿傀（vein_sentinel） | 翻开井外的旧工具柜 | 获胜一次后可办理一次 |  | 暗星刀匣底图（star_blade_pattern）×1 |  | 2 | 3 | 9 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
+| 玄砂矿脉（black_mine） | 横肩偏井（deep_vein） | 横肩矿傀（vein_sentinel） | 顺碎车槽去剔松矿脉 | 清除本地全部看守 |  | 暗金（black_iron）×4、灵晶（core）×1 | 暗金（初始4、上限6、每8日补2）、灵晶（初始1、上限3、每8日补1） | 2 | 3 | 9 | 1 | 固定间隔 | 15.3 | 看守回来才须再清场，库存单独回生 |
 | 天衡石台（sky_terrace） | 反峰镜门（mirror_gate） | 持衡镜灵（mirror_warden） | 扶稳印座，取出衡印 | 获胜一次后可办理一次 |  | 镜门衡印（sky_seal）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 沉钟岭（ridge） | 背钟试剑亭（foundation_duel） | 守卷剑客何鹿（foundation_duelist） | 请守书人在借卷帖上盖印 | 获胜一次后可办理一次 |  | 守卷剑客的试剑印（foundation_spar_mark）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 云炉石谷（kiln_valley） | 旧丹窑内壁（foundation_kiln） | 护印窑影（foundation_kiln_echo） | 擦掉挡板上的灰，取出旧印 | 获胜一次后可办理一次 |  | 丹窑旧印半片（foundation_kiln_seal）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 碎云雪关（snow_pass） | 封石验药室（foundation_court） | 封石护炉人（foundation_warden） | 请护炉人补上最后一道印 | 获胜一次后可办理一次 |  | 验药室的留火印（foundation_warden_proof）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 跃鱼旧渠（fish_ladder） | 第三级闸口（ladder_drop） | 横脊闸兽（river_gateback） | 到最下面的水槽筛寒铁 | 清除本地全部看守 |  | 寒铁（ore）×3 | 槽底寒铁（初始4、上限7、每5日补2） | 1 | 2 | 6 | 1 | 随种群密度变化 | 6 | 看守回来才须再清场，库存单独回生 |
-| 晒盘坡（screen_slope） | 断壁筛架（slope_sieves） | 石甲獾（stone_badger） | 抓着绳子，到高处筛暗金 | 清除本地全部看守 |  | 暗金（black_iron）×2 | 高处筛盘的暗金（初始2、上限5、每7日补1） | 1 | 3 | 6 | 1 | 随种群密度变化 | 6 | 看守回来才须再清场，库存单独回生 |
+| 跃鱼旧渠（fish_ladder） | 第三级闸口（ladder_drop） | 横脊闸兽（river_gateback） | 到最下面的水槽筛寒铁 | 清除本地全部看守 |  | 寒铁（ore）×3 | 槽底寒铁（初始4、上限7、每5日补2） | 2 | 3 | 6 | 1 | 随种群密度变化 | 6 | 看守回来才须再清场，库存单独回生 |
+| 晒盘坡（screen_slope） | 断壁筛架（slope_sieves） | 石甲獾（stone_badger） | 抓着绳子，到高处筛暗金 | 清除本地全部看守 |  | 暗金（black_iron）×2 | 高处筛盘的暗金（初始2、上限5、每7日补1） | 2 | 4 | 6 | 1 | 随种群密度变化 | 6 | 看守回来才须再清场，库存单独回生 |
+| 晒盘坡（screen_slope） | 双灯照到的旧吊板（slope_lantern_high） | 石鹞（river_cliff_kite） | 抓牢护绳，筛吊板尽头的暗金 | 清除本地全部看守 |  | 暗金（black_iron）×2 | 吊板尽头石缝里的暗金（初始4、上限6、每8日补2） | 1 | 1 | 8 | 1 | 随种群密度变化 | 8 | 看守回来才须再清场，库存单独回生 |
 | 回潮母洞（undertow_grotto） | 退水石脊（undertow_bed） | 负丘虺（undertow_moundback） | 挖泥地正中的黑泥 | 获胜一次后可办理一次 |  | 伏潮息泥（heart_silt）×2 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 回潮母洞（undertow_grotto） | 退水石脊（undertow_bed） | 负丘虺（undertow_moundback） | 沿石脊绕去侧洞，采灵晶 | 击败看守后永久开放 |  | 灵晶（core）×4 | 侧洞灵晶（初始5、上限9、每7日补2） | 1 | 1 | 0 | 0 | 不回补 |  | 取胜后有余料即可直接采，库存单独回生 |
 | 反声钟窟（counter_bell） | 信架与钟枢（counter_bell_score） | 屈膝铜影（river_copper_echo） | 取出信架下的传送卷轴图纸 | 获胜一次后可办理一次 |  | 传送卷轴图纸（gate_scroll_formula）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 反声钟窟（counter_bell） | 信架与钟枢（counter_bell_score） | 屈膝铜影（river_copper_echo） | 移开挂片，筛钟座下的暗金 | 击败看守后永久开放 |  | 暗金（black_iron）×3 | 钟座暗金（初始4、上限8、每7日补2） | 1 | 1 | 0 | 0 | 不回补 |  | 取胜后有余料即可直接采，库存单独回生 |
-| 藻鳞泥浜（scale_bog） | 青膜硬埂（zhao_scales） | 泥鳞鬃犬（mud_shrike） | 挖浅水边的铁砂 | 可直接采，活跃对手可能打断每批采集 | 30% | 寒铁（ore）×6 | 藻下铁砂（初始8、上限12、每5日补4） | 1 | 3 | 7 | 1 | 随种群密度变化 | 7 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
+| 蛙背塘（frog_pond） | 塘背的旧便门（zhao_pond_shutter） | 撞闩塘獭（zhao_gate_otter） | 扶正小水门，请堤工当场验一遭 | 获胜一次后可办理一次 |  | 省潮司的试闸回条（zhao_gate_receipt）×1 |  | 1 | 1 |  |  | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
+| 藻鳞泥浜（scale_bog） | 青膜硬埂（zhao_scales） | 泥鳞鬃犬（mud_shrike） | 挖浅水边的铁砂 | 可直接采，活跃对手可能打断每批采集 | 30% | 寒铁（ore）×6 | 藻下铁砂（初始8、上限12、每5日补4） | 2 | 5 | 7 | 1 | 随种群密度变化 | 7 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
 | 沉水量站（sunken_lab） | 铜槽旁（zhao_submerged_table） | 槽背水魁（lab_crawler） | 拔掉铜板的插销，印下刻图 | 获胜一次后可办理一次 |  | 伏潮漏图（phase_chart）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 烧黑的伏火坑（night_pit） | 赤泥横穴（zhao_bank_fire） | 伏灰炭魈（ember_yak） | 沿帘脚扫出暗金 | 清除本地全部看守 |  | 暗金（black_iron）×6 | 帘脚的暗金（初始9、上限14、每10日补4） | 1 | 1 | 19 | 1 | 固定间隔 | 19 | 看守回来才须再清场，库存单独回生 |
+| 烧黑的伏火坑（night_pit） | 赤泥横穴（zhao_bank_fire） | 伏灰炭魈（ember_yak） | 沿帘脚扫出暗金 | 清除本地全部看守 |  | 暗金（black_iron）×6 | 帘内暗金（初始9、上限14、每10日补4） | 1 | 1 | 19 | 1 | 固定间隔 | 19 | 看守回来才须再清场，库存单独回生 |
 | 错水湖底（fault_lake） | 分水三柱（zhao_deep_pillars） | 分柱水君（fault_warden） | 打开石台上的暗槽，取出旧文书 | 获胜一次后可办理一次 |  | 留水底印（fault_receipt）×1 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 叩石院（sand_bell_cloister） | 对簧石台（sand_cloister_trial） | 叩石师姐袁息（sand_tuner） | 向袁息讨这场的评语 | 获胜一次后可办理一次 |  |  |  | 1 | 1 |  |  | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 静盐井心（stillwell_vault） | 挂陶罐的井壁（sand_stillwell_vault） | 静井伏鳞（sand_well_basilisk） | 解下铜钉上挂着的陶罐 | 获胜一次后可办理一次 |  | 井心水盐（stillwell_salt）×1 |  | 1 | 1 |  |  | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 倒驿白廊（chalk_archive） | 倒挂的驿印（sand_archive_guard） | 倒驿锁影（sand_inverted_keeper） | 按货牌上的记号打开货柜 | 获胜一次后可办理一次 |  | 暗金（black_iron）×8、灵晶（core）×6 |  | 1 | 1 |  |  | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 空音桥（dry_sound_bridge） | 晃铜的桥栏（sand_bridge_rail） | 黄结桥蝰（sand_rattle_viper） | 从外侧石台取走多出来的松木 | 可直接采，活跃对手可能打断每批采集 | 25% | 松木（wood）×2 | 桥板旁的旧松木（初始4、上限7、每4日补2） | 1 | 3 | 4.5 | 1 | 随种群密度变化 | 4.5 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
-| 落琉洼（glass_hail_sink） | 断琉棱（sand_hail_floor） | 三痕琉狮（sand_glass_lynx） | 取出卡在晶石底下的金属片 | 清除本地全部看守 |  | 落琉洼的弹片（sand_glass_pass）×1 |  | 1 | 2 | 13 | 1 | 随种群密度变化 | 14.95 | 看守回来才须再清场，库存单独回生 |
-| 落琉洼（glass_hail_sink） | 断琉棱（sand_hail_floor） | 三痕琉狮（sand_glass_lynx） | 挖断晶下面的大块灵晶 | 清除本地全部看守 |  | 灵晶（core）×4 | 断棱底下的灵晶（初始5、上限8、每8日补2） | 1 | 2 | 13 | 1 | 随种群密度变化 | 14.95 | 看守回来才须再清场，库存单独回生 |
-| 横生脉（hanging_vein） | 贴壁支木（sand_hanging_support） | 负砂豺（sand_vein_jackal） | 钻进绳架后淘暗金 | 清除本地全部看守 |  | 暗金（black_iron）×3 | 支架后的暗金（初始4、上限8、每6日补2） | 1 | 2 | 8 | 1 | 随种群密度变化 | 10 | 看守回来才须再清场，库存单独回生 |
+| 空音桥（dry_sound_bridge） | 晃铜的桥栏（sand_bridge_rail） | 黄结桥蝰（sand_rattle_viper） | 从外侧石台取走多出来的松木 | 可直接采，活跃对手可能打断每批采集 | 25% | 松木（wood）×2 | 桥板旁的旧松木（初始4、上限7、每4日补2） | 2 | 5 | 4.5 | 1 | 随种群密度变化 | 4.5 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
+| 落琉洼（glass_hail_sink） | 断琉棱（sand_hail_floor） | 三痕琉狮（sand_glass_lynx） | 取出卡在晶石底下的金属片 | 清除本地全部看守 |  | 落琉洼的弹片（sand_glass_pass）×1 |  | 2 | 3 | 13 | 1 | 随种群密度变化 | 14.95 | 看守回来才须再清场，库存单独回生 |
+| 落琉洼（glass_hail_sink） | 断琉棱（sand_hail_floor） | 三痕琉狮（sand_glass_lynx） | 挖断晶下面的大块灵晶 | 清除本地全部看守 |  | 灵晶（core）×4 | 断棱底下的灵晶（初始5、上限8、每8日补2） | 2 | 3 | 13 | 1 | 随种群密度变化 | 14.95 | 看守回来才须再清场，库存单独回生 |
+| 横生脉（hanging_vein） | 贴壁支木（sand_hanging_support） | 负砂豺（sand_vein_jackal） | 钻进绳架后淘暗金 | 清除本地全部看守 |  | 暗金（black_iron）×3 | 支架后的暗金（初始4、上限8、每6日补2） | 2 | 3 | 8 | 1 | 随种群密度变化 | 10 | 看守回来才须再清场，库存单独回生 |
 | 砾盘浅沟（bone_dry_rill） | 岸边竹棚（sand_basket_shed） | 补箩老人（sand_basket_mender） | 请老人讲讲方才那一步 | 获胜一次后可办理一次 |  |  |  | 1 | 1 |  |  | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 琉脊天室（glass_rotunda） | 铜轮前（sand_glass_chamber） | 照壁刀师邢既横（sand_sundial_master） | 拉住铁环，和邢既横一起转动铜轮 | 获胜一次后可办理一次 |  | 暗金（black_iron）×5、灵晶（core）×8、旧布袋的底纹（qiankun_inner_pattern）×1 |  | 1 | 1 |  |  | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 白苇滩（marsh） | 封乔的护堤木台（marsh_pole_lesson） | 护堤人封乔（river_spar_captain） | 接过封乔的试杆签 | 获胜一次后可办理一次 |  | 封乔的试杆签（river_trial_writ）×1 |  | 1 | 1 | 5 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 闭潮渡（ford） | 闸下无灯梯（ford_below_steps） | 悬梯堰影（ford_lower_spirit） | 翻看松动的修闸名牌 | 获胜一次后可办理一次 |  |  |  | 1 | 2 | 11 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
+| 闭潮渡（ford） | 闸下无灯梯（ford_below_steps） | 悬梯堰影（ford_lower_spirit） | 翻看松动的修闸名牌 | 获胜一次后可办理一次 |  |  |  | 2 | 4 | 11 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
 
 ## 事件正文
 
@@ -1659,21 +1860,27 @@
 | meadow_ruts | 雁脚泥垄 |  | 水口封住后，泥地晒出一层硬壳，雀儿落下来一啄就碎。深处有个长条形的土坑。 |
 | shoal_baskets | 灰鹭晒篮处 |  | 岸边水浅，鹭草露着细根。下游的石缝里常积些水冲上来的灵晶。白宜坐在两处中间，拿针给旧鞋补眼。 |
 | ladder_drop | 第三级闸口 |  | 上头的木梁低，涨水时漂来的枝条容易挂在上面。第二级阶没在及膝的水里，再往下才是排矿渣的槽。钓客岑响坐在水边的石凳上。 |
-| willow_yard | 卸货后院 |  | 货柜靠墙排成一列，旅人的包袱都暂堆在檐下。 |
-| gauge_piles | 刻尺水桩 |  | 水桩上方挂着一块红布。轮值人胥婉把湿纸托得很平，下方有格外深的第三截尺。水浪把晶屑推到外侧一只废铁盘上。 |
+| willow_yard | 卸货后院 |  | 货柜靠墙排成一列，旅人的包袱都暂堆在檐下。柴灶旁支着锅，门房正给歇脚的船工分肉汤。 |
+| gauge_piles | 刻尺水桩 |  | 水桩上方挂着一块红布。轮值人胥婉把湿纸托得很平，下方有格外深的第三截尺。外侧搁着一只废铁盘。 |
 | slope_sieves | 断壁筛架 |  | 坡下摆着筛寒铁的旧盘，盘沿能翻过来看。坡上的筛架靠两根木柱撑着，攀上去得抓住柱间垂下来的绳。 |
 | lantern_term | 夜灯廊 |  | 弟子裴见抱着一条用来护住过路人的粗绳。身旁串着几盏灯，门外长凳上还留着给行人歇脚的位置。 |
-| undertow_bed | 退水石脊 |  | 两股潮水都漫不过中间的石脊。顺绳下来，前面是一片平泥地。再往外，侧洞的石壁上闪着灵晶。 |
-| counter_bell_score | 信架与钟枢 |  | 你停下了，脚步声还从钟里多回来一下。墙上擦痕高过肩头，一直伸到古钟后面。角落的信架歪着，底下压了几页厚纸，旁边钟座上露出暗金。 |
+| slope_lantern_gap | 背风处的断灯 |  | 岩下有个凹窝，正对着裴见画的那一笔。两盏灯倒扣在油布上，铜扣旁扔着半截磨断的绳。 |
+| slope_lantern_low | 石沟下的灯棚 |  | 从灯下的脚窝下去就到浅沟。背风的大石下有人搭了个窄棚，药农正靠着药担喝茶。 |
+| slope_lantern_high | 双灯照到的旧吊板 |  | 两盏灯照着吊板，板下是冲浅的矿槽。矿夫在近头摊了小筛，走到尽头才够得着岩缝。 |
+| undertow_bed | 退水石脊 |  | 两股潮水都漫不过中间的石脊。顺绳下来，前面是一片平泥地，侧洞的口就在外侧。 |
+| counter_bell_score | 信架与钟枢 |  | 你停下了，脚步声还从钟里多回来一下。墙上擦痕高过肩头，一直伸到古钟后面。角落的信架歪着，底下压了几页厚纸。 |
 | zhao_flood_office | 城门水尺档 |  | 一排尺杆挂在墙上。司水的杜椿和外州船户核对水痕，手边搁着新、旧两册。 |
+| zhao_porridge_shed | 城墙根的粥铺 |  | 姜婶用铁勺刮了刮铜锅底，又给端碗的人添了一瓢水。门框上夹着一张等船脚带走的领米条。 |
 | zhao_dyke_bend | 两面低埂 |  | 晒席垂在靠水一面，水线贴着席子的下沿。老堤工站在低埂上，手边是一根挂晴雨旗的杆。 |
+| zhao_shutter_tracks | 往田里放水的旧闸 |  | 旧闸抬起后给田里放水。老堤工蹲在闸边，拿竹片戳了戳积泥上的一道长印。歪着的闸板下卡着半截门闩。 |
 | zhao_float_goods | 三姓木码头 |  | 船腹贴着木台，案板上压着写有各家姓氏的货签。余节扶着半边晒网架，另一头已经垂到了船里。 |
 | zhao_bamboo_duel | 竹尺庭 |  | 砖圈外的弟子喊了声「傅师父」。那人双脚没挪，竹尺一挑，滚到背后的石珠便落进他左手。他把珠子搁回窗台，示意你进来说话。 |
 | zhao_frog_shelf | 斜萍石窝 |  | 塘边的低石围出一口浅窝。沿外圈的踏脚石走，伸手便能碰到水边。 |
+| zhao_pond_shutter | 塘背的旧便门 |  | 浮木挤在旧便门上方，水里拖着半截青埂的门闩。岸边有条沿高石走的路。 |
 | zhao_retreat_marks | 倒行刻碑 |  | 碑上正面向河，刻的一律是涨水，背面朝着另一头，斜刀口里有水从低往高爬的线。 |
 | zhao_leak_bench | 斜漏驿棚 |  | 施荀把两只漏斗放在桌上试水。风一大，他就用手压住漏斗，底下还垫着一块斜铁。 |
 | zhao_isle_reeds | 浮洲松根 |  | 打弯的浅水只冲倒过松的一边，另一侧的沉根压着几团水晶。 |
-| zhao_scales | 青膜硬埂 |  | 一条硬埂把浅水和泥坑隔开。往左能踏上埂顶，贴右侧水湾也能站稳。铁砂大半埋在水藻底下。 |
+| zhao_scales | 青膜硬埂 |  | 一条硬埂把浅水和泥坑隔开。埂顶朝北接蛙背塘，朝水那边分出一道藻沟，铁砂大半埋在沟口。贴另一侧水湾的露石走也能站稳。 |
 | zhao_grain_ladder | 高脚粮仓 |  | 木梯有一只脚开裂了。何绢坐在谷壳里等人修，旁边晒着一堆短木，短得做不了接头。 |
 | zhao_ridge_permit | 青瓦验牒房 |  | 柯伯翻看手里的通行木牌。雨刚停，上一队人弄坏了两副绳架。验牌房的铃响起来，鸣沙那头也听得见。 |
 | zhao_old_wheel | 横卧的半边磨轮 |  | 半只磨轮躺在屋脚。水进不了底下的转弯，那里堆着被水推来的浮石。磨轮背后压着一块木牌。 |
@@ -1687,7 +1894,7 @@
 | zhao_ferry_hook | 长礁灯脚 |  | 清点货物的人往灯里添油，搁在灯下的船桨还粘着雾梁州的泥。礁石后常积着水冲来的沉木。 |
 | zhao_assay_tubs | 回水试槽 |  | 两根管子正往浅槽里滴水。一边有道低缺口，水满了能漫出去。施荀手边搁着调水的木柄，两只小陶罐倒扣在桌上。 |
 | sand_city_registry | 鸣沙井籍房 |  | 鲁勤正把去年的井票分成两叠。摆在案角的两张，去的都是担盐岗。 |
-| sand_cinder_kitchen | 炭篷边炉 |  | 杨芹端着汤，等走远路的人把满是沙的鞋脱在炉边。椅子还没坐热，她就问谁在白蹄道听到了铃。 |
+| sand_cinder_kitchen | 炭篷边炉 |  | 杨芹端着汤，等走远路的人把满是沙的鞋脱在炉边。椅子还没坐热，她就问谁在白蹄道听到了铃。锅旁晾着能包肉的宽叶。 |
 | sand_cloister_trial | 对簧石台 |  | 梁弦在棚下逐块敲石板，听回音。袁息守着少了一块石板的空架，旁边用麻绳围出练手的位置。两位巡井的人坐在圈外照看。 |
 | sand_ring_maker | 梁弦的工坊 |  | 工坊里挂着几片拨动会响的薄铜。梁弦正在案边削木把手。 |
 | sand_tent_watch | 晾绳矮帐 |  | 荀霜收卷晾过的粗绳，帐角的水滴一路落到残席的草根。 |
@@ -1695,19 +1902,19 @@
 | sand_salt_ledger | 井边老秤 |  | 老秤上拴着半卷油纸。每逢挑担的人来，邢茧便侧身让路，护住脚边的布包。 |
 | sand_stillwell_mouth | 井口的两根绳 |  | 闻銮守着卷井绳的石轮。粗绳垂进井里，细绳固定在旁边的铁框上，绳旁的扣子磨得发亮。 |
 | sand_stillwell_vault | 挂陶罐的井壁 |  | 井底白得像雪。一只长满粗鳞的兽伏在踏脚坑旁，井壁上的陶罐用铜钉挂得很高。 |
-| sand_stillwell_sill | 井底隔水板 |  | 铁梯底端另外有半面隔水板。渗水的盐痕沿侧边淌过，可以伸手够到浅槽里的晶角。 |
+| sand_stillwell_sill | 井底隔水板 |  | 铁梯底端另外有半面隔水板。渗水的盐痕沿侧边淌过。 |
 | sand_cold_kiln_house | 阮杪的档房 |  | 阮杪正在裁纸。墙上挂着几只雪白的陶罐，裂纹里一点灰都没有。桌上两份旧记录摊在一起，同一晚上竟写着两个火候。 |
-| sand_approach_hoof | 逆纹马蹄石 |  | 蹄纹踩向山下，旁边的小铁片都朝山上；从白石左边走，只会绕回起步处。 |
+| sand_approach_hoof | 逆纹马蹄石 |  | 蹄纹踩向山下，嵌在白石上的铁尖都朝山上。从白石左边走，只会绕回起步处。 |
 | sand_archive_guard | 倒挂的驿印 |  | 正前方有个挂着旧驿印的货柜。白柱后透出两点微光，脚步声过了一会儿才回来。 |
 | sand_bridge_rail | 晃铜的桥栏 |  | 黄桥匠在数栏上松脱的铜扣。手旁有块桥板没卡紧，下面还伸出几片垫桥板的松木。 |
-| sand_wind_work | 风楔架 |  | 石板被铁块卡住，朝阳的缝里能看见铁色。背风一侧还有一道积着细小灵晶的槽。 |
+| sand_wind_work | 风楔架 |  | 石板一块靠一块，朝阳和背阴的岩缝各通到一头。 |
 | sand_silo_door | 关了一半的仓门 |  | 蒋芨弯腰捡散落的粮仓封条。卸谷子的斜槽搭在仓边，石缝里落了不少风吹来的苇籽。 |
-| sand_hail_floor | 断琉棱 |  | 洼地边有些亮石片，浅浅埋在土里。断开的晶石反出一线光，照着石脊下原先安弹片的位置。 |
-| sand_hanging_support | 贴壁支木 |  | 风沙把寒铁渣推到支木前。翻过矮梁，暗金砂沿石脉向里的旧绳架堆。 |
+| sand_hail_floor | 断琉棱 |  | 断开的晶石反出一线光，照着石脊下原先安弹片的位置。 |
+| sand_hanging_support | 贴壁支木 |  | 风顺着矮梁下的矿缝穿过去。往里还有一座用绳和坠石拉住的旧架子。 |
 | sand_dune_grass | 伏草沙坎 |  | 伏草沿小坎连起一条阴沟。两段草根往外分，风过的时候响得不同。 |
 | sand_guest_miller | 栾火的并磨盘 |  | 栾火拿杯子量谷，脚边的磨盘有一半快转歪了。杯壁开了缝，计用水多少的木签也掉了一角。 |
-| sand_rooftile_patch | 留阴瓦畦 |  | 田户骆椿伏在瓦畦里修剪枯茎。她把分下的苇尖留在松土畦，旧谷堆在另一个瓦棚。 |
-| sand_gravel_rill | 搁木的浅弯 |  | 里弯有短木横过细砾，一点铁灰从外侧砾盘边渗出来。 |
+| sand_rooftile_patch | 留阴瓦畦 |  | 田户骆椿伏在瓦畦里修剪枯茎。西边一个瓦棚挡着日头，她刚从棚下一条小路绕过来。 |
+| sand_gravel_rill | 搁木的浅弯 |  | 里弯的细砾还带点潮气。绕到外侧，石子磨得更圆些。 |
 | sand_basket_shed | 岸边竹棚 |  | 一个老人坐在竹帘后补箩筐。凳腿陷进沙里，箩筐一点点向沟那边歪过去。 |
 | sand_glass_chamber | 铜轮前 |  | 石柱旁坐着一个人。他拿脚边的石头试刀，随手削下一角。听见脚步，他站了起来，正好挡在铜轮前。你回头还能看见来时的石缝。 |
 | puzzle_gauge_pin | 胥婉的旧水尺 |  | 胥婉把量水位的长木尺靠在墙边。尺顶的把手裂了。她一扶稳木尺，旁边的小筒就跟着晃，里面的铜杆撞得叮当响。 |
@@ -1720,6 +1927,9 @@
 | puzzle_granary_catch | 歪了的粮箱 |  | 粮仓里架着一口上宽下窄的木箱，谷子从箱底的小门放出来。眼下箱子歪了，门缝往下掉谷壳。箱子和木架之间夹着块麻布，地上还有几块垫脚的木头。 |
 | puzzle_hoof_markers | 三块刻着蹄印的石头 |  | 路边、窄道口和谷底各有一块能转动的石头。每块石头上都凿着蹄印，只是风沙把印子磨得几乎看不见了。 |
 | zhao_terrace_arena | 观内朱线台 |  | 台上画着三道红线，两侧坐着裁判。候场的人把木尺靠在名单旁，坐到长凳上绑护腕。 |
+| ford_watch_lamp | 渡口换班灯 |  | 渡口有条木栏伸进水面，候船的人坐在石阶上。 |
+| wharf_lee_lamp | 背风灯台 |  | 一段石台藏在岩壁背后。陈婆坐在台边，雨披搁在膝上缝了一半。 |
+| sand_saltwater_tracks | 沙脊下的兽迹 |  | 沙脊背面踩出一片新蹄印。印子全往炭篷驿那边去，边上还有股咸水味。 |
 | undertow_door | 反潮石门 |  | 芦苇后露出半扇厚重的石门，门边有道空槽。水从石门两侧往不同方向流，外侧的台阶还露在水面上。 |
 | marsh_pole_lesson | 封乔的护堤木台 |  | 护堤人封乔常年领村里的河工。他把湿麻绳拴在矮台外，留下近处一截给练手的人扶。台边立着长杆和软头杆。 |
 | counter_bell_door | 倒钟后的反声门 |  | 倒钟最矮处留着一枚没有字的石阶。石阶后有两个不同宽窄的孔，一长声一短声从里面撞回来。 |
@@ -1730,292 +1940,331 @@
 
 采集类选项的用时、伤害及产量按一批编排。每点一次、完成一批，所得先放在当前具体地点。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。
 
-| 事件标识 | 事件名称 | 选项序号 | 选项 | 时间（天） | 灵钱变化 | 气血变化 | 真气变化 | 首次选中所得修为 | 所需物品 | 消耗所需物品 | 条件满足前隐藏 | 所得物品 | 引发战斗 | 先做同一地点的选项序号 | 现场选项需先击败 | 每次胜利才可再次领取 | 在场会挡住选择的对手 | 有对手时每批采集伏击 | 选前可见内容 | 执行后结果 | 执行后受伤原因 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| reed_banks | 浅水苇丛 | 1 | 挖浅处的苇芯 | 0.25 | 0 | 0 | 0 | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  | 站在踏石上，手能伸到近岸的泥边。 | 你从踏石边的泥里挑出长实的白苇芯。 |  |
-| reed_banks | 浅水苇丛 | 2 | 蹚过去挖深处的苇芯 | 0.5 | 0 | -4 | 0 | 3 |  |  |  | 灵草（reed）×3 |  |  |  |  |  |  | 露水沾在水湾那丛苇叶上。 | 你蹚到水湾，抽出底下发白的嫩芯。 | 泥里埋着碎蚌壳，拔脚时划破了小腿。 |
-| sunk_pack | 烂木桩浅汊 | 1 | 把竹篓拉上岸 | 0.5 | 0 | 0 | 0 | 1 |  |  |  | 落水药篓（lost_basket）×1 |  |  |  |  |  |  | 篓子的背带露在水面上，伸手够得着。 | 你攥住背带，把竹篓从木桩旁拉起来。水顺着竹条滴下，篓口的扣还紧着。 |  |
-| sunk_pack | 烂木桩浅汊 | 2 | 沿木桩内侧的石路往前看 | 0.125 | 0 | 0 | 0 | 0 |  |  |  |  |  |  |  |  |  |  | 几片卷起的木屑从河弯后漂出来。 | 石路绕过河弯。一个老渡工坐在沙滩上削船桨，脚边全是卷起来的木屑。 |  |
-| mud_track | 碎石水眼 | 1 | 靠近水边的石滩 | 0.5 | 0 | 0 | 0 | 0 |  |  |  |  | 泥鳞兽（mud_beast） |  |  |  |  |  | 石滩能站稳，从那儿看得见水眼深处。 | 鞋底刚踩实，硬鳞便破了水。一头泥鳞兽扑上石滩。 |  |
-| mud_track | 碎石水眼 | 2 | 去干土路边捡松枝 | 1 | 0 | 0 | 0 | 1 |  |  |  | 松木（wood）×2 |  |  |  |  |  |  | 碎石堆横在水边，漂来的枝条都卡在这里。 | 你沿干土路绕过水眼，捡走卡在碎石间的松枝。 |  |
-| mud_track | 碎石水眼 | 3 | 沿土路上的脚印看看 | 0.5 | 0 | 0 | 0 | 0 |  |  |  |  | 苇尾狐（reed_fox） |  |  |  |  |  | 脚印一直进了苇丛，矮苇被什么压低了一截。 | 脚下的苇秆一响，一只苇尾狐从低处蹿出来。 |  |
-| mud_track | 碎石水眼 | 4 | 踩着石头往苇后探 | 0.125 | 0 | 0 | 0 | 0 |  |  |  |  |  |  |  |  |  |  | 水眼背后有几块石头排成一线，像是有人铺过。 | 拨开最后一丛苇，露出背雨的半截石渠，里面有旧柴火的焦痕。 |  |
-| mud_track | 碎石水眼 | 5 | 捡起土路边的油纸包 | 0 |  |  |  |  |  |  |  | 干粮（ration）×1 |  |  | 苇尾狐（reed_fox） |  |  |  | 那只狐败退时蹬断了几根苇秆，油纸包从低处滚到了土路边。 | 油纸里有过路人落下的一份干粮，系绳还好好的。 |  |
-| old_fire | 背雨石渠 | 1 | 添柴歇脚 | 0.5 | 0 | 6 | 4 | 0 | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  | 石炉还通风，挨着背风一侧便能烤火。 | 火把石壁烘热，湿鞋上慢慢蒸出白气。 |  |
-| old_fire | 背雨石渠 | 2 | 捆些干柴 | 1 | 0 | 0 | 0 | 1 |  |  |  | 松木（wood）×3 |  |  |  |  |  |  | 有人把松枝藏在渠边石板下，风吹不着。 | 压在石渠里的松枝还干着，折一下便响。 |  |
-| old_fire | 背雨石渠 | 3 | 掀开渠底的破瓦 | 0 | 0 | 0 | 0 | 1 |  |  |  | 反字残瓦（kiln_shard）×1 |  |  |  |  |  |  | 灰里露着瓦沿，边上像有划痕。 | 瓦上的字是反着刻的。抹掉一层灰，才辨出「敲两下，停一停」。 |  |
-| old_fire | 背雨石渠 | 4 | 从冷炉边取下残纸 | 0.25 |  |  |  | 1 |  |  |  | 石炉沿的折纸样（ember_fold）×1 |  |  |  |  |  |  | 炉沿的砖缝夹着一点纸边。 | 残纸还存着三道折痕。最里一层的松灰没散开，纸边却烧穿了。 |  |
-| reed_ferryman | 渡工的刨木滩 | 1 | 把补桨的料递给渡工 | 0.25 | 0 | 0 | 0 | 3 | 灵草（reed）×2、松木（wood）×1 | 是 |  | 干粮（ration）×1、沉钟岭路图（ridge_rubbing）×1 |  |  |  |  |  |  | 「两份苇芯塞进裂口，再削一根松枝卡紧。我拿进山的路图跟你换。」 | 渡工从斗笠夹层取出沉钟岭的路图。新桨接牢后，他拿脚边那把旧桨比了比，又瞧了眼桨背上的刻线。 |  |
-| reed_ferryman | 渡工的刨木滩 | 2 | 往对岸的白苇走去 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 巡岸水鬼（marsh_ghost） |  |  |  |  |  | 渡工把刨桨的小刀放回膝头。「那边有什么一直来回，我没看清。」 | 脚下的浅石刚露头，一道没有脚的影子就横在白苇前。水鬼抱住两臂，挡着去路。 |  |
-| reed_ferryman | 渡工的刨木滩 | 3 | 帮他把旧桨翻过来 | 0.25 | 0 | 0 | 0 | 1 |  |  |  | 旧桨上的靠岸图（oar_mark）×1 |  |  |  |  |  |  | 泥盖住了半截刻线，渡工用拇指擦了几下。 | 渡工擦去桨背的泥，给你看三根画得歪斜的船桩。「认准第三根，往断桅那头走，有道高埂。」 |  |
-| reed_ferryman | 渡工的刨木滩 | 4 | 采下对岸的熟苇芯 | 0.5 |  |  |  | 2 |  |  |  | 灵草（reed）×3 |  |  |  |  | 巡岸水鬼（marsh_ghost） |  | 白苇就长在水边的浅石间，叶尖已经黄了。 | 踩过空下来的石路，你伸手从齐腰的白苇中抽出熟芯。 |  |
-| bank_watch | 矮石堤 | 1 | 跟拦滩客过招 | 0.25 | 0 | 0 | 0 | 0 |  |  |  |  | 拦滩客（bank_runner） |  |  |  |  |  | 「想借图？跟我过两招，赢了连这把备刀也拿去。撑不住就抬手，我收杖。」 | 拦滩客把备刀留在石上，紧了紧腰带，横着木杖站稳。 |  |
-| bank_watch | 矮石堤 | 2 | 问他渡工在哪儿 | 0 | 0 | 0 | 0 | 0 |  |  |  |  |  |  |  |  |  |  | 他顺口提起那张图是河弯的渡工画的。 | 他朝那几根歪木桩一抬下巴。「拐过弯就是刨木滩。他给断桨接新柄呢。」 |  |
-| bank_watch | 矮石堤 | 3 | 等拦滩客兑现交手的约定 | 0 |  |  |  |  |  |  |  | 沉钟岭路图（ridge_rubbing）×1、渡口钩刃（hook_blade）×1 |  |  | 拦滩客（bank_runner） |  |  |  | 他解开腰间缚住折图的细绳，招手让你过去。 | 拦滩客把折图和备刀一起推过来。「说过的算数。走到北边倒钟下，细看图上那道岔。」 |  |
-| drowned_mast | 沉桅高埂 | 1 | 踩上断桅杆，看看水下 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 沉桅虺（mast_beast） |  |  |  |  |  | 断桅杆从高岸斜伸到水面，能沿着它往下看。 | 你刚踩上桅杆，缠在水底那头的水兽便张开头侧两道鳍。 |  |
-| drowned_mast | 沉桅高埂 | 2 | 站在高岸上看水怎么流 | 0 | 0 | 0 | 0 | 1 |  |  |  |  |  |  |  |  |  |  |  | 水流到断桅杆前便分成两股。你照水的一涨一落调了几次呼吸，那口闷气慢慢散了。回村找个清静地方，还可以照着练。 |  |
-| drowned_mast | 沉桅高埂 | 3 | 拨开桅杆旁边的草 | 0 |  |  |  |  |  |  |  | 认路钱（path_charm）×1 |  |  | 沉桅虺（mast_beast） |  |  |  | 木缝里还有一点铜色，拨开水草就够得着。 | 草里卡着半枚带孔的旧渡钱，钱上的记号还没被水磨尽。 |  |
-| ore_rain | 落矿的冲沟 | 1 | 在沟边拾铁 | 1 | 0 | 0 | 0 | 2 |  |  |  | 寒铁（ore）×2 |  |  |  |  |  |  |  | 洗掉浮泥，底下是寒铁。 |  |
-| ore_rain | 落矿的冲沟 | 2 | 爬上坡去撬矿块 | 1 | 0 | -6 | 0 | 3 |  |  |  | 寒铁（ore）×3 |  |  |  |  |  |  |  | 坡上有大块寒铁，连着石皮撬了下来。 | 下坡时一块松石滚下来，撞在膝上。 |
-| ore_rain | 落矿的冲沟 | 3 | 问护篷下敲的是什么坯 | 0.5 |  |  |  | 2 |  |  |  | 厚脊剑坯样（blade_template）×1 |  |  |  |  |  |  | 验矿人在护篷里敲打半块旧剑坯。 | 验矿人把两种锤痕指给你看，捡一块断坯送你。「厚背那一段得留着，锻薄了剑容易崩。」 |  |
-| ore_rain | 落矿的冲沟 | 4 | 捞洗砂槽里反光的碎石 | 0.75 |  |  |  | 1 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  | 泥砂漏下手掌，只有几块透着光的灵晶沉在筛底。 |  |
-| empty_oven | 歇炉的茶棚 | 1 | 在石灶里添柴，烤衣歇脚 | 0.5 | 0 | 9 | 6 | 1 | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  | 湿衣蒸出了白气，烤过火才慢慢暖透。 |  |
-| empty_oven | 歇炉的茶棚 | 2 | 掀开木板取些柴 | 1 | 0 | 0 | 1 | 3 |  |  |  | 松木（wood）×2、茶棚木板上的掌谱（echo_note）×1 |  |  |  |  |  |  |  | 木板反面画着个侧耳贴石的人，掌下还刻有几道难认的线。 |  |
-| miner_echo | 有回声的矿道 | 1 | 沿主道往里走 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 持锤矿煞（ore_wight） |  |  |  |  |  | 主道一直往下，尽头两条矿脉泛着亮光。 | 持锤的影子一转身，握紧石锤挡住了矿壁。 |  |
-| miner_echo | 有回声的矿道 | 2 | 侧身钻进旁孔 | 1 | 0 | 0 | -2 | 3 |  |  |  | 寒铁（ore）×2 |  |  |  |  |  |  | 旁孔拐在主道外侧，风夹着干粉。脚边的碎石有铁色。 | 你侧身绕过岩角。那边的锤声透不过厚岩，脚下有些松动的寒铁。 |  |
-| miner_echo | 有回声的矿道 | 3 | 贴着透光的石缝往外看 | 0.125 | 0 | 0 | 0 | 0 |  |  |  |  |  |  |  |  |  |  |  | 石缝对面有个浅石洞，就是回声石龛。洞口朝着山背，顺矿口外的窄坡可以绕过去。 |  |
-| miner_echo | 有回声的矿道 | 4 | 去主道的矿壁撬松矿脉 | 1 |  |  |  | 2 |  |  |  | 寒铁（ore）×3、灵晶（core）×2 |  |  |  |  | 持锤矿煞（ore_wight） |  | 有人沿石壁凿了几道槽，寒铁和灵晶从槽头露出来。 | 你沿先前留下的锤槽撬石，分开寒铁矿片和有光的灵晶。 |  |
-| rope_run | 断绳坡 | 1 | 从侧坡绕下去帮挑夫 | 1 | 10 | 0 | 0 | 2 |  |  |  | 干粮（ration）×2、挑夫的叠片缝样（plate_lacing）×1 |  |  |  |  |  |  |  | 挑夫捆好货，分了口粮和盘缠，又从裂开的护板上拆下一片给你。他指向矿口旁的窄坡：「绕到山背就是回声石龛。旧矿工到那儿躲过风。」 |  |
-| rope_run | 断绳坡 | 2 | 在车辙旁守一会儿 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 石甲獾（stone_badger） |  |  |  |  |  | 车辙截断了一串爪印，能看清它在哪堆碎石里断的。 | 石甲獾钻出碎石，四爪抓住了坡面。 |  |
-| stone_niche | 回声石龛 | 1 | 撬开石缝，取里面的纸 | 2 | 0 | 0 | -3 | 3 |  |  |  | 灵晶（core）×1、旧渡水图（ford_chart）×1 |  |  |  |  |  |  |  | 石缝里的一块碎岩松了。拿出来才看见，底下的纸是张叠起来的旧水图。 |  |
-| stone_niche | 回声石龛 | 2 | 提起洞口的破铃 | 1 | 5 | 0 | 0 | 1 |  |  |  | 寒铁（ore）×1、石龛音痕（stone_rubbing）×1 |  |  |  |  |  |  | 铃边贴着石壁，一角后面还留着空隙。 | 破铃碰到石壁，先响一声。等第二阵回声传来，才震下一片寒铁。铃下还压着几枚旧灵钱。沿石缝望去，几级石阶绕到了裂钟背后。 |  |
-| stone_niche | 回声石龛 | 3 | 拿瓦角比对铃沿 | 0 | 0 | 0 | 0 | 1 | 反字残瓦（kiln_shard）×1 |  | 是 | 带结的铃舌（bell_clapper）×1 |  |  |  |  |  |  | 两处凹弧的宽窄正好能接上。 | 照瓦上的旧字叩完，铃腹发出很短的一声。系着细缆的铃舌从裂口滑了出来。 |  |
-| cracked_bell | 裂钟背面 | 1 | 从裂片间靠近钟座 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 裂钟魄（bell_wraith） |  |  |  |  |  | 裂口时宽时窄，破片下面透出一线灰光。 | 钟魄猛地抬起头，破片一齐响了。 |  |
-| cracked_bell | 裂钟背面 | 2 | 退回山脊 | 0 | 0 | 0 | 0 | 1 |  |  |  |  |  |  |  |  |  |  |  | 退过山脊，背后的钟声才听不见。 |  |
-| cracked_bell | 裂钟背面 | 3 | 取下铜钩上的小铃 | 0 |  |  |  |  |  |  |  | 定声铃（bell_charm）×1 |  |  | 裂钟魄（bell_wraith） |  |  |  | 铜钩紧挨裂开的大钟，钩上小铃倒是完好。 | 你绕过钟座，从铜钩上解下定声铃。晃了一下，铃里的铁片没有动。 |  |
-| low_tide | 闸外浅阶 | 1 | 扫起浅阶上的亮晶粒 | 1 | 0 | 0 | 0 | 2 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  | 趁潮水未回，把阶角的细砂淘掉，捡出还透着光的灵晶。 |  |
-| low_tide | 闸外浅阶 | 2 | 走到下游船绳边 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 缠舟兽（rope_eel） |  |  |  |  |  | 船绳能当扶手，水下轮廓得靠近些才认得出。 | 水里一团长影卷过船绳，是一条缠舟兽。 |  |
-| low_tide | 闸外浅阶 | 3 | 握着船绳扫出槽底的灵晶 | 1 |  |  |  | 2 |  |  |  | 灵晶（core）×3 |  |  |  |  |  | 缠舟兽（rope_eel） · 30% | 槽底粗晶沉得深，握紧船绳才够得着。 | 你扶稳船绳，顺水扫开碎砂。亮晶咔嗒碰在石坎底下。 |  |
-| boat_shade | 没篷的渡舟 | 1 | 坐上船里的凳子歇脚 | 1 | 0 | 13 | 8 | 1 |  |  |  |  |  |  |  |  |  |  |  | 船舷挡住了风。你坐到水势变缓，手脚才不再发冷。 |  |
-| boat_shade | 没篷的渡舟 | 2 | 捞起船底的木柜 | 1 | 15 | -4 | -2 | 2 |  |  |  | 灵晶（core）×1 |  |  |  |  |  |  | 船沿下有两只木柜脚。门板被水压着，还没漂开。 | 柜门里积着碎灵晶，摸到底还有几枚灵钱。 | 抬柜时水一顶，胳膊撞上了船底的一圈铁带。 |
-| boat_shade | 没篷的渡舟 | 3 | 比一比铃上的绳子和旧船绳 | 0.5 | 0 | 0 | 0 | 1 | 带结的铃舌（bell_clapper）×1 |  | 是 | 倒潮刻样（backwash_mark）×1 |  |  |  |  |  |  | 两根绳子的结都朝同一边收紧，绳圈也磨在同一边。 | 把两个绳圈并排挂起来，旧船绳就松开了一截。船身摆开半尺，露出一道朝上游的槽，槽口夹着块薄铜片。 |  |
-| tide_keeper | 旧闸深槽 | 1 | 等水低了跨进闸间 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 守潮灵（tide_spirit） |  |  |  |  |  | 闸门下有排低石阶。水落一些，脚就能踩实。 | 两扇门之间锁链一绷，守潮灵转过了身。重锁压在闸边的方槽上，印钮在锁链下露出来。 |  |
-| tide_keeper | 旧闸深槽 | 2 | 去高处看看旧枪的接头 | 1 | 0 | 0 | 1 | 3 |  |  |  | 闸把的分水榫（spear_joint）×1 |  |  |  |  |  |  |  | 听潮人用旧枪头指了指浪线，取下一块松动的接头给你。 |  |
-| tide_keeper | 旧闸深槽 | 3 | 取出闸边石槽里的镇渡印 | 0 |  |  |  |  |  |  |  | 镇渡印（seal）×1 |  |  | 守潮灵（tide_spirit） |  |  |  | 重锁松脱，原先被压住的印钮可以伸手提起来。 | 你把镇渡印提离石槽，印底还带着同一层湿泥。 |  |
-| flood_lines | 刻洪痕的石壁 | 1 | 从石缝里拽出布包 | 1 | 0 | 0 | 0 | 4 |  |  |  | 逆潮符（tide_talisman）×1、闸工的潮牌（tide_note）×1、济潮丹丹方（formula_tide）×1 |  |  |  |  |  |  |  | 布包里有旧符和闸工的潮牌。牌背写着涨落时刻，翻开还夹着一页蜡封的济潮丹方。 |  |
-| flood_lines | 刻洪痕的石壁 | 2 | 沿壁根摸寻碎灵晶 | 1 | 0 | 0 | 0 | 1 |  |  |  | 灵晶（core）×1 |  |  |  |  |  |  |  | 石缝一松，碎灵晶露了出来。水还没漫过鞋面。 |  |
-| lock_deck | 悬锁木排 | 1 | 解下铁环上的漆盒 | 1 | 0 | 3 | 0 | 1 |  |  |  | 干粮（ration）×3 |  |  |  |  |  |  | 盒扣用布裹住，提绳在比水面高半尺的铁环上。 | 木排搁浅的一端能坐。你坐下解开盒扣，里面是没泡水的干粮。 |  |
-| lock_deck | 悬锁木排 | 2 | 抬起铁块，挪开木排 | 1 | 7 | 0 | -3 | 3 |  |  |  | 灵晶（core）×2、旧排的护甲扣（gate_buckles）×1 |  |  |  |  |  |  |  | 木排一挪开，石缝里露出碎灵晶、几枚灵钱和一串旧护甲扣。底下的石阶通往深槽，侧边有条窄路通向船工的棚子。 |  |
-| ford_relay | 旧闸外的驮棚 | 1 | 给船工送来支柱和口粮 | 0.5 | 0 | 0 | 0 | 2 | 松木（wood）×4、干粮（ration）×3 | 是 |  | 松场驮道图（pine_pass）×1 |  |  |  |  |  |  | 「我得在这里守到雨住。松场的路图你要有用，拿一张去。」 | 老船工支稳棚柱，指着图上断桥后的几棵松树告诉你哪一边尚能过去。 |  |
-| ford_relay | 旧闸外的驮棚 | 2 | 坐在棚里等雨歇 | 0.5 | 0 | 5 | 3 | 0 |  |  |  |  |  |  |  |  |  |  |  | 风把雨推到驮棚另一面，你往里让了半步。 |  |
-| upstream_lights | 逆水灯龛 | 1 | 用松枝点起槽里的火 | 1 | 0 | 0 | 4 | 2 | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  | 火沿干槽传进灯腹，半寸旧灯芯缩了一下便亮了。迎着这点火光坐了一阵，水汽也从袖口散开。 |  |
-| upstream_lights | 逆水灯龛 | 2 | 在灯座背风处坐一阵 | 1 | 0 | 14 | 7 | 1 |  |  |  |  |  |  |  |  |  |  |  | 埠里少有潮声，连风也是绕开这里走的。 |  |
-| sunken_mooring | 低水船桩 | 1 | 下埠拨开湿蓑衣 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 湿蓑灯蜕（wick_husk） |  |  |  |  |  |  | 蓑衣下那只手一翻，灯芯升起一线火。 |  |
-| sunken_mooring | 低水船桩 | 2 | 站在岸上松开浮绳 | 0 | 0 | 0 | 0 | 2 |  |  |  | 干粮（ration）×1 |  |  |  |  |  |  |  | 绳套松开，缠在旁边的一只粮匣漂了回来。 |  |
-| sunken_mooring | 低水船桩 | 3 | 用松枝点亮桩灯 | 0.25 |  |  | 4 | 2 | 松木（wood）×1 | 是 |  |  |  |  | 湿蓑灯蜕（wick_husk） |  |  |  | 灯芯卷在铜罩里，没被雨打湿。 | 你借松枝点起桩灯，盖回挡雨的铜罩。靠桩坐了一会儿，胸口的沉滞才松开。 |  |
-| still_pole | 风口灯杆 | 1 | 问他风里怎么护灯 | 0.5 | 0 | 0 | 0 | 3 |  |  |  | 灯夫手势（lamp_sketch）×1 |  |  |  |  |  |  |  | 「看手。」老人把灯转向风里，迎风的那只手一撇，火苗便直了。 |  |
-| still_pole | 风口灯杆 | 2 | 和他聊聊旧渡 | 0.5 | 0 | 0 | 0 | 2 |  |  |  |  |  |  |  |  |  |  |  | 老人指着埠外。「东西放在三处。我要是跟船散了，涨潮也能摸回来。」 |  |
-| pine_stand | 刮脂松架 | 1 | 收架下积脂的松木片 | 1 |  |  | 0 | 2 |  |  |  | 松木（wood）×4 |  |  |  |  |  |  |  | 松脂把几片干松木粘在一起。捡走厚片，树皮浅槽还能继续滴脂。 |  |
-| pine_stand | 刮脂松架 | 2 | 解下挂住的枯枝 | 0.75 |  |  |  | 1 |  |  |  | 松木（wood）×3 |  |  |  |  |  |  |  | 枯枝一扳就下来。将细枝折齐，比拖回去轻省。 |  |
-| pine_stand | 刮脂松架 | 3 | 翻看架头的弯松条 | 0.25 |  |  |  | 2 |  |  |  | 松架上的试弓木（bow_stave）×1 |  |  |  |  |  |  | 一截弯松条刚好嵌进箩筐上面的弧槽。 | 松条底下有量弦的刻线。这是猎人拿来试韧皮条受力的弓样。 |  |
-| timber_bridge | 缺板的驮桥 | 1 | 给赶车人松木补桥 | 1 |  |  |  | 3 | 松木（wood）×5 | 是 |  | 窑车辙样（kiln_tracks）×1、干粮（ration）×3 |  |  |  |  |  |  | 赶车人用胳膊顶住车轮。「厚木补缺口，薄木带松脂的烤软了填缝。桥能走了，我就把窑车的路图给你。」 | 赶车人指给你看松树根边的两道车轮印。桥补好了，沿着车轮印绕山便能进窑谷。 |  |
-| timber_bridge | 缺板的驮桥 | 2 | 在石墩背后歇脚 | 0.5 |  | 6 | 4 | 0 |  |  |  |  |  |  |  |  |  |  |  | 石墩挡掉了山口横风，你把肩上的箩筐靠到石面。 |  |
-| pine_hollow | 翻车的松沟 | 1 | 靠近树沟里翻倒的窑车 | 0.75 |  |  |  |  |  |  |  |  | 灰脊松熊（pitch_bear） |  |  |  |  |  |  | 一只灰脊松熊从车后滚下来，先把车轴压进湿土。 |  |
-| pine_hollow | 翻车的松沟 | 2 | 沿斜沟绕回松架 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 你沿沟边走稳脚。转过土脊，回头已看不见窑车。 |  |
-| pine_hollow | 翻车的松沟 | 3 | 拾起小路边的木签 | 0 |  |  |  |  |  |  |  | 窑车辙样（kiln_tracks）×1 |  |  | 灰脊松熊（pitch_bear） |  |  |  | 松熊败退时撞歪了车轴，绳上的木签掉到沟外。 | 车签背后刻着窑车出入的双车辙。老道在贴着松根的那一边转向窑谷。 |  |
-| pine_ledges | 背阴的断肩崖 | 1 | 从松枝之间拣厚木片 | 1 |  |  |  | 2 |  |  |  | 松木（wood）×4 |  |  |  |  |  |  |  | 背阴处不晒，松木上的厚脂还粘手，几片能带回去做活。 |  |
-| pine_spar | 索棚拳场 | 1 | 接下守索人的试刀礼 | 0.5 |  |  |  |  |  |  |  |  | 松场巡索人（road_sparrer） |  |  |  |  |  |  | 守索人把礼刀放回架上，自己抄起一把钝练刀。「接得住几招，这把新刀就归你。」 |  |
-| pine_spar | 索棚拳场 | 2 | 替看桥人把草垫收好 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 你把沾泥的一面朝外叠好。棚边腾出的路能直接走回木架。 |  |
-| pine_spar | 索棚拳场 | 3 | 向轮值的守索人领试刀礼 | 0 |  |  |  |  |  |  |  | 松场习刀（trail_cutter）×1 |  |  | 松场巡索人（road_sparrer） | 是 |  |  | 守索人把架上那把习刀转过来，柄朝着你。 | 守索人把架上那把习刀递过来。「算你这次赢。刀归你，我还得去换班巡索。」 |  |
-| clay_bank | 白泥洗坯坡 | 1 | 蹲在坡根铲白泥 | 1 |  |  |  | 2 |  |  |  | 耐火泥（kiln_clay）×4 |  |  |  |  |  |  |  | 白泥能捏成团，搬到筐底也没有散开。 |  |
-| clay_bank | 白泥洗坯坡 | 2 | 顺着干泥带挖一筐 | 1.25 |  | -5 |  | 2 |  |  |  | 耐火泥（kiln_clay）×6 |  |  |  |  |  |  |  | 干壳底下罩着很厚一层白泥。 | 砂层松了，你滑下来时被坡根的硬泥擦伤。 |
-| abandoned_kiln | 冷下来的老窑 | 1 | 从铁圈下取出石牌 | 0.5 |  |  |  | 3 |  |  |  | 窑匠火候牌（kiln_manual）×1 |  |  |  |  |  |  |  | 石牌刻着怎么掌火，还有落灯村丹师安蒲的印。铁圈一松，灰从缝里吹向窑后一道低门。那扇门通往烟道。 |  |
-| abandoned_kiln | 冷下来的老窑 | 2 | 靠灰线后的平石歇脚 | 0.5 |  | 6 | 5 | 0 |  |  |  |  |  |  |  |  |  |  |  | 平石替你挡住了穿窑风，灰没有吹到衣领里。 |  |
-| abandoned_kiln | 冷下来的老窑 | 3 | 擦去木柄末端的焦灰 | 0.25 |  |  |  | 2 |  |  |  | 守炉杖的样柄（resin_tamper）×1 |  |  |  |  |  |  |  | 木柄裂开，露出灌松脂的小孔。尾端还刻着守炉人用来聚气的手势。 |  |
-| kiln_carter | 药篓车棚 | 1 | 给赶车人材料补车板 | 1 |  |  |  | 4 | 耐火泥（kiln_clay）×6、松木（wood）×3 | 是 |  | 篁泽的药篓绳（herb_tie）×1、干粮（ration）×3 |  |  |  |  |  |  | 他晃了晃装药篓的隔板。「拿硬泥填，再用松脂封上。你若想去篁泽，我这儿有张过竹桥的图。」 | 赶车人补好车板，解下一截旧药篓上的绑绳递给你。绳边缝的一小块丝布画着通往篁泽的竹桥。 |  |
-| kiln_carter | 药篓车棚 | 2 | 掀起车底的旧篷 | 0.5 |  |  |  | 1 |  |  |  | 耐火泥（kiln_clay）×2 |  |  |  |  |  |  | 车轮下垂着一角篷布，底下压着两团没淋湿的泥。 | 旧篷下还有两团耐火泥。赶车人用不着这么多，便匀给你。 |  |
-| kiln_flue | 废窑烟道 | 1 | 掰开靠外的窑砖看一眼 | 0.75 |  |  |  |  |  |  |  |  | 炉渣犬（cinder_hound） |  |  |  |  |  |  | 窑砖一掀，有团炉灰抖成犬形扑出。 |  |
-| kiln_flue | 废窑烟道 | 2 | 退到有风的地方拍灰 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 窑口风大，袖上沾着的灰一拍便沿墙散开。 |  |
-| kiln_flue | 废窑烟道 | 3 | 揭下碎砖间的焦纸 | 0.5 |  |  |  | 3 |  |  |  | 焦痕丹窑账页（foundation_ledger）×1 |  |  |  |  |  |  |  | 纸上留了三枚缺角的旧印。末尾还写着一句话。「想凑齐这炉的丹方，找落灯村的安蒲对印。」 |  |
-| kiln_flue | 废窑烟道 | 4 | 用碎瓦淘窑沟里沉下的亮砂 | 0.75 |  |  |  | 1 |  |  |  | 暗金（black_iron）×2 |  |  |  |  |  |  |  | 温水把细灰带走，碎瓦内只剩几粒能在火里立住形的暗金。 |  |
-| kiln_flue | 废窑烟道 | 5 | 取石柜底未烧过的耐火泥 | 0.5 |  |  |  | 1 |  |  |  | 耐火泥（kiln_clay）×3 |  |  |  |  | 炉渣犬（cinder_hound） |  | 柜子避雨，底下有一方还裹着布的原泥。 | 穿过堆砖，把柜底的泥料提出来。裹泥的厚布隔开了窑灰。 |  |
-| herb_beds | 银脉水畦 | 1 | 把上排的老叶剪下来 | 1 |  |  |  | 2 |  |  |  | 灵草（reed）×4 |  |  |  |  |  |  |  | 你只剪摸得着的粗柄，水下的细芽没有受伤。 |  |
-| mist_shelter | 垫高脚的药棚 | 1 | 给泽医交叶和烘干用的枝条 | 1 |  |  |  | 4 | 灵草（reed）×8、松木（wood）×4 | 是 |  | 玄砂引矿签（mine_guide）×1、干粮（ration）×3 |  |  |  |  |  |  | 「阴雨浸坏了这一批，我得给矿队重扎几包药。你若进矿脉，带我的引矿签过去。」 | 泽医把木片从药匣上拆下，指给你看哪边的石槽连着玄砂矿脉。 |  |
-| mist_shelter | 垫高脚的药棚 | 2 | 问泽医板上的凹槽怎么用 | 0.5 |  |  |  | 2 |  |  |  | 泽医捣药板（herb_press）×1、清脉饮丹方（formula_leaf）×1 |  |  |  |  |  |  | 木板上刻了几道不同深浅的槽，中间压着一张试药的便条。 | 泽医拿药板比给你看，又递来一页清脉饮丹方。「药汁先过一道槽，再过第二道，少一道味就不对。」 |  |
-| vine_pond | 白藤塘 | 1 | 沿浅滩的蹄印找藤鹿 | 0.75 |  |  |  |  |  |  |  |  | 白角藤鹿（vine_stag） |  |  |  |  |  |  | 白角从藤下挑起来，鹿蹄刨开一片湿泥。 |  |
-| vine_pond | 白藤塘 | 2 | 沿斜石绕到岸外听一会儿 | 0.125 |  |  | 3 | 1 |  |  |  |  |  |  |  |  |  |  |  | 藤影在另一边摇动。留在斜石上时，呼吸渐渐平匀。 |  |
-| vine_pond | 白藤塘 | 3 | 踩过浅水去剪银脉叶 | 0.75 |  |  |  | 2 |  |  |  | 灵草（reed）×4 |  |  |  |  |  | 白角藤鹿（vine_stag） · 35% | 药叶长在凹水里，从踏石上俯身正好够得到。 | 你在踏石上掐下熟叶，细根还扎在泥里。 |  |
-| vine_pond | 白藤塘 | 4 | 顺着上游的大蹄印走 | 0.75 |  |  |  |  |  |  |  |  | 白纹鹿王（vine_king） |  |  |  |  |  | 大蹄印沿水往上，没入一架粗藤后面。 | 粗藤往两边一分，一只老鹿压低交错的白角，堵在坝根。 |  |
-| vine_pond | 白藤塘 | 5 | 到背水坡剪上游的银脉叶 | 1 |  |  |  | 3 |  |  |  | 灵草（reed）×4 |  |  | 白纹鹿王（vine_king） |  | 白纹鹿王（vine_king） |  | 倒藤外侧能踩稳脚。坡上的叶已长开。 | 你站在背水坡把熟叶剪下来，水从旧鹿槽绕过去。 |  |
-| mine_tailings | 黑砂洗矿槽 | 1 | 在外沿筛去浮砂 | 1 |  |  |  | 3 |  |  |  | 暗金（black_iron）×4 |  |  |  |  |  |  |  | 你慢慢筛走细砂，筛里剩下颗粒粗的暗金。 |  |
-| mine_tailings | 黑砂洗矿槽 | 2 | 下到槽内撬重石 | 1.25 |  | -5 | -2 | 3 |  |  |  | 暗金（black_iron）×6 |  |  |  |  |  |  |  | 铁镞深入石缝以后，黑石顺水松了。 | 槽底的砂扫住了鞋，你抽身时被来水推撞了膝头。 |
-| winch_house | 断榫绞盘屋 | 1 | 给矿工材料修转盘 | 1.25 |  |  |  | 4 | 暗金（black_iron）×6、耐火泥（kiln_clay）×4 | 是 |  | 翻雪关的栈牌（snow_token）×1、干粮（ration）×4 |  |  |  |  |  |  | 「盘转得起来，才够得着外头的梯子。给我点好铁和硬泥，我把翻雪关用的木牌给你。」 | 转盘动了一圈。矿工爬到外梯旁，从石架上取下翻雪关的木牌递给你。 |  |
-| winch_house | 断榫绞盘屋 | 2 | 翻过铁零件看看接头 | 0.5 |  |  |  | 3 |  |  |  | 两寸机臂铁样（vein_pattern）×1、包铁箭样（arrow_pattern）×1 |  |  |  |  |  |  |  | 矿工让你带走那块短铁样，又把从矿壁拔下的一根包铁箭递给你比对。 |  |
-| deep_vein | 横肩偏井 | 1 | 进偏井敲开卡住的车槽 | 1 |  |  |  |  |  |  |  |  | 横肩矿傀（vein_sentinel） |  |  |  |  |  |  | 一声钝响落地。两片黑岩并成一道石身，挡住了车眼。 |  |
-| deep_vein | 横肩偏井 | 2 | 沿旧窄槽绕回路面 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 鞋底踏出了湿亮的车痕，你绕回宽一些的路。 |  |
-| deep_vein | 横肩偏井 | 3 | 翻开井外的旧工具柜 | 0 |  |  |  |  |  |  |  | 暗星刀（star_blade）×1、暗星刀匣底图（star_blade_pattern）×1 |  |  | 横肩矿傀（vein_sentinel） |  |  |  | 败退的矿傀撞开了柜架，柜子滑到了井外，盖子裂出一道缝。 | 矿队留下的暗星刀还卡在木托上。油布里包着一张照着实刀画的锻打样，连刀口的分厚都标好了。 |  |
-| deep_vein | 横肩偏井 | 4 | 顺碎车槽去剔松矿脉 | 1 |  |  |  | 2 |  |  |  | 暗金（black_iron）×4、灵晶（core）×1 |  |  |  |  | 横肩矿傀（vein_sentinel） |  | 碎车槽内侧是一条暗金细脉，旁边挨着夹在石里的亮晶。 | 你清开碎车边的松屑，从石壁剔下暗金和独立成片的灵晶。 |  |
-| silk_bough | 背风雪蜥径 | 1 | 扶石绳拾低处的雪蜥蜕 | 1.25 |  |  |  | 3 |  |  |  | 兽革（hide）×4 |  |  |  |  |  |  |  | 你提起石窝的旧蜕，阴冷处长出的韧皮冻过也能弯。 |  |
-| silk_bough | 背风雪蜥径 | 2 | 爬上冰沿取挂住的整蜕 | 1.5 |  | -7 |  | 3 |  |  |  | 兽革（hide）×6 |  |  |  |  |  |  |  | 石缝里一直干着，留了几张厚实的雪蜥蜕。 | 你撤手时冰皮断了，硬边划过小臂。 |
-| snow_fire | 护栈火棚 | 1 | 把兽革和灵草交给守栈人 | 1 |  |  |  | 5 | 兽革（hide）×6、灵草（reed）×5 | 是 |  | 三峰引绳结（sky_cord）×1、干粮（ration）×4 |  |  |  |  |  |  | 「兽革缝个新套，灵草敷敷手。你若要上天衡石台，我教你怎么看岔路上的绳结。」 | 他在短绳上打了三个不同的结。「每遇一道岔路，挑绳结跟这个对得上的梁走。走过第三条，便是天衡石台。」 |  |
-| snow_fire | 护栈火棚 | 2 | 添干枝借火烘衣 | 0.5 |  | 12 | 6 | 0 | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  | 你拨开灰，把干枝贴到火星上。火烧起来时，湿衣的下摆慢慢暖了。 |  |
-| snow_fire | 护栈火棚 | 3 | 问他皮套怎么缝才挡雪 | 0.5 |  |  |  | 2 |  |  |  | 护栈人的夹皮缝样（pass_seam）×1 |  |  |  |  |  |  | 守栈人摊开缝到一半的皮套，两层粗布之间夹着一片兽皮。 | 他让你摸里面的缝线。「线藏进来，外头下雪也浸不透。」说完递来一片缝好的样子。 |  |
-| white_ravine | 露背的雪沟 | 1 | 在迎风处敲响谷口的旧锣 | 1 |  |  |  |  |  |  |  |  | 雪脊兽（snow_warden） |  |  |  |  |  |  | 山沟里的白背抖落积雪。雪脊兽昂头，把厚颈露在风里。 |  |
-| white_ravine | 露背的雪沟 | 2 | 贴着短栈道回避风处 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 沿护绳走到短栈尽头，背坡挡住了风，能望见火棚门口。 |  |
-| white_ravine | 露背的雪沟 | 3 | 拨开栈道边的雪，看看铁钩 | 0.25 |  |  |  | 2 |  |  |  | 断雪戟的回钩样（hook_iron）×1 |  |  |  |  |  |  | 扶绳底下露着一点弯铁，余下部分埋在雪里。 | 你翻过半截铁钩，才看见钩尖是向内弯的。铁上留着一道旧砍痕。 |  |
-| cloud_scree | 浮光晶坡 | 1 | 拾起雾边露出的晶片 | 1.25 |  |  |  | 4 |  |  |  | 灵晶（core）×4 |  |  |  |  |  |  |  | 雾薄了一层，露在坡边的晶片亮起来。 |  |
-| cloud_scree | 浮光晶坡 | 2 | 攀岩脊撬开晶层 | 1.5 |  | -8 | -3 | 4 |  |  |  | 灵晶（core）×6 |  |  |  |  |  |  |  | 撬开的断口发出一阵脆声，光从更深处亮起来。 | 薄岩有一处塌下，你被晶片划伤了手背。 |
-| cloud_scree | 浮光晶坡 | 3 | 查看工台旁的浅槽 | 0.25 |  |  |  | 2 |  |  |  | 晶镞轻重样（cloud_tip）×1 |  |  |  |  |  |  |  | 浅槽里躺着几只拆下的箭头。背后的板上有用于配重的刻线。 |  |
-| cloud_scree | 浮光晶坡 | 4 | 托住火盏拨开封泥 | 0.5 |  |  |  | 3 |  |  |  | 照心露丹方（formula_jade）×1 |  |  |  |  |  |  | 火盏的口被干泥封住，盏身夹在架里。 | 盏内干燥，盏沿夹了一卷照心露丹方。卷首画的火盏就嵌在这同一处石架上。 |  |
-| old_observatory | 偏影观星梁 | 1 | 趁雾散拓下石梁里的刻圈 | 1 |  |  |  | 5 |  |  |  | 天衡位刻（meridian_etching）×1 |  |  |  |  |  |  |  | 拓完抬头，最靠外的刻圈反光照到梁背。沿光走，尽头有扇反照远峰的镜门。 |  |
-| old_observatory | 偏影观星梁 | 2 | 在石梁旁向阳的地方歇一会儿 | 0.5 |  | 8 | 7 | 1 |  |  |  |  |  |  |  |  |  |  |  | 你坐在石梁背风的一侧。石头晒得暖和，远处扶绳拍打木梁的响声也轻了。 |  |
-| old_observatory | 偏影观星梁 | 3 | 从梁后取那块木账片看看 | 0.25 |  |  |  | 2 |  |  |  | 玉片披甲的接丝账（loom_tack）×1 |  |  |  |  |  |  |  | 账片记的是披甲。工匠在每次收紧软丝的地方都压了一道线。 |  |
-| mirror_gate | 反峰镜门 | 1 | 跨过观星梁的投影查验印座 | 1 |  |  |  |  |  |  |  |  | 持衡镜灵（mirror_warden） |  |  |  |  |  |  | 你移到梁影之外，镜里的手伸出来，按住了卡在凹处的衡印。石台的守灵踩着另一道投影走出来。 |  |
-| mirror_gate | 反峰镜门 | 2 | 沿镜面外侧绕回石梁 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 镜峰偏了半寸。你循着光退回观星梁旁。 |  |
-| mirror_gate | 反峰镜门 | 3 | 扶稳印座，取出衡印 | 0 |  |  |  |  |  |  |  | 镜门衡印（sky_seal）×1 |  |  | 持衡镜灵（mirror_warden） |  |  |  | 镜影散开后，卡住印的石槽完整露了出来。 | 你托住石座，把衡印向外抬出来。石槽深处依稀还有印台的正线。 |  |
-| foundation_duel | 背钟试剑亭 | 1 | 出示借卷帖，接守书人的剑 | 0.75 |  |  |  |  |  |  |  |  | 守卷剑客何鹿（foundation_duelist） |  |  |  |  |  |  | 守书人看过帖子，一脚拨开木凳。「你赢了，我就给你盖印。接招时留神，我可不会收着剑。」 |  |
-| foundation_duel | 背钟试剑亭 | 2 | 沿倒钟侧道出去 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 钟背的石阶能通到矿坡，方向渐渐辨得清了。 |  |
-| foundation_duel | 背钟试剑亭 | 3 | 请守书人在借卷帖上盖印 | 0 |  |  |  |  |  |  |  | 守卷剑客的试剑印（foundation_spar_mark）×1 |  |  | 守卷剑客何鹿（foundation_duelist） |  |  |  | 守书人收起剑，在木桌上试了试印章。 | 他在借卷帖上盖了个缺一角的印，再把帖子还给你。 |  |
-| foundation_kiln | 旧丹窑内壁 | 1 | 扶住挡板，朝窑影走过去 | 0.75 |  |  |  |  |  |  |  |  | 护印窑影（foundation_kiln_echo） |  |  |  |  |  |  | 被风吹回的灰聚成人形。它一手拍在挡板上，遮住那点金光。 |  |
-| foundation_kiln | 旧丹窑内壁 | 2 | 顺着风退回后烟道 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 一绕出挡板，炉风就不再吹眼睛了。 |  |
-| foundation_kiln | 旧丹窑内壁 | 3 | 擦掉挡板上的灰，取出旧印 | 0 |  |  |  |  |  |  |  | 丹窑旧印半片（foundation_kiln_seal）×1 |  |  | 护印窑影（foundation_kiln_echo） |  |  |  | 挡板的浅槽里露出半枚旧印，边上积着灰。 | 你擦掉薄灰，从挡板的浅槽里取下半枚旧印。 |  |
-| foundation_court | 封石验药室 | 1 | 进场接受护炉人的考验 | 1 |  |  |  |  |  |  |  |  | 封石护炉人（foundation_warden） |  |  |  |  |  |  | 护炉人把旧印放到灯盏后。「守得住这道火，我就在你的信帖上盖最后一道印。」 |  |
-| foundation_court | 封石验药室 | 2 | 扶着石门退到背风处 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 石门沉着，没有随风再开。炉火在门缝里剩下一线亮。 |  |
-| foundation_court | 封石验药室 | 3 | 请护炉人补上最后一道印 | 0 |  |  |  |  |  |  |  | 验药室的留火印（foundation_warden_proof）×1 |  |  | 封石护炉人（foundation_warden） |  |  |  | 护炉人移开灯盏，第三枚印章就放在旁边。 | 护炉人在信帖上盖了最后一道印，再把验药室的留火印交到你手上。 |  |
-| meadow_channel | 姚六的弯渠 | 1 | 采田边的灵草 | 0.5 |  |  |  | 1 |  |  |  | 灵草（reed）×3 |  |  |  |  |  |  |  | 姚六指了指内沟边的嫩草，你顺着他指的地方采了几束。 |  |
-| meadow_channel | 姚六的弯渠 | 2 | 搬开沟口卡住的枯木 | 0.5 |  |  |  | 1 |  |  |  | 松木（wood）×2 |  |  |  |  |  |  |  | 枯木挪开后，浑水沿外沟慢慢流了下去。 |  |
-| meadow_channel | 姚六的弯渠 | 3 | 拿松木帮姚六修水槽 | 0.5 | 7 |  |  | 2 | 松木（wood）×2 | 是 |  | 蒲湾渠契（river_field_stamp）×1 |  |  |  |  |  |  | 水槽边的木板向外翘着。姚六说：「拿两片直木把这个口子撑住，两户田都能过水。修完去驿站报个名。」 | 水槽修好后，姚六从袖里数出几枚钱，又在修渠凭据背面写上名字，画了去驿站的路。 |  |
-| meadow_channel | 姚六的弯渠 | 4 | 把困在水里的野雁托上岸 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  | 芦叶下面有只湿透的雁，只剩一只脚能站稳。 | 野雁在泥边晃了两步才飞走。姚六把外沟的水放浅一些，免得再有鸟陷进去。 |  |
-| meadow_ruts | 雁脚泥垄 | 1 | 沿土窝外面走一圈 | 0.375 |  |  |  |  |  |  |  |  | 苇尾狐（reed_fox） |  |  |  |  |  |  | 狐从边上的草洞绕到堤背，对着鞋跟一口咬来。 |  |
-| meadow_ruts | 雁脚泥垄 | 2 | 站上矮堤，找校潮亭的方向 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 远处有人把红布缠上水尺顶端。红布旁就是下一座管着水渠的亭子。 |  |
-| shoal_baskets | 灰鹭晒篮处 | 1 | 拔岸边露根的鹭草 | 0.5 |  |  |  | 1 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  | 抓住露头的草叶轻轻一拽，草根上成团的白泥落回水边。 |  |
-| shoal_baskets | 灰鹭晒篮处 | 2 | 拨开浅石捡晶砂 | 0.625 |  |  |  | 2 |  |  |  | 灵晶（core）×1 |  |  |  |  |  |  |  | 阳光照进浅滩，洗过的砂里有些灵晶能捡。 |  |
-| shoal_baskets | 灰鹭晒篮处 | 3 | 问白宜哪边的滩好走 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 白宜把鞋上的线咬断。「沿干石走。白苇后有人高的石缝，我年轻时进去过，潮一转，人又被挤回原岸。照原有个管水的也去看过。」她指了指旧渡，说那边还有给人送木料的商船。 |  |
-| ladder_drop | 第三级闸口 | 1 | 取上层木梁上的枯枝 | 0.75 |  |  |  | 1 |  |  |  | 松木（wood）×3 |  |  |  |  |  |  |  | 枝条一松，露出木梁被水泡深的纹路。 |  |
-| ladder_drop | 第三级闸口 | 2 | 走到中间的台阶，引开水里的兽 | 0.375 |  |  |  |  |  |  |  |  | 横脊闸兽（river_gateback） |  |  |  |  |  |  | 岑响抄起鱼篓往上退。横脊闸兽甩动背鳍，重重打在闸梁上。 |  |
-| ladder_drop | 第三级闸口 | 3 | 到最下面的水槽筛寒铁 | 0.875 |  |  |  | 3 |  |  |  | 寒铁（ore）×3 |  |  |  |  | 横脊闸兽（river_gateback） |  |  | 筛掉浮砂，较沉的铁粒留在布里。 |  |
-| ladder_drop | 第三级闸口 | 4 | 问岑响为何守着坏掉的水闸 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 岑响抖了抖鱼篓底的泥。「闸坏了，岸边的鱼游不上来。等找人修好了，总还会回来。」 |  |
-| willow_yard | 卸货后院 | 1 | 问门房这两块名牌是谁的 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 门房把系灯院的牌子挂回钩上，留下写着「白苇滩，封乔」的那块。「咱们夜里只托熟人送货。你若在木台上赢过封乔，他给你木签，我这儿就认得你了。」 |  |
-| willow_yard | 卸货后院 | 2 | 替门房补好接雨水的木槽 | 0.5 | 8 |  |  | 1 | 松木（wood）×3 | 是 |  |  |  |  |  |  |  |  | 门房瞧了一眼天色。「手头若有三片木，我出八钱。再漏一晚，来歇脚的人都睡不好。」 | 木槽接住檐下的水。门房用麻绳固定好，从茶桌下取出约定的钱。 |  |
-| gauge_piles | 刻尺水桩 | 1 | 替胥婉按住纸，印下水尺刻痕 | 0.375 |  |  |  | 2 |  |  |  | 校潮亭抄尺（river_gauge_copy）×1 |  |  |  |  |  |  |  | 胥婉拿炭条擦过纸面，尺上的刻痕便印了下来。她把第一份晾好交给你。「最下面记的是潮水倒流的时辰。东边旧县也有一把长尺。」 |  |
-| gauge_piles | 刻尺水桩 | 2 | 问最下面那两道深刻痕 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  | 尺脚有两道格外深的痕，湿纸压上去，边沿都翘了起来。 | 胥婉把短尺翻给你看。那两道痕照的是反潮石门上固定绳子的槽。东边的测水人来试过槽里的铁楔，走时把铁楔也带过了渡。 |  |
-| gauge_piles | 刻尺水桩 | 3 | 筛废铁盘外沿的晶砂 | 0.625 |  |  |  | 1 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  | 细筛晃过几下，晶砂留在旧铁盘的外沿。 |  |
-| slope_sieves | 断壁筛架 | 1 | 用坡下的筛盘筛寒铁 | 0.75 |  |  |  | 2 |  |  |  | 寒铁（ore）×3 |  |  |  |  |  |  |  | 铁粒滚到筛盘底部，你拨开盖在上面的石粉。 |  |
-| slope_sieves | 断壁筛架 | 2 | 走近上坡那两根木柱 | 0.5 |  |  |  |  |  |  |  |  | 石甲獾（stone_badger） |  |  |  |  |  |  | 石甲獾从第一根木柱后挤出来，转身直顶你的脚踝。 |  |
-| slope_sieves | 断壁筛架 | 3 | 抓着绳子，到高处筛暗金 | 1 |  |  |  | 2 |  |  |  | 暗金（black_iron）×2 |  |  |  |  | 石甲獾（stone_badger） |  |  | 深色颗粒很沉，顺着筛底落进矿工挂的布袋。 |  |
-| slope_sieves | 断壁筛架 | 4 | 翻看筛盘背面 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 筛盘背面留了一宽一窄两个孔，旁边刻着几级向上的台阶。有人拿炭笔写了个「回」字，笔画快给手磨平了。 |  |
-| lantern_term | 夜灯廊 | 1 | 问裴见这几盏灯是给谁的 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 裴见一盏盏翻给你看。采药人去旧渠，拉货的车去松场，也有人挑担去西岸。各人都认得自己的那盏，走到多晚也能认路。 |  |
-| lantern_term | 夜灯廊 | 2 | 给裴见兽革，补好安全绳 | 0.5 |  |  |  | 1 | 兽革（hide）×2 | 是 |  | 铁障符（iron_talisman）×1、干粮（ration）×2 |  |  |  |  |  |  | 裴见拉过绳头。擦着山石的地方本来包了皮，如今连里面的麻丝都磨出来了。 | 裴见缝好皮，自己先拽了两把。「这样才敢叫别人抓。」他顺手把一张符夹进两包干粮，趁热递给你。 |  |
-| undertow_bed | 退水石脊 | 1 | 沿石脊走近那片泥地 | 0.5 |  |  |  |  |  |  |  |  | 负丘虺（undertow_moundback） |  |  |  |  |  |  | 负丘虺从水里顶起整片泥地，侧身把你逼到石脊尽头。 |  |
-| undertow_bed | 退水石脊 | 2 | 挖泥地正中的黑泥 | 0.625 |  |  |  | 6 |  |  |  | 伏潮息泥（heart_silt）×2 |  |  | 负丘虺（undertow_moundback） |  |  |  |  | 潮水还在石脊两边响，泥心却不起一丝水纹。你挖出两份伏潮息泥，包好时指尖还凉着。 |  |
-| undertow_bed | 退水石脊 | 3 | 沿石脊绕去侧洞，采灵晶 | 1 |  |  |  | 3 |  |  |  | 灵晶（core）×4 |  |  |  |  | 负丘虺（undertow_moundback） |  |  | 晶砂从岩壁落进筛里。侧洞的水来得慢，你还能循这条路回到高处。 |  |
-| counter_bell_score | 信架与钟枢 | 1 | 顺着钟槌留下的擦痕去看古钟 | 0.375 |  |  |  |  |  |  |  |  | 屈膝铜影（river_copper_echo） |  |  |  |  |  |  | 铜影从墙边抬起手臂，挤进窄缝，一槌砸向通道正中。 |  |
-| counter_bell_score | 信架与钟枢 | 2 | 取出信架下的传送卷轴图纸 | 0.375 |  |  |  | 5 |  |  |  | 传送卷轴图纸（gate_scroll_formula）×1 |  |  | 屈膝铜影（river_copper_echo） |  |  |  |  | 图上写着怎样做传送卷轴，用的是薄木、草浆和少量灵晶砂。卷轴只通向自己认过的门。 |  |
-| counter_bell_score | 信架与钟枢 | 3 | 移开挂片，筛钟座下的暗金 | 0.875 |  |  |  | 2 |  |  |  | 暗金（black_iron）×3 |  |  |  |  | 屈膝铜影（river_copper_echo） |  |  | 大块暗金压在钟脚下。你挑松动的小片筛进布里。 |  |
-| counter_bell_score | 信架与钟枢 | 4 | 看看旧送信人走过哪些门 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 折水驿、系灯院和落灯村的门写在同一页。送信人先徒步去认过这些门，往后的账上就很少再报脚钱。 |  |
-| zhao_flood_office | 城门水尺档 | 1 | 问两本账的来历 | 0.125 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  | 杜椿用指头压着旧账上一行小字。「落灯去年停船。照这上头的水位，比眼下还低半尺，怎么就不能走了？」他翻了翻后一页，空的。「这一页是施荀量的。他如今在斜漏水驿，你若遇见，替我问一声。」 |  |
-| zhao_flood_office | 城门水尺档 | 2 | 把冷炉验火册给杜椿看 | 0.25 |  |  |  | 5 | 冷炉验火册（cold_kiln_record）×1 |  | 是 |  |  |  |  |  |  |  |  | 杜椿看得很慢。「同一晚，雾梁涨了水，鸣沙退了水，照原的水却往地下渗。账没错。施荀那儿有只试水槽，能用一碗水试出那晚怎么回事。」 |  |
-| zhao_dyke_bend | 两面低埂 | 1 | 掐浅水白芽 | 0.5 |  |  |  | 2 |  |  |  | 灵草（reed）×4 |  |  |  |  |  |  | 贴席的水不及鞋面。 | 从还没伸叶的老根上掐下了几束白芽。 |  |
-| zhao_dyke_bend | 两面低埂 | 2 | 到抓痕处守一阵 | 0.125 |  |  |  |  |  |  |  |  | 黄沿水貂（dyke_marten） |  |  |  |  |  | 泥土下面有厚实的碎蚌壳，咬一口的痕迹还新。 |  |  |
-| zhao_dyke_bend | 两面低埂 | 3 | 扶堤工把晴雨旗拉起来 | 0.5 | 8 |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  | 雨旗刚拉高，河工停下手头的活指向青埂北边。「那面碑刻过旧汛线，常有人来找。」他把埂工钱与你分了。 |  |
-| zhao_float_goods | 三姓木码头 | 1 | 帮余节换掉撑渔网的断木 | 0.25 | 0 |  |  | 4 | 松木（wood）×5 | 是 |  | 漏潮货签（zhao_sand_chit）×1 |  |  |  |  |  |  | 撑木一断，晒到一半的网又搭回湿船板。余节拎起网角，水还顺着手肘往下淌。 | 余节递来货签。「过叠石关给柯伯看这个。他认得我的印。」他收起架上的一卷干网，往腰间巴掌大的布袋里一塞。 |  |
-| zhao_float_goods | 三姓木码头 | 2 | 捡码头木台下的松枝 | 0.5 |  |  |  | 2 |  |  |  | 松木（wood）×4 |  |  |  |  |  |  | 撞断的枝条在台下随水摇晃。 | 你抽出还能用的松枝，掰掉泡烂的皮。 |  |
-| zhao_float_goods | 三姓木码头 | 3 | 问余节那只布袋怎么装得下渔网 | 0.125 |  |  |  |  |  |  |  | 旧行商的袋样（qiankun_pattern）×1 |  | 1 |  |  |  |  |  | 余节解开袋口，翻出一截里衬。「这叫乾坤袋。我上一只给鱼钩划烂了，袋底还在。你带去给会缝皮子的人看看。」他从木箱里取出那块旧袋底递给你。 |  |
-| zhao_bamboo_duel | 竹尺庭 | 1 | 请持尺人讲练尺的事 | 0.125 |  |  |  | 3 |  |  |  | 扶膝起身帖（body_breath_note）×1 |  |  |  |  |  |  |  | 他把竹尺靠回台沿。「刚来的人先稳脚。」他教你从低木凳扶膝起身，再把沾了汗渍的讲义给你。「想学站得稳的法子，得先给庭里添一袋压脚石。」 |  |
-| zhao_bamboo_duel | 竹尺庭 | 2 | 进砖圈切磋 | 0.125 |  |  |  |  |  |  |  |  | 掌尺人傅澄（zhao_spar） |  |  |  |  |  | 只要有人跪倒，圈外的弟子就会上前叫停。 | 弟子把身后的木门合上。傅澄换了根没钉铜片的竹尺。 |  |
-| zhao_frog_shelf | 斜萍石窝 | 1 | 踩上低石，看看水下的动静 | 0.125 |  |  |  |  |  |  |  |  | 火斑大蛙（glass_frog） |  |  |  |  |  | 齐脚深的水里，有一团红斑贴着石壁挪。 | 两只鼓胀的腮帮先冒出水。你还没看清，红斑便跃上了石头。 |  |
-| zhao_frog_shelf | 斜萍石窝 | 2 | 采池边的灵草 | 0.75 |  |  |  | 2 |  |  |  | 灵草（reed）×5 |  |  |  |  |  |  | 几块踏脚石之间挤着几丛新芽。 | 把根上的泥抖进水里，叶片在风里晾了一会儿。 |  |
-| zhao_retreat_marks | 倒行刻碑 | 1 | 揭开碑背垫着的湿纸 | 0.5 |  |  |  | 4 |  |  |  | 倒行水痕拓样（return_tide_note）×1 |  |  |  |  |  |  |  | 纸上的折线从照原一路往白苇退去，纸角写着「斜漏水驿，施荀收」。你把湿纸平平揭了下来。 |  |
-| zhao_retreat_marks | 倒行刻碑 | 2 | 从碑脚的泥里淘寒铁 | 0.75 |  |  |  | 2 |  |  |  | 寒铁（ore）×4 |  |  |  |  |  |  | 细铁砂从台阶缝落下来，积在碑脚的泥坑里。 | 把细砂搓掉，铁粒像米一样粘在掌心。 |  |
-| zhao_leak_bench | 斜漏驿棚 | 1 | 把旧碑的印纸给施荀看，帮他修漏斗架 | 0.25 | 0 |  |  | 4 | 倒行水痕拓样（return_tide_note）×1、松木（wood）×6、寒铁（ore）×3 | 是 |  | 倒浪楔（undertow_wedge）×1 |  |  |  |  |  |  | 木架裂了一道缝，宽得能塞进两根手指。他需要松木和寒铁把架子撑牢。 | 你用捆来的松木和寒铁撑好漏斗架。施荀收起印纸，把剩下的斜铁递给你。「白苇滩那扇石门退潮时往里开。找到门边的槽，把铁上三道凹痕朝外卡进去。」 |  |
-| zhao_leak_bench | 斜漏驿棚 | 2 | 听施荀讲两股水怎么落 | 0.125 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  | 施荀松手，右边水管一下滴了好几滴。他拿指腹堵住管口，水声才又匀了。「老站的人把这事刻在铜板上。那块铜板没给洪水冲走的话，还在站里。」 |  |
-| zhao_isle_reeds | 浮洲松根 | 1 | 割松根上的干片 | 0.75 |  |  |  | 2 |  |  |  | 松木（wood）×5 |  |  |  |  |  |  | 古根裸露在水外，指尖能扣住松动的片。 | 把贴着根的干片横扭下来。 |  |
-| zhao_isle_reeds | 浮洲松根 | 2 | 掏水下亮晶 | 1 |  |  |  | 2 |  |  |  | 灵晶（core）×4 |  |  |  |  |  |  | 踩稳裸根，泥泡下面还粘着一些晶粒。 | 把沾泥的晶粒冲到粗布上去。 |  |
-| zhao_scales | 青膜硬埂 | 1 | 踩上土堤，循爪印往前找 | 0.25 |  |  |  |  |  |  |  |  | 泥鳞鬃犬（mud_shrike） |  |  |  |  |  | 两行带蹼的足印进了水藻，再往外就断了。 |  |  |
-| zhao_scales | 青膜硬埂 | 2 | 挖浅水边的铁砂 | 1 |  |  |  | 2 |  |  |  | 寒铁（ore）×6 |  |  |  |  |  | 泥鳞鬃犬（mud_shrike） · 30% | 站在岸边，弯腰就够得着泥。 | 你淘出不少裹在水藻里的寒铁。 |  |
-| zhao_grain_ladder | 高脚粮仓 | 1 | 给何绢松木和兽革，修好梯脚 | 0.25 | 12 |  |  | 4 | 兽革（hide）×2、松木（wood）×2 | 是 |  | 干粮（ration）×6 |  |  |  |  |  |  | 何绢抬起梯脚给你看，裂缝进了两节指头。「头两级还能踩，背袋米上去就难说了。」 | 何绢自己提了袋米上梯，落脚时梯子没再晃。她从仓里包了粮饼下来。「水一涨，总有人背着湿谷来求地方。你帮我腾出这几格，饼就劳你吃了吧。」 |  |
-| zhao_grain_ladder | 高脚粮仓 | 2 | 捡粮仓后门的碎松木 | 0.75 |  |  |  | 2 |  |  |  | 松木（wood）×5 |  |  |  |  |  |  | 掉在门外的碎木片已经晒干。 | 你把松木拢进臂弯，粮仓的人又把一堆削下来的短木耙到檐下。 |  |
-| zhao_ridge_permit | 青瓦验牒房 | 1 | 出示余节的货签，替柯伯补绳架 | 0.25 | -11 |  |  | 4 | 漏潮货签（zhao_sand_chit）×1、兽革（hide）×3、松木（wood）×4 | 是 |  | 叠石驿牒（sand_writ）×1 |  |  |  |  |  |  | 柯伯指着檐下两条磨起毛的绳，说木架也得补。 | 柯伯换好绳架，把两州都认的通行牌交给你。「过了浅石滩就没多少水了。跟紧下一趟带铃的骡车。」 |  |
-| zhao_ridge_permit | 青瓦验牒房 | 2 | 隔关听骡铃 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 一声铃从石隙深处转出来。柯伯说鸣沙城把新绳价写在城门，冲坏的井也还等人修。 |  |
-| zhao_old_wheel | 横卧的半边磨轮 | 1 | 把石脚的灵晶抠出来 | 1 |  |  |  | 2 |  |  |  | 灵晶（core）×5 |  |  |  |  |  |  | 街外磨台已经没人轮值，脚下的水也很慢。 | 你撬裂了两块浮石，夹在其中的灵晶正好随水滚下来。 |  |
-| zhao_old_wheel | 横卧的半边磨轮 | 2 | 看看磨轮背后写了什么 | 0.25 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  | 牌上写着，把灯挂在磨轮下面，靠岩壁的一边会反出两点光。卖竹筐的人把灯连同坏器具带去了碎琉璃滩，搁在晒网上。 |  |
-| zhao_firedoor | 斜封窑棚 | 1 | 给马荻材料，换一面湿帘 | 0.25 | -8 |  |  | 4 | 耐火泥（kiln_clay）×5、兽革（hide）×3、灵草（reed）×5 | 是 |  | 浸炭湿帘（fire_cloth）×1 |  |  |  |  |  |  | 帘绳断了，帘下的接缝被烤得发红。马荻要补泥、皮料和灵草。 | 马荻抹泥封住侧面的缝，抛给你另一面湿帘。「里面那东西受惊就踩着炭堆扑。真要进去，先看看哪边能退出去。」 |  |
-| zhao_firedoor | 斜封窑棚 | 2 | 捡晾棚的松枝头 | 0.75 |  |  |  | 2 |  |  |  | 松木（wood）×5 |  |  |  |  |  |  | 被雨打湿的整炭仍在袋里，棚外松尖晾得干。 | 轻推棚角，掉下来一些没熏透的松尖。 |  |
-| zhao_submerged_table | 铜槽旁 | 1 | 提灯沿水槽走到深处 | 0.25 |  |  |  |  |  |  |  |  | 槽背水魁（lab_crawler） |  |  |  |  |  |  | 灯一晃，湿漉漉的石甲从槽里拱起来。堵在出水孔里的东西侧过身，水打湿了你半条裤腿。 |  |
-| zhao_submerged_table | 铜槽旁 | 2 | 拔掉铜板的插销，印下刻图 | 0.75 |  |  |  | 6 |  |  |  | 伏潮漏图（phase_chart）×1 |  |  | 槽背水魁（lab_crawler） |  |  |  |  | 水魁退进岩缝，水槽另一头终于能抬起来。铜板背面刻着水滴该隔多久落下。你把图印到纸上，原板留在旧站。 |  |
-| zhao_submerged_table | 铜槽旁 | 3 | 在外围收晶屑 | 1.25 |  |  |  | 2 |  |  |  | 灵晶（core）×7 |  |  |  |  |  |  | 灯旁有一块高台，槽里的水挤不到这边。 | 干台的一层短晶透过水汽露出了棱。 |  |
-| zhao_bank_fire | 赤泥横穴 | 1 | 越过湿帘，向灰里投一颗石子 | 0.25 |  |  |  |  |  |  |  |  | 伏灰炭魈（ember_yak） |  |  |  |  |  |  |  |  |
-| zhao_bank_fire | 赤泥横穴 | 2 | 沿帘脚扫出暗金 | 1.25 |  |  |  | 2 |  |  |  | 暗金（black_iron）×6 |  |  |  |  | 伏灰炭魈（ember_yak） |  | 靠近时能看到黑砂发亮，别碰帘后舔木的暗火。 | 刮起不烧手的一层重砂，余炭重新盖过坑沿。 |  |
-| zhao_bank_fire | 赤泥横穴 | 3 | 看看没冒烟的两个风孔 | 0.25 |  |  |  | 5 |  |  |  |  |  |  |  |  |  |  |  | 有人曾把测温的纸签挂在这里。一大一小两个孔离得很近，同时打开，下面的暗火就会停住。 |  |
-| zhao_glass_net | 六角晒网 | 1 | 修好灯座，向章老借灯 | 0.25 | -16 |  |  | 4 | 寒铁（ore）×5、松木（wood）×5、灵晶（core）×2 | 是 |  | 靠岩导灯（lab_beacon）×1 |  |  |  |  |  |  | 灯座搁在网上，撑灯的横木已经开裂。 | 章老拿撑渔网的杆子压了压新灯座。「去缺轮磨台，过了磨轮后站到岩壁边。哪条路反出两点光，就沿哪条去沉水量站。」 |  |
-| zhao_glass_net | 六角晒网 | 2 | 从碎琉璃中挑灵晶 | 0.75 |  |  |  | 2 |  |  |  | 灵晶（core）×4 |  |  |  |  |  |  | 晒网旁的碎片里也有清澈的灵晶。 | 你一片片挑出来，把表面的盐洗掉。 |  |
-| zhao_deep_pillars | 分水三柱 | 1 | 踏过断柱，往对面的石台去 | 0.25 |  |  |  |  |  |  |  |  | 分柱水君（fault_warden） |  |  |  |  |  | 你刚把脚搭上断柱，那人就横过了剑。退回岸上的路还在。 | 他在水上让开半步，一道浪却贴着他的剑锋扫到石台边。 |  |
-| zhao_deep_pillars | 分水三柱 | 2 | 打开石台上的暗槽，取出旧文书 | 0.75 |  |  |  | 7 |  |  |  | 留水底印（fault_receipt）×1 |  |  | 分柱水君（fault_warden） |  |  |  |  | 你抬起暗槽一侧还能活动的盖，里头压着一份旧约。纸上除了三州的水位，还记着田地淹过以后，三户船家分头把船送到了哪儿。 |  |
-| zhao_rope_sound | 沙坠顺风线 | 1 | 牵出旧绳上的重砂 | 1 |  |  |  | 2 |  |  |  | 暗金（black_iron）×4 |  |  |  |  |  |  | 挑那根还裹着水迹的，黑粒挂得密。 | 你把两段绳搓干，重砂从毛边筛了下来。 |  |
-| zhao_rope_sound | 沙坠顺风线 | 2 | 顺足印去背阴处 | 0.125 |  |  |  |  |  |  |  |  | 黄沿水貂（dyke_marten） |  |  |  |  |  |  |  |  |
-| zhao_broken_rake | 三口相背的堰齿 | 1 | 从外侧石柱旁铲灵晶 | 1.25 |  |  |  | 2 |  |  |  | 灵晶（core）×6 |  |  |  |  |  |  | 通向里面的路断了，外侧石柱边的白晶还够得着。 | 铲下的灵晶沿水坝滑到浅滩，薄片之间还滴着水。 |  |
-| zhao_broken_rake | 三口相背的堰齿 | 2 | 把铜板上印下的水图给楚棱看 | 0.5 |  |  |  | 5 | 伏潮漏图（phase_chart）×1 |  | 是 | 错水折尺（fault_route）×1 |  |  |  |  |  |  |  | 楚棱认出旧水槽的退水记号，把尺从布套里取出摊开。「湖底有三根柱子，一位修士守着残台。去过的人多半给赶回来了。下水前先看看从哪儿退。」 |  |
-| zhao_ferry_hook | 长礁灯脚 | 1 | 拖一捆靠浅礁的沉木 | 1 |  |  |  | 2 |  |  |  | 松木（wood）×6 |  |  |  |  |  |  | 灯脚的边缘能踩着，泥不及膝。 | 把木节拖到石条上晒了一会儿，滴水的部分留给后到的船。 |  |
-| zhao_ferry_hook | 长礁灯脚 | 2 | 问什么货最等不得开渡 | 0.125 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  | 点货人把返潮的盐罐挪到一边。「湿谷多放一天就多坏几袋。先找好船工，哪条路能走，也给后来的船留句话。」 |  |
-| zhao_assay_tubs | 回水试槽 | 1 | 看看桌边陶罐上的盐痕 | 0.125 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  | 两个罐底各留了一撮盐。施荀轻叩左边，盐早沿底边结成细圈，再一碰右边，整团滚了出来。「同样的盐，两个罐一个刚温过，一个放了一夜。要验那张方，我还得见见三州留下的东西。」 |  |
-| sand_city_registry | 鸣沙井籍房 | 1 | 问鲁勤桌角的换班记录 | 0.25 |  |  |  | 3 |  |  |  | 换井役簿（sand_watch_register）×1 |  |  |  |  |  |  |  | 鲁勤把盐井的换班记录翻给你。「担盐岗的邢茧等着核对旧井票。你肯跑一趟，就拿这份给他看。」 |  |
-| sand_cinder_kitchen | 炭篷边炉 | 1 | 问杨芹为何留意白蹄道 | 0.25 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 杨芹把汤勺往锅沿一搁。「我师傅从前给倒驿送灯。回来鞋还是干的，手上却全是湿泥。他说白蹄道有块马蹄样的白石，底下的泥一按，跟在喘气似的。」 |  |
-| sand_cloister_trial | 对簧石台 | 1 | 给梁弦材料，帮他修挂石板的架子 | 0.5 | -12 |  |  | 4 | 寒铁（ore）×2、灵晶（core）×1 | 是 |  |  |  |  |  |  |  |  | 两块寒铁能打新的支脚，一枚灵晶用来听清回声。 | 梁弦把新铁片垫在架脚下，再敲石板，架子没晃。「省得我再拿膝盖顶着。来，随我去工坊。有片外州来的铜，我想托人送回山里。」 |  |
-| sand_cloister_trial | 对簧石台 | 2 | 进绳圈和袁息切磋 | 0.25 |  |  |  |  |  |  |  |  | 叩石师姐袁息（sand_tuner） |  |  |  |  |  | 袁息说好用钝剑，谁退到圈外就收手。 | 袁息压低钝剑。「听见石响就换步，站不住可以自行退到绳外。」 |  |
-| sand_cloister_trial | 对簧石台 | 3 | 向袁息讨这场的评语 | 0.25 |  |  |  | 4 |  |  |  |  |  |  | 叩石师姐袁息（sand_tuner） |  |  |  |  | 袁息将木片敲在你刚站过的石板上，回声清清楚楚。「这一步落得轻。我去给梁师傅递个话，他想托个脚步稳的人带件东西出州。你到工坊找他。」 |  |
-| sand_ring_maker | 梁弦的工坊 | 1 | 接过梁弦留下的铜片 | 0.25 |  |  |  | 5 |  |  |  | 听矿铜簧（echo_tuning_key）×1 |  |  |  |  |  |  |  | 梁弦拿铜片碰了碰石板，尾音半晌才消。「我从沉钟岭带回来时就缺这一角。你到岭上听钟，找找哪块石头上有和它对得上的凹口。」 |  |
-| sand_ring_maker | 梁弦的工坊 | 2 | 问梁弦那块大毡子是怎么塞进去的 | 0.25 |  |  |  |  |  |  |  | 鸣沙的叠缝样（qiankun_fold_pattern）×1 |  |  |  |  |  |  |  | 梁弦把袋口翻出来。里头的布一层压一层，针脚都藏在折里。「这只原是装井绳的。」他找出一截旧布递给你。「带回去，照这道折缝量。」 |  |
-| sand_tent_watch | 晾绳矮帐 | 1 | 问荀霜商队为何绕开石洼 | 0.25 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 「晶石发光那几晚，上坡的人都先低头看有没有爪印。要往深处走，就带能打穿硬甲的家伙。在外沿歇脚倒没事。」 |  |
-| sand_tent_watch | 晾绳矮帐 | 2 | 从滴水的帐沿挖灵草 | 0.25 |  |  |  | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  | 帐绳顺水往地上滴，根部灵气比沙上看着稳。 |  |
-| sand_crossing_rail | 连鞍岔牌 | 1 | 给曾微两份兽革缝鞍带 | 0.5 | 12 |  |  | 4 | 兽革（hide）×2 | 是 |  | 干粮（ration）×2 |  |  |  |  |  |  |  | 曾微收紧鞍带，扯了两下才撒手。「井梯也一样，差半边就会滑。拿井票给静盐井的守井人看，他有卡梯子的铜扣。别自个儿往下爬。」他把工钱塞给你。 |  |
-| sand_salt_ledger | 井边老秤 | 1 | 给邢茧看盐井的换班记录 | 0.25 |  |  |  | 4 | 换井役簿（sand_watch_register）×1 |  |  | 静井准入票（sand_well_chit）×1 |  |  |  |  |  |  |  | 邢茧对过两份记录上的印，又瞧了一眼井口。「上回下去的孩子回来少了一只鞋，手在绳上磨得没皮。我说过不让他们再下。你若执意去，拿票找守井人，那儿有架铁梯。」 |  |
-| sand_salt_ledger | 井边老秤 | 2 | 捡坡脚旧扁担上的松木 | 0.5 |  |  |  | 2 |  |  |  | 松木（wood）×2 |  |  |  |  |  |  |  | 木头浸过盐水，表面发白。你从里面挑出几块还能用的松木。 |  |
-| sand_stillwell_mouth | 井口的两根绳 | 1 | 抓粗绳下几步，看看井底 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 刚沿粗绳下去几步，带鳞的尾巴就扫了上来。井壁滑得踩不住，你只好抓绳退回。 |  |
-| sand_stillwell_mouth | 井口的两根绳 | 2 | 给闻銮看井票，请他用细绳放下铁梯 | 0.25 |  |  |  | 4 | 静井准入票（sand_well_chit）×1 |  |  | 井梯铜扣（sand_well_open）×1 |  |  |  |  |  |  |  | 闻銮对过印，把固定铁梯的半块铜扣塞给你。「沿铁梯下去，鞋带系紧。井壁挂着一只陶罐，绕过那头大兽才够得着。」 |  |
-| sand_stillwell_vault | 挂陶罐的井壁 | 1 | 踩着井壁的凹坑过去，引开伏鳞 | 0.5 |  |  |  |  |  |  |  |  | 静井伏鳞（sand_well_basilisk） |  |  |  |  |  |  | 伏鳞抬头时盐壳簌簌落下，粗尾已绕到你身后。 |  |
-| sand_stillwell_vault | 挂陶罐的井壁 | 2 | 解下铜钉上挂着的陶罐 | 0.25 |  |  |  | 8 |  |  |  | 井心水盐（stillwell_salt）×1 |  |  | 静井伏鳞（sand_well_basilisk） |  |  |  |  | 罐解下来了，没漏出一点水。井底的盐整整齐齐封在里面，盖上还压着旧炉房的印。 |  |
-| sand_stillwell_sill | 井底隔水板 | 1 | 取隔水板后浅槽里的灵晶 | 0.75 |  |  |  | 3 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  | 浅槽里只有盐泥和几块灵晶。要去挂陶罐的深井，还得从另一侧下去。 |  |
-| sand_cold_kiln_house | 阮杪的档房 | 1 | 问阮杪这些陶罐为何不沾灰 | 0.25 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  | 阮杪取下一只裂罐，用湿布抹过，裂缝也是白的。「冷炉烧的罐经得住水，册子却给人抄岔了。你若带来静盐井的盐，再拿那班井票给我对印，我就能把原来的火候找出来。」 |  |
-| sand_cold_kiln_house | 阮杪的档房 | 2 | 出示井票和井盐，请阮杪抄验火册 | 0.75 | -18 |  |  | 8 | 静井准入票（sand_well_chit）×1、井心水盐（stillwell_salt）×1 |  |  | 冷炉验火册（cold_kiln_record）×1 |  |  |  |  |  |  |  | 阮杪对过井票，从罐口刮下一点盐霜，又盖好还给你。她抄完原来的记录，把纸翻到末页。「瞧见照原那个印了么？这炉火是他们和咱们一块儿试的。」 |  |
-| sand_approach_hoof | 逆纹马蹄石 | 1 | 循马蹄白石往前试走 | 0.5 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 背风的地方又露出刚才那块白石。你认得来路，只把鞋上粘灰拍掉。 |  |
-| sand_approach_hoof | 逆纹马蹄石 | 2 | 在朝反方向的蹄印旁放一点伏潮息泥 | 0.5 |  |  |  | 6 | 伏潮息泥（heart_silt）×1 |  | 是 |  |  |  |  |  |  |  |  | 只有朝反方向的那道蹄印能把泥水聚成一线，让它流下旧路的坡。坡下有块白石能抬起来，石缝里传出门销松动的声音。 |  |
-| sand_approach_hoof | 逆纹马蹄石 | 3 | 拣白石边冒出的寒铁片 | 0.75 |  |  |  | 3 |  |  |  | 寒铁（ore）×2 |  |  |  |  |  |  |  | 铁片下面只是被沙磨开的铁锈。 |  |
-| sand_archive_guard | 倒挂的驿印 | 1 | 举起兵器，走向白柱后的守影 | 0.5 |  |  |  |  |  |  |  |  | 倒驿锁影（sand_inverted_keeper） |  |  |  |  |  |  | 守影拖动货柜的锁。铁链刚响，它就从白柱后转过身来。 |  |
-| sand_archive_guard | 倒挂的驿印 | 2 | 按货牌上的记号打开货柜 | 0.5 |  |  |  | 8 |  |  |  | 暗金（black_iron）×8、灵晶（core）×6 |  |  | 倒驿锁影（sand_inverted_keeper） |  |  |  |  | 守影一散，倒挂的货柜慢慢垂了下来。丢失多年的矿货还裹在驿站的旧布里。 |  |
-| sand_bridge_rail | 晃铜的桥栏 | 1 | 拨开晃响的铜扣，看看栏下 | 0.25 |  |  |  |  |  |  |  |  | 黄结桥蝰（sand_rattle_viper） |  |  |  |  |  |  | 蛇绕过铜扣，从栏杆另一侧垂了下来。 |  |
-| sand_bridge_rail | 晃铜的桥栏 | 2 | 给黄桥匠两块松木撑稳桥板 | 0.5 | 8 |  |  | 4 | 松木（wood）×2 | 是 |  |  |  |  |  |  |  |  |  | 黄桥匠架稳桥板。北边冷炉院以前和这里共用水尺，阮杪手里多半还留着借还水尺的旧账。 |  |
-| sand_bridge_rail | 晃铜的桥栏 | 3 | 从外侧石台取走多出来的松木 | 0.5 |  |  |  | 2 |  |  |  | 松木（wood）×2 |  |  |  |  |  | 黄结桥蝰（sand_rattle_viper） · 25% |  | 绕过栏杆留空的地方，就能从废槽抽出几段无主的松木。 |  |
-| sand_wind_work | 风楔架 | 1 | 撬开朝阳岩缝里的寒铁 | 0.75 |  |  |  | 3 |  |  |  | 寒铁（ore）×3 |  |  |  |  |  |  |  | 铁块松了，卡在侧壁的石板轻轻晃了一阵，路仍然通着。 |  |
-| sand_wind_work | 风楔架 | 2 | 顺小槽筛出灵晶 | 0.75 |  |  |  | 3 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  | 细砂被风扫走，底板上几块亮石没有动。 |  |
-| sand_silo_door | 关了一半的仓门 | 1 | 站到滑槽旁等小兽出来 | 0.25 |  |  |  |  |  |  |  |  | 仓花貂（sand_silo_marten） |  |  |  |  |  |  | 旧仓里的花貂低伏着扑上仓板。 |  |
-| sand_silo_door | 关了一半的仓门 | 2 | 给蒋芨一份口粮、听他讲仓门 | 0.25 |  |  |  | 3 | 干粮（ration）×1 | 是 |  |  |  |  |  |  |  |  |  | 「先前专给驻桥人磨粮，改了官路就没人用。」蒋芨收好粮，「落琉洼边的旧订单是送给测风的人，里头还有未缴回的器械。」 |  |
-| sand_silo_door | 关了一半的仓门 | 3 | 从滑槽外沿拔灵草 | 0.25 |  |  |  | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  | 仓墙背后日晒少，草在旧木板下面还绿着。 |  |
-| sand_hail_floor | 断琉棱 | 1 | 留在洼地边上筛灵晶 | 0.5 |  |  |  | 3 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  | 你在边上收了几枚灵晶。下面风响个不停，沿来路还能退出去。 |  |
-| sand_hail_floor | 断琉棱 | 2 | 翻过断晶，往爪声传来的地方走 | 0.5 |  |  |  |  |  |  |  |  | 三痕琉狮（sand_glass_lynx） |  |  |  |  |  |  | 三痕琉狮压折前爪下的碎晶，先扬起一层花白的尘雪。 |  |
-| sand_hail_floor | 断琉棱 | 3 | 取出卡在晶石底下的金属片 | 0.5 |  |  |  | 7 |  |  |  | 落琉洼的弹片（sand_glass_pass）×1 |  |  | 三痕琉狮（sand_glass_lynx） |  | 三痕琉狮（sand_glass_lynx） |  |  | 你把弹片向下压平。迎面一阵风卷走石粉，晶石后露出一道窄缝。 |  |
-| sand_hail_floor | 断琉棱 | 4 | 挖断晶下面的大块灵晶 | 1 |  |  |  | 4 |  |  |  | 灵晶（core）×4 |  |  |  |  | 三痕琉狮（sand_glass_lynx） |  |  | 断晶下面看不见新脚印了。你沿细槽撬出了几块没碎的灵晶。 |  |
-| sand_hanging_support | 贴壁支木 | 1 | 捡支架前的寒铁碎料 | 0.75 |  |  |  | 3 |  |  |  | 寒铁（ore）×2 |  |  |  |  |  |  |  | 几块粗铁还能拿来打新的支脚。 |  |
-| sand_hanging_support | 贴壁支木 | 2 | 靠近绳架，看看暗处那双金眼 | 0.5 |  |  |  |  |  |  |  |  | 负砂豺（sand_vein_jackal） |  |  |  |  |  |  | 负砂豺咬住绳边的坠石。石粉从你的脚边簌簌滑下。 |  |
-| sand_hanging_support | 贴壁支木 | 3 | 钻进绳架后淘暗金 | 1 |  |  |  | 4 |  |  |  | 暗金（black_iron）×3 |  |  |  |  | 负砂豺（sand_vein_jackal） |  |  | 架子总算没受力，积砂里亮出几粒颜色深的暗金。 |  |
-| sand_dune_grass | 伏草沙坎 | 1 | 挖阴沟两侧的灵草 | 0.25 |  |  |  | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  | 把带露的根束扎好，干沙自行抖掉了。 |  |
-| sand_dune_grass | 伏草沙坎 | 2 | 去看草根边跳动的耳朵 | 0.25 |  |  |  |  |  |  |  |  | 沙丘野兔（sand_dune_hare） |  |  |  |  |  |  | 沙丘野兔穿出湿草，歪头朝近处扑了两步。 |  |
-| sand_guest_miller | 栾火的并磨盘 | 1 | 给栾火两份灵草，补杯子的缝 | 0.5 | 7 |  |  | 3 | 灵草（reed）×2 | 是 |  | 干粮（ration）×2 |  |  |  |  |  |  |  | 栾火用泡软的苇芯填住杯缝，再摇也不漏谷。他分了些磨好的干粮，又给了你一半工钱。 |  |
-| sand_guest_miller | 栾火的并磨盘 | 2 | 问栾火是谁定的共用磨盘规矩 | 0.25 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 「关山师兄下山没少替人分磨钱。」栾火抬抬手，「院里也一样，帮得上忙才有账记，跟你是哪的人无关。」 |  |
-| sand_rooftile_patch | 留阴瓦畦 | 1 | 捡田边剪下的灵草 | 0.25 |  |  |  | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  | 骆椿留足下一茬的草根，剩下的嫩草晒一晒就能带走。 |  |
-| sand_rooftile_patch | 留阴瓦畦 | 2 | 问骆椿为何用瓦盖住湿土 | 0.25 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  | 骆椿翻过一片旧瓦给你看。「拿瓦晒盐也得看背面的纹。向阳一面太烫，冷炉那种背面留粗纹的瓦才能反复用。」 |  |
-| sand_rooftile_patch | 留阴瓦畦 | 3 | 收瓦棚下散开的谷子 | 0.5 |  |  |  | 2 |  |  |  | 新收的谷子（millet_grain）×2 |  |  |  |  |  |  |  | 旧箩筛尽了干砂，只剩适合煮粥的碎谷。 |  |
-| sand_gravel_rill | 搁木的浅弯 | 1 | 沿里弯把干松木拖上岸 | 0.5 |  |  |  | 2 |  |  |  | 松木（wood）×3 |  |  |  |  |  |  |  | 木头晒裂了一点，折齐还能作炉料。 |  |
-| sand_gravel_rill | 搁木的浅弯 | 2 | 扒开外弯的石子，找寒铁 | 0.5 |  |  |  | 2 |  |  |  | 寒铁（ore）×1 |  |  |  |  |  |  |  | 大石块挪不动，石子堆下面倒剩了一块厚铁。 |  |
-| sand_basket_shed | 岸边竹棚 | 1 | 帮老人扶稳箩筐 | 0.125 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 他伸脚把矮凳拖回来，又往你这边让了半块空地。「风从沟里来，坐里头些。」 |  |
-| sand_basket_shed | 岸边竹棚 | 2 | 问老人愿不愿意试两招 | 0.125 |  |  |  |  |  |  |  |  |  | 1 |  |  |  |  |  | 「要找人过招，去院里才热闹。」他低头用指甲把翘起来的竹篾压回去。 |  |
-| sand_basket_shed | 岸边竹棚 | 3 | 拿一截闲竹比划两下，再请老人指点 | 0.125 |  |  |  |  |  |  |  |  |  | 2 |  |  |  |  |  | 老人看完，先把箩筐搬进棚，再用拐杖在沙上画了个圈。「只在圈里试。撑不住就抬手，我会停。」 |  |
-| sand_basket_shed | 岸边竹棚 | 4 | 走进圈里和老人试招 | 0.125 |  |  |  |  |  |  |  |  | 补箩老人（sand_basket_mender） | 3 |  |  |  |  | 老人手里还是那根旧竹杖。 | 你刚抬手，竹杖已经贴上手腕。老人脚下那双旧布鞋连位置都没挪。 |  |
-| sand_basket_shed | 岸边竹棚 | 5 | 请老人讲讲方才那一步 | 0.25 |  |  |  | 7 |  |  |  |  |  |  | 补箩老人（sand_basket_mender） |  |  |  |  | 他拿竹杖指了指你刚踩过的石子。「脚下那颗会滚。下回动手之前，先知道自己站在哪儿。」 |  |
-| sand_glass_chamber | 铜轮前 | 1 | 拔出兵器，走向铜轮 | 0.5 |  |  |  |  |  |  |  |  | 照壁刀师邢既横（sand_sundial_master） |  |  |  |  |  | 那人把刀一横，刀刃上还沾着石粉。 | 那人把刀鞘往柱边一抛，提刀迎了上来。 |  |
-| sand_glass_chamber | 铜轮前 | 2 | 拉住铁环，和邢既横一起转动铜轮 | 0.5 |  |  |  | 8 |  |  |  | 暗金（black_iron）×5、灵晶（core）×8、旧布袋的底纹（qiankun_inner_pattern）×1 |  |  | 照壁刀师邢既横（sand_sundial_master） |  |  |  |  | 铜轮底下响了一声，露出个暗格。邢既横倒空灰布袋，里头滚出灵晶和暗金。他翻过袋底，细细的针脚还在。「袋子划破了，这几针倒没散。拿去，让会缝的人照着试试。」 |  |
-| puzzle_gauge_pin | 胥婉的旧水尺 | 1 | 给胥婉两份木料修把手 | 0.375 |  |  |  | 2 | 松木（wood）×2 | 是 |  | 水闸铜杆（sluice_gauge_pin）×1 |  |  |  |  |  |  | 她说，修好把手就能取出铜杆。跃鱼旧渠的水闸正用得上它。 | 胥婉垫好把手，取出铜杆给你。「跃鱼旧渠找梁溥。这三道刻痕记的是各处需要多少水。」 |  |
-| puzzle_joint_gates | 旧渠的分水闸 | 1 | 问梁溥三道水该怎么走 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  | 梁溥站在干处，手贴着石头，听水从脚下过去。 | 梁溥指向石阶。「急水打这儿走。稻根沾一点水就行，再多就冲倒了。米库那头得干着。」 |  |
-| puzzle_scale_register | 挑秤人的砖柜 | 1 | 帮高婆扶住小秤 | 0.25 |  |  |  | 2 |  |  |  | 旧秤下的小木块（zhao_weigh_note）×1 |  |  |  |  |  |  |  | 你扶住秤杆。高婆抽出小木块，指了指上头刻的图。「你看，同样重的东西，离秤中间那根柱子越远，就越压得下去。守尺观后房正少一块这样的木头，你替我捎去吧。」 |  |
-| puzzle_lever_cabinet | 旧柜上的秤 | 1 | 问看门弟子这架秤是做什么的 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 弟子敲了敲柜门上的铜牌。「从前有人拿偏轻的砝码收草药，观里就做了这架秤。按牌上写的称平了，柜门就开。试的时候，手离门缝远些。」 |  |
-| puzzle_bridge_verse | 灶边的旧桥灯 | 1 | 问杨芹巡桥时怎么报平安 | 0.25 |  |  |  | 2 |  |  |  | 桥工的铜环（sand_crossing_song）×1 |  |  |  |  |  |  |  | 杨芹把铜环和小牌取下来。「人从驿站这头起步，先敲一声。往前走每到一处都得响。到了桥那头，转身前后各响一次，守桥人才知道你已经往回走。铜环给你，桥外的旧绳可经不起折腾。」 |  |
-| puzzle_sound_relay | 桥下的传声筒 | 1 | 拂开横梁上的沙，看看旧刻痕 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 木梁上刻着两条线，一条从驿站画到对岸，一条从对岸折回驿站。两条线都挨着桥那头的瓦片，那里还有两道叠在一起的锈圈。 |  |
-| puzzle_spool_loom | 春衫织棚 | 1 | 帮姚莼摊开打湿的旧灯罩 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 姚莼把旧灯罩举起来。正面的芦苇丝之间透进几道亮光，背面的挂绳孔缠着几圈粗麻线。她把灯罩搁回织机边。 |  |
-| puzzle_granary_catch | 歪了的粮箱 | 1 | 问何绢粮箱为什么会歪 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 何绢指了指箱子和木架之间的接缝。「布一干就打滑。箱子一歪，架脚下的木块也会被它推出来。开门就按住露在外头的弹簧，手别伸进门里。」 |  |
-| puzzle_hoof_markers | 三块刻着蹄印的石头 | 1 | 低头看看石头缝里的白灰 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  | 白灰里落着几片泥。泥片一面平，一面印着一道浅浅的马蹄边，像是有人拿湿泥往石头上按过。 |  |
-| zhao_terrace_arena | 观内朱线台 | 1 | 问裁判怎么报名 | 0.125 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 裁判指着桌上的名单。「报了名就等我们叫你上台。撑不住时敲一下台边的铜片，算认输，我们会让双方停手。」 |  |
-| undertow_door | 反潮石门 | 1 | 沿外侧石阶绕一圈 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  | 墙外还有一排露出水面的石阶，一直连回岸边。 | 你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮，门两边的水都换了方向。水势一变，只有靠里的高阶还露在外头。 |  |
-| undertow_door | 反潮石门 | 2 | 把倒浪楔卡进石槽，固定绳子 | 0.5 |  |  |  | 3 | 倒浪楔（undertow_wedge）×1 |  | 是 | 回潮洞引线（undertow_entry）×1 |  |  |  |  |  |  | 施荀给的铁楔刚好对得上石槽。潮水倒流时，可以抓着绳子找高处的台阶。 | 第二股潮水打过来，铁楔才牢牢卡住。你沿绳摸到上方的石阶，找到了去回潮母洞的路。 |  |
-| undertow_door | 反潮石门 | 3 | 用校潮亭的印纸对照潮水方向 | 0.25 |  |  |  | 2 | 校潮亭抄尺（river_gauge_copy）×1 |  | 是 |  |  |  |  |  |  |  | 石槽边的浅痕正对着倒流的潮水，和印纸最下面几道痕同向。 | 印纸贴在槽边，最后两道线只从内侧湿起。绳子会随水换方向，固定它的铁件得同时卡住槽的两头。 |  |
-| marsh_pole_lesson | 封乔的护堤木台 | 1 | 问封乔河里出了什么事 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 封乔指着台下被卷碎的苇筏。「深水里有条大兽，爱伏在石门旁。它不来浅岸。我守的是河工，你别顺深水去追。」 |  |
-| marsh_pole_lesson | 封乔的护堤木台 | 2 | 拿练习杆，和封乔切磋 | 0.25 |  |  |  |  |  |  |  |  | 护堤人封乔（river_spar_captain） |  |  |  |  |  | 他把麻绳放松一截。「站不稳就叫停，别跌进水里。」 | 河工守在台边。封乔换了根软头短杆，朝你让出几步。 |  |
-| marsh_pole_lesson | 封乔的护堤木台 | 3 | 接过封乔的试杆签 | 0.125 |  |  |  | 4 |  |  |  | 封乔的试杆签（river_trial_writ）×1 |  |  | 护堤人封乔（river_spar_captain） |  |  |  | 封乔放下短杆，取了一支先前用红布系好的木签。 | 封乔在木签上按了手印。「夜里水响，赶路靠脚稳。折水驿要托人带急信，你肯帮忙，就拿这个给他们看。」 |  |
-| counter_bell_door | 倒钟后的反声门 | 1 | 贴着石壁敲三下 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 前两声沿石阶传回来，第三声却顺宽孔往下传。弯下腰细听，石阶底下还有一处空腔。 |  |
-| counter_bell_door | 倒钟后的反声门 | 2 | 把听矿铜簧斜卡进两个石孔 | 0.5 |  |  |  | 3 | 听矿铜簧（echo_tuning_key）×1 |  | 是 | 反声孔通路（counter_bell_entry）×1 |  |  |  |  |  |  | 那块铜片宽端抵住外面的孔，缺角的一端斜着能卡进里面的凹口。 | 第三声在窄孔里没了回音。下方石阶却落稳了，宽孔的回声从脚底传来。那是通往反声钟窟的路。 |  |
-| ford_packet_boat | 外桩商船 | 1 | 给夏狄修船料，领去照原的货单 | 0.75 | -7 |  |  | 3 | 松木（wood）×4、寒铁（ore）×2 | 是 |  | 商船货单（ferry_manifest）×1 |  |  |  |  |  |  | 夏狄认得外港的水路。船边要用四份松木、两份寒铁修补，添上七钱船费，她就把你写进货单。 | 夏狄换掉磨薄的船板，把新木钉牢。「大渡口关着也能从外港走。坐船里侧，看见照原那三把高水尺就到了。」她在商船货单背面写下你的名字。 |  |
-| ford_packet_boat | 外桩商船 | 2 | 问夏狄的船从哪条水路出港 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 夏狄指着水闸外的大石。「大渡口开了就有官船。外港水浅，只走这种小船，带不了整批货。」 |  |
-| ford_below_steps | 闸下无灯梯 | 1 | 留在上层，看看梯边的木牌 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  | 小旗在暗处也摸得到。旁边的木牌写着，照原城的人来修过排水口。换了水尺后，巡闸人就很少再下到第三级。 |  |
-| ford_below_steps | 闸下无灯梯 | 2 | 沿短绳下到第二根栏杆 | 0.5 |  |  |  |  |  |  |  |  | 悬梯堰影（ford_lower_spirit） |  |  |  |  |  | 石阶刚够转身，一手仍能攥住绳尾。 | 薄灯下有道皱着的长影，听见绳扣响，猛地甩开下面两层灯架。 |  |
-| ford_below_steps | 闸下无灯梯 | 3 | 翻看松动的修闸名牌 | 0.25 |  |  |  | 3 |  |  |  |  |  |  | 悬梯堰影（ford_lower_spirit） |  |  |  |  | 牌背刻着照原量水司和三名工人的名字。你把木牌留在栏上，扶绳回到外桩。 |  |
+| 事件标识 | 事件名称 | 选项序号 | 选项 | 时间（天） | 灵钱变化 | 气血变化 | 真气变化 | 首次选中所得修为 | 所需物品 | 消耗所需物品 | 条件满足前隐藏 | 所得物品 | 引发战斗 | 先做同一地点的选项序号 | 现场选项需先击败 | 每次胜利才可再次领取 | 在场会挡住选择的对手 | 有对手时每批采集伏击 | 昼夜要求 | 未到时的提示 | 执行后留在原地 | 选前可见内容 | 执行后结果 | 执行后受伤原因 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| reed_banks | 浅水苇丛 | 1 | 挖浅处的苇芯 | 0.25 | 0 | 0 | 0 | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  |  |  | 站在踏石上，手能伸到近岸的泥边。 | 你从踏石边的泥里挑出长实的白苇芯。 |  |
+| reed_banks | 浅水苇丛 | 2 | 蹚过去挖深处的苇芯 | 0.5 | 0 | -4 | 0 | 3 |  |  |  | 灵草（reed）×3 |  |  |  |  |  |  |  |  |  | 露水沾在水湾那丛苇叶上。 | 你蹚到水湾，抽出底下发白的嫩芯。 | 泥里埋着碎蚌壳，拔脚时划破了小腿。 |
+| sunk_pack | 烂木桩浅汊 | 1 | 把竹篓拉上岸 | 0.5 | 0 | 0 | 0 | 1 |  |  |  | 落水药篓（lost_basket）×1 |  |  |  |  |  |  |  |  |  | 篓子的背带露在水面上，伸手够得着。 | 你攥住背带，把竹篓从木桩旁拉起来。水顺着竹条滴下，篓口的扣还紧着。 |  |
+| sunk_pack | 烂木桩浅汊 | 2 | 沿木桩内侧的石路往前看 | 0.125 | 0 | 0 | 0 | 0 |  |  |  |  |  |  |  |  |  |  |  |  |  | 几片卷起的木屑从河弯后漂出来。 | 石路绕过河弯。一个老渡工坐在沙滩上削船桨，脚边全是卷起来的木屑。 |  |
+| mud_track | 碎石水眼 | 1 | 靠近水边的石滩 | 0.5 | 0 | 0 | 0 | 0 |  |  |  |  | 泥鳞兽（mud_beast） |  |  |  |  |  |  |  |  | 石滩能站稳，从那儿看得见水眼深处。 | 鞋底刚踩实，硬鳞便破了水。一头泥鳞兽扑上石滩。 |  |
+| mud_track | 碎石水眼 | 2 | 去干土路边捡松枝 | 1 | 0 | 0 | 0 | 1 |  |  |  | 松木（wood）×2 |  |  |  |  |  |  |  |  |  | 碎石堆横在水边，漂来的枝条都卡在这里。 | 你沿干土路绕过水眼，捡走卡在碎石间的松枝。 |  |
+| mud_track | 碎石水眼 | 3 | 沿土路上的脚印看看 | 0.5 | 0 | 0 | 0 | 0 |  |  |  |  | 苇尾狐（reed_fox） |  |  |  |  |  |  |  |  | 脚印一直进了苇丛，矮苇被什么压低了一截。 | 脚下的苇秆一响，一只苇尾狐从低处蹿出来。 |  |
+| mud_track | 碎石水眼 | 4 | 踩着石头往苇后探 | 0.125 | 0 | 0 | 0 | 0 |  |  |  |  |  |  |  |  |  |  |  |  |  | 水眼背后有几块石头排成一线，像是有人铺过。 | 拨开最后一丛苇，露出背雨的半截石渠，里面有旧柴火的焦痕。 |  |
+| mud_track | 碎石水眼 | 5 | 捡起土路边的油纸包 | 0 |  |  |  |  |  |  |  | 干粮（ration）×1 |  |  | 苇尾狐（reed_fox） |  |  |  |  |  |  | 那只狐败退时蹬断了几根苇秆，油纸包从低处滚到了土路边。 | 油纸里有过路人落下的一份干粮，系绳还好好的。 |  |
+| mud_track | 碎石水眼 | 6 | 到背水坡猎白耳兔 | 0.25 |  |  |  |  |  |  |  |  | 白耳兔（reed_hare） |  |  |  |  |  |  |  |  |  | 一对白耳从短苇里抬起。野兔绕过苇根，沿着斜坡猛蹬过来。 |  |
+| old_fire | 背雨石渠 | 1 | 添柴歇脚 | 0.5 | 0 | 6 | 4 | 0 | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  |  |  | 石炉还通风，挨着背风一侧便能烤火。 | 火把石壁烘热，湿鞋上慢慢蒸出白气。 |  |
+| old_fire | 背雨石渠 | 2 | 捆些干柴 | 1 | 0 | 0 | 0 | 1 |  |  |  | 松木（wood）×3 |  |  |  |  |  |  |  |  |  | 有人把松枝藏在渠边石板下，风吹不着。 | 压在石渠里的松枝还干着，折一下便响。 |  |
+| old_fire | 背雨石渠 | 3 | 掀开渠底的破瓦 | 0 | 0 | 0 | 0 | 1 |  |  |  | 反字残瓦（kiln_shard）×1 |  |  |  |  |  |  |  |  |  | 灰里露着瓦沿，边上像有划痕。 | 瓦上的字是反着刻的。抹掉一层灰，才辨出「敲两下，停一停」。 |  |
+| old_fire | 背雨石渠 | 4 | 从冷炉边取下残纸 | 0.25 |  |  |  | 1 |  |  |  | 石炉沿的折纸样（ember_fold）×1 |  |  |  |  |  |  |  |  |  | 炉沿的砖缝夹着一点纸边。 | 残纸还存着三道折痕。最里一层的松灰没散开，纸边却烧穿了。 |  |
+| reed_ferryman | 渡工的刨木滩 | 1 | 把补桨的料递给渡工 | 0.25 | 0 | 0 | 0 | 3 | 灵草（reed）×2、松木（wood）×1 | 是 |  | 干粮（ration）×1、沉钟岭路图（ridge_rubbing）×1 |  |  |  |  |  |  |  |  |  | 「两份苇芯塞进裂口，再削一根松枝卡紧。我拿进山的路图跟你换。」 | 渡工从斗笠夹层取出沉钟岭的路图。新桨接牢后，他拿脚边那把旧桨比了比，又瞧了眼桨背上的刻线。 |  |
+| reed_ferryman | 渡工的刨木滩 | 2 | 往对岸的白苇走去 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 巡岸水鬼（marsh_ghost） |  |  |  |  |  |  |  |  | 渡工把刨桨的小刀放回膝头。「那边有什么一直来回，我没看清。」 | 脚下的浅石刚露头，一道没有脚的影子就横在白苇前。水鬼抱住两臂，挡着去路。 |  |
+| reed_ferryman | 渡工的刨木滩 | 3 | 帮他把旧桨翻过来 | 0.25 | 0 | 0 | 0 | 1 |  |  |  | 旧桨上的靠岸图（oar_mark）×1 |  |  |  |  |  |  |  |  |  | 泥盖住了半截刻线，渡工用拇指擦了几下。 | 渡工擦去桨背的泥，给你看三根画得歪斜的船桩。「认准第三根，往断桅那头走，有道高埂。」 |  |
+| reed_ferryman | 渡工的刨木滩 | 4 | 采下对岸的熟苇芯 | 0.5 |  |  |  | 2 |  |  |  | 灵草（reed）×3 |  |  |  |  | 巡岸水鬼（marsh_ghost） |  |  |  |  | 白苇就长在水边的浅石间，叶尖已经黄了。 | 踩过空下来的石路，你伸手从齐腰的白苇中抽出熟芯。 |  |
+| bank_watch | 矮石堤 | 1 | 跟拦滩客过招 | 0.25 | 0 | 0 | 0 | 0 |  |  |  |  | 拦滩客（bank_runner） |  |  |  |  |  |  |  |  | 「想借图？跟我过两招，赢了连这把备刀也拿去。撑不住就抬手，我收杖。」 | 拦滩客把备刀留在石上，紧了紧腰带，横着木杖站稳。 |  |
+| bank_watch | 矮石堤 | 2 | 问他渡工在哪儿 | 0 | 0 | 0 | 0 | 0 |  |  |  |  |  |  |  |  |  |  |  |  |  | 他顺口提起那张图是河弯的渡工画的。 | 他朝那几根歪木桩一抬下巴。「拐过弯就是刨木滩。他给断桨接新柄呢。」 |  |
+| bank_watch | 矮石堤 | 3 | 等拦滩客兑现交手的约定 | 0 |  |  |  |  |  |  |  | 沉钟岭路图（ridge_rubbing）×1、渡口钩刃（hook_blade）×1 |  |  | 拦滩客（bank_runner） |  |  |  |  |  |  | 他解开腰间缚住折图的细绳，招手让你过去。 | 拦滩客把折图和备刀一起推过来。「说过的算数。走到北边倒钟下，细看图上那道岔。」 |  |
+| drowned_mast | 沉桅高埂 | 1 | 踩上断桅杆，看看水下 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 沉桅虺（mast_beast） |  |  |  |  |  |  |  |  | 断桅杆从高岸斜伸到水面，能沿着它往下看。 | 你刚踩上桅杆，缠在水底那头的水兽便张开头侧两道鳍。 |  |
+| drowned_mast | 沉桅高埂 | 2 | 站在高岸上看水怎么流 | 0 | 0 | 0 | 0 | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 水流到断桅杆前便分成两股。你照水的一涨一落调了几次呼吸，那口闷气慢慢散了。回村找个清静地方，还可以照着练。 |  |
+| drowned_mast | 沉桅高埂 | 3 | 拨开桅杆旁边的草 | 0 |  |  |  |  |  |  |  | 认路钱（path_charm）×1 |  |  | 沉桅虺（mast_beast） |  |  |  |  |  |  | 木缝里还有一点铜色，拨开水草就够得着。 | 草里卡着半枚带孔的旧渡钱，钱上的记号还没被水磨尽。 |  |
+| ore_rain | 落矿的冲沟 | 1 | 在沟边拾铁 | 1 | 0 | 0 | 0 | 2 |  |  |  | 寒铁（ore）×2 |  |  |  |  |  |  |  |  |  |  | 洗掉浮泥，底下是寒铁。 |  |
+| ore_rain | 落矿的冲沟 | 2 | 爬上坡去撬矿块 | 1 | 0 | -6 | 0 | 3 |  |  |  | 寒铁（ore）×3 |  |  |  |  |  |  |  |  |  |  | 坡上有大块寒铁，连着石皮撬了下来。 | 下坡时一块松石滚下来，撞在膝上。 |
+| ore_rain | 落矿的冲沟 | 3 | 问护篷下敲的是什么坯 | 0.5 |  |  |  | 2 |  |  |  | 厚脊剑坯样（blade_template）×1 |  |  |  |  |  |  |  |  |  | 验矿人在护篷里敲打半块旧剑坯。 | 验矿人把两种锤痕指给你看，捡一块断坯送你。「厚背那一段得留着，锻薄了剑容易崩。」 |  |
+| ore_rain | 落矿的冲沟 | 4 | 捞洗砂槽里反光的碎石 | 0.75 |  |  |  | 1 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  |  |  |  | 泥砂漏下手掌，只有几块透着光的灵晶沉在筛底。 |  |
+| empty_oven | 歇炉的茶棚 | 1 | 在石灶里添柴，烤衣歇脚 | 0.5 | 0 | 9 | 6 | 1 | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  |  |  |  | 湿衣蒸出了白气，烤过火才慢慢暖透。 |  |
+| empty_oven | 歇炉的茶棚 | 2 | 掀开木板取些柴 | 1 | 0 | 0 | 1 | 3 |  |  |  | 松木（wood）×2、茶棚木板上的掌谱（echo_note）×1 |  |  |  |  |  |  |  |  |  |  | 木板反面画着个侧耳贴石的人，掌下还刻有几道难认的线。 |  |
+| miner_echo | 有回声的矿道 | 1 | 沿主道往里走 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 持锤矿煞（ore_wight） |  |  |  |  |  |  |  |  | 主道一直往下，尽头两条矿脉泛着亮光。 | 持锤的影子一转身，握紧石锤挡住了矿壁。 |  |
+| miner_echo | 有回声的矿道 | 2 | 侧身钻进旁孔 | 1 | 0 | 0 | -2 | 3 |  |  |  | 寒铁（ore）×2 |  |  |  |  |  |  |  |  |  | 旁孔拐在主道外侧，风夹着干粉。脚边的碎石有铁色。 | 你侧身绕过岩角。那边的锤声透不过厚岩，脚下有些松动的寒铁。 |  |
+| miner_echo | 有回声的矿道 | 3 | 贴着透光的石缝往外看 | 0.125 | 0 | 0 | 0 | 0 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 石缝对面有个浅石洞，就是回声石龛。洞口朝着山背，顺矿口外的窄坡可以绕过去。 |  |
+| miner_echo | 有回声的矿道 | 4 | 去主道的矿壁撬松矿脉 | 1 |  |  |  | 2 |  |  |  | 寒铁（ore）×3、灵晶（core）×2 |  |  |  |  | 持锤矿煞（ore_wight） |  |  |  |  | 有人沿石壁凿了几道槽，寒铁和灵晶从槽头露出来。 | 你沿先前留下的锤槽撬石，分开寒铁矿片和有光的灵晶。 |  |
+| rope_run | 断绳坡 | 1 | 从侧坡绕下去帮挑夫 | 1 | 10 | 0 | 0 | 2 |  |  |  | 干粮（ration）×2、挑夫的叠片缝样（plate_lacing）×1 |  |  |  |  |  |  |  |  |  |  | 挑夫捆好货，分了口粮和盘缠，又从裂开的护板上拆下一片给你。他指向矿口旁的窄坡：「绕到山背就是回声石龛。旧矿工到那儿躲过风。」 |  |
+| rope_run | 断绳坡 | 2 | 在车辙旁守一会儿 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 石甲獾（stone_badger） |  |  |  |  |  |  |  |  | 车辙截断了一串爪印，能看清它在哪堆碎石里断的。 | 石甲獾钻出碎石，四爪抓住了坡面。 |  |
+| stone_niche | 回声石龛 | 1 | 撬开石缝，取里面的纸 | 2 | 0 | 0 | -3 | 3 |  |  |  | 灵晶（core）×1、旧渡水图（ford_chart）×1 |  |  |  |  |  |  |  |  |  |  | 石缝里的一块碎岩松了。拿出来才看见，底下的纸是张叠起来的旧水图。 |  |
+| stone_niche | 回声石龛 | 2 | 提起洞口的破铃 | 1 | 5 | 0 | 0 | 1 |  |  |  | 寒铁（ore）×1、石龛音痕（stone_rubbing）×1 |  |  |  |  |  |  |  |  |  | 铃边贴着石壁，一角后面还留着空隙。 | 破铃碰到石壁，先响一声。等第二阵回声传来，才震下一片寒铁。铃下还压着几枚旧灵钱。沿石缝望去，几级石阶绕到了裂钟背后。 |  |
+| stone_niche | 回声石龛 | 3 | 拿瓦角比对铃沿 | 0 | 0 | 0 | 0 | 1 | 反字残瓦（kiln_shard）×1 |  | 是 | 带结的铃舌（bell_clapper）×1 |  |  |  |  |  |  |  |  |  | 两处凹弧的宽窄正好能接上。 | 照瓦上的旧字叩完，铃腹发出很短的一声。系着细缆的铃舌从裂口滑了出来。 |  |
+| cracked_bell | 裂钟背面 | 1 | 从裂片间靠近钟座 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 裂钟魄（bell_wraith） |  |  |  |  |  |  |  |  | 裂口时宽时窄，破片下面透出一线灰光。 | 钟魄猛地抬起头，破片一齐响了。 |  |
+| cracked_bell | 裂钟背面 | 2 | 退回山脊 | 0 | 0 | 0 | 0 | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 退过山脊，背后的钟声才听不见。 |  |
+| cracked_bell | 裂钟背面 | 3 | 取下铜钩上的小铃 | 0 |  |  |  |  |  |  |  | 定声铃（bell_charm）×1 |  |  | 裂钟魄（bell_wraith） |  |  |  |  |  |  | 铜钩紧挨裂开的大钟，钩上小铃倒是完好。 | 你绕过钟座，从铜钩上解下定声铃。晃了一下，铃里的铁片没有动。 |  |
+| low_tide | 闸外浅阶 | 1 | 扫起浅阶上的亮晶粒 | 1 | 0 | 0 | 0 | 2 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  |  |  |  | 趁潮水未回，把阶角的细砂淘掉，捡出还透着光的灵晶。 |  |
+| low_tide | 闸外浅阶 | 2 | 走到下游船绳边 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 缠舟兽（rope_eel） |  |  |  |  |  |  |  |  | 船绳能当扶手，水下轮廓得靠近些才认得出。 | 水里一团长影卷过船绳，是一条缠舟兽。 |  |
+| low_tide | 闸外浅阶 | 3 | 握着船绳扫出槽底的灵晶 | 1 |  |  |  | 2 |  |  |  | 灵晶（core）×3 |  |  |  |  |  | 缠舟兽（rope_eel） · 30% |  |  |  | 槽底粗晶沉得深，握紧船绳才够得着。 | 你扶稳船绳，顺水扫开碎砂。亮晶咔嗒碰在石坎底下。 |  |
+| low_tide | 闸外浅阶 | 4 | 去东边浅湾捉银背鱼 | 0.375 |  |  |  |  |  |  |  |  | 银背鱼（ford_silver_dace） |  |  |  |  |  |  |  |  |  | 你截在回水边。银背鱼跳出水面，背鳍朝掌心刮过来。 |  |
+| low_tide | 闸外浅阶 | 5 | 从闸墩石缝引出黑纹蟹 | 0.5 |  |  |  |  |  |  |  |  | 黑纹蟹（ford_shale_crab） |  |  |  |  |  |  |  |  |  | 石缝里伸出一对黑钳，蟹拖着满身湿砂横挤出来。 |  |
+| low_tide | 闸外浅阶 | 6 | 沿外滩拖印找泥鳞兽 | 0.5 |  |  |  |  |  |  |  |  | 泥鳞兽（mud_beast） |  |  |  |  |  |  |  |  |  | 压倒的芦苇突然掀开，泥鳞兽从根下扑上硬地。 |  |
+| boat_shade | 没篷的渡舟 | 1 | 坐上船里的凳子歇脚 | 1 | 0 | 13 | 8 | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 船舷挡住了风。你坐到水势变缓，手脚才不再发冷。 |  |
+| boat_shade | 没篷的渡舟 | 2 | 捞起船底的木柜 | 1 | 15 | -4 | -2 | 2 |  |  |  | 灵晶（core）×1 |  |  |  |  |  |  |  |  |  | 船沿下有两只木柜脚。门板被水压着，还没漂开。 | 柜门里积着碎灵晶，摸到底还有几枚灵钱。 | 抬柜时水一顶，胳膊撞上了船底的一圈铁带。 |
+| boat_shade | 没篷的渡舟 | 3 | 比一比铃上的绳子和旧船绳 | 0.5 | 0 | 0 | 0 | 1 | 带结的铃舌（bell_clapper）×1 |  | 是 | 倒潮刻样（backwash_mark）×1 |  |  |  |  |  |  |  |  |  | 两根绳子的结都朝同一边收紧，绳圈也磨在同一边。 | 把两个绳圈并排挂起来，旧船绳就松开了一截。船身摆开半尺，露出一道朝上游的槽，槽口夹着块薄铜片。 |  |
+| tide_keeper | 旧闸深槽 | 1 | 等水低了跨进闸间 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 守潮灵（tide_spirit） |  |  |  |  |  |  |  |  | 闸门下有排低石阶。水落一些，脚就能踩实。 | 两扇门之间锁链一绷，守潮灵转过了身。重锁压在闸边的方槽上，印钮在锁链下露出来。 |  |
+| tide_keeper | 旧闸深槽 | 2 | 去高处看看旧枪的接头 | 1 | 0 | 0 | 1 | 3 |  |  |  | 闸把的分水榫（spear_joint）×1 |  |  |  |  |  |  |  |  |  |  | 听潮人用旧枪头指了指浪线，取下一块松动的接头给你。 |  |
+| tide_keeper | 旧闸深槽 | 3 | 取出闸边石槽里的镇渡印 | 0 |  |  |  |  |  |  |  | 镇渡印（seal）×1 |  |  | 守潮灵（tide_spirit） |  |  |  |  |  |  | 重锁松脱，原先被压住的印钮可以伸手提起来。 | 你把镇渡印提离石槽，印底还带着同一层湿泥。 |  |
+| flood_lines | 刻洪痕的石壁 | 1 | 从石缝里拽出布包 | 1 | 0 | 0 | 0 | 4 |  |  |  | 逆潮符（tide_talisman）×1、闸工的潮牌（tide_note）×1、济潮丹丹方（formula_tide）×1 |  |  |  |  |  |  |  |  |  |  | 布包里有旧符和闸工的潮牌。牌背写着涨落时刻，翻开还夹着一页蜡封的济潮丹方。 |  |
+| flood_lines | 刻洪痕的石壁 | 2 | 沿壁根摸寻碎灵晶 | 1 | 0 | 0 | 0 | 1 |  |  |  | 灵晶（core）×1 |  |  |  |  |  |  |  |  |  |  | 石缝一松，碎灵晶露了出来。水还没漫过鞋面。 |  |
+| lock_deck | 悬锁木排 | 1 | 解下铁环上的漆盒 | 1 | 0 | 3 | 0 | 1 |  |  |  | 干粮（ration）×3 |  |  |  |  |  |  |  |  |  | 盒扣用布裹住，提绳在比水面高半尺的铁环上。 | 木排搁浅的一端能坐。你坐下解开盒扣，里面是没泡水的干粮。 |  |
+| lock_deck | 悬锁木排 | 2 | 抬起铁块，挪开木排 | 1 | 7 | 0 | -3 | 3 |  |  |  | 灵晶（core）×2、旧排的护甲扣（gate_buckles）×1 |  |  |  |  |  |  |  |  |  |  | 木排一挪开，石缝里露出碎灵晶、几枚灵钱和一串旧护甲扣。底下的石阶通往深槽，侧边有条窄路通向船工的棚子。 |  |
+| ford_relay | 旧闸外的驮棚 | 1 | 给船工送来支柱和口粮 | 0.5 | 0 | 0 | 0 | 2 | 松木（wood）×4、干粮（ration）×3 | 是 |  | 松场驮道图（pine_pass）×1 |  |  |  |  |  |  |  |  |  | 「我得在这里守到雨住。松场的路图你要有用，拿一张去。」 | 老船工支稳棚柱，指着图上断桥后的几棵松树告诉你哪一边尚能过去。 |  |
+| ford_relay | 旧闸外的驮棚 | 2 | 坐在棚里等雨歇 | 0.5 | 0 | 5 | 3 | 0 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 风把雨推到驮棚另一面，你往里让了半步。 |  |
+| upstream_lights | 逆水灯龛 | 1 | 用松枝点起槽里的火 | 1 | 0 | 0 | 4 | 2 | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  |  |  |  | 火沿干槽传进灯腹，半寸旧灯芯缩了一下便亮了。迎着这点火光坐了一阵，水汽也从袖口散开。 |  |
+| upstream_lights | 逆水灯龛 | 2 | 在灯座背风处坐一阵 | 1 | 0 | 14 | 7 | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 埠里少有潮声，连风也是绕开这里走的。 |  |
+| sunken_mooring | 低水船桩 | 1 | 下埠拨开湿蓑衣 | 1 | 0 | 0 | 0 | 0 |  |  |  |  | 湿蓑灯蜕（wick_husk） |  |  |  |  |  |  |  |  |  | 蓑衣下那只手一翻，灯芯升起一线火。 |  |
+| sunken_mooring | 低水船桩 | 2 | 站在岸上松开浮绳 | 0 | 0 | 0 | 0 | 2 |  |  |  | 干粮（ration）×1 |  |  |  |  |  |  |  |  |  |  | 绳套松开，缠在旁边的一只粮匣漂了回来。 |  |
+| sunken_mooring | 低水船桩 | 3 | 用松枝点亮桩灯 | 0.25 |  |  | 4 | 2 | 松木（wood）×1 | 是 |  |  |  |  | 湿蓑灯蜕（wick_husk） |  |  |  |  |  |  | 灯芯卷在铜罩里，没被雨打湿。 | 你借松枝点起桩灯，盖回挡雨的铜罩。靠桩坐了一会儿，胸口的沉滞才松开。 |  |
+| still_pole | 风口灯杆 | 1 | 问他风里怎么护灯 | 0.5 | 0 | 0 | 0 | 3 |  |  |  | 灯夫手势（lamp_sketch）×1 |  |  |  |  |  |  |  |  |  |  | 「看手。」老人把灯转向风里，迎风的那只手一撇，火苗便直了。 |  |
+| still_pole | 风口灯杆 | 2 | 和他聊聊旧渡 | 0.5 | 0 | 0 | 0 | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 老人指着埠外。「东西放在三处。我要是跟船散了，涨潮也能摸回来。」 |  |
+| pine_stand | 刮脂松架 | 1 | 收架下积脂的松木片 | 1 |  |  | 0 | 2 |  |  |  | 松木（wood）×4 |  |  |  |  |  |  |  |  |  |  | 松脂把几片干松木粘在一起。捡走厚片，树皮浅槽还能继续滴脂。 |  |
+| pine_stand | 刮脂松架 | 2 | 解下挂住的枯枝 | 0.75 |  |  |  | 1 |  |  |  | 松木（wood）×3 |  |  |  |  |  |  |  |  |  |  | 枯枝一扳就下来。将细枝折齐，比拖回去轻省。 |  |
+| pine_stand | 刮脂松架 | 3 | 翻看架头的弯松条 | 0.25 |  |  |  | 2 |  |  |  | 松架上的试弓木（bow_stave）×1 |  |  |  |  |  |  |  |  |  | 一截弯松条刚好嵌进箩筐上面的弧槽。 | 松条底下有量弦的刻线。这是猎人拿来试韧皮条受力的弓样。 |  |
+| timber_bridge | 缺板的驮桥 | 1 | 给赶车人松木补桥 | 1 |  |  |  | 3 | 松木（wood）×5 | 是 |  | 窑车辙样（kiln_tracks）×1、干粮（ration）×3 |  |  |  |  |  |  |  |  |  | 赶车人用胳膊顶住车轮。「厚木补缺口，薄木带松脂的烤软了填缝。桥能走了，我就把窑车的路图给你。」 | 赶车人指给你看松树根边的两道车轮印。桥补好了，沿着车轮印绕山便能进窑谷。 |  |
+| timber_bridge | 缺板的驮桥 | 2 | 在石墩背后歇脚 | 0.5 |  | 6 | 4 | 0 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 石墩挡掉了山口横风，你把肩上的箩筐靠到石面。 |  |
+| pine_hollow | 翻车的松沟 | 1 | 靠近树沟里翻倒的窑车 | 0.75 |  |  |  |  |  |  |  |  | 灰脊松熊（pitch_bear） |  |  |  |  |  |  |  |  |  | 一只灰脊松熊从车后滚下来，先把车轴压进湿土。 |  |
+| pine_hollow | 翻车的松沟 | 2 | 沿斜沟绕回松架 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 你沿沟边走稳脚。转过土脊，回头已看不见窑车。 |  |
+| pine_hollow | 翻车的松沟 | 3 | 拾起小路边的木签 | 0 |  |  |  |  |  |  |  | 窑车辙样（kiln_tracks）×1 |  |  | 灰脊松熊（pitch_bear） |  |  |  |  |  |  | 松熊败退时撞歪了车轴，绳上的木签掉到沟外。 | 车签背后刻着窑车出入的双车辙。老道在贴着松根的那一边转向窑谷。 |  |
+| pine_ledges | 背阴的断肩崖 | 1 | 从松枝之间拣厚木片 | 1 |  |  |  | 2 |  |  |  | 松木（wood）×4 |  |  |  |  |  |  |  |  |  |  | 背阴处不晒，松木上的厚脂还粘手，几片能带回去做活。 |  |
+| pine_spar | 索棚拳场 | 1 | 接下守索人的试刀礼 | 0.5 |  |  |  |  |  |  |  |  | 松场巡索人（road_sparrer） |  |  |  |  |  |  |  |  |  | 守索人把礼刀放回架上，自己抄起一把钝练刀。「接得住几招，这把新刀就归你。」 |  |
+| pine_spar | 索棚拳场 | 2 | 替看桥人把草垫收好 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 你把沾泥的一面朝外叠好。棚边腾出的路能直接走回木架。 |  |
+| pine_spar | 索棚拳场 | 3 | 向轮值的守索人领试刀礼 | 0 |  |  |  |  |  |  |  | 松场习刀（trail_cutter）×1 |  |  | 松场巡索人（road_sparrer） | 是 |  |  |  |  |  | 守索人把架上那把习刀转过来，柄朝着你。 | 守索人把架上那把习刀递过来。「算你这次赢。刀归你，我还得去换班巡索。」 |  |
+| clay_bank | 白泥洗坯坡 | 1 | 蹲在坡根铲白泥 | 1 |  |  |  | 2 |  |  |  | 耐火泥（kiln_clay）×4 |  |  |  |  |  |  |  |  |  |  | 白泥能捏成团，搬到筐底也没有散开。 |  |
+| clay_bank | 白泥洗坯坡 | 2 | 顺着干泥带挖一筐 | 1.25 |  | -5 |  | 2 |  |  |  | 耐火泥（kiln_clay）×6 |  |  |  |  |  |  |  |  |  |  | 干壳底下罩着很厚一层白泥。 | 砂层松了，你滑下来时被坡根的硬泥擦伤。 |
+| abandoned_kiln | 冷下来的老窑 | 1 | 从铁圈下取出石牌 | 0.5 |  |  |  | 3 |  |  |  | 窑匠火候牌（kiln_manual）×1 |  |  |  |  |  |  |  |  |  |  | 石牌刻着怎么掌火，还有落灯村丹师安蒲的印。铁圈一松，灰从缝里吹向窑后一道低门。那扇门通往烟道。 |  |
+| abandoned_kiln | 冷下来的老窑 | 2 | 靠灰线后的平石歇脚 | 0.5 |  | 6 | 5 | 0 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 平石替你挡住了穿窑风，灰没有吹到衣领里。 |  |
+| abandoned_kiln | 冷下来的老窑 | 3 | 擦去木柄末端的焦灰 | 0.25 |  |  |  | 2 |  |  |  | 守炉杖的样柄（resin_tamper）×1 |  |  |  |  |  |  |  |  |  |  | 木柄裂开，露出灌松脂的小孔。尾端还刻着守炉人用来聚气的手势。 |  |
+| kiln_carter | 药篓车棚 | 1 | 给赶车人材料补车板 | 1 |  |  |  | 4 | 耐火泥（kiln_clay）×6、松木（wood）×3 | 是 |  | 篁泽的药篓绳（herb_tie）×1、干粮（ration）×3 |  |  |  |  |  |  |  |  |  | 他晃了晃装药篓的隔板。「拿硬泥填，再用松脂封上。你若想去篁泽，我这儿有张过竹桥的图。」 | 赶车人补好车板，解下一截旧药篓上的绑绳递给你。绳边缝的一小块丝布画着通往篁泽的竹桥。 |  |
+| kiln_carter | 药篓车棚 | 2 | 掀起车底的旧篷 | 0.5 |  |  |  | 1 |  |  |  | 耐火泥（kiln_clay）×2 |  |  |  |  |  |  |  |  |  | 车轮下垂着一角篷布，底下压着两团没淋湿的泥。 | 旧篷下还有两团耐火泥。赶车人用不着这么多，便匀给你。 |  |
+| kiln_flue | 废窑烟道 | 1 | 掰开靠外的窑砖看一眼 | 0.75 |  |  |  |  |  |  |  |  | 炉渣犬（cinder_hound） |  |  |  |  |  |  |  |  |  | 窑砖一掀，有团炉灰抖成犬形扑出。 |  |
+| kiln_flue | 废窑烟道 | 2 | 退到有风的地方拍灰 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 窑口风大，袖上沾着的灰一拍便沿墙散开。 |  |
+| kiln_flue | 废窑烟道 | 3 | 揭下碎砖间的焦纸 | 0.5 |  |  |  | 3 |  |  |  | 焦痕丹窑账页（foundation_ledger）×1 |  |  |  |  |  |  |  |  |  |  | 纸上留了三枚缺角的旧印。末尾还写着一句话。「想凑齐这炉的丹方，找落灯村的安蒲对印。」 |  |
+| kiln_flue | 废窑烟道 | 4 | 用碎瓦淘窑沟里沉下的亮砂 | 0.75 |  |  |  | 1 |  |  |  | 暗金（black_iron）×2 |  |  |  |  |  |  |  |  |  |  | 温水把细灰带走，碎瓦内只剩几粒能在火里立住形的暗金。 |  |
+| kiln_flue | 废窑烟道 | 5 | 取石柜底未烧过的耐火泥 | 0.5 |  |  |  | 1 |  |  |  | 耐火泥（kiln_clay）×3 |  |  |  |  | 炉渣犬（cinder_hound） |  |  |  |  | 柜子避雨，底下有一方还裹着布的原泥。 | 穿过堆砖，把柜底的泥料提出来。裹泥的厚布隔开了窑灰。 |  |
+| herb_beds | 银脉水畦 | 1 | 把上排的老叶剪下来 | 1 |  |  |  | 2 |  |  |  | 灵草（reed）×4 |  |  |  |  |  |  |  |  |  |  | 你只剪摸得着的粗柄，水下的细芽没有受伤。 |  |
+| mist_shelter | 垫高脚的药棚 | 1 | 给泽医交叶和烘干用的枝条 | 1 |  |  |  | 4 | 灵草（reed）×8、松木（wood）×4 | 是 |  | 玄砂引矿签（mine_guide）×1、干粮（ration）×3 |  |  |  |  |  |  |  |  |  | 「阴雨浸坏了这一批，我得给矿队重扎几包药。你若进矿脉，带我的引矿签过去。」 | 泽医把木片从药匣上拆下，指给你看哪边的石槽连着玄砂矿脉。 |  |
+| mist_shelter | 垫高脚的药棚 | 2 | 问泽医板上的凹槽怎么用 | 0.5 |  |  |  | 2 |  |  |  | 泽医捣药板（herb_press）×1、清脉饮丹方（formula_leaf）×1 |  |  |  |  |  |  |  |  |  | 木板上刻了几道不同深浅的槽，中间压着一张试药的便条。 | 泽医拿药板比给你看，又递来一页清脉饮丹方。「药汁先过一道槽，再过第二道，少一道味就不对。」 |  |
+| vine_pond | 白藤塘 | 1 | 沿浅滩的蹄印找藤鹿 | 0.75 |  |  |  |  |  |  |  |  | 白角藤鹿（vine_stag） |  |  |  |  |  |  |  |  |  | 白角从藤下挑起来，鹿蹄刨开一片湿泥。 |  |
+| vine_pond | 白藤塘 | 2 | 沿斜石绕到岸外听一会儿 | 0.125 |  |  | 3 | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 藤影在另一边摇动。留在斜石上时，呼吸渐渐平匀。 |  |
+| vine_pond | 白藤塘 | 3 | 踩过浅水去剪银脉叶 | 0.75 |  |  |  | 2 |  |  |  | 灵草（reed）×4 |  |  |  |  |  | 白角藤鹿（vine_stag） · 35% |  |  |  | 药叶长在凹水里，从踏石上俯身正好够得到。 | 你在踏石上掐下熟叶，细根还扎在泥里。 |  |
+| vine_pond | 白藤塘 | 4 | 顺着上游的大蹄印走 | 0.75 |  |  |  |  |  |  |  |  | 白纹鹿王（vine_king） |  |  |  |  |  |  |  |  | 大蹄印沿水往上，没入一架粗藤后面。 | 粗藤往两边一分，一只老鹿压低交错的白角，堵在坝根。 |  |
+| vine_pond | 白藤塘 | 5 | 到背水坡剪上游的银脉叶 | 1 |  |  |  | 3 |  |  |  | 灵草（reed）×4 |  |  | 白纹鹿王（vine_king） |  | 白纹鹿王（vine_king） |  |  |  |  | 倒藤外侧能踩稳脚。坡上的叶已长开。 | 你站在背水坡把熟叶剪下来，水从旧鹿槽绕过去。 |  |
+| mine_tailings | 黑砂洗矿槽 | 1 | 在外沿筛去浮砂 | 1 |  |  |  | 3 |  |  |  | 暗金（black_iron）×4 |  |  |  |  |  |  |  |  |  |  | 你慢慢筛走细砂，筛里剩下颗粒粗的暗金。 |  |
+| mine_tailings | 黑砂洗矿槽 | 2 | 下到槽内撬重石 | 1.25 |  | -5 | -2 | 3 |  |  |  | 暗金（black_iron）×6 |  |  |  |  |  |  |  |  |  |  | 铁镞深入石缝以后，黑石顺水松了。 | 槽底的砂扫住了鞋，你抽身时被来水推撞了膝头。 |
+| winch_house | 断榫绞盘屋 | 1 | 给矿工材料修转盘 | 1.25 |  |  |  | 4 | 暗金（black_iron）×6、耐火泥（kiln_clay）×4 | 是 |  | 翻雪关的栈牌（snow_token）×1、干粮（ration）×4 |  |  |  |  |  |  |  |  |  | 「盘转得起来，才够得着外头的梯子。给我点好铁和硬泥，我把翻雪关用的木牌给你。」 | 转盘动了一圈。矿工爬到外梯旁，从石架上取下翻雪关的木牌递给你。 |  |
+| winch_house | 断榫绞盘屋 | 2 | 翻过铁零件看看接头 | 0.5 |  |  |  | 3 |  |  |  | 两寸机臂铁样（vein_pattern）×1、包铁箭样（arrow_pattern）×1 |  |  |  |  |  |  |  |  |  |  | 矿工让你带走那块短铁样，又把从矿壁拔下的一根包铁箭递给你比对。 |  |
+| deep_vein | 横肩偏井 | 1 | 进偏井敲开卡住的车槽 | 1 |  |  |  |  |  |  |  |  | 横肩矿傀（vein_sentinel） |  |  |  |  |  |  |  |  |  | 一声钝响落地。两片黑岩并成一道石身，挡住了车眼。 |  |
+| deep_vein | 横肩偏井 | 2 | 沿旧窄槽绕回路面 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 鞋底踏出了湿亮的车痕，你绕回宽一些的路。 |  |
+| deep_vein | 横肩偏井 | 3 | 翻开井外的旧工具柜 | 0 |  |  |  |  |  |  |  | 暗星刀匣底图（star_blade_pattern）×1 |  |  | 横肩矿傀（vein_sentinel） |  |  |  |  |  |  | 败退的矿傀撞开了柜架，柜子滑到了井外，盖子裂出一道缝。 | 木托里是一把断成三截的矿刀，刀身已经锈穿。油布倒还护着锻打图，连断口两边该锻多厚都标了。 |  |
+| deep_vein | 横肩偏井 | 4 | 顺碎车槽去剔松矿脉 | 1 |  |  |  | 2 |  |  |  | 暗金（black_iron）×4、灵晶（core）×1 |  |  |  |  | 横肩矿傀（vein_sentinel） |  |  |  |  | 碎车槽内侧是一条暗金细脉，旁边挨着夹在石里的亮晶。 | 你清开碎车边的松屑，从石壁剔下暗金和独立成片的灵晶。 |  |
+| silk_bough | 背风雪蜥径 | 1 | 扶石绳拾低处的雪蜥蜕 | 1.25 |  |  |  | 3 |  |  |  | 兽革（hide）×4 |  |  |  |  |  |  |  |  |  |  | 你提起石窝的旧蜕，阴冷处长出的韧皮冻过也能弯。 |  |
+| silk_bough | 背风雪蜥径 | 2 | 爬上冰沿取挂住的整蜕 | 1.5 |  | -7 |  | 3 |  |  |  | 兽革（hide）×6 |  |  |  |  |  |  |  |  |  |  | 石缝里一直干着，留了几张厚实的雪蜥蜕。 | 你撤手时冰皮断了，硬边划过小臂。 |
+| snow_fire | 护栈火棚 | 1 | 把兽革和灵草交给守栈人 | 1 |  |  |  | 5 | 兽革（hide）×6、灵草（reed）×5 | 是 |  | 三峰引绳结（sky_cord）×1、干粮（ration）×4 |  |  |  |  |  |  |  |  |  | 「兽革缝个新套，灵草敷敷手。你若要上天衡石台，我教你怎么看岔路上的绳结。」 | 他在短绳上打了三个不同的结。「每遇一道岔路，挑绳结跟这个对得上的梁走。走过第三条，便是天衡石台。」 |  |
+| snow_fire | 护栈火棚 | 2 | 添干枝借火烘衣 | 0.5 |  | 12 | 6 | 0 | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  |  |  |  | 你拨开灰，把干枝贴到火星上。火烧起来时，湿衣的下摆慢慢暖了。 |  |
+| snow_fire | 护栈火棚 | 3 | 问他皮套怎么缝才挡雪 | 0.5 |  |  |  | 2 |  |  |  | 护栈人的夹皮缝样（pass_seam）×1 |  |  |  |  |  |  |  |  |  | 守栈人摊开缝到一半的皮套，两层粗布之间夹着一片兽皮。 | 他让你摸里面的缝线。「线藏进来，外头下雪也浸不透。」说完递来一片缝好的样子。 |  |
+| white_ravine | 露背的雪沟 | 1 | 在迎风处敲响谷口的旧锣 | 1 |  |  |  |  |  |  |  |  | 雪脊兽（snow_warden） |  |  |  |  |  |  |  |  |  | 山沟里的白背抖落积雪。雪脊兽昂头，把厚颈露在风里。 |  |
+| white_ravine | 露背的雪沟 | 2 | 贴着短栈道回避风处 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 沿护绳走到短栈尽头，背坡挡住了风，能望见火棚门口。 |  |
+| white_ravine | 露背的雪沟 | 3 | 拨开栈道边的雪，看看铁钩 | 0.25 |  |  |  | 2 |  |  |  | 断雪戟的回钩样（hook_iron）×1 |  |  |  |  |  |  |  |  |  | 扶绳底下露着一点弯铁，余下部分埋在雪里。 | 你翻过半截铁钩，才看见钩尖是向内弯的。铁上留着一道旧砍痕。 |  |
+| cloud_scree | 浮光晶坡 | 1 | 拾起雾边露出的晶片 | 1.25 |  |  |  | 4 |  |  |  | 灵晶（core）×4 |  |  |  |  |  |  |  |  |  |  | 雾薄了一层，露在坡边的晶片亮起来。 |  |
+| cloud_scree | 浮光晶坡 | 2 | 攀岩脊撬开晶层 | 1.5 |  | -8 | -3 | 4 |  |  |  | 灵晶（core）×6 |  |  |  |  |  |  |  |  |  |  | 撬开的断口发出一阵脆声，光从更深处亮起来。 | 薄岩有一处塌下，你被晶片划伤了手背。 |
+| cloud_scree | 浮光晶坡 | 3 | 查看工台旁的浅槽 | 0.25 |  |  |  | 2 |  |  |  | 晶镞轻重样（cloud_tip）×1 |  |  |  |  |  |  |  |  |  |  | 浅槽里躺着几只拆下的箭头。背后的板上有用于配重的刻线。 |  |
+| cloud_scree | 浮光晶坡 | 4 | 托住火盏拨开封泥 | 0.5 |  |  |  | 3 |  |  |  | 照心露丹方（formula_jade）×1 |  |  |  |  |  |  |  |  |  | 火盏的口被干泥封住，盏身夹在架里。 | 盏内干燥，盏沿夹了一卷照心露丹方。卷首画的火盏就嵌在这同一处石架上。 |  |
+| old_observatory | 偏影观星梁 | 1 | 趁雾散拓下石梁里的刻圈 | 1 |  |  |  | 5 |  |  |  | 天衡位刻（meridian_etching）×1 |  |  |  |  |  |  |  |  |  |  | 拓完抬头，最靠外的刻圈反光照到梁背。沿光走，尽头有扇反照远峰的镜门。 |  |
+| old_observatory | 偏影观星梁 | 2 | 在石梁旁向阳的地方歇一会儿 | 0.5 |  | 8 | 7 | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 你坐在石梁背风的一侧。石头晒得暖和，远处扶绳拍打木梁的响声也轻了。 |  |
+| old_observatory | 偏影观星梁 | 3 | 从梁后取那块木账片看看 | 0.25 |  |  |  | 2 |  |  |  | 玉片披甲的接丝账（loom_tack）×1 |  |  |  |  |  |  |  |  |  |  | 账片记的是披甲。工匠在每次收紧软丝的地方都压了一道线。 |  |
+| mirror_gate | 反峰镜门 | 1 | 跨过观星梁的投影查验印座 | 1 |  |  |  |  |  |  |  |  | 持衡镜灵（mirror_warden） |  |  |  |  |  |  |  |  |  | 你移到梁影之外，镜里的手伸出来，按住了卡在凹处的衡印。石台的守灵踩着另一道投影走出来。 |  |
+| mirror_gate | 反峰镜门 | 2 | 沿镜面外侧绕回石梁 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 镜峰偏了半寸。你循着光退回观星梁旁。 |  |
+| mirror_gate | 反峰镜门 | 3 | 扶稳印座，取出衡印 | 0 |  |  |  |  |  |  |  | 镜门衡印（sky_seal）×1 |  |  | 持衡镜灵（mirror_warden） |  |  |  |  |  |  | 镜影散开后，卡住印的石槽完整露了出来。 | 你托住石座，把衡印向外抬出来。石槽深处依稀还有印台的正线。 |  |
+| foundation_duel | 背钟试剑亭 | 1 | 出示借卷帖，接守书人的剑 | 0.75 |  |  |  |  |  |  |  |  | 守卷剑客何鹿（foundation_duelist） |  |  |  |  |  |  |  |  |  | 守书人看过帖子，一脚拨开木凳。「你赢了，我就给你盖印。接招时留神，我可不会收着剑。」 |  |
+| foundation_duel | 背钟试剑亭 | 2 | 沿倒钟侧道出去 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 钟背的石阶能通到矿坡，方向渐渐辨得清了。 |  |
+| foundation_duel | 背钟试剑亭 | 3 | 请守书人在借卷帖上盖印 | 0 |  |  |  |  |  |  |  | 守卷剑客的试剑印（foundation_spar_mark）×1 |  |  | 守卷剑客何鹿（foundation_duelist） |  |  |  |  |  |  | 守书人收起剑，在木桌上试了试印章。 | 他在借卷帖上盖了个缺一角的印，再把帖子还给你。 |  |
+| foundation_kiln | 旧丹窑内壁 | 1 | 扶住挡板，朝窑影走过去 | 0.75 |  |  |  |  |  |  |  |  | 护印窑影（foundation_kiln_echo） |  |  |  |  |  |  |  |  |  | 被风吹回的灰聚成人形。它一手拍在挡板上，遮住那点金光。 |  |
+| foundation_kiln | 旧丹窑内壁 | 2 | 顺着风退回后烟道 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 一绕出挡板，炉风就不再吹眼睛了。 |  |
+| foundation_kiln | 旧丹窑内壁 | 3 | 擦掉挡板上的灰，取出旧印 | 0 |  |  |  |  |  |  |  | 丹窑旧印半片（foundation_kiln_seal）×1 |  |  | 护印窑影（foundation_kiln_echo） |  |  |  |  |  |  | 挡板的浅槽里露出半枚旧印，边上积着灰。 | 你擦掉薄灰，从挡板的浅槽里取下半枚旧印。 |  |
+| foundation_court | 封石验药室 | 1 | 进场接受护炉人的考验 | 1 |  |  |  |  |  |  |  |  | 封石护炉人（foundation_warden） |  |  |  |  |  |  |  |  |  | 护炉人把旧印放到灯盏后。「守得住这道火，我就在你的信帖上盖最后一道印。」 |  |
+| foundation_court | 封石验药室 | 2 | 扶着石门退到背风处 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 石门沉着，没有随风再开。炉火在门缝里剩下一线亮。 |  |
+| foundation_court | 封石验药室 | 3 | 请护炉人补上最后一道印 | 0 |  |  |  |  |  |  |  | 验药室的留火印（foundation_warden_proof）×1 |  |  | 封石护炉人（foundation_warden） |  |  |  |  |  |  | 护炉人移开灯盏，第三枚印章就放在旁边。 | 护炉人在信帖上盖了最后一道印，再把验药室的留火印交到你手上。 |  |
+| meadow_channel | 姚六的弯渠 | 1 | 采田边的灵草 | 0.5 |  |  |  | 1 |  |  |  | 灵草（reed）×3 |  |  |  |  |  |  |  |  |  |  | 姚六指了指内沟边的嫩草，你顺着他指的地方采了几束。 |  |
+| meadow_channel | 姚六的弯渠 | 2 | 搬开沟口卡住的枯木 | 0.5 |  |  |  | 1 |  |  |  | 松木（wood）×2 |  |  |  |  |  |  |  |  |  |  | 枯木挪开后，浑水沿外沟慢慢流了下去。 |  |
+| meadow_channel | 姚六的弯渠 | 3 | 拿松木帮姚六修水槽 | 0.5 | 7 |  |  | 2 | 松木（wood）×2 | 是 |  | 蒲湾渠契（river_field_stamp）×1 |  |  |  |  |  |  |  |  |  | 水槽边的木板向外翘着。姚六说：「拿两片直木把这个口子撑住，两户田都能过水。修完去驿站报个名。」 | 水槽修好后，姚六从袖里数出几枚钱，又在修渠凭据背面写上名字，画了去驿站的路。 |  |
+| meadow_channel | 姚六的弯渠 | 4 | 把困在水里的野雁托上岸 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  | 芦叶下面有只湿透的雁，只剩一只脚能站稳。 | 野雁在泥边晃了两步才飞走。姚六把外沟的水放浅一些，免得再有鸟陷进去。 |  |
+| meadow_ruts | 雁脚泥垄 | 1 | 沿土窝外面走一圈 | 0.375 |  |  |  |  |  |  |  |  | 苇尾狐（reed_fox） |  |  |  |  |  |  |  |  |  | 狐从边上的草洞绕到堤背，对着鞋跟一口咬来。 |  |
+| meadow_ruts | 雁脚泥垄 | 2 | 站上矮堤，找校潮亭的方向 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 远处有人把红布缠上水尺顶端。红布旁就是下一座管着水渠的亭子。 |  |
+| shoal_baskets | 灰鹭晒篮处 | 1 | 拔岸边露根的鹭草 | 0.5 |  |  |  | 1 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  |  |  |  | 抓住露头的草叶轻轻一拽，草根上成团的白泥落回水边。 |  |
+| shoal_baskets | 灰鹭晒篮处 | 2 | 拨开浅石捡晶砂 | 0.625 |  |  |  | 2 |  |  |  | 灵晶（core）×1 |  |  |  |  |  |  |  |  |  |  | 阳光照进浅滩，洗过的砂里有些灵晶能捡。 |  |
+| shoal_baskets | 灰鹭晒篮处 | 3 | 问白宜哪边的滩好走 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 白宜把鞋上的线咬断。「沿干石走。白苇后有人高的石缝，我年轻时进去过，潮一转，人又被挤回原岸。照原有个管水的也去看过。」她指了指旧渡，说那边还有给人送木料的商船。 |  |
+| ladder_drop | 第三级闸口 | 1 | 取上层木梁上的枯枝 | 0.75 |  |  |  | 1 |  |  |  | 松木（wood）×3 |  |  |  |  |  |  |  |  |  |  | 枝条一松，露出木梁被水泡深的纹路。 |  |
+| ladder_drop | 第三级闸口 | 2 | 走到中间的台阶，引开水里的兽 | 0.375 |  |  |  |  |  |  |  |  | 横脊闸兽（river_gateback） |  |  |  |  |  |  |  |  |  | 岑响抄起鱼篓往上退。横脊闸兽甩动背鳍，重重打在闸梁上。 |  |
+| ladder_drop | 第三级闸口 | 3 | 到最下面的水槽筛寒铁 | 0.875 |  |  |  | 3 |  |  |  | 寒铁（ore）×3 |  |  |  |  | 横脊闸兽（river_gateback） |  |  |  |  |  | 筛掉浮砂，较沉的铁粒留在布里。 |  |
+| ladder_drop | 第三级闸口 | 4 | 问岑响为何守着坏掉的水闸 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 岑响抖了抖鱼篓底的泥。「闸坏了，岸边的鱼游不上来。等找人修好了，总还会回来。」 |  |
+| willow_yard | 卸货后院 | 1 | 问门房这两块名牌是谁的 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 门房把系灯院的牌子挂回钩上，留下写着「白苇滩，封乔」的那块。「咱们夜里只托熟人送货。你若在木台上赢过封乔，他给你木签，我这儿就认得你了。」 |  |
+| willow_yard | 卸货后院 | 2 | 替门房补好接雨水的木槽 | 0.5 | 8 |  |  | 1 | 松木（wood）×3 | 是 |  |  |  |  |  |  |  |  |  |  |  | 门房瞧了一眼天色。「手头若有三片木，我出八钱。再漏一晚，来歇脚的人都睡不好。」 | 木槽接住檐下的水。门房用麻绳固定好，从茶桌下取出约定的钱。 |  |
+| willow_yard | 卸货后院 | 3 | 请门房把猎物炖成路粮 | 0.75 | -3 |  |  |  | 生兽肉（beast_meat）×3、松木（wood）×1 | 是 |  | 山炉肉汤（meat_broth）×3 |  |  |  |  |  |  |  |  | 是 | 「三份肉可以同锅煮。你出松枝和三钱，我给你分进三个罐里，走远些也够吃。」 | 门房撇去锅沿的浮沫，把肉汤匀进三个陶罐，罐口都用细麻绳扎牢。 |  |
+| gauge_piles | 刻尺水桩 | 1 | 替胥婉按住纸，印下水尺刻痕 | 0.375 |  |  |  | 2 |  |  |  | 校潮亭抄尺（river_gauge_copy）×1 |  |  |  |  |  |  |  |  |  |  | 胥婉拿炭条擦过纸面，尺上的刻痕便印了下来。她把第一份晾好交给你。「最下面记的是潮水倒流的时辰。东边旧县也有一把长尺。」 |  |
+| gauge_piles | 刻尺水桩 | 2 | 问最下面那两道深刻痕 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  | 尺脚有两道格外深的痕，湿纸压上去，边沿都翘了起来。 | 胥婉把短尺翻给你看。那两道痕照的是反潮石门上固定绳子的槽。东边的测水人来试过槽里的铁楔，走时把铁楔也带过了渡。 |  |
+| gauge_piles | 刻尺水桩 | 3 | 筛废铁盘外沿的晶砂 | 0.625 |  |  |  | 1 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  |  |  |  | 细筛晃过几下，晶砂留在旧铁盘的外沿。 |  |
+| slope_sieves | 断壁筛架 | 1 | 用坡下的筛盘筛寒铁 | 0.75 |  |  |  | 2 |  |  |  | 寒铁（ore）×3 |  |  |  |  |  |  |  |  |  |  | 铁粒滚到筛盘底部，你拨开盖在上面的石粉。 |  |
+| slope_sieves | 断壁筛架 | 2 | 走近上坡那两根木柱 | 0.5 |  |  |  |  |  |  |  |  | 石甲獾（stone_badger） |  |  |  |  |  |  |  |  |  | 石甲獾从第一根木柱后挤出来，转身直顶你的脚踝。 |  |
+| slope_sieves | 断壁筛架 | 3 | 抓着绳子，到高处筛暗金 | 1 |  |  |  | 2 |  |  |  | 暗金（black_iron）×2 |  |  |  |  | 石甲獾（stone_badger） |  |  |  |  |  | 深色颗粒很沉，顺着筛底落进矿工挂的布袋。 |  |
+| slope_sieves | 断壁筛架 | 4 | 翻看筛盘背面 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 筛盘背面留了一宽一窄两个孔，旁边刻着几级向上的台阶。有人拿炭笔写了个「回」字，笔画快给手磨平了。 |  |
+| lantern_term | 夜灯廊 | 1 | 问裴见这几盏灯是给谁的 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 裴见一盏盏翻给你看。采药人去旧渠，拉货的车去松场，也有人挑担去西岸。各人都认得自己的那盏，走到多晚也能认路。 |  |
+| lantern_term | 夜灯廊 | 2 | 给裴见兽革，补好安全绳 | 0.5 |  |  |  | 1 | 兽革（hide）×2 | 是 |  | 铁障符（iron_talisman）×1、干粮（ration）×2 |  |  |  |  |  |  |  |  |  | 裴见拉过绳头。擦着山石的地方本来包了皮，如今连里面的麻丝都磨出来了。 | 裴见缝好皮，自己先拽了两把。「这样才敢叫别人抓。」他顺手把一张符夹进两包干粮，趁热递给你。 |  |
+| lantern_term | 夜灯廊 | 3 | 问裴见墙上是哪两盏灯空着 | 0.125 |  |  |  |  |  |  |  | 裴见画的旧灯图（lantern_route_copy）×1 |  |  |  |  |  |  |  |  |  |  | 裴见把断绳放到桌上。「晒盘坡的石角把绳磨开了。低路挑药，高路背矿，两边夜里都认灯。」他在纸上画了两只灯和岩缝，又点了点背风的石窝。「有盏灯让人先挪进这里了，去之前把旧图拿上。谁肯去，我都认这份工。」 |  |
+| slope_lantern_gap | 背风处的断灯 | 1 | 取出油布包里的旧铜扣 | 0.125 |  |  |  |  |  |  |  | 停风处捡到的铜扣（lantern_clasp）×1 |  |  |  |  |  |  |  |  |  |  | 幸存的铜扣只剩一只。低处的灯能用一片松木卡在扁石上。想把两盏灯挂回原处，得用寒铁遮住两处石角，再把整张革裹到绳上。 |  |
+| slope_lantern_gap | 背风处的断灯 | 2 | 用松木把灯固定在低处的扁石上 | 0.375 |  |  |  | 3 | 停风处捡到的铜扣（lantern_clasp）×1、松木（wood）×1 | 是 |  | 低路试点回条（lantern_low_note）×1 |  | 1 |  |  |  |  |  |  |  | 铜扣铆进扁石后，灯能照亮浅沟，照不到旧吊板。想修两处的话，可以先留着铜扣去找寒铁和兽革。 | 你把铜扣铆在低处，灯照到三枚石窝。一位药农沿脚窝走来，挪开了浅沟口的篱笆。他在纸上摁了指印，托你带回院里。 |  |
+| slope_lantern_gap | 背风处的断灯 | 3 | 修好护绳，把高低两盏灯挂回原处 | 0.625 |  |  |  | 4 | 停风处捡到的铜扣（lantern_clasp）×1、兽革（hide）×1、寒铁（ore）×2 | 是 |  | 双灯复挂回条（lantern_high_note）×1 |  | 1 |  |  |  |  |  |  |  | 用两片寒铁遮住岩尖，再拿一张兽革裹住粗绳。把铜扣留在绳尾，浅沟和旧吊板就都能照亮。 | 矿夫先用两片寒铁包好岩尖，你用兽革裹住粗绳，在下头收紧铜扣。两盏灯分开照着浅沟和吊板。矿夫走过头几块板，回来在纸上添了两道墨，叫你拿给裴见。 |  |
+| slope_lantern_low | 石沟下的灯棚 | 1 | 采几把背风处的灵草 | 0.375 |  |  |  |  |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  |  |  |  | 石后潮气没被吹干，能挑些已经舒开的叶子带走。 |  |
+| slope_lantern_low | 石沟下的灯棚 | 2 | 把沟口卡住的小木搬起来 | 0.375 |  |  |  |  |  |  |  | 松木（wood）×2 |  |  |  |  |  |  |  |  |  |  | 浅沟通开了，药担不用再踩泥。 |  |
+| slope_lantern_low | 石沟下的灯棚 | 3 | 接过药农递来的热茶 | 0.125 |  | 5 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 药农从火边端来碗热茶。「再晚来也能看见这盏灯，走累了就来靠一靠。」 |  |
+| slope_lantern_high | 双灯照到的旧吊板 | 1 | 在第一盏灯下帮矿夫筛晶砂 | 0.5 |  |  |  |  |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  |  |  |  | 亮砂比普通石粉沉，筛几下就能分开。 |  |
+| slope_lantern_high | 双灯照到的旧吊板 | 2 | 沿吊板去看白羽从哪落下 | 0.25 |  |  |  |  |  |  |  |  | 石鹞（river_cliff_kite） |  |  |  |  |  |  |  |  |  | 石鹞压着岩壁掠回来，伸出爪子想把人带离吊板。 |  |
+| slope_lantern_high | 双灯照到的旧吊板 | 3 | 抓牢护绳，筛吊板尽头的暗金 | 0.75 |  |  |  |  |  |  |  | 暗金（black_iron）×2 |  |  |  |  | 石鹞（river_cliff_kite） |  |  |  |  |  | 绳套没有再碰岩尖，你能腾出一只手把石缝里的暗金拨进布袋。 |  |
+| undertow_bed | 退水石脊 | 1 | 沿石脊走近那片泥地 | 0.5 |  |  |  |  |  |  |  |  | 负丘虺（undertow_moundback） |  |  |  |  |  |  |  |  |  | 负丘虺从水里顶起整片泥地，侧身把你逼到石脊尽头。 |  |
+| undertow_bed | 退水石脊 | 2 | 挖泥地正中的黑泥 | 0.625 |  |  |  | 6 |  |  |  | 伏潮息泥（heart_silt）×2 |  |  | 负丘虺（undertow_moundback） |  |  |  |  |  |  |  | 潮水还在石脊两边响，泥心却不起一丝水纹。你挖出两份伏潮息泥，包好时指尖还凉着。 |  |
+| undertow_bed | 退水石脊 | 3 | 沿石脊绕去侧洞，采灵晶 | 1 |  |  |  | 3 |  |  |  | 灵晶（core）×4 |  |  |  |  | 负丘虺（undertow_moundback） |  |  |  |  |  | 晶砂从岩壁落进筛里。侧洞的水来得慢，你还能循这条路回到高处。 |  |
+| counter_bell_score | 信架与钟枢 | 1 | 顺着钟槌留下的擦痕去看古钟 | 0.375 |  |  |  |  |  |  |  |  | 屈膝铜影（river_copper_echo） |  |  |  |  |  |  |  |  |  | 铜影从墙边抬起手臂，挤进窄缝，一槌砸向通道正中。 |  |
+| counter_bell_score | 信架与钟枢 | 2 | 取出信架下的传送卷轴图纸 | 0.375 |  |  |  | 5 |  |  |  | 传送卷轴图纸（gate_scroll_formula）×1 |  |  | 屈膝铜影（river_copper_echo） |  |  |  |  |  |  |  | 图上写着怎样做传送卷轴，用的是薄木、草浆和少量灵晶砂。卷轴只通向自己认过的门。 |  |
+| counter_bell_score | 信架与钟枢 | 3 | 移开挂片，筛钟座下的暗金 | 0.875 |  |  |  | 2 |  |  |  | 暗金（black_iron）×3 |  |  |  |  | 屈膝铜影（river_copper_echo） |  |  |  |  |  | 大块暗金压在钟脚下。你挑松动的小片筛进布里。 |  |
+| counter_bell_score | 信架与钟枢 | 4 | 看看旧送信人走过哪些门 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 折水驿、系灯院和落灯村的门写在同一页。送信人先徒步去认过这些门，往后的账上就很少再报脚钱。 |  |
+| zhao_flood_office | 城门水尺档 | 1 | 问两本账的来历 | 0.125 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 杜椿用指头压着旧账上一行小字。「落灯去年停船。照这上头的水位，比眼下还低半尺，怎么就不能走了？」他翻了翻后一页，空的。「这一页是施荀量的。他如今在斜漏水驿，你若遇见，替我问一声。」 |  |
+| zhao_flood_office | 城门水尺档 | 2 | 把冷炉验火册给杜椿看 | 0.25 |  |  |  | 5 | 冷炉验火册（cold_kiln_record）×1 |  | 是 |  |  |  |  |  |  |  |  |  |  |  | 杜椿看得很慢。「同一晚，雾梁涨了水，鸣沙退了水，照原的水却往地下渗。账没错。施荀那儿有只试水槽，能用一碗水试出那晚怎么回事。」 |  |
+| zhao_flood_office | 城门水尺档 | 3 | 取一张窗格下的悬赏告示 | 0.125 |  |  |  |  |  |  |  | 试水门悬赏（zhao_gate_notice）×1 |  |  |  |  |  |  |  |  |  |  | 杜椿往你手上的告示点了一下。「青埂报了三夜的撞门响。先问堤工，再去河边看。是谁碰了闩，别只凭一枚妖丹回来报。」 |  |
+| zhao_porridge_shed | 城墙根的粥铺 | 1 | 替姜婶把领米条带去白鹤粮仓 | 0.125 |  |  |  |  |  |  |  | 粥铺的领米条（zhao_porridge_order）×1 |  |  |  |  |  |  |  |  |  |  | 姜婶把纸条折好塞进你手里。「船行说雨大，昨儿没捎来米。你找看高脚粮仓的何绢问问，有货给我留两袋，空船路过就带。」 |  |
+| zhao_dyke_bend | 两面低埂 | 1 | 掐浅水白芽 | 0.5 |  |  |  | 2 |  |  |  | 灵草（reed）×4 |  |  |  |  |  |  |  |  |  | 贴席的水不及鞋面。 | 从还没伸叶的老根上掐下了几束白芽。 |  |
+| zhao_dyke_bend | 两面低埂 | 2 | 到抓痕处守一阵 | 0.125 |  |  |  |  |  |  |  |  | 黄沿水貂（dyke_marten） |  |  |  |  |  |  |  |  | 泥土下面有厚实的碎蚌壳，咬一口的痕迹还新。 |  |  |
+| zhao_dyke_bend | 两面低埂 | 3 | 扶堤工把晴雨旗拉起来 | 0.5 | 8 |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 雨旗刚拉高，河工停下手头的活指向青埂北边。「那面碑刻过旧汛线，常有人来找。」他把埂工钱与你分了。 |  |
+| zhao_dyke_bend | 两面低埂 | 4 | 绕到蒲叶外侧，等灰鸭游近 | 0.125 |  |  |  |  |  |  |  |  | 灰苇灵鸭（zhao_reed_duck） |  |  |  |  |  |  |  |  | 这里是浅湾，贴着晒席走就能避开。 | 一只灰鸭抛开刚叼起的泥螺，踏着水面朝你扑来。 |  |
+| zhao_shutter_tracks | 往田里放水的旧闸 | 1 | 帮堤工从闸板下拔出断闩 | 0.25 |  |  |  | 3 |  |  |  | 带咬痕的旧门闩（zhao_gate_shaving）×1 |  |  |  |  |  |  |  |  |  |  | 断闩是从下边给咬的，齿缝里还塞着茸毛。老堤工用竹片指着长印。「一头在这里，一头往蛙背塘。塘边总有人晾船，你过去叫他们往高一点的地方挪。」 |  |
+| zhao_float_goods | 三姓木码头 | 1 | 帮余节换掉撑渔网的断木 | 0.25 | 0 |  |  | 4 | 松木（wood）×5 | 是 |  | 漏潮货签（zhao_sand_chit）×1 |  |  |  |  |  |  |  |  |  | 撑木一断，晒到一半的网又搭回湿船板。余节拎起网角，水还顺着手肘往下淌。 | 余节递来货签。「过叠石关给柯伯看这个。他认得我的印。」他收起架上的一卷干网，往腰间巴掌大的布袋里一塞。 |  |
+| zhao_float_goods | 三姓木码头 | 2 | 捡码头木台下的松枝 | 0.5 |  |  |  | 2 |  |  |  | 松木（wood）×4 |  |  |  |  |  |  |  |  |  | 撞断的枝条在台下随水摇晃。 | 你抽出还能用的松枝，掰掉泡烂的皮。 |  |
+| zhao_float_goods | 三姓木码头 | 3 | 问余节那只布袋怎么装得下渔网 | 0.125 |  |  |  |  |  |  |  | 旧行商的袋样（qiankun_pattern）×1 |  | 1 |  |  |  |  |  |  |  |  | 余节解开袋口，翻出一截里衬。「这叫乾坤袋。我上一只给鱼钩划烂了，袋底还在。你带去给会缝皮子的人看看。」他从木箱里取出那块旧袋底递给你。 |  |
+| zhao_bamboo_duel | 竹尺庭 | 1 | 请持尺人讲练尺的事 | 0.125 |  |  |  | 3 |  |  |  | 扶膝起身帖（body_breath_note）×1 |  |  |  |  |  |  |  |  |  |  | 他把竹尺靠回台沿。「刚来的人先稳脚。」他教你从低木凳扶膝起身，再把沾了汗渍的讲义给你。「想学站得稳的法子，得先给庭里添一袋压脚石。」 |  |
+| zhao_bamboo_duel | 竹尺庭 | 2 | 进砖圈切磋 | 0.125 |  |  |  |  |  |  |  |  | 掌尺人傅澄（zhao_spar） |  |  |  |  |  |  |  |  | 只要有人跪倒，圈外的弟子就会上前叫停。 | 弟子把身后的木门合上。傅澄换了根没钉铜片的竹尺。 |  |
+| zhao_frog_shelf | 斜萍石窝 | 1 | 踩上低石，看看水下的动静 | 0.125 |  |  |  |  |  |  |  |  | 火斑大蛙（glass_frog） |  |  |  |  |  |  |  |  | 齐脚深的水里，有一团红斑贴着石壁挪。 | 两只鼓胀的腮帮先冒出水。你还没看清，红斑便跃上了石头。 |  |
+| zhao_frog_shelf | 斜萍石窝 | 2 | 采池边的灵草 | 0.75 |  |  |  | 2 |  |  |  | 灵草（reed）×5 |  |  |  |  |  |  |  |  |  | 几块踏脚石之间挤着几丛新芽。 | 把根上的泥抖进水里，叶片在风里晾了一会儿。 |  |
+| zhao_pond_shutter | 塘背的旧便门 | 1 | 沿高石喊船户解绳，把空船挪上去 | 0.375 |  |  |  |  |  |  |  | 撤船的两枚竹签（zhao_bank_receipt）×1 |  |  |  |  |  |  |  |  |  |  | 你在高石边接住船头绳。两户避开浮木，把船一前一后拉到岸上。他们把写了名字的竹签交给你，托你给省潮司报个平安。 |  |
+| zhao_pond_shutter | 塘背的旧便门 | 2 | 等船让开水面，踩上门桩引开塘獭 | 0.125 |  |  |  |  |  |  |  |  | 撞闩塘獭（zhao_gate_otter） | 1 |  |  |  |  |  |  |  | 门闩又撞了一下。水上冒出一绺毛，嘴里咬着缠上门闩的麻绳。 | 塘獭撒开绳头，四爪拨水朝门桩来。高石仍能踏回去。 |  |
+| zhao_pond_shutter | 塘背的旧便门 | 3 | 扶正小水门，请堤工当场验一遭 | 0.375 |  |  |  |  |  |  |  | 省潮司的试闸回条（zhao_gate_receipt）×1 |  |  | 撞闩塘獭（zhao_gate_otter） |  |  |  |  |  |  |  | 老堤工扶着便门一头。「上游旧闸我已扶正，等这头回槽就能试水。」两人抬了抬闸板，水顺石渠流到田里。他在回条上按下拇指印，托你带回照原城。 |  |
+| zhao_retreat_marks | 倒行刻碑 | 1 | 揭开碑背垫着的湿纸 | 0.5 |  |  |  | 4 |  |  |  | 倒行水痕拓样（return_tide_note）×1 |  |  |  |  |  |  |  |  |  |  | 纸上的折线从照原一路往白苇退去，纸角写着「斜漏水驿，施荀收」。你把湿纸平平揭了下来。 |  |
+| zhao_retreat_marks | 倒行刻碑 | 2 | 从碑脚的泥里淘寒铁 | 0.75 |  |  |  | 2 |  |  |  | 寒铁（ore）×4 |  |  |  |  |  |  |  |  |  | 细铁砂从台阶缝落下来，积在碑脚的泥坑里。 | 把细砂搓掉，铁粒像米一样粘在掌心。 |  |
+| zhao_leak_bench | 斜漏驿棚 | 1 | 把旧碑的印纸给施荀看，帮他修漏斗架 | 0.25 | 0 |  |  | 4 | 倒行水痕拓样（return_tide_note）×1、松木（wood）×6、寒铁（ore）×3 | 是 |  | 倒浪楔（undertow_wedge）×1 |  |  |  |  |  |  |  |  |  | 木架裂了一道缝，宽得能塞进两根手指。他需要松木和寒铁把架子撑牢。 | 你用捆来的松木和寒铁撑好漏斗架。施荀收起印纸，把剩下的斜铁递给你。「白苇滩那扇石门退潮时往里开。找到门边的槽，把铁上三道凹痕朝外卡进去。」 |  |
+| zhao_leak_bench | 斜漏驿棚 | 2 | 听施荀讲两股水怎么落 | 0.125 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 施荀松手，右边水管一下滴了好几滴。他拿指腹堵住管口，水声才又匀了。「老站的人把这事刻在铜板上。那块铜板没给洪水冲走的话，还在站里。」 |  |
+| zhao_isle_reeds | 浮洲松根 | 1 | 割松根上的干片 | 0.75 |  |  |  | 2 |  |  |  | 松木（wood）×5 |  |  |  |  |  |  |  |  |  | 古根裸露在水外，指尖能扣住松动的片。 | 把贴着根的干片横扭下来。 |  |
+| zhao_isle_reeds | 浮洲松根 | 2 | 掏水下亮晶 | 1 |  |  |  | 2 |  |  |  | 灵晶（core）×4 |  |  |  |  |  |  |  |  |  | 踩稳裸根，泥泡下面还粘着一些晶粒。 | 把沾泥的晶粒冲到粗布上去。 |  |
+| zhao_scales | 青膜硬埂 | 1 | 踩上土堤，循爪印往前找 | 0.25 |  |  |  |  |  |  |  |  | 泥鳞鬃犬（mud_shrike） |  |  |  |  |  |  |  |  | 两行带蹼的足印进了水藻，再往外就断了。 |  |  |
+| zhao_scales | 青膜硬埂 | 2 | 挖浅水边的铁砂 | 1 |  |  |  | 2 |  |  |  | 寒铁（ore）×6 |  |  |  |  |  | 泥鳞鬃犬（mud_shrike） · 30% |  |  |  | 站在岸边，弯腰就够得着泥。 | 你淘出不少裹在水藻里的寒铁。 |  |
+| zhao_scales | 青膜硬埂 | 3 | 沿水湾的露石去看浮起的背甲 | 0.25 |  |  |  |  |  |  |  |  | 苔背泽鳖（zhao_moss_turtle） |  |  |  |  |  |  |  |  | 那块生苔的背甲往深处沉了一寸，又抬起来。 | 背甲转了半圈，苔底先露出一双眼。泽鳖贴着脚下的泥扑了过来。 |  |
+| zhao_scales | 青膜硬埂 | 4 | 到北边浅滩寻火斑大蛙 | 0.125 |  |  |  |  |  |  |  |  | 火斑大蛙（glass_frog） |  |  |  |  |  |  |  |  | 蛙背塘流来的水刚没过碎石，踩在水里也看得到腿边。 | 一团红斑从齐脚深的水里跃出来，两腮一鼓，就跳到了石脊上。 |  |
+| zhao_scales | 青膜硬埂 | 5 | 扒开沟边水藻找泥鳗 | 0.125 |  |  |  |  |  |  |  |  | 缠藻泥鳗（zhao_rush_eel） |  |  |  |  |  |  |  |  | 沟里的水混得看不到底，几片沉叶正被拖过沟口。 | 一道细背紧贴着沟底拐弯，泥鳗嘴里的藻根刚松，就朝你脚边窜。 |  |
+| zhao_grain_ladder | 高脚粮仓 | 1 | 给何绢松木和兽革，修好梯脚 | 0.25 | 12 |  |  | 4 | 兽革（hide）×2、松木（wood）×2 | 是 |  | 干粮（ration）×6 |  |  |  |  |  |  |  |  |  | 何绢抬起梯脚给你看，裂缝进了两节指头。「头两级还能踩，背袋米上去就难说了。」 | 何绢自己提了袋米上梯，落脚时梯子没再晃。她从仓里包了粮饼下来。「水一涨，总有人背着湿谷来求地方。你帮我腾出这几格，饼就劳你吃了吧。」 |  |
+| zhao_grain_ladder | 高脚粮仓 | 2 | 捡粮仓后门的碎松木 | 0.75 |  |  |  | 2 |  |  |  | 松木（wood）×5 |  |  |  |  |  |  |  |  |  | 掉在门外的碎木片已经晒干。 | 你把松木拢进臂弯，粮仓的人又把一堆削下来的短木耙到檐下。 |  |
+| zhao_grain_ladder | 高脚粮仓 | 3 | 把粥铺的领米条交给何绢 | 0.25 | 0 |  |  | 0 | 粥铺的领米条（zhao_porridge_order）×1 | 是 | 是 | 何绢按印的回条（zhao_grain_reply）×1 |  |  |  |  |  |  |  |  |  | 何绢在低檐下晾清点粮袋的小竹牌，手边的干谷还够拨两袋。 | 她对了对纸条末尾的花押，把门边两袋干谷用麻绳系在一起。「挪旁边的湿谷还得晾。等空船过来，先装这两袋。」她把按印的回条交给你。 |  |
+| zhao_ridge_permit | 青瓦验牒房 | 1 | 凭水栈货签申领通行牌，帮柯伯补绳架 | 0.25 | -11 |  |  | 4 | 漏潮货签（zhao_sand_chit）×1、兽革（hide）×3、松木（wood）×4 | 是 |  | 叠石驿牒（sand_writ）×1 |  |  |  |  |  |  |  |  |  | 柯伯指着檐下磨起毛的绳和散开的木架。水栈的货签、三份兽革和四份松木都得交，灵钱用来付新绳和验牌。 | 柯伯换好绳架，把两州都认的通行牌交给你。「过了浅石滩就没多少水了。跟紧下一趟带铃的骡车。」 |  |
+| zhao_ridge_permit | 青瓦验牒房 | 2 | 隔关听骡铃 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 一声铃从石隙深处转出来。柯伯说鸣沙城把新绳价写在城门，冲坏的井也还等人修。 |  |
+| zhao_ridge_permit | 青瓦验牒房 | 3 | 问柯伯用哪家的货签验牌 | 0.125 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 柯伯扣了扣腰间的牌。「杨木水栈余节的货签就行，落款我认得。水路来的客人多，得凭本地货签把名字写进过关册。」 |  |
+| zhao_old_wheel | 横卧的半边磨轮 | 1 | 把石脚的灵晶抠出来 | 1 |  |  |  | 2 |  |  |  | 灵晶（core）×5 |  |  |  |  |  |  |  |  |  | 街外磨台已经没人轮值，脚下的水也很慢。 | 你撬裂了两块浮石，夹在其中的灵晶正好随水滚下来。 |  |
+| zhao_old_wheel | 横卧的半边磨轮 | 2 | 看看磨轮背后写了什么 | 0.25 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 牌上写着，把灯挂在磨轮下面，靠岩壁的一边会反出两点光。卖竹筐的人把灯连同坏器具带去了碎琉璃滩，搁在晒网上。 |  |
+| zhao_firedoor | 斜封窑棚 | 1 | 给马荻材料，换一面湿帘 | 0.25 | -8 |  |  | 4 | 耐火泥（kiln_clay）×5、兽革（hide）×3、灵草（reed）×5 | 是 |  | 浸炭湿帘（fire_cloth）×1 |  |  |  |  |  |  |  |  |  | 帘绳断了，帘下的接缝被烤得发红。马荻要补泥、皮料和灵草。 | 马荻抹泥封住侧面的缝，抛给你另一面湿帘。「里面那东西受惊就踩着炭堆扑。真要进去，先看看哪边能退出去。」 |  |
+| zhao_firedoor | 斜封窑棚 | 2 | 捡晾棚的松枝头 | 0.75 |  |  |  | 2 |  |  |  | 松木（wood）×5 |  |  |  |  |  |  |  |  |  | 被雨打湿的整炭仍在袋里，棚外松尖晾得干。 | 轻推棚角，掉下来一些没熏透的松尖。 |  |
+| zhao_submerged_table | 铜槽旁 | 1 | 提灯沿水槽走到深处 | 0.25 |  |  |  |  |  |  |  |  | 槽背水魁（lab_crawler） |  |  |  |  |  |  |  |  |  | 灯一晃，湿漉漉的石甲从槽里拱起来。堵在出水孔里的东西侧过身，水打湿了你半条裤腿。 |  |
+| zhao_submerged_table | 铜槽旁 | 2 | 拔掉铜板的插销，印下刻图 | 0.75 |  |  |  | 6 |  |  |  | 伏潮漏图（phase_chart）×1 |  |  | 槽背水魁（lab_crawler） |  |  |  |  |  |  |  | 水魁退进岩缝，水槽另一头终于能抬起来。铜板背面刻着水滴该隔多久落下。你把图印到纸上，原板留在旧站。 |  |
+| zhao_submerged_table | 铜槽旁 | 3 | 在外围收晶屑 | 1.25 |  |  |  | 2 |  |  |  | 灵晶（core）×7 |  |  |  |  |  |  |  |  |  | 灯旁有一块高台，槽里的水挤不到这边。 | 干台的一层短晶透过水汽露出了棱。 |  |
+| zhao_bank_fire | 赤泥横穴 | 1 | 越过湿帘，向灰里投一颗石子 | 0.25 |  |  |  |  |  |  |  |  | 伏灰炭魈（ember_yak） |  |  |  |  |  |  |  |  |  |  |  |
+| zhao_bank_fire | 赤泥横穴 | 2 | 沿帘脚扫出暗金 | 1.25 |  |  |  | 2 |  |  |  | 暗金（black_iron）×6 |  |  |  |  | 伏灰炭魈（ember_yak） |  |  |  |  | 靠近时能看到黑砂发亮，别碰帘后舔木的暗火。 | 刮起不烧手的一层重砂，余炭重新盖过坑沿。 |  |
+| zhao_bank_fire | 赤泥横穴 | 3 | 看看没冒烟的两个风孔 | 0.25 |  |  |  | 5 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 有人曾把测温的纸签挂在这里。一大一小两个孔离得很近，同时举起挡板，风会把贴地的火引回炉嘴。孔边两支挡板都够得着。 |  |
+| zhao_bank_fire | 赤泥横穴 | 4 | 站在帘外同时开风孔，扫出重砂 | 0.375 |  |  |  |  |  |  |  | 暗金（black_iron）×2 |  | 3 |  |  |  |  |  |  |  | 热气贴着脚面走。两支挡板翻进槽里就能卡稳，帘外的砂不用踩进火道就够得着。 | 风贴着石壁往上卷，帘根不再冒火。原先烫手的两撮重砂现在能捡了。 |  |
+| zhao_glass_net | 六角晒网 | 1 | 修好灯座，向章老借灯 | 0.25 | -16 |  |  | 4 | 寒铁（ore）×5、松木（wood）×5、灵晶（core）×2 | 是 |  | 靠岩导灯（lab_beacon）×1 |  |  |  |  |  |  |  |  |  | 灯座搁在网上，撑灯的横木已经开裂。 | 章老拿撑渔网的杆子压了压新灯座。「去缺轮磨台，过了磨轮后站到岩壁边。哪条路反出两点光，就沿哪条去沉水量站。」 |  |
+| zhao_glass_net | 六角晒网 | 2 | 从碎琉璃中挑灵晶 | 0.75 |  |  |  | 2 |  |  |  | 灵晶（core）×4 |  |  |  |  |  |  |  |  |  | 晒网旁的碎片里也有清澈的灵晶。 | 你一片片挑出来，把表面的盐洗掉。 |  |
+| zhao_deep_pillars | 分水三柱 | 1 | 踏过断柱，往对面的石台去 | 0.25 |  |  |  |  |  |  |  |  | 分柱水君（fault_warden） |  |  |  |  |  |  |  |  | 你刚把脚搭上断柱，那人就横过了剑。退回岸上的路还在。 | 他在水上让开半步，一道浪却贴着他的剑锋扫到石台边。 |  |
+| zhao_deep_pillars | 分水三柱 | 2 | 打开石台上的暗槽，取出旧文书 | 0.75 |  |  |  | 7 |  |  |  | 留水底印（fault_receipt）×1 |  |  | 分柱水君（fault_warden） |  |  |  |  |  |  |  | 你抬起暗槽一侧还能活动的盖，里头压着一份旧约。纸上除了三州的水位，还记着田地淹过以后，三户船家分头把船送到了哪儿。 |  |
+| zhao_rope_sound | 沙坠顺风线 | 1 | 牵出旧绳上的重砂 | 1 |  |  |  | 2 |  |  |  | 暗金（black_iron）×4 |  |  |  |  |  |  |  |  |  | 挑那根还裹着水迹的，黑粒挂得密。 | 你把两段绳搓干，重砂从毛边筛了下来。 |  |
+| zhao_rope_sound | 沙坠顺风线 | 2 | 顺足印去背阴处 | 0.125 |  |  |  |  |  |  |  |  | 黄沿水貂（dyke_marten） |  |  |  |  |  |  |  |  |  |  |  |
+| zhao_broken_rake | 三口相背的堰齿 | 1 | 从外侧石柱旁铲灵晶 | 1.25 |  |  |  | 2 |  |  |  | 灵晶（core）×6 |  |  |  |  |  |  |  |  |  | 通向里面的路断了，外侧石柱边的白晶还够得着。 | 铲下的灵晶沿水坝滑到浅滩，薄片之间还滴着水。 |  |
+| zhao_broken_rake | 三口相背的堰齿 | 2 | 把铜板上印下的水图给楚棱看 | 0.5 |  |  |  | 5 | 伏潮漏图（phase_chart）×1 |  | 是 | 错水折尺（fault_route）×1 |  |  |  |  |  |  |  |  |  |  | 楚棱认出旧水槽的退水记号，把尺从布套里取出摊开。「湖底有三根柱子，一位修士守着残台。去过的人多半给赶回来了。下水前先看看从哪儿退。」 |  |
+| zhao_ferry_hook | 长礁灯脚 | 1 | 拖一捆靠浅礁的沉木 | 1 |  |  |  | 2 |  |  |  | 松木（wood）×6 |  |  |  |  |  |  |  |  |  | 灯脚的边缘能踩着，泥不及膝。 | 把木节拖到石条上晒了一会儿，滴水的部分留给后到的船。 |  |
+| zhao_ferry_hook | 长礁灯脚 | 2 | 问什么货最等不得开渡 | 0.125 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 点货人把返潮的盐罐挪到一边。「湿谷多放一天就多坏几袋。先找好船工，哪条路能走，也给后来的船留句话。」 |  |
+| zhao_assay_tubs | 回水试槽 | 1 | 看看桌边陶罐上的盐痕 | 0.125 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 两个罐底各留了一撮盐。施荀轻叩左边，盐早沿底边结成细圈，再一碰右边，整团滚了出来。「同样的盐，两个罐一个刚温过，一个放了一夜。要验那张方，我还得见见三州留下的东西。」 |  |
+| sand_city_registry | 鸣沙井籍房 | 1 | 问鲁勤桌角的换班记录 | 0.25 |  |  |  | 3 |  |  |  | 换井役簿（sand_watch_register）×1 |  |  |  |  |  |  |  |  |  |  | 鲁勤把盐井的换班记录翻给你。「担盐岗的邢茧等着核对旧井票。你肯跑一趟，就拿这份给他看。」 |  |
+| sand_cinder_kitchen | 炭篷边炉 | 1 | 问杨芹为何留意白蹄道 | 0.25 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 杨芹把汤勺往锅沿一搁。「我师傅从前给倒驿送灯。回来鞋还是干的，手上却全是湿泥。他说白蹄道有块马蹄样的白石，底下的泥一按，跟在喘气似的。」 |  |
+| sand_cinder_kitchen | 炭篷边炉 | 2 | 请杨芹炖两包灵草肉 | 0.5 | -5 |  |  |  | 生兽肉（beast_meat）×2、灵草（reed）×1、松木（wood）×1 | 是 |  | 灵草炖肉（herb_stew）×2 |  |  |  |  |  |  |  |  | 是 | 「有兽肉、灵草和一根干柴，五钱就给你用这口锅。收好汁再裹叶，带过沙地不洒汤。」 | 杨芹切开炖透的肉，把锅底的灵草汁舀进去。她拿叶子裹紧两包，放在炉边晾凉。 |  |
+| sand_cloister_trial | 对簧石台 | 1 | 给梁弦材料，帮他修挂石板的架子 | 0.5 | -12 |  |  | 4 | 寒铁（ore）×2、灵晶（core）×1 | 是 |  |  |  |  |  |  |  |  |  |  |  | 两块寒铁能打新的支脚，一枚灵晶用来听清回声。 | 梁弦把新铁片垫在架脚下，再敲石板，架子没晃。「省得我再拿膝盖顶着。来，随我去工坊。有片外州来的铜，我想托人送回山里。」 |  |
+| sand_cloister_trial | 对簧石台 | 2 | 进绳圈和袁息切磋 | 0.25 |  |  |  |  |  |  |  |  | 叩石师姐袁息（sand_tuner） |  |  |  |  |  |  |  |  | 袁息说好用钝剑，谁退到圈外就收手。 | 袁息压低钝剑。「听见石响就换步，站不住可以自行退到绳外。」 |  |
+| sand_cloister_trial | 对簧石台 | 3 | 向袁息讨这场的评语 | 0.25 |  |  |  | 4 |  |  |  |  |  |  | 叩石师姐袁息（sand_tuner） |  |  |  |  |  |  |  | 袁息将木片敲在你刚站过的石板上，回声清清楚楚。「这一步落得轻。我去给梁师傅递个话，他想托个脚步稳的人带件东西出州。你到工坊找他。」 |  |
+| sand_ring_maker | 梁弦的工坊 | 1 | 接过梁弦留下的铜片 | 0.25 |  |  |  | 5 |  |  |  | 听矿铜簧（echo_tuning_key）×1 |  |  |  |  |  |  |  |  |  |  | 梁弦拿铜片碰了碰石板，尾音半晌才消。「我从沉钟岭带回来时就缺这一角。你到岭上听钟，找找哪块石头上有和它对得上的凹口。」 |  |
+| sand_ring_maker | 梁弦的工坊 | 2 | 问梁弦那块大毡子是怎么塞进去的 | 0.25 |  |  |  |  |  |  |  | 鸣沙的叠缝样（qiankun_fold_pattern）×1 |  |  |  |  |  |  |  |  |  |  | 梁弦把袋口翻出来。里头的布一层压一层，针脚都藏在折里。「这只原是装井绳的。」他找出一截旧布递给你。「带回去，照这道折缝量。」 |  |
+| sand_tent_watch | 晾绳矮帐 | 1 | 问荀霜商队为何绕开石洼 | 0.25 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 「晶石发光那几晚，上坡的人都先低头看有没有爪印。要往深处走，就带能打穿硬甲的家伙。在外沿歇脚倒没事。」 |  |
+| sand_tent_watch | 晾绳矮帐 | 2 | 从滴水的帐沿挖灵草 | 0.25 |  |  |  | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  |  |  |  | 帐绳顺水往地上滴，根部灵气比沙上看着稳。 |  |
+| sand_crossing_rail | 连鞍岔牌 | 1 | 给曾微两份兽革缝鞍带 | 0.5 | 12 |  |  | 4 | 兽革（hide）×2 | 是 |  | 干粮（ration）×2 |  |  |  |  |  |  |  |  |  |  | 曾微收紧鞍带，扯了两下才撒手。「井梯也一样，差半边就会滑。拿井票给静盐井的守井人看，他有卡梯子的铜扣。别自个儿往下爬。」他把工钱塞给你。 |  |
+| sand_salt_ledger | 井边老秤 | 1 | 给邢茧看盐井的换班记录 | 0.25 |  |  |  | 4 | 换井役簿（sand_watch_register）×1 |  |  | 静井准入票（sand_well_chit）×1 |  |  |  |  |  |  |  |  |  |  | 邢茧对过两份记录上的印，又瞧了一眼井口。「上回下去的孩子回来少了一只鞋，手在绳上磨得没皮。我说过不让他们再下。你若执意去，拿票找守井人，那儿有架铁梯。」 |  |
+| sand_salt_ledger | 井边老秤 | 2 | 捡坡脚旧扁担上的松木 | 0.5 |  |  |  | 2 |  |  |  | 松木（wood）×2 |  |  |  |  |  |  |  |  |  |  | 木头浸过盐水，表面发白。你从里面挑出几块还能用的松木。 |  |
+| sand_stillwell_mouth | 井口的两根绳 | 1 | 抓粗绳下几步，看看井底 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 刚沿粗绳下去几步，带鳞的尾巴就扫了上来。井壁滑得踩不住，你只好抓绳退回。 |  |
+| sand_stillwell_mouth | 井口的两根绳 | 2 | 给闻銮看井票，请他用细绳放下铁梯 | 0.25 |  |  |  | 4 | 静井准入票（sand_well_chit）×1 |  |  | 井梯铜扣（sand_well_open）×1 |  |  |  |  |  |  |  |  |  |  | 闻銮对过印，把固定铁梯的半块铜扣塞给你。「沿铁梯下去，鞋带系紧。井壁挂着一只陶罐，绕过那头大兽才够得着。」 |  |
+| sand_stillwell_vault | 挂陶罐的井壁 | 1 | 踩着井壁的凹坑过去，引开伏鳞 | 0.5 |  |  |  |  |  |  |  |  | 静井伏鳞（sand_well_basilisk） |  |  |  |  |  |  |  |  |  | 伏鳞抬头时盐壳簌簌落下，粗尾已绕到你身后。 |  |
+| sand_stillwell_vault | 挂陶罐的井壁 | 2 | 解下铜钉上挂着的陶罐 | 0.25 |  |  |  | 8 |  |  |  | 井心水盐（stillwell_salt）×1 |  |  | 静井伏鳞（sand_well_basilisk） |  |  |  |  |  |  |  | 罐解下来了，没漏出一点水。井底的盐整整齐齐封在里面，盖上还压着旧炉房的印。 |  |
+| sand_stillwell_sill | 井底隔水板 | 1 | 取隔水板后浅槽里的灵晶 | 0.75 |  |  |  | 3 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  |  |  |  | 浅槽里只有盐泥和几块灵晶。要去挂陶罐的深井，还得从另一侧下去。 |  |
+| sand_cold_kiln_house | 阮杪的档房 | 1 | 问阮杪这些陶罐为何不沾灰 | 0.25 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 阮杪取下一只裂罐，用湿布抹过，裂缝也是白的。「冷炉烧的罐经得住水，册子却给人抄岔了。你若带来静盐井的盐，再拿那班井票给我对印，我就能把原来的火候找出来。」 |  |
+| sand_cold_kiln_house | 阮杪的档房 | 2 | 出示井票和井盐，请阮杪抄验火册 | 0.75 | -18 |  |  | 8 | 静井准入票（sand_well_chit）×1、井心水盐（stillwell_salt）×1 |  |  | 冷炉验火册（cold_kiln_record）×1 |  |  |  |  |  |  |  |  |  |  | 阮杪对过井票，从罐口刮下一点盐霜，又盖好还给你。她抄完原来的记录，把纸翻到末页。「瞧见照原那个印了么？这炉火是他们和咱们一块儿试的。」 |  |
+| sand_approach_hoof | 逆纹马蹄石 | 1 | 循马蹄白石往前试走 | 0.5 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 背风的地方又露出刚才那块白石。你认得来路，只把鞋上粘灰拍掉。 |  |
+| sand_approach_hoof | 逆纹马蹄石 | 2 | 从伏潮息泥上蘸水去试反向蹄印 | 0.5 |  |  |  | 6 | 伏潮息泥（heart_silt）×1 |  | 是 |  |  |  |  |  |  |  |  |  |  |  | 你用一滴从伏潮息泥上蘸下的水试了几处。只有朝反方向的蹄印把水聚成一线，流下旧路的坡。坡下有块白石能抬起来，石缝里传出门销松动的声音。 |  |
+| sand_approach_hoof | 逆纹马蹄石 | 3 | 拣白石边冒出的寒铁片 | 0.75 |  |  |  | 3 |  |  |  | 寒铁（ore）×2 |  |  |  |  |  |  |  |  |  |  | 铁片下面只是被沙磨开的铁锈。 |  |
+| sand_archive_guard | 倒挂的驿印 | 1 | 举起兵器，走向白柱后的守影 | 0.5 |  |  |  |  |  |  |  |  | 倒驿锁影（sand_inverted_keeper） |  |  |  |  |  |  |  |  |  | 守影拖动货柜的锁。铁链刚响，它就从白柱后转过身来。 |  |
+| sand_archive_guard | 倒挂的驿印 | 2 | 按货牌上的记号打开货柜 | 0.5 |  |  |  | 8 |  |  |  | 暗金（black_iron）×8、灵晶（core）×6 |  |  | 倒驿锁影（sand_inverted_keeper） |  |  |  |  |  |  |  | 守影一散，倒挂的货柜慢慢垂了下来。丢失多年的矿货还裹在驿站的旧布里。 |  |
+| sand_bridge_rail | 晃铜的桥栏 | 1 | 拨开晃响的铜扣，看看栏下 | 0.25 |  |  |  |  |  |  |  |  | 黄结桥蝰（sand_rattle_viper） |  |  |  |  |  |  |  |  |  | 蛇绕过铜扣，从栏杆另一侧垂了下来。 |  |
+| sand_bridge_rail | 晃铜的桥栏 | 2 | 给黄桥匠两块松木撑稳桥板 | 0.5 | 8 |  |  | 4 | 松木（wood）×2 | 是 |  |  |  |  |  |  |  |  |  |  |  |  | 黄桥匠架稳桥板。北边冷炉院以前和这里共用水尺，阮杪手里多半还留着借还水尺的旧账。 |  |
+| sand_bridge_rail | 晃铜的桥栏 | 3 | 从外侧石台取走多出来的松木 | 0.5 |  |  |  | 2 |  |  |  | 松木（wood）×2 |  |  |  |  |  | 黄结桥蝰（sand_rattle_viper） · 25% |  |  |  |  | 绕过栏杆留空的地方，就能从废槽抽出几段无主的松木。 |  |
+| sand_wind_work | 风楔架 | 1 | 取朝阳岩缝里的寒铁 | 0.75 |  |  |  | 3 |  |  |  | 寒铁（ore）×3 |  |  |  |  |  |  |  |  |  |  | 松砂里撬出来几片碎铁，卡住石板的楔子还在原位。 |  |
+| sand_wind_work | 风楔架 | 2 | 顺小槽筛出灵晶 | 0.75 |  |  |  | 3 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  |  |  |  | 细砂被风扫走，底板上几块亮石没有动。 |  |
+| sand_silo_door | 关了一半的仓门 | 1 | 站到滑槽旁等小兽出来 | 0.25 |  |  |  |  |  |  |  |  | 仓花貂（sand_silo_marten） |  |  |  |  |  |  |  |  |  | 旧仓里的花貂低伏着扑上仓板。 |  |
+| sand_silo_door | 关了一半的仓门 | 2 | 给蒋芨一份干粮，听他讲仓门 | 0.25 |  |  |  | 3 | 干粮（ration）×1 | 是 |  |  |  |  |  |  |  |  |  |  |  | 他想带一份路上方便嚼的干粮，等收完封条就走。 | 「先前专给驻桥人磨粮，改了官路就没人用。」蒋芨收好粮，「落琉洼边的旧订单是送给测风的人，里头还有未缴回的器械。」 |  |
+| sand_silo_door | 关了一半的仓门 | 3 | 从滑槽外沿拔灵草 | 0.25 |  |  |  | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  |  |  |  | 仓墙背后日晒少，草在旧木板下面还绿着。 |  |
+| sand_hail_floor | 断琉棱 | 1 | 留在洼地边上筛灵晶 | 0.5 |  |  |  | 3 |  |  |  | 灵晶（core）×2 |  |  |  |  |  |  |  |  |  |  | 你在边上收了几枚灵晶。下面风响个不停，沿来路还能退出去。 |  |
+| sand_hail_floor | 断琉棱 | 2 | 翻过断晶，往爪声传来的地方走 | 0.5 |  |  |  |  |  |  |  |  | 三痕琉狮（sand_glass_lynx） |  |  |  |  |  |  |  |  |  | 三痕琉狮压折前爪下的碎晶，先扬起一层花白的尘雪。 |  |
+| sand_hail_floor | 断琉棱 | 3 | 取出卡在晶石底下的金属片 | 0.5 |  |  |  | 7 |  |  |  | 落琉洼的弹片（sand_glass_pass）×1 |  |  | 三痕琉狮（sand_glass_lynx） |  | 三痕琉狮（sand_glass_lynx） |  |  |  |  |  | 你把弹片向下压平。迎面一阵风卷走石粉，晶石后露出一道窄缝。 |  |
+| sand_hail_floor | 断琉棱 | 4 | 挖断晶下面的大块灵晶 | 1 |  |  |  | 4 |  |  |  | 灵晶（core）×4 |  |  |  |  | 三痕琉狮（sand_glass_lynx） |  |  |  |  |  | 断晶下面看不见新脚印了。你沿细槽撬出了几块没碎的灵晶。 |  |
+| sand_hanging_support | 贴壁支木 | 1 | 捡支架前的寒铁碎料 | 0.75 |  |  |  | 3 |  |  |  | 寒铁（ore）×2 |  |  |  |  |  |  |  |  |  |  | 几块粗铁还能拿来打新的支脚。 |  |
+| sand_hanging_support | 贴壁支木 | 2 | 靠近绳架，看看暗处那双金眼 | 0.5 |  |  |  |  |  |  |  |  | 负砂豺（sand_vein_jackal） |  |  |  |  |  |  |  |  |  | 负砂豺咬住绳边的坠石。石粉从你的脚边簌簌滑下。 |  |
+| sand_hanging_support | 贴壁支木 | 3 | 钻进绳架后淘暗金 | 1 |  |  |  | 4 |  |  |  | 暗金（black_iron）×3 |  |  |  |  | 负砂豺（sand_vein_jackal） |  |  |  |  |  | 架子总算没受力，积砂里亮出几粒颜色深的暗金。 |  |
+| sand_hanging_support | 贴壁支木 | 4 | 翻到外侧晒石上，从侧面堵住花斑蜥 | 0.25 |  |  |  |  |  |  |  |  | 铁斑蜥（sand_iron_skink） |  |  |  |  |  |  |  |  |  | 花斑蜥闪向暖石的边沿。见缝被你堵住，它把尾巴高高弓起来。 |  |
+| sand_dune_grass | 伏草沙坎 | 1 | 挖阴沟两侧的灵草 | 0.25 |  |  |  | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  |  |  |  | 把带露的根束扎好，干沙自行抖掉了。 |  |
+| sand_dune_grass | 伏草沙坎 | 2 | 去看草根边跳动的耳朵 | 0.25 |  |  |  |  |  |  |  |  | 沙丘野兔（sand_dune_hare） |  |  |  |  |  |  |  |  |  | 沙丘野兔穿出湿草，歪头朝近处扑了两步。 |  |
+| sand_dune_grass | 伏草沙坎 | 3 | 沿坡顶的草响找褐翅山雉 | 0.25 |  |  |  |  |  |  |  |  | 沙脊雉（sand_ridge_pheasant） |  |  |  |  |  |  |  |  |  | 沙脊雉从干草里蹿出来。长风压住翅膀，它擦着沙面绕了半圈，又从侧面扑过来。 |  |
+| sand_dune_grass | 伏草沙坎 | 4 | 循灌木外的梅花脚印去寻狐 | 0.375 |  |  |  |  |  |  |  |  | 盐尾狐（sand_salt_fox） |  |  |  |  |  |  |  |  |  | 盐尾狐跳过灌木根。它收起拖地的厚尾，隔着两丛矮刺盯住你的手。 |  |
+| sand_dune_grass | 伏草沙坎 | 5 | 顺着翻开的湿土找伏沟野猪 | 0.5 |  |  |  |  |  |  |  |  | 伏沟野猪（sand_root_boar） |  |  |  |  |  |  |  |  |  | 伏沟野猪挖得满鼻子土。你刚踏进洼地，它便把嘴边的湿泥连同草根一并甩开。 |  |
+| sand_guest_miller | 栾火的并磨盘 | 1 | 给栾火两份灵草，补杯子的缝 | 0.5 | 7 |  |  | 3 | 灵草（reed）×2 | 是 |  | 干粮（ration）×2 |  |  |  |  |  |  |  |  |  |  | 栾火用泡软的苇芯填住杯缝，再摇也不漏谷。他分了些磨好的干粮，又给了你一半工钱。 |  |
+| sand_guest_miller | 栾火的并磨盘 | 2 | 问栾火是谁定的共用磨盘规矩 | 0.25 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 「关山师兄下山没少替人分磨钱。」栾火抬抬手，「院里也一样，帮得上忙才有账记，跟你是哪的人无关。」 |  |
+| sand_rooftile_patch | 留阴瓦畦 | 1 | 捡田边剪下的灵草 | 0.25 |  |  |  | 2 |  |  |  | 灵草（reed）×2 |  |  |  |  |  |  |  |  |  |  | 骆椿留足下一茬的草根，剩下的嫩草晒一晒就能带走。 |  |
+| sand_rooftile_patch | 留阴瓦畦 | 2 | 问骆椿为何用瓦盖住湿土 | 0.25 |  |  |  | 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 骆椿翻过一片旧瓦给你看。「拿瓦晒盐也得看背面的纹。向阳一面太烫，冷炉那种背面留粗纹的瓦才能反复用。」 |  |
+| sand_rooftile_patch | 留阴瓦畦 | 3 | 收瓦棚下散开的谷子 | 0.5 |  |  |  | 2 |  |  |  | 新收的谷子（millet_grain）×2 |  |  |  |  |  |  |  |  |  |  | 旧箩筛尽了干砂，只剩适合煮粥的碎谷。 |  |
+| sand_gravel_rill | 搁木的浅弯 | 1 | 沿里弯把干松木拖上岸 | 0.5 |  |  |  | 2 |  |  |  | 松木（wood）×3 |  |  |  |  |  |  |  |  |  |  | 木头晒裂了一点，折齐还能作炉料。 |  |
+| sand_gravel_rill | 搁木的浅弯 | 2 | 扒开外弯的石子，找寒铁 | 0.5 |  |  |  | 2 |  |  |  | 寒铁（ore）×1 |  |  |  |  |  |  |  |  |  |  | 大石块挪不动，石子堆下面倒剩了一块厚铁。 |  |
+| sand_basket_shed | 岸边竹棚 | 1 | 帮老人扶稳箩筐 | 0.125 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 他伸脚把矮凳拖回来，又往你这边让了半块空地。「风从沟里来，坐里头些。」 |  |
+| sand_basket_shed | 岸边竹棚 | 2 | 问老人愿不愿意试两招 | 0.125 |  |  |  |  |  |  |  |  |  | 1 |  |  |  |  |  |  |  |  | 「要找人过招，去院里才热闹。」他低头用指甲把翘起来的竹篾压回去。 |  |
+| sand_basket_shed | 岸边竹棚 | 3 | 拿一截闲竹比划两下，再请老人指点 | 0.125 |  |  |  |  |  |  |  |  |  | 2 |  |  |  |  |  |  |  |  | 老人看完，先把箩筐搬进棚，再用拐杖在沙上画了个圈。「只在圈里试。撑不住就抬手，我会停。」 |  |
+| sand_basket_shed | 岸边竹棚 | 4 | 走进圈里和老人试招 | 0.125 |  |  |  |  |  |  |  |  | 补箩老人（sand_basket_mender） | 3 |  |  |  |  |  |  |  | 老人手里还是那根旧竹杖。 | 你刚抬手，竹杖已经贴上手腕。老人脚下那双旧布鞋连位置都没挪。 |  |
+| sand_basket_shed | 岸边竹棚 | 5 | 请老人讲讲方才那一步 | 0.25 |  |  |  | 7 |  |  |  |  |  |  | 补箩老人（sand_basket_mender） |  |  |  |  |  |  |  | 他拿竹杖指了指你刚踩过的石子。「脚下那颗会滚。下回动手之前，先知道自己站在哪儿。」 |  |
+| sand_glass_chamber | 铜轮前 | 1 | 拔出兵器，走向铜轮 | 0.5 |  |  |  |  |  |  |  |  | 照壁刀师邢既横（sand_sundial_master） |  |  |  |  |  |  |  |  | 那人把刀一横，刀刃上还沾着石粉。 | 那人把刀鞘往柱边一抛，提刀迎了上来。 |  |
+| sand_glass_chamber | 铜轮前 | 2 | 拉住铁环，和邢既横一起转动铜轮 | 0.5 |  |  |  | 8 |  |  |  | 暗金（black_iron）×5、灵晶（core）×8、旧布袋的底纹（qiankun_inner_pattern）×1 |  |  | 照壁刀师邢既横（sand_sundial_master） |  |  |  |  |  |  |  | 铜轮底下响了一声，露出个暗格。邢既横倒空灰布袋，里头滚出灵晶和暗金。他翻过袋底，细细的针脚还在。「袋子划破了，这几针倒没散。拿去，让会缝的人照着试试。」 |  |
+| puzzle_gauge_pin | 胥婉的旧水尺 | 1 | 给胥婉两份木料修把手 | 0.375 |  |  |  | 2 | 松木（wood）×2 | 是 |  | 水闸铜杆（sluice_gauge_pin）×1 |  |  |  |  |  |  |  |  |  | 她说，修好把手就能取出铜杆。跃鱼旧渠的水闸正用得上它。 | 胥婉垫好把手，取出铜杆给你。「跃鱼旧渠找梁溥。这三道刻痕记的是各处需要多少水。」 |  |
+| puzzle_joint_gates | 旧渠的分水闸 | 1 | 问梁溥三道水该怎么走 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  | 梁溥站在干处，手贴着石头，听水从脚下过去。 | 梁溥指向石阶。「急水打这儿走。稻根沾一点水就行，再多就冲倒了。米库那头得干着。」 |  |
+| puzzle_scale_register | 挑秤人的砖柜 | 1 | 帮高婆扶住小秤 | 0.25 |  |  |  | 2 |  |  |  | 旧秤下的小木块（zhao_weigh_note）×1 |  |  |  |  |  |  |  |  |  |  | 你扶住秤杆。高婆抽出小木块，指了指上头刻的图。「你看，同样重的东西，离秤中间那根柱子越远，就越压得下去。守尺观后房正少一块这样的木头，你替我捎去吧。」 |  |
+| puzzle_lever_cabinet | 旧柜上的秤 | 1 | 问看门弟子这架秤是做什么的 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 弟子敲了敲柜门上的铜牌。「从前有人拿偏轻的砝码收草药，观里就做了这架秤。按牌上写的称平了，柜门就开。试的时候，手离门缝远些。」 |  |
+| puzzle_bridge_verse | 灶边的旧桥灯 | 1 | 问杨芹巡桥时怎么报平安 | 0.25 |  |  |  | 2 |  |  |  | 桥工的铜环（sand_crossing_song）×1 |  |  |  |  |  |  |  |  |  |  | 杨芹把铜环和小牌取下来。「人从驿站这头起步，先敲一声。往前走每到一处都得响。到了桥那头，转身前后各响一次，守桥人才知道你已经往回走。铜环给你，桥外的旧绳可经不起折腾。」 |  |
+| puzzle_sound_relay | 桥下的传声筒 | 1 | 拂开横梁上的沙，看看旧刻痕 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 木梁上刻着两条线，一条从驿站画到对岸，一条从对岸折回驿站。两条线都挨着桥那头的瓦片，那里还有两道叠在一起的锈圈。 |  |
+| puzzle_spool_loom | 春衫织棚 | 1 | 帮姚莼摊开打湿的旧灯罩 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 姚莼把旧灯罩举起来。正面的芦苇丝之间透进几道亮光，背面的挂绳孔缠着几圈粗麻线。她把灯罩搁回织机边。 |  |
+| puzzle_granary_catch | 歪了的粮箱 | 1 | 问何绢粮箱为什么会歪 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 何绢指了指箱子和木架之间的接缝。「布一干就打滑。箱子一歪，架脚下的木块也会被它推出来。开门就按住露在外头的弹簧，手别伸进门里。」 |  |
+| puzzle_hoof_markers | 三块刻着蹄印的石头 | 1 | 低头看看石头缝里的白灰 | 0.125 |  |  |  | 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 白灰里落着几片泥。泥片一面平，一面印着一道浅浅的马蹄边，像是有人拿湿泥往石头上按过。 |  |
+| zhao_terrace_arena | 观内朱线台 | 1 | 问裁判怎么报名 | 0.125 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 裁判指着桌上的名单。「报了名就等我们叫你上台。撑不住时敲一下台边的铜片，算认输，我们会让双方停手。」 |  |
+| ford_watch_lamp | 渡口换班灯 | 1 | 接下今晚的换班木牌 | 0.125 |  |  |  |  |  |  |  | 夜船的换班木牌（ferry_watch_tag）×1 |  |  |  |  |  |  | 入夜后 | 要等天黑，两盏换班灯都亮了再去。 |  |  | 两盏灯一齐亮起来。掌船人从钩上摘下木牌。「我这里还要留人。你既认得回灯埠，劳你给守灯的陈婆送一趟。」 |  |
+| ford_watch_lamp | 渡口换班灯 | 2 | 在木栏边再等一阵 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 是 |  | 你靠在栏边，听木桩底下的水声换了几回。 |  |
+| ford_watch_lamp | 渡口换班灯 | 3 | 把陈婆的回条交给掌船人 | 0.125 | 4 |  |  |  | 守灯人的回条（ferry_watch_reply）×1 | 是 | 是 | 干粮（ration）×3 |  |  |  |  |  |  |  |  |  |  | 掌船人认出灯油印，弯腰把回条压好。他从船篓里匀出几张厚饼，连脚钱一并递给你。 |  |
+| wharf_lee_lamp | 背风灯台 | 1 | 把换班牌交给陈婆 | 0.125 |  |  |  |  | 夜船的换班木牌（ferry_watch_tag）×1 | 是 |  | 守灯人的回条（ferry_watch_reply）×1 |  |  |  |  |  |  |  |  |  |  | 陈婆把牌挂在灯下，取过一张纸给你。「告诉他灯照得见。九月送药那回，就是这点光把船引进来的。」 |  |
+| wharf_lee_lamp | 背风灯台 | 2 | 用松木给灯台补两只脚 | 0.25 |  |  |  |  | 松木（wood）×2 | 是 |  | 渡工短篙（ferry_pole）×1 |  | 1 |  |  |  |  |  |  |  |  | 灯架站稳了。陈婆往里移了半步试风，把舱顶那根截短的竹篙取下来。「我如今用不着。你拿去，走窄处还撑得住。」 |  |
+| sand_saltwater_tracks | 沙脊下的兽迹 | 1 | 取出石缝里卡着的苇梗 | 0.125 |  |  |  |  |  |  |  | 结着盐壳的苇梗（sand_saltwater_reed）×1 |  |  |  |  |  |  |  |  |  |  | 苇梗朝上的一头裹着白盐，卡在底下的一头却还带着湿泥。湿土里还有几枚新踩进去的蹄印。 |  |
+| undertow_door | 反潮石门 | 1 | 沿外侧石阶绕一圈 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  | 墙外还有一排露出水面的石阶，一直连回岸边。 | 你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮，门两边的水都换了方向。水势一变，只有靠里的高阶还露在外头。 |  |
+| undertow_door | 反潮石门 | 2 | 把倒浪楔卡进石槽，固定绳子 | 0.5 |  |  |  | 3 | 倒浪楔（undertow_wedge）×1 |  | 是 | 回潮洞引线（undertow_entry）×1 |  |  |  |  |  |  |  |  |  | 施荀给的铁楔刚好对得上石槽。潮水倒流时，可以抓着绳子找高处的台阶。 | 第二股潮水打过来，铁楔才牢牢卡住。你沿绳摸到上方的石阶，找到了去回潮母洞的路。 |  |
+| undertow_door | 反潮石门 | 3 | 用校潮亭的印纸对照潮水方向 | 0.25 |  |  |  | 2 | 校潮亭抄尺（river_gauge_copy）×1 |  | 是 |  |  |  |  |  |  |  |  |  |  | 石槽边的浅痕正对着倒流的潮水，和印纸最下面几道痕同向。 | 印纸贴在槽边，最后两道线只从内侧湿起。绳子会随水换方向，固定它的铁件得同时卡住槽的两头。 |  |
+| marsh_pole_lesson | 封乔的护堤木台 | 1 | 问封乔河里出了什么事 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 封乔指着台下被卷碎的苇筏。「深水里有条大兽，爱伏在石门旁。它不来浅岸。我守的是河工，你别顺深水去追。」 |  |
+| marsh_pole_lesson | 封乔的护堤木台 | 2 | 拿练习杆，和封乔切磋 | 0.25 |  |  |  |  |  |  |  |  | 护堤人封乔（river_spar_captain） |  |  |  |  |  |  |  |  | 他把麻绳放松一截。「站不稳就叫停，别跌进水里。」 | 河工守在台边。封乔换了根软头短杆，朝你让出几步。 |  |
+| marsh_pole_lesson | 封乔的护堤木台 | 3 | 接过封乔的试杆签 | 0.125 |  |  |  | 4 |  |  |  | 封乔的试杆签（river_trial_writ）×1 |  |  | 护堤人封乔（river_spar_captain） |  |  |  |  |  |  | 封乔放下短杆，取了一支先前用红布系好的木签。 | 封乔在木签上按了手印。「夜里水响，赶路靠脚稳。折水驿要托人带急信，你肯帮忙，就拿这个给他们看。」 |  |
+| counter_bell_door | 倒钟后的反声门 | 1 | 贴着石壁敲三下 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 前两声沿石阶传回来，第三声却顺宽孔往下传。弯下腰细听，石阶底下还有一处空腔。 |  |
+| counter_bell_door | 倒钟后的反声门 | 2 | 把听矿铜簧斜卡进两个石孔 | 0.5 |  |  |  | 3 | 听矿铜簧（echo_tuning_key）×1 |  | 是 | 反声孔通路（counter_bell_entry）×1 |  |  |  |  |  |  |  |  |  | 那块铜片宽端抵住外面的孔，缺角的一端斜着能卡进里面的凹口。 | 第三声在窄孔里没了回音。下方石阶却落稳了，宽孔的回声从脚底传来。那是通往反声钟窟的路。 |  |
+| ford_packet_boat | 外桩商船 | 1 | 给夏狄修船料，领去照原的货单 | 0.75 | -7 |  |  | 3 | 松木（wood）×4、寒铁（ore）×2 | 是 |  | 商船货单（ferry_manifest）×1 |  |  |  |  |  |  |  |  |  | 夏狄认得外港的水路。船边要用四份松木、两份寒铁修补，添上七钱船费，她就把你写进货单。 | 夏狄换掉磨薄的船板，把新木钉牢。「大渡口关着也能从外港走。坐船里侧，看见照原那三把高水尺就到了。」她在商船货单背面写下你的名字。 |  |
+| ford_packet_boat | 外桩商船 | 2 | 问夏狄的船从哪条水路出港 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 夏狄指着水闸外的大石。「大渡口开了就有官船。外港水浅，只走这种小船，带不了整批货。」 |  |
+| ford_below_steps | 闸下无灯梯 | 1 | 留在上层，看看梯边的木牌 | 0.125 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 小旗在暗处也摸得到。旁边的木牌写着，照原城的人来修过排水口。换了水尺后，巡闸人就很少再下到第三级。 |  |
+| ford_below_steps | 闸下无灯梯 | 2 | 沿短绳下到第二根栏杆 | 0.5 |  |  |  |  |  |  |  |  | 悬梯堰影（ford_lower_spirit） |  |  |  |  |  |  |  |  | 石阶刚够转身，一手仍能攥住绳尾。 | 薄灯下有道皱着的长影，听见绳扣响，猛地甩开下面两层灯架。 |  |
+| ford_below_steps | 闸下无灯梯 | 3 | 翻看松动的修闸名牌 | 0.25 |  |  |  | 3 |  |  |  |  |  |  | 悬梯堰影（ford_lower_spirit） |  |  |  |  |  |  |  | 牌背刻着照原量水司和三名工人的名字。你把木牌留在栏上，扶绳回到外桩。 |  |
 
 ## 现场机关与试错
 
@@ -2043,6 +2292,9 @@
 
 | 标识 | 名称 | 敌方境界 | 境界名 | 气血 | 基础攻击 | 普攻扣防前伤害 | 防御 | 装备克制标签 | 仅在护场地结算切磋 | 首胜修为 | 实际身体掉落 | 说明 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| reed_hare | 白耳兔 | 0 | 炼气初期 | 18 | 5 | 5 | 0 | beast、furred |  | 1 | 生兽肉（beast_meat）×2、炼气期妖丹（qi_core）×1 | 白耳几乎和枯苇一个颜色。腿劲不小，这种小兽的肉炖汤很合适。 |
+| ford_silver_dace | 银背鱼 | 0 | 炼气初期 | 20 | 6 | 6 | 1 | beast、scaled |  | 1 | 生兽肉（beast_meat）×2、炼气期妖丹（qi_core）×1 | 浅水里游得急，跃出水面时背鳍最锋利。 |
+| ford_shale_crab | 黑纹蟹 | 1 | 炼气中期 | 35 | 8 | 8 | 5 | beast、scaled |  | 3 | 生兽肉（beast_meat）×1、兽革（hide）×2、炼气期妖丹（qi_core）×2 | 壳上的黑纹压着钳根，双钳高抬时会露出接缝。硬壳打磨后能补护具。 |
 | mud_beast | 泥鳞兽 | 0 | 炼气初期 | 25 | 7 | 7 | 2 | beast、scaled |  | 3 | 生兽肉（beast_meat）×2、兽革（hide）×2、炼气期妖丹（qi_core）×1 | 伏身后会扑向脚下，硬鳞收拢时适合恢复真气或蓄势。 |
 | reed_fox | 苇尾狐 | 0 | 炼气初期 | 24 | 6 | 6 | 1 | beast、furred |  | 2 | 生兽肉（beast_meat）×1、兽革（hide）×1、炼气期妖丹（qi_core）×1 | 尾上的厚毛扫起了枯苇。它会先绕着干埂寻找扑咬的空当。 |
 | marsh_ghost | 巡岸水鬼 | 0 | 炼气初期 | 28 | 8 | 8 | 2 | spirit |  | 4 | 炼气期妖丹（qi_core）×1 | 开场先抱臂结雾，准备好再把它拖出水边。 |
@@ -2067,21 +2319,30 @@
 | foundation_warden | 封石护炉人 | 2 | 炼气后期 | 72 | 16 | 17 / 18 | 6 | human |  | 8 |  | 他先自己稳住火，过招时连番去碰你的手腕。别让抽气和重招挤在一处。 |
 | river_spar_captain | 护堤人封乔 | 6 | 金丹初期 | 128 | 25 | 24 / 28 | 10 | human | 是 | 8 |  | 他拿的是裹了软布的杆子，台边有人照看。看他双手握近杆头，就要下重手了。 |
 | river_gateback | 横脊闸兽 | 2 | 炼气后期 | 60 | 13 | 13 / 15 | 5 | beast、scaled |  | 5 | 生兽肉（beast_meat）×3、兽革（hide）×2、炼气期妖丹（qi_core）×2 | 游在最小的宽面上。后脊一倒下，尾巴便会顺闸向外冲扫。 |
+| river_cliff_kite | 石鹞 | 2 | 炼气后期 | 48 | 11 | 11 | 4 | beast |  | 4 | 生兽肉（beast_meat）×1、炼气期妖丹（qi_core）×1 | 翼尖有两道磨白的羽缘。脚爪收拢时，它会贴着石梁冲下来。 |
 | undertow_moundback | 负丘虺 | 6 | 金丹初期 | 115 | 23 | 23 / 25 | 9 | beast、scaled |  | 18 | 生兽肉（beast_meat）×6、兽革（hide）×4、妖目（beast_eye）×1、金丹期妖丹（gold_core）×1 | 它在石门里翻泥为窝，外潮能把它送到高脊。负起整层泥之前，两角会先收成一线。 |
 | river_copper_echo | 屈膝铜影 | 5 | 筑基后期 | 100 | 21 | 21 / 24 | 9 | spirit、stoneborn |  | 13 | 筑基期妖丹（foundation_core）×3 | 旧守门人的半副铜影。槌头顶上钟背时会借第二响落重手。 |
 | ford_lower_spirit | 悬梯堰影 | 4 | 筑基中期 | 83 | 18 | 18 | 7 | spirit |  | 10 | 筑基期妖丹（foundation_core）×2 | 旧堰和暗灯之间来回游。它先绷住铁栏，再甩开贴门的深水。 |
-| dyke_marten | 黄沿水貂 | 0 | 炼气初期 | 22 | 7 | 7 | 2 | furred |  | 2 | 生兽肉（beast_meat）×2、兽革（hide）×1、炼气期妖丹（qi_core）×1 |  |
+| dyke_marten | 黄沿水貂 | 0 | 炼气初期 | 22 | 7 | 7 | 2 | beast、furred |  | 2 | 生兽肉（beast_meat）×2、兽革（hide）×1、炼气期妖丹（qi_core）×1 |  |
+| zhao_reed_duck | 灰苇灵鸭 | 0 | 炼气初期 | 19 | 6 | 6 / 7 | 1 | beast |  | 2 | 生兽肉（beast_meat）×2、炼气期妖丹（qi_core）×1 | 常在蒲叶下拣螺。它先伸颈啄手，一双蹼掌踩住浅石时，才会振翅扑来。 |
 | glass_frog | 火斑大蛙 | 1 | 炼气中期 | 33 | 10 | 10 / 11 | 3 | beast |  | 3 | 生兽肉（beast_meat）×3、妖目（beast_eye）×1、炼气期妖丹（qi_core）×2 |  |
 | mud_shrike | 泥鳞鬃犬 | 3 | 筑基初期 | 73 | 15 | 15 / 17 | 7 | furred、beast |  | 4 | 生兽肉（beast_meat）×5、兽革（hide）×3、筑基期妖丹（foundation_core）×1 |  |
+| zhao_moss_turtle | 苔背泽鳖 | 2 | 炼气后期 | 54 | 13 | 13 | 7 | beast、scaled |  | 4 | 生兽肉（beast_meat）×4、妖目（beast_eye）×1、炼气期妖丹（qi_core）×3 | 远看像一截生了苔的浮石。它缩颈时背甲朝上，侧转探头咬人时，肩边会露一道甲缝。 |
+| zhao_rush_eel | 缠藻泥鳗 | 1 | 炼气中期 | 36 | 11 | 11 / 13 | 3 | beast、scaled |  | 3 | 生兽肉（beast_meat）×3、炼气期妖丹（qi_core）×1 | 这鳗在水藻下贴泥而游。咬住东西就会把尾绕在石根上，借那一绕往回拖。 |
 | lab_crawler | 槽背水魁 | 4 | 筑基中期 | 95 | 18 | 18 | 8 | stoneborn |  | 8 | 妖目（beast_eye）×1、筑基期妖丹（foundation_core）×3 |  |
-| ember_yak | 伏灰炭魈 | 6 | 金丹初期 | 119 | 24 | 24 / 27 | 10 | furred |  | 9 | 生兽肉（beast_meat）×7、兽革（hide）×4、金丹期妖丹（gold_core）×1 |  |
+| ember_yak | 伏灰炭魈 | 6 | 金丹初期 | 119 | 24 | 24 / 27 | 10 | beast、furred |  | 9 | 生兽肉（beast_meat）×7、兽革（hide）×4、金丹期妖丹（gold_core）×1 |  |
 | fault_warden | 分柱水君 | 7 | 金丹中期 | 163 | 29 | 29 / 32 | 13 | spirit |  | 16 | 妖目（beast_eye）×2、金丹期妖丹（gold_core）×4 |  |
 | zhao_spar | 掌尺人傅澄 | 5 | 筑基后期 | 103 | 20 | 20 | 8 | human | 是 | 6 |  |  |
+| zhao_gate_otter | 撞闩塘獭 | 2 | 炼气后期 | 47 | 12 | 12 | 4 | beast、furred |  | 5 | 生兽肉（beast_meat）×3、兽革（hide）×2、炼气期妖丹（qi_core）×2 | 胸前沾了一片木屑。它伏在门桩后，一旦两条后腿踩住门槛，就会贴着水面跳过来。 |
 | sand_dune_hare | 沙丘野兔 | 0 | 炼气初期 | 20 | 6 | 6 | 1 | beast、furred |  | 2 | 生兽肉（beast_meat）×1、兽革（hide）×1、炼气期妖丹（qi_core）×1 | 从软沙露面，蓄势时耳尖几乎贴回头上。 |
+| sand_ridge_pheasant | 沙脊雉 | 0 | 炼气初期 | 22 | 7 | 7 | 1 | beast |  | 2 | 生兽肉（beast_meat）×2、炼气期妖丹（qi_core）×1 | 褐羽与干草颜色很近。它先擦着草尾掠过，抬头时才扇开翅膀。 |
+| sand_salt_fox | 盐尾狐 | 1 | 炼气中期 | 31 | 9 | 9 | 2 | beast、furred |  | 3 | 生兽肉（beast_meat）×1、兽革（hide）×2、炼气期妖丹（qi_core）×1 | 尾巴拖过当地的咸土，毛尖发白，皮比草丘野兔厚。隔着灌木时，它总往你的兵刃外侧绕。 |
+| sand_root_boar | 伏沟野猪 | 2 | 炼气后期 | 42 | 11 | 11 | 3 | beast、furred |  | 4 | 生兽肉（beast_meat）×4、兽革（hide）×1、炼气期妖丹（qi_core）×3 | 宽背有一层硬鬃。见它前蹄在泥里踏出两道斜痕，下一刻就会顶上来。 |
 | sand_silo_marten | 仓花貂 | 0 | 炼气初期 | 26 | 7 | 7 | 2 | beast、furred |  | 2 | 生兽肉（beast_meat）×2、兽革（hide）×1、炼气期妖丹（qi_core）×1 | 跟着废仓过日子的小兽，擅长在旧板间跳转。 |
 | sand_rattle_viper | 黄结桥蝰 | 1 | 炼气中期 | 32 | 9 | 9 | 2 | beast、scaled |  | 3 | 生兽肉（beast_meat）×2、兽革（hide）×1、炼气期妖丹（qi_core）×2 | 桥栏的铜结为它遮住半个头，须提防从高处伸下的毒牙。 |
 | sand_tuner | 叩石师姐袁息 | 3 | 筑基初期 | 52 | 13 | 13 | 4 | human | 是 | 5 |  | 叩石院的授习师姐，使用钝剑。摆剑守势后会跟半步斜斩。 |
 | sand_vein_jackal | 负砂豺 | 4 | 筑基中期 | 63 | 15 | 15 | 5 | beast、furred |  | 5 | 生兽肉（beast_meat）×3、兽革（hide）×3、筑基期妖丹（foundation_core）×1 | 一只耳朵曾被矿架夹伤。它在架子下面一转身，固定木梁的重物就开始摇晃。 |
+| sand_iron_skink | 铁斑蜥 | 1 | 炼气中期 | 30 | 8 | 8 | 3 | beast、scaled |  | 3 | 生兽肉（beast_meat）×1、兽革（hide）×1、炼气期妖丹（qi_core）×2 | 外坡石缝里常见的蜥。鳞面斑纹像铁锈，尾巴离开石面便要横扫。 |
 | sand_well_basilisk | 静井伏鳞 | 5 | 筑基后期 | 79 | 17 | 17 / 19 | 5 | beast、scaled |  | 9 | 生兽肉（beast_meat）×4、兽革（hide）×3、妖目（beast_eye）×1、筑基期妖丹（foundation_core）×2 | 鳞片上挂满白盐。尾巴在井壁上刮出刺耳的声响，声音一停，它便会抬尾重砸。 |
 | sand_glass_lynx | 三痕琉狮 | 6 | 金丹初期 | 110 | 22 | 22 | 8 | beast、furred |  | 11 | 生兽肉（beast_meat）×5、兽革（hide）×4、妖目（beast_eye）×1、金丹期妖丹（gold_core）×1 | 肩背和鬃毛间嵌满晶片。每次把眼睛藏进鬃毛，它都会用肩膀撞向附近的晶石。 |
 | sand_inverted_keeper | 倒驿锁影 | 7 | 金丹中期 | 122 | 24 | 24 | 9 | spirit |  | 12 | 金丹期妖丹（gold_core）×2 | 越过旧影先落地的位置，锁链会在回声传到前先扑到。 |
@@ -2090,6 +2351,7 @@
 | terrace_stride | 量步客陆黍 | 1 | 炼气中期 | 34 | 10 | 10 | 3 | human | 是 | 3 |  | 擅长用小步挤人离尺线，蓄势时前脚会踩得格外深。 |
 | terrace_crossbeam | 斜梁手田素功 | 3 | 筑基初期 | 57 | 14 | 15 / 14 | 5 | human | 是 | 5 |  | 他常把尺横在身前挡招。对手一动，他就转身换到另一侧。 |
 | terrace_finalist | 立尺教习卫箬 | 5 | 筑基后期 | 82 | 18 | 19 | 6 | human | 是 | 8 |  | 她动手前会低头听你的呼吸。长尺一收，接着就会往外重重推出。 |
+| sand_saltwater_jackal | 盐泥豺 | 2 | 炼气后期 | 43 | 9 | 9 | 3 | beast、furred |  | 4 | 生兽肉（beast_meat）×2、兽革（hide）×2、炼气期妖丹（qi_core）×2 | 后腿沾了一层干盐泥，落地时不大使力。它先压低肩脊，接着才从低处猛扑。 |
 
 ## 敌人回合意图
 
@@ -2097,6 +2359,14 @@
 
 | 敌人标识 | 敌人名称 | 动作序号 | 名称 | 类别 | 倍率 |
 | --- | --- | --- | --- | --- | --- |
+| reed_hare | 白耳兔 | 1 | 蹬土扑来 | 普通攻势 | 1 |
+| reed_hare | 白耳兔 | 2 | 缩身伏地 | 防御 | 1.2 |
+| reed_hare | 白耳兔 | 3 | 蹬坡撞腿 | 重招 | 1.45 |
+| ford_silver_dace | 银背鱼 | 1 | 跃水划鳍 | 普通攻势 | 1 |
+| ford_silver_dace | 银背鱼 | 2 | 伏水蹿撞 | 重招 | 1.45 |
+| ford_shale_crab | 黑纹蟹 | 1 | 合钳挡脸 | 防御 | 1.55 |
+| ford_shale_crab | 黑纹蟹 | 2 | 侧身扫钳 | 普通攻势 | 1 |
+| ford_shale_crab | 黑纹蟹 | 3 | 举钳砸石 | 重招 | 1.55 |
 | mud_beast | 泥鳞兽 | 1 | 偏头啃咬 | 普通攻势 | 1 |
 | mud_beast | 泥鳞兽 | 2 | 伏身猛扑 | 重招 | 1.7 |
 | mud_beast | 泥鳞兽 | 3 | 蜷尾守鳞 | 防御 | 1.35 |
@@ -2190,6 +2460,9 @@
 | river_gateback | 横脊闸兽 | 2 | 压低脊鳍 | 防御 | 1.4 |
 | river_gateback | 横脊闸兽 | 3 | 沿闸梁冲横 | 重招 | 1.55 |
 | river_gateback | 横脊闸兽 | 4 | 贴闸游回 | 普通攻势 | 1.09 |
+| river_cliff_kite | 石鹞 | 1 | 贴梁掠爪 | 普通攻势 | 1 |
+| river_cliff_kite | 石鹞 | 2 | 收翅抱石 | 防御 | 1.35 |
+| river_cliff_kite | 石鹞 | 3 | 振翼俯冲 | 重招 | 1.55 |
 | undertow_moundback | 负丘虺 | 1 | 抖落泥团 | 普通攻势 | 1 |
 | undertow_moundback | 负丘虺 | 2 | 低头用角护身 | 防御 | 1.45 |
 | undertow_moundback | 负丘虺 | 3 | 顶起泥浪冲上石脊 | 重招 | 1.62 |
@@ -2205,6 +2478,9 @@
 | ford_lower_spirit | 悬梯堰影 | 4 | 压暗灯罩 | 吸取真气 | 0.58 |
 | dyke_marten | 黄沿水貂 | 1 | 贴着堤边撕咬 | 普通攻势 | 1 |
 | dyke_marten | 黄沿水貂 | 2 | 朝腿上猛扑 | 重招 | 1.4 |
+| zhao_reed_duck | 灰苇灵鸭 | 1 | 甩翅扑脸 | 普通攻势 | 1 |
+| zhao_reed_duck | 灰苇灵鸭 | 2 | 伸颈啄手 | 普通攻势 | 1.1 |
+| zhao_reed_duck | 灰苇灵鸭 | 3 | 蹬水飞起连啄 | 重招 | 1.45 |
 | glass_frog | 火斑大蛙 | 1 | 伸舌甩来泥点 | 普通攻势 | 1 |
 | glass_frog | 火斑大蛙 | 2 | 鼓起两腮顶撞 | 普通攻势 | 1.1 |
 | glass_frog | 火斑大蛙 | 3 | 收腹蹬腿猛跳 | 重招 | 1.55 |
@@ -2212,6 +2488,12 @@
 | mud_shrike | 泥鳞鬃犬 | 2 | 压低鬃毛 | 重招 | 1.55 |
 | mud_shrike | 泥鳞鬃犬 | 3 | 尾巴卷作一环 | 防御 |  |
 | mud_shrike | 泥鳞鬃犬 | 4 | 贴地扯咬 | 普通攻势 | 1.12 |
+| zhao_moss_turtle | 苔背泽鳖 | 1 | 缩颈顶起背甲 | 防御 | 1.35 |
+| zhao_moss_turtle | 苔背泽鳖 | 2 | 侧转咬向脚腕 | 普通攻势 | 1 |
+| zhao_moss_turtle | 苔背泽鳖 | 3 | 抬甲掀开脚下的泥 | 重招 | 1.55 |
+| zhao_rush_eel | 缠藻泥鳗 | 1 | 从藻下叼住鞋边 | 普通攻势 | 1 |
+| zhao_rush_eel | 缠藻泥鳗 | 2 | 翻尾把人拖进浅沟 | 普通攻势 | 1.12 |
+| zhao_rush_eel | 缠藻泥鳗 | 3 | 缠住脚后猛拽 | 重招 | 1.48 |
 | lab_crawler | 槽背水魁 | 1 | 撑着水槽扬起砂子 | 普通攻势 | 1 |
 | lab_crawler | 槽背水魁 | 2 | 从铜槽喷出冷气 | 吸取真气 | 1.15 |
 | lab_crawler | 槽背水魁 | 3 | 翻身用背甲压起水浪 | 重招 | 1.57 |
@@ -2229,9 +2511,21 @@
 | zhao_spar | 掌尺人傅澄 | 2 | 竖起竹尺 | 防御 |  |
 | zhao_spar | 掌尺人傅澄 | 3 | 向后一翻竹尺 | 重招 | 1.4 |
 | zhao_spar | 掌尺人傅澄 | 4 | 转门横推 | 普通攻势 | 1 |
+| zhao_gate_otter | 撞闩塘獭 | 1 | 扯着绳头撕咬 | 普通攻势 | 1 |
+| zhao_gate_otter | 撞闩塘獭 | 2 | 伏身在门桩后 | 防御 | 1.25 |
+| zhao_gate_otter | 撞闩塘獭 | 3 | 踩着门槛猛扑 | 重招 | 1.48 |
 | sand_dune_hare | 沙丘野兔 | 1 | 跳咬脚跟 | 普通攻势 | 1 |
 | sand_dune_hare | 沙丘野兔 | 2 | 缩进草坎 | 防御 | 1.4 |
 | sand_dune_hare | 沙丘野兔 | 3 | 压耳蹬地 | 重招 | 1.5 |
+| sand_ridge_pheasant | 沙脊雉 | 1 | 掠地啄来 | 普通攻势 | 1 |
+| sand_ridge_pheasant | 沙脊雉 | 2 | 贴着草茎收翅 | 防御 | 1.35 |
+| sand_ridge_pheasant | 沙脊雉 | 3 | 振翅扑向面门 | 重招 | 1.48 |
+| sand_salt_fox | 盐尾狐 | 1 | 绕过矮刺寻空当 | 普通攻势 | 1 |
+| sand_salt_fox | 盐尾狐 | 2 | 把身子伏到尾下 | 防御 | 1.42 |
+| sand_salt_fox | 盐尾狐 | 3 | 借草坡斜扑 | 重招 | 1.55 |
+| sand_root_boar | 伏沟野猪 | 1 | 拱开碎石逼近 | 普通攻势 | 1 |
+| sand_root_boar | 伏沟野猪 | 2 | 低肩护住前胸 | 防御 | 1.44 |
+| sand_root_boar | 伏沟野猪 | 3 | 蹬地挑獠牙 | 重招 | 1.6 |
 | sand_silo_marten | 仓花貂 | 1 | 借仓板侧扑 | 普通攻势 | 1 |
 | sand_silo_marten | 仓花貂 | 2 | 趴上木栓 | 防御 | 1.35 |
 | sand_silo_marten | 仓花貂 | 3 | 缩腰翻板 | 重招 | 1.55 |
@@ -2244,6 +2538,9 @@
 | sand_vein_jackal | 负砂豺 | 1 | 踩着木架扑来 | 普通攻势 | 1 |
 | sand_vein_jackal | 负砂豺 | 2 | 躲到木梁后 | 防御 | 1.45 |
 | sand_vein_jackal | 负砂豺 | 3 | 顶落梁上的重物 | 重招 | 1.62 |
+| sand_iron_skink | 铁斑蜥 | 1 | 探头咬向鞋边 | 普通攻势 | 1 |
+| sand_iron_skink | 铁斑蜥 | 2 | 翻过鳞背护腹 | 防御 | 1.4 |
+| sand_iron_skink | 铁斑蜥 | 3 | 甩起长尾横扫 | 重招 | 1.55 |
 | sand_well_basilisk | 静井伏鳞 | 1 | 绕圈探爪 | 普通攻势 | 1 |
 | sand_well_basilisk | 静井伏鳞 | 2 | 鳞尾贴井壁 | 防御 | 1.42 |
 | sand_well_basilisk | 静井伏鳞 | 3 | 抬尾重砸井壁 | 重招 | 1.62 |
@@ -2279,6 +2576,9 @@
 | terrace_finalist | 立尺教习卫箬 | 3 | 顺潮抱尺 | 防御 | 1.42 |
 | terrace_finalist | 立尺教习卫箬 | 4 | 逆水返尺 | 重招 | 1.68 |
 | terrace_finalist | 立尺教习卫箬 | 5 | 点步短推 | 普通攻势 | 1.05 |
+| sand_saltwater_jackal | 盐泥豺 | 1 | 贴沙试咬 | 普通攻势 | 1 |
+| sand_saltwater_jackal | 盐泥豺 | 2 | 缩头护住伤腿 | 防御 | 1.4 |
+| sand_saltwater_jackal | 盐泥豺 | 3 | 压肩扑来 | 重招 | 1.7 |
 
 ## 委托
 
@@ -2296,8 +2596,13 @@
 | sky_treaty | 沿新路把衡印带回村 |  |  | 炼气初期 | 得知物品 镜门衡印（sky_seal） |  | 把旧渡的印带回来（last_lantern） | 村老摸了摸衡印。「印有了。旧渡还关着，得先把镇渡印带回来，船才能送通行契去各处驿站。」 | 村里想把新路告诉各处驿站。带回衡印，就能在通行文书上盖章。 | 镜门衡印（sky_seal）×1 | 干粮（ration）×6、照心露（jade_pill）×2 | 60 | 10 |  | 村老接过衡印，盖好了通行文书。送信的人从渡口灯下启程，把沿山到石台的路图送往各处驿站。 |
 | willow_check_dike | 核对蒲湾的木渠 | 折水驿（willow_post） |  | 炼气初期 | 得知物品 蒲湾渠契（river_field_stamp） |  |  |  | 门房把蒲湾的两张旧账摊开。「同一条渠，两户出过多少木头，抄得不一样。你把原凭据带来，再添三块松木。明年下雨前，手边总得有料可换。」 | 蒲湾渠契（river_field_stamp）×1、松木（wood）×3 | 干粮（ration）×4、松脂膏（salve）×1 | 14 | 3 |  | 驿站的人把两户的份额记到木牌背面，收好备用的木料，结了钱和路上的口粮。 |
 | willow_night_packet | 给走夜路的送货人备兽革 | 折水驿（willow_post） |  | 炼气初期 | 得知物品 封乔的试杆签（river_trial_writ） |  |  |  | 门房认出封乔的木签，从后院叫来个正绑货的脚夫。脚夫掀开背篓让你看。「明早上坡修水槽，绳子总在石沿磨断。还差三张整皮包住绳头。」 | 封乔的试杆签（river_trial_writ）×1、兽革（hide）×3 | 铁障符（iron_talisman）×2、干粮（ration）×5 | 24 | 4 |  | 驿站把兽革扎好留给送货人，挂起封乔的木签，又从巡夜人的符袋里拿出两张符，和工钱一起递给你。 |
+| lantern_low_report | 把低路试点回条交给裴见 | 系灯院（lantern_court） |  | 炼气初期 | 得知物品 低路试点回条（lantern_low_note） |  |  |  | 裴见把两条旧挂灯绳留在廊下，等人来信。回条上有药农的指印，低处那盏灯已经照得见浅沟。 | 低路试点回条（lantern_low_note）×1 |  | 10 | 2 |  | 裴见把通往浅沟的灯号画上木牌。来歇脚的药农抄了一份。他收好指印回条，把工钱递给你。 |
+| lantern_high_report | 把双灯复挂回条交给裴见 | 系灯院（lantern_court） |  | 炼气初期 | 得知物品 双灯复挂回条（lantern_high_note） |  |  |  | 裴见摊开晒盘坡的旧灯图。矿夫在回条上画的两道墨，正落在图上两只灯的位置。 | 双灯复挂回条（lantern_high_note）×1 |  | 17 | 3 |  | 裴见照着回条重画了两盏灯的位置，让下一班顺路摸一摸护绳磨到了哪。他当面结清这趟的工钱。 |
 | zhao_sealed_load | 修好省潮司的水位尺 | 照原城（zhao_city） |  | 炼气初期 |  |  |  |  | 城门旁水尺的支脚已泡烂。杜椿想在秋汛前换上松木支脚，用寒铁把尺身重新箍紧。 | 松木（wood）×6、寒铁（ore）×4 | 干粮（ration）×4、松脂膏（salve）×2 | 23 | 5 | 否 | 杜椿扶住尺身，等工匠把铁箍敲紧，才试着松手。「这根倒不了。水真涨起来，也得看看上游那把尺怎么量。」 |
 | zhao_joint_measure | 校准三州的水尺 | 照原城（zhao_city） |  | 炼气初期 | 得知物品 留水底印（fault_receipt） |  |  |  | 杜椿在等那份给三州分水的旧约。施荀要做三副铜夹，用同一股水把各州的刻度对齐。 | 留水底印（fault_receipt）×1、灵晶（core）×10、寒铁（ore）×12、松木（wood）×8 | 缓脉丹（gold_salve）×4 | 81 | 14 |  | 三把尺并排浸进水槽，水痕终于挨成一条线。来借尺的货郎问杜椿：「按这把量，下游庄子哪天能收粮？我好把船给他们留一趟。」 |
+| zhao_porridge_reply | 给粥铺回个准话 | 照原城（zhao_city） |  | 炼气初期 | 得知物品 粥铺的领米条（zhao_porridge_order） |  |  |  | 姜婶给船工留着下午的一锅粥。去白鹤粮仓找何绢问清有没有干谷，把她的回条带回照原。 | 何绢按印的回条（zhao_grain_reply）×1 | 干粮（ration）×3 |  | 2 | 否 | 姜婶看清回条上「干谷」两个字，转身去叫喝粥的船工。她把刚出笼的三块米饼包了给你。「明早这锅能熬稠些了。」 |
+| zhao_bank_rescue | 给两户船家报平安 | 照原城（zhao_city） |  | 炼气初期 | 得知物品 撤船的两枚竹签（zhao_bank_receipt） |  |  |  | 青埂下游还有人在等两户船家的消息。拿他们的竹签给杜椿，省得有人下水逐处去找。 | 撤船的两枚竹签（zhao_bank_receipt）×1 | 干粮（ration）×2 | 9 | 3 | 否 | 杜椿照着竹签上的名字勾了两笔，又让送信人顺道通知下游。他按码头出工的例给了你两份干粮和脚钱。 |
+| zhao_gate_bounty | 照原悬赏 · 查验青埂旧闸 | 照原城（zhao_city） |  | 炼气初期 | 得知物品 试水门悬赏（zhao_gate_notice） |  |  |  | 省潮司要断闩和试闸回条。沿青埂闸下的拖痕去蛙背塘，等船离水再查撞门的东西。事后得让堤工亲手试一次闸。 | 带咬痕的旧门闩（zhao_gate_shaving）×1、省潮司的试闸回条（zhao_gate_receipt）×1 | 松脂膏（salve）×2 | 31 | 7 | 否 | 杜椿把断闩拿去和先前的齿印比对，再照回条给各家的引水册补上一页。他拆下已验的告示，依悬赏所写给你灵钱和药膏。 |
 | sand_repair_sacks | 给鲁勤补两块箱盖 | 鸣沙城（mingsha_city） |  | 炼气初期 |  |  |  |  | 鲁勤两手一压，受潮的箱盖还是合不上。「一场雨能把两年的井票泡成浆。给我两块薄松木，再拿一份干灵草垫箱角，纸就不贴木头受潮了。」 | 松木（wood）×2、灵草（reed）×1 | 干粮（ration）×4 | 10 | 3 | 否 | 鲁勤用新木把纸压平，换掉旧盖，给你包了过关路上吃的干粮。 |
 | sand_inn_bedding | 给炭篷换挡风帘 | 炭篷驿（cinder_inn） |  | 炼气初期 |  |  |  |  | 杨芹给靠门的旅客换了铺，掀帘时沙直往锅边跑。「顶风这面缺两张皮。帘子一补，夜里晚来的也能有张暖铺。」 | 兽革（hide）×2 | 松脂膏（salve）×1、干粮（ration）×2 | 8 | 3 | 否 | 杨芹让出已经落灰的边铺，把新皮缝上布架。炉边重新暖起来了。 |
 | sand_tuner_shoes | 给学徒换防滑鞋底 | 叩石院（sand_bell_cloister） |  | 炼气初期 |  |  |  |  | 袁息扫着练剑落下的碎石，扫把底下露出一道打滑的脚印。「末排的小徒弟不敢换步，鞋底磨穿了。两片寒铁、一张兽革，我能给他补一双。」 | 寒铁（ore）×2、兽革（hide）×1 | 灵晶（core）×1、松脂膏（salve）×1 | 10 | 3 | 否 | 袁息给最年少的学徒贴上新鞋底，取来一枚原先用来试分量的灵晶作谢礼。 |
@@ -2468,8 +2773,9 @@
 | 装备部位 | 标识 | 名称 | 初始耐久 |
 | --- | --- | --- | --- |
 | 武器 | cudgel | 枣木杖 | 26 |
-| 护具 | straw_cape | 蓑衣 | 24 |
-| 饰物 |  |  |  |
+| 副手 |  |  |  |
+| 身甲 | straw_cape | 蓑衣 | 24 |
+| 法器 |  |  |  |
 
 ## 开局术法
 

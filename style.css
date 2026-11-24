@@ -184,6 +184,8 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .ground-row + .ground-row { border-top: 1px solid var(--line); }
 .ground-row > .button { min-height: 32px; padding: 3px 7px; font-size: 13px; }
 .card p { margin-top: 3px; }
+.local-incident { padding: 10px 0; margin: 8px 0; border-block: 1px solid var(--line); }
+.local-incident .actions { margin-top: 8px; }
 .intro, .fine, .section-note, .card p, .choice p { color: var(--muted); }
 .fine, .section-note, .card p, .choice p, .tag { font-size: 13px; }
 .choice .choice-blocker { color: var(--amber); }

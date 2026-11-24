@@ -4,10 +4,10 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const file = async path => (await readFile(new URL(path, root), "utf8")).replace(/\r\n/g, "\n");
-const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, world, training, data, economy, alchemy, engine, app] = await Promise.all([
+const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, world, training, data, economy, alchemy, ferry, hazards, engine, app] = await Promise.all([
   file("game.html"), file("style.css"), file("intro.css"), file("river-content.mjs"), file("zhao-content.mjs"), file("sand-content.mjs"),
   file("late-content.mjs"), file("puzzle-content.mjs"), file("mechanisms.mjs"), file("tournament.mjs"), file("world.mjs"), file("training.mjs"), file("data.mjs"), file("economy.mjs"),
-  file("alchemy.mjs"), file("engine.mjs"), file("app.mjs"),
+  file("alchemy.mjs"), file("ferry-content.mjs"), file("hazards.mjs"), file("engine.mjs"), file("app.mjs"),
 ]);
 const originalCss = `${style}\n${intro}`;
 const destination = process.argv[2] ? resolve(process.argv[2]) : fileURLToPath(new URL("dist/雾渡山河.html", root));
@@ -52,6 +52,14 @@ const { tournamentContent, tournamentData, initialTournament, tournamentView, to
 ${moduleBody(tournament)}
 return { tournamentContent, tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution };
 })();
+const ferryContent = (() => {
+${moduleBody(ferry)}
+return ferryContent;
+})();
+const { hazardContent, hazardView, hazardAction, hazardVictory } = (() => {
+${moduleBody(hazards)}
+return { hazardContent, hazardView, hazardAction, hazardVictory };
+})();
 const moduleData = (() => {
 ${moduleBody(data)}
 return { default: data, ...data };
@@ -78,9 +86,9 @@ const { alchemyData, initialAlchemyState, alchemyView, alchemyAction } = (() => 
 ${moduleBody(alchemy)}
 return { alchemyData, initialAlchemyState, alchemyView, alchemyAction };
 })();
-const { act, createGame, rules, view } = (() => {
+const { act, createGame, handConflict, rules, view } = (() => {
 ${moduleBody(engine)}
-return { act, createGame, rules, view };
+return { act, createGame, handConflict, rules, view };
 })();
 ${moduleBody(app)}
 })();`.replace(/<\/script/gi, "<\\/script");

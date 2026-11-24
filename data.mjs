@@ -4,6 +4,8 @@ import { sandContent } from './sand-content.mjs';
 import { lateContent } from './late-content.mjs';
 import { puzzleContent } from './puzzle-content.mjs';
 import { tournamentContent, tournamentData } from './tournament.mjs';
+import { ferryContent } from './ferry-content.mjs';
+import { hazardContent } from './hazards.mjs';
 
 const realms = [
   { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
@@ -110,8 +112,9 @@ const items = [
   { id: 'short_spear', name: '摊市短矛', kind: 'gear', price: 27, sell: 10, desc: '重心挨着手，矛尾可顺势架一下来招。' },
   { id: 'hook_blade', name: '渡口钩刃', kind: 'gear', price: 0, sell: 15, desc: '拦滩客从路上带回的备刃。刀脊微弯，握柄大小刚合手。' },
   { id: 'trail_cutter', name: '松场习刀', kind: 'gear', price: 0, sell: 11, desc: '松场守索人给胜者备的短砍刀。护手做成一整圈。' },
-  { id: 'star_blade', name: '暗星刀', kind: 'gear', price: 0, sell: 29, desc: '偏井锁柜里的护矿短刀。刃厚而短，寻常力道也能掌控。' },
-  { id: 'star_blade_pattern', name: '暗星刀匣底图', kind: 'key', price: 0, sell: 0, desc: '偏井护矿人用来配修暗星刀的寸图。刃底三处刻点与旧锁柜里那把刀相合。' },
+  { id: 'star_blade', name: '暗星刀', kind: 'gear', price: 0, sell: 29, desc: '照偏井护矿人留下的旧图打成。刃厚而短，寻常力道也能掌控。' },
+  { id: 'star_blade_pattern', name: '暗星刀匣底图', kind: 'key', price: 0, sell: 0, desc: '偏井护矿人留下的锻打寸图。断刀的三处裂口旁注明了哪边该留厚。' },
+  { id: 'hide_shield', name: '包革小盾', kind: 'gear', price: 0, sell: 9, desc: '用松木弯成的圆盾，外包两层兽革。' },
   { id: 'coil_spear', name: '绕脊枪', kind: 'gear', price: 0, sell: 25, desc: '用配重翻过的长枪。刃近手心，长柄仍能顺畅回收。' },
   { id: 'reed_bow', name: '苇弦弓', kind: 'gear', price: 0, sell: 8, desc: '将削薄的苇片贴在韧木上制成的猎弓。' },
   { id: 'iron_sword', name: '寒铁剑', kind: 'gear', price: 33, sell: 14, desc: '用沉钟岭的铁打成，兼顾出手和耐用。' },
@@ -160,7 +163,8 @@ const gear = [
   { id: 'short_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0, durability: 27, repair: 7, entry: '村口巡守平日练的短矛。柄尾能架住近处来招，矛尖却薄，得时常修。' },
   { id: 'hook_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 31, repair: 6, entry: '拦滩客的备刀。分量略沉，寻常人也能劈得稳。' },
   { id: 'trail_cutter', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0, durability: 33, repair: 5, entry: '索棚比手的奖刀。护手宽，敢把刃从对手手边送过去。' },
-  { id: 'star_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 37, repair: 11, entry: '落进矿傀深处的老刀，劈硬物分量十足。养气浅些也能握得稳。' },
+  { id: 'star_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 37, repair: 11, entry: '照护矿人的旧式锻成，刀背厚，劈硬物时刃口容易吃住石缝。养气浅些也能握得稳。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
+  { id: 'hide_shield', slot: 'offhand', tier: 0, atk: 0, def: 0, brace: 3, durability: 28, repair: 5, entry: '空出一只手便能用。防住蓄力后砸来的重招时，盾面能卸开一股力。' },
   { id: 'coil_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 45, repair: 10, entry: '练得不深也能贯穿整段枪势的重兵。枪杆经用，锻造却要吃掉一匣硬料。' },
   { id: 'reed_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 3, def: 0, hp: 0, qi: 0, retreat: 0, durability: 28, repair: 4, entry: '寻常猎弓，弓力温和。可用削苇箭或包铁箭，射入厚毛不易滑脱。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 2 } },
   { id: 'iron_sword', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '不挑修为的实用剑。厚脊让劈刺都稳，常年巡矿也不用总补剑身。' },
@@ -274,7 +278,8 @@ const recipes = [
   { id: 'r_sky_bow', result: 'sky_bow', count: 1, tier: 3, facility: 'forge', facilityLevel: 3, cost: 39, need: { wood: 8, core: 6, hide: 6 }, days: 4, reveal: { item: 'axis_tuning' } },
   { id: 'r_sky_cloak', result: 'sky_cloak', count: 1, tier: 3, facility: 'forge', facilityLevel: 3, cost: 36, need: { hide: 8, core: 5 }, days: 4, reveal: { item: 'loom_tack' } },
   { id: 'r_jade_pendant', result: 'jade_pendant', count: 1, tier: 3, facility: 'forge', facilityLevel: 2, cost: 26, need: { core: 5, hide: 3, beast_eye: 1 }, days: 3, reveal: { item: 'axis_tuning' } },
-  { id: 'r_star_blade', result: 'star_blade', count: 1, tier: 2, facility: 'forge', facilityLevel: 2, cost: 24, need: { black_iron: 6, core: 3, wood: 3 }, days: 3.5, reveal: { item: 'star_blade_pattern' } },
+  { id: 'r_star_blade', result: 'star_blade', count: 1, tier: 2, facility: 'forge', facilityLevel: 2, cost: 35, need: { black_iron: 9, ore: 5, core: 4, wood: 3 }, days: 4, reveal: { item: 'star_blade_pattern' } },
+  { id: 'r_hide_shield', result: 'hide_shield', count: 1, tier: 0, facility: 'forge', cost: 8, need: { wood: 4, hide: 3 }, days: 1.25, requiresShownHide: true },
   { id: 'r_resin_pill', result: 'resin_pill', count: 3, tier: 1, facility: 'furnace', formula: 'formula_resin', cost: 6, need: { wood: 3, reed: 3, qi_core: 1 }, days: 2 },
   { id: 'r_leaf_pill', result: 'leaf_pill', count: 3, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_leaf', cost: 10, need: { reed: 4, kiln_clay: 2, wood: 2, qi_core: 2 }, days: 3 },
   { id: 'r_jade_pill', result: 'jade_pill', count: 3, tier: 3, facility: 'furnace', facilityLevel: 3, formula: 'formula_jade', cost: 16, need: { reed: 5, core: 2, wood: 2, foundation_core: 1, beast_eye: 1 }, days: 4 },
@@ -312,10 +317,12 @@ const sites = [
     creatures: {
       mud_beast: { start: 1, cap: 3, interval: 4, growth: 1, curve: 'wild' },
       reed_fox: { start: 2, cap: 4, interval: 4, growth: 1, curve: 'wild' },
+      reed_hare: { start: 2, cap: 5, interval: 3.25, growth: 1, curve: 'wild' },
     },
     creatureText: {
       mud_beast: { present: '近岸冒一溜水泡，几片硬鳞擦过露出水面的石头。', absent: '近岸平静，水面看不到鳞片。' },
       reed_fox: { present: '干埂有新兽印，苇梗上还挂着短毛。', absent: '干埂只剩几道磨浅的旧兽印。' },
+      reed_hare: { present: '背水坡的矮苇一簇簇晃动。有几对白耳贴着地面，从苇根间挪过去。', absent: '背水坡的苇根还留着浅浅的啃痕。' },
     },
     emptyText: '水眼没有动静，干埂只剩浅兽印和拾空的碎枝。另一头仍有几块排齐的石头伸进芦苇。' },
   { id: 'old_fire', region: 'marsh', name: '背雨石渠', afterChoices: ['mud_track:3'],
@@ -327,8 +334,8 @@ const sites = [
     } },
   { id: 'reed_ferryman', region: 'marsh', name: '渡工的刨木滩', afterChoices: ['sunk_pack:1', 'bank_watch:1'], once: [0, 2],
     stocks: { reed: { start: 3, cap: 5, interval: 5, growth: 2, choices: [3] } },
-    creatures: { marsh_ghost: { start: 1, cap: 2, interval: 3, growth: 1 } },
-    creatureText: { marsh_ghost: { present: '对岸的影子贴着白苇的浅滩来回走，把过水的石路挡住了。渡工停了刀，盯着它看。', absent: '对岸的石路空下来。水从白苇间流走。' } },
+    creatures: { marsh_ghost: { start: 1, cap: 2, interval: 5, growth: 1 } },
+    creatureText: { marsh_ghost: { present: '对岸的影子贴着白苇的浅滩来回走，把过水的石路挡住了。渡工停了刀，往对岸看。', absent: '对岸的石路空下来。水从白苇间流走。' } },
     afterOnceText: { 0: '渡工把接上新柄的桨平码在石头上。他脚边另有把翻到背面的旧桨。对岸浅石围着一丛白苇。' } },
   { id: 'bank_watch', region: 'marsh', name: '矮石堤', once: [1, 2], protectedArena: true,
     creatures: { bank_runner: { start: 1, cap: 1, interval: 0, growth: 0 } },
@@ -373,8 +380,18 @@ const sites = [
   { id: 'low_tide', region: 'ford', name: '闸外浅阶',
     stocks: { core: { label: '浅阶灵晶', start: 2, cap: 3, interval: 2, growth: 1, choices: [0] },
       core_silt: { item: 'core', label: '槽底灵晶', start: 2, cap: 3, interval: 2, growth: 1, choices: [2] } },
-    creatures: { rope_eel: { start: 1, cap: 3, interval: 2.5, growth: 1, curve: 'wild' } },
-    creatureText: { rope_eel: { present: '下游船绳时松时紧，深槽外的水不时打旋。', absent: '下游船绳浮在水上，无物牵动。' } },
+    creatures: {
+      rope_eel: { start: 1, cap: 3, interval: 2.5, growth: 1, curve: 'wild' },
+      ford_silver_dace: { start: 3, cap: 5, interval: 3.25, growth: 1, curve: 'wild' },
+      ford_shale_crab: { start: 2, cap: 4, interval: 5, growth: 1, curve: 'wild' },
+      mud_beast: { start: 1, cap: 3, interval: 6, growth: 1, curve: 'wild' },
+    },
+    creatureText: {
+      rope_eel: { present: '下游船绳时松时紧，深槽外的水不时打旋。', absent: '下游船绳浮在水上，无物牵动。' },
+      ford_silver_dace: { present: '东边浅湾银光一闪，几条鱼贴着水面转了个弯。', absent: '东边湾底的沙已经澄清，水面没有鱼影。' },
+      ford_shale_crab: { present: '裸露的闸墩挂着几枚灰壳，石缝里又伸出一只带黑纹的钳。', absent: '闸墩的石缝里只挂着几枚旧灰壳。' },
+      mud_beast: { present: '外滩泥地有几道腹鳞拖出的长印，直没入芦根。', absent: '外滩的长印已经被水冲淡。' },
+    },
     emptyText: '浅阶已经扫净，下游的船绳浮着不动。只有浪沫漫过石缝。' },
   { id: 'boat_shade', region: 'ford', name: '没篷的渡舟', once: [1, 2],
     afterOnceText: { 1: '柜子移走了，船底的铁带留下一道擦痕。船里的凳子还干，旧船绳挂在朝水的钩上。灯架熏黑了一半。' } },
@@ -523,6 +540,7 @@ const events = [
     { label: '沿土路上的脚印看看', desc: '脚印一直进了苇丛，矮苇被什么压低了一截。', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', outcome: '脚下的苇秆一响，一只苇尾狐从低处蹿出来。' },
     { label: '踩着石头往苇后探', desc: '水眼背后有几块石头排成一线，像是有人铺过。', days: 0.125, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '拨开最后一丛苇，露出背雨的半截石渠，里面有旧柴火的焦痕。' },
     { label: '捡起土路边的油纸包', desc: '那只狐败退时蹬断了几根苇秆，油纸包从低处滚到了土路边。', afterFight: 'reed_fox', days: 0, loot: { ration: 1 }, outcome: '油纸里有过路人落下的一份干粮，系绳还好好的。' },
+    { label: '到背水坡猎白耳兔', days: 0.25, enemy: 'reed_hare', outcome: '一对白耳从短苇里抬起。野兔绕过苇根，沿着斜坡猛蹬过来。' },
   ] },
   { id: 'old_fire', name: '背雨石渠', text: '半截石渠能挡雨。砌进渠脚的小石炉朝水开口，几片瓦挡着风，炉沿留着浅浅的烟痕。', choices: [
     { label: '添柴歇脚', desc: '石炉还通风，挨着背风一侧便能烤火。', need: { wood: 1 }, consume: true, days: 0.5, coins: 0, hp: 6, qi: 4, insight: 0, loot: {}, enemy: null, outcome: '火把石壁烘热，湿鞋上慢慢蒸出白气。' },
@@ -610,6 +628,9 @@ const events = [
     { label: '握着船绳扫出槽底的灵晶', desc: '槽底粗晶沉得深，握紧船绳才够得着。',
       ambush: { enemy: 'rope_eel', chance: 0.3, outcome: '船绳猛地一绷，缠舟兽从水槽里翻了上来。' },
       days: 1, insight: 2, loot: { core: 3 }, outcome: '你扶稳船绳，顺水扫开碎砂。亮晶咔嗒碰在石坎底下。' },
+    { label: '去东边浅湾捉银背鱼', days: 0.375, enemy: 'ford_silver_dace', outcome: '你截在回水边。银背鱼跳出水面，背鳍朝掌心刮过来。' },
+    { label: '从闸墩石缝引出黑纹蟹', days: 0.5, enemy: 'ford_shale_crab', outcome: '石缝里伸出一对黑钳，蟹拖着满身湿砂横挤出来。' },
+    { label: '沿外滩拖印找泥鳞兽', days: 0.5, enemy: 'mud_beast', outcome: '压倒的芦苇突然掀开，泥鳞兽从根下扑上硬地。' },
   ] },
   { id: 'boat_shade', name: '没篷的渡舟', revisit: true, text: '老船卡在闸边，船舷正好挡着风。旧船绳挂在外侧，绳圈上结了一层白盐。船头的灯架熏黑了一半。', choices: [
     { label: '坐上船里的凳子歇脚', days: 1, coins: 0, hp: 13, qi: 8, insight: 1, loot: {}, enemy: null, outcome: '船舷挡住了风。你坐到水势变缓，手脚才不再发冷。' },
@@ -740,7 +761,7 @@ const events = [
   { id: 'deep_vein', name: '横肩偏井', text: '井边挤着两道肩形黑岩，遮住一只倒扣的旧工具柜。碎车槽尽头有裸露的矿脉，窄槽从右边还能绕到石井外。', choices: [
     { label: '进偏井敲开卡住的车槽', days: 1, enemy: 'vein_sentinel', outcome: '一声钝响落地。两片黑岩并成一道石身，挡住了车眼。' },
     { label: '沿旧窄槽绕回路面', days: 0.125, insight: 1, loot: {}, outcome: '鞋底踏出了湿亮的车痕，你绕回宽一些的路。' },
-    { label: '翻开井外的旧工具柜', desc: '败退的矿傀撞开了柜架，柜子滑到了井外，盖子裂出一道缝。', afterFight: 'vein_sentinel', days: 0, loot: { star_blade: 1, star_blade_pattern: 1 }, outcome: '矿队留下的暗星刀还卡在木托上。油布里包着一张照着实刀画的锻打样，连刀口的分厚都标好了。' },
+    { label: '翻开井外的旧工具柜', desc: '败退的矿傀撞开了柜架，柜子滑到了井外，盖子裂出一道缝。', afterFight: 'vein_sentinel', days: 0, loot: { star_blade_pattern: 1 }, outcome: '木托里是一把断成三截的矿刀，刀身已经锈穿。油布倒还护着锻打图，连断口两边该锻多厚都标了。' },
     { label: '顺碎车槽去剔松矿脉', desc: '碎车槽内侧是一条暗金细脉，旁边挨着夹在石里的亮晶。', guardedBy: 'vein_sentinel', days: 1, insight: 2, loot: { black_iron: 4, core: 1 }, outcome: '你清开碎车边的松屑，从石壁剔下暗金和独立成片的灵晶。' },
   ] },
 
@@ -804,6 +825,15 @@ const events = [
 ];
 
 const enemies = [
+  { id: 'reed_hare', name: '白耳兔', tags: ['beast', 'furred'], tier: 0, hp: 18, atk: 5, def: 0,
+    intents: [{ name: '蹬土扑来', kind: 'attack', mult: 1 }, { name: '缩身伏地', kind: 'guard', mult: 1.2 }, { name: '蹬坡撞腿', kind: 'heavy', mult: 1.45 }],
+    insight: 1, loot: { beast_meat: 2, qi_core: 1 }, desc: '白耳几乎和枯苇一个颜色。腿劲不小，这种小兽的肉炖汤很合适。' },
+  { id: 'ford_silver_dace', name: '银背鱼', tags: ['beast', 'scaled'], tier: 0, hp: 20, atk: 6, def: 1,
+    intents: [{ name: '跃水划鳍', kind: 'attack', mult: 1 }, { name: '伏水蹿撞', kind: 'heavy', mult: 1.45 }],
+    insight: 1, loot: { beast_meat: 2, qi_core: 1 }, desc: '浅水里游得急，跃出水面时背鳍最锋利。' },
+  { id: 'ford_shale_crab', name: '黑纹蟹', tags: ['beast', 'scaled'], tier: 1, hp: 35, atk: 8, def: 5,
+    intents: [{ name: '合钳挡脸', kind: 'guard', mult: 1.55 }, { name: '侧身扫钳', kind: 'attack', mult: 1 }, { name: '举钳砸石', kind: 'heavy', mult: 1.55 }],
+    insight: 3, loot: { beast_meat: 1, hide: 2, qi_core: 2 }, desc: '壳上的黑纹压着钳根，双钳高抬时会露出接缝。硬壳打磨后能补护具。' },
   { id: 'mud_beast', name: '泥鳞兽', tags: ['beast', 'scaled'], tier: 0, hp: 25, atk: 7, def: 2, intents: [{ name: '偏头啃咬', kind: 'attack', mult: 1 }, { name: '伏身猛扑', kind: 'heavy', mult: 1.7 }, { name: '蜷尾守鳞', kind: 'guard', mult: 1.35 }, { name: '掀尾扫腿', kind: 'attack', mult: 1 }], insight: 3, loot: { beast_meat: 2, hide: 2, qi_core: 1 }, desc: '伏身后会扑向脚下，硬鳞收拢时适合恢复真气或蓄势。' },
   { id: 'reed_fox', name: '苇尾狐', tags: ['beast', 'furred'], tier: 0, hp: 24, atk: 6, def: 1, intents: [{ name: '斜掠扑咬', kind: 'attack', mult: 1 }, { name: '团尾护腹', kind: 'guard', mult: 1.4 }, { name: '伏脊跳扑', kind: 'heavy', mult: 1.5 }], insight: 2, loot: { beast_meat: 1, hide: 1, qi_core: 1 }, desc: '尾上的厚毛扫起了枯苇。它会先绕着干埂寻找扑咬的空当。' },
   { id: 'marsh_ghost', name: '巡岸水鬼', tags: ['spirit'], tier: 0, hp: 28, atk: 8, def: 2, intents: [{ name: '抱臂裹雾', kind: 'guard', mult: 1.4 }, { name: '伸指拖拽', kind: 'attack', mult: 1 }, { name: '借雾扑面', kind: 'heavy', mult: 1.6 }], insight: 4, loot: { qi_core: 1 }, desc: '开场先抱臂结雾，准备好再把它拖出水边。' },
@@ -955,7 +985,7 @@ const regionDetails = { ...riverContent.regionDetails, ...zhaoContent.regionDeta
 const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => content.sects ?? []);
 const mechanisms = puzzleContent.mechanisms;
 
-for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent]) {
+for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent, ferryContent, hazardContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -963,6 +993,27 @@ for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzz
 }
 sites.push(...extendSites);
 events.push(...extendEvents);
+
+const solitaryTerritories = new Set(['river_cliff_kite', 'snow_warden', 'ember_yak']);
+const twoHandedClasses = new Set(['bow', 'crossbow', 'spear', 'staff']);
+const oneHandedWeapons = new Set(['cudgel', 'short_spear', 'ferry_pole']);
+for (const item of gear) {
+  if (item.slot === 'weapon') item.hands = twoHandedClasses.has(item.weaponClass) && !oneHandedWeapons.has(item.id) ? 2 : 1;
+}
+const eventsBySite = new Map(events.map((event) => [event.id, event]));
+const sparringEnemies = new Set(enemies.filter((enemy) => enemy.sparring).map((enemy) => enemy.id));
+for (const site of sites) {
+  if (!site.creatures || site.protectedArena) continue;
+  const guards = new Set(eventsBySite.get(site.id)?.choices.map((choice) => choice.guardedBy));
+  for (const [id, pool] of Object.entries(site.creatures)) {
+    if (!pool.interval || !pool.growth || sparringEnemies.has(id) || solitaryTerritories.has(id)) continue;
+    site.creatures[id] = {
+      ...pool,
+      start: pool.start > 0 ? pool.start + 1 : 0,
+      cap: pool.cap + (guards.has(id) ? 1 : 2),
+    };
+  }
+}
 
 const data = { realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms, tournament: tournamentData };

@@ -464,6 +464,17 @@ test('chosen sites retain depletion, and only elapsed days replenish their local
   assert.ok(smith.inventory.hide_coat);
   assert.ok(view(smith).discoveredRecipes.includes('r_hide_coat'));
   seek(hunting, 'mud_track');
+  assert.equal(view(hunting).visibleChoices[0].available, true);
+  supplyFixture(hunting, { salve: 5 });
+  for (let attempts = 0; huntCount(hunting) > 0 && attempts < 8; attempts++) {
+    choose(hunting, 0);
+    while (hunting.combat) {
+      const intent = view(hunting).intent.kind;
+      if (intent === 'heavy') play(hunting, 'guard');
+      else if (hunting.hp < 15) play(hunting, 'use', { id: 'salve' });
+      else play(hunting, 'attack');
+    }
+  }
   assert.equal(view(hunting).visibleChoices[0].available, false);
   assert.match(view(hunting).currentEvent.text, /平静|看不到鳞片/);
   assert.equal(act(hunting, 'choose', { index: 0 }).ok, false);
@@ -472,7 +483,7 @@ test('chosen sites retain depletion, and only elapsed days replenish their local
     feed(hunting, 10);
     play(hunting, 'wait');
   }
-  assert.equal(huntCount(hunting), initial);
+  assert.equal(huntCount(hunting), 1);
   feed(hunting, 20);
   seek(hunting, 'mud_track');
   assert.equal(view(hunting).visibleChoices[0].available, true);
@@ -522,6 +533,71 @@ test('a guarded herb is gathered separately from the spirit that blocks the bank
   play(state, 'take', { id: 'reed', count: 3 });
   assert.equal(state.inventory.reed, 3);
   assert.equal(state.localPools.reed_ferryman.stocks.reed.count, preHarvest - 3);
+});
+
+test('a crafted shield gives up two-handed weapons and wears only when bracing a heavy hit', () => {
+  const state = createGame();
+  supplyFixture(state, { ore: 1 });
+  workForge(state, 'r_hide_shield');
+  play(state, 'equip', { id: 'hide_shield' });
+  supplyFixture(state, { reed_bow: 1, knife: 1 });
+  state.durability.reed_bow = 10;
+  state.durability.knife = 10;
+  assert.match(act(state, 'equip', { id: 'reed_bow' }).message, /先卸下副手/);
+  play(state, 'unequip', { slot: 'offhand' });
+  play(state, 'equip', { id: 'reed_bow' });
+  assert.match(act(state, 'equip', { id: 'hide_shield' }).message, /双手兵刃/);
+  play(state, 'equip', { id: 'knife' });
+  play(state, 'equip', { id: 'hide_shield' });
+  feed(state, 60);
+  walk(state, 'marsh');
+  seek(state, 'mud_track');
+  choose(state, 0);
+  const initialWear = state.durability.hide_shield;
+  play(state, 'guard');
+  assert.equal(state.durability.hide_shield, initialWear);
+  const before = structuredClone(state);
+  before.equipment.offhand = null;
+  assert.match(act(state, 'combatEquip', { id: 'reed_bow' }).message, /先卸下副手/);
+  const protectedHit = play(state, 'guard');
+  const bareHit = play(before, 'guard');
+  assert.equal(state.durability.hide_shield, initialWear - 1);
+  assert.match(protectedHit.message, /包革小盾/);
+  assert.equal(protectedHit.damageTaken, Math.max(0, bareHit.damageTaken - 3));
+});
+
+test('an expedition can hunt and turn its meat into road food at the local inn', () => {
+  const state = createGame();
+  play(state, 'buy', { id: 'knife' });
+  play(state, 'equip', { id: 'knife' });
+  walk(state, 'marsh');
+  seek(state, 'mud_track');
+  choose(state, 5);
+  while (state.combat) play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+  pickGathered(state, view(state).groundLoot);
+  assert.equal(state.inventory.beast_meat, 2);
+  choose(state, 5);
+  while (state.combat) play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+  pickGathered(state, view(state).groundLoot);
+  assert.equal(state.inventory.beast_meat, 4);
+  choose(state, 1);
+  feed(state, 65);
+  walk(state, 'pale_shoal');
+  walk(state, 'willow_post');
+  seek(state, 'willow_yard');
+  const initialMoney = state.coins;
+  const initialDay = state.day;
+  const initialWood = state.inventory.wood;
+  play(state, 'choose', { index: 2 });
+  assert.equal(state.coins, initialMoney - 3);
+  assert.equal(state.day, initialDay + 0.75);
+  assert.equal(state.inventory.wood, initialWood - 1);
+  assert.equal(state.inventory.beast_meat, 1);
+  assert.equal(state.inventory.meat_broth, 3);
+  assert.equal(view(state).visibleChoices.find(({ index }) => index === 2).available, false);
+  const hunger = state.satiety;
+  play(state, 'eat', { id: 'meat_broth' });
+  assert.equal(state.satiety, Math.min(100, hunger + 44));
 });
 
 test('satiety follows game time and only a deliberate meal consumes food', () => {
