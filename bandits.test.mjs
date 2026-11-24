@@ -143,6 +143,9 @@ test('ferry units do not roll for bandits and interrupted journeys only consume 
 
 const allGear = Object.fromEntries(data.gear.map((entry) => [entry.id, entry]));
 const roadPolicyKit = { data, records: { gear: allGear },
+  banditDenPopulation: (state, id) => Object.values(data.sites.find((site) => site.id === id).creatures)
+    .reduce((sum, { start }) => sum + start, 0) -
+    Object.values(state.siteVictories[id] ?? {}).reduce((sum, won) => sum + won, 0),
   activeGear: (state) => Object.values(state.equipment).filter((id) => state.durability[id] > 0).map((id) => allGear[id]) };
 const riskyLeg = { key: 'marsh|ridge' };
 

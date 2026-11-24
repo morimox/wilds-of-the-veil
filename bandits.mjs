@@ -6,6 +6,11 @@ export const banditRules = Object.freeze({
   maxConcealment: 0.45,
   ordinaryGearChance: 0.24,
   richGearChance: 0.75,
+  recruitDelay: 18,
+  recruitInterval: 6,
+  leaderlessDelay: 36,
+  leaderlessInterval: 12,
+  leaderlessPatrol: 0.55,
 });
 
 export const roadKey = (a, b) => [a, b].sort().join('|');
@@ -38,6 +43,39 @@ function crewRecord(state, id) {
   return (state.banditCrews[id] ??= { encounters: 0, defeated: [] });
 }
 
+function lostLeader(state, crew, kit) {
+  const boss = kit.data.roadBandits.dens[crew.den]?.boss;
+  return boss && (state.siteVictories[crew.den]?.[boss] ?? 0) > 0;
+}
+
+function recruitmentTerms(state, crew, kit) {
+  if (lostLeader(state, crew, kit)) return { delay: banditRules.leaderlessDelay, interval: banditRules.leaderlessInterval };
+  return crew.recruit ?? { delay: banditRules.recruitDelay, interval: banditRules.recruitInterval };
+}
+
+function recruitsByNow(state, id, kit) {
+  const record = state.banditCrews[id];
+  if (!record?.defeated.length || record.nextRecruitDay == null || state.day < record.nextRecruitDay) return record;
+  const crew = kit.data.roadBandits.crews[id];
+  const { interval } = recruitmentTerms(state, crew, kit);
+  const amount = Math.min(record.defeated.length, Math.floor((state.day - record.nextRecruitDay) / interval) + 1);
+  const recruits = { ...record.recruits };
+  for (const key of record.defeated.slice(0, amount)) recruits[key] = (recruits[key] ?? 0) + 1;
+  const defeated = record.defeated.slice(amount);
+  return { ...record, defeated, recruits, nextRecruitDay: defeated.length ? record.nextRecruitDay + amount * interval : null };
+}
+
+export function deferBanditRecruits(state, siteId, enemyId, kit) {
+  if (kit.data.roadBandits.dens[siteId]?.boss !== enemyId) return;
+  for (const [id, crew] of Object.entries(kit.data.roadBandits.crews)) {
+    if (crew.den !== siteId) continue;
+    const record = recruitsByNow(state, id, kit);
+    if (!record) continue;
+    state.banditCrews[id] = record;
+    if (record.defeated.length) record.nextRecruitDay = Math.max(record.nextRecruitDay ?? 0, state.day + banditRules.leaderlessDelay);
+  }
+}
+
 function unresolvedBandit(crewId, enemies, state) {
   const roster = crewRoster(enemies);
   const defeated = new Set(state.banditCrews[crewId]?.defeated);
@@ -46,7 +84,9 @@ function unresolvedBandit(crewId, enemies, state) {
 }
 
 function memberLootSeed(state, bandit) {
-  return [...`${bandit.crew}:${bandit.member}`].reduce(
+  const replacement = state.banditCrews[bandit.crew]?.recruits?.[bandit.member] ?? 0;
+  const identity = `${bandit.crew}:${bandit.member}${replacement ? `:${replacement}` : ''}`;
+  return [...identity].reduce(
     (hash, character) => Math.imul(hash ^ character.charCodeAt(0), 16777619) >>> 0,
     state.banditLootSeed,
   );
@@ -68,18 +108,21 @@ export function roadBanditRisk(state, leg, kit) {
   if (!profile) return null;
   const crew = kit.data.roadBandits.crews[profile.crew];
   const den = kit.data.roadBandits.dens[crew.den];
-  const routed = den ? Object.values(state.siteVictories[crew.den] ?? {}).reduce((sum, n) => sum + n, 0) : 0;
+  const leaderless = lostLeader(state, crew, kit);
+  const livingGuards = den ? (kit.banditDenPopulation?.(state, crew.den) ?? den.heads) : 0;
+  const routed = den ? Math.max(0, den.heads - livingGuards) : 0;
   const population = crew.members.reduce((sum, number) => sum + number, 0);
-  const defeated = state.banditCrews[profile.crew]?.defeated.length ?? 0;
+  const defeated = recruitsByNow(state, profile.crew, kit)?.defeated.length ?? 0;
   const remaining = Math.max(0, population - defeated);
-  const patrol = den ? 1 - Math.min(1, routed / den.heads) * (1 - den.minFactor) : 1;
+  const maximumPatrol = leaderless ? banditRules.leaderlessPatrol : 1;
+  const patrol = den ? den.minFactor + (maximumPatrol - den.minFactor) * Math.min(1, livingGuards / den.heads) : 1;
   const avoidance = kit.activeGear(state)
     .flatMap(({ trait, traits = [] }) => [trait, ...traits])
     .reduce((sum, trait) => sum + (trait?.kind === 'dodge' ? trait.bonus : 0), 0);
   const concealment = Math.min(banditRules.maxConcealment, avoidance * banditRules.concealmentFactor);
   return { chance: profile.chance * (remaining / population) * patrol * (1 - concealment), crew: profile.crew,
     riskText: !remaining ? '近来已看不见守路伸手的人。'
-      : routed >= (den?.heads ?? Infinity) ? '坡寨散了，各处只偶尔还见人盘桓。'
+      : leaderless ? '坡寨换了人看门，路边的贼哨稀了。'
       : defeated >= population / 2 ? '这一带拦路的人已经少多了。'
       : routed ? '路边的贼哨少了。' : profile.riskText };
 }
@@ -112,7 +155,8 @@ function stopForBandit(state, leg, crewId, kit) {
   const enemy = fixed?.enemy ?? pool.enemy;
   const stage = Math.floor(kit.records.enemies[enemy].tier / 3);
   const nonThreat = Boolean(fixed && fixed.fee != null && stage !== grade);
-  const fee = fixed ? (nonThreat ? null : fixed.fee ?? null) : range(state, pool.fee);
+  const fee = fixed ? (nonThreat ? null : fixed.fee ?? null)
+    : range({ roadSeed: memberLootSeed(state, { crew: crewId, member: member.key }) ^ 0x85a3ef1f }, pool.fee);
   const onStoryRoad = fixed && roadKey(fixed.a, fixed.b) === leg.key;
   const unexpected = stage < grade
     ? '他先打量你背光的一侧，伸手时并没看清护具的纹样。'
@@ -130,6 +174,8 @@ function stopForBandit(state, leg, crewId, kit) {
 export function checkRoadBanditStep(state, leg, index, kit) {
   const profile = roadBanditRisk(state, leg, kit);
   if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1)) {
+    const roster = recruitsByNow(state, profile.crew, kit);
+    if (roster) state.banditCrews[profile.crew] = roster;
     const pause = stopForBandit(state, leg, profile.crew, kit);
     if (pause) return pause;
   }
@@ -279,7 +325,14 @@ export function winRoadBandit(state, enemy, kit) {
     return { ...kit.say(state, lead + bandit.intro), roadInterrupted: true };
   }
   if (story) return resolveBandit(state, story, story.afterWin, lead + (story.afterWin?.outcome ?? ''), kit);
-  crewRecord(state, bandit.crew).defeated.push(bandit.member);
+  const record = recruitsByNow(state, bandit.crew, kit) ?? crewRecord(state, bandit.crew);
+  state.banditCrews[bandit.crew] = record;
+  record.defeated.push(bandit.member);
+  if (record.nextRecruitDay == null) {
+    const crew = kit.data.roadBandits.crews[bandit.crew];
+    const { delay } = recruitmentTerms(state, crew, kit);
+    record.nextRecruitDay = state.day + delay;
+  }
   const lootRoll = { roadSeed: memberLootSeed(state, bandit) };
   const rich = draw(lootRoll) < pool.richChance;
   const coins = range(lootRoll, rich ? pool.richCash : pool.cash);

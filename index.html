@@ -488,7 +488,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=29" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=30" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -3686,23 +3686,23 @@ const roadsideCart = 'bandit_marsh_lamp';
 const greyGully = 'grey_gully';
 
 const crews = {
-  [greyGully]: { name: '灰沟坡寨', members: [16, 12, 8, 4, 3, 2, 1, 1, 0], den,
+  [greyGully]: { name: '灰沟坡寨', members: [16, 12, 8, 5, 4, 2, 0, 0, 0], den,
     headquarters: { region: 'screen_slope', name: '灰沟坡寨' } },
-  ferryHills: { name: '桥索边的抬木帮', members: [15, 11, 7, 4, 2, 1, 0, 0, 0],
-    headquarters: { region: 'pine_ridge', name: '断桥下的挡雨棚' } },
-  quarryTracks: { name: '旧矿道的散伙矿客', members: [8, 8, 7, 6, 5, 4, 3, 2, 1],
+  ferryHills: { name: '桥索边的抬木帮', members: [16, 14, 10, 0, 0, 0, 0, 0, 0],
+    headquarters: { region: 'pine_ridge', name: '断桥下的挡雨棚' }, recruit: { delay: 16, interval: 6 } },
+  quarryTracks: { name: '旧矿道的散伙矿客', members: [2, 2, 3, 4, 5, 5, 10, 8, 5],
     headquarters: { region: 'black_mine', name: '废绞车后屋' } },
-  ferryWood: { name: '浅水红绳帮', members: [9, 10, 7, 5, 4, 3, 2, 1, 1],
+  ferryWood: { name: '浅水红绳帮', members: [10, 10, 7, 5, 4, 3, 2, 1, 0],
     headquarters: { region: 'glass_bank', name: '晒网滩外的棚船' } },
-  reedBank: { name: '青埂芦窝的伙计', members: [13, 11, 8, 5, 3, 1, 1, 0, 0],
+  reedBank: { name: '青埂芦窝的伙计', members: [13, 11, 8, 6, 3, 1, 0, 0, 0],
     headquarters: { region: 'green_dyke', name: '青埂北面的堆草房' } },
   weirReef: { name: '断堰捆船帮', members: [6, 7, 7, 7, 6, 5, 4, 3, 2],
     headquarters: { region: 'burnt_weir', name: '堰柱上的旧守水屋' } },
-  saltPath: { name: '盐路拾篓人', members: [12, 9, 8, 7, 5, 3, 2, 1, 0],
-    headquarters: { region: 'salt_ledger_barrows', name: '担盐岗背坡的空盐仓' } },
-  windBridge: { name: '空音桥背风帮', members: [6, 6, 8, 8, 7, 6, 5, 4, 3],
+  windBridge: { name: '盐路背风帮', members: [10, 9, 9, 8, 6, 5, 3, 2, 1],
     headquarters: { region: 'dry_sound_bridge', name: '空音桥底的石屋' } },
-  tentDunes: { name: '断帐沟的过夜客', members: [12, 9, 7, 6, 4, 3, 2, 1, 0],
+  glassRidge: { name: '落琉洼的黑篷客', members: [0, 0, 0, 0, 0, 0, 6, 5, 3],
+    headquarters: { region: 'glass_hail_sink', name: '暗晶壁下的黑篷' }, recruit: { delay: 26, interval: 11 } },
+  tentDunes: { name: '断帐沟的过夜客', members: [19, 15, 10, 0, 0, 0, 0, 0, 0],
     headquarters: { region: 'silk_tent_road', name: '旧帐道的背风窝棚' } },
 };
 
@@ -3743,15 +3743,15 @@ const crewRoads = {
     ['rope_sands', 'burnt_weir', 0.07, '沙路越过几根拴索的木桩，堰脚还有一排断柱。'],
     ['burnt_weir', 'beacon_reefs', 0.085, '内堰到外礁的岸坎下捆过货箱，沙里还埋着新断的绳。'],
   ],
-  saltPath: [
+  windBridge: [
     ['salt_ledger_barrows', 'stillwell_mouth', 0.055, '背阴的盐袋架旁有两道窄脚印。'],
     ['salt_ledger_barrows', 'chalk_hoof_trail', 0.05, '过山的白石道绕过一层风积沙，旁边有歇过脚的痕迹。'],
     ['stillwell_mouth', 'dry_sound_bridge', 0.055, '盐井外拴着运货绳，绳后有一面裂开的石墙。'],
-  ],
-  windBridge: [
     ['wind_slate', 'dry_sound_bridge', 0.065, '石板夹出的路一直通到桥肩，最窄处不好回身。'],
     ['dry_sound_bridge', 'cold_kiln', 0.095, '冷窑坡下那几个雨棚，近日有人重新补了草帘。'],
     ['wind_slate', 'cold_kiln', 0.06, '石板背风的一排小孔边积着新鞋印。'],
+  ],
+  glassRidge: [
     ['cold_kiln', 'glass_hail_sink', 0.055, '窑道被砂流冲出几道浅岔口，地面没有新路牌。'],
     ['hanging_vein', 'glass_hail_sink', 0.06, '浅梁下的矿包曾有人打开过，麻绳留在石上。'],
   ],
@@ -3875,18 +3875,22 @@ const fixed = [
   },
 ];
 
-const resident = (start) => ({ start, cap: start, interval: 0, growth: 0, fixedPopulation: true });
+const resident = (start, interval = 0) => ({ start, cap: start, interval, growth: interval > 0 ? 1 : 0, fixedPopulation: true });
 const sites = [
   { id: roadsideCart, name: '北堤歇车处', region: 'marsh' },
   { id: den, name: '灰沟坡寨', region: 'screen_slope', afterBandit: den, once: [4, 5, 6, 7],
-    creatures: { [scout]: resident(8), [sentry]: resident(8), [carpenter]: resident(6), [leader]: resident(1) },
+    creatures: { [scout]: resident(8, 28), [sentry]: resident(8, 32), [carpenter]: resident(6, 36), [leader]: resident(1) },
     creatureText: {
-      [scout]: { present: '外栅的哨绳不时抖动，灰沟深处也有人应声。', absent: '栅外哨绳垂回地面，站在灰沟能看见棚门。' },
+      [scout]: { present: '外栅的哨绳轻轻抖动，灰沟深处传来短矛碰石的声音。', absent: '栅外哨绳垂在地上，站在灰沟能看见棚门。' },
       [sentry]: { present: '棚里有几道火光，门前的平石被铁箍磕出新痕。', absent: '棚门已经推开，露出后头搭了木架的货廊。' },
-      [carpenter]: { present: '长货廊的木架间有乱脚步。有人把扁担竖靠在货箱旁，正往里传话。', absent: '没人再从木架间出来，贴着两侧货箱就能去掌账的里屋。' },
+      [carpenter]: { present: '长货廊的木架后有脚步声，扁担偶尔擦过木柱。', absent: '木架间没了脚步声。贴着廊边就能走到原先掌账的里屋。' },
       [leader]: { present: '挂货签的里间还有人翻账。方才有人隔门喊过一声「许爷」，里头只响了一下刀鞘。', absent: '里间已经静下来，桌上的断凳腿横在地上。' },
     },
-    afterOnceText: { 4: '货柜已拖到棚外。外栅拆了一半，从坡路上就能看见棚顶。', 5: '棚门敞开。肯下山交代的人已经离开，灰沟再没有换哨的声响。' },
+    afterOnceText: {
+      4: '外栅边那只倒扣的木盆还在。从那里往里能看见长长的货廊。',
+      5: '先前跟巡山人下去的伤号已经离开。棚门后还留着他们解下的旧哨绳。',
+    },
+    choiceText: { 4: { after: '货柜和钱匣早已搬下山。廊下那几块方方的柜脚印里落了新砂。' } },
   },
 ];
 
@@ -3904,16 +3908,16 @@ const events = [
         outcome: '灰沟里的细铁响了一声，放哨人提着短矛翻过栅脚。' },
       { label: '沿棚门的平石进去', guardedBy: scout, days: 0.25, enemy: sentry,
         outcome: '火盆就在门内，带铁箍的袖子伸过火光，将你往门外逼。' },
-      { label: '贴着货架穿过长廊', desc: '廊两边堆了没解绳的货箱，中间只够一人过。', guardedBy: [scout, sentry], days: 0.25, enemy: carpenter,
+      { label: '贴着货架穿过长廊', desc: '廊两边排着几架粗木货架，中间只够一人过。', guardedBy: [scout, sentry], days: 0.25, enemy: carpenter,
         outcome: '木架背后挤出一个抬货人。他抄起扁担，逼你退回廊口。' },
       { label: '推开挂货签的里屋门', guardedBy: [scout, sentry, carpenter], days: 0.25, enemy: leader,
         outcome: '许涧把门边插着的货签折断，又用脚把空凳拨到桌前。「叫我许涧的多，叫我贼王的也有。货在廊下，想搬，得先过这张桌。」他才把长刀从桌底抽出来。' },
-      { label: '把藏赃的货柜拖出棚门', afterFight: leader, days: 0.375, stay: true, coins: 18,
+      { label: '把藏赃的货柜拖出棚门', afterFight: leader, guardedBy: [scout, sentry, carpenter], days: 0.375, stay: true, coins: 180,
         loot: { ration: 4, ore: 6, core: 3, hide: 2 },
-        outcome: '晒盘坡的矿户认出柜上的货签，帮你把有主的货分好。领货的人凑了十八枚灵钱答谢，又分给你几包行粮、寒铁、灵晶和兽革。' },
-      { label: '给伤号留一包干粮，叫他们下坡见巡山人', afterFight: leader, days: 0.25, stay: true,
+        outcome: '晒盘坡的矿户照货签领走失物。货柜夹层还有一只铁匣，账上只写着「寨里公用」。巡山人当场清点，把无人认领的一百八十枚灵钱和几份余货给了你，随后把空匣和货柜一道抬下山。' },
+      { label: '给伤号留一包干粮，叫他们下坡见巡山人', afterFight: leader, guardedBy: [scout, sentry, carpenter], days: 0.25, stay: true,
         need: { ration: 1 }, consume: true,
-        outcome: '几个躲在棚后的伤号拿走干粮，交出换哨的细绳。坡脚的人挨个领他们下山，守路的人把回仓的货先搬到路边。' },
+        outcome: '几个躲在棚后的伤号拿走干粮，交出换哨的细绳。巡山人叫他们沿外栅慢慢走，一个个领下了坡。' },
       { label: '查看哨位旁的粮袋', desc: '矮凳下有一个敞口粮袋，看样子是给换哨的人备的。', guardedBy: scout, days: 0.125, stay: true,
         loot: { ration: 3 }, outcome: '粮袋里还留着三包没启封的干粮。' },
       { label: '把棚门内的药匣拎出来', desc: '几团用过的布旁有只小木匣，匣盖上压着一片干药渣。', guardedBy: [scout, sentry], days: 0.125, stay: true,
@@ -3945,7 +3949,7 @@ const innerStyles = [
 
 const banditContent = {
   items, sites, events, enemies: [...commonEnemies, ...specialEnemies], innerStyles,
-  roadBandits: { roads, pools, fixed, crews, dens: { [den]: { heads: 23, minFactor: 0.13 } } },
+  roadBandits: { roads, pools, fixed, crews, dens: { [den]: { heads: 23, minFactor: 0.13, boss: leader } } },
 };
 
 return banditContent;
@@ -5847,7 +5851,7 @@ function worldAction(state, action, payload, kit) {
 
 return { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView };
 })();
-const { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit } = (() => {
+const { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, deferBanditRecruits } = (() => {
 const banditRules = Object.freeze({
   distanceUnit: 2,
   gearGradeOdds: [[0.95, 0.05, 0], [0.04, 0.92, 0.04], [0, 0.06, 0.94]],
@@ -5856,6 +5860,11 @@ const banditRules = Object.freeze({
   maxConcealment: 0.45,
   ordinaryGearChance: 0.24,
   richGearChance: 0.75,
+  recruitDelay: 18,
+  recruitInterval: 6,
+  leaderlessDelay: 36,
+  leaderlessInterval: 12,
+  leaderlessPatrol: 0.55,
 });
 
 const roadKey = (a, b) => [a, b].sort().join('|');
@@ -5888,6 +5897,39 @@ function crewRecord(state, id) {
   return (state.banditCrews[id] ??= { encounters: 0, defeated: [] });
 }
 
+function lostLeader(state, crew, kit) {
+  const boss = kit.data.roadBandits.dens[crew.den]?.boss;
+  return boss && (state.siteVictories[crew.den]?.[boss] ?? 0) > 0;
+}
+
+function recruitmentTerms(state, crew, kit) {
+  if (lostLeader(state, crew, kit)) return { delay: banditRules.leaderlessDelay, interval: banditRules.leaderlessInterval };
+  return crew.recruit ?? { delay: banditRules.recruitDelay, interval: banditRules.recruitInterval };
+}
+
+function recruitsByNow(state, id, kit) {
+  const record = state.banditCrews[id];
+  if (!record?.defeated.length || record.nextRecruitDay == null || state.day < record.nextRecruitDay) return record;
+  const crew = kit.data.roadBandits.crews[id];
+  const { interval } = recruitmentTerms(state, crew, kit);
+  const amount = Math.min(record.defeated.length, Math.floor((state.day - record.nextRecruitDay) / interval) + 1);
+  const recruits = { ...record.recruits };
+  for (const key of record.defeated.slice(0, amount)) recruits[key] = (recruits[key] ?? 0) + 1;
+  const defeated = record.defeated.slice(amount);
+  return { ...record, defeated, recruits, nextRecruitDay: defeated.length ? record.nextRecruitDay + amount * interval : null };
+}
+
+function deferBanditRecruits(state, siteId, enemyId, kit) {
+  if (kit.data.roadBandits.dens[siteId]?.boss !== enemyId) return;
+  for (const [id, crew] of Object.entries(kit.data.roadBandits.crews)) {
+    if (crew.den !== siteId) continue;
+    const record = recruitsByNow(state, id, kit);
+    if (!record) continue;
+    state.banditCrews[id] = record;
+    if (record.defeated.length) record.nextRecruitDay = Math.max(record.nextRecruitDay ?? 0, state.day + banditRules.leaderlessDelay);
+  }
+}
+
 function unresolvedBandit(crewId, enemies, state) {
   const roster = crewRoster(enemies);
   const defeated = new Set(state.banditCrews[crewId]?.defeated);
@@ -5896,7 +5938,9 @@ function unresolvedBandit(crewId, enemies, state) {
 }
 
 function memberLootSeed(state, bandit) {
-  return [...`${bandit.crew}:${bandit.member}`].reduce(
+  const replacement = state.banditCrews[bandit.crew]?.recruits?.[bandit.member] ?? 0;
+  const identity = `${bandit.crew}:${bandit.member}${replacement ? `:${replacement}` : ''}`;
+  return [...identity].reduce(
     (hash, character) => Math.imul(hash ^ character.charCodeAt(0), 16777619) >>> 0,
     state.banditLootSeed,
   );
@@ -5918,18 +5962,21 @@ function roadBanditRisk(state, leg, kit) {
   if (!profile) return null;
   const crew = kit.data.roadBandits.crews[profile.crew];
   const den = kit.data.roadBandits.dens[crew.den];
-  const routed = den ? Object.values(state.siteVictories[crew.den] ?? {}).reduce((sum, n) => sum + n, 0) : 0;
+  const leaderless = lostLeader(state, crew, kit);
+  const livingGuards = den ? (kit.banditDenPopulation?.(state, crew.den) ?? den.heads) : 0;
+  const routed = den ? Math.max(0, den.heads - livingGuards) : 0;
   const population = crew.members.reduce((sum, number) => sum + number, 0);
-  const defeated = state.banditCrews[profile.crew]?.defeated.length ?? 0;
+  const defeated = recruitsByNow(state, profile.crew, kit)?.defeated.length ?? 0;
   const remaining = Math.max(0, population - defeated);
-  const patrol = den ? 1 - Math.min(1, routed / den.heads) * (1 - den.minFactor) : 1;
+  const maximumPatrol = leaderless ? banditRules.leaderlessPatrol : 1;
+  const patrol = den ? den.minFactor + (maximumPatrol - den.minFactor) * Math.min(1, livingGuards / den.heads) : 1;
   const avoidance = kit.activeGear(state)
     .flatMap(({ trait, traits = [] }) => [trait, ...traits])
     .reduce((sum, trait) => sum + (trait?.kind === 'dodge' ? trait.bonus : 0), 0);
   const concealment = Math.min(banditRules.maxConcealment, avoidance * banditRules.concealmentFactor);
   return { chance: profile.chance * (remaining / population) * patrol * (1 - concealment), crew: profile.crew,
     riskText: !remaining ? '近来已看不见守路伸手的人。'
-      : routed >= (den?.heads ?? Infinity) ? '坡寨散了，各处只偶尔还见人盘桓。'
+      : leaderless ? '坡寨换了人看门，路边的贼哨稀了。'
       : defeated >= population / 2 ? '这一带拦路的人已经少多了。'
       : routed ? '路边的贼哨少了。' : profile.riskText };
 }
@@ -5962,7 +6009,8 @@ function stopForBandit(state, leg, crewId, kit) {
   const enemy = fixed?.enemy ?? pool.enemy;
   const stage = Math.floor(kit.records.enemies[enemy].tier / 3);
   const nonThreat = Boolean(fixed && fixed.fee != null && stage !== grade);
-  const fee = fixed ? (nonThreat ? null : fixed.fee ?? null) : range(state, pool.fee);
+  const fee = fixed ? (nonThreat ? null : fixed.fee ?? null)
+    : range({ roadSeed: memberLootSeed(state, { crew: crewId, member: member.key }) ^ 0x85a3ef1f }, pool.fee);
   const onStoryRoad = fixed && roadKey(fixed.a, fixed.b) === leg.key;
   const unexpected = stage < grade
     ? '他先打量你背光的一侧，伸手时并没看清护具的纹样。'
@@ -5980,6 +6028,8 @@ function stopForBandit(state, leg, crewId, kit) {
 function checkRoadBanditStep(state, leg, index, kit) {
   const profile = roadBanditRisk(state, leg, kit);
   if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1)) {
+    const roster = recruitsByNow(state, profile.crew, kit);
+    if (roster) state.banditCrews[profile.crew] = roster;
     const pause = stopForBandit(state, leg, profile.crew, kit);
     if (pause) return pause;
   }
@@ -6129,7 +6179,14 @@ function winRoadBandit(state, enemy, kit) {
     return { ...kit.say(state, lead + bandit.intro), roadInterrupted: true };
   }
   if (story) return resolveBandit(state, story, story.afterWin, lead + (story.afterWin?.outcome ?? ''), kit);
-  crewRecord(state, bandit.crew).defeated.push(bandit.member);
+  const record = recruitsByNow(state, bandit.crew, kit) ?? crewRecord(state, bandit.crew);
+  state.banditCrews[bandit.crew] = record;
+  record.defeated.push(bandit.member);
+  if (record.nextRecruitDay == null) {
+    const crew = kit.data.roadBandits.crews[bandit.crew];
+    const { delay } = recruitmentTerms(state, crew, kit);
+    record.nextRecruitDay = state.day + delay;
+  }
   const lootRoll = { roadSeed: memberLootSeed(state, bandit) };
   const rich = draw(lootRoll) < pool.richChance;
   const coins = range(lootRoll, rich ? pool.richCash : pool.cash);
@@ -6146,7 +6203,7 @@ function winRoadBandit(state, enemy, kit) {
     roadCoins: coins, ...(loot ? { gathered: goods, gatheredRegion: state.region } : {}) };
 }
 
-return { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit };
+return { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, deferBanditRecruits };
 })();
 const { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead } = (() => {
 const trainingData = [
@@ -8555,6 +8612,7 @@ function finishCombat(state, enemy) {
   if (site?.creatures?.[enemy.id]) {
     spendPool(state, site, 'creatures', enemy.id, 1);
     const wins = (state.siteVictories[site.id] ??= {});
+    deferBanditRecruits(state, site.id, enemy.id, economyKit);
     wins[enemy.id] = (wins[enemy.id] ?? 0) + 1;
     const tracks = state.huntTracks?.[site.id];
     for (const [index, track] of Object.entries(tracks ?? {})) {
@@ -9623,6 +9681,7 @@ const economyKit = {
   isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure, roadProtection,
   saleTerms, activeGear, checkRoadStep: (state, leg, index) => checkRoadBanditStep(state, leg, index, economyKit),
   roadRisk: (state, leg) => roadBanditRisk(state, leg, economyKit),
+  banditDenPopulation: (state, id) => Object.values(poolCounts(state, records.sites[id], 'creatures')).reduce((sum, count) => sum + count, 0),
   eatOnRoad: (state, id) => eat(state, false, id),
 };
 

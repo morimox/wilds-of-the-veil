@@ -107,9 +107,9 @@ const { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, wor
 ${moduleBody(world)}
 return { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView };
 })();
-const { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit } = (() => {
+const { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, deferBanditRecruits } = (() => {
 ${moduleBody(bandits)}
-return { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit };
+return { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, deferBanditRecruits };
 })();
 const { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead } = (() => {
 ${moduleBody(training)}

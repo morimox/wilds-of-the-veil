@@ -1313,17 +1313,17 @@
 | 横生脉（hanging_vein） | 叩石院（sand_bell_cloister） | 普通陆路 |  | 5 | 10 | 1.25 | 0% |  |  |  | hanging_vein\|sand_bell_cloister |  |  |  |
 | 并磨坊（guest_mill） | 断纬帐道（silk_tent_road） | 普通陆路 |  | 4 | 8 | 1 | 5.5% | tentDunes |  | 石磨上游的低沟能一直绕到路旁。 | guest_mill\|silk_tent_road |  |  |  |
 | 伏兔草丘（camel_grass_dunes） | 断纬帐道（silk_tent_road） | 普通陆路 |  | 4 | 8 | 1 | 5% | tentDunes |  | 沿途有松垮的旧帐布，看不清矮丘背面。 | camel_grass_dunes\|silk_tent_road |  |  |  |
-| 担盐岗（salt_ledger_barrows） | 静盐井口（stillwell_mouth） | 普通陆路 |  | 5 | 10 | 1.25 | 5.5% | saltPath |  | 背阴的盐袋架旁有两道窄脚印。 | salt_ledger_barrows\|stillwell_mouth |  |  |  |
-| 白蹄旧道（chalk_hoof_trail） | 担盐岗（salt_ledger_barrows） | 普通陆路 |  | 5 | 10 | 1.25 | 5% | saltPath |  | 过山的白石道绕过一层风积沙，旁边有歇过脚的痕迹。 | chalk_hoof_trail\|salt_ledger_barrows |  |  |  |
+| 担盐岗（salt_ledger_barrows） | 静盐井口（stillwell_mouth） | 普通陆路 |  | 5 | 10 | 1.25 | 5.5% | windBridge |  | 背阴的盐袋架旁有两道窄脚印。 | salt_ledger_barrows\|stillwell_mouth |  |  |  |
+| 白蹄旧道（chalk_hoof_trail） | 担盐岗（salt_ledger_barrows） | 普通陆路 |  | 5 | 10 | 1.25 | 5% | windBridge |  | 过山的白石道绕过一层风积沙，旁边有歇过脚的痕迹。 | chalk_hoof_trail\|salt_ledger_barrows |  |  |  |
 | 静盐井口（stillwell_mouth） | 静盐井心（stillwell_vault） | 普通陆路 |  | 5 | 10 | 1.25 | 0% |  |  |  | stillwell_mouth\|stillwell_vault |  |  |  |
-| 空音桥（dry_sound_bridge） | 静盐井口（stillwell_mouth） | 普通陆路 |  | 5 | 10 | 1.25 | 5.5% | saltPath |  | 盐井外拴着运货绳，绳后有一面裂开的石墙。 | dry_sound_bridge\|stillwell_mouth |  |  |  |
+| 空音桥（dry_sound_bridge） | 静盐井口（stillwell_mouth） | 普通陆路 |  | 5 | 10 | 1.25 | 5.5% | windBridge |  | 盐井外拴着运货绳，绳后有一面裂开的石墙。 | dry_sound_bridge\|stillwell_mouth |  |  |  |
 | 冷炉院（cold_kiln） | 空音桥（dry_sound_bridge） | 普通陆路 |  | 6 | 12 | 1.5 | 9.5% | windBridge |  | 冷窑坡下那几个雨棚，近日有人重新补了草帘。 | cold_kiln\|dry_sound_bridge |  |  |  |
 | 冷炉院（cold_kiln） | 空籴仓（hollow_silo） | 普通陆路 |  | 5 | 10 | 1.25 | 0% |  |  |  | cold_kiln\|hollow_silo |  |  |  |
 | 冷炉院（cold_kiln） | 架风板（wind_slate） | 普通陆路 |  | 6 | 12 | 1.5 | 6% | windBridge |  | 石板背风的一排小孔边积着新鞋印。 | cold_kiln\|wind_slate |  |  |  |
-| 冷炉院（cold_kiln） | 落琉洼（glass_hail_sink） | 普通陆路 |  | 6 | 12 | 1.5 | 5.5% | windBridge |  | 窑道被砂流冲出几道浅岔口，地面没有新路牌。 | cold_kiln\|glass_hail_sink |  |  |  |
+| 冷炉院（cold_kiln） | 落琉洼（glass_hail_sink） | 普通陆路 |  | 6 | 12 | 1.5 | 5.5% | glassRidge |  | 窑道被砂流冲出几道浅岔口，地面没有新路牌。 | cold_kiln\|glass_hail_sink |  |  |  |
 | 倒驿白廊（chalk_archive） | 白蹄旧道（chalk_hoof_trail） | 普通陆路 |  | 6 | 12 | 1.5 | 0% |  |  |  | chalk_archive\|chalk_hoof_trail |  |  |  |
 | 空音桥（dry_sound_bridge） | 架风板（wind_slate） | 普通陆路 |  | 5 | 10 | 1.25 | 6.5% | windBridge |  | 石板夹出的路一直通到桥肩，最窄处不好回身。 | dry_sound_bridge\|wind_slate |  |  |  |
-| 落琉洼（glass_hail_sink） | 横生脉（hanging_vein） | 普通陆路 |  | 6 | 12 | 1.5 | 6% | windBridge |  | 浅梁下的矿包曾有人打开过，麻绳留在石上。 | glass_hail_sink\|hanging_vein |  |  |  |
+| 落琉洼（glass_hail_sink） | 横生脉（hanging_vein） | 普通陆路 |  | 6 | 12 | 1.5 | 6% | glassRidge |  | 浅梁下的矿包曾有人打开过，麻绳留在石上。 | glass_hail_sink\|hanging_vein |  |  |  |
 | 落琉洼（glass_hail_sink） | 琉脊天室（glass_rotunda） | 普通陆路 |  | 6 | 12 | 1.5 | 0% |  |  |  | glass_hail_sink\|glass_rotunda |  |  |  |
 | 伏兔草丘（camel_grass_dunes） | 覆瓦旱畦（kiln_roof_farm） | 普通陆路 |  | 4 | 8 | 1 | 0% |  |  |  | camel_grass_dunes\|kiln_roof_farm |  |  |  |
 | 砾盘浅沟（bone_dry_rill） | 覆瓦旱畦（kiln_roof_farm） | 普通陆路 |  | 3 | 6 | 0.75 | 0% |  |  |  | bone_dry_rill\|kiln_roof_farm |  |  |  |
@@ -1334,19 +1334,19 @@
 
 ## 强盗团伙和常驻人数
 
-外出成员胜一名少一名，不补人。进不了的窝也照常分享这一名单。管辖路每步先乘剩余人数比例，可进山寨的守卫清退再另乘一项。
+进不了的窝也有实际名单。管辖路每步先乘剩余人数比例，可进山寨按当下活跃守卫再另乘一项。寨主被击败后，巡路倍率上限为 55%。
 
-| 标识 | 名称 | 共享当场人数的路段 | 初始外出人数 | 炼气初期至金丹后期各小境人数 | 据点位置 | 所处区域 | 可进的藏身处 | 寨内人数 | 寨内守卫清空后的路段概率倍率 | headquarters |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| grey_gully | 灰沟坡寨 | 白苇滩 至 沉钟岭、沉钟岭 至 闭潮渡、沉钟岭 至 晒盘坡、青崖松场 至 晒盘坡、晒盘坡 至 篁泽药谷 | 47 | 16 / 12 / 8 / 4 / 3 / 2 / 1 / 1 / 0 | 灰沟坡寨 | 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 23 | 13% | 所属地区＝screen_slope、名称＝灰沟坡寨 |
-| ferryHills | 桥索边的抬木帮 | 白苇滩 至 闭潮渡、闭潮渡 至 青崖松场、青崖松场 至 云炉石谷、云炉石谷 至 篁泽药谷 | 40 | 15 / 11 / 7 / 4 / 2 / 1 / 0 / 0 / 0 | 断桥下的挡雨棚 | 青崖松场（pine_ridge） |  |  |  | 所属地区＝pine_ridge、名称＝断桥下的挡雨棚 |
-| quarryTracks | 旧矿道的散伙矿客 | 沉钟岭 至 玄砂矿脉、篁泽药谷 至 玄砂矿脉、玄砂矿脉 至 碎云雪关 | 44 | 8 / 8 / 7 / 6 / 5 / 4 / 3 / 2 / 1 | 废绞车后屋 | 玄砂矿脉（black_mine） |  |  |  | 所属地区＝black_mine、名称＝废绞车后屋 |
-| ferryWood | 浅水红绳帮 | 杨木水栈 至 碎琉璃滩、杨木水栈 至 白鹤粮仓、白鹤粮仓 至 碎琉璃滩、连环浅洲 至 碎琉璃滩 | 42 | 9 / 10 / 7 / 5 / 4 / 3 / 2 / 1 / 1 | 晒网滩外的棚船 | 碎琉璃滩（glass_bank） |  |  |  | 所属地区＝glass_bank、名称＝晒网滩外的棚船 |
-| reedBank | 青埂芦窝的伙计 | 青埂 至 没顶刻碑、青埂 至 连环浅洲、蛙背塘 至 藻鳞泥浜 | 42 | 13 / 11 / 8 / 5 / 3 / 1 / 1 / 0 / 0 | 青埂北面的堆草房 | 青埂（green_dyke） |  |  |  | 所属地区＝green_dyke、名称＝青埂北面的堆草房 |
-| weirReef | 断堰捆船帮 | 连环浅洲 至 望船排礁、碎琉璃滩 至 望船排礁、挂炭坳 至 断齿内堰、拴绳沙洼 至 断齿内堰、断齿内堰 至 望船排礁 | 47 | 6 / 7 / 7 / 7 / 6 / 5 / 4 / 3 / 2 | 堰柱上的旧守水屋 | 断齿内堰（burnt_weir） |  |  |  | 所属地区＝burnt_weir、名称＝堰柱上的旧守水屋 |
-| saltPath | 盐路拾篓人 | 担盐岗 至 静盐井口、担盐岗 至 白蹄旧道、静盐井口 至 空音桥 | 47 | 12 / 9 / 8 / 7 / 5 / 3 / 2 / 1 / 0 | 担盐岗背坡的空盐仓 | 担盐岗（salt_ledger_barrows） |  |  |  | 所属地区＝salt_ledger_barrows、名称＝担盐岗背坡的空盐仓 |
-| windBridge | 空音桥背风帮 | 架风板 至 空音桥、空音桥 至 冷炉院、架风板 至 冷炉院、冷炉院 至 落琉洼、横生脉 至 落琉洼 | 53 | 6 / 6 / 8 / 8 / 7 / 6 / 5 / 4 / 3 | 空音桥底的石屋 | 空音桥（dry_sound_bridge） |  |  |  | 所属地区＝dry_sound_bridge、名称＝空音桥底的石屋 |
-| tentDunes | 断帐沟的过夜客 | 断纬帐道 至 伏兔草丘、断纬帐道 至 并磨坊 | 44 | 12 / 9 / 7 / 6 / 4 / 3 / 2 / 1 / 0 | 旧帐道的背风窝棚 | 断纬帐道（silk_tent_road） |  |  |  | 所属地区＝silk_tent_road、名称＝旧帐道的背风窝棚 |
+| 标识 | 名称 | 共享当场人数的路段 | 初始外出人数 | 炼气初期至金丹后期各小境人数 | 据点位置 | 所处区域 | 可进的藏身处 | 寨内人数 | 寨内守卫清空后的路段概率倍率 | 首个空缺补员用时（日） | 之后补一人用时（日） | 首领败退后首个空缺等待（日） | 首领败退后补一人用时（日） | headquarters | recruit |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| grey_gully | 灰沟坡寨 | 白苇滩 至 沉钟岭、沉钟岭 至 闭潮渡、沉钟岭 至 晒盘坡、青崖松场 至 晒盘坡、晒盘坡 至 篁泽药谷 | 47 | 16 / 12 / 8 / 5 / 4 / 2 / 0 / 0 / 0 | 灰沟坡寨 | 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 23 | 13% | 18 | 6 | 36 | 12 | 所属地区＝screen_slope、名称＝灰沟坡寨 |  |
+| ferryHills | 桥索边的抬木帮 | 白苇滩 至 闭潮渡、闭潮渡 至 青崖松场、青崖松场 至 云炉石谷、云炉石谷 至 篁泽药谷 | 40 | 16 / 14 / 10 / 0 / 0 / 0 / 0 / 0 / 0 | 断桥下的挡雨棚 | 青崖松场（pine_ridge） |  |  |  | 16 | 6 |  |  | 所属地区＝pine_ridge、名称＝断桥下的挡雨棚 | delay＝16、interval＝6 |
+| quarryTracks | 旧矿道的散伙矿客 | 沉钟岭 至 玄砂矿脉、篁泽药谷 至 玄砂矿脉、玄砂矿脉 至 碎云雪关 | 44 | 2 / 2 / 3 / 4 / 5 / 5 / 10 / 8 / 5 | 废绞车后屋 | 玄砂矿脉（black_mine） |  |  |  | 18 | 6 |  |  | 所属地区＝black_mine、名称＝废绞车后屋 |  |
+| ferryWood | 浅水红绳帮 | 杨木水栈 至 碎琉璃滩、杨木水栈 至 白鹤粮仓、白鹤粮仓 至 碎琉璃滩、连环浅洲 至 碎琉璃滩 | 42 | 10 / 10 / 7 / 5 / 4 / 3 / 2 / 1 / 0 | 晒网滩外的棚船 | 碎琉璃滩（glass_bank） |  |  |  | 18 | 6 |  |  | 所属地区＝glass_bank、名称＝晒网滩外的棚船 |  |
+| reedBank | 青埂芦窝的伙计 | 青埂 至 没顶刻碑、青埂 至 连环浅洲、蛙背塘 至 藻鳞泥浜 | 42 | 13 / 11 / 8 / 6 / 3 / 1 / 0 / 0 / 0 | 青埂北面的堆草房 | 青埂（green_dyke） |  |  |  | 18 | 6 |  |  | 所属地区＝green_dyke、名称＝青埂北面的堆草房 |  |
+| weirReef | 断堰捆船帮 | 连环浅洲 至 望船排礁、碎琉璃滩 至 望船排礁、挂炭坳 至 断齿内堰、拴绳沙洼 至 断齿内堰、断齿内堰 至 望船排礁 | 47 | 6 / 7 / 7 / 7 / 6 / 5 / 4 / 3 / 2 | 堰柱上的旧守水屋 | 断齿内堰（burnt_weir） |  |  |  | 18 | 6 |  |  | 所属地区＝burnt_weir、名称＝堰柱上的旧守水屋 |  |
+| windBridge | 盐路背风帮 | 担盐岗 至 静盐井口、担盐岗 至 白蹄旧道、静盐井口 至 空音桥、架风板 至 空音桥、空音桥 至 冷炉院、架风板 至 冷炉院 | 53 | 10 / 9 / 9 / 8 / 6 / 5 / 3 / 2 / 1 | 空音桥底的石屋 | 空音桥（dry_sound_bridge） |  |  |  | 18 | 6 |  |  | 所属地区＝dry_sound_bridge、名称＝空音桥底的石屋 |  |
+| glassRidge | 落琉洼的黑篷客 | 冷炉院 至 落琉洼、横生脉 至 落琉洼 | 14 | 0 / 0 / 0 / 0 / 0 / 0 / 6 / 5 / 3 | 暗晶壁下的黑篷 | 落琉洼（glass_hail_sink） |  |  |  | 26 | 11 |  |  | 所属地区＝glass_hail_sink、名称＝暗晶壁下的黑篷 | delay＝26、interval＝11 |
+| tentDunes | 断帐沟的过夜客 | 断纬帐道 至 伏兔草丘、断纬帐道 至 并磨坊 | 44 | 19 / 15 / 10 / 0 / 0 / 0 / 0 / 0 / 0 | 旧帐道的背风窝棚 | 断纬帐道（silk_tent_road） |  |  |  | 18 | 6 |  |  | 所属地区＝silk_tent_road、名称＝旧帐道的背风窝棚 |  |
 
 ## 拦路要价、财物和装备
 
@@ -2487,7 +2487,7 @@
 | 架风板（wind_slate） | ridge_armory_refuge | 风板下的旧弦库 |  | 梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截 |  |  |  |  |  |  |  | ridge_armory_goat＝present＝库墙拐角的绳头还在颤，矮门洞里露出几对岩羊蹄子。、absent＝羊蹄印已经蒙了砂。、ridge_armory_lizard＝present＝两块旧簧片碰了一下，一条淡黄尾巴从底下掠过。、absent＝压簧片的旧石下只剩脱落的鳞屑。、ridge_armory_lynx＝present＝外墙角勾着赤毛，石梁上的软沙被踩出了几处深印。、absent＝落砂盖住了石梁上的爪印。、ridge_armory_ram＝present＝往北看，立着的风板让一根大角蹭得歪了一寸。、absent＝北面的风板靠在墙上，再也没有大角来顶。 |  |  |
 | 叩石院（sand_bell_cloister） | forge_fist_bench | 挡风墙下的石墩 |  | 对簧石台（sand_cloister_trial） · 给梁弦材料，帮他修挂石板的架子 |  | 1、2、3 |  | 0＝第一只石墩端正搁在托木上。柯醒伸指弹去拳垫上的石灰，示意你把手伸过去。、1＝拳垫上留下浅浅一个凹印。柯醒擦去垫边石粉，翻过磨破一角的搬石护手。、2＝两只石墩都落回托木上。柯醒把要送去试脚力的石墩用麻布裹好，拳垫仍靠墙立着。 |  |  |  |  |  |  |
 | 白苇滩（marsh） | bandit_marsh_lamp | 北堤歇车处 |  |  |  |  |  |  |  |  |  |  |  |  |
-| 晒盘坡（screen_slope） | bandit_slope_den | 灰沟坡寨 |  |  |  | 5、6、7、8 |  | 4＝货柜已拖到棚外。外栅拆了一半，从坡路上就能看见棚顶。、5＝棚门敞开。肯下山交代的人已经离开，灰沟再没有换哨的声响。 |  |  |  | bandit_den_scout＝present＝外栅的哨绳不时抖动，灰沟深处也有人应声。、absent＝栅外哨绳垂回地面，站在灰沟能看见棚门。、bandit_den_sentry＝present＝棚里有几道火光，门前的平石被铁箍磕出新痕。、absent＝棚门已经推开，露出后头搭了木架的货廊。、bandit_den_carpenter＝present＝长货廊的木架间有乱脚步。有人把扁担竖靠在货箱旁，正往里传话。、absent＝没人再从木架间出来，贴着两侧货箱就能去掌账的里屋。、bandit_den_leader＝present＝挂货签的里间还有人翻账。方才有人隔门喊过一声「许爷」，里头只响了一下刀鞘。、absent＝里间已经静下来，桌上的断凳腿横在地上。 |  | bandit_slope_den |
+| 晒盘坡（screen_slope） | bandit_slope_den | 灰沟坡寨 |  |  |  | 5、6、7、8 |  | 4＝外栅边那只倒扣的木盆还在。从那里往里能看见长长的货廊。、5＝先前跟巡山人下去的伤号已经离开。棚门后还留着他们解下的旧哨绳。 |  |  | 4＝after＝货柜和钱匣早已搬下山。廊下那几块方方的柜脚印里落了新砂。 | bandit_den_scout＝present＝外栅的哨绳轻轻抖动，灰沟深处传来短矛碰石的声音。、absent＝栅外哨绳垂在地上，站在灰沟能看见棚门。、bandit_den_sentry＝present＝棚里有几道火光，门前的平石被铁箍磕出新痕。、absent＝棚门已经推开，露出后头搭了木架的货廊。、bandit_den_carpenter＝present＝长货廊的木架后有脚步声，扁担偶尔擦过木柱。、absent＝木架间没了脚步声。贴着廊边就能走到原先掌账的里屋。、bandit_den_leader＝present＝挂货签的里间还有人翻账。方才有人隔门喊过一声「许爷」，里头只响了一下刀鞘。、absent＝里间已经静下来，桌上的断凳腿横在地上。 |  | bandit_slope_den |
 | 白苇滩（marsh） | undertow_door | 反潮石门 |  | 灰鹭晒篮处（shoal_baskets） · 问白宜哪边的滩好走、封乔的护堤木台（marsh_pole_lesson） · 问封乔河里出了什么事 | 得知物品 倒浪楔（undertow_wedge） | 2、3 |  | 1＝新铁楔卡在旧槽里，绳子通向高处的石阶。外侧的潮水还会倒流，过洞口时可以抓住绳子。 |  |  |  |  |  |  |
 | 白苇滩（marsh） | marsh_pole_lesson | 封乔的护堤木台 | 是 |  |  | 1、3 |  | 2＝领过试杆签，封乔把另一支短杆扶直，台角还有供照看的安全绳。 |  |  |  | river_spar_captain＝present＝封乔正拿杆尖朝练手台上点，不时让渔人过桥，手和眼睛都没乱。、absent＝封乔退到了灯影下。他把红布搁到台边，让手腕缓一缓再陪来客切磋。 |  |  |
 | 沉钟岭（ridge） | counter_bell_door | 倒钟后的反声门 |  |  |  | 2 |  | 1＝铜片斜卡在一宽一窄两个孔之间。第一层台阶已经落下，脚步声顺着台阶传进地下。 |  |  |  |  |  |  |
@@ -2706,9 +2706,9 @@
 | 风板下的旧弦库（ridge_armory_refuge） | 种群 | 砂棱地蜥（ridge_armory_lizard） | ridge_armory_lizard |  | 8 | 8 | 0 | 0 | 不回补 |  |  |  |
 | 风板下的旧弦库（ridge_armory_refuge） | 种群 | 盘崖赤猞（ridge_armory_lynx） | ridge_armory_lynx |  | 5 | 5 | 0 | 0 | 不回补 |  |  |  |
 | 风板下的旧弦库（ridge_armory_refuge） | 种群 | 断风角羚（ridge_armory_ram） | ridge_armory_ram |  | 1 | 1 | 0 | 0 | 不回补 |  |  |  |
-| 灰沟坡寨（bandit_slope_den） | 种群 | 坡寨放哨人（bandit_den_scout） | bandit_den_scout |  | 8 | 8 | 0 | 0 | 不回补 |  | 是 |  |
-| 灰沟坡寨（bandit_slope_den） | 种群 | 守棚的箍刀手（bandit_den_sentry） | bandit_den_sentry |  | 8 | 8 | 0 | 0 | 不回补 |  | 是 |  |
-| 灰沟坡寨（bandit_slope_den） | 种群 | 货廊的抬木手（bandit_den_carpenter） | bandit_den_carpenter |  | 6 | 6 | 0 | 0 | 不回补 |  | 是 |  |
+| 灰沟坡寨（bandit_slope_den） | 种群 | 坡寨放哨人（bandit_den_scout） | bandit_den_scout |  | 8 | 8 | 28 | 1 | 固定间隔 |  | 是 |  |
+| 灰沟坡寨（bandit_slope_den） | 种群 | 守棚的箍刀手（bandit_den_sentry） | bandit_den_sentry |  | 8 | 8 | 32 | 1 | 固定间隔 |  | 是 |  |
+| 灰沟坡寨（bandit_slope_den） | 种群 | 货廊的抬木手（bandit_den_carpenter） | bandit_den_carpenter |  | 6 | 6 | 36 | 1 | 固定间隔 |  | 是 |  |
 | 灰沟坡寨（bandit_slope_den） | 种群 | 灰沟贼王许涧（bandit_den_leader） | bandit_den_leader |  | 1 | 1 | 0 | 0 | 不回补 |  | 是 |  |
 | 封乔的护堤木台（marsh_pole_lesson） | 种群 | 护堤人封乔（river_spar_captain） | river_spar_captain |  | 1 | 1 | 5 | 1 | 固定间隔 |  |  |  |
 | 闸下无灯梯（ford_below_steps） | 种群 | 悬梯堰影（ford_lower_spirit） | ford_lower_spirit |  | 2 | 4 | 11 | 1 | 固定间隔 |  |  |  |
@@ -2809,17 +2809,21 @@
 | 断齿内堰（burnt_weir） | 沉木滩（dyke_sunken_yard） | 贴桩鳞鳄（dyke_yard_croc） | 把滩尾的旧梁垫起，请郁稷收回木架 | 通过前要清除该行动所列的全部看守 |  | 寒铁（ore）×3 |  | 6 | 6 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 断齿内堰（burnt_weir） | 沉木滩（dyke_sunken_yard） | 白脚沼豕（dyke_yard_boar） | 把滩尾的旧梁垫起，请郁稷收回木架 | 通过前要清除该行动所列的全部看守 |  | 寒铁（ore）×3 |  | 4 | 4 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 断齿内堰（burnt_weir） | 沉木滩（dyke_sunken_yard） | 托梁老鳄（dyke_old_croc） | 把滩尾的旧梁垫起，请郁稷收回木架 | 通过前要清除该行动所列的全部看守 |  | 寒铁（ore）×3 |  | 1 | 1 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 沿棚门的平石进去 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 贴着货架穿过长廊 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 守棚的箍刀手（bandit_den_sentry） | 贴着货架穿过长廊 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 推开挂货签的里屋门 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 守棚的箍刀手（bandit_den_sentry） | 推开挂货签的里屋门 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 货廊的抬木手（bandit_den_carpenter） | 推开挂货签的里屋门 | 通过前要清除该行动所列的全部看守 |  |  |  | 6 | 6 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 灰沟贼王许涧（bandit_den_leader） | 把藏赃的货柜拖出棚门 | 获胜一次后可办理一次 |  | 干粮（ration）×4、寒铁（ore）×6、灵晶（core）×3、兽革（hide）×2 |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 灰沟贼王许涧（bandit_den_leader） | 给伤号留一包干粮，叫他们下坡见巡山人 | 获胜一次后可办理一次 |  |  |  | 1 | 1 | 0 | 0 | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 查看哨位旁的粮袋 | 通过前要清除该行动所列的全部看守 |  | 干粮（ration）×3 |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 把棚门内的药匣拎出来 | 通过前要清除该行动所列的全部看守 |  | 松脂膏（salve）×2 |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
-| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 守棚的箍刀手（bandit_den_sentry） | 把棚门内的药匣拎出来 | 通过前要清除该行动所列的全部看守 |  | 松脂膏（salve）×2 |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 沿棚门的平石进去 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 28 | 1 | 固定间隔 | 28 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 贴着货架穿过长廊 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 28 | 1 | 固定间隔 | 28 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 守棚的箍刀手（bandit_den_sentry） | 贴着货架穿过长廊 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 32 | 1 | 固定间隔 | 32 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 推开挂货签的里屋门 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 28 | 1 | 固定间隔 | 28 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 守棚的箍刀手（bandit_den_sentry） | 推开挂货签的里屋门 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 32 | 1 | 固定间隔 | 32 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 货廊的抬木手（bandit_den_carpenter） | 推开挂货签的里屋门 | 通过前要清除该行动所列的全部看守 |  |  |  | 6 | 6 | 36 | 1 | 固定间隔 | 36 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 把藏赃的货柜拖出棚门 | 通过前要清除该行动所列的全部看守 |  | 干粮（ration）×4、寒铁（ore）×6、灵晶（core）×3、兽革（hide）×2 |  | 8 | 8 | 28 | 1 | 固定间隔 | 28 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 守棚的箍刀手（bandit_den_sentry） | 把藏赃的货柜拖出棚门 | 通过前要清除该行动所列的全部看守 |  | 干粮（ration）×4、寒铁（ore）×6、灵晶（core）×3、兽革（hide）×2 |  | 8 | 8 | 32 | 1 | 固定间隔 | 32 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 货廊的抬木手（bandit_den_carpenter） | 把藏赃的货柜拖出棚门 | 通过前要清除该行动所列的全部看守 |  | 干粮（ration）×4、寒铁（ore）×6、灵晶（core）×3、兽革（hide）×2 |  | 6 | 6 | 36 | 1 | 固定间隔 | 36 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 给伤号留一包干粮，叫他们下坡见巡山人 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 28 | 1 | 固定间隔 | 28 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 守棚的箍刀手（bandit_den_sentry） | 给伤号留一包干粮，叫他们下坡见巡山人 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 32 | 1 | 固定间隔 | 32 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 货廊的抬木手（bandit_den_carpenter） | 给伤号留一包干粮，叫他们下坡见巡山人 | 通过前要清除该行动所列的全部看守 |  |  |  | 6 | 6 | 36 | 1 | 固定间隔 | 36 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 查看哨位旁的粮袋 | 通过前要清除该行动所列的全部看守 |  | 干粮（ration）×3 |  | 8 | 8 | 28 | 1 | 固定间隔 | 28 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 坡寨放哨人（bandit_den_scout） | 把棚门内的药匣拎出来 | 通过前要清除该行动所列的全部看守 |  | 松脂膏（salve）×2 |  | 8 | 8 | 28 | 1 | 固定间隔 | 28 | 本种看守回来才须再清场，库存独立回补 |
+| 晒盘坡（screen_slope） | 灰沟坡寨（bandit_slope_den） | 守棚的箍刀手（bandit_den_sentry） | 把棚门内的药匣拎出来 | 通过前要清除该行动所列的全部看守 |  | 松脂膏（salve）×2 |  | 8 | 8 | 32 | 1 | 固定间隔 | 32 | 本种看守回来才须再清场，库存独立回补 |
 | 白苇滩（marsh） | 封乔的护堤木台（marsh_pole_lesson） | 护堤人封乔（river_spar_captain） | 接过封乔的试杆签 | 获胜一次后可办理一次 |  | 封乔的试杆签（river_trial_writ）×1 |  | 1 | 1 | 5 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 闭潮渡（ford） | 闸下无灯梯（ford_below_steps） | 悬梯堰影（ford_lower_spirit） | 翻看松动的修闸名牌 | 获胜一次后可办理一次 |  |  |  | 2 | 4 | 11 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
 
@@ -3427,10 +3431,10 @@
 | bandit_marsh_lamp | 北堤歇车处 | 1 | 问他为何把刀鞘缠起来 | 0 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 是 |  | 「过了北堤，有人专在山道上等。先看你穿的甲，再看腰里挂的刀。披亮甲的，出来讨钱的往往也更不好惹。村口和驿站有人巡，他们少往那边凑。我上山总留几枚散钱，包里也放点救急的料。上回给了两截松木，那人就挪开了绳。」 |  |
 | bandit_slope_den | 灰沟坡寨 | 1 | 翻过外栅，截住换哨人 | 0.25 |  |  |  |  |  |  |  |  | 坡寨放哨人（bandit_den_scout） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 外栅这头落脚平稳，另一头是两道刚绑好的哨绳。 | 灰沟里的细铁响了一声，放哨人提着短矛翻过栅脚。 |  |
 | bandit_slope_den | 灰沟坡寨 | 2 | 沿棚门的平石进去 | 0.25 |  |  |  |  |  |  |  |  | 守棚的箍刀手（bandit_den_sentry） |  |  |  |  |  |  |  | 坡寨放哨人（bandit_den_scout） |  |  |  |  |  |  |  |  |  |  |  |  | 火盆就在门内，带铁箍的袖子伸过火光，将你往门外逼。 |  |
-| bandit_slope_den | 灰沟坡寨 | 3 | 贴着货架穿过长廊 | 0.25 |  |  |  |  |  |  |  |  | 货廊的抬木手（bandit_den_carpenter） |  |  |  |  |  |  |  | 坡寨放哨人（bandit_den_scout）、守棚的箍刀手（bandit_den_sentry） |  |  |  |  |  |  |  |  |  |  |  | 廊两边堆了没解绳的货箱，中间只够一人过。 | 木架背后挤出一个抬货人。他抄起扁担，逼你退回廊口。 |  |
+| bandit_slope_den | 灰沟坡寨 | 3 | 贴着货架穿过长廊 | 0.25 |  |  |  |  |  |  |  |  | 货廊的抬木手（bandit_den_carpenter） |  |  |  |  |  |  |  | 坡寨放哨人（bandit_den_scout）、守棚的箍刀手（bandit_den_sentry） |  |  |  |  |  |  |  |  |  |  |  | 廊两边排着几架粗木货架，中间只够一人过。 | 木架背后挤出一个抬货人。他抄起扁担，逼你退回廊口。 |  |
 | bandit_slope_den | 灰沟坡寨 | 4 | 推开挂货签的里屋门 | 0.25 |  |  |  |  |  |  |  |  | 灰沟贼王许涧（bandit_den_leader） |  |  |  |  |  |  |  | 坡寨放哨人（bandit_den_scout）、守棚的箍刀手（bandit_den_sentry）、货廊的抬木手（bandit_den_carpenter） |  |  |  |  |  |  |  |  |  |  |  |  | 许涧把门边插着的货签折断，又用脚把空凳拨到桌前。「叫我许涧的多，叫我贼王的也有。货在廊下，想搬，得先过这张桌。」他才把长刀从桌底抽出来。 |  |
-| bandit_slope_den | 灰沟坡寨 | 5 | 把藏赃的货柜拖出棚门 | 0.375 | 18 |  |  |  |  |  |  | 干粮（ration）×4、寒铁（ore）×6、灵晶（core）×3、兽革（hide）×2 |  |  |  |  |  |  | 灰沟贼王许涧（bandit_den_leader） |  |  |  |  |  |  |  |  |  |  |  |  | 是 |  | 晒盘坡的矿户认出柜上的货签，帮你把有主的货分好。领货的人凑了十八枚灵钱答谢，又分给你几包行粮、寒铁、灵晶和兽革。 |  |
-| bandit_slope_den | 灰沟坡寨 | 6 | 给伤号留一包干粮，叫他们下坡见巡山人 | 0.25 |  |  |  |  | 干粮（ration）×1 | 是 |  |  |  |  |  |  |  |  | 灰沟贼王许涧（bandit_den_leader） |  |  |  |  |  |  |  |  |  |  |  |  | 是 |  | 几个躲在棚后的伤号拿走干粮，交出换哨的细绳。坡脚的人挨个领他们下山，守路的人把回仓的货先搬到路边。 |  |
+| bandit_slope_den | 灰沟坡寨 | 5 | 把藏赃的货柜拖出棚门 | 0.375 | 180 |  |  |  |  |  |  | 干粮（ration）×4、寒铁（ore）×6、灵晶（core）×3、兽革（hide）×2 |  |  |  |  |  |  | 灰沟贼王许涧（bandit_den_leader） |  | 坡寨放哨人（bandit_den_scout）、守棚的箍刀手（bandit_den_sentry）、货廊的抬木手（bandit_den_carpenter） |  |  |  |  |  |  |  |  |  |  | 是 |  | 晒盘坡的矿户照货签领走失物。货柜夹层还有一只铁匣，账上只写着「寨里公用」。巡山人当场清点，把无人认领的一百八十枚灵钱和几份余货给了你，随后把空匣和货柜一道抬下山。 |  |
+| bandit_slope_den | 灰沟坡寨 | 6 | 给伤号留一包干粮，叫他们下坡见巡山人 | 0.25 |  |  |  |  | 干粮（ration）×1 | 是 |  |  |  |  |  |  |  |  | 灰沟贼王许涧（bandit_den_leader） |  | 坡寨放哨人（bandit_den_scout）、守棚的箍刀手（bandit_den_sentry）、货廊的抬木手（bandit_den_carpenter） |  |  |  |  |  |  |  |  |  |  | 是 |  | 几个躲在棚后的伤号拿走干粮，交出换哨的细绳。巡山人叫他们沿外栅慢慢走，一个个领下了坡。 |  |
 | bandit_slope_den | 灰沟坡寨 | 7 | 查看哨位旁的粮袋 | 0.125 |  |  |  |  |  |  |  | 干粮（ration）×3 |  |  |  |  |  |  |  |  | 坡寨放哨人（bandit_den_scout） |  |  |  |  |  |  |  |  |  |  | 是 | 矮凳下有一个敞口粮袋，看样子是给换哨的人备的。 | 粮袋里还留着三包没启封的干粮。 |  |
 | bandit_slope_den | 灰沟坡寨 | 8 | 把棚门内的药匣拎出来 | 0.125 |  |  |  |  |  |  |  | 松脂膏（salve）×2 |  |  |  |  |  |  |  |  | 坡寨放哨人（bandit_den_scout）、守棚的箍刀手（bandit_den_sentry） |  |  |  |  |  |  |  |  |  |  | 是 | 几团用过的布旁有只小木匣，匣盖上压着一片干药渣。 | 你把里头干净的两包松脂膏拣出来。 |  |
 | undertow_door | 反潮石门 | 1 | 沿外侧石阶绕一圈 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 墙外还有一排露出水面的石阶，一直连回岸边。 | 你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮，门两边的水都换了方向。水势一变，只有靠里的高阶还露在外头。 |  |

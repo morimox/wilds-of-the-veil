@@ -435,7 +435,9 @@ const crewRows = Object.entries(data.roadBandits.crews).map(([id, crew]) => ({
   id, ...crew, count: crew.members.reduce((sum, value) => sum + value, 0),
   hideout: crew.headquarters?.name, baseRegion: crew.headquarters?.region,
   roads: data.roadBandits.roads.filter(({ crew: owner }) => owner === id).map(({ a, b }) => `${name(a)} 至 ${name(b)}`).join('、'),
+  delay: crew.recruit?.delay ?? banditRules.recruitDelay, interval: crew.recruit?.interval ?? banditRules.recruitInterval,
   inside: data.roadBandits.dens[crew.den]?.heads, minFactor: data.roadBandits.dens[crew.den]?.minFactor,
+  leaderlessDelay: crew.den && banditRules.leaderlessDelay, leaderlessInterval: crew.den && banditRules.leaderlessInterval,
 }));
 const banditRanges = ([min, max]) => `${min}–${max}`;
 const rollList = (pool) => pool.map(({ id, weight }) => `${ref(id)} × ${weight}`).join('、');
@@ -607,7 +609,9 @@ const tables = [
     ['members', '炼气初期至金丹后期各小境人数', (counts) => counts.join(' / ')],
     ['hideout', '据点位置'], ['baseRegion', '所处区域', ref], ['den', '可进的藏身处', siteRef],
     ['inside', '寨内人数'], ['minFactor', '寨内守卫清空后的路段概率倍率', percent],
-  ], { note: '外出成员胜一名少一名，不补人。进不了的窝也照常分享这一名单。管辖路每步先乘剩余人数比例，可进山寨的守卫清退再另乘一项。' }),
+    ['delay', '首个空缺补员用时（日）'], ['interval', '之后补一人用时（日）'],
+    ['leaderlessDelay', '首领败退后首个空缺等待（日）'], ['leaderlessInterval', '首领败退后补一人用时（日）'],
+  ], { note: '进不了的窝也有实际名单。管辖路每步先乘剩余人数比例，可进山寨按当下活跃守卫再另乘一项。寨主被击败后，巡路倍率上限为 55%。' }),
   table('bandit-pools', '拦路要价、财物和装备', gated(data.roadBandits.pools), [
     'tier', tier, ['enemy', '对手', ref], ['fee', '索要灵钱范围', banditRanges], ['cash', '一般胜后灵钱范围', banditRanges],
     ['richChance', '富裕成员概率', percent], ['richCash', '富裕成员灵钱范围', banditRanges],

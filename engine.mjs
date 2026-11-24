@@ -7,7 +7,7 @@ import { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, ne
 import { initialMechanisms, mechanismView, mechanismAction } from './mechanisms.mjs';
 import { tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution } from './tournament.mjs';
 import { chooseEnemyIntent } from './combat-tactics.mjs';
-import { checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit } from './bandits.mjs';
+import { checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, deferBanditRecruits } from './bandits.mjs';
 
 const data = { ...moduleData.default, ...moduleData };
 
@@ -1187,6 +1187,7 @@ function finishCombat(state, enemy) {
   if (site?.creatures?.[enemy.id]) {
     spendPool(state, site, 'creatures', enemy.id, 1);
     const wins = (state.siteVictories[site.id] ??= {});
+    deferBanditRecruits(state, site.id, enemy.id, economyKit);
     wins[enemy.id] = (wins[enemy.id] ?? 0) + 1;
     const tracks = state.huntTracks?.[site.id];
     for (const [index, track] of Object.entries(tracks ?? {})) {
@@ -2255,6 +2256,7 @@ const economyKit = {
   isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure, roadProtection,
   saleTerms, activeGear, checkRoadStep: (state, leg, index) => checkRoadBanditStep(state, leg, index, economyKit),
   roadRisk: (state, leg) => roadBanditRisk(state, leg, economyKit),
+  banditDenPopulation: (state, id) => Object.values(poolCounts(state, records.sites[id], 'creatures')).reduce((sum, count) => sum + count, 0),
   eatOnRoad: (state, id) => eat(state, false, id),
 };
 
