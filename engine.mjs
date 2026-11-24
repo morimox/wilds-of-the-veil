@@ -11,7 +11,7 @@ import { chooseEnemyIntent } from './combat-tactics.mjs';
 const data = { ...moduleData.default, ...moduleData };
 
 const records = Object.fromEntries(
-  ['realms', 'items', 'gear', 'foods', 'pills', 'talismans', 'arts', 'recipes', 'regions', 'events', 'enemies', 'quests', 'deductions', 'sites', 'ammunition']
+  ['realms', 'items', 'gear', 'foods', 'pills', 'talismans', 'arts', 'recipes', 'regions', 'events', 'enemies', 'quests', 'deductions', 'sites', 'ammunition', 'innerStyles']
     .map((key) => [key, Object.assign(Object.create(null), Object.fromEntries((data[key] ?? []).map((entry) => [entry.id, entry])))]),
 );
 const experiments = Object.fromEntries(data.events.filter(({ experiment }) => experiment).map(({ experiment }) => [experiment.id, experiment]));
@@ -37,6 +37,15 @@ export const rules = Object.freeze({
   perceptionCap: 0.7,
   observedHitLimit: 3,
   combatDodgeCap: 0.30,
+  combatActiveDodge: 0.36,
+  combatActiveDodgeCap: 0.50,
+  combatDodgeAccuracyScale: 0.25,
+  combatQuickDodgeFactor: 0.55,
+  combatActiveQuickDodgeFactor: 0.65,
+  combatConsecutiveDodges: 2,
+  largeRealmGap: 3,
+  largeRealmPressure: 0.14,
+  largeRealmAccuracy: 0.035,
   combatChargeFloor: 4,
   combatChargeFactor: 0.35,
   enemyChargeFactor: 0.25,
@@ -106,12 +115,34 @@ function activeGear(state) {
     .filter((entry) => entry && state.durability[entry.id] > 0);
 }
 
+function activeManual(state) {
+  return owns(state, state.activeManual) > 0 ? records.innerStyles[state.activeManual] : null;
+}
+
+function manualRank(state, id) {
+  return state.manualRanks?.[id] ?? 1;
+}
+
+function activeManualRank(state) {
+  const manual = activeManual(state);
+  return manual?.ranks[manualRank(state, manual.id) - 1];
+}
+
+function manualFocus(state, weaponClass) {
+  const manual = activeManual(state);
+  return manual?.specialty.includes(weaponClass) ? activeManualRank(state)?.focus : null;
+}
+
 function fogProtection(state) {
   let protection;
   for (const gear of activeGear(state)) {
     if ((gear.field?.fogTolerance ?? 0) > (protection?.field.fogTolerance ?? 0)) protection = gear;
   }
   return protection;
+}
+
+function totalFogTolerance(state, protection) {
+  return rules.pressureThreshold + (protection?.field.fogTolerance ?? 0) + (activeManualRank(state)?.base.fogTolerance ?? 0);
 }
 
 function roadProtection(state, province) {
@@ -122,14 +153,15 @@ function stats(state) {
   const realm = realmOf(state);
   const worn = activeGear(state);
   const trained = trainingStats(state);
+  const manual = activeManualRank(state)?.base ?? {};
   const sum = (key) => worn.reduce((total, entry) => total + (entry[key] ?? 0), 0);
   return {
-    maxHp: Math.max(1, realm.hp + sum('hp') + trained.hp - rules.woundPenalty * state.wounds),
-    maxQi: Math.max(1, realm.qi + sum('qi') + trained.qi),
-    attack: realm.atk + sum('atk'),
-    defense: realm.def + sum('def') + trained.def,
-    perception: (realm.perception ?? 0) + sum('perception'),
-    retreat: sum('retreat'),
+    maxHp: Math.max(1, realm.hp + sum('hp') + trained.hp + (manual.hp ?? 0) - rules.woundPenalty * state.wounds),
+    maxQi: Math.max(1, realm.qi + sum('qi') + trained.qi + (manual.qi ?? 0)),
+    attack: realm.atk + sum('atk') + (manual.atk ?? 0),
+    defense: realm.def + sum('def') + trained.def + (manual.def ?? 0),
+    perception: (realm.perception ?? 0) + sum('perception') + (manual.perception ?? 0),
+    retreat: sum('retreat') + (manual.retreat ?? 0),
   };
 }
 
@@ -239,6 +271,10 @@ function removeItem(state, id, count, spendRelief = true) {
     state.inventory[id] = remaining;
   } else {
     delete state.inventory[id];
+    if (state.activeManual === id) {
+      state.activeManual = null;
+      normalize(state);
+    }
     if (records.gear[id]) {
       delete state.durability[id];
       const slot = records.gear[id].slot;
@@ -358,6 +394,8 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     region: hub,
     world: initialWorld(),
     training: initialTraining(),
+    activeManual: null,
+    manualRanks: {},
     mechanisms: initialMechanisms(),
     tournament: initialTournament(),
     hp: 0,
@@ -394,6 +432,7 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     encounterSeed: seed >>> 0,
     combatSeed: (seed ^ 0x9e3779b9) >>> 0,
     evadeSeed: (seed ^ 0x85ebca6b) >>> 0,
+    enemyEvadeSeed: (seed ^ 0x27d4eb2f) >>> 0,
     basketInspected: false,
     basketDisposition: null,
     showedHideToSmith: false,
@@ -489,7 +528,8 @@ const choiceExcluded = (state, choice, site) =>
   Boolean(choice.excludesChoices?.some((index) => state.seenChoices.includes(`${site.id}:${index}`)));
 
 function knowsChoice(state, choice, site) {
-  return (choice.afterChoice === undefined || state.seenChoices.includes(`${site?.id}:${choice.afterChoice}`)) &&
+  const previous = choice.afterChoice ?? choice.afterVisitChoice;
+  return (previous === undefined || state.seenChoices.includes(`${site?.id}:${previous}`)) &&
     (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
     (!choice.hideWhenExcluded || !choiceExcluded(state, choice, site)) &&
     (!choice.hidden || hasChoiceNeeds(state, choice));
@@ -625,6 +665,9 @@ export function view(state) {
   const groundLoot = { ...groundAt(state) };
   const combatWeapon = weaponView(state);
   const side = sideWeapon(state);
+  const fist = fistWeapon(state);
+  const fistTechnique = activeManualRank(state)?.fistCharge;
+  const fistChargeReason = combatFistReason(state, fistTechnique);
   const studies = trainingView(state, economyKit);
   const visibleChoices = (currentEvent?.choices ?? []).map((choice, index) => {
     const blocker = choiceBlocker(state, choice, currentSite, index);
@@ -637,13 +680,14 @@ export function view(state) {
       ...(gather.length ? { gather } : {}) };
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
     knowsChoice(state, currentEvent.choices[index], currentSite));
-  const { combatSeed, evadeSeed, combat, ...visibleState } = state;
+  const { combatSeed, evadeSeed, enemyEvadeSeed, combat, ...visibleState } = state;
   return {
     ...visibleState,
     ...stats(state),
     ...worldView(state, economyKit),
     localHazard: hazardView(state, economyKit),
     training: studies.rows,
+    innerStyle: innerStyleView(state, combatWeapon, side),
     mechanism: mechanismView(state, economyKit),
     spiritSense: studies.spiritSense,
     tournament: tournamentView(state, economyKit),
@@ -652,7 +696,7 @@ export function view(state) {
     batchMeals: ['field', 'village', 'event'].includes(mode) && !state.gathering
       ? Object.fromEntries(data.foods.map(({ id }) => [id, batchMealCount(state, id)]).filter(([, count]) => count > 1))
       : {},
-    fogTolerance: rules.pressureThreshold + (fogProtection(state)?.field.fogTolerance ?? 0),
+    fogTolerance: totalFogTolerance(state, fogProtection(state)),
     mode,
     day: state.day,
     realmIndex: state.realm,
@@ -691,11 +735,15 @@ export function view(state) {
       sparring: inProtectedBout(state), maxHp: enemy.hp, hp: combat.hp } : null,
     combatWeapon,
     combatOffhand: side ? { id: side.id, name: nameOf(side.id), chargeRequired: Boolean(side.chargeRequired) } : null,
+    combatFist: combat ? { name: fist ? nameOf(fist.id) : '徒手出拳',
+      chargeName: fistTechnique ? fistTechnique.name ?? '蓄势出拳' : null,
+      chargeAvailable: Boolean(fistTechnique && !fistChargeReason), chargeReason: fistChargeReason } : null,
     openingShotReady: canInterceptOpening(state, intent) && Boolean(combatWeapon.selectedAmmo),
     openingShotPossible: Boolean(combat?.openingRange && combat.round === 0 && combatWeapon.selectedAmmo),
     combatRead,
     combatCharge: Boolean(combat?.playerCharge),
-    chargingWeapon: combat?.playerCharge ? { ...combat.playerCharge, name: nameOf(combat.playerCharge.id) } : null,
+    chargingWeapon: combat?.playerCharge ? { ...combat.playerCharge,
+      name: combat.playerCharge.id === 'bare_fist' ? '拳势' : nameOf(combat.playerCharge.id) } : null,
     enemyCharged: Boolean(combat?.enemyCharged),
     lastEnemyIntent: combat?.lastEnemyIntent ?? null,
     intent,
@@ -768,12 +816,14 @@ function encounter(state, id) {
     state.insight += rules.firstRegionInsight;
   }
   const protection = fogProtection(state);
-  const tolerance = rules.pressureThreshold + (protection?.field.fogTolerance ?? 0);
+  const tolerance = totalFogTolerance(state, protection);
   const pressurized = exposed && state.pressure > rules.pressureThreshold && state.qi > 0;
   const burdened = pressurized && state.pressure > tolerance;
   if (burdened) state.qi = Math.max(0, state.qi - rules.pressureQi);
   const fog = burdened ? `在雾里走久了，真气−${rules.pressureQi}。`
-    : pressurized ? `${nameOf(protection.id)}微热，胸口逼来的雾气散了些。` : '';
+    : pressurized ? protection && state.pressure <= rules.pressureThreshold + protection.field.fogTolerance
+      ? `${nameOf(protection.id)}微热，胸口逼来的雾气散了些。`
+      : '你收慢呼吸，胸口逼来的雾气散了些。' : '';
   return say(state, `在${region.name}遇上${records.events[id].name}。${first ? `初探此地，见识+${rules.firstRegionInsight}。` : ''}${fog}`);
 }
 
@@ -1150,11 +1200,20 @@ function attackingIntent(intent) {
 function estimatedHit(state, enemy, intent) {
   if (!attackingIntent(intent)) return 0;
   const extra = state.combat.enemyCharged ? Math.ceil(enemy.atk * rules.enemyChargeFactor) : 0;
-  return Math.ceil(enemy.atk * (intent.mult ?? 1)) + extra;
+  return Math.ceil((Math.ceil(enemy.atk * (intent.mult ?? 1)) + extra) * realmPressure(state, enemy));
+}
+
+function excessRealmGap(state, enemy) {
+  return Math.max(0, enemy.tier - state.realm - rules.largeRealmGap + 1);
+}
+
+function realmPressure(state, enemy) {
+  return 1 + excessRealmGap(state, enemy) * rules.largeRealmPressure;
 }
 
 function breathingQi(state) {
-  return Math.min(rules.guardQiRecovery, Math.max(0, stats(state).maxQi - state.qi));
+  const recovery = rules.guardQiRecovery + (activeManualRank(state)?.base.breathingQi ?? 0);
+  return Math.min(recovery, Math.max(0, stats(state).maxQi - state.qi));
 }
 
 function retreatRisk(state, enemy, intent, bonus = 0, guard = 0) {
@@ -1169,7 +1228,7 @@ function retreatRisk(state, enemy, intent, bonus = 0, guard = 0) {
 function crossRealmFactor(state, enemy) {
   return data.realms
     .filter(({ id }) => id > state.realm && id <= enemy.tier)
-    .reduce((factor, realm) => factor * (realm.pressure ?? 1), 1);
+    .reduce((factor, realm) => factor * (realm.pressure ?? 1), 1) / realmPressure(state, enemy);
 }
 
 function weaponLoadout(state) {
@@ -1180,6 +1239,11 @@ function weaponLoadout(state) {
   const selected = compatible.includes(state.selectedAmmo) && stocked(state.selectedAmmo)
     ? state.selectedAmmo : compatible.find(stocked);
   return { weapon, compatible, ammo: records.ammunition[selected] ?? null };
+}
+
+function fistWeapon(state) {
+  const { weapon } = weaponLoadout(state);
+  return weapon?.weaponClass === 'fist' ? weapon : null;
 }
 
 function weaponView(state) {
@@ -1212,7 +1276,7 @@ function sideWeapon(state) {
 }
 
 function combatTraits(traits, enemy, intent) {
-  const effects = { damage: 0, pierce: 0, guard: 0, reflect: 0, dodge: 0 };
+  const effects = { damage: 0, pierce: 0, guard: 0, reflect: 0, dodge: 0, accuracy: 0 };
   for (const trait of traits) {
     if (!trait || (trait.enemyTag && !enemy.tags?.includes(trait.enemyTag)) ||
         (trait.intent && trait.intent !== intent.kind) || !Object.hasOwn(effects, trait.kind)) continue;
@@ -1224,28 +1288,39 @@ function combatTraits(traits, enemy, intent) {
 function combatEffects(state, enemy, intent, move) {
   const { damage = 0, pierce = 0, brace = false, wearWeapon = false, hungerAffected = wearWeapon, ammo } = move;
   const { defense, attack: force } = stats(state);
+  const focus = manualFocus(state, move.weaponClass);
   const heavyBrace = brace && intent.kind === 'heavy';
-  const counter = heavyBrace ? rules.guardCounter : 0;
-  const guard = (move.guard ?? 0) + (brace ? rules.guardBonus + (heavyBrace ? rules.heavyGuardBonus : 0) : 0);
-  const interrupt = ['heavy', 'heal', 'focus'].includes(intent.kind) ? move.interrupt ?? 0 : 0;
+  const counter = heavyBrace ? Math.max(1, Math.floor(rules.guardCounter / realmPressure(state, enemy))) : 0;
+  const guard = (move.guard ?? 0) + (focus?.guard ?? 0) + (brace ? rules.guardBonus + (heavyBrace ? rules.heavyGuardBonus : 0) : 0);
+  const proposedInterrupt = ['heavy', 'heal', 'focus'].includes(intent.kind) ? move.interrupt ?? 0 : 0;
   const charge = move.releaseCharge && damage > 0
-    ? Math.max(rules.combatChargeFloor, Math.ceil((move.chargeBase ?? force) * rules.combatChargeFactor)) : 0;
+    ? Math.max(rules.combatChargeFloor, Math.ceil(((move.chargeBase ?? force) + (focus?.atk ?? 0)) * rules.combatChargeFactor)) : 0;
   const training = trainingPerks(state, enemy, intent);
-  const traits = combatTraits([
-    ...activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), ammo?.trait, ...(ammo?.traits ?? []),
-  ], enemy, intent);
-  const weaponDamageBonus = wearWeapon ? traits.damage : 0;
-  const weaponPierceBonus = wearWeapon ? traits.pierce : 0;
+  const gearTraits = ({ trait, traits = [] }) => [trait, ...traits];
+  const worn = activeGear(state);
+  const traits = combatTraits(worn.flatMap(gearTraits), enemy, intent);
+  const strikingSlot = wearWeapon ? 'weapon' : move.wearSlot;
+  const strikingTraits = strikingSlot ? combatTraits([
+    ...worn.filter(({ slot, sideAtk }) => slot === strikingSlot || (slot !== 'weapon' && !sideAtk)).flatMap(gearTraits),
+    ammo?.trait, ...(ammo?.traits ?? []),
+  ], enemy, intent) : null;
   const armor = intent.kind === 'guard'
     ? Math.max(enemy.def + rules.enemyGuardBonus, Math.ceil(enemy.def * (intent.mult ?? 1)))
-    : enemy.def;
+    : enemy.def + (attackingIntent(intent) ? enemy.manualGuard ?? 0 : 0);
   const hunger = hungerAffected && state.satiety === 0 ? rules.emptyAttackMultiplier : 1;
-  const effectiveDamage = Math.floor((damage + charge + weaponDamageBonus + training.damage + (ammo?.atk ?? 0)) * hunger * crossRealmFactor(state, enemy));
-  const dealt = damage > 0
-    ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - weaponPierceBonus - training.pierce - (ammo?.pierce ?? 0))) : 0;
+  const effectiveDamage = Math.floor((damage + charge + (focus?.atk ?? 0) + (strikingTraits?.damage ?? 0)
+    + training.damage + (ammo?.atk ?? 0)) * hunger * crossRealmFactor(state, enemy));
+  const proposedDamage = damage > 0
+    ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - (focus?.pierce ?? 0)
+      - (strikingTraits?.pierce ?? 0) - training.pierce - (ammo?.pierce ?? 0))) : 0;
+  const missChance = dodgeChance(enemy.dodge ?? 0, strikingTraits?.accuracy ?? 0, rules.combatDodgeCap);
+  const missed = proposedDamage > 0 && Boolean(move.weaponClass) && combatEvaded(state, 'enemy', missChance);
+  const dealt = missed ? 0 : proposedDamage;
+  const interrupt = missed ? 0 : proposedInterrupt;
   const hit = Boolean(ammo && dealt > 0 && canInterceptOpening(state, intent));
   const incoming = hit || !attackingIntent(intent) ? 0
-    : Math.max(0, estimatedHit(state, enemy, intent) - defense - guard - traits.guard - training.guard - interrupt);
+    : Math.max(0, estimatedHit(state, enemy, intent) - Math.max(0, defense - (enemy.manualPierce ?? 0))
+      - guard - traits.guard - training.guard - interrupt);
   const shield = heavyBrace && incoming > 0 ? activeGear(state).find(({ slot, brace }) => slot === 'offhand' && brace) : null;
   const received = Math.max(0, incoming - (shield?.brace ?? 0));
   const qiToPlayer = intent.kind === 'drain' ? Math.min(state.qi, received) : 0;
@@ -1253,15 +1328,30 @@ function combatEffects(state, enemy, intent, move) {
   const healing = intent.kind === 'heal' ? Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt) : 0;
   const reflect = damageToPlayer > 0 && damageToPlayer < state.hp && !intent.ranged &&
     (intent.kind === 'attack' || intent.kind === 'heavy') ? traits.reflect : 0;
-  const dodge = damageToPlayer > 0 && intent.kind === 'attack' && !intent.ranged ? Math.min(rules.combatDodgeCap, traits.dodge) : 0;
-  return { dealt, counter, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer };
+  const quick = intent.ranged || intent.kind === 'drain';
+  const hardToEvade = quick || intent.kind === 'heavy';
+  const passive = (traits.dodge + (activeManualRank(state)?.base.dodge ?? 0)) * (hardToEvade ? rules.combatQuickDodgeFactor : 1);
+  const active = move.evade ? rules.combatActiveDodge * (quick ? rules.combatActiveQuickDodgeFactor : 1) : 0;
+  const accuracy = (enemy.accuracy ?? 0) + (intent.accuracy ?? 0) + excessRealmGap(state, enemy) * rules.largeRealmAccuracy;
+  const dodge = received > 0
+    ? dodgeChance(passive + active, accuracy, move.evade ? rules.combatActiveDodgeCap : rules.combatDodgeCap) : 0;
+  return { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer };
 }
 
-function evaded(state, chance) {
-  if (!chance) return false;
-  const seed = state.evadeSeed ?? ((state.combatSeed ^ 0x85ebca6b) >>> 0);
-  state.evadeSeed = (Math.imul(1664525, seed) + 1013904223) >>> 0;
-  return state.evadeSeed / 0x100000000 < chance;
+function dodgeChance(evasion, accuracy, cap) {
+  return Math.min(cap, evasion / (1 + evasion) / (1 + accuracy / rules.combatDodgeAccuracyScale));
+}
+
+function combatEvaded(state, defender, chance) {
+  const combat = state.combat;
+  const streaks = (combat.dodgeStreaks ??= {});
+  const seedKey = defender === 'enemy' ? 'enemyEvadeSeed' : 'evadeSeed';
+  const seed = state[seedKey] ?? ((state.evadeSeed ^ 0x27d4eb2f) >>> 0);
+  const eligible = chance > 0 && (streaks[defender] ?? 0) < rules.combatConsecutiveDodges;
+  if (eligible) state[seedKey] = (Math.imul(1664525, seed) + 1013904223) >>> 0;
+  const success = eligible && state[seedKey] / 0x100000000 < chance;
+  streaks[defender] = success ? (streaks[defender] ?? 0) + 1 : 0;
+  return success;
 }
 
 function respondToMove(state, enemy, kind) {
@@ -1281,7 +1371,7 @@ function combatTurn(state, move) {
   const { kind = 'recover', brace, wearWeapon, ammo, message } = move;
   const intent = respondToMove(state, enemy, kind);
   const result = combatEffects(state, enemy, intent, move);
-  const { dealt, counter, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer } = result;
+  const { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer } = result;
   const healthBefore = state.hp;
   const enemyMove = { name: intent.name, kind: intent.kind };
   const read = state.combat.plan.reader === 'enemy' ? `${enemy.name}看破了你的起手。` : '';
@@ -1295,6 +1385,7 @@ function combatTurn(state, move) {
     if (observed.length > rules.observedHitLimit) observed.shift();
   }
   state.combat.hp -= dealt + counter;
+  if (counter > 0) (state.combat.dodgeStreaks ??= {}).enemy = 0;
   const abandoned = state.combat.playerCharge && !move.releaseCharge;
   state.combat.playerCharge = move.prepareWeapon ?? null;
   const recovered = brace && intent.kind === 'guard' ? breathingQi(state) : 0;
@@ -1304,18 +1395,23 @@ function combatTurn(state, move) {
   if (ammo) removeItem(state, ammo.id, 1);
   const playerMove = brace ? counter ? '你挡住重招，趁对手还没收招打了回去。'
     : recovered ? `你趁对手守势回了${recovered}点真气。` : '你收回手，挡在身前。' : message;
-  let summary = `${read}${abandoned ? '你收住了方才蓄着的劲。' : ''}${playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
+  let summary = `${read}${abandoned ? '你收住了方才蓄着的劲。' : ''}${playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${missed ? `${enemy.name}侧身闪过了这一击。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
   if (state.combat.hp <= 0) {
     if (counter) summary += `「${intent.name}」被你截住了。`;
     return combatVictory(state, enemy, summary, { damageDealt, damageTaken: 0, ...(counter ? { enemyMove } : {}) });
   }
   summary += intent.kind === 'remedy' ? `${enemy.name}${intent.name}。` : `${enemy.name}使出「${intent.name}」。`;
   if (attackingIntent(intent)) state.combat.enemyCharged = false;
-  const dodged = evaded(state, dodge);
+  const dodged = !hit && (qiToPlayer > 0 || damageToPlayer > 0) && combatEvaded(state, 'player', dodge);
   if (hit) {
     summary += `这一箭拦住了${enemy.name}的冲势。`;
   } else if (dodged) {
     summary += '你错开半步，这一招落了空。' + wear(state, 'boots');
+    const restored = Math.min((activeManualRank(state)?.base.evadeQi ?? 0), Math.max(0, stats(state).maxQi - state.qi));
+    if (restored) {
+      state.qi += restored;
+      summary += `脚下站稳，一口气转回来，真气恢复${restored}点。`;
+    }
   } else if (intent.kind === 'heal') {
     const before = state.combat.hp;
     state.combat.hp = Math.min(enemy.hp, before + healing);
@@ -1334,6 +1430,7 @@ function combatTurn(state, move) {
     state.combat.enemyCharged = dealt < rules.chargeBreakDamage && !interrupt;
     summary += state.combat.enemyCharged ? '它的下一记出招会更重。' : '蓄势被你打断了。';
   } else {
+    if (move.evade && (qiToPlayer || damageToPlayer)) summary += '脚下没能让开。';
     if (shield) summary += nameOf(shield.id) + '卸掉了一股冲力。' + wear(state, 'offhand');
     state.qi -= qiToPlayer;
     state.hp -= damageToPlayer;
@@ -1354,14 +1451,14 @@ function combatTurn(state, move) {
       summary += `护具把来劲弹了回去，造成${reflectedDamage}点反伤。`;
     }
   }
-  if (state.combat.hp <= 0) return combatVictory(state, enemy, summary, { damageDealt, damageTaken: healthBefore - state.hp, enemyMove, reflectedDamage });
+  if (state.combat.hp <= 0) return combatVictory(state, enemy, summary, { damageDealt, damageTaken: healthBefore - state.hp, enemyMove, reflectedDamage, dodged, missed });
   state.combat.lastEnemyIntent = enemyMove;
   state.combat.round += 1;
   normalize(state);
   const damageTaken = Math.max(0, healthBefore - state.hp);
   say(state, summary);
   const fell = state.hp === 0 ? fall(state) : null;
-  return { ...fell, ok: true, message: summary + (fell?.message ?? ''), damageDealt, damageTaken, enemyMove, reflectedDamage, dodged };
+  return { ...fell, ok: true, message: summary + (fell?.message ?? ''), damageDealt, damageTaken, enemyMove, reflectedDamage, dodged, missed };
 }
 
 function retreat(state, bonus = 0, lead = '', guard = 0) {
@@ -1374,9 +1471,9 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
   }
   const intent = respondToMove(state, enemy, 'retreat');
-  const { damage: received, retreatBonus } = retreatRisk(state, enemy, intent, bonus, guard);
+  const { damage: received } = retreatRisk(state, enemy, intent, bonus, guard);
   advance(state, rules.retreatDays);
-  const charmDamage = retreatBonus > 0 ? wear(state, 'charm') : '';
+  const charmDamage = activeGear(state).some(({ slot, retreat }) => slot === 'charm' && retreat > 0) ? wear(state, 'charm') : '';
   const armorDamage = received ? wear(state, 'armor') : '';
   const healthBefore = state.hp;
   state.hp -= received;
@@ -1409,7 +1506,7 @@ function cast(state, id) {
   const weaponBased = art.weaponBased !== false;
   if (weaponBased && compatible.length && !ammo) return refuse('这门术要借兵器出手，先备上弹药。');
   const pending = state.combat.playerCharge;
-  if (weaponBased && pending && pending.id !== weapon?.id) return refuse('先放下另一件兵器的蓄力。');
+  if (weaponBased && pending && (pending.slot !== 'weapon' || pending.id !== weapon?.id)) return refuse('先收住正在蓄着的劲。');
   if (weaponBased && weapon?.chargeRequired && !pending) return refuse('先用这件主武器蓄力。');
   const releaseCharge = weaponBased && Boolean(weapon?.chargeRequired);
   state.qi -= cost;
@@ -1417,6 +1514,7 @@ function cast(state, id) {
   state.focus -= focus;
   return combatTurn(state, {
     kind: 'strike', releaseCharge,
+    weaponClass: weaponBased ? (weapon?.weaponClass ?? 'fist') : null,
     damage: stats(state).attack - (weaponBased ? 0 : weapon?.atk ?? 0) + (art.power ?? 0) + focus * rules.focusDamage,
     pierce: (art.pierce ?? 0) + (releaseCharge ? weapon.chargePierce ?? 0 : 0),
     guard: art.guard,
@@ -1430,7 +1528,7 @@ function cast(state, id) {
 
 function prepareWeaponAttack(state, weapon) {
   const pending = state.combat.playerCharge;
-  if (pending) return pending.id === weapon?.id ? null : refuse('先放下另一件兵器的蓄力。');
+  if (pending) return pending.slot === weapon?.slot && pending.id === weapon?.id ? null : refuse('先收住正在蓄着的劲。');
   if (!weapon?.chargeRequired) return null;
   return combatTurn(state, {
     kind: 'focus', prepareWeapon: { slot: weapon.slot, id: weapon.id },
@@ -1440,19 +1538,63 @@ function prepareWeaponAttack(state, weapon) {
 
 function attack(state) {
   const { weapon, compatible, ammo } = weaponLoadout(state);
-  const unarmed = !weapon || (compatible.length > 0 && !ammo);
-  const preparation = prepareWeaponAttack(state, unarmed ? null : weapon);
+  if (!weapon || (compatible.length && !ammo)) return fistAttack(state);
+  const preparation = prepareWeaponAttack(state, weapon);
   if (preparation) return preparation;
-  const releaseCharge = !unarmed && Boolean(weapon.chargeRequired);
+  const releaseCharge = Boolean(weapon.chargeRequired);
   return combatTurn(state, {
     kind: 'strike', releaseCharge,
-    damage: stats(state).attack - (unarmed ? weapon?.atk ?? 0 : 0),
+    weaponClass: weapon.weaponClass,
+    damage: stats(state).attack,
     pierce: releaseCharge ? weapon.chargePierce : 0,
-    wearWeapon: !unarmed,
+    wearWeapon: true,
     hungerAffected: true,
     ammo,
-    message: unarmed ? '你空手出招。' : releaseCharge ? `你挥动${nameOf(weapon.id)}出手。` : '你抢先出手。',
+    message: weapon.weaponClass === 'fist' ? `你用${nameOf(weapon.id)}出拳。`
+      : releaseCharge ? `你挥动${nameOf(weapon.id)}出手。` : '你抢先出手。',
   });
+}
+
+function fistMove(state, technique) {
+  const { weapon } = weaponLoadout(state);
+  const fist = weapon?.weaponClass === 'fist' ? weapon : null;
+  const force = stats(state).attack - (fist ? 0 : weapon?.atk ?? 0);
+  return combatTurn(state, {
+    kind: 'strike', weaponClass: 'fist', wearWeapon: Boolean(fist), hungerAffected: true,
+    damage: force + (technique?.power ?? 0), pierce: technique?.pierce ?? 0,
+    releaseCharge: Boolean(technique), chargeBase: force,
+    message: technique ? `你使出${technique.name ?? '蓄势拳'}，${fist ? '指虎' : '拳锋'}贴着对手的中门送出。`
+      : fist ? `你用${nameOf(fist.id)}出拳。` : '你空手出拳。',
+  });
+}
+
+function fistAttack(state) {
+  if (state.combat.playerCharge) return refuse('先收住正在蓄着的劲。');
+  return fistMove(state);
+}
+
+function fistChargeBlocker(state, technique) {
+  const pending = state.combat.playerCharge;
+  if (pending && (pending.slot !== 'fist' || pending.id !== (fistWeapon(state)?.id ?? 'bare_fist'))) return '先收住正在蓄着的劲。';
+  if (state.qi < technique.qi) return '真气不足。';
+  return '';
+}
+
+function combatFistReason(state, technique) {
+  return state.combat && technique ? fistChargeBlocker(state, technique) : '';
+}
+
+function fistCharge(state) {
+  const technique = activeManualRank(state)?.fistCharge;
+  if (!technique) return refuse('你还没练会这门蓄势拳。');
+  const reason = fistChargeBlocker(state, technique);
+  if (reason) return refuse(reason);
+  if (!state.combat.playerCharge) return combatTurn(state, {
+    kind: 'focus', prepareWeapon: { slot: 'fist', id: fistWeapon(state)?.id ?? 'bare_fist' },
+    message: '你收拳沉肩，将一口真气缓缓压入腰腹。',
+  });
+  state.qi -= technique.qi;
+  return fistMove(state, technique);
 }
 
 function offhandAttack(state) {
@@ -1464,6 +1606,7 @@ function offhandAttack(state) {
   const damage = stats(state).attack - (weapon?.atk ?? 0) + side.sideAtk;
   return combatTurn(state, {
     kind: 'strike', releaseCharge: Boolean(side.chargeRequired), hungerAffected: true, wearSlot: 'offhand',
+    weaponClass: side.weaponClass,
     damage, chargeBase: damage, pierce: side.sidePierce, guard: side.sideGuard,
     message: `你用${nameOf(side.id)}出手。`,
   });
@@ -1626,12 +1769,16 @@ function takeFromGround(state, id, requested) {
     ...(requested === undefined && ground[id] ? { leftOnGround: { [id]: ground[id] } } : {}) };
 }
 
+function restQi(state) {
+  return rules.restQi + trainingPerks(state).restQi + (activeManualRank(state)?.base.restQi ?? 0);
+}
+
 function recoverySessions(state) {
   const { maxHp, maxQi } = stats(state);
   const unwoundedHp = maxHp + state.wounds * rules.woundPenalty;
   return Math.max(
     Math.ceil((unwoundedHp - state.hp) / rules.restHp),
-    Math.ceil((maxQi - state.qi) / (rules.restQi + trainingPerks(state).restQi)),
+    Math.ceil((maxQi - state.qi) / restQi(state)),
     Math.ceil(state.wounds / rules.restWounds), Math.ceil(state.toxin / rules.restToxin),
     state.pressure || needsSenseRest(state) ? 1 : 0,
   );
@@ -1643,7 +1790,7 @@ function applyHalfDayRest(state) {
   state.toxin -= rules.restToxin;
   state.pressure = 0;
   state.hp += rules.restHp;
-  state.qi += rules.restQi + trainingPerks(state).restQi;
+  state.qi += restQi(state);
   const recoveredSense = restoreTrainingSense(state);
   normalize(state);
   return recoveredSense > 0;
@@ -1728,6 +1875,72 @@ function spendHome(state, cost, need) {
       delete warehouseWear[id];
     }
   }
+}
+
+function manualEquipBlocker(state, manual) {
+  if (!manual || !owns(state, manual.id)) return '行囊里没有这本内功。';
+  if (state.combat || state.gathering || state.victoryPending) return '等手上的事办完，再换内功。';
+  if (state.realm < manual.tier) return '修为还压不住这门内功的行气。';
+  return '';
+}
+
+function manualUpgradeBlocker(state, manual, next) {
+  const locked = manualEquipBlocker(state, manual);
+  if (locked) return locked;
+  if (!next) return '这本内功已经练至顶层。';
+  if (state.event || !settlementOf(data, state.region)?.inn) return '到一处能歇脚的地方再练。';
+  if (state.realm < (next.tier ?? manual.tier)) return `到${records.realms[next.tier ?? manual.tier].name}才能再往深处练。`;
+  return homeRequirements(state, next.cost, next.need);
+}
+
+function innerStyleView(state, weapon, side) {
+  const classes = [weapon.isLoaded && weapon.id ? weapon.weaponClass : 'fist', side?.weaponClass];
+  const books = data.innerStyles.filter(({ id }) => owns(state, id) > 0).map((manual) => {
+    const { id, name, grade, desc, specialty, ranks } = manual;
+    const rank = manualRank(state, id);
+    const next = ranks[rank];
+    const equipReason = manualEquipBlocker(state, manual);
+    const reason = next ? manualUpgradeBlocker(state, manual, next) : '';
+    return { id, name, grade, desc, specialty, rank, maxRank: ranks.length, effect: ranks[rank - 1].effect,
+      aligned: classes.some((type) => specialty.includes(type)), canEquip: !equipReason, equipReason,
+      upgrade: next ? { coins: next.cost, days: next.days, tier: records.realms[next.tier ?? manual.tier].name,
+        need: resourceEntries(next.need).map(([id, count]) => ({ id, name: nameOf(id), count, total: homeSupplies(state, id) })),
+        reason, available: !reason } : null };
+  });
+  if (!books.length) return null;
+  return { books, active: books.find(({ id }) => state.activeManual === id) ?? null };
+}
+
+function equipManual(state, id) {
+  const manual = records.innerStyles[id];
+  const reason = manualEquipBlocker(state, manual);
+  if (reason) return refuse(reason);
+  if (state.activeManual === id) return refuse('你已经在运转这门内功。');
+  state.activeManual = id;
+  normalize(state);
+  return say(state, `你依着《${manual.name}》调过呼吸，将内息引入新的经路。`);
+}
+
+function unequipManual(state) {
+  if (!activeManual(state)) return refuse('你还没有运转一门内功。');
+  state.activeManual = null;
+  normalize(state);
+  return say(state, '你收住行气，任真气顺着平时的经路流转。');
+}
+
+function upgradeManual(state, id) {
+  const manual = records.innerStyles[id];
+  const rank = manualRank(state, id);
+  const next = manual?.ranks[rank];
+  const reason = manualUpgradeBlocker(state, manual, next);
+  if (reason) return refuse(reason);
+  spendHome(state, next.cost, next.need);
+  state.manualRanks[id] = rank + 1;
+  advance(state, next.days);
+  normalize(state);
+  const learned = next.fistCharge && !manual.ranks[rank - 1].fistCharge;
+  return say(state, learned ? `你循着《${manual.name}》练通了气路，拳劲终于能在手中收住。`
+    : `你慢慢走完《${manual.name}》里新的一重气路。`);
 }
 
 function hasRoom(state, loot, spent) {
@@ -2035,6 +2248,9 @@ const generalActions = {
   use: (state, { id }) => use(state, id, false),
   equip: (state, { id }) => equip(state, id),
   unequip: (state, { slot }) => unequip(state, slot),
+  equipManual: (state, { id }) => equipManual(state, id),
+  unequipManual,
+  upgradeManual: (state, { id }) => upgradeManual(state, id),
   discard: (state, { id, count }) => discard(state, id, count),
   take: (state, { id, count }) => takeFromGround(state, id, count),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
@@ -2044,13 +2260,16 @@ const generalActions = {
 const combatActions = {
   attack,
   offhandAttack,
+  fistAttack,
+  fistCharge,
   tournamentWithdraw: (state) => tournamentAction(state, 'tournamentWithdraw', economyKit),
   readSpirit: (state) => recordTrainingRead(state, economyKit),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   combatEquip: (state, { id }) => equip(state, id, true),
   guard: (state) => combatTurn(state, { kind: 'brace', brace: true }),
+  dodge: (state) => combatTurn(state, { kind: 'dodge', evade: true, message: '你侧身挪步。' }),
   cancelCharge: (state) => {
-    if (!state.combat.playerCharge) return refuse('眼下没有正在蓄力的兵器。');
+    if (!state.combat.playerCharge) return refuse('眼下没有正在蓄力的招式。');
     state.combat.playerCharge = null;
     return say(state, '你停下蓄力。');
   },
@@ -2088,6 +2307,9 @@ function takeTurn(state, action, payload) {
     if (action === 'use') return use(state, payload.id, false);
     if (action === 'equip') return equip(state, payload.id);
     if (action === 'unequip') return unequip(state, payload.slot);
+    if (action === 'equipManual') return equipManual(state, payload.id);
+    if (action === 'unequipManual') return unequipManual(state);
+    if (action === 'upgradeManual') return upgradeManual(state, payload.id);
     if (action === 'inspectBasket') return inspectBasket(state);
     if (action === 'unpackBasket') return unpackBasket(state);
     if (action === 'selectAmmo') return selectAmmo(state, payload.id);

@@ -14,7 +14,16 @@ battleDays,0.125,战斗操作每回合用时（天）
 perceptionScale,12,洞察概率曲线分母的固定项。洞察差除以固定项与洞察差之和
 perceptionCap,0.7,洞察优势转化为看破的概率上限
 observedHitLimit,3,敌人参考最近几次实际承受的主动出招伤害
-combatDodgeCap,0.3,完好装备对普通近击的闪避叠加上限
+combatDodgeCap,0.3,被动闪避概率上限
+combatActiveDodge,0.36,主动闪避计入的基础闪避值
+combatActiveDodgeCap,0.5,主动闪避概率上限
+combatDodgeAccuracyScale,0.25,命中抵消闪避的折算基准
+combatQuickDodgeFactor,0.55,重招、远程或抽气时被动闪避值的乘数
+combatActiveQuickDodgeFactor,0.65,远程或抽气时主动闪避基础值的乘数
+combatConsecutiveDodges,2,连续闪开伤害后的上限，下一次符合条件的有效攻势命中
+largeRealmGap,3,额外境界压制起始差距（小境界数）
+largeRealmPressure,0.14,每个超出的小境界带来的对方攻势倍率增项及己方输出除数增项
+largeRealmAccuracy,0.035,每个超出的小境界额外提高的敌方命中
 combatChargeFloor,4,蓄势下一次亲手出招的最小原始增伤
 combatChargeFactor,0.35,蓄势增伤按人物攻击计算的比例
 enemyChargeFactor,0.25,敌方蓄势增伤按基础攻击计算的比例

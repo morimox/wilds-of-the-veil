@@ -9,6 +9,7 @@ import { hazardContent } from './hazards.mjs';
 import { caravanContent } from './caravan-content.mjs';
 import { employersContent } from './employers-content.mjs';
 import { borderContent } from './border-content.mjs';
+import { innerStyleContent } from './inner-style-content.mjs';
 import { huntMaterialContent } from './hunt-materials.mjs';
 import { dykeArmoryContent } from './dyke-armory.mjs';
 import { ridgeArmoryContent } from './ridge-armory.mjs';
@@ -1147,10 +1148,11 @@ const provinces = [
 const regionDetails = { ...riverContent.regionDetails, ...zhaoContent.regionDetails, ...sandContent.regionDetails };
 const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => content.sects ?? []);
 const mechanisms = puzzleContent.mechanisms;
+const { innerStyles, enemyInnerStyles } = innerStyleContent;
 
 for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
   ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent,
-  dykeArmoryContent, ridgeArmoryContent, explorerKitContent]) {
+  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -1158,6 +1160,7 @@ for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzz
 }
 sites.push(...extendSites);
 events.push(...extendEvents);
+innerStyleContent.extendScenes(sites, events, gear, enemies);
 
 const solitaryTerritories = new Set(['river_cliff_kite', 'snow_warden', 'ember_yak']);
 const twoHandedClasses = new Set(['bow', 'crossbow', 'spear', 'staff']);
@@ -1207,6 +1210,19 @@ for (const enemy of enemies) {
     const medicineId = tier < 2 ? 'salve' : tier < 5 ? 'heal_pill' : 'tide_pill';
     enemy.medicine = profile.medicine ?? { id: medicineId, count: 1 };
   }
+  const practice = enemyInnerStyles[enemy.id];
+  if (practice) {
+    const manual = innerStyles.find(({ id }) => id === practice.id);
+    const rank = manual.ranks[practice.rank - 1];
+    const focus = manual.specialty.includes(practice.weaponClass) ? rank.focus : null;
+    enemy.innerStyleName = manual.name;
+    enemy.hp += rank.base.hp ?? 0;
+    enemy.atk += (rank.base.atk ?? 0) + (focus?.atk ?? 0);
+    enemy.def += rank.base.def ?? 0;
+    enemy.perception += rank.base.perception ?? 0;
+    enemy.manualGuard = focus?.guard ?? 0;
+    enemy.manualPierce = focus?.pierce ?? 0;
+  }
 }
 const sparringEnemies = new Set(enemies.filter((enemy) => enemy.sparring).map((enemy) => enemy.id));
 for (const site of sites) {
@@ -1225,7 +1241,8 @@ for (const site of sites) {
 const equipmentSlots = { weapon: '主武器', offhand: '副手', armor: '盔甲', head: '头部', boots: '鞋子', belt: '饰品', charm: '法器' };
 
 const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
-  services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms, tournament: tournamentData };
+  services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms,
+  innerStyles, enemyInnerStyles, tournament: tournamentData };
 
 export { data, realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms };

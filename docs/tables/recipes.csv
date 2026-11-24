@@ -65,3 +65,5 @@ r_breath_belt,行气束带（breath_belt）,,2,炼气后期,16,兽革（hide）�
 r_side_hook,系绳短钩（side_hook）,,0,炼气初期,8,寒铁（ore）×2、松木（wood）×2、兽革（hide）×1,1,得知物品 旧桨上的靠岸图（oar_mark）,,,,,
 r_anvil_hammer,短柄砧锤（anvil_hammer）,,2,炼气后期,18,寒铁（ore）×6、松木（wood）×2、兽革（hide）×2,2,得知物品 寒铁（ore）,,,锻炉（forge）,2,
 r_scale_chisel,翻鳞凿（scale_chisel）,,4,筑基中期,23,厚甲片（hard_scale）×4、暗金（black_iron）×3、兽革（hide）×2、坚韧兽筋（battle_sinew）×1,2.75,得知物品 厚甲片（hard_scale）,,,锻炉（forge）,2,
+r_leather_knuckles,缠皮指虎（leather_knuckles）,1,0,炼气初期,5,兽革（hide）×2、灵草（reed）×1、寒铁（ore）×1,0.75,得知物品 苇岸抱拳谱（reed_hand_manual）,,,,,按渡工拳谱封底打好铁环，用苇纤把铁环和兽革一起缝牢。
+r_echo_knuckles,叩石指虎（echo_knuckles）,1,4,筑基中期,38,暗金（black_iron）×6、厚甲片（hard_scale）×5、坚韧兽筋（battle_sinew）×5、筑基期妖丹（foundation_core）×2,3,得知物品 叩石指虎铁样（forge_knuckle_sample）,,,锻炉（forge）,2,按叩石院留下的铁样打出暗金环，再换上韧筋和厚甲片。铁样留着做比较。

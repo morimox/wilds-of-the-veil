@@ -96,6 +96,16 @@ const ruleDescriptions = {
   fallQi: '被救回后留下的真气（点），受真气上限限制',
   maxWounds: '伤势数量上限',
   maxTradeCount: '单次买卖可提交的最大数量',
+  combatDodgeCap: '被动闪避概率上限',
+  combatActiveDodge: '主动闪避计入的基础闪避值',
+  combatActiveDodgeCap: '主动闪避概率上限',
+  combatDodgeAccuracyScale: '命中抵消闪避的折算基准',
+  combatQuickDodgeFactor: '重招、远程或抽气时被动闪避值的乘数',
+  combatActiveQuickDodgeFactor: '远程或抽气时主动闪避基础值的乘数',
+  combatConsecutiveDodges: '连续闪开伤害后的上限，下一次符合条件的有效攻势命中',
+  largeRealmGap: '额外境界压制起始差距（小境界数）',
+  largeRealmPressure: '每个超出的小境界带来的对方攻势倍率增项及己方输出除数增项',
+  largeRealmAccuracy: '每个超出的小境界额外提高的敌方命中',
 };
 
 const name = (id) => names.get(id) ?? id;
@@ -104,7 +114,7 @@ const resources = (entries = {}) => Object.entries(entries)
   .map(([id, count]) => `${ref(id)}×${count}`).join('、');
 const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
-  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药',
+  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书',
   attack: '普通攻势', heavy: '重招', guard: '防御', drain: '吸取真气', heal: '恢复', focus: '蓄势', remedy: '服药',
 };
 const slotNames = data.equipmentSlots;
@@ -230,10 +240,10 @@ const describeChoice = (key) => {
   return choice ? `${ref(event)} · ${choice.label}` : key;
 };
 const traitText = (trait) => [
-  ({ damage: '额外伤害', pierce: '额外穿甲', guard: '额外护持', reflect: '受相应近击后的反伤', dodge: '闪避普通近击' })[trait.kind] ?? trait.kind,
+  ({ damage: '额外伤害', pierce: '额外穿甲', guard: '额外护持', reflect: '受相应近击后的反伤', dodge: '被动闪避值', accuracy: '降低对手闪避的命中值' })[trait.kind] ?? trait.kind,
   trait.enemyTag && `敌人标签 ${trait.enemyTag}`,
   trait.intent && (knownKinds[trait.intent] ?? trait.intent),
-  `加成 ${trait.kind === 'dodge' ? percent(trait.bonus) : trait.bonus}`,
+  `加成 ${['dodge', 'accuracy'].includes(trait.kind) ? percent(trait.bonus) : trait.bonus}`,
 ].filter(Boolean).join(' · ');
 const intents = data.enemies.flatMap(({ id, name, intents }) =>
   intents.map((intent, index) => ({ enemyId: id, enemyName: name, order: index + 1, ...intent })));
@@ -269,7 +279,7 @@ const facilityLevels = economyData.facilities.flatMap(({ id, name, start, desc, 
       reveal,
       alternateReveal,
     })));
-const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', axe: '斧', bow: '弓', crossbow: '弩', hammer: '锤' };
+const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', axe: '斧', bow: '弓', crossbow: '弩', hammer: '锤', fist: '徒手与指虎' };
 const offeredItems = new Set(marketOffers.map(({ id }) => id));
 const itemTradeRows = data.items.map((item) => ({ ...item, price: offeredItems.has(item.id) ? item.price : 0 }));
 const localOfferRows = data.regions.flatMap(({ id: region }) => {
@@ -426,6 +436,15 @@ const matchRows = data.tournament.matches.map((match, index) => ({ ...match, ord
 const tournamentPrizes = data.tournament.prizes.map((prize, wins) => ({ ...prize, wins }));
 const incidentJobNames = { report: '向杨芹报信', brace: '加固栏杆', move: '撤驮兽', look: '从草丘查水源',
   divert: '给旧水槽分流', fight: '前往截住盐泥豺', repair: '善后修栏', settle: '结清工钱' };
+const manualSources = data.events.flatMap(({ id, choices }) => choices.flatMap((choice, index) =>
+  Object.keys(choice.loot ?? {}).map((item) => [item, describeChoice(`${id}:${index}`)])));
+const innerStyleRanks = data.innerStyles.flatMap(({ id, name, grade, tier, specialty, ranks }) =>
+  ranks.map(({ base, focus, fistCharge, effect, tier: rankTier = tier, cost = 0, days = 0, need }, index) => ({
+    id, name, grade, rank: index + 1, maxRank: ranks.length, tier: rankTier, cost, days, need, effect,
+    specialty, source: manualSources.find(([item]) => item === id)?.[1],
+    ...base, focusAtk: focus?.atk, focusPierce: focus?.pierce, focusGuard: focus?.guard,
+    fistName: fistCharge?.name, fistPower: fistCharge?.power, fistPierce: fistCharge?.pierce, fistQi: fistCharge?.qi,
+  })));
 
 const tables = [
   table('realms', '境界与突破', data.realms, [
@@ -506,6 +525,17 @@ const tables = [
   table('ammunition', '弹药与命中效果', described(data.ammunition ?? []), [
     'id', 'name', ['atk', '每发攻击修正'], ['pierce', '每发基础穿甲'], ['trait', '适用目标与加成', traitText],
   ], { note: '远射和借远兵的术诀每次实际出手扣 1 发。缺弹时普通出手改为徒手，换兵刃会经过一回合。' }),
+  table('inner-styles', '内功来源、每重效果与修习费用', gated(innerStyleRanks), [
+    'id', 'name', ['grade', '品阶'], ['source', '获得途径'],
+    ['rank', '重数'], ['maxRank', '最高重数'], 'tier', tier, ['cost', '灵钱'], 'need', 'days',
+    ['specialty', '专攻兵刃', (types) => types.map((type) => weaponClass[type]).join('、')],
+    ['atk', '通用攻击'], ['hp', '气血上限'], ['def', '防御'], ['qi', '真气上限'], ['perception', '洞察'],
+    ['restQi', '每半日额外回气'], ['fogTolerance', '雾压承受加值'], ['breathingQi', '双守势额外回气'],
+    ['retreat', '追击减伤率', percent], ['dodge', '被动闪避值', percent], ['evadeQi', '闪避成功回气'],
+    ['focusAtk', '专攻额外攻击'], ['focusPierce', '专攻穿甲'], ['focusGuard', '专攻护持'],
+    ['fistName', '蓄力拳'], ['fistPower', '蓄力拳出手攻击加值'], ['fistPierce', '蓄力拳额外穿甲'],
+    ['fistQi', '蓄力拳出手耗气'], ['effect', '词条说明'],
+  ], { note: '一次只运转一本。基础效果与同一招实际所用兵刃的专攻同时生效。同本历重用当前重数的整行，数值不逐重累加。运转必须带在行囊里。' }),
   table('foods', '口粮与料理', foodRows, [
     'id', 'name', ['grade', '料理档次'], ['satiety', '食用恢复饱腹'], ['hp', '食用恢复气血'],
     ['level', '备粮灶等级'], 'need', 'count', ['cost', '每批费用（灵钱）'], 'days',
@@ -601,6 +631,7 @@ const tables = [
     ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days',
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
     'need', 'consume', 'hidden', 'loot', 'enemy', ['openingRange', '远处开战，可先发一箭'], ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
+    ['afterVisitChoice', '此前做过的同地点选项序号', (index) => index + 1],
     ['encounter', '抽取的当地种群', (ids) => ids.map(ref).join('、')],
     ['encounterWeights', '此进路不同对手的权重', (values) => Object.entries(values).map(([id, weight]) => `${ref(id)}×${weight}`).join('、')],
     ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
@@ -623,12 +654,14 @@ const tables = [
   ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
   table('enemies', '敌人', enemyRows, [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
-    'def', ['perception', '洞察'], ['strategy', '交手策略', (id) => ({
+    'def', ['perception', '洞察'], ['accuracy', '命中值', percent], ['dodge', '被动闪避值', percent],
+    ['innerStyleName', '使用内功'], ['manualGuard', '内功兵刃专攻护持'], ['manualPierce', '内功兵刃专攻穿甲'],
+    ['strategy', '交手策略', (id) => ({
       instinct: '本能', predator: '抢攻', bulwark: '守中求进', duelist: '见招拆招', schemer: '耗气与破势',
     })[id] ?? id], ['medicine', '单场携带补药', ({ id, count }) => `${ref(id)}×${count}`],
     ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'],
     ['loot', '固定解取的身体掉落', resources], ['chanceLoot', '概率额外掉落', formatChanceLoot], 'desc',
-  ], { omit: ['intents'], note: '每个普攻取基础攻击乘招式倍率后向上取整。概率掉落独立掷骰，成功与固定掉落相加。守着的草药、矿物、文书与奖品需要在现场另行取得。' }),
+  ], { omit: ['intents'], note: '普攻取所列攻击乘招式倍率后向上取整。攻击等基础值已经算入敌方内功，出招专攻护持另列，差距至少三小境时另有压制。概率掉落与固定掉落分别结算。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '常用动作序号'], 'name', 'kind', 'mult', ['ranged', '远程出手'],
   ], { note: '普通妖兽大多按这些习性出招。人物和部分大妖用自己承受过的伤害估计威胁。抽中洞察后能看到玩家这回合动作的类别。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),

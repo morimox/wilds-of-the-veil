@@ -8,7 +8,9 @@ const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [reci
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
 const slotNames = data.equipmentSlots;
 const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
-const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药" };
+const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药", manual: "内功" };
+const weaponNames = { fist: "拳与指虎", sword: "剑", blade: "刀斧", spear: "枪戟", staff: "棍杖", hammer: "锤", bow: "弓", crossbow: "弩" };
+const manualRankName = new Intl.NumberFormat("zh-CN-u-nu-hanidec");
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
 const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterline"];
 const app = document.querySelector("#app");
@@ -77,8 +79,8 @@ function escape(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-function linkButton(label, action, value = "", tone = "", disabled = false, count = 1) {
-  return `<button type="button" class="button ${tone}" data-action="${action}" data-value="${escape(value)}"${count > 1 ? ` data-count="${count}"` : ""}${disabled ? " disabled" : ""}>${escape(label)}</button>`;
+function linkButton(label, action, value = "", tone = "", disabled = false, count = 1, descriptionId = "") {
+  return `<button type="button" class="button ${tone}" data-action="${action}" data-value="${escape(value)}"${count > 1 ? ` data-count="${count}"` : ""}${descriptionId ? ` aria-describedby="${escape(descriptionId)}"` : ""}${disabled ? " disabled" : ""}>${escape(label)}</button>`;
 }
 
 
@@ -162,7 +164,7 @@ function vital(label, current, max, low, explanation) {
 function stats(s) {
   const warnings = [];
   const meal = data.foods.find(({ id }) => s.inventory[id] > 0);
-  const showsQi = s.knownArts.length > 0 || s.pressure > rules.pressureThreshold;
+  const showsQi = s.knownArts.length > 0 || s.pressure > rules.pressureThreshold || Boolean(s.combatFist?.chargeName);
   if (s.satiety === 0) warnings.push("空腹乏力");
   if (!meal && s.satiety < rules.rationSatiety) warnings.push("口粮已尽");
   if (s.toxin >= rules.toxinThreshold) warnings.push("丹毒发作");
@@ -182,7 +184,7 @@ function stats(s) {
     ${canUseSalve ? linkButton("敷伤药", "use", "salve", "quick-eat") : ""}
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
-    ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施展术诀、在雾中久留都会消耗真气。在据点歇息能恢复。") : ""}
+    ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施展术诀、打出部分招式或在雾中久留会消耗真气。歇息时能恢复。") : ""}
     ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息能恢复神识。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
@@ -405,6 +407,9 @@ function combatScreen(s) {
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
   const weapon = s.combatWeapon;
   const side = s.combatOffhand;
+  const fist = s.combatFist;
+  const canMainAttack = Boolean(weapon?.id && (!weapon.needsAmmo || weapon.isLoaded));
+  const ordinaryPunch = !fist?.name || ["徒手", "徒手出拳"].includes(fist.name) ? "徒手出拳" : `用${fist.name}出拳`;
   const ammoBar = weapon?.needsAmmo ? `<div class="combat-ammo">
     <p class="fine">${escape(weapon.name)} · ${weapon.isLoaded ? "已备弹药" : "弹药已尽，可徒手出手"}</p>
     <div class="actions">${(weapon.ammo ?? []).map(ammo => linkButton(
@@ -416,11 +421,15 @@ function combatScreen(s) {
   const charging = s.chargingWeapon;
   const mainCharged = charging?.slot === "weapon" && charging.id === weapon?.id;
   const sideCharged = charging?.slot === "offhand" && charging.id === side?.id;
+  const fistCharged = charging?.slot === "fist";
   const mainBlocked = Boolean(charging && !mainCharged);
   const sideBlocked = Boolean(charging && !sideCharged);
-  const attackLabel = weapon?.chargeRequired ? `用${weapon.name}${mainCharged ? "打出" : "蓄力"}`
-    : openingShot ? "抢先放箭" : weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : side ? "主武器出手" : "出手";
+  const attackLabel = !canMainAttack ? ordinaryPunch : weapon.chargeRequired ? `用${weapon.name}${mainCharged ? "打出" : "蓄力"}`
+    : weapon.weaponClass === "fist" ? `用${weapon.name}出拳` : openingShot ? "抢先放箭" : `用${weapon.name}出手`;
   const sideLabel = side?.chargeRequired ? `用${side.name}${sideCharged ? "打出" : "蓄力"}` : side && `用${side.name}出手`;
+  const fistChargeLabel = fistCharged ? `打出${fist?.chargeName ?? charging.name}` : `蓄力 · ${fist?.chargeName}`;
+  const fistChargeReason = (!charging || fistCharged) && fist?.chargeReason?.replace(/[。！]+$/, "");
+  const fistChargeDisabled = (!fistCharged && Boolean(charging)) || !fist?.chargeAvailable || Boolean(fistChargeReason);
   const guardLabel = intent?.kind === "heavy" ? "挡住重招" : intent?.kind === "guard" && s.breathingQi ? "收势调息" : "防御";
   const flight = intent && s.retreatRisk;
   const retreatLabel = enemy.sparring ? "认输" : flight?.wouldFall ? "撤退会倒下"
@@ -431,7 +440,7 @@ function combatScreen(s) {
   const openingNote = openingShot ? "对方还隔着一段路。这一回合放箭，能拦住它的头一扑。"
     : !intent && s.openingShotPossible ? "还隔着一段路。对方若冲来，首箭能拦一下。" : "";
   const chargeNote = [
-    charging && `${charging.name}已经蓄好力。可以用它打出。防御、用药或换兵器会让这次蓄力散掉。`,
+    charging && (fistCharged ? '拳劲已收住，可以打出这一拳。' : `${charging.name}已经蓄好力，可以出手。`),
     s.enemyCharged && "对方已经攒足了劲。",
   ].filter(Boolean).join("");
   const spiritLabel = intent || s.combatRead === "enemy" ? "凝神护身" : "凝神看招";
@@ -451,9 +460,13 @@ function combatScreen(s) {
     ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
-    <div class="actions">${linkButton(attackLabel, "attack", "", "primary", mainBlocked)}
+    <div class="actions">${linkButton(attackLabel, !canMainAttack && fist ? "fistAttack" : "attack", "", fistCharged ? "" : "primary", mainBlocked)}
       ${side ? linkButton(sideLabel, "offhandAttack", "", "", sideBlocked) : ""}
+      ${canMainAttack && fist && weapon.weaponClass !== "fist" ? linkButton(ordinaryPunch, "fistAttack", "", "", Boolean(charging)) : ""}
+      ${fist?.chargeName || fistCharged ? linkButton(fistChargeReason ? `${fistChargeLabel}（${fistChargeReason}）` : fistChargeLabel,
+        "fistCharge", "", fistCharged ? "primary" : "", fistChargeDisabled) : ""}
       ${linkButton(guardLabel, "guard")}
+      <span class="action-hint">${linkButton("闪避", "dodge", "", "", false, 1, "dodge-explanation")}<span class="item-tip" id="dodge-explanation" role="tooltip">侧身躲开来招。若被击中，照常受伤。</span></span>
       ${charging ? linkButton("取消蓄力", "cancelCharge", "", "quiet") : ""}
       ${linkButton(retreatLabel, "retreat", "", !enemy.sparring && flight?.damage ? "danger" : "quiet")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
@@ -495,8 +508,32 @@ function itemSlot(item, location, description, actions = "", label = "", count =
   </div>`;
 }
 
+function manualDescription(book, active = false) {
+  const specialty = [...new Set(book.specialty.map(kind => weaponNames[kind]).filter(Boolean))].join("、");
+  const rank = manualRankName.format(book.rank);
+  const rankText = book.rank >= book.maxRank ? `已练到最高的第${rank}层。`
+    : `已练到第${rank}层，可练至第${manualRankName.format(book.maxRank)}层。`;
+  return [book.grade && `${book.grade}内功。`, book.desc, book.effect, specialty && `专练${specialty}。`,
+    active && book.aligned && "手头的打法合它的路数。", rankText].filter(Boolean).join(" ");
+}
+
+function manualActions(book, active, canManage) {
+  if (!canManage) return "";
+  const stance = active ? linkButton("收功", "unequipManual", book.id)
+    : linkButton(book.canEquip ? "运功" : book.equipReason || "暂不能运功", "equipManual", book.id, "", !book.canEquip);
+  const upgrade = book.upgrade;
+  if (!upgrade) return stance;
+  const cost = [upgrade.need.map(row => `${row.name} ×${row.count}`).join("、"), upgrade.coins && `${upgrade.coins} 灵钱`]
+    .filter(Boolean).join("、");
+  const requirements = [cost && `需${cost}。`, upgrade.days > 0 && `用时 ${upgrade.days} 日。`,
+    !upgrade.available && upgrade.reason].filter(Boolean).join(" ");
+  return stance + linkButton("研习下一层", "upgradeManual", book.id, "quiet", !upgrade.available) +
+    (requirements ? `<p class="fine manual-upgrade-note">${escape(requirements)}</p>` : "");
+}
+
 function pack(s) {
   const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event";
+  const canManageManual = canEquip && !s.gathering;
   const canUse = canEquip || s.mode === "combat";
   const canEat = canUse;
   const repair = s.mode === "village" ? s.repairService : null;
@@ -512,11 +549,16 @@ function pack(s) {
       (canEquip ? linkButton("卸下", "unequip", slot) : "") + repairAction(id, remaining, gear.durability),
       slotNames[slot]);
   });
-  const carried = data.items.filter(row => s.inventory[row.id] && !Object.values(s.equipment).includes(row.id));
+  const manuals = new Map((s.innerStyle?.books ?? []).map(book => [book.id, book]));
+  const activeManual = s.innerStyle?.active;
+  if (activeManual) worn.push(itemSlot(itemRows[activeManual.id], "worn", manualDescription(activeManual, true),
+    manualActions(activeManual, true, canManageManual), "内功"));
+  const carried = data.items.filter(row => s.inventory[row.id] && row.id !== activeManual?.id && !Object.values(s.equipment).includes(row.id));
   const inventory = carried.filter(row => row.kind !== "key" || row.breakthrough).map(row => {
     const gear = data.gear.find(g => g.id === row.id);
     const pill = data.pills.find(g => g.id === row.id);
     const seal = data.talismans.find(g => g.id === row.id);
+    const book = manuals.get(row.id);
     let actions = "";
     if (gear) {
       const remaining = s.durability[row.id] ?? gear.durability;
@@ -533,6 +575,7 @@ function pack(s) {
       actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy);
     }
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
+    if (book) actions = manualActions(book, false, canManageManual);
     if (foodRows[row.id] && canEat && (s.satiety < s.maxSatiety || s.hp < s.maxHp)) {
       actions = linkButton(`吃${row.name}`, "eat", row.id);
       const quantity = s.batchMeals[row.id];
@@ -545,7 +588,7 @@ function pack(s) {
     }
     if (row.id === "gate_scroll" && canEquip && !s.gathering) actions += tabButton("展开卷轴", "atlas");
     if (canEquip && !row.breakthrough) actions += linkButton("放下", "discard", row.id, "quiet");
-    const description = gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
+    const description = book ? manualDescription(book) : gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
     return itemSlot(row, "held", description, actions, "", s.inventory[row.id]);
   });
   const keys = carried.filter(row => row.kind === "key" && !row.breakthrough);
@@ -960,7 +1003,8 @@ function keyboardFocus() {
 function restoreKeyboardFocus(focus) {
   if (!focus) return;
   const candidates = focus.keys ? [...focus.area.querySelectorAll(`button${focus.keys}:enabled`)] : [];
-  const chosen = candidates.find(control => control.getClientRects().length) ??
+  const inspected = focus.area === kit && selectedItem ? kit.querySelector(`[data-item="${CSS.escape(selectedItem)}"]`) : null;
+  const chosen = candidates.find(control => control.getClientRects().length) ?? inspected ??
     [...main.querySelectorAll("button:enabled")].find(control => control.getClientRects().length);
   if (chosen) {
     chosen.focus({ preventScroll: true });
@@ -1102,7 +1146,7 @@ function feedback(before, after, result, action) {
     didRecover && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
     action === "guard" && after.qi > before.qi && `真气回升 ${after.qi - before.qi} 点`,
     after.qi > before.qi && (rested || action === "choose" || action === "use") && !narrative.includes("真气") && "真气恢复",
-    after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
+    after.qi < before.qi && ["choose", "visit", "revisit", "art", "fistCharge"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
     after.satiety > before.satiety && (ate || action === "use") && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
     action === "restUntilRecovered" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     action === "finishGather" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
@@ -1131,7 +1175,9 @@ function performAction(action, payload) {
     atlasProvince = null;
     atlasPoint = null;
   }
-  if (action === "travel" || action === "discard" || action === "take" || action === "equip" || action === "unequip") selectedItem = null;
+  if (["travel", "discard", "take", "equip", "unequip"].includes(action)) selectedItem = null;
+  if (result.ok && action === "equipManual") selectedItem = `worn-${payload.id}`;
+  if (result.ok && action === "unequipManual") selectedItem = `held-${payload.id}`;
   render();
   if (action === "beginGather" && result.ok) {
     runGatherProgress(state.gathering);

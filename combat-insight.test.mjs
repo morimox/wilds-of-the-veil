@@ -187,26 +187,42 @@ test('an injured human spends a carried medicine in one turn and cannot use it a
   }
 });
 
-test('dodge combines compatible worn items, respects the cap and only consumes a dodge roll for a damaging melee hit', () => {
-  const duel = staged('sand_spine_lizard', { realm: 2, items: ['frost_robe', 'path_charm', 'reed_boots'] });
+test('passive dodge combines compatible worn items with diminishing returns', () => {
+  const duel = staged('sand_spine_lizard', { realm: 6, items: ['frost_robe', 'path_charm', 'reed_boots'] });
   const attack = enemies.sand_spine_lizard.intents.find(({ kind }) => kind === 'attack');
   duel.combat.plan = { round: 0, reader: null, intent: attack };
-  const aboveCap = structuredClone(duel);
+  const aboveChance = structuredClone(duel);
   const disabled = structuredClone(duel);
   const boots = duel.durability.reed_boots;
-  duel.evadeSeed = seedBetween(0.26, 0.29);
-  aboveCap.evadeSeed = seedBetween(0.31, 0.33);
+  duel.evadeSeed = seedBetween(0.22, 0.24);
+  aboveChance.evadeSeed = seedBetween(0.28, 0.30);
   disabled.evadeSeed = duel.evadeSeed;
   disabled.durability.reed_boots = 0;
   assert.equal(play(duel, 'attack').dodged, true);
   assert.equal(duel.durability.reed_boots, boots - 1);
-  assert.ok(play(aboveCap, 'attack').damageTaken > 0);
+  assert.ok(play(aboveChance, 'attack').damageTaken > 0);
   assert.ok(play(disabled, 'attack').damageTaken > 0);
   const heavy = staged('sand_spine_lizard', { realm: 2, items: ['reed_boots'] });
   heavy.combat.plan = { round: 0, reader: null, intent: enemies.sand_spine_lizard.intents.find(({ kind }) => kind === 'heavy') };
   const seed = heavy.evadeSeed;
   assert.ok(play(heavy, 'attack').damageTaken > 0);
   assert.equal(heavy.evadeSeed, seed);
+});
+
+test('an active dodge can evade fast or heavy attacks, with worse odds against a shot', () => {
+  const enemy = 'border_wind_ambusher';
+  const shot = enemies[enemy].intents.find(({ kind, ranged }) => kind === 'heavy' && ranged);
+  const duel = staged(enemy, { realm: 3 });
+  duel.combat.plan = { round: 0, reader: null, intent: shot };
+  const attainable = structuredClone(duel);
+  const close = structuredClone(duel);
+  close.combat.plan.intent.ranged = false;
+  duel.evadeSeed = seedBetween(0.21, 0.23);
+  close.evadeSeed = duel.evadeSeed;
+  attainable.evadeSeed = seedBetween(0.01, 0.04);
+  assert.equal(play(duel, 'dodge').dodged, false);
+  assert.equal(play(close, 'dodge').dodged, true);
+  assert.equal(play(attainable, 'dodge').dodged, true);
 });
 
 test('both ordinary and charge-only weapons can be paired and selected in either hand', () => {

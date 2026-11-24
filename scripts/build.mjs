@@ -4,12 +4,12 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const file = async path => (await readFile(new URL(path, root), "utf8")).replace(/\r\n/g, "\n");
-const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, world, training, data, economy, alchemy, ferry, hazards, caravan, employers, border, hunts, dyke, ridge, kit, tactics, engine, app] = await Promise.all([
+const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, world, training, data, economy, alchemy, ferry, hazards, caravan, employers, border, hunts, dyke, ridge, kit, innerStyles, tactics, engine, app] = await Promise.all([
   file("game.html"), file("style.css"), file("intro.css"), file("river-content.mjs"), file("zhao-content.mjs"), file("sand-content.mjs"),
   file("late-content.mjs"), file("puzzle-content.mjs"), file("mechanisms.mjs"), file("tournament.mjs"), file("world.mjs"), file("training.mjs"), file("data.mjs"), file("economy.mjs"),
   file("alchemy.mjs"), file("ferry-content.mjs"), file("hazards.mjs"), file("caravan-content.mjs"),
   file("employers-content.mjs"), file("border-content.mjs"), file("hunt-materials.mjs"), file("dyke-armory.mjs"), file("ridge-armory.mjs"),
-  file("explorer-kit.mjs"), file("combat-tactics.mjs"), file("engine.mjs"), file("app.mjs"),
+  file("explorer-kit.mjs"), file("inner-style-content.mjs"), file("combat-tactics.mjs"), file("engine.mjs"), file("app.mjs"),
 ]);
 const originalCss = `${style}\n${intro}`;
 const destination = process.argv[2] ? resolve(process.argv[2]) : fileURLToPath(new URL("dist/雾渡山河.html", root));
@@ -89,6 +89,10 @@ return ridgeArmoryContent;
 const explorerKitContent = (() => {
 ${moduleBody(kit)}
 return explorerKitContent;
+})();
+const innerStyleContent = (() => {
+${moduleBody(innerStyles)}
+return innerStyleContent;
 })();
 const moduleData = (() => {
 ${moduleBody(data)}

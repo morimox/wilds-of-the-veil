@@ -28,3 +28,5 @@ lake_bow,回湖弓,制作,r_lake_bow,68,松木（wood）×12、兽革（hide）�
 quarry_spear,裂鳞枪,制作,r_quarry_spear,68,暗金（black_iron）×9、灵晶（core）×7、金丹期妖丹（gold_core）×5、兽革（hide）×5、厚甲片（hard_scale）×14,,,是,
 ferry_pole,渡工短篙,现场获得,背风灯台（wharf_lee_lamp） · 用松木给灯台补两只脚,,,,,否,
 anvil_hammer,短柄砧锤,制作,r_anvil_hammer,18,寒铁（ore）×6、松木（wood）×2、兽革（hide）×2,,,是,
+leather_knuckles,缠皮指虎,制作,r_leather_knuckles,5,兽革（hide）×2、灵草（reed）×1、寒铁（ore）×1,,,是,
+echo_knuckles,叩石指虎,制作,r_echo_knuckles,38,暗金（black_iron）×6、厚甲片（hard_scale）×5、坚韧兽筋（battle_sinew）×5、筑基期妖丹（foundation_core）×2,,,是,

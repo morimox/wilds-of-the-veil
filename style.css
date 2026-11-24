@@ -139,12 +139,16 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
   overflow-wrap: anywhere;
   pointer-events: none;
 }
-.entry-anchor { position: relative; display: inline-block; max-width: 100%; }
+.entry-anchor, .action-hint { position: relative; display: inline-block; max-width: 100%; }
+.action-hint > .item-tip { position: absolute; z-index: 3; top: 100%; left: 50%; width: min(190px, 50vw); transform: translateX(-50%); }
+.action-hint > button:focus-visible + .item-tip { display: block; }
 .item-tools { display: flex; grid-column: 1 / -1; flex-wrap: wrap; gap: 5px; margin: 4px 0; }
 .item-tools .button { padding: 3px 8px; min-height: 30px; font-size: 13px; }
+.manual-upgrade-note { flex-basis: 100%; overflow-wrap: anywhere; }
 @media (hover: hover) {
   .item-trigger:hover + .item-tip { position: absolute; z-index: 3; display: block; inset: calc(100% - 1px) 0 auto; }
   .entry-anchor > .item-trigger:hover + .item-tip { right: auto; width: min(236px, 73vw); }
+  .action-hint > button:hover + .item-tip { display: block; }
 }
 .item-trigger:focus-visible + .item-tip,
 .item-trigger[aria-expanded="true"] + .item-tip {

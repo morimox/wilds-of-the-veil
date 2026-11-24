@@ -54,7 +54,7 @@ export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, rea
   const threat = incomingEstimate(enemy, guard ?? order.find(({ kind }) => kind === 'guard'), observedHits);
   const open = threat?.open ?? 0;
 
-  const safeWindow = read?.kind === 'brace' || read?.kind === 'focus' || read?.kind === 'recover' || read?.kind === 'switch';
+  const safeWindow = ['brace', 'dodge', 'focus', 'recover', 'switch'].includes(read?.kind);
   const recentlyPassive = previousKind === 'guard' || recentlyRecovered || previousKind === 'focus';
   if (medicine?.hp > 0 && !recentlyRecovered && read?.kind !== 'retreat' &&
       (safeWindow || (threat && !recentlyPassive && open < hp))) {
@@ -78,6 +78,10 @@ export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, rea
     if (worthwhileHeal(enemy, heal, hp, 0, strategy.healAt)) return heal;
     if (!charged && hp > enemy.hp * 0.25 && enemy.strategy !== 'predator') return focus;
     return attack;
+  }
+  if (read.kind === 'dodge') {
+    if (worthwhileHeal(enemy, heal, hp, 0, strategy.healAt)) return heal;
+    return available.find(({ accuracy, ranged, kind }) => isAttack(kind) && (accuracy || ranged || kind === 'drain')) ?? attack;
   }
   if (read.kind === 'recover' && worthwhileHeal(enemy, heal, hp, 0, strategy.healAt)) return heal;
   if (read.kind !== 'strike') {

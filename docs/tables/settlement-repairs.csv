@@ -51,6 +51,8 @@
 落灯村（village）,落灯村工坊,side_hook,系绳短钩,0,5
 落灯村（village）,落灯村工坊,anvil_hammer,短柄砧锤,0,12
 落灯村（village）,落灯村工坊,scale_chisel,翻鳞凿,0,10
+落灯村（village）,落灯村工坊,leather_knuckles,缠皮指虎,0,4
+落灯村（village）,落灯村工坊,echo_knuckles,叩石指虎,0,15
 照原城（zhao_city）,蒲霖的后炉,cudgel,枣木杖,2,5
 照原城（zhao_city）,蒲霖的后炉,knife,割苇短刀,2,7
 照原城（zhao_city）,蒲霖的后炉,split_axe,劈柴小钺,2,6
@@ -103,6 +105,8 @@
 照原城（zhao_city）,蒲霖的后炉,side_hook,系绳短钩,2,7
 照原城（zhao_city）,蒲霖的后炉,anvil_hammer,短柄砧锤,2,14
 照原城（zhao_city）,蒲霖的后炉,scale_chisel,翻鳞凿,2,12
+照原城（zhao_city）,蒲霖的后炉,leather_knuckles,缠皮指虎,2,6
+照原城（zhao_city）,蒲霖的后炉,echo_knuckles,叩石指虎,2,17
 叩石院（sand_bell_cloister）,梁弦的外院修具台,cudgel,枣木杖,3,6
 叩石院（sand_bell_cloister）,梁弦的外院修具台,knife,割苇短刀,3,8
 叩石院（sand_bell_cloister）,梁弦的外院修具台,split_axe,劈柴小钺,3,7
@@ -155,3 +159,5 @@
 叩石院（sand_bell_cloister）,梁弦的外院修具台,side_hook,系绳短钩,3,8
 叩石院（sand_bell_cloister）,梁弦的外院修具台,anvil_hammer,短柄砧锤,3,15
 叩石院（sand_bell_cloister）,梁弦的外院修具台,scale_chisel,翻鳞凿,3,13
+叩石院（sand_bell_cloister）,梁弦的外院修具台,leather_knuckles,缠皮指虎,3,7
+叩石院（sand_bell_cloister）,梁弦的外院修具台,echo_knuckles,叩石指虎,3,18
