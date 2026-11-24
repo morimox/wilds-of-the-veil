@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { data } from './data.mjs';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame, prepareQuietRoad, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 function play(state, action, payload) {
   if (state.event && ['travel', 'visit', 'revisit', 'wait'].includes(action)) {
@@ -29,6 +30,7 @@ function pickGathered(state, gathered) {
 }
 
 function walk(state, id) {
+  prepareQuietRoad(state);
   play(state, 'travel', { id });
 }
 
@@ -101,7 +103,7 @@ function uncoverFerryman(state) {
   return chooseAt(state, 'bank_watch', 1);
 }
 
-const marshLandmarks = ['reed_banks', 'sunk_pack', 'mud_track', 'bank_watch', 'marsh_pole_lesson'];
+const marshLandmarks = ['reed_banks', 'sunk_pack', 'mud_track', 'bank_watch', 'bandit_marsh_lamp', 'marsh_pole_lesson'];
 const siteIds = (state) => view(state).sites.map(({ id }) => id);
 const marketStock = (state) => view(state).market.stalls.flatMap(({ offers }) => offers.map(({ id }) => id));
 
@@ -439,7 +441,8 @@ test('chosen sites retain depletion, and only elapsed days replenish their local
   const huntCoins = hunting.coins;
   const retreating = structuredClone(hunting);
   choose(retreating, 0);
-  play(retreating, 'retreat');
+  stageRetreatOpening(retreating);
+  assert.equal(play(retreating, 'retreat').retreated, true);
   assert.equal(huntCount(retreating), initial);
   choose(hunting, 0);
   for (let turn = 0; hunting.combat && turn < 6; turn++) play(hunting, 'attack');
@@ -503,7 +506,8 @@ test('a guarded herb is gathered separately from the spirit that blocks the bank
 
   const escaping = structuredClone(state);
   choose(escaping, 1);
-  play(escaping, 'retreat');
+  stageRetreatOpening(escaping);
+  assert.equal(play(escaping, 'retreat').retreated, true);
   seek(escaping, 'reed_ferryman');
   assert.equal(act(escaping, 'choose', { index: 3 }).ok, false);
   assert.equal(escaping.inventory.reed, undefined);
@@ -1161,9 +1165,13 @@ test('restoratives heal, toxin applies at the threshold, and a retreat talisman 
   state.inventory.reed_talisman = 1;
   state.combat = { id: 'mud_beast', hp: 25, round: 1, escapeBonus: 0 };
   const before = state.hp;
-  play(state, 'use', { id: 'reed_talisman' });
-  assert.equal(state.hp, before);
+  const blocked = play(state, 'use', { id: 'reed_talisman' });
+  assert.equal(blocked.retreated, false);
+  assert.ok(state.hp < before);
+  assert.ok(state.combat);
   assert.equal(state.inventory.reed_talisman, undefined);
+  stageRetreatOpening(state);
+  assert.equal(play(state, 'retreat').retreated, true);
   assert.equal(view(state).mode, 'field');
 });
 

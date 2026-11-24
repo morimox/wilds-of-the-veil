@@ -2,11 +2,12 @@ import * as moduleData from './data.mjs';
 import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale } from './economy.mjs';
 import { hazardView, hazardAction, hazardVictory } from './hazards.mjs';
 import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
-import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement } from './world.mjs';
+import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView } from './world.mjs';
 import { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead } from './training.mjs';
 import { initialMechanisms, mechanismView, mechanismAction } from './mechanisms.mjs';
 import { tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution } from './tournament.mjs';
 import { chooseEnemyIntent } from './combat-tactics.mjs';
+import { checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit } from './bandits.mjs';
 
 const data = { ...moduleData.default, ...moduleData };
 
@@ -54,7 +55,9 @@ export const rules = Object.freeze({
   ebbCycleDays: 2,
   ebbWindowDays: 0.625,
   retreatDays: 0.25,
-  retreatDamageFactor: 0.5,
+  escapeDodgeFactor: 0.75,
+  escapeChanceCap: 0.85,
+  banditEscapeChanceCap: 0.40,
   mixedTrackDays: 3,
   mixedTrackHealingPerDay: 6,
   emptyReturnDays: 0.25,
@@ -228,8 +231,11 @@ function combinedResources(...lists) {
 }
 
 function groundPlace(state) {
-  return state.event ?? state.combat?.siteId ?? state.region;
+  return state.event ?? state.combat?.siteId ?? state.roadTrip?.stop ?? state.region;
 }
+
+const roadsideActions = new Set(['eat', 'batchEat', 'use', 'equip', 'unequip', 'equipManual',
+  'unequipManual', 'selectAmmo', 'take', 'discard']);
 
 function groundAt(state, place = groundPlace(state)) {
   return state.ground?.[place] ?? {};
@@ -433,6 +439,14 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     combatSeed: (seed ^ 0x9e3779b9) >>> 0,
     evadeSeed: (seed ^ 0x85ebca6b) >>> 0,
     enemyEvadeSeed: (seed ^ 0x27d4eb2f) >>> 0,
+    roadSeed: (seed ^ 0xc2b2ae35) >>> 0,
+    banditLootSeed: (seed ^ 0x76f1c043) >>> 0,
+    escapeSeed: (seed ^ 0x165667b1) >>> 0,
+    roadTrip: null,
+    roadBandit: null,
+    banditCrews: {},
+    resolvedBandits: [],
+    banditLeads: [],
     basketInspected: false,
     basketDisposition: null,
     showedHideToSmith: false,
@@ -537,8 +551,9 @@ function knowsChoice(state, choice, site) {
 
 function knowsSite(state, site) {
   const visited = state.eventsSeen[site.region] ?? [];
-  const startsVisible = !site.afterChoices?.length && !site.reveal;
+  const startsVisible = !site.afterChoices?.length && !site.reveal && !site.afterBandit;
   return startsVisible || visited.includes(site.id) ||
+    Boolean(site.afterBandit && state.banditLeads.includes(site.id)) ||
     Boolean(site.afterChoices?.some((id) => state.seenChoices.includes(id))) ||
     Boolean(site.reveal && isRevealed(state, site.reveal));
 }
@@ -651,7 +666,7 @@ export function view(state) {
   const observed = combatRead === 'player' || (state.combat && state.combat.spiritReadRound === state.combat.round);
   const intent = observed ? readableIntent(state) : null;
   const inSettlement = isSettlement(state);
-  const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.event ? 'event' : inSettlement ? 'village' : 'field';
+  const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.roadTrip ? 'road' : state.event ? 'event' : inSettlement ? 'village' : 'field';
   const questLocation = inSettlement ? state.region : hub;
   const discoveredQuests = data.quests.filter((quest) => (quest.region ?? hub) === questLocation && knowsQuest(state, quest));
   const services = data.services.filter(({ id }) => knowsService(state, id) && (!inSettlement || atHome(state) ||
@@ -680,11 +695,13 @@ export function view(state) {
       ...(gather.length ? { gather } : {}) };
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
     knowsChoice(state, currentEvent.choices[index], currentSite));
-  const { combatSeed, evadeSeed, enemyEvadeSeed, combat, ...visibleState } = state;
+  const { combatSeed, evadeSeed, enemyEvadeSeed, roadSeed, banditLootSeed, escapeSeed, combat, roadTrip, roadBandit,
+    banditCrews, resolvedBandits, banditLeads, ...visibleState } = state;
   return {
     ...visibleState,
     ...stats(state),
     ...worldView(state, economyKit),
+    roadTrip: roadTrip ? { ...roadTripView(state, economyKit), bandit: roadBanditView(state, economyKit) } : null,
     localHazard: hazardView(state, economyKit),
     training: studies.rows,
     innerStyle: innerStyleView(state, combatWeapon, side),
@@ -693,7 +710,7 @@ export function view(state) {
     tournament: tournamentView(state, economyKit),
     maxSatiety: rules.maxSatiety,
     restSessions: mode === 'village' && settlementOf(data, state.region)?.inn ? recoverySessions(state) : 0,
-    batchMeals: ['field', 'village', 'event'].includes(mode) && !state.gathering
+    batchMeals: (['field', 'village', 'event'].includes(mode) || (mode === 'road' && !roadBandit)) && !state.gathering
       ? Object.fromEntries(data.foods.map(({ id }) => [id, batchMealCount(state, id)]).filter(([, count]) => count > 1))
       : {},
     fogTolerance: totalFogTolerance(state, fogProtection(state)),
@@ -1129,7 +1146,7 @@ function fall(state, place = groundPlace(state)) {
     .filter(([id, count]) => count > 0 && records.items[id]?.kind !== 'key' && !records.items[id]?.keepOnFall));
   leaveOnGround(state, lostGoods, state.durability, place);
   const dropped = goodsText(lostGoods);
-  const placeName = records.sites[place]?.name ?? regionOf(state).name;
+  const placeName = state.roadTrip ? '刚才交手的路边' : records.sites[place]?.name ?? regionOf(state).name;
   for (const [id, count] of Object.entries(lostGoods)) removeItem(state, id, count);
   state.expeditionLoot = {};
   state.coins -= coinsLost;
@@ -1137,6 +1154,8 @@ function fall(state, place = groundPlace(state)) {
   state.event = null;
   state.gathering = null;
   state.combat = null;
+  state.roadTrip = null;
+  state.roadBandit = null;
   state.pressure = 0;
   state.focus = 0;
   state.toxin = 0;
@@ -1157,6 +1176,12 @@ function mechanismFailure(state, { damage = 0, fatal = false }, cause) {
 
 function finishCombat(state, enemy) {
   const combat = state.combat;
+  if (combat.roadBandit) {
+    state.combat = null;
+    state.focus = 0;
+    recordPractice(state);
+    return winRoadBandit(state, enemy, economyKit);
+  }
   const site = records.sites[combat.siteId];
   const protectedBout = inProtectedBout(state);
   if (site?.creatures?.[enemy.id]) {
@@ -1216,13 +1241,31 @@ function breathingQi(state) {
   return Math.min(recovery, Math.max(0, stats(state).maxQi - state.qi));
 }
 
+export function baseEscapeChance(enemy) {
+  if (enemy.escapeChance !== undefined) return enemy.escapeChance;
+  const tags = enemy.tags ?? [];
+  const base = tags.includes('human') ? 0.32
+    : tags.includes('stoneborn') ? 0.62
+    : tags.includes('furred') ? 0.42
+    : tags.includes('spirit') ? 0.44 : 0.58;
+  return Math.max(0.18, base - (enemy.tier ?? 0) * 0.018 - (enemy.hp >= 90 ? 0.06 : 0));
+}
+
 function retreatRisk(state, enemy, intent, bonus = 0, guard = 0) {
-  const { defense, retreat: retreatBonus } = stats(state);
+  if (!attackingIntent(intent)) {
+    const evasion = combatTraits(activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), enemy, intent).dodge
+      + (activeManualRank(state)?.base.dodge ?? 0);
+    const cap = enemy.tags?.includes('bandit') ? rules.banditEscapeChanceCap : rules.escapeChanceCap;
+    const chance = clamp(baseEscapeChance(enemy) + stats(state).retreat + evasion * rules.escapeDodgeFactor + (state.combat.escapeBonus ?? 0) + bonus,
+      0, cap);
+    return { blocked: false, chance, damage: 0, wouldFall: false };
+  }
+  const { defense } = stats(state);
   const training = trainingPerks(state, enemy, intent);
-  const reduction = clamp(retreatBonus + (state.combat.escapeBonus ?? 0) + bonus, 0, 1);
-  const damage = Math.max(0, Math.ceil(estimatedHit(state, enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
-    - defense - guard - training.guard);
-  return { damage, wouldFall: damage > 0 && damage >= state.hp, retreatBonus };
+  const traits = combatTraits(activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), enemy, intent);
+  const damage = Math.max(0, estimatedHit(state, enemy, intent) - Math.max(0, defense - (enemy.manualPierce ?? 0))
+    - guard - training.guard - traits.guard - (intent.kind === 'drain' ? state.qi : 0));
+  return { blocked: true, chance: 0, damage, wouldFall: damage >= state.hp };
 }
 
 function crossRealmFactor(state, enemy) {
@@ -1313,7 +1356,9 @@ function combatEffects(state, enemy, intent, move) {
   const proposedDamage = damage > 0
     ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - (focus?.pierce ?? 0)
       - (strikingTraits?.pierce ?? 0) - training.pierce - (ammo?.pierce ?? 0))) : 0;
-  const missChance = dodgeChance(enemy.dodge ?? 0, strikingTraits?.accuracy ?? 0, rules.combatDodgeCap);
+  const enemyActiveDodge = intent.kind === 'dodge';
+  const missChance = dodgeChance((enemy.dodge ?? 0) + (enemyActiveDodge ? rules.combatActiveDodge : 0), strikingTraits?.accuracy ?? 0,
+    enemyActiveDodge ? rules.combatActiveDodgeCap : rules.combatDodgeCap);
   const missed = proposedDamage > 0 && Boolean(move.weaponClass) && combatEvaded(state, 'enemy', missChance);
   const dealt = missed ? 0 : proposedDamage;
   const interrupt = missed ? 0 : proposedInterrupt;
@@ -1426,6 +1471,8 @@ function combatTurn(state, move) {
     summary += `气血回了${restored}点。`;
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
+  } else if (intent.kind === 'dodge') {
+    summary += missed ? '他贴着路沿站稳。' : '他错开一步，绕到了旁边。';
   } else if (intent.kind === 'focus') {
     state.combat.enemyCharged = dealt < rules.chargeBreakDamage && !interrupt;
     summary += state.combat.enemyCharged ? '它的下一记出招会更重。' : '蓄势被你打断了。';
@@ -1471,29 +1518,30 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
   }
   const intent = respondToMove(state, enemy, 'retreat');
-  const { damage: received } = retreatRisk(state, enemy, intent, bonus, guard);
+  const { blocked, chance } = retreatRisk(state, enemy, intent, bonus, guard);
+  if (!blocked) state.escapeSeed = (Math.imul(state.escapeSeed ?? 1, 1664525) + 1013904223) >>> 0;
+  if (blocked || state.escapeSeed / 0x100000000 >= chance) {
+    const failure = combatTurn(state, { kind: 'retreat', guard,
+      message: `${lead}你转身要走，${enemy.name}紧跟上来，没能脱身。` });
+    return { ...failure, retreated: false };
+  }
   advance(state, rules.retreatDays);
   const charmDamage = activeGear(state).some(({ slot, retreat }) => slot === 'charm' && retreat > 0) ? wear(state, 'charm') : '';
-  const armorDamage = received ? wear(state, 'armor') : '';
-  const healthBefore = state.hp;
-  state.hp -= received;
-  normalize(state);
-  const damageTaken = Math.max(0, healthBefore - state.hp);
   const outerEdge = state.combat.huntChoice !== undefined ? state.combat.siteId : null;
-  const position = outerEdge ? '退回了这处猎场的外沿' : `仍在${regionOf(state).name}`;
-  const reaction = attackingIntent(intent) ? `${enemy.name}以「${intent.name}」追来。` : '';
-  const summary = `${lead}${reaction}你退出了与${enemy.name}的交手，${position}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
-  say(state, summary);
-  if (state.hp === 0) {
-    const fell = fall(state);
-    return { ...fell, message: summary + fell.message, damageDealt: 0, damageTaken };
-  }
+  const road = state.combat.roadBandit;
+  const position = outerEdge ? '退回了这处猎场的外沿' : road ? '折回先前走过的路口' : `仍在${regionOf(state).name}`;
+  const summary = `${lead}趁${enemy.name}使出「${intent.name}」，你脱开身，${position}。${charmDamage}`;
   if (outerEdge) {
     saveHuntTrack(state);
     state.event = outerEdge;
   }
   state.combat = null;
-  return { ok: true, message: summary, damageDealt: 0, damageTaken };
+  state.focus = 0;
+  if (road) {
+    state.roadBandit = null;
+    backFromRoad(state, economyKit);
+  }
+  return { ...say(state, summary), damageDealt: 0, damageTaken: 0, retreated: true };
 }
 
 function cast(state, id) {
@@ -2205,6 +2253,8 @@ const economyKit = {
   data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem, startCombat, readableIntent,
   missingItems, payItems, hasRoom, backpackSlots, leaveOnGround, groundAt, nameOf, goodsText, normalize,
   isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure, roadProtection,
+  saleTerms, activeGear, checkRoadStep: (state, leg, index) => checkRoadBanditStep(state, leg, index, economyKit),
+  roadRisk: (state, leg) => roadBanditRisk(state, leg, economyKit),
   eatOnRoad: (state, id) => eat(state, false, id),
 };
 
@@ -2295,6 +2345,13 @@ function takeTurn(state, action, payload) {
   if (state.combat) {
     if (Object.hasOwn(combatActions, action)) return combatActions[action](state, payload);
     return refuse('先处理眼前的对手。');
+  }
+  if (state.roadTrip) {
+    if (state.roadBandit) return banditAction(state, action, payload, economyKit) ?? refuse('先处理眼前拦路的人。');
+    if (action === 'roadContinue') return continueRoad(state, economyKit);
+    if (action === 'roadBack') return backFromRoad(state, economyKit);
+    if (roadsideActions.has(action)) return generalActions[action](state, payload);
+    return refuse('先走完这段路，或折回先前的路口。');
   }
   if (action === 'gateScroll') return worldAction(state, action, payload, economyKit);
   const tournament = tournamentAction(state, action, economyKit);

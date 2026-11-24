@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
-import { act, createGame, view } from './engine.mjs';
+import { act, view } from './engine.mjs';
+import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 function play(state, action, payload) {
   const result = act(state, action, payload);
@@ -112,7 +113,8 @@ function finishSource(state, first, second, chief) {
   choose(state, 3);
   assert.equal(view(state).currentEnemy.id, chief);
   const site = state.combat.siteId;
-  play(state, 'retreat');
+  stageRetreatOpening(state);
+  assert.equal(play(state, 'retreat').retreated, true);
   assert.equal(state.siteVictories[site][chief], undefined, 'retreat never clears a guard');
   play(state, 'visit', { id: site });
   assert.equal(option(state, 3).available, true);

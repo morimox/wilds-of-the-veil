@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
 const reedManual = 'reed_hand_manual';
 const forgeManual = 'forge_fist_manual';

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 import { data } from './data.mjs';
 import { trainingData } from './training.mjs';
 
@@ -121,7 +122,8 @@ test('one spirit reading per round, one guarded reply, and rest at a visited new
   play(state, 'readSpirit');
   assert.equal(view(state).spiritSense.prediction, null);
   assert.equal(view(state).intent, null);
-  play(state, 'retreat');
+  stageRetreatOpening(state);
+  assert.equal(play(state, 'retreat').retreated, true);
   assert.equal(view(state).spiritSense.current, 0);
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;

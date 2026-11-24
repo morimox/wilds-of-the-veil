@@ -18,7 +18,7 @@ export const explorerKitContent = {
       field: { fogTolerance: 1 }, entry: '帽檐拦开扑到眼前的雾，容易看清对手的来招。在雾里多待一阵才会耗真气。' },
     { id: 'reed_boots', slot: 'boots', tier: 0, retreat: 0.06, durability: 28, repair: 5,
       trait: { kind: 'dodge', bonus: 0.08, intent: 'attack' },
-      entry: '鞋底踩得住，寻常的贴身一击有时能侧步闪开。转身脱离交手时也能少挨追击。' },
+      entry: '鞋底踩得住，寻常的贴身一击有时能侧步闪开。脚下轻，赶路不容易招眼，有空当也好抽身。' },
     { id: 'breath_belt', slot: 'belt', tier: 2, qi: 4, hp: 3, def: 1, durability: 44, repair: 10,
       entry: '勒在腰腹，带下的灵晶能养一口长气。气息稳了，腰腹挨招也有些支撑。' },
     { id: 'side_hook', slot: 'offhand', weaponClass: 'blade', tier: 0, sideAtk: 4, sidePierce: 1, sideGuard: 2, durability: 30, repair: 5,

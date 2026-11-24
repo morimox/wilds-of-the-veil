@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
 function play(state, action, payload) {
   const result = act(state, action, payload);
@@ -70,15 +71,18 @@ test('interrupting arts can deny an actual field enemy’s restoration', () => {
   assert.equal(ordinary.qi - state.qi, 3);
 });
 
-test('retreat forecast distinguishes lethal pursuit from the safe enemy guard window', () => {
+test('a known attack blocks retreat and a guard opening offers a seeded escape', () => {
   const state = startHunt();
   assert.equal(revealCurrentMove(state).intent.kind, 'heavy');
-  assert.equal(view(state).retreatRisk.damage, 3);
   state.hp = 3;
   const safeOpening = structuredClone(state);
   const forecast = view(state).retreatRisk;
+  assert.equal(forecast.blocked, true);
+  assert.equal(forecast.chance, 0);
   assert.equal(forecast.wouldFall, true);
-  assert.equal(play(state, 'retreat').damageTaken, forecast.damage);
+  const failed = play(state, 'retreat');
+  assert.equal(failed.retreated, false);
+  assert.equal(failed.damageTaken, 3);
   assert.equal(view(state).mode, 'village');
 
   // A healthier traveler can brace once and wait for a safe opening.
@@ -87,6 +91,14 @@ test('retreat forecast distinguishes lethal pursuit from the safe enemy guard wi
   assert.equal(revealCurrentMove(safeOpening).intent.kind, 'guard');
   assert.equal(view(safeOpening).retreatRisk.damage, 0);
   assert.equal(view(safeOpening).retreatRisk.wouldFall, false);
+  assert.equal(view(safeOpening).retreatRisk.blocked, false);
+  assert.ok(view(safeOpening).retreatRisk.chance > 0);
+  const unlucky = structuredClone(safeOpening);
+  unlucky.escapeSeed = 1500;
+  assert.equal(play(unlucky, 'retreat').retreated, false);
+  assert.ok(unlucky.combat);
+  safeOpening.escapeSeed = 1972;
   assert.equal(play(safeOpening, 'retreat').damageTaken, 0);
+  assert.equal(safeOpening.combat, null);
   assert.equal(safeOpening.region, 'marsh');
 });

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { act, createGame, view } from './engine.mjs';
+import { act, view } from './engine.mjs';
+import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
 const play = (state, action, options) => {
   const result = act(state, action, options);

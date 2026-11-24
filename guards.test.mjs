@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { data } from './data.mjs';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 const definition = (id) => data.sites.find((site) => site.id === id);
 const field = (state, id) => view(state).sites.find((site) => site.id === id);
@@ -224,7 +225,8 @@ test('encounter-prone harvesting can succeed, get interrupted, or be safe when t
     assert.equal(view(hit).groundLoot[item], undefined);
     assert.equal(view(hit).currentEnemy.id, enemy);
     const present = field(hit, site).creatures[enemy];
-    play(hit, 'retreat');
+    stageRetreatOpening(hit);
+    assert.equal(play(hit, 'retreat').retreated, true);
     assert.equal(field(hit, site).creatures[enemy], present);
     assert(field(hit, site).witnessedEnemies.includes(enemy));
     enter(hit, site);

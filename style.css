@@ -85,7 +85,20 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .panel-header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
 .actions { margin-top: 9px; }
 .place-actions { margin-top: 0; }
-.route-action { display: inline-flex; align-items: center; gap: 6px; }
+.route-action { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+.route-action > .button { flex: 0 0 auto; }
+.route-notes { min-width: 0; }
+.route-warning { margin-top: 2px; }
+.road-position { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; padding: 0 0 7px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.road-position strong { color: var(--jade); font-weight: 600; }
+.road-position small { font-size: inherit; }
+.road-demand { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; margin-top: 10px; color: var(--amber); }
+.road-offers { margin-top: 10px; }
+.road-offers > summary { color: var(--jade); cursor: pointer; }
+.road-offer { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+.road-offer:first-of-type { margin-top: 4px; }
+.road-offer > .actions { margin-top: 0; }
+.retreat-cue { margin-top: 5px; }
 .site-list { display: grid; gap: 6px; }
 .site-list:not(:empty) { margin-bottom: 12px; }
 .site-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; }

@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
 import { economyData } from './economy.mjs';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
 function play(state, action, payload = {}) {
   const result = act(state, action, payload);

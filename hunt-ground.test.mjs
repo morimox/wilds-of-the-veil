@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
-import { act, createGame, view } from './engine.mjs';
+import { act, view } from './engine.mjs';
+import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
 const herb = {
   site: 'herb_den', region: 'herb_basin', lead: 'mist_shelter',

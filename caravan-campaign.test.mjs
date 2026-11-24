@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
-import { act, createGame, view } from './engine.mjs';
+import { act, view } from './engine.mjs';
+import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 function play(state, action, payload) {
   const result = act(state, action, payload);
@@ -233,7 +234,8 @@ test('retreat and defeat leave the guards in place and preserve the reopened sid
   visit(state, 'caravan_wagon_rise');
   choose(state, 0);
   choose(state, 1);
-  play(state, 'retreat');
+  stageRetreatOpening(state);
+  assert.equal(play(state, 'retreat').retreated, true);
   visit(state, 'caravan_wagon_rise');
   assert.equal(field(state, 'caravan_wagon_rise').creatures.caravan_guard_hound, 2);
   assert.equal(option(state, 0), undefined);

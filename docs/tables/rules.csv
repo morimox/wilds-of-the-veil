@@ -32,7 +32,9 @@ harvestEncounterDays,0.125,采集中遭遇伏击时开打前用时（天）
 ebbCycleDays,2,闭潮渡退水循环（游戏日）
 ebbWindowDays,0.625,每次退水维持时间（游戏日）
 retreatDays,0.25,撤出战斗所需用时（天）
-retreatDamageFactor,0.5,脱身时先乘此值，再计算减伤和防御
+escapeDodgeFactor,0.75,战斗闪避值折算成脱身概率的倍率
+escapeChanceCap,0.85,普通敌手有空当时的脱身概率上限
+banditEscapeChanceCap,0.4,强盗有空当时的脱身概率上限
 mixedTrackDays,3,混合猎场的同一路脚印消散用时（游戏日）
 mixedTrackHealingPerDay,6,失去接触的猎物每日恢复气血（向下取整）
 emptyReturnDays,0.25,空腹返村额外用时（天）

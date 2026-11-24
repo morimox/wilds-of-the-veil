@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
 const enemies = Object.fromEntries(data.enemies.map((enemy) => [enemy.id, enemy]));
 const gear = Object.fromEntries(data.gear.map((entry) => [entry.id, entry]));

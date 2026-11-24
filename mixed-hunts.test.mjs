@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
-import { act, createGame, view } from './engine.mjs';
+import { act, view } from './engine.mjs';
+import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 const quarry = 'sand_hunt_colony';
 const actors = ['sand_quarry_skink', 'sand_quarry_guard', 'sand_quarry_matriarch', 'sand_quarry_rockscorpion'];
@@ -42,7 +43,8 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   play(full, 'attack');
   const previousFoeHealth = full.combat.hp;
   const observed = structuredClone(full.combat.observedHits);
-  play(full, 'retreat');
+  stageRetreatOpening(full);
+  assert.equal(play(full, 'retreat').retreated, true);
   assert.deepEqual(countAt(full), [48, 8, 1, 24]);
   assert.ok(!full.siteVictories[quarry]);
   assert.ok(!full.ground[quarry]);
@@ -53,7 +55,8 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   assert.equal(full.encounterSeed, randomAfterFirst);
   assert.equal(full.combat.hp, previousFoeHealth + 1);
   assert.deepEqual(full.combat.observedHits, observed);
-  play(full, 'retreat');
+  stageRetreatOpening(full);
+  assert.equal(play(full, 'retreat').retreated, true);
   play(full, 'leave');
   play(full, 'eat', { id: 'ration' });
   for (let day = 0; day < 3; day++) {

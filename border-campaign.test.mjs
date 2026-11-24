@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 import { data } from './data.mjs';
 
 function play(state, action, details = {}) {
@@ -271,8 +272,8 @@ test('a weak arrival can turn back, or fall and return without opening stages or
   const coins = state.coins;
   choose(state, 0);
   assert.equal(view(state).currentEnemy.sparring, false);
-  const beforeRetreat = state.hp;
-  assert.ok(play(state, 'retreat').damageTaken < beforeRetreat);
+  stageRetreatOpening(state);
+  assert.equal(play(state, 'retreat').retreated, true);
   assert.equal(state.region, 'chalk_hoof_trail');
   visit(state, 'border_hoof_patrol');
   assert.equal(available(state, 0), true);

@@ -23,7 +23,7 @@ const manuals = [
         base: { qi: 3, restQi: 2, fogTolerance: 1 }, effect: '歇息更容易回气，入雾也能多撑一阵。' },
       { tier: 3, cost: 40, days: 2, need: { reed: 6, core: 4, foundation_core: 1 },
         base: { qi: 4, restQi: 3, fogTolerance: 2, retreat: 0.05 },
-        effect: '最适合常进浓雾的人。歇脚回气更多，撤身时也能少挨一点追击。' },
+        effect: '最适合常进浓雾的人。歇脚回气更多，见到空当时也更容易抽身。' },
     ],
   },
   {
@@ -61,11 +61,11 @@ const manuals = [
     ranks: [
       { base: { dodge: 0.04, evadeQi: 1 }, effect: '被打时有机会错开来势。闪过一招，便能趁那一口空当回些真气。' },
       { tier: 3, cost: 25, days: 1, need: { reed: 4, hide: 3, qi_core: 3 },
-        base: { dodge: 0.055, evadeQi: 1, retreat: 0.025 }, effect: '换脚更轻，也能少挨一点撤身时的追击。' },
+        base: { dodge: 0.055, evadeQi: 1, retreat: 0.025 }, effect: '换脚更轻，趁空当撤身时也比较容易脱开。' },
       { tier: 5, cost: 47, days: 2, need: { core: 4, battle_sinew: 4, foundation_core: 2 },
         base: { dodge: 0.07, evadeQi: 2, retreat: 0.035 }, effect: '脚下更轻捷些，避开一招后也能回上更多真气。' },
       { tier: 7, cost: 71, days: 3, need: { black_iron: 4, beast_eye: 2, gold_core: 2 },
-        base: { dodge: 0.08, evadeQi: 3, retreat: 0.045 }, effect: '翻身与换气接得更短。成功闪身时回气最多，身后有追手仍能先站稳。' },
+        base: { dodge: 0.08, evadeQi: 3, retreat: 0.045 }, effect: '翻身与换气接得更短。成功闪身时回气最多，瞅见空当时也好抽身。' },
     ],
   },
   {

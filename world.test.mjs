@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { act, createGame, rules, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
+import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 import { data } from './data.mjs';
 import { transportRules } from './world.mjs';
 

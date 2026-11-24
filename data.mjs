@@ -10,6 +10,7 @@ import { caravanContent } from './caravan-content.mjs';
 import { employersContent } from './employers-content.mjs';
 import { borderContent } from './border-content.mjs';
 import { innerStyleContent } from './inner-style-content.mjs';
+import { banditContent } from './bandit-content.mjs';
 import { huntMaterialContent } from './hunt-materials.mjs';
 import { dykeArmoryContent } from './dyke-armory.mjs';
 import { ridgeArmoryContent } from './ridge-armory.mjs';
@@ -188,13 +189,13 @@ const gear = [
   { id: 'tide_coat', slot: 'armor', tier: 2, atk: 0, def: 5, hp: 9, qi: -1, retreat: 0, durability: 46, repair: 12,
     entry: '炼气后期用的厚甲。甲下气息走得窄，穿着时体内少容些真气。挨了贴身的重招而受伤，甲片会反震伤敌。',
     trait: { kind: 'reflect', intent: 'heavy', bonus: 2 } },
-  { id: 'reed_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 0, qi: 2, retreat: 0.05, durability: 25, repair: 3, entry: '小巧的凡制护符。苇声能帮助稳住真气，脱身时也能少挨些追击。' },
+  { id: 'reed_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 0, qi: 2, retreat: 0.05, durability: 25, repair: 3, entry: '小巧的凡制护符。苇声能帮助稳住真气，抓准空当时也更容易脱身。' },
   { id: 'path_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 2, qi: 0, retreat: 0.17, durability: 28, repair: 5,
-    entry: '旧渡工用的护身钱。撤走时能少挨追击，对方寻常的贴身一击袭来，也有时能闪开。',
+    entry: '旧渡工用的护身钱。抓准空当更容易抽身，对方寻常的贴身一击袭来，也有时能闪开。',
     trait: { kind: 'dodge', bonus: 0.1, intent: 'attack' } },
   { id: 'bell_charm', slot: 'charm', tier: 1, atk: 0, def: 1, hp: 0, qi: 4, retreat: 0.05, durability: 38, repair: 8, entry: '炼气中期可佩的无声小铃。能多存些真气，受击和撤退时也有一点保护。' },
-  { id: 'tide_charm', slot: 'charm', tier: 2, atk: 0, def: 1, hp: 4, qi: 3, retreat: 0.20, durability: 46, repair: 12, entry: '炼气后期可佩的玉坠。能护身、储存真气，撤退时还能挡掉身后的部分追击。' },
-  { id: 'jetty_charm', slot: 'charm', tier: 2, atk: 0, def: 0, hp: 0, qi: 5, retreat: 0.30, durability: 38, repair: 9, entry: '炼气后期可佩的旧渡口灯坠。能多存些真气，撤离险处时尤其能挡住追击。' },
+  { id: 'tide_charm', slot: 'charm', tier: 2, atk: 0, def: 1, hp: 4, qi: 3, retreat: 0.20, durability: 46, repair: 12, entry: '炼气后期可佩的玉坠。能护身、储存真气，趁人收招时也好抽身。' },
+  { id: 'jetty_charm', slot: 'charm', tier: 2, atk: 0, def: 0, hp: 0, qi: 5, retreat: 0.30, durability: 38, repair: 9, entry: '炼气后期可佩的旧渡口灯坠。能多存些真气，察觉空当时尤其容易抽身。' },
   { id: 'pine_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 5, def: 0, perception: 5, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 7, entry: '耐雨长弓。拉得稳，瞄住猎物时有余裕看它哪只脚先动。削苇箭和包铁箭都合弦。' },
   { id: 'resin_staff', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 2, perception: 3, hp: 0, qi: 2, retreat: 0, durability: 40, repair: 7, entry: '炉户用的厚杖。能架住来势，杖芯温热，持久行气时也趁手。' },
   { id: 'black_crossbow', slot: 'weapon', weaponClass: 'crossbow', ammo: ['black_bolt'], tier: 2, atk: 6, def: 0, perception: 2, hp: 0, qi: 0, retreat: 0, durability: 36, repair: 12, entry: '炼气后期才能拉开的弩。只能用暗金短矢，对付长着石甲的敌人尤其容易射穿。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
@@ -1148,11 +1149,13 @@ const provinces = [
 const regionDetails = { ...riverContent.regionDetails, ...zhaoContent.regionDetails, ...sandContent.regionDetails };
 const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => content.sects ?? []);
 const mechanisms = puzzleContent.mechanisms;
-const { innerStyles, enemyInnerStyles } = innerStyleContent;
+const { enemyInnerStyles } = innerStyleContent;
+const innerStyles = [...innerStyleContent.innerStyles, ...banditContent.innerStyles];
+const { roadBandits } = banditContent;
 
 for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
   ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent,
-  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent]) {
+  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent, banditContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -1161,6 +1164,11 @@ for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzz
 sites.push(...extendSites);
 events.push(...extendEvents);
 innerStyleContent.extendScenes(sites, events, gear, enemies);
+const roadsideEnemyIds = new Set([...roadBandits.pools, ...roadBandits.fixed].map(({ enemy }) => enemy));
+for (const enemy of banditContent.enemies) {
+  enemy.tags.push('bandit');
+  if (roadsideEnemyIds.has(enemy.id)) enemy.name = `强盗 · ${realms[enemy.tier].name}`;
+}
 
 const solitaryTerritories = new Set(['river_cliff_kite', 'snow_warden', 'ember_yak']);
 const twoHandedClasses = new Set(['bow', 'crossbow', 'spear', 'staff']);
@@ -1242,7 +1250,7 @@ const equipmentSlots = { weapon: '主武器', offhand: '副手', armor: '盔甲'
 
 const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms,
-  innerStyles, enemyInnerStyles, tournament: tournamentData };
+  innerStyles, enemyInnerStyles, roadBandits, tournament: tournamentData };
 
 export { data, realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms };

@@ -2,10 +2,11 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import data from '../data.mjs';
-import { createGame, rules, view } from '../engine.mjs';
+import { baseEscapeChance, createGame, rules, view } from '../engine.mjs';
+import { banditRules, roadKey } from '../bandits.mjs';
 import { bulkSaleRules, economyData } from '../economy.mjs';
 import { alchemyData } from '../alchemy.mjs';
-import { localGoods, settlementOf, transportRules } from '../world.mjs';
+import { localGoods, roadGraph, settlementOf, transportRules } from '../world.mjs';
 import { trainingData } from '../training.mjs';
 import { hazardData } from '../hazards.mjs';
 
@@ -21,7 +22,7 @@ const titles = {
   id: '标识', name: '名称', tier: '境界要求', price: '购入价（灵钱）', sell: '卖出价（灵钱）',
   desc: '说明', hp: '气血', qi: '真气', atk: '攻击', def: '防御', insight: '修为',
   cost: '费用', need: '所需物品', days: '时间（天）', kind: '类别', slot: '装备部位',
-  retreat: '脱身减伤加成', durability: '最大耐久', repair: '修理费（灵钱）',
+  retreat: '有空当时增加脱身概率', durability: '最大耐久', repair: '修理费（灵钱）',
   toxin: '丹毒变化', wound: '消除伤势', focus: '定息层数', damage: '固定伤害',
   guard: '额外防御', power: '攻击修正', pierce: '破甲', break: '削减重招伤害',
   reveal: '发现条件', result: '产物', count: '数量', travel: '行程（天）',
@@ -58,7 +59,9 @@ const ruleDescriptions = {
   worthyFightPractice: '首次赢过某种同境或更强的野外对手，额外增加的历练进度',
   harvestEncounterDays: '采集中遭遇伏击时开打前用时（天）',
   retreatDays: '撤出战斗所需用时（天）',
-  retreatDamageFactor: '脱身时先乘此值，再计算减伤和防御',
+  escapeDodgeFactor: '战斗闪避值折算成脱身概率的倍率',
+  escapeChanceCap: '普通敌手有空当时的脱身概率上限',
+  banditEscapeChanceCap: '强盗有空当时的脱身概率上限',
   mixedTrackDays: '混合猎场的同一路脚印消散用时（游戏日）',
   mixedTrackHealingPerDay: '失去接触的猎物每日恢复气血（向下取整）',
   emptyReturnDays: '空腹返村额外用时（天）',
@@ -115,7 +118,7 @@ const resources = (entries = {}) => Object.entries(entries)
 const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
   gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书',
-  attack: '普通攻势', heavy: '重招', guard: '防御', drain: '吸取真气', heal: '恢复', focus: '蓄势', remedy: '服药',
+  attack: '普通攻势', heavy: '重招', guard: '防御', dodge: '闪避', drain: '吸取真气', heal: '恢复', focus: '蓄势', remedy: '服药',
 };
 const slotNames = data.equipmentSlots;
 const reveal = ({ item, quest, need } = {}) => {
@@ -381,7 +384,7 @@ ruleRows.push(
 );
 const normalHit = (enemy) => [...new Set(enemy.intents.filter(({ kind }) => kind === 'attack')
   .map(({ mult }) => Math.ceil(enemy.atk * (mult ?? 1))))].join(' / ');
-const enemyRows = gated(data.enemies.map((enemy) => ({ ...enemy, normalHits: normalHit(enemy) })));
+const enemyRows = gated(data.enemies.map((enemy) => ({ ...enemy, normalHits: normalHit(enemy), escapeChance: baseEscapeChance(enemy) })));
 const foodRows = described(data.foods).map((meal) => {
   const project = meal.grade > 0 ? economyData.projects.find((row) => row.loot?.[meal.id]) : undefined;
   return { ...meal, need: project?.need, level: project?.level, cost: project?.cost, days: project?.days, count: project?.loot[meal.id] };
@@ -420,6 +423,29 @@ const transportRows = [
   { label: '传送卷轴', days: transportRules.scrollDays, item: 'gate_scroll', reason: '每次使用一张，从任意安全停靠点传往已认门。' },
   { label: '跨州阵至阵', price: transportRules.arrayPrice, days: transportRules.arrayDays, reason: '两端州阵已修通。' },
 ];
+const roadProfiles = new Map(data.roadBandits.roads.map((profile) => [roadKey(profile.a, profile.b), profile]));
+const roadRows = roadGraph(data).map((edge) => {
+  const profile = roadProfiles.get(edge.key);
+  return { ...edge, distance: edge.units * banditRules.distanceUnit, chance: profile?.chance ?? 0, crew: profile?.crew,
+    mode: edge.water ? '渡船' : edge.cross ? '跨州陆路' : edge.openedBy ? '支路' : '普通陆路',
+    open: edge.openedBy ? describeChoice(edge.openedBy)
+      : [edge.cross?.item, edge.cross?.quest].filter(Boolean).map(ref).join(' 或 '), riskText: profile?.riskText };
+});
+const crewRows = Object.entries(data.roadBandits.crews).map(([id, crew]) => ({
+  id, ...crew, count: crew.members.reduce((sum, value) => sum + value, 0),
+  hideout: crew.headquarters?.name, baseRegion: crew.headquarters?.region,
+  roads: data.roadBandits.roads.filter(({ crew: owner }) => owner === id).map(({ a, b }) => `${name(a)} 至 ${name(b)}`).join('、'),
+  inside: data.roadBandits.dens[crew.den]?.heads, minFactor: data.roadBandits.dens[crew.den]?.minFactor,
+}));
+const banditRanges = ([min, max]) => `${min}–${max}`;
+const rollList = (pool) => pool.map(({ id, weight }) => `${ref(id)} × ${weight}`).join('、');
+const fixedBanditRows = data.roadBandits.fixed.flatMap(({ id, a, b, chance, intro, enemy, fee, actions, afterPay, afterWin, crew, forceAt, nonThreatActions }) => [
+  ...actions.map(({ id: action, ...choice }) => ({ action, ...choice })),
+  ...(nonThreatActions ?? []).map(({ id: action, ...choice }) => ({ action, ...choice })),
+  ...(fee != null ? [{ action: 'pay', label: '交过路钱', ...afterPay }] : []),
+  ...(afterWin?.actions?.length ? afterWin.actions.map(({ id: action, ...choice }) => ({ action, ...choice, intro: afterWin.intro }))
+    : [{ action: 'victory', label: '胜后', ...afterWin }]),
+].map((row) => ({ id, a, b, chance, intro, enemy, fee, crew, forceAt, ...row })));
 const arrayRows = regionRows.filter(({ array }) => array).map(({ id: region, province }) => ({
   region, province, ...transportRules.arrayPlans[province],
 }));
@@ -438,6 +464,8 @@ const incidentJobNames = { report: '向杨芹报信', brace: '加固栏杆', mov
   divert: '给旧水槽分流', fight: '前往截住盐泥豺', repair: '善后修栏', settle: '结清工钱' };
 const manualSources = data.events.flatMap(({ id, choices }) => choices.flatMap((choice, index) =>
   Object.keys(choice.loot ?? {}).map((item) => [item, describeChoice(`${id}:${index}`)])));
+manualSources.push(...fixedBanditRows.flatMap(({ a, b, label, loot }) =>
+  Object.keys(loot ?? {}).map((item) => [item, `${name(a)}至${name(b)} · ${label}`])));
 const innerStyleRanks = data.innerStyles.flatMap(({ id, name, grade, tier, specialty, ranks }) =>
   ranks.map(({ base, focus, fistCharge, effect, tier: rankTier = tier, cost = 0, days = 0, need }, index) => ({
     id, name, grade, rank: index + 1, maxRank: ranks.length, tier: rankTier, cost, days, need, effect,
@@ -516,7 +544,7 @@ const tables = [
       field.gatherPadding && '每批采集减伤 ' + field.gatherPadding + '，至少受 1 点伤',
       field.roadSatiety && '鸣沙境内普通步行耗粮 −' + (field.roadSatiety.fraction * 100) + '%',
     ].filter(Boolean).join('、')],
-  ], { note: '装备耐久为 0 后失去加成。双手兵刃与副手互斥。盾主动挡重招并确实缓冲时损耗耐久。反伤须承受相应近战的气血损伤并能继续交手。脱身系数 0.17 即减免撤退伤害 17%。' }),
+  ], { note: '装备耐久为 0 后失去战斗加成。双手兵刃与副手互斥。盾主动挡重招并确实缓冲时损耗耐久。反伤须承受相应近战的气血损伤并能继续交手。脱身 0.17 表示有空当时加 17 个百分点。' }),
   table('weapon-acquisition', '武器获取渠道', acquisitionRows, [
     'id', ['weapon', '武器'], ['method', '获得方法'], ['source', '具体来源'], ['price', '单次成本（灵钱）'],
     'need', ['afterFight', '现场领取前需击败', ref], ['interval', '货源或对手恢复间隔（天）'],
@@ -531,7 +559,7 @@ const tables = [
     ['specialty', '专攻兵刃', (types) => types.map((type) => weaponClass[type]).join('、')],
     ['atk', '通用攻击'], ['hp', '气血上限'], ['def', '防御'], ['qi', '真气上限'], ['perception', '洞察'],
     ['restQi', '每半日额外回气'], ['fogTolerance', '雾压承受加值'], ['breathingQi', '双守势额外回气'],
-    ['retreat', '追击减伤率', percent], ['dodge', '被动闪避值', percent], ['evadeQi', '闪避成功回气'],
+    ['retreat', '脱身概率加成', percent], ['dodge', '被动闪避值', percent], ['evadeQi', '闪避成功回气'],
     ['focusAtk', '专攻额外攻击'], ['focusPierce', '专攻穿甲'], ['focusGuard', '专攻护持'],
     ['fistName', '蓄力拳'], ['fistPower', '蓄力拳出手攻击加值'], ['fistPierce', '蓄力拳额外穿甲'],
     ['fistQi', '蓄力拳出手耗气'], ['effect', '词条说明'],
@@ -569,6 +597,26 @@ const tables = [
   ], { omit: ['draws', 'food'], note: '图上显示已知道的点。实际可走路线、要花的时间和道具限制由引擎按所在点结算。威胁标记只用于内容参考。' }),
   table('world-transport', '长程道路、传送门与卷轴', transportRows, [
     ['label', '交通'], ['a', '起点', ref], ['b', '终点', ref], 'price', 'days', ['item', '道具或凭证', ref], ['quest', '另一路由', ref], ['reason', '使用条件'],
+  ]),
+  table('roads', '实际路段、距离和拦路概率', roadRows, [
+    ['from', '一端', ref], ['to', '另一端', ref], ['mode', '路段类型'], 'label', ['units', '路格'], ['distance', '里程（里）'],
+    'days', ['chance', '满员时每完整路格的基础拦路概率', percent], ['crew', '管这片路的团伙'], ['open', '启用条件'], ['riskText', '路边所见'],
+  ], { note: '一个完整路格为 2 里、0.25 日。短半格按距离比例判定。已知且可走的路按里程选最短；零概率路段、渡船、传送门、卷轴与州阵不会掷拦路签。' }),
+  table('bandit-crews', '强盗团伙和常驻人数', crewRows, [
+    'id', 'name', ['roads', '共享当场人数的路段'], ['count', '初始外出人数'],
+    ['members', '炼气初期至金丹后期各小境人数', (counts) => counts.join(' / ')],
+    ['hideout', '据点位置'], ['baseRegion', '所处区域', ref], ['den', '可进的藏身处', siteRef],
+    ['inside', '寨内人数'], ['minFactor', '寨内守卫清空后的路段概率倍率', percent],
+  ], { note: '外出成员胜一名少一名，不补人。进不了的窝也照常分享这一名单。管辖路每步先乘剩余人数比例，可进山寨的守卫清退再另乘一项。' }),
+  table('bandit-pools', '拦路要价、财物和装备', gated(data.roadBandits.pools), [
+    'tier', tier, ['enemy', '对手', ref], ['fee', '索要灵钱范围', banditRanges], ['cash', '一般胜后灵钱范围', banditRanges],
+    ['richChance', '富裕成员概率', percent], ['richCash', '富裕成员灵钱范围', banditRanges],
+    ['gear', '一般成员装备及权重', rollList], ['richGear', '富裕成员装备及权重', rollList],
+  ], { note: '一般与富裕成员分别有 24% 和 75% 的概率带一件可缴装备。款物随本局的成员固定；玩家已持有或占用同名装备时，该件无第二份。' }),
+  table('bandit-stories', '拦路人物与一次性结局', fixedBanditRows, [
+    'id', ['a', '通常出现的一端', ref], ['b', '通常出现的另一端', ref], ['crew', '提前遇见的计数范围'],
+    ['forceAt', '未解决时保底遭遇'], ['chance', '普通遇见后转为此人的概率', percent], 'enemy', ['fee', '开价（灵钱）'],
+    ['intro', '初遇场景'], ['action', '动作标识'], 'label', 'desc', 'need', 'loot', ['revealSite', '可发现的藏身处', siteRef], ['outcome', '结果'],
   ]),
   table('world-arrays', '州阵修复', arrayRows, ['region', ['province', '州', ref], ['coins', '总需灵钱'], 'need'],
     { note: '可分批交钱和材料。两端全部修通即可通行。修好后传送时另计路费。' }),
@@ -655,6 +703,7 @@ const tables = [
   table('enemies', '敌人', enemyRows, [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
     'def', ['perception', '洞察'], ['accuracy', '命中值', percent], ['dodge', '被动闪避值', percent],
+    ['escapeChance', '未被进攻时基础脱身概率', percent],
     ['innerStyleName', '使用内功'], ['manualGuard', '内功兵刃专攻护持'], ['manualPierce', '内功兵刃专攻穿甲'],
     ['strategy', '交手策略', (id) => ({
       instinct: '本能', predator: '抢攻', bulwark: '守中求进', duelist: '见招拆招', schemer: '耗气与破势',

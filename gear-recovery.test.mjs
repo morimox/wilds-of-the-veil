@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { act, createGame, view } from './engine.mjs';
+import { act, view } from './engine.mjs';
+import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 function play(state, action, payload) {
   const result = act(state, action, payload);
@@ -75,7 +76,8 @@ test('only designated local smiths repair the gear in hand at the quoted price',
   play(state, 'visit', { id: 'mud_track' });
   play(state, 'choose', { index: 0 });
   play(state, 'attack');
-  play(state, 'retreat');
+  stageRetreatOpening(state);
+  assert.equal(play(state, 'retreat').retreated, true);
   const worn = state.durability.cudgel;
   assert.ok(worn < 26);
   assert.equal(view(state).repairService, null);

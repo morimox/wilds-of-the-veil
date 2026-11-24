@@ -94,7 +94,20 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .panel-header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
 .actions { margin-top: 9px; }
 .place-actions { margin-top: 0; }
-.route-action { display: inline-flex; align-items: center; gap: 6px; }
+.route-action { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+.route-action > .button { flex: 0 0 auto; }
+.route-notes { min-width: 0; }
+.route-warning { margin-top: 2px; }
+.road-position { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; padding: 0 0 7px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.road-position strong { color: var(--jade); font-weight: 600; }
+.road-position small { font-size: inherit; }
+.road-demand { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; margin-top: 10px; color: var(--amber); }
+.road-offers { margin-top: 10px; }
+.road-offers > summary { color: var(--jade); cursor: pointer; }
+.road-offer { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+.road-offer:first-of-type { margin-top: 4px; }
+.road-offer > .actions { margin-top: 0; }
+.retreat-cue { margin-top: 5px; }
 .site-list { display: grid; gap: 6px; }
 .site-list:not(:empty) { margin-bottom: 12px; }
 .site-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; }
@@ -475,7 +488,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=28" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=29" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -762,7 +775,7 @@ const extendEvents = [
   ] },
   { id: 'ford_packet_boat', name: '外桩商船', text: '闸外有条窄船拴在缓水里。船家夏狄翻起一块裂开的木板，指给船工看船侧的缺口。', choices: [
     { label: '给夏狄修船料，领去照原的货单', desc: '夏狄认得外港的水路。船边要用四份松木、两份寒铁修补，添上七钱船费，她就把你写进货单。', need: { wood: 4, ore: 2 }, consume: true, coins: -7, days: 0.75, insight: 3, loot: { ferry_manifest: 1 }, outcome: '夏狄换掉磨薄的船板，把新木钉牢。「大渡口关着也能从外港走。坐船里侧，看见照原那三把高水尺就到了。」她在商船货单背面写下你的名字。' },
-    { label: '问夏狄的船从哪条水路出港', days: 0.125, insight: 1, outcome: '夏狄指着水闸外的大石。「大渡口开了就有官船。外港水浅，只走这种小船，带不了整批货。」' },
+    { label: '问夏狄的船从哪条水路出港', days: 0.125, insight: 1, outcome: '夏狄指着水闸外的大石。「外港水浅，只走这种小船。过几夜才看得见照原的水尺，吃的记得自己带。」' },
   ] },
   { id: 'ford_below_steps', name: '闸下无灯梯', text: '一截铁梯从木排外沿伸进水闸下面，铁栏折了两处。第一根栏杆上绑着小旗，短绳就系在旗旁，供人扶着下梯。', choices: [
     { label: '留在上层，看看梯边的木牌', days: 0.125, insight: 1, outcome: '小旗在暗处也摸得到。旁边的木牌写着，照原城的人来修过排水口。换了水尺后，巡闸人就很少再下到第三级。' },
@@ -1091,7 +1104,7 @@ scene('crane_granary', 'zhao_grain_ladder', '高脚粮仓', '木梯有一只脚�
 scene('zhao_pass', 'zhao_ridge_permit', '青瓦验牒房', '柯伯翻看手里的通行木牌。雨刚停，上一队人弄坏了两副绳架。验牌房的铃响起来，鸣沙那头也听得见。', [
   offer('凭水栈货签申领通行牌，帮柯伯补绳架', '柯伯指着檐下磨起毛的绳和散开的木架。水栈的货签、三份兽革和四份松木都得交，灵钱用来付新绳和验牌。', { zhao_sand_chit: 1, hide: 3, wood: 4 },
     { sand_writ: 1 }, -11, '柯伯换好绳架，把两州都认的通行牌交给你。「过了浅石滩就没多少水了。跟紧下一趟带铃的骡车。」'),
-  { label: '隔关听骡铃', days: 0.125, insight: 2, outcome: '一声铃从石隙深处转出来。柯伯说鸣沙城把新绳价写在城门，冲坏的井也还等人修。' },
+  { label: '隔关听骡铃', days: 0.125, insight: 2, outcome: '一声铃从石隙深处转出来。柯伯掸了掸运粮的麻袋。「往后几天只在背风坡停歇。到了鸣沙先找炭篷驿，杨芹灶上常留着热汤。」' },
   { label: '问柯伯用哪家的货签验牌', days: 0.125, outcome: '柯伯扣了扣腰间的牌。「杨木水栈余节的货签就行，落款我认得。水路来的客人多，得凭本地货签把名字写进过关册。」' },
 ], { once: [0, 1, 2], afterOnceText: { 0: '两副绳架已靠回檐下，破绳卷在门边。柯伯给牵骡的人让开路，关那头不时传来铃声。' } });
 
@@ -3308,7 +3321,7 @@ const explorerKitContent = {
       field: { fogTolerance: 1 }, entry: '帽檐拦开扑到眼前的雾，容易看清对手的来招。在雾里多待一阵才会耗真气。' },
     { id: 'reed_boots', slot: 'boots', tier: 0, retreat: 0.06, durability: 28, repair: 5,
       trait: { kind: 'dodge', bonus: 0.08, intent: 'attack' },
-      entry: '鞋底踩得住，寻常的贴身一击有时能侧步闪开。转身脱离交手时也能少挨追击。' },
+      entry: '鞋底踩得住，寻常的贴身一击有时能侧步闪开。脚下轻，赶路不容易招眼，有空当也好抽身。' },
     { id: 'breath_belt', slot: 'belt', tier: 2, qi: 4, hp: 3, def: 1, durability: 44, repair: 10,
       entry: '勒在腰腹，带下的灵晶能养一口长气。气息稳了，腰腹挨招也有些支撑。' },
     { id: 'side_hook', slot: 'offhand', weaponClass: 'blade', tier: 0, sideAtk: 4, sidePierce: 1, sideGuard: 2, durability: 30, repair: 5,
@@ -3362,7 +3375,7 @@ const manuals = [
         base: { qi: 3, restQi: 2, fogTolerance: 1 }, effect: '歇息更容易回气，入雾也能多撑一阵。' },
       { tier: 3, cost: 40, days: 2, need: { reed: 6, core: 4, foundation_core: 1 },
         base: { qi: 4, restQi: 3, fogTolerance: 2, retreat: 0.05 },
-        effect: '最适合常进浓雾的人。歇脚回气更多，撤身时也能少挨一点追击。' },
+        effect: '最适合常进浓雾的人。歇脚回气更多，见到空当时也更容易抽身。' },
     ],
   },
   {
@@ -3400,11 +3413,11 @@ const manuals = [
     ranks: [
       { base: { dodge: 0.04, evadeQi: 1 }, effect: '被打时有机会错开来势。闪过一招，便能趁那一口空当回些真气。' },
       { tier: 3, cost: 25, days: 1, need: { reed: 4, hide: 3, qi_core: 3 },
-        base: { dodge: 0.055, evadeQi: 1, retreat: 0.025 }, effect: '换脚更轻，也能少挨一点撤身时的追击。' },
+        base: { dodge: 0.055, evadeQi: 1, retreat: 0.025 }, effect: '换脚更轻，趁空当撤身时也比较容易脱开。' },
       { tier: 5, cost: 47, days: 2, need: { core: 4, battle_sinew: 4, foundation_core: 2 },
         base: { dodge: 0.07, evadeQi: 2, retreat: 0.035 }, effect: '脚下更轻捷些，避开一招后也能回上更多真气。' },
       { tier: 7, cost: 71, days: 3, need: { black_iron: 4, beast_eye: 2, gold_core: 2 },
-        base: { dodge: 0.08, evadeQi: 3, retreat: 0.045 }, effect: '翻身与换气接得更短。成功闪身时回气最多，身后有追手仍能先站稳。' },
+        base: { dodge: 0.08, evadeQi: 3, retreat: 0.045 }, effect: '翻身与换气接得更短。成功闪身时回气最多，瞅见空当时也好抽身。' },
     ],
   },
   {
@@ -3621,7 +3634,324 @@ const innerStyleContent = {
 
 return innerStyleContent;
 })();
+const banditContent = (() => {
+const cut = (name, mult = 1) => ({ kind: 'attack', name, mult });
+const slam = (name, mult = 1.5) => ({ kind: 'heavy', name, mult });
+const cover = (name, mult = 1.35) => ({ kind: 'guard', name, mult });
+const shoot = (name, mult = 1) => ({ ...cut(name, mult), ranged: true });
+const evade = (name) => ({ kind: 'dodge', name });
+
+const roadEnemy = (id, name, tier, hp, atk, def, perception, strategy, desc, intents, escapeChance = 0.07) => ({
+  id, name, tier, hp, atk, def, perception, strategy, tags: ['human'],
+  insight: 0, loot: {}, desc, intents, escapeChance,
+});
+
+const commonEnemies = [
+  roadEnemy('road_knife_runner', '灰帕短刀客', 0, 24, 7, 2, 11, 'duelist',
+    '灰布沿刀柄缠了几圈。出刀时他先把脚收回来，见人没有追才会再试一步。',
+    [cut('收脚平削'), cover('把短刀横在胸前'), slam('突然翻腕劈下', 1.4), evade('一个错步让开')], 0.1),
+  roadEnemy('road_spear_taker', '磨杆短矛手', 1, 32, 9, 3, 13, 'predator',
+    '矛杆有两处握出来的光。把手挪到后头，就会迎面送出一矛。',
+    [cut('短矛推向肩头'), slam('跨步直刺', 1.45), cover('拽回矛杆挡身')]),
+  roadEnemy('road_bow_robber', '绳肩劫弓手', 2, 38, 10, 3, 15, 'duelist',
+    '弓把有一道用麻绳缠好的裂口。指头压住弦扣时，他还望着你脚下的位置。',
+    [shoot('朝脚边试一箭'), cover('退开捻弓弦'), { ...slam('搭硬箭射来', 1.45), ranged: true }, evade('贴着树身往侧面一闪')], 0.11),
+  roadEnemy('road_salt_cutter', '盐袋刀手', 3, 51, 12, 5, 19, 'duelist',
+    '他把旧盐袋折厚垫在左肩，刀顺着衣摆拖，手上没有多余的动作。',
+    [cut('平刀抵到臂侧'), cover('以厚肩偏开半步'), slam('反手提刀斩下')]),
+  roadEnemy('road_piked_guard', '绳鞘钩枪客', 4, 61, 14, 5, 21, 'predator',
+    '枪尖下有个收绳的钩，脚步很稳。枪从身后抬高时，横着也够得远。',
+    [cut('贴杆扎向腰侧'), slam('倒握枪杆横扫', 1.5), cover('把枪身架在眼前')]),
+  roadEnemy('road_shield_broker', '旧甲劫货人', 5, 71, 15, 6, 24, 'bulwark',
+    '成排的甲片有好几块是从别处补来的。每次换手，盾沿总朝着可能出招的那边。',
+    [cut('沿盾边探刀'), cover('并手稳住盾面', 1.45), slam('提盾压肩后下刀', 1.47)], 0.05),
+  roadEnemy('road_wind_swordsman', '避风劫剑客', 6, 79, 18, 7, 27, 'duelist',
+    '他将披风束在背后，剑鞘空着。剑尖一低，他便能从你让开的那侧进步。',
+    [cut('递剑点向手肘'), cover('回剑守肋'), slam('贴身旋剑回斩', 1.54), evade('收剑错开一步')], 0.1),
+  roadEnemy('road_black_bowist', '冷弦夺货人', 7, 87, 20, 7, 30, 'schemer',
+    '他的弩搁在肩窝，指腹只按着一枚短矢。看见你靠近，他会反向让开半步把弩抬平。',
+    [shoot('抬弩放出短矢'), cover('借石影上弦'), { ...slam('扣弦压出一支硬矢', 1.55), ranged: true }], 0.09),
+  roadEnemy('road_sandal_halberd', '沉靴劫道客', 8, 104, 22, 9, 33, 'predator',
+    '短靴裹了几层硬皮，一步踩下几乎没有声响。他把短戟立在身侧，尖刃只露出一截。',
+    [cut('挑戟向膝下扫'), slam('沉肩挑起短戟', 1.62), cover('立戟压住地面', 1.5)]),
+];
+
+const den = 'bandit_slope_den';
+const scout = 'bandit_den_scout';
+const sentry = 'bandit_den_sentry';
+const carpenter = 'bandit_den_carpenter';
+const leader = 'bandit_den_leader';
+const sleeve = 'road_sleeve_manual';
+const roadsideCart = 'bandit_marsh_lamp';
+const greyGully = 'grey_gully';
+
+const crews = {
+  [greyGully]: { name: '灰沟坡寨', members: [16, 12, 8, 4, 3, 2, 1, 1, 0], den,
+    headquarters: { region: 'screen_slope', name: '灰沟坡寨' } },
+  ferryHills: { name: '桥索边的抬木帮', members: [15, 11, 7, 4, 2, 1, 0, 0, 0],
+    headquarters: { region: 'pine_ridge', name: '断桥下的挡雨棚' } },
+  quarryTracks: { name: '旧矿道的散伙矿客', members: [8, 8, 7, 6, 5, 4, 3, 2, 1],
+    headquarters: { region: 'black_mine', name: '废绞车后屋' } },
+  ferryWood: { name: '浅水红绳帮', members: [9, 10, 7, 5, 4, 3, 2, 1, 1],
+    headquarters: { region: 'glass_bank', name: '晒网滩外的棚船' } },
+  reedBank: { name: '青埂芦窝的伙计', members: [13, 11, 8, 5, 3, 1, 1, 0, 0],
+    headquarters: { region: 'green_dyke', name: '青埂北面的堆草房' } },
+  weirReef: { name: '断堰捆船帮', members: [6, 7, 7, 7, 6, 5, 4, 3, 2],
+    headquarters: { region: 'burnt_weir', name: '堰柱上的旧守水屋' } },
+  saltPath: { name: '盐路拾篓人', members: [12, 9, 8, 7, 5, 3, 2, 1, 0],
+    headquarters: { region: 'salt_ledger_barrows', name: '担盐岗背坡的空盐仓' } },
+  windBridge: { name: '空音桥背风帮', members: [6, 6, 8, 8, 7, 6, 5, 4, 3],
+    headquarters: { region: 'dry_sound_bridge', name: '空音桥底的石屋' } },
+  tentDunes: { name: '断帐沟的过夜客', members: [12, 9, 7, 6, 4, 3, 2, 1, 0],
+    headquarters: { region: 'silk_tent_road', name: '旧帐道的背风窝棚' } },
+};
+
+const crewRoads = {
+  [greyGully]: [
+    ['marsh', 'ridge', 0.055, '倒钟前的山道有几处能藏人的矮石墙。'],
+    ['ridge', 'ford', 0.06, '旧商道只须过一道山口，两侧却都有荒屋。'],
+    ['ridge', 'screen_slope', 0.09, '晒盘后侧的石径狭窄，路旁矮石墙边常见新脚印。'],
+    ['pine_ridge', 'screen_slope', 0.06, '枯松遮住了筛盘背后的一段坡路。'],
+    ['screen_slope', 'herb_basin', 0.055, '药谷外的黄草遮到膝头，枝干上勾着一段新布。'],
+  ],
+  ferryHills: [
+    ['marsh', 'ford', 0.05, '旧渡的下坡贴着一道看不清底的土沟。'],
+    ['ford', 'pine_ridge', 0.045, '桥索外头还有一片旧车辙，最近被人踩乱了。'],
+    ['pine_ridge', 'kiln_valley', 0.055, '林脚这边松枝太密，从路上看不见坡底。'],
+    ['kiln_valley', 'herb_basin', 0.05, '两间废窑的后墙之间只容一人穿过。'],
+  ],
+  quarryTracks: [
+    ['ridge', 'black_mine', 0.055, '废矿车正挡在矿脊便道的一处拐角。'],
+    ['herb_basin', 'black_mine', 0.055, '废掉的矿道窄，沿路几个旧窝棚近日有火星。'],
+    ['black_mine', 'snow_pass', 0.05, '越过裸岩后风大，背石的那侧有人走过的痕迹。'],
+  ],
+  ferryWood: [
+    ['flood_market', 'glass_bank', 0.065, '碎琉璃滩外有一道简陋的横杆，水上看不清谁在守。'],
+    ['flood_market', 'crane_granary', 0.045, '粮仓的后路绕过一排平日没人看的空高脚屋。'],
+    ['crane_granary', 'glass_bank', 0.055, '枯芦把下岸的路挤成一条单行窄道。'],
+    ['ring_isles', 'glass_bank', 0.055, '白石和晒网之间有几条人走出来的岔。'],
+  ],
+  reedBank: [
+    ['green_dyke', 'old_marker', 0.04, '堤下水浅，夹布的空篮卡在半截矮桩上。'],
+    ['green_dyke', 'ring_isles', 0.05, '一连串踏石中间有两处看不见对岸。'],
+    ['frog_pond', 'scale_bog', 0.065, '苔堤狭长，沿线有几处能从泥滩绕到身后。'],
+  ],
+  weirReef: [
+    ['ring_isles', 'beacon_reefs', 0.045, '离岗灯还有一段下坡，低处的礁缝能避风。'],
+    ['glass_bank', 'beacon_reefs', 0.065, '浅岸边的破船壳一直卡在两块礁中间。'],
+    ['charcoal_ridge', 'burnt_weir', 0.06, '挂炭袋的树一直排到堰边。最远两只背后有窄坎。'],
+    ['rope_sands', 'burnt_weir', 0.07, '沙路越过几根拴索的木桩，堰脚还有一排断柱。'],
+    ['burnt_weir', 'beacon_reefs', 0.085, '内堰到外礁的岸坎下捆过货箱，沙里还埋着新断的绳。'],
+  ],
+  saltPath: [
+    ['salt_ledger_barrows', 'stillwell_mouth', 0.055, '背阴的盐袋架旁有两道窄脚印。'],
+    ['salt_ledger_barrows', 'chalk_hoof_trail', 0.05, '过山的白石道绕过一层风积沙，旁边有歇过脚的痕迹。'],
+    ['stillwell_mouth', 'dry_sound_bridge', 0.055, '盐井外拴着运货绳，绳后有一面裂开的石墙。'],
+  ],
+  windBridge: [
+    ['wind_slate', 'dry_sound_bridge', 0.065, '石板夹出的路一直通到桥肩，最窄处不好回身。'],
+    ['dry_sound_bridge', 'cold_kiln', 0.095, '冷窑坡下那几个雨棚，近日有人重新补了草帘。'],
+    ['wind_slate', 'cold_kiln', 0.06, '石板背风的一排小孔边积着新鞋印。'],
+    ['cold_kiln', 'glass_hail_sink', 0.055, '窑道被砂流冲出几道浅岔口，地面没有新路牌。'],
+    ['hanging_vein', 'glass_hail_sink', 0.06, '浅梁下的矿包曾有人打开过，麻绳留在石上。'],
+  ],
+  tentDunes: [
+    ['silk_tent_road', 'camel_grass_dunes', 0.05, '沿途有松垮的旧帐布，看不清矮丘背面。'],
+    ['silk_tent_road', 'guest_mill', 0.055, '石磨上游的低沟能一直绕到路旁。'],
+  ],
+};
+
+const roads = Object.entries(crewRoads).flatMap(([crew, routes]) =>
+  routes.map(([a, b, chance, riskText]) => ({ a, b, crew, chance, riskText })));
+
+const gearRolls = (entries) => entries.map(([id, weight]) => ({ id, weight }));
+const pool = (tier, index, fee, cash, richChance, richCash, gear, richGear) => ({
+  tier, enemy: commonEnemies[index].id, fee, cash, richChance, richCash,
+  gear: gearRolls(gear), richGear: gearRolls(richGear),
+});
+
+const pools = [
+  pool(0, 0, [2, 4], [0, 3], 0.045, [4, 7],
+    [['knife', 4], ['straw_cape', 3], ['reed_hat', 2], ['leather_knuckles', 1]],
+    [['hide_shield', 3], ['short_spear', 1]]),
+  pool(1, 1, [4, 6], [1, 4], 0.05, [5, 9],
+    [['short_spear', 4], ['hide_coat', 3], ['reed_boots', 2], ['hide_shield', 1]],
+    [['iron_coat', 3], ['resin_staff', 1]]),
+  pool(2, 2, [6, 8], [2, 5], 0.055, [6, 11],
+    [['reed_bow', 4], ['hide_coat', 3], ['breath_belt', 2], ['side_hook', 1]],
+    [['pine_bow', 3], ['frost_robe', 2], ['black_crossbow', 1]]),
+  pool(3, 3, [9, 11], [3, 7], 0.055, [9, 14],
+    [['iron_sword', 4], ['iron_coat', 3], ['tide_charm', 2], ['resin_staff', 1]],
+    [['weir_knife', 3], ['sky_cloak', 2], ['sky_sword', 1]]),
+  pool(4, 4, [11, 13], [4, 9], 0.06, [11, 17],
+    [['tide_spear', 4], ['tide_coat', 3], ['side_hook', 2], ['breath_belt', 1]],
+    [['coil_pole', 3], ['gauze_armor', 2], ['echo_knuckles', 1]]),
+  pool(5, 5, [13, 15], [5, 11], 0.065, [13, 20],
+    [['hide_shield', 4], ['iron_coat', 3], ['tide_coat', 2], ['iron_sword', 1]],
+    [['gauze_armor', 3], ['coal_tassel', 2], ['foil_sword', 1]]),
+  pool(6, 6, [16, 18], [6, 13], 0.065, [17, 23],
+    [['iron_sword', 4], ['frost_robe', 3], ['tide_charm', 2], ['sky_sword', 1]],
+    [['foil_sword', 3], ['coal_tassel', 2], ['fault_coat', 1]]),
+  pool(7, 7, [18, 21], [7, 15], 0.07, [19, 27],
+    [['black_crossbow', 4], ['breath_belt', 3], ['frost_robe', 2], ['pine_bow', 1]],
+    [['lake_bow', 3], ['jade_pendant', 2], ['fault_coat', 1]]),
+  pool(8, 8, [21, 24], [8, 17], 0.075, [20, 30],
+    [['snow_halberd', 4], ['coil_pole', 3], ['tide_coat', 2], ['sky_cloak', 1]],
+    [['foil_sword', 3], ['gauze_armor', 2], ['fault_coat', 1]]),
+];
+
+const specialEnemies = [
+  roadEnemy('road_slate_boss', '灰褂拦路人', 1, 35, 9, 3, 14, 'duelist',
+    '他把左脚踩在板车侧沿，右手提一把削薄的刀。左臂绕着肉眼可见的血布。',
+    [cut('用右手带刀横削'), cover('将刀收到伤臂旁边'), slam('借车沿蹬出一刀', 1.43), evade('挨着车辕退开')], 0.05),
+  roadEnemy('road_ferry_tollman', '系红绳的篙手', 3, 55, 12, 4, 20, 'predator',
+    '草鞋浸透了水，手上仍稳。等篙脚一松，他就有地方从横杆旁扎出一篙。',
+    [cut('傍石斜刺一篙'), slam('抬高篙尾扫下来', 1.55), cover('退守横杆背面')], 0.06),
+  roadEnemy('road_wind_cutman', '拨桥扣的刀客', 5, 73, 16, 7, 25, 'schemer',
+    '正面看去只露出一段刀柄。等桥扣晃响，他会借着响动从遮风石旁露刀。',
+    [cut('趁铜扣响时出刀'), cover('闪回石板阴影'), slam('退半步扬腕劈下', 1.58), evade('沿风板迅速让开')], 0.1),
+  roadEnemy(scout, '坡寨放哨人', 1, 33, 9, 3, 13, 'predator',
+    '短矛靠在哨绳旁。出手前他总会看向沟口，像在等谁来接班。',
+    [cut('矛尖挑向鞋头'), slam('借高坎扎出一矛', 1.45), cover('把矛柄竖在胸前')]),
+  roadEnemy(sentry, '守棚的箍刀手', 2, 43, 11, 4, 16, 'bulwark',
+    '他握刀那只袖子缝了铁箍。把刀压低时，铁箍也会迎着对手的手腕。',
+    [cut('抬铁箍压向前腕'), cover('举袖护住半身'), slam('架开来手后重劈', 1.57)]),
+  roadEnemy(carpenter, '货廊的抬木手', 3, 54, 12, 5, 18, 'duelist',
+    '他从货架后的窄道挤出来，手里提着一根削平的扁担。手一换，扁担两头都能打人。',
+    [cut('扁担低头扫腿'), cover('扁担横过胸口'), slam('抬扁担纵劈', 1.54)]),
+  { ...roadEnemy(leader, '灰沟贼王许涧', 3, 76, 14, 6, 22, 'schemer',
+    '许涧平时隔着长桌点货，出刀也紧贴桌角。见他将空凳拨到身前，先留心凳脚后扬起的刀。',
+    [cut('贴着桌沿递刀'), cover('贴住桌角，以刀护身'),
+      { kind: 'focus', name: '把空凳拨到身前，藏刀攒劲' },
+      slam('踢开木凳，跟着一刀斩下', 1.56), cut('绕过桌角横扫腰侧', 1.1)]),
+    accuracy: 0.07 },
+];
+
+const fixed = [
+  {
+    id: 'road_slate_peg', a: 'marsh', b: 'ridge', crew: greyGully, forceAt: 3,
+    enemy: 'road_slate_boss', chance: 0.6, fee: 5,
+    intro: '板车歪在道上，只留下车辕边一线窄路。一个灰褂人握着短刀，左臂上裹了层透红的布。他叫你丢五枚钱到车板上。',
+    nonThreatIntro: '板车歪在道上。灰褂人打量一眼你的兵器，把短刀连鞘搁在车板上。他用右手托着车辕，左袖的布透着血。「劳驾扶一下，别让车再倒过来。」',
+    nonThreatActions: [{ id: 'ask_cart_road', label: '帮他扶住车辕，问他从哪儿下来',
+      desc: '他一个人扶不住板车。车底夹着半张送货图。', revealSite: den,
+      outcome: '车身一正，灰褂人从底下抽出货图。「我是从晒盘坡逃下来的。筛盘后头有条灰沟，矮栅脚下扣着木盆，往里就是那伙人的寨子。」说完他把板车推到路边。' }],
+    actions: [{ id: 'bind_road_arm', label: '拿出药膏，替灰褂人裹住左臂',
+      desc: '那只手抬不稳，布一动就往下滴血，原先打的结也松了。', need: { salve: 1 },
+      loot: { [sleeve]: 1 }, revealSite: den,
+      outcome: '你给他上了药。灰褂人用右手扶着车，替你腾开窄路。「这伤是晒盘坡背后的寨里留的。走筛盘旁的灰沟，认倒扣的木盆。」他让你从车板下抽本薄册。「原先护车时拿它保命。下回看清谁先出手，再伸手。」' }],
+    afterPay: { revealSite: den,
+      outcome: '车辕挪开时落出一张旧货图。图上的山路从晒盘坡筛盘拐进灰沟。沟尽头画着矮栅，栅脚倒扣着一只木盆。' },
+    afterWin: {
+      intro: '短刀掉进车底。灰褂人靠住车轮，右手抓紧渗血的左袖。「我本是替寨里赶车的。上回他们叫我把押货的小孩捆进棚，我没下手，回头就挨了这一刀。拦你是想凑点看伤的钱。放我一回，我往山下走，再不上这条道。」',
+      actions: [
+        { id: 'spare_slate_robber', label: '拨开他脚边的短刀，放他下山',
+          desc: '他把空着的右手摊在车板上，等你让路。', revealSite: den,
+          outcome: '灰褂人扶车站起来，从车槽抽出半张送货图。「晒盘坡旧筛盘后面有条灰沟。沟尽头的矮栅脚下扣着木盆，从那儿进去。」他把短刀留在车下，按着伤口走下坡。' },
+        { id: 'kill_slate_robber', label: '了结灰褂人',
+          desc: '他已经够不着车下的短刀，只能扶着车轮。', loot: { ration: 1 }, revealSite: den,
+          outcome: '灰褂人倒在车轮旁。车槽里压着一包干粮和半张被轮轴碾破的送货图。图上从晒盘坡一架旧筛盘画到灰沟尽头，矮栅旁标着一只倒扣的木盆。' },
+      ],
+    },
+  },
+  {
+    id: 'road_reed_tariff', a: 'flood_market', b: 'glass_bank', enemy: 'road_ferry_tollman', chance: 0.52, fee: 8,
+    intro: '拦水的横杆浮过来，后头接着一根泡裂的浮木。一个脚踝系红绳的篙手立在浅石上，说过杆交八枚钱。杆后有两艘等着靠岸的船。',
+    actions: [{ id: 'repair_raft_bar', label: '给两截松木，帮他接住脱开的浮杆',
+      desc: '横杆是旧榫，用两截结实的木头平撑住，船就不必一直停在急水边。', need: { wood: 2 },
+      loot: { ration: 1 }, outcome: '篙手把旧榫从水里勾起，接住你递下的松木。两边的船终于能靠紧。他朝船主招手。「先拢船。今天这趟不用给钱了。」等船的人塞给你一包干粮。' }],
+    afterPay: { outcome: '篙手把横杆朝旧桩一挂，招呼等着的两条船往浅处并拢，一起补上榫头。' },
+    afterWin: { loot: { ration: 1, wood: 1 },
+      outcome: '篙手松开红绳，从侧边浅滩游开。船客剪去横杆上的私绳，把两条船靠到同一侧。一位船客让你带包干粮，另一位从舱里抽了一截干松木。' },
+  },
+  {
+    id: 'road_coil_rope', a: 'wind_slate', b: 'dry_sound_bridge', enemy: 'road_wind_cutman', chance: 0.48,
+    intro: '桥肩的半扇栏动了一下。一人背靠石板握着刀，脚边摆着一只松脱的铜扣。他一只肩朝着桥中，鞋底沿着石缝蹭来蹭去。',
+    actions: [{ id: 'pass_spare_tie', label: '递给他两份坚韧兽筋，帮他系回栏扣',
+      desc: '他压低刀柄，「那根旧绳已经磨进铜眼。我只要两根新绳，叫它今晚别掉下去。」', need: { battle_sinew: 2 },
+      loot: { ore: 1 }, outcome: '绳在铜眼里穿了两圈，他往后拉紧，晃动的半扇栏攀住石肩。那人把拆掉的寒铁补片塞给你，转身去把桥那头的人叫来。' }],
+    afterWin: { loot: { ore: 1, salve: 1 },
+      outcome: '他弃下松扣，沿桥肩的石梯下去。扣边那捆旧垫片解开后还有一截好铁，布里裹着一罐补手的药膏。' },
+  },
+];
+
+const resident = (start) => ({ start, cap: start, interval: 0, growth: 0, fixedPopulation: true });
+const sites = [
+  { id: roadsideCart, name: '北堤歇车处', region: 'marsh' },
+  { id: den, name: '灰沟坡寨', region: 'screen_slope', afterBandit: den, once: [4, 5, 6, 7],
+    creatures: { [scout]: resident(8), [sentry]: resident(8), [carpenter]: resident(6), [leader]: resident(1) },
+    creatureText: {
+      [scout]: { present: '外栅的哨绳不时抖动，灰沟深处也有人应声。', absent: '栅外哨绳垂回地面，站在灰沟能看见棚门。' },
+      [sentry]: { present: '棚里有几道火光，门前的平石被铁箍磕出新痕。', absent: '棚门已经推开，露出后头搭了木架的货廊。' },
+      [carpenter]: { present: '长货廊的木架间有乱脚步。有人把扁担竖靠在货箱旁，正往里传话。', absent: '没人再从木架间出来，贴着两侧货箱就能去掌账的里屋。' },
+      [leader]: { present: '挂货签的里间还有人翻账。方才有人隔门喊过一声「许爷」，里头只响了一下刀鞘。', absent: '里间已经静下来，桌上的断凳腿横在地上。' },
+    },
+    afterOnceText: { 4: '货柜已拖到棚外。外栅拆了一半，从坡路上就能看见棚顶。', 5: '棚门敞开。肯下山交代的人已经离开，灰沟再没有换哨的声响。' },
+  },
+];
+
+const events = [
+  { id: roadsideCart, name: '北堤歇车处',
+    text: '北堤分出一条上山的石路。赶木车的人歇在路口，扯下一截旧布，把腰间刀鞘上的铜包角缠住。',
+    choices: [
+      { label: '问他为何把刀鞘缠起来', days: 0, stay: true,
+        outcome: '「过了北堤，有人专在山道上等。先看你穿的甲，再看腰里挂的刀。披亮甲的，出来讨钱的往往也更不好惹。村口和驿站有人巡，他们少往那边凑。我上山总留几枚散钱，包里也放点救急的料。上回给了两截松木，那人就挪开了绳。」' },
+    ],
+  },
+  { id: den, name: '灰沟坡寨', text: '旧筛盘后的灰沟一路窄下去，绕到半人高的外栅。倒扣的木盆就在栅脚。栅内是排开数间的换哨棚，后头一溜货廊尽头才是掌账的里屋。',
+    choices: [
+      { label: '翻过外栅，截住换哨人', desc: '外栅这头落脚平稳，另一头是两道刚绑好的哨绳。', days: 0.25, enemy: scout,
+        outcome: '灰沟里的细铁响了一声，放哨人提着短矛翻过栅脚。' },
+      { label: '沿棚门的平石进去', guardedBy: scout, days: 0.25, enemy: sentry,
+        outcome: '火盆就在门内，带铁箍的袖子伸过火光，将你往门外逼。' },
+      { label: '贴着货架穿过长廊', desc: '廊两边堆了没解绳的货箱，中间只够一人过。', guardedBy: [scout, sentry], days: 0.25, enemy: carpenter,
+        outcome: '木架背后挤出一个抬货人。他抄起扁担，逼你退回廊口。' },
+      { label: '推开挂货签的里屋门', guardedBy: [scout, sentry, carpenter], days: 0.25, enemy: leader,
+        outcome: '许涧把门边插着的货签折断，又用脚把空凳拨到桌前。「叫我许涧的多，叫我贼王的也有。货在廊下，想搬，得先过这张桌。」他才把长刀从桌底抽出来。' },
+      { label: '把藏赃的货柜拖出棚门', afterFight: leader, days: 0.375, stay: true, coins: 18,
+        loot: { ration: 4, ore: 6, core: 3, hide: 2 },
+        outcome: '晒盘坡的矿户认出柜上的货签，帮你把有主的货分好。领货的人凑了十八枚灵钱答谢，又分给你几包行粮、寒铁、灵晶和兽革。' },
+      { label: '给伤号留一包干粮，叫他们下坡见巡山人', afterFight: leader, days: 0.25, stay: true,
+        need: { ration: 1 }, consume: true,
+        outcome: '几个躲在棚后的伤号拿走干粮，交出换哨的细绳。坡脚的人挨个领他们下山，守路的人把回仓的货先搬到路边。' },
+      { label: '查看哨位旁的粮袋', desc: '矮凳下有一个敞口粮袋，看样子是给换哨的人备的。', guardedBy: scout, days: 0.125, stay: true,
+        loot: { ration: 3 }, outcome: '粮袋里还留着三包没启封的干粮。' },
+      { label: '把棚门内的药匣拎出来', desc: '几团用过的布旁有只小木匣，匣盖上压着一片干药渣。', guardedBy: [scout, sentry], days: 0.125, stay: true,
+        loot: { salve: 2 }, outcome: '你把里头干净的两包松脂膏拣出来。' },
+    ],
+  },
+];
+
+const items = [
+  { id: sleeve, name: '守车短袖诀', kind: 'manual', price: 0, sell: 0, keepOnFall: true,
+    desc: '灰褂人的护车薄册，封面抹过一层油。纸角压得很平，翻开就看见几笔将刀拢在半臂之内的画。' },
+];
+
+const innerStyles = [
+  {
+    id: sleeve, name: '守车短袖诀', grade: '凡品', tier: 0, specialty: ['blade'],
+    desc: '早年走车的人在窄路上护身的法子。先用半边袖口收住手腕，免得交手时挡了自己的退路。',
+    ranks: [
+      { base: { retreat: 0.05 }, focus: { atk: 1, guard: 1 }, effect: '趁对手收招时更容易抽身，出刀还能顺势护住手臂。' },
+      { tier: 1, cost: 12, days: 0.75, need: { hide: 2, reed: 2 },
+        base: { retreat: 0.075, perception: 1 }, focus: { atk: 1, guard: 2 },
+        effect: '能稍早觉出对手起手，等他露出空当时更能把握抽身机会。用刀时也更能护住手臂。' },
+      { tier: 3, cost: 30, days: 1.5, need: { ore: 3, hide: 4, battle_sinew: 2 },
+        base: { retreat: 0.11, perception: 2 }, focus: { atk: 2, guard: 2 },
+        effect: '近身出刀更有力。看准对手收招的空当，抽身也更有把握。' },
+    ],
+  },
+];
+
+const banditContent = {
+  items, sites, events, enemies: [...commonEnemies, ...specialEnemies], innerStyles,
+  roadBandits: { roads, pools, fixed, crews, dens: { [den]: { heads: 23, minFactor: 0.13 } } },
+};
+
+return banditContent;
+})();
 const moduleData = (() => {
+
 
 
 
@@ -3812,13 +4142,13 @@ const gear = [
   { id: 'tide_coat', slot: 'armor', tier: 2, atk: 0, def: 5, hp: 9, qi: -1, retreat: 0, durability: 46, repair: 12,
     entry: '炼气后期用的厚甲。甲下气息走得窄，穿着时体内少容些真气。挨了贴身的重招而受伤，甲片会反震伤敌。',
     trait: { kind: 'reflect', intent: 'heavy', bonus: 2 } },
-  { id: 'reed_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 0, qi: 2, retreat: 0.05, durability: 25, repair: 3, entry: '小巧的凡制护符。苇声能帮助稳住真气，脱身时也能少挨些追击。' },
+  { id: 'reed_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 0, qi: 2, retreat: 0.05, durability: 25, repair: 3, entry: '小巧的凡制护符。苇声能帮助稳住真气，抓准空当时也更容易脱身。' },
   { id: 'path_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 2, qi: 0, retreat: 0.17, durability: 28, repair: 5,
-    entry: '旧渡工用的护身钱。撤走时能少挨追击，对方寻常的贴身一击袭来，也有时能闪开。',
+    entry: '旧渡工用的护身钱。抓准空当更容易抽身，对方寻常的贴身一击袭来，也有时能闪开。',
     trait: { kind: 'dodge', bonus: 0.1, intent: 'attack' } },
   { id: 'bell_charm', slot: 'charm', tier: 1, atk: 0, def: 1, hp: 0, qi: 4, retreat: 0.05, durability: 38, repair: 8, entry: '炼气中期可佩的无声小铃。能多存些真气，受击和撤退时也有一点保护。' },
-  { id: 'tide_charm', slot: 'charm', tier: 2, atk: 0, def: 1, hp: 4, qi: 3, retreat: 0.20, durability: 46, repair: 12, entry: '炼气后期可佩的玉坠。能护身、储存真气，撤退时还能挡掉身后的部分追击。' },
-  { id: 'jetty_charm', slot: 'charm', tier: 2, atk: 0, def: 0, hp: 0, qi: 5, retreat: 0.30, durability: 38, repair: 9, entry: '炼气后期可佩的旧渡口灯坠。能多存些真气，撤离险处时尤其能挡住追击。' },
+  { id: 'tide_charm', slot: 'charm', tier: 2, atk: 0, def: 1, hp: 4, qi: 3, retreat: 0.20, durability: 46, repair: 12, entry: '炼气后期可佩的玉坠。能护身、储存真气，趁人收招时也好抽身。' },
+  { id: 'jetty_charm', slot: 'charm', tier: 2, atk: 0, def: 0, hp: 0, qi: 5, retreat: 0.30, durability: 38, repair: 9, entry: '炼气后期可佩的旧渡口灯坠。能多存些真气，察觉空当时尤其容易抽身。' },
   { id: 'pine_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 5, def: 0, perception: 5, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 7, entry: '耐雨长弓。拉得稳，瞄住猎物时有余裕看它哪只脚先动。削苇箭和包铁箭都合弦。' },
   { id: 'resin_staff', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 2, perception: 3, hp: 0, qi: 2, retreat: 0, durability: 40, repair: 7, entry: '炉户用的厚杖。能架住来势，杖芯温热，持久行气时也趁手。' },
   { id: 'black_crossbow', slot: 'weapon', weaponClass: 'crossbow', ammo: ['black_bolt'], tier: 2, atk: 6, def: 0, perception: 2, hp: 0, qi: 0, retreat: 0, durability: 36, repair: 12, entry: '炼气后期才能拉开的弩。只能用暗金短矢，对付长着石甲的敌人尤其容易射穿。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
@@ -4772,11 +5102,13 @@ const provinces = [
 const regionDetails = { ...riverContent.regionDetails, ...zhaoContent.regionDetails, ...sandContent.regionDetails };
 const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => content.sects ?? []);
 const mechanisms = puzzleContent.mechanisms;
-const { innerStyles, enemyInnerStyles } = innerStyleContent;
+const { enemyInnerStyles } = innerStyleContent;
+const innerStyles = [...innerStyleContent.innerStyles, ...banditContent.innerStyles];
+const { roadBandits } = banditContent;
 
 for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
   ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent,
-  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent]) {
+  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent, banditContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -4785,6 +5117,11 @@ for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzz
 sites.push(...extendSites);
 events.push(...extendEvents);
 innerStyleContent.extendScenes(sites, events, gear, enemies);
+const roadsideEnemyIds = new Set([...roadBandits.pools, ...roadBandits.fixed].map(({ enemy }) => enemy));
+for (const enemy of banditContent.enemies) {
+  enemy.tags.push('bandit');
+  if (roadsideEnemyIds.has(enemy.id)) enemy.name = `强盗 · ${realms[enemy.tier].name}`;
+}
 
 const solitaryTerritories = new Set(['river_cliff_kite', 'snow_warden', 'ember_yak']);
 const twoHandedClasses = new Set(['bow', 'crossbow', 'spear', 'staff']);
@@ -4866,7 +5203,7 @@ const equipmentSlots = { weapon: '主武器', offhand: '副手', armor: '盔甲'
 
 const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms,
-  innerStyles, enemyInnerStyles, tournament: tournamentData };
+  innerStyles, enemyInnerStyles, roadBandits, tournament: tournamentData };
 
 
 
@@ -4874,13 +5211,13 @@ const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, ta
 return { default: data, ...data };
 })();
 const { data } = (() => ({ data: moduleData.default }))();
-const { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement } = (() => {
+const { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView } = (() => {
 
 
 const home = 'village';
 const legacy = new Set(['village', 'marsh', 'ridge', 'ford', 'hidden', 'pine_ridge', 'kiln_valley', 'herb_basin', 'black_mine', 'snow_pass', 'sky_terrace']);
 const crossings = [
-  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, item: 'ferry_manifest', quest: 'last_lantern', reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' },
+  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, ferry: true, item: 'ferry_manifest', quest: 'last_lantern', reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' },
   { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' },
 ];
 const shortcuts = [
@@ -4893,7 +5230,7 @@ const arrayPlans = {
   mingsha: { coins: 140, need: { wood: 28, ore: 32, core: 32, black_iron: 25 } },
 };
 const transportRules = Object.freeze({ gatePrice: 2, gateDays: 0.125, arrayPrice: 4, arrayDays: 0.25, scrollDays: 0.125,
-  arrayPlans, crossings, shortcuts });
+  roadUnitDays: 0.25, arrayPlans, crossings, shortcuts });
 
 function initialWorld() {
   return { lastSettlement: home, gates: [], arrays: {}, shops: {}, recovery: {}, affiliation: null, memberships: {} };
@@ -4928,31 +5265,48 @@ function crossBlocker(state, edge) {
   return edge && !known(state, edge.item) && !state.completedQuests.includes(edge.quest) ? edge.reason : '';
 }
 
-function signedRoad(data, from, to) {
-  return detail(data, from).links?.includes(to) || detail(data, to).links?.includes(from);
+const roadKey = (from, to) => [from, to].sort().join('|');
+
+function localRoadDays(from, to) {
+  const eitherHome = from.id === home || to.id === home;
+  const bothLegacy = legacy.has(from.id) && legacy.has(to.id);
+  const distances = (from.travel ?? 1) + (to.travel ?? 1);
+  if (bothLegacy && eitherHome) return (from.id === home ? to : from).travel;
+  if (bothLegacy) return Math.max(0.75, Math.round(distances) / 4);
+  return Math.max(0.5, Math.round(distances * 2) / 4);
 }
 
-function directRoad(state, from, to, kit) {
-  const fromRegion = kit.records.regions[from];
-  const toRegion = kit.records.regions[to];
-  if (!fromRegion || !toRegion || from === to) return null;
-  const cross = crossRoute(from, to);
-  if (cross) return { days: cross.days, cross };
-  const shortcut = shortcuts.find((road) => otherside(road, from) === to && state.seenChoices.includes(road.openedBy));
-  if (shortcut) return { days: shortcut.days, label: shortcut.label };
-  if (provinceOf(kit.data, from) !== provinceOf(kit.data, to) || !signedRoad(kit.data, from, to)) return null;
-  if (legacy.has(from) && legacy.has(to)) {
-    const days = from === home || to === home ? (from === home ? toRegion : fromRegion).travel
-      : Math.max(0.75, Math.round((fromRegion.travel ?? 1) + (toRegion.travel ?? 1)) / 4);
-    return { days };
+function roadGraph(data, { state } = {}) {
+  const regions = new Map(data.regions.map((region) => [region.id, region]));
+  const roads = new Map();
+  const add = (a, b, days, extra = {}) => {
+    if (!regions.has(a) || !regions.has(b) || a === b) return;
+    const key = roadKey(a, b);
+    const [from, to] = key.split('|');
+    roads.set(key, { from, to, key, days, units: days / transportRules.roadUnitDays, ...extra });
+  };
+  for (const [a, from] of regions) {
+    for (const b of detail(data, a).links ?? []) {
+      if (regions.has(b) && provinceOf(data, a) === provinceOf(data, b)) add(a, b, localRoadDays(from, regions.get(b)));
+    }
   }
-  const days = Math.max(0.5, Math.round(((fromRegion.travel ?? 1) + (toRegion.travel ?? 1)) * 2) / 4);
-  return { days };
+  for (const cross of crossings) add(cross.a, cross.b, cross.days, { cross, label: cross.label, water: Boolean(cross.ferry) });
+  for (const shortcut of shortcuts) {
+    if (!state || state.seenChoices.includes(shortcut.openedBy)) {
+      add(shortcut.a, shortcut.b, shortcut.days, { label: shortcut.label, openedBy: shortcut.openedBy });
+    }
+  }
+  return [...roads.values()];
+}
+
+function directRoad(from, to, edges) {
+  return edges.find((edge) => edge.key === roadKey(from, to));
 }
 
 function learnAdjacentRegions(state, kit) {
+  const edges = roadGraph(kit.data, { state });
   for (const region of kit.data.regions) {
-    if (marked(state, region.id) || !directRoad(state, state.region, region.id, kit)) continue;
+    if (marked(state, region.id) || !directRoad(state.region, region.id, edges)) continue;
     const cross = crossRoute(state.region, region.id);
     if (cross ? crossBlocker(state, cross) : region.reveal || region.secret) continue;
     state.discovered.push(region.id);
@@ -4964,25 +5318,24 @@ function learnAdjacentRegions(state, kit) {
   }
 }
 
-function knownRoutes(state, kit) {
-  const routes = new Map([[state.region, { days: 0, via: [] }]]);
-  const here = provinceOf(kit.data, state.region);
-  const unvisited = new Set([state.region, ...state.discovered.filter((id) => provinceOf(kit.data, id) === here)]);
+function knownRoutes(state, edges) {
+  const routes = new Map([[state.region, { units: 0, legs: [] }]]);
+  const unvisited = new Set([state.region, ...state.discovered]);
+  const permitted = edges.filter((edge) => !crossBlocker(state, edge.cross));
   while (unvisited.size) {
     let nearest;
     let nearestCost = Infinity;
     for (const id of unvisited) {
-      if ((routes.get(id)?.days ?? Infinity) < nearestCost) { nearest = id; nearestCost = routes.get(id).days; }
+      if ((routes.get(id)?.units ?? Infinity) < nearestCost) { nearest = id; nearestCost = routes.get(id).units; }
     }
     if (!nearest) break;
     unvisited.delete(nearest);
-    for (const id of unvisited) {
-      const road = directRoad(state, nearest, id, kit);
-      if (!road || road.cross) continue;
-      const nextCost = nearestCost + road.days;
-      if (nextCost < (routes.get(id)?.days ?? Infinity)) {
-        const via = nearest === state.region ? [] : [...routes.get(nearest).via, nearest];
-        routes.set(id, { days: nextCost, via });
+    for (const edge of permitted) {
+      const id = otherside({ a: edge.from, b: edge.to }, nearest);
+      if (!id || !unvisited.has(id)) continue;
+      const units = nearestCost + edge.units;
+      if (units < (routes.get(id)?.units ?? Infinity)) {
+        routes.set(id, { units, legs: [...routes.get(nearest).legs, { ...edge, from: nearest, to: id }] });
       }
     }
   }
@@ -5005,27 +5358,38 @@ function roadFood(state, required, kit) {
   return { meals, deficit, satiety };
 }
 
-function quoteRoad(state, id, kit, routes) {
+function legDiet(state, leg, kit) {
+  const protection = leg.cross ? null : kit.roadProtection(state, provinceOf(kit.data, leg.to));
+  const rate = kit.rules.satietyDrainPerDay * (1 - (protection?.field.roadSatiety.fraction ?? 0));
+  return { rate, protection };
+}
+
+function quoteRoad(state, id, kit, edges, routes) {
   if (!kit.records.regions[id]) return { reason: '找不到这条路。' };
   if (!marked(state, id)) return { reason: '你还没有找到那条路。' };
   if (state.region === id) return { reason: '你已经在这里。' };
-  const road = directRoad(state, state.region, id, kit) ?? (routes ?? knownRoutes(state, kit)).get(id);
-  if (!road) return { reason: '没找到能从这里接上的路。' };
-  const blockedCrossing = crossBlocker(state, road.cross);
-  if (blockedCrossing) return { ...road, reason: blockedCrossing };
+  const route = routes.get(id);
+  if (!route) {
+    const blocked = directRoad(state.region, id, edges);
+    const reason = crossBlocker(state, blocked?.cross);
+    return reason ? { ...blocked, legs: [{ ...blocked, from: state.region, to: id }], reason }
+      : { reason: '没找到能从这里接上的路。' };
+  }
+  const legs = route.legs.map((leg) => ({ ...leg, ...legDiet(state, leg, kit) }));
+  const road = { ...route, legs, days: route.units * transportRules.roadUnitDays, cross: legs.some((leg) => leg.cross) };
   if (state.satiety === 0) {
     if (road.cross) return { ...road, reason: '腹中空空，先回住处吃些东西，再走跨州路。' };
     if (!settlementOf(kit.data, id)?.inn) return { ...road, reason: '腹中空空，先吃些东西。' };
     return { ...road, days: road.days + kit.rules.emptyReturnDays, rescue: true, reason: '' };
   }
-  const protection = road.cross ? null : kit.roadProtection(state, provinceOf(kit.data, id));
-  const rate = kit.rules.satietyDrainPerDay * (1 - (protection?.field.roadSatiety.fraction ?? 0));
-  const remaining = state.satiety - road.days * rate;
-  const longWalk = road.via?.length && road.days >= 2.5;
+  const provisions = legs.reduce((sum, leg) => sum + leg.days * leg.rate, 0);
+  const remaining = state.satiety - provisions;
+  const longWalk = legs.length > 1 && road.days >= 2.5;
   const reserve = longWalk ? 20 : 0;
-  const food = road.cross || longWalk ? roadFood(state, road.days * rate + reserve, kit) : null;
-  return { ...road, rate, protection, meals: food?.meals, emptyOnArrival: remaining + (food?.satiety ?? 0) <= 0,
-    reason: road.cross && food.deficit > 0 ? '带的口粮还不够走完这段路。' : '' };
+  const autoMeals = road.cross || longWalk;
+  const food = autoMeals ? roadFood(state, provisions + reserve, kit) : null;
+  return { ...road, autoMeals, reserve, meals: food?.meals, emptyOnArrival: remaining + (food?.satiety ?? 0) <= 0,
+    reason: road.cross && food.deficit > reserve ? '带的口粮还不够走完这段路。' : '' };
 }
 
 function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) {
@@ -5040,26 +5404,118 @@ function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) 
   }
 }
 
-function travelRoad(state, id, kit) {
-  const road = quoteRoad(state, id, kit);
-  if (road.reason) return kit.refuse(road.reason);
-  const protection = road.protection;
-  const baseRate = kit.rules.satietyDrainPerDay;
-  const satietyRate = road.rate ?? baseRate;
-  const unprotectedSatiety = Math.max(0, state.satiety - road.days * baseRate);
-  const arrivalDay = state.day + road.days;
-  for (const [food, count] of Object.entries(road.meals ?? {})) {
-    for (let meal = 0; meal < count; meal++) {
-      kit.advance(state, Math.min(Math.max(0, arrivalDay - state.day), state.satiety / satietyRate), satietyRate);
-      kit.eatOnRoad(state, food);
-    }
+function eatTripMeal(state, trip, kit) {
+  const food = kit.data.foods.filter((item) => item.satiety > 0 && kit.owns(state, item.id))
+    .reduce((smallest, item) => !smallest || item.satiety < smallest.satiety ? item : smallest, null);
+  if (!food || !kit.eatOnRoad(state, food.id).ok) return false;
+  trip.meals[food.id] = (trip.meals[food.id] ?? 0) + 1;
+  return true;
+}
+
+function advanceRoad(state, trip, days, rate, kit) {
+  const end = Math.round((state.day + days) * 1000) / 1000;
+  let remaining = days;
+  while (trip.autoMeals && state.satiety < remaining * rate) {
+    const untilHungry = state.satiety / rate;
+    if (untilHungry > 0) kit.advance(state, untilHungry, rate);
+    remaining = Math.max(0, end - state.day);
+    if (!eatTripMeal(state, trip, kit)) break;
   }
-  arrive(state, id, Math.max(0, arrivalDay - state.day), kit, { satietyRate });
-  const travelText = road.rescue ? '腹中没了力气，沿路慢走了一程。'
-    : protection && state.satiety > unprotectedSatiety ? `裹紧${kit.nameOf(protection.id)}的衣襟挡住风沙，这一程没那么耗力。` : '';
-  const used = road.meals && kit.goodsText(road.meals);
-  return { ...kit.say(state, `抵达${kit.records.regions[id].name}。${road.label ? `这次走的是${road.label}。` : ''}${used ? `途中吃了${used}。` : ''}${travelText}`),
-    ...(used ? { travelMeals: road.meals } : {}) };
+  kit.advance(state, Math.max(0, end - state.day), rate);
+}
+
+function nextRoadStep(leg, progress) {
+  if (leg.from < leg.to) {
+    const index = Math.floor(progress) + 1;
+    return { index, units: Math.min(index, leg.units) - progress };
+  }
+  const position = leg.units - progress;
+  const index = Math.ceil(position);
+  return { index, units: position - index + 1 };
+}
+
+function finishRoad(state, trip, kit) {
+  if (state.satiety < trip.reserve) eatTripMeal(state, trip, kit);
+  arrive(state, trip.destination, trip.extraDays, kit);
+  state.roadTrip = null;
+  const labels = trip.legs.filter(({ label }) => label).map(({ label }) => label);
+  const used = kit.goodsText(trip.meals);
+  const travelText = trip.extraDays ? '腹中没了力气，沿路慢走了一程。'
+    : trip.protection && state.satiety > 0 ? `裹紧${kit.nameOf(trip.protection)}的衣襟挡住风沙，这一程没那么耗力。` : '';
+  return { ...kit.say(state, `抵达${kit.records.regions[trip.destination].name}。${labels.length ? `这次走的是${labels.join('、')}。` : ''}${used ? `途中吃了${used}。` : ''}${travelText}`),
+    ...(used ? { travelMeals: trip.meals } : {}) };
+}
+
+function walkRoad(state, kit) {
+  const trip = state.roadTrip;
+  trip.stop = null;
+  while (trip.legIndex < trip.legs.length) {
+    const leg = trip.legs[trip.legIndex];
+    const { rate, protection } = legDiet(state, leg, kit);
+    if (protection) trip.protection = protection.id;
+    while (trip.progress < leg.units) {
+      const { index, units } = nextRoadStep(leg, trip.progress);
+      advanceRoad(state, trip, units * transportRules.roadUnitDays, rate, kit);
+      trip.progress += units;
+      trip.unitsWalked += units;
+      if (leg.water || !kit.checkRoadStep) continue;
+      trip.stop = `road:${leg.key}:${index}`;
+      const pause = kit.checkRoadStep(state, { ...leg, stepUnits: units }, index);
+      if (pause) return { ok: true, roadInterrupted: true, ...(typeof pause === 'object' ? pause : kit.say(state, '你停在路上。')) };
+      trip.stop = null;
+    }
+    state.region = leg.to;
+    trip.legIndex += 1;
+    trip.progress = 0;
+  }
+  return finishRoad(state, trip, kit);
+}
+
+function travelRoad(state, id, kit) {
+  if (state.roadTrip) return kit.refuse('先走完或折回现在走的这段路。');
+  const edges = roadGraph(kit.data, { state });
+  const road = quoteRoad(state, id, kit, edges, knownRoutes(state, edges));
+  if (road.reason) return kit.refuse(road.reason);
+  state.roadTrip = { destination: id, legs: road.legs, legIndex: 0, progress: 0, unitsWalked: 0, totalUnits: road.units,
+    stop: null, autoMeals: Boolean(road.autoMeals), reserve: road.reserve ?? 0,
+    extraDays: road.rescue ? kit.rules.emptyReturnDays : 0, meals: {} };
+  return walkRoad(state, kit);
+}
+
+function continueRoad(state, kit) {
+  const trip = state.roadTrip;
+  if (!trip) return kit.refuse('你当前没有在路上。');
+  if (state.combat) return kit.refuse('先处理眼前的对手。');
+  const remaining = trip.legs.slice(trip.legIndex);
+  if (remaining.some(({ cross }) => cross)) {
+    const provisions = remaining.reduce((cost, leg, i) => cost + (leg.units - (i === 0 ? trip.progress : 0))
+      * transportRules.roadUnitDays * legDiet(state, leg, kit).rate, 0);
+    if (roadFood(state, provisions, kit).deficit > 0) return kit.refuse('带的口粮还不够走完这段路。');
+  }
+  return walkRoad(state, kit);
+}
+
+function backFromRoad(state, kit) {
+  const trip = state.roadTrip;
+  if (!trip) return kit.refuse('你当前没有在路上。');
+  if (state.combat) return kit.refuse('先处理眼前的对手。');
+  const leg = trip.legs[trip.legIndex];
+  const { rate } = legDiet(state, { ...leg, from: leg.to, to: leg.from }, kit);
+  advanceRoad(state, trip, trip.progress * transportRules.roadUnitDays, rate, kit);
+  arrive(state, state.region, 0, kit);
+  state.roadTrip = null;
+  return kit.say(state, `你沿着刚走过的路折回${kit.records.regions[state.region].name}。`);
+}
+
+function roadTripView(state, kit) {
+  const trip = state.roadTrip;
+  if (!trip) return null;
+  const leg = trip.legs[trip.legIndex];
+  return { destination: trip.destination, destinationName: kit.records.regions[trip.destination].name,
+    from: leg.from, fromName: kit.records.regions[leg.from].name, to: leg.to, toName: kit.records.regions[leg.to].name,
+    key: leg.key, progress: trip.progress, legUnits: leg.units, unitsWalked: trip.unitsWalked, totalUnits: trip.totalUnits,
+    remainingUnits: trip.totalUnits - trip.unitsWalked,
+    stop: trip.stop, backDays: trip.progress * transportRules.roadUnitDays };
 }
 
 function gateQuote(state, id, kit, scroll) {
@@ -5330,18 +5786,24 @@ function worldView(state, kit) {
   const actual = kit.records.regions[state.region];
   const here = detail(kit.data, state.region);
   const discovered = kit.data.regions.filter((region) => marked(state, region.id));
-  const routesFromHere = knownRoutes(state, kit);
+  const edges = roadGraph(kit.data, { state });
+  const routesFromHere = knownRoutes(state, edges);
   const journeys = discovered.flatMap((region) => {
     if (region.id === state.region) return [];
-    const quote = quoteRoad(state, region.id, kit, routesFromHere);
-    const ordinary = directRoad(state, state.region, region.id, kit);
-    const via = (quote.via ?? []).map((id) => kit.records.regions[id].name);
+    const quote = quoteRoad(state, region.id, kit, edges, routesFromHere);
+    const ordinary = directRoad(state.region, region.id, edges);
+    const via = (quote.legs ?? []).slice(0, -1).map(({ to }) => to);
     return quote.days === undefined ? [] :
       [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue),
-        direct: Boolean(ordinary), via, path: [state.region, ...(quote.via ?? []), region.id],
+        units: quote.units, direct: Boolean(ordinary), via: via.map((id) => kit.records.regions[id].name), path: [state.region, ...via, region.id],
         meals: quote.meals, emptyOnArrival: quote.emptyOnArrival })];
   });
   const roads = journeys.filter((road) => road.direct || road.rescue);
+  const knownEdges = edges.filter(({ from, to }) => marked(state, from) && marked(state, to)).map((edge) => {
+    const reason = crossBlocker(state, edge.cross);
+    const riskText = kit.roadRisk?.(state, edge)?.riskText;
+    return { ...edge, available: !reason, reason, ...(riskText ? { riskText } : {}) };
+  });
   const roadsById = Object.fromEntries(journeys.map((road) => [road.id, road]));
   const closedSidePaths = crossings.filter((edge) => {
     const other = otherside(edge, state.region);
@@ -5363,7 +5825,7 @@ function worldView(state, kit) {
   const affiliation = kit.data.sects?.find(({ id }) => state.world.affiliation === id);
   return { settlement: settlementOf(kit.data, state.region), localMarket: localMarket(state, kit), sect: sectView(state, kit),
     affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit: pledge(state, affiliation).credit } : null,
-    world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, journeys, crossings: closedSidePaths,
+    world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, edges: knownEdges, journeys, crossings: closedSidePaths,
       here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: here.x, y: here.y, description: here.description ?? actual.desc },
       scrollCount: kit.owns(state, 'gate_scroll'), gates, localGate: here.portal ? { attuned: state.world.gates.includes(state.region) } : null,
       localArray: arrayView(state, state.region, kit), arrays } };
@@ -5383,7 +5845,308 @@ function worldAction(state, action, payload, kit) {
   return null;
 }
 
-return { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement };
+return { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView };
+})();
+const { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit } = (() => {
+const banditRules = Object.freeze({
+  distanceUnit: 2,
+  gearGradeOdds: [[0.95, 0.05, 0], [0.04, 0.92, 0.04], [0, 0.06, 0.94]],
+  wornWeights: { armor: 4, weapon: 2, offhand: 1, head: 2, boots: 2, belt: 1, charm: 1 },
+  concealmentFactor: 1.25,
+  maxConcealment: 0.45,
+  ordinaryGearChance: 0.24,
+  richGearChance: 0.75,
+});
+
+const roadKey = (a, b) => [a, b].sort().join('|');
+
+function draw(state) {
+  state.roadSeed = (Math.imul(state.roadSeed ?? 1, 1664525) + 1013904223) >>> 0;
+  return state.roadSeed / 0x100000000;
+}
+
+function chooseWeighted(state, rows, weight) {
+  if (!rows.length) return null;
+  let position = draw(state) * rows.reduce((sum, row) => sum + weight(row), 0);
+  for (const row of rows) {
+    position -= weight(row);
+    if (position < 0) return row;
+  }
+  return rows.at(-1);
+}
+
+function range(state, [min, max]) {
+  return min + Math.floor(draw(state) * (max - min + 1));
+}
+
+function crewRoster(crew) {
+  return crew.members.flatMap((headcount, tier) =>
+    Array.from({ length: headcount }, (_, index) => ({ tier, key: `${tier}:${index}` })));
+}
+
+function crewRecord(state, id) {
+  return (state.banditCrews[id] ??= { encounters: 0, defeated: [] });
+}
+
+function unresolvedBandit(crewId, enemies, state) {
+  const roster = crewRoster(enemies);
+  const defeated = new Set(state.banditCrews[crewId]?.defeated);
+  const met = state.roadTrip.banditsMet ?? [];
+  return roster.filter(({ key }) => !defeated.has(key) && !met.includes(`${crewId}/${key}`));
+}
+
+function memberLootSeed(state, bandit) {
+  return [...`${bandit.crew}:${bandit.member}`].reduce(
+    (hash, character) => Math.imul(hash ^ character.charCodeAt(0), 16777619) >>> 0,
+    state.banditLootSeed,
+  );
+}
+
+function apparentBanditGrade(state, kit) {
+  const gradeWeights = [0, 0, 0];
+  for (const [slot, id] of Object.entries(state.equipment)) {
+    const gear = kit.records.gear[id];
+    if (gear) gradeWeights[Math.min(2, Math.floor(gear.tier / 3))] += banditRules.wornWeights[slot] ?? 1;
+  }
+  const median = gradeWeights.reduce((sum, amount) => sum + amount, 0) / 2;
+  return gradeWeights[0] >= median ? 0 : gradeWeights[0] + gradeWeights[1] >= median ? 1 : 2;
+}
+
+function roadBanditRisk(state, leg, kit) {
+  if (leg.cross?.ferry) return null;
+  const profile = kit.data.roadBandits.roads.find(({ a, b }) => roadKey(a, b) === leg.key);
+  if (!profile) return null;
+  const crew = kit.data.roadBandits.crews[profile.crew];
+  const den = kit.data.roadBandits.dens[crew.den];
+  const routed = den ? Object.values(state.siteVictories[crew.den] ?? {}).reduce((sum, n) => sum + n, 0) : 0;
+  const population = crew.members.reduce((sum, number) => sum + number, 0);
+  const defeated = state.banditCrews[profile.crew]?.defeated.length ?? 0;
+  const remaining = Math.max(0, population - defeated);
+  const patrol = den ? 1 - Math.min(1, routed / den.heads) * (1 - den.minFactor) : 1;
+  const avoidance = kit.activeGear(state)
+    .flatMap(({ trait, traits = [] }) => [trait, ...traits])
+    .reduce((sum, trait) => sum + (trait?.kind === 'dodge' ? trait.bonus : 0), 0);
+  const concealment = Math.min(banditRules.maxConcealment, avoidance * banditRules.concealmentFactor);
+  return { chance: profile.chance * (remaining / population) * patrol * (1 - concealment), crew: profile.crew,
+    riskText: !remaining ? '近来已看不见守路伸手的人。'
+      : routed >= (den?.heads ?? Infinity) ? '坡寨散了，各处只偶尔还见人盘桓。'
+      : defeated >= population / 2 ? '这一带拦路的人已经少多了。'
+      : routed ? '路边的贼哨少了。' : profile.riskText };
+}
+
+function pickBandit(state, grade, crewId, kit) {
+  const stages = banditRules.gearGradeOdds[grade].map((weight, index) => ({ index, weight }));
+  const stage = chooseWeighted(state, stages, ({ weight }) => weight).index;
+  const crew = kit.data.roadBandits.crews[crewId];
+  return chooseWeighted(state, unresolvedBandit(crewId, crew, state).filter(({ tier }) => Math.floor(tier / 3) === stage),
+    ({ tier }) => [4, 3, 2][tier % 3]);
+}
+
+function roadStory(state, leg, crewId, grade, kit) {
+  const met = state.roadTrip.banditsMet ?? [];
+  const options = kit.data.roadBandits.fixed.filter(({ id }) => !state.resolvedBandits.includes(id) && !met.includes(id));
+  const encounters = state.banditCrews[crewId]?.encounters ?? 0;
+  const forced = options.find((story) => story.crew === crewId && story.forceAt && encounters + 1 >= story.forceAt);
+  if (forced) return forced;
+  const story = options.find(({ a, b, enemy, fee }) => roadKey(a, b) === leg.key &&
+    (fee == null || Math.floor(kit.records.enemies[enemy].tier / 3) === grade));
+  return story && draw(state) < story.chance ? story : null;
+}
+
+function stopForBandit(state, leg, crewId, kit) {
+  const grade = apparentBanditGrade(state, kit);
+  const fixed = roadStory(state, leg, crewId, grade, kit);
+  const member = fixed ? null : pickBandit(state, grade, crewId, kit);
+  if (!fixed && !member) return null;
+  const pool = member && kit.data.roadBandits.pools.find(({ tier }) => tier === member.tier);
+  const enemy = fixed?.enemy ?? pool.enemy;
+  const stage = Math.floor(kit.records.enemies[enemy].tier / 3);
+  const nonThreat = Boolean(fixed && fixed.fee != null && stage !== grade);
+  const fee = fixed ? (nonThreat ? null : fixed.fee ?? null) : range(state, pool.fee);
+  const onStoryRoad = fixed && roadKey(fixed.a, fixed.b) === leg.key;
+  const unexpected = stage < grade
+    ? '他先打量你背光的一侧，伸手时并没看清护具的纹样。'
+    : '路边的人本像是在等别的旅客。见你到了近处，他才挪身拦住。';
+  const message = fixed
+    ? (nonThreat ? fixed.nonThreatIntro : onStoryRoad ? fixed.intro : fixed.crewIntro ?? fixed.intro)
+    : (stage === grade ? '他横着兵器挡住路，朝你的行囊抬了抬下巴。' : unexpected);
+  state.roadBandit = { enemy, fixed: fixed?.id, crew: crewId, member: member?.key,
+    fee, paid: 0, intro: message, nonThreat };
+  (state.roadTrip.banditsMet ??= []).push(fixed?.id ?? `${crewId}/${member.key}`);
+  crewRecord(state, crewId).encounters++;
+  return { ...kit.say(state, message), roadInterrupted: true };
+}
+
+function checkRoadBanditStep(state, leg, index, kit) {
+  const profile = roadBanditRisk(state, leg, kit);
+  if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1)) {
+    const pause = stopForBandit(state, leg, profile.crew, kit);
+    if (pause) return pause;
+  }
+  if (Object.keys(kit.groundAt(state)).length) {
+    return { ...kit.say(state, '你认出路边这处石脚，地上还有些东西。'), roadInterrupted: true };
+  }
+  return null;
+}
+
+function demands(state, kit) {
+  return Object.entries(state.inventory).flatMap(([id]) => {
+    const item = kit.records.items[id];
+    const count = kit.saleTerms(state, id).count;
+    return item?.sell > 0 && count > 0 && !kit.isEvidence(item) && !item.keepOnFall && item.kind !== 'manual'
+      ? [{ id, name: item.name, count, price: item.sell }] : [];
+  });
+}
+
+function storyOf(state, kit) {
+  return kit.data.roadBandits.fixed.find(({ id }) => id === state.roadBandit?.fixed);
+}
+
+function plotOptions(story, encounter) {
+  if (encounter.aftermath) return story?.afterWin?.actions ?? [];
+  return [...(story?.actions ?? []), ...(encounter.nonThreat ? story?.nonThreatActions ?? [] : [])];
+}
+
+function plotReason(state, option, kit) {
+  if (state.coins < (option.coins ?? 0)) return `还要带${option.coins}枚灵钱。`;
+  const missing = Object.fromEntries(Object.entries(option.need ?? {})
+    .filter(([id, count]) => kit.saleTerms(state, id).count < count));
+  return Object.keys(missing).length ? `手边还缺${kit.goodsText(missing)}。` : '';
+}
+
+function roadBanditView(state, kit) {
+  const bandit = state.roadBandit;
+  if (!bandit || state.combat) return null;
+  const story = storyOf(state, kit);
+  const remaining = bandit.fee === null ? null : bandit.fee - bandit.paid;
+  const offers = remaining === null ? [] : demands(state, kit);
+  return { name: kit.records.enemies[bandit.enemy].name,
+    intro: bandit.intro,
+    fee: bandit.fee, remaining, coins: state.coins,
+    offers: offers.map(({ count, price, ...goods }) => ({ ...goods, held: count, count: Math.min(count, Math.ceil(remaining / price)), price })),
+    allValue: state.coins + offers.reduce((sum, { count, price }) => sum + count * price, 0),
+    aftermath: Boolean(bandit.aftermath),
+    passAllowed: bandit.nonThreat && !bandit.aftermath,
+    fightAllowed: !bandit.nonThreat && !bandit.aftermath,
+    actions: plotOptions(story, bandit).map(({ id, label, desc, ...option }) => {
+      const reason = plotReason(state, option, kit);
+      return { id, label, desc, available: !reason, reason };
+    }),
+  };
+}
+
+function resolveBandit(state, story, reward, message, kit) {
+  if (story) (state.resolvedBandits ??= []).push(story.id);
+  const found = reward?.revealSite && kit.records.sites[reward.revealSite];
+  const newRoute = found && !state.banditLeads.includes(found.id);
+  if (newRoute) state.banditLeads.push(found.id);
+  const { accepted, spilled } = kit.addItems(state, reward?.loot ?? {}, true);
+  const carried = kit.goodsText(accepted);
+  const onGround = kit.goodsText(spilled);
+  state.roadBandit = null;
+  return { ...kit.say(state, `${message}${carried ? `得到${carried}。` : ''}${onGround ? `${onGround}留在脚边。` : ''}` +
+    (newRoute ? `从${kit.records.regions[found.region].name}可以去「${found.name}」了。` : '')),
+    roadInterrupted: true };
+}
+
+function payAndPass(state, story, message, kit) {
+  const aftermath = story?.afterPay;
+  return resolveBandit(state, story, aftermath, message + (aftermath?.outcome ?? ''), kit);
+}
+
+const roadActions = new Set(['banditFight', 'banditPlot', 'banditPass', 'banditPay', 'banditPayCoins', 'banditPayItem', 'banditSurrender']);
+
+function banditAction(state, action, { id, count = 1 }, kit) {
+  if (!state.roadBandit || !roadActions.has(action)) return null;
+  const bandit = state.roadBandit;
+  const story = storyOf(state, kit);
+  if (bandit.aftermath && action !== 'banditPlot') return kit.refuse('他还在等你答话。');
+  if (action === 'banditPass') {
+    if (!bandit.nonThreat) return kit.refuse('眼下他还挡在路上。');
+    return resolveBandit(state, null, null, '他扶着车板退开一步，你沿路往前走。', kit);
+  }
+  if (action === 'banditFight') {
+    if (bandit.nonThreat) return kit.refuse('他已经把兵器收起，让开了路。');
+    kit.startCombat(state, bandit.enemy);
+    state.combat.roadBandit = true;
+    return kit.say(state, '你把行囊拢到身后，摆开架势。');
+  }
+  if (action === 'banditPlot') {
+    const option = plotOptions(story, bandit).find((entry) => entry.id === id);
+    if (!option) return kit.refuse('眼下没有这个说法。');
+    const reason = plotReason(state, option, kit);
+    if (reason) return kit.refuse(reason);
+    for (const [itemId, amount] of Object.entries(option.need ?? {})) kit.removeItem(state, itemId, amount, false);
+    state.coins -= option.coins ?? 0;
+    return resolveBandit(state, story, option, option.outcome, kit);
+  }
+  if (bandit.fee === null) return kit.refuse('他并未开口讨钱。');
+  const remaining = bandit.fee - bandit.paid;
+  if (action === 'banditSurrender') {
+    const offers = demands(state, kit);
+    if (state.coins + offers.reduce((sum, item) => sum + item.count * item.price, 0) >= remaining) {
+      return kit.refuse('手里的东西还凑得齐，挑几样给他就能过去。');
+    }
+    const paid = { ...Object.fromEntries(offers.map((item) => [item.id, item.count])) };
+    for (const item of offers) kit.removeItem(state, item.id, item.count, false);
+    const coins = state.coins;
+    state.coins = 0;
+    const contents = [coins && `${coins}枚灵钱`, kit.goodsText(paid)].filter(Boolean).join('、');
+    return { ...payAndPass(state, story, contents
+      ? `你交出${contents}。他掂了掂，侧过身让出路。`
+      : '你把空钱袋翻给他看。他嘟囔了一声，转进草里。', kit), paidGoods: paid, paidCoins: coins };
+  }
+  if (action === 'banditPay' || action === 'banditPayCoins') {
+    const coins = Math.min(state.coins, remaining);
+    if (!coins || (action === 'banditPay' && coins < remaining)) return kit.refuse('手头的灵钱还不够。');
+    state.coins -= coins;
+    bandit.paid += coins;
+    const message = `你递给他${coins}枚灵钱。`;
+    return { ...(coins === remaining ? payAndPass(state, story, message + '他让开了路。', kit)
+      : kit.say(state, message + `他还要${remaining - coins}枚。`)), paidCoins: coins };
+  }
+  const quote = demands(state, kit).find((item) => item.id === id);
+  if (!quote || !Number.isSafeInteger(count) || count < 1 || count > Math.min(quote.count, Math.ceil(remaining / quote.price))) {
+    return kit.refuse('挑一样他肯收的物件，再看看数量。');
+  }
+  kit.removeItem(state, id, count, false);
+  const value = count * quote.price;
+  bandit.paid += value;
+  const message = `你交了${quote.name}×${count}，抵${value}枚灵钱。`;
+  return { ...(value >= remaining ? payAndPass(state, story, message + '他让开了路。', kit)
+    : kit.say(state, message + `他还要${remaining - value}枚。`)), paidGoods: { [id]: count } };
+}
+
+function winRoadBandit(state, enemy, kit) {
+  const bandit = state.roadBandit;
+  const story = storyOf(state, kit);
+  const pool = kit.data.roadBandits.pools.find(({ enemy: id }) => id === enemy.id);
+  const lead = `你击退了${enemy.name}。`;
+  if (story?.afterWin?.actions?.length) {
+    bandit.aftermath = true;
+    bandit.fee = null;
+    bandit.intro = story.afterWin.intro;
+    return { ...kit.say(state, lead + bandit.intro), roadInterrupted: true };
+  }
+  if (story) return resolveBandit(state, story, story.afterWin, lead + (story.afterWin?.outcome ?? ''), kit);
+  crewRecord(state, bandit.crew).defeated.push(bandit.member);
+  const lootRoll = { roadSeed: memberLootSeed(state, bandit) };
+  const rich = draw(lootRoll) < pool.richChance;
+  const coins = range(lootRoll, rich ? pool.richCash : pool.cash);
+  const candidate = draw(lootRoll) < (rich ? banditRules.richGearChance : banditRules.ordinaryGearChance)
+    ? chooseWeighted(lootRoll, rich ? pool.richGear : pool.gear, ({ weight }) => weight) : null;
+  const item = candidate && !kit.gearReserved(state, candidate.id) ? kit.records.gear[candidate.id] : null;
+  const goods = item ? { [item.id]: 1 } : {};
+  const wear = item ? { [item.id]: Math.ceil(item.durability * range(lootRoll, rich ? [65, 87] : [34, 65]) / 100) } : {};
+  kit.leaveOnGround(state, goods, wear);
+  state.coins += coins;
+  const loot = kit.goodsText(goods);
+  return { ...resolveBandit(state, null, null, lead + (coins ? `从他掉下的钱袋里捡到${coins}枚灵钱。` : '') +
+    (loot ? `他把${loot}落在了脚边。` : coins ? '' : '他身上没落下什么。'), kit),
+    roadCoins: coins, ...(loot ? { gathered: goods, gatheredRegion: state.region } : {}) };
+}
+
+return { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit };
 })();
 const { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead } = (() => {
 const trainingData = [
@@ -6613,6 +7376,7 @@ const { act, createGame, handConflict, rules, view } = (() => {
 
 
 
+
 const data = { ...moduleData.default, ...moduleData };
 
 const records = Object.fromEntries(
@@ -6659,7 +7423,9 @@ const rules = Object.freeze({
   ebbCycleDays: 2,
   ebbWindowDays: 0.625,
   retreatDays: 0.25,
-  retreatDamageFactor: 0.5,
+  escapeDodgeFactor: 0.75,
+  escapeChanceCap: 0.85,
+  banditEscapeChanceCap: 0.40,
   mixedTrackDays: 3,
   mixedTrackHealingPerDay: 6,
   emptyReturnDays: 0.25,
@@ -6833,8 +7599,11 @@ function combinedResources(...lists) {
 }
 
 function groundPlace(state) {
-  return state.event ?? state.combat?.siteId ?? state.region;
+  return state.event ?? state.combat?.siteId ?? state.roadTrip?.stop ?? state.region;
 }
+
+const roadsideActions = new Set(['eat', 'batchEat', 'use', 'equip', 'unequip', 'equipManual',
+  'unequipManual', 'selectAmmo', 'take', 'discard']);
 
 function groundAt(state, place = groundPlace(state)) {
   return state.ground?.[place] ?? {};
@@ -7038,6 +7807,14 @@ function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     combatSeed: (seed ^ 0x9e3779b9) >>> 0,
     evadeSeed: (seed ^ 0x85ebca6b) >>> 0,
     enemyEvadeSeed: (seed ^ 0x27d4eb2f) >>> 0,
+    roadSeed: (seed ^ 0xc2b2ae35) >>> 0,
+    banditLootSeed: (seed ^ 0x76f1c043) >>> 0,
+    escapeSeed: (seed ^ 0x165667b1) >>> 0,
+    roadTrip: null,
+    roadBandit: null,
+    banditCrews: {},
+    resolvedBandits: [],
+    banditLeads: [],
     basketInspected: false,
     basketDisposition: null,
     showedHideToSmith: false,
@@ -7142,8 +7919,9 @@ function knowsChoice(state, choice, site) {
 
 function knowsSite(state, site) {
   const visited = state.eventsSeen[site.region] ?? [];
-  const startsVisible = !site.afterChoices?.length && !site.reveal;
+  const startsVisible = !site.afterChoices?.length && !site.reveal && !site.afterBandit;
   return startsVisible || visited.includes(site.id) ||
+    Boolean(site.afterBandit && state.banditLeads.includes(site.id)) ||
     Boolean(site.afterChoices?.some((id) => state.seenChoices.includes(id))) ||
     Boolean(site.reveal && isRevealed(state, site.reveal));
 }
@@ -7256,7 +8034,7 @@ function view(state) {
   const observed = combatRead === 'player' || (state.combat && state.combat.spiritReadRound === state.combat.round);
   const intent = observed ? readableIntent(state) : null;
   const inSettlement = isSettlement(state);
-  const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.event ? 'event' : inSettlement ? 'village' : 'field';
+  const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.roadTrip ? 'road' : state.event ? 'event' : inSettlement ? 'village' : 'field';
   const questLocation = inSettlement ? state.region : hub;
   const discoveredQuests = data.quests.filter((quest) => (quest.region ?? hub) === questLocation && knowsQuest(state, quest));
   const services = data.services.filter(({ id }) => knowsService(state, id) && (!inSettlement || atHome(state) ||
@@ -7285,11 +8063,13 @@ function view(state) {
       ...(gather.length ? { gather } : {}) };
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
     knowsChoice(state, currentEvent.choices[index], currentSite));
-  const { combatSeed, evadeSeed, enemyEvadeSeed, combat, ...visibleState } = state;
+  const { combatSeed, evadeSeed, enemyEvadeSeed, roadSeed, banditLootSeed, escapeSeed, combat, roadTrip, roadBandit,
+    banditCrews, resolvedBandits, banditLeads, ...visibleState } = state;
   return {
     ...visibleState,
     ...stats(state),
     ...worldView(state, economyKit),
+    roadTrip: roadTrip ? { ...roadTripView(state, economyKit), bandit: roadBanditView(state, economyKit) } : null,
     localHazard: hazardView(state, economyKit),
     training: studies.rows,
     innerStyle: innerStyleView(state, combatWeapon, side),
@@ -7298,7 +8078,7 @@ function view(state) {
     tournament: tournamentView(state, economyKit),
     maxSatiety: rules.maxSatiety,
     restSessions: mode === 'village' && settlementOf(data, state.region)?.inn ? recoverySessions(state) : 0,
-    batchMeals: ['field', 'village', 'event'].includes(mode) && !state.gathering
+    batchMeals: (['field', 'village', 'event'].includes(mode) || (mode === 'road' && !roadBandit)) && !state.gathering
       ? Object.fromEntries(data.foods.map(({ id }) => [id, batchMealCount(state, id)]).filter(([, count]) => count > 1))
       : {},
     fogTolerance: totalFogTolerance(state, fogProtection(state)),
@@ -7734,7 +8514,7 @@ function fall(state, place = groundPlace(state)) {
     .filter(([id, count]) => count > 0 && records.items[id]?.kind !== 'key' && !records.items[id]?.keepOnFall));
   leaveOnGround(state, lostGoods, state.durability, place);
   const dropped = goodsText(lostGoods);
-  const placeName = records.sites[place]?.name ?? regionOf(state).name;
+  const placeName = state.roadTrip ? '刚才交手的路边' : records.sites[place]?.name ?? regionOf(state).name;
   for (const [id, count] of Object.entries(lostGoods)) removeItem(state, id, count);
   state.expeditionLoot = {};
   state.coins -= coinsLost;
@@ -7742,6 +8522,8 @@ function fall(state, place = groundPlace(state)) {
   state.event = null;
   state.gathering = null;
   state.combat = null;
+  state.roadTrip = null;
+  state.roadBandit = null;
   state.pressure = 0;
   state.focus = 0;
   state.toxin = 0;
@@ -7762,6 +8544,12 @@ function mechanismFailure(state, { damage = 0, fatal = false }, cause) {
 
 function finishCombat(state, enemy) {
   const combat = state.combat;
+  if (combat.roadBandit) {
+    state.combat = null;
+    state.focus = 0;
+    recordPractice(state);
+    return winRoadBandit(state, enemy, economyKit);
+  }
   const site = records.sites[combat.siteId];
   const protectedBout = inProtectedBout(state);
   if (site?.creatures?.[enemy.id]) {
@@ -7821,13 +8609,31 @@ function breathingQi(state) {
   return Math.min(recovery, Math.max(0, stats(state).maxQi - state.qi));
 }
 
+function baseEscapeChance(enemy) {
+  if (enemy.escapeChance !== undefined) return enemy.escapeChance;
+  const tags = enemy.tags ?? [];
+  const base = tags.includes('human') ? 0.32
+    : tags.includes('stoneborn') ? 0.62
+    : tags.includes('furred') ? 0.42
+    : tags.includes('spirit') ? 0.44 : 0.58;
+  return Math.max(0.18, base - (enemy.tier ?? 0) * 0.018 - (enemy.hp >= 90 ? 0.06 : 0));
+}
+
 function retreatRisk(state, enemy, intent, bonus = 0, guard = 0) {
-  const { defense, retreat: retreatBonus } = stats(state);
+  if (!attackingIntent(intent)) {
+    const evasion = combatTraits(activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), enemy, intent).dodge
+      + (activeManualRank(state)?.base.dodge ?? 0);
+    const cap = enemy.tags?.includes('bandit') ? rules.banditEscapeChanceCap : rules.escapeChanceCap;
+    const chance = clamp(baseEscapeChance(enemy) + stats(state).retreat + evasion * rules.escapeDodgeFactor + (state.combat.escapeBonus ?? 0) + bonus,
+      0, cap);
+    return { blocked: false, chance, damage: 0, wouldFall: false };
+  }
+  const { defense } = stats(state);
   const training = trainingPerks(state, enemy, intent);
-  const reduction = clamp(retreatBonus + (state.combat.escapeBonus ?? 0) + bonus, 0, 1);
-  const damage = Math.max(0, Math.ceil(estimatedHit(state, enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
-    - defense - guard - training.guard);
-  return { damage, wouldFall: damage > 0 && damage >= state.hp, retreatBonus };
+  const traits = combatTraits(activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), enemy, intent);
+  const damage = Math.max(0, estimatedHit(state, enemy, intent) - Math.max(0, defense - (enemy.manualPierce ?? 0))
+    - guard - training.guard - traits.guard - (intent.kind === 'drain' ? state.qi : 0));
+  return { blocked: true, chance: 0, damage, wouldFall: damage >= state.hp };
 }
 
 function crossRealmFactor(state, enemy) {
@@ -7918,7 +8724,9 @@ function combatEffects(state, enemy, intent, move) {
   const proposedDamage = damage > 0
     ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - (focus?.pierce ?? 0)
       - (strikingTraits?.pierce ?? 0) - training.pierce - (ammo?.pierce ?? 0))) : 0;
-  const missChance = dodgeChance(enemy.dodge ?? 0, strikingTraits?.accuracy ?? 0, rules.combatDodgeCap);
+  const enemyActiveDodge = intent.kind === 'dodge';
+  const missChance = dodgeChance((enemy.dodge ?? 0) + (enemyActiveDodge ? rules.combatActiveDodge : 0), strikingTraits?.accuracy ?? 0,
+    enemyActiveDodge ? rules.combatActiveDodgeCap : rules.combatDodgeCap);
   const missed = proposedDamage > 0 && Boolean(move.weaponClass) && combatEvaded(state, 'enemy', missChance);
   const dealt = missed ? 0 : proposedDamage;
   const interrupt = missed ? 0 : proposedInterrupt;
@@ -8031,6 +8839,8 @@ function combatTurn(state, move) {
     summary += `气血回了${restored}点。`;
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
+  } else if (intent.kind === 'dodge') {
+    summary += missed ? '他贴着路沿站稳。' : '他错开一步，绕到了旁边。';
   } else if (intent.kind === 'focus') {
     state.combat.enemyCharged = dealt < rules.chargeBreakDamage && !interrupt;
     summary += state.combat.enemyCharged ? '它的下一记出招会更重。' : '蓄势被你打断了。';
@@ -8076,29 +8886,30 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
   }
   const intent = respondToMove(state, enemy, 'retreat');
-  const { damage: received } = retreatRisk(state, enemy, intent, bonus, guard);
+  const { blocked, chance } = retreatRisk(state, enemy, intent, bonus, guard);
+  if (!blocked) state.escapeSeed = (Math.imul(state.escapeSeed ?? 1, 1664525) + 1013904223) >>> 0;
+  if (blocked || state.escapeSeed / 0x100000000 >= chance) {
+    const failure = combatTurn(state, { kind: 'retreat', guard,
+      message: `${lead}你转身要走，${enemy.name}紧跟上来，没能脱身。` });
+    return { ...failure, retreated: false };
+  }
   advance(state, rules.retreatDays);
   const charmDamage = activeGear(state).some(({ slot, retreat }) => slot === 'charm' && retreat > 0) ? wear(state, 'charm') : '';
-  const armorDamage = received ? wear(state, 'armor') : '';
-  const healthBefore = state.hp;
-  state.hp -= received;
-  normalize(state);
-  const damageTaken = Math.max(0, healthBefore - state.hp);
   const outerEdge = state.combat.huntChoice !== undefined ? state.combat.siteId : null;
-  const position = outerEdge ? '退回了这处猎场的外沿' : `仍在${regionOf(state).name}`;
-  const reaction = attackingIntent(intent) ? `${enemy.name}以「${intent.name}」追来。` : '';
-  const summary = `${lead}${reaction}你退出了与${enemy.name}的交手，${position}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
-  say(state, summary);
-  if (state.hp === 0) {
-    const fell = fall(state);
-    return { ...fell, message: summary + fell.message, damageDealt: 0, damageTaken };
-  }
+  const road = state.combat.roadBandit;
+  const position = outerEdge ? '退回了这处猎场的外沿' : road ? '折回先前走过的路口' : `仍在${regionOf(state).name}`;
+  const summary = `${lead}趁${enemy.name}使出「${intent.name}」，你脱开身，${position}。${charmDamage}`;
   if (outerEdge) {
     saveHuntTrack(state);
     state.event = outerEdge;
   }
   state.combat = null;
-  return { ok: true, message: summary, damageDealt: 0, damageTaken };
+  state.focus = 0;
+  if (road) {
+    state.roadBandit = null;
+    backFromRoad(state, economyKit);
+  }
+  return { ...say(state, summary), damageDealt: 0, damageTaken: 0, retreated: true };
 }
 
 function cast(state, id) {
@@ -8810,6 +9621,8 @@ const economyKit = {
   data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem, startCombat, readableIntent,
   missingItems, payItems, hasRoom, backpackSlots, leaveOnGround, groundAt, nameOf, goodsText, normalize,
   isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure, roadProtection,
+  saleTerms, activeGear, checkRoadStep: (state, leg, index) => checkRoadBanditStep(state, leg, index, economyKit),
+  roadRisk: (state, leg) => roadBanditRisk(state, leg, economyKit),
   eatOnRoad: (state, id) => eat(state, false, id),
 };
 
@@ -8901,6 +9714,13 @@ function takeTurn(state, action, payload) {
     if (Object.hasOwn(combatActions, action)) return combatActions[action](state, payload);
     return refuse('先处理眼前的对手。');
   }
+  if (state.roadTrip) {
+    if (state.roadBandit) return banditAction(state, action, payload, economyKit) ?? refuse('先处理眼前拦路的人。');
+    if (action === 'roadContinue') return continueRoad(state, economyKit);
+    if (action === 'roadBack') return backFromRoad(state, economyKit);
+    if (roadsideActions.has(action)) return generalActions[action](state, payload);
+    return refuse('先走完这段路，或折回先前的路口。');
+  }
   if (action === 'gateScroll') return worldAction(state, action, payload, economyKit);
   const tournament = tournamentAction(state, action, economyKit);
   if (tournament) return tournament;
@@ -8957,12 +9777,13 @@ return { act, createGame, handConflict, rules, view };
 
 
 
+
 const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
 const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [recipe.formula] : []));
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
 const slotNames = data.equipmentSlots;
-const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
+const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", dodge: "闪避", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
 const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药", manual: "内功" };
 const weaponNames = { fist: "拳与指虎", sword: "剑", blade: "刀斧", spear: "枪戟", staff: "棍杖", hammer: "锤", bow: "弓", crossbow: "弩" };
 const manualRankName = new Intl.NumberFormat("zh-CN-u-nu-hanidec");
@@ -8976,6 +9797,8 @@ const notices = document.querySelector("#notices");
 const opening = document.querySelector("#opening");
 const transfer = document.querySelector("#transfer");
 const instantRoutes = ["gateJump", "gateScroll", "arrayJump"];
+const roadTravelActions = ["travel", "roadContinue", "roadBack"];
+const banditPaymentActions = ["banditPay", "banditPayCoins", "banditPayItem", "banditSurrender"];
 let state = freshGame();
 let screen = "journey";
 let marketMode = "buy";
@@ -9105,6 +9928,10 @@ function inVillage(s) {
   return s.mode === "village";
 }
 
+function onOpenRoad(s) {
+  return s.mode === "road" && !s.roadTrip?.bandit;
+}
+
 function atLanding(s) {
   return inVillage(s) && s.region.id === "village";
 }
@@ -9131,8 +9958,8 @@ function stats(s) {
     <summary>${danger ? "雾压过重" : "雾压"} <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
     <span>雾积满后，再探索会耗真气。到有人歇脚的地方就会散去。</span>
   </details>` : "";
-  const canEat = s.mode !== "victory" && meal && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
-  const canUseSalve = s.hp < s.maxHp && s.inventory.salve > 0 && ["village", "field", "combat"].includes(s.mode);
+  const canEat = s.mode !== "victory" && (s.mode !== "road" || onOpenRoad(s)) && meal && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
+  const canUseSalve = s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
   const sense = s.spiritSense;
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
     ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。敷伤药或在据点歇息都能恢复。")}
@@ -9144,13 +9971,21 @@ function stats(s) {
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
-function routeAction(road) {
+function distance(units) {
+  return `${units * banditRules.distanceUnit} 里`;
+}
+
+function routeAction(road, edges = []) {
   const label = road.rescue ? `慢慢走到${road.name}` : road.id === "village" ? "回村" : `去${road.name}`;
-  const note = road.reason || [`${road.days} 日`, road.via?.length && `经 ${road.via.join("、")}`,
-    road.meals && Object.keys(road.meals).length && `途中吃 ${supplies(road.meals)}`,
+  const forecast = [road.meals && Object.keys(road.meals).length && `途中吃 ${supplies(road.meals)}`,
     road.emptyOnArrival && !road.rescue && "到时会空腹"].filter(Boolean).join(" · ");
+  const note = [road.units != null && distance(road.units), `${road.days} 日`, road.via?.length && `经 ${road.via.join("、")}`,
+    road.reason || forecast].filter(Boolean).join(" · ");
+  const path = road.path ?? [];
+  const directlyConnects = ({ from, to }) => path.some((id, index) => (id === from && path[index + 1] === to) || (id === to && path[index + 1] === from));
+  const warnings = [...new Set(edges.filter(edge => edge.riskText && directlyConnects(edge)).map(edge => edge.riskText))];
   return `<div class="route-action">${linkButton(label, "travel", road.id, "", !road.available)}
-    <span class="fine">${escape(note)}</span></div>`;
+    <div class="route-notes"><span class="fine">${escape(note)}</span>${warnings.map(warning => `<p class="fine route-warning">${escape(warning)}</p>`).join("")}</div></div>`;
 }
 
 function siteResources(s, site) {
@@ -9176,9 +10011,60 @@ function hazardNotice(hazard) {
       `<div class="route-action">${linkButton(label, "hazard", id, "", Boolean(reason))}${reason ? `<p class="fine">${escape(reason)}</p>` : ""}</div>`).join("")}</div>` : ""}</section>`;
 }
 
+function roadPosition(road) {
+  if (!road) return "";
+  const from = road.fromName ?? road.from;
+  const to = road.toName ?? road.to;
+  const onLastStep = road.legUnits > 0 && road.progress >= road.legUnits;
+  const location = onLastStep ? `${to}附近` : from && to && from !== to ? `${from}与${to}之间` : from || to || "";
+  return `<p class="road-position" aria-label="行程进度"><strong>去${escape(road.destinationName ?? road.destination)}</strong><span>还剩 ${distance(road.remainingUnits)}</span>${location ? `<small>${escape(location)}</small>` : ""}</p>`;
+}
+
+function banditOffers(bandit) {
+  const offers = (bandit.offers ?? []).filter(offer => offer.count > 0 && offer.price > 0);
+  if (!offers.length) return "";
+  const expanded = main.querySelector("[data-road-offers]")?.open;
+  const rows = offers.map(({ id, name, held, count, price }) => {
+    const quantity = Math.min(count, Math.ceil(bandit.remaining / price));
+    const entry = `road-offer-${id}`;
+    const first = linkButton("交 1 件", "banditPayItem", id, "quiet", false, 1, entry);
+    const batch = quantity > 1 ? linkButton(`交 ${quantity} 件`, "banditPayItem", id, "quiet", false, quantity, entry) : "";
+    return `<div class="road-offer"><span id="${escape(entry)}">${escape(name)} <small class="fine">×${held ?? count} · 每件抵 ${price} 灵钱</small></span><div class="actions">${first}${batch}</div></div>`;
+  });
+  return `<details class="road-offers" data-road-offers${expanded ? " open" : ""}><summary>拿东西抵价</summary>${rows.join("")}</details>`;
+}
+
+function banditScreen(bandit) {
+  const remaining = bandit.remaining;
+  const askingForMoney = !bandit.aftermath && remaining != null;
+  const pay = !askingForMoney ? "" : bandit.coins >= remaining ? linkButton(`付 ${remaining} 灵钱`, "banditPay", "", "primary")
+    : bandit.coins > 0 ? linkButton(`先付 ${bandit.coins} 灵钱`, "banditPayCoins") : "";
+  const surrender = askingForMoney && bandit.allValue < remaining
+    ? linkButton(bandit.allValue ? "交出所有能抵价的东西" : "亮出空钱袋，请他放行", "banditSurrender", "", "quiet") : "";
+  const fight = !bandit.aftermath && bandit.fightAllowed !== false ? linkButton("动手闯过去", "banditFight", "", "danger") : "";
+  const pass = bandit.passAllowed ? `<div class="actions">${linkButton("从旁边过去", "banditPass", "", "quiet")}</div>` : "";
+  const ask = bandit.actions ?? [];
+  const plot = ask.map(({ id, label, desc, available, reason }) => `<div class="choice">
+    ${desc ? `<p>${escape(desc)}</p>` : ""}${linkButton(label, "banditPlot", id, "quiet", available === false)}
+    ${reason ? `<p class="choice-blocker">${escape(reason)}</p>` : ""}</div>`).join("");
+  return panel(bandit.aftermath ? "交手之后" : bandit.name, `<p class="intro">${escape(bandit.intro)}</p>
+    ${askingForMoney ? `<p class="road-demand">开价 ${bandit.fee} 灵钱${remaining !== bandit.fee ? ` · 还差 ${remaining} 灵钱` : ""}<span class="fine">钱袋 ${bandit.coins} 灵钱</span></p>` : ""}
+    ${pay || surrender || fight ? `<div class="actions">${pay}${surrender}${fight}</div>` : ""}
+    ${askingForMoney ? banditOffers(bandit) : ""}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
+}
+
+function roadScreen(s) {
+  const road = s.roadTrip;
+  if (road.bandit) return banditScreen(road.bandit);
+  const turnBack = road.fromName ? `折回${road.fromName}` : "沿原路折返";
+  return panel("路上", `<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
+    ${linkButton(turnBack, "roadBack", "", "quiet")}</div>`);
+}
+
 function journey(s) {
   if (s.mode === "event") return eventScreen(s);
   if (s.mode === "combat") return combatScreen(s);
+  if (s.mode === "road") return roadScreen(s);
   if (s.mode === "victory") {
     const final = s.completionPhase === "final";
     return panel(final ? "旧渡通行契" : "旧渡重新开船", `<p class="intro">${final ? "村里收到了衡印。送信的人乘渡船出发，去给沿岸驿站送通行文书。" : "渡口重新点起了灯。第一趟船也带回了岭外的消息。"}</p><div class="actions">${linkButton("继续上路", "resume", "", "primary")}</div>`);
@@ -9191,7 +10077,7 @@ function journey(s) {
   const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.pressure || (s.inventory.ration ?? 0) < rules.reliefRations ||
     (s.spiritSense && s.spiritSense.current < s.spiritSense.max);
   return panel(s.region.name, `${siteList(s)}${hazardNotice(s.localHazard)}<div class="actions place-actions">
-    ${nearby.map(routeAction).join("")}
+    ${nearby.map(road => routeAction(road, s.world.edges)).join("")}
     ${originalHome ? tabButton("找药僮", "apprentice") : ""}
     ${originalHome && s.services.includes("workshop") ? tabButton("去工坊", "workshop") : ""}
     ${originalHome && s.services.includes("market") ? tabButton("逛坊市", "market") : ""}
@@ -9205,25 +10091,24 @@ function journey(s) {
     ${s.tournament ? tabButton("去看宗门大比", "tournament") : ""}
     ${isHome && s.training?.some(({ region }) => region === s.region.id) ? tabButton("请教修习", "training") : ""}
     ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) : ""}
-  </div>${further.length ? `<details class="route-list"><summary>其他已知去路</summary><div class="actions">${further.map(routeAction).join("")}</div></details>` : ""}
+  </div>${further.length ? `<details class="route-list"><summary>其他已知去路</summary><div class="actions">${further.map(road => routeAction(road, s.world.edges)).join("")}</div></details>` : ""}
   ${s.world.crossings.map(({ label, reason }) => `<p class="fine crossing">${escape(label)} · ${escape(reason)}</p>`).join("")}`);
 }
 
-function atlasMap(province, points, selected, route) {
+function atlasMap(province, points, selected, route, edges) {
   const byId = Object.fromEntries(points.map((point) => [point.id, point]));
   const paths = new Set();
   const routeLegs = new Set((route?.path ?? []).slice(1).map((id, index) => [route.path[index], id].sort().join("/")));
   const lines = [];
-  for (const point of points) {
-    for (const id of data.regionDetails[point.id]?.links ?? []) {
-      const neighbor = byId[id];
-      const path = [point.id, id].sort().join("/");
-      if (!neighbor || paths.has(path)) continue;
-      paths.add(path);
-      const dx = neighbor.x - point.x;
-      const dy = (neighbor.y - point.y) / 1.45;
-      lines.push(`<i aria-hidden="true" class="atlas-road${routeLegs.has(path) ? " chosen" : ""}" style="--x:${point.x}%;--y:${point.y}%;--length:${Math.hypot(dx, dy)}%;--angle:${Math.atan2(dy, dx)}rad"></i>`);
-    }
+  for (const { from, to } of edges ?? []) {
+    const point = byId[from];
+    const neighbor = byId[to];
+    const path = [from, to].sort().join("/");
+    if (!point || !neighbor || paths.has(path)) continue;
+    paths.add(path);
+    const dx = neighbor.x - point.x;
+    const dy = (neighbor.y - point.y) / 1.45;
+    lines.push(`<i aria-hidden="true" class="atlas-road${routeLegs.has(path) ? " chosen" : ""}" style="--x:${point.x}%;--y:${point.y}%;--length:${Math.hypot(dx, dy)}%;--angle:${Math.atan2(dy, dx)}rad"></i>`);
   }
   const marks = points.map(point => `<button type="button" class="atlas-mark${point.current ? " here" : ""}${point.settlement ? " town" : ""}${point.attuned ? " linked" : ""}"
     style="--x:${point.x}%;--y:${point.y}%" data-atlas-point="${escape(point.id)}" aria-label="${escape(point.name)}" aria-pressed="${point.id === selected.id}">
@@ -9262,7 +10147,7 @@ function atlas(s) {
   const scrollBlocker = makeScroll && s.craftReasons[recipe.id];
   const usable = gate && !selected.current;
   const transport = `<div class="actions atlas-actions">
-      ${road ? routeAction(road) : ""}
+      ${road ? routeAction(road, world.edges) : ""}
       ${currentGate ? linkButton("点亮传送门", "attuneGate") : ""}
       ${idle && usable && world.localGate?.attuned && selected.province === world.province ? linkButton(`门间传送 · ${gate.price} 灵钱`, "gateJump", gate.id, "", !gate.available) : ""}
       ${usable && world.scrollCount ? linkButton(`展开卷轴 · 余 ${world.scrollCount} 张`, "gateScroll", gate.id, "", !gate.byScroll) : ""}
@@ -9270,7 +10155,7 @@ function atlas(s) {
       ${makeScroll && selected.current ? linkButton(scrollBlocker || "制备传送卷轴", "craft", recipe.id, "quiet", Boolean(scrollBlocker)) : ""}
     </div>`;
   return panel("山河图", `<div class="actions atlas-tabs" aria-label="州">${tabs}</div>
-    ${atlasMap(province, points, selected, road)}
+    ${atlasMap(province, points, selected, road, world.edges)}
     <details class="atlas-index"${atlasIndexOpen ? " open" : ""}><summary>查已知地点</summary><div class="actions">${points.map(({ id, name }) =>
       `<button type="button" class="button quiet" data-atlas-point="${escape(id)}">${escape(name)}</button>`).join("")}</div></details>
     <div class="atlas-place"><h3>${escape(selected.name)}</h3>${marks ? tag(marks) : ""}
@@ -9387,8 +10272,9 @@ function combatScreen(s) {
   const fistChargeDisabled = (!fistCharged && Boolean(charging)) || !fist?.chargeAvailable || Boolean(fistChargeReason);
   const guardLabel = intent?.kind === "heavy" ? "挡住重招" : intent?.kind === "guard" && s.breathingQi ? "收势调息" : "防御";
   const flight = intent && s.retreatRisk;
-  const retreatLabel = enemy.sparring ? "认输" : flight?.wouldFall ? "撤退会倒下"
-    : flight?.damage ? `撤退 · 追伤 ${flight.damage}` : flight ? "撤退 · 无追伤" : "撤退";
+  const retreatLabel = enemy.sparring ? "认输" : "撤退";
+  const retreatCue = flight?.blocked ? (flight.wouldFall ? "对方正要出手，这时脱不开身，挨上一招可能会倒下。" : "对方正要出手，这时脱不开身。")
+    : flight ? "对方这回合没在进攻，可以找空当脱身。" : "";
   const intentLine = intent
     ? `<div class="intent"><b>看破来招 · ${escape(intent.name)}</b>　${escape(intentNames[intent.kind])}</div>`
     : `<p class="intent unread">${s.combatRead === "enemy" ? "对方盯着你的起手，没先露招。" : "一时看不清对方的来招。"}</p>`;
@@ -9423,10 +10309,11 @@ function combatScreen(s) {
       ${linkButton(guardLabel, "guard")}
       <span class="action-hint">${linkButton("闪避", "dodge", "", "", false, 1, "dodge-explanation")}<span class="item-tip" id="dodge-explanation" role="tooltip">侧身躲开来招。若被击中，照常受伤。</span></span>
       ${charging ? linkButton("取消蓄力", "cancelCharge", "", "quiet") : ""}
-      ${linkButton(retreatLabel, "retreat", "", !enemy.sparring && flight?.damage ? "danger" : "quiet")}
+      ${linkButton(retreatLabel, "retreat", "", flight?.blocked ? "danger" : "quiet", false, 1, retreatCue ? "retreat-cue" : "")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
       ${s.spiritSense ? linkButton(spiritLabel, "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
     </div>
+    ${retreatCue ? `<p class="fine retreat-cue" id="retreat-cue">${escape(retreatCue)}</p>` : ""}
     ${s.lastEnemyIntent ? `<p class="fine">上回合 · ${escape(s.lastEnemyIntent.name)}</p>` : ""}
     ${observation}
     ${techniques.length ? `<div class="card-grid learned-arts">${techniques.join("")}</div>` : ""}
@@ -9472,22 +10359,23 @@ function manualDescription(book, active = false) {
     active && book.aligned && "手头的打法合它的路数。", rankText].filter(Boolean).join(" ");
 }
 
-function manualActions(book, active, canManage) {
+function manualActions(book, active, canManage, canTrain) {
   if (!canManage) return "";
   const stance = active ? linkButton("收功", "unequipManual", book.id)
     : linkButton(book.canEquip ? "运功" : book.equipReason || "暂不能运功", "equipManual", book.id, "", !book.canEquip);
   const upgrade = book.upgrade;
   if (!upgrade) return stance;
+  const canUpgrade = canTrain && upgrade.available;
   const cost = [upgrade.need.map(row => `${row.name} ×${row.count}`).join("、"), upgrade.coins && `${upgrade.coins} 灵钱`]
     .filter(Boolean).join("、");
   const requirements = [cost && `需${cost}。`, upgrade.days > 0 && `用时 ${upgrade.days} 日。`,
-    !upgrade.available && upgrade.reason].filter(Boolean).join(" ");
-  return stance + linkButton("研习下一层", "upgradeManual", book.id, "quiet", !upgrade.available) +
+    !canTrain ? "到歇脚处再练。" : !upgrade.available && upgrade.reason].filter(Boolean).join(" ");
+  return stance + linkButton("研习下一层", "upgradeManual", book.id, "quiet", !canUpgrade) +
     (requirements ? `<p class="fine manual-upgrade-note">${escape(requirements)}</p>` : "");
 }
 
 function pack(s) {
-  const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event";
+  const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event" || onOpenRoad(s);
   const canManageManual = canEquip && !s.gathering;
   const canUse = canEquip || s.mode === "combat";
   const canEat = canUse;
@@ -9507,7 +10395,7 @@ function pack(s) {
   const manuals = new Map((s.innerStyle?.books ?? []).map(book => [book.id, book]));
   const activeManual = s.innerStyle?.active;
   if (activeManual) worn.push(itemSlot(itemRows[activeManual.id], "worn", manualDescription(activeManual, true),
-    manualActions(activeManual, true, canManageManual), "内功"));
+    manualActions(activeManual, true, canManageManual, !onOpenRoad(s)), "内功"));
   const carried = data.items.filter(row => s.inventory[row.id] && row.id !== activeManual?.id && !Object.values(s.equipment).includes(row.id));
   const inventory = carried.filter(row => row.kind !== "key" || row.breakthrough).map(row => {
     const gear = data.gear.find(g => g.id === row.id);
@@ -9530,18 +10418,18 @@ function pack(s) {
       actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy);
     }
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
-    if (book) actions = manualActions(book, false, canManageManual);
+    if (book) actions = manualActions(book, false, canManageManual, !onOpenRoad(s));
     if (foodRows[row.id] && canEat && (s.satiety < s.maxSatiety || s.hp < s.maxHp)) {
       actions = linkButton(`吃${row.name}`, "eat", row.id);
       const quantity = s.batchMeals[row.id];
       if (quantity > 1) actions += linkButton(`连吃 ${quantity} 份`, "batchEat", row.id, "quiet");
     }
-    if (row.id === "lost_basket" && canEquip) {
+    if (row.id === "lost_basket" && canEquip && !onOpenRoad(s)) {
       if (!s.basketInspected) actions += linkButton("查看药篓", "inspectBasket");
       if (inVillage(s)) actions += tabButton("找药僮", "apprentice");
       actions += linkButton("拆篓取药", "unpackBasket", "", "danger");
     }
-    if (row.id === "gate_scroll" && canEquip && !s.gathering) actions += tabButton("展开卷轴", "atlas");
+    if (row.id === "gate_scroll" && canEquip && !s.gathering && !onOpenRoad(s)) actions += tabButton("展开卷轴", "atlas");
     if (canEquip && !row.breakthrough) actions += linkButton("放下", "discard", row.id, "quiet");
     const description = book ? manualDescription(book) : gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
     return itemSlot(row, "held", description, actions, "", s.inventory[row.id]);
@@ -9977,7 +10865,7 @@ function render() {
   const s = view(state);
   if (s.mode !== "combat") combatObservation = null;
   const inEvent = s.mode === "event";
-  const inEncounter = s.mode === "combat" || s.mode === "victory" || Boolean(s.gathering);
+  const inEncounter = s.mode === "combat" || s.mode === "victory" || s.mode === "road" || Boolean(s.gathering);
   const services = inVillage(s) ? villageServices(s) : [];
   const originalHome = atLanding(s);
   const knowMap = s.region.id !== "village" || s.discovered.length > 2 || Object.keys(s.eventsSeen).length > 0;
@@ -10003,7 +10891,7 @@ function render() {
     button.hidden = inEncounter || id === tab || !available[id] || (inEvent && !["journey", "atlas"].includes(id));
   }
   guide.querySelector('[data-tab="training"]').hidden = !available.training || inEncounter || inEvent;
-  main.innerHTML = content[tab](s);
+  main.innerHTML = roadPosition(s.roadTrip) + content[tab](s);
   restoreKeyboardFocus(focus);
 }
 
@@ -10049,6 +10937,11 @@ function feedback(before, after, result, action) {
     if (moved) return [`${depositing ? "存入" : "取出"}${moved.name} ×${quantity(moved)}。`];
   }
   const lines = [];
+  if (result.ok && banditPaymentActions.includes(action)) {
+    const cost = [result.paidCoins > 0 && `${result.paidCoins} 灵钱`, supplies(result.paidGoods)].filter(Boolean).join("、");
+    if (cost) lines.push(`交出${cost}。`);
+  }
+  if (result.roadCoins > 0) lines.push(`从路上捡到 ${result.roadCoins} 灵钱。`);
   if (result.ok && (action === "attack" || action === "art")) {
     const spent = (data.ammunition ?? []).filter(({ id }) => (before.inventory[id] ?? 0) > (after.inventory[id] ?? 0));
     for (const { id } of spent) lines.push(`消耗${itemRows[id].name} ×${before.inventory[id] - (after.inventory[id] ?? 0)}。`);
@@ -10070,6 +10963,10 @@ function feedback(before, after, result, action) {
   const picking = result.ok && action === "take";
   const gathered = supplies(result.gathered);
   let narrative = result.message ?? "";
+  if (result.paidCoins || Object.keys(result.paidGoods ?? {}).length) {
+    narrative = narrative.replace(/^你(?:递给他|交出|交了)[^。]+。/, "").replace(/他还要\d+枚。/, "");
+  }
+  if (result.roadCoins) narrative = narrative.replace(/从他掉下的钱袋里捡到\d+枚灵钱。/, "");
   if (ate) narrative = narrative.replace(/(?:饱腹|气血)\+\d+(?:\.\d+)?[，。]?/g, "");
   if (result.damageDealt || result.damageTaken) {
     narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "")
@@ -10079,14 +10976,14 @@ function feedback(before, after, result, action) {
   if (picking && acquired.length) narrative = "";
   if (gathered) narrative = narrative.replace(/采得[^。]*，留在脚边。|脚边留下[^。]*。/g, "");
   if (result.injury) narrative = narrative.replace(result.injury.cause, "").replace(/丹毒积重，损失\d+点生命。?/g, "");
-  if (result.ok && ["travel", "visit", "revisit"].includes(action)) {
+  if (result.ok && !result.roadInterrupted && [...roadTravelActions, "visit", "revisit"].includes(action)) {
     narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
   }
   if (result.travelMeals) narrative = narrative.replace(/途中吃了[^。]+。/, "");
   if (!result.ok || (action !== "batchEat" && action !== "restUntilRecovered")) narrative = publicText(narrative);
   narrative = narrative.replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
-  if (result.travelMeals) lines.push(`途中吃了${supplies(result.travelMeals)}。抵达时饱腹 ${Math.floor(after.satiety)} 点。`);
+  if (supplies(result.travelMeals)) lines.push(`途中吃了${supplies(result.travelMeals)}。${result.roadInterrupted ? "停步" : "抵达"}时饱腹 ${Math.floor(after.satiety)} 点。`);
   if (gathered) {
     const place = result.gatheredRegion && result.gatheredRegion !== after.region
       ? data.sites.find(({ id }) => id === result.gatheredSite)?.name ?? data.regions.find(({ id }) => id === result.gatheredRegion)?.name
@@ -10105,8 +11002,8 @@ function feedback(before, after, result, action) {
     after.satiety > before.satiety && (ate || action === "use") && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
     action === "restUntilRecovered" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     action === "finishGather" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
-    action === "travel" && !result.travelMeals && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
-    after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",
+    roadTravelActions.includes(action) && !result.travelMeals && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
+    after.coins > before.coins && !result.roadCoins && !banditPaymentActions.includes(action) && action !== "sell" && "获得灵钱",
     after.coins < before.coins && ["alchemyBuyFormula", "alchemyAdvance"].includes(action) && `付出 ${before.coins - after.coins} 灵钱`,
   ].filter(Boolean);
   if (changes.length) lines.push(changes.join("，") + "。");
@@ -10125,12 +11022,12 @@ function performAction(action, payload) {
   };
   const result = act(state, action, payload);
   const transferred = result.ok && instantRoutes.includes(action);
-  if (["travel", "visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
-  if (transferred || (result.ok && action === "travel")) {
+  if ([...roadTravelActions, "visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
+  if (transferred || (result.ok && roadTravelActions.includes(action))) {
     atlasProvince = null;
     atlasPoint = null;
   }
-  if (["travel", "discard", "take", "equip", "unequip"].includes(action)) selectedItem = null;
+  if ([...roadTravelActions, "discard", "take", "equip", "unequip"].includes(action)) selectedItem = null;
   if (result.ok && action === "equipManual") selectedItem = `worn-${payload.id}`;
   if (result.ok && action === "unequipManual") selectedItem = `held-${payload.id}`;
   render();
@@ -10141,7 +11038,7 @@ function performAction(action, payload) {
   const lines = feedback(before, state, result, action);
   showNotice(lines, Boolean(result.injury || result.damageTaken || !result.ok));
   if (transferred) showTransfer();
-  if (["travel", "visit", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
+  if ([...roadTravelActions, "visit", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
 }
 
 function runGatherProgress(job) {
