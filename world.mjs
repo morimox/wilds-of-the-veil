@@ -54,8 +54,12 @@ function directRoad(from, to, kit) {
   if (!fromRegion || !toRegion || from === to) return null;
   const cross = crossRoute(from, to);
   if (cross) return { days: cross.days, cross };
-  if (legacy.has(from) && legacy.has(to)) return { days: (to === home ? fromRegion : toRegion).travel ?? 0 };
   if (provinceOf(kit.data, from) !== provinceOf(kit.data, to) || !signedRoad(kit.data, from, to)) return null;
+  if (legacy.has(from) && legacy.has(to)) {
+    const days = from === home || to === home ? (from === home ? toRegion : fromRegion).travel
+      : Math.max(0.75, Math.round((fromRegion.travel ?? 1) + (toRegion.travel ?? 1)) / 4);
+    return { days };
+  }
   const days = Math.max(0.5, Math.round(((fromRegion.travel ?? 1) + (toRegion.travel ?? 1)) * 2) / 4);
   return { days };
 }
@@ -74,35 +78,53 @@ export function learnAdjacentRegions(state, kit) {
   }
 }
 
-function safeRoad(state, target, kit) {
-  if (!settlementOf(kit.data, target)?.inn || provinceOf(kit.data, target) !== provinceOf(kit.data, state.region)) return null;
-  const cost = new Map([[state.region, 0]]);
-  const unvisited = new Set(state.discovered);
+function knownRoutes(state, kit) {
+  const routes = new Map([[state.region, { days: 0, via: [] }]]);
+  const here = provinceOf(kit.data, state.region);
+  const unvisited = new Set([state.region, ...state.discovered.filter((id) => provinceOf(kit.data, id) === here)]);
   while (unvisited.size) {
     let nearest;
     let nearestCost = Infinity;
     for (const id of unvisited) {
-      if ((cost.get(id) ?? Infinity) < nearestCost) { nearest = id; nearestCost = cost.get(id); }
+      if ((routes.get(id)?.days ?? Infinity) < nearestCost) { nearest = id; nearestCost = routes.get(id).days; }
     }
-    if (!nearest) return null;
-    if (nearest === target) return { days: nearestCost, rescue: true };
+    if (!nearest) break;
     unvisited.delete(nearest);
     for (const id of unvisited) {
       const road = directRoad(nearest, id, kit);
       if (!road || road.cross) continue;
       const nextCost = nearestCost + road.days;
-      if (nextCost < (cost.get(id) ?? Infinity)) cost.set(id, nextCost);
+      if (nextCost < (routes.get(id)?.days ?? Infinity)) {
+        const via = nearest === state.region ? [] : [...routes.get(nearest).via, nearest];
+        routes.set(id, { days: nextCost, via });
+      }
     }
   }
-  return null;
+  return routes;
 }
 
-function quoteRoad(state, id, kit) {
+function roadFood(state, required, kit) {
+  let deficit = Math.max(0, required - state.satiety);
+  const meals = {};
+  let satiety = 0;
+  const foods = [...kit.data.foods].sort((a, b) => a.satiety - b.satiety);
+  for (const food of foods) {
+    const count = Math.min(kit.owns(state, food.id), Math.ceil(deficit / food.satiety));
+    if (!count) continue;
+    meals[food.id] = count;
+    const foodSatiety = count * food.satiety;
+    satiety += foodSatiety;
+    deficit = Math.max(0, deficit - foodSatiety);
+  }
+  return { meals, deficit, satiety };
+}
+
+function quoteRoad(state, id, kit, routes) {
   if (!kit.records.regions[id]) return { reason: '找不到这条路。' };
   if (!marked(state, id)) return { reason: '你还没有找到那条路。' };
   if (state.region === id) return { reason: '你已经在这里。' };
-  const road = directRoad(state.region, id, kit) ?? (state.satiety === 0 ? safeRoad(state, id, kit) : null);
-  if (!road) return { reason: '此处没有直达的路。' };
+  const road = directRoad(state.region, id, kit) ?? (routes ?? knownRoutes(state, kit)).get(id);
+  if (!road) return { reason: '没找到能从这里接上的路。' };
   const blockedCrossing = crossBlocker(state, road.cross);
   if (blockedCrossing) return { ...road, reason: blockedCrossing };
   if (state.satiety === 0) {
@@ -110,7 +132,14 @@ function quoteRoad(state, id, kit) {
     if (!settlementOf(kit.data, id)?.inn) return { ...road, reason: '腹中空空，先吃些东西。' };
     return { ...road, days: road.days + kit.rules.emptyReturnDays, rescue: true, reason: '' };
   }
-  return { ...road, reason: '' };
+  const protection = road.cross ? null : kit.roadProtection(state, provinceOf(kit.data, id));
+  const rate = kit.rules.satietyDrainPerDay * (1 - (protection?.field.roadSatiety.fraction ?? 0));
+  const remaining = state.satiety - road.days * rate;
+  const longWalk = road.via?.length && road.days >= 2.5;
+  const reserve = longWalk ? 20 : 0;
+  const food = road.cross || longWalk ? roadFood(state, road.days * rate + reserve, kit) : null;
+  return { ...road, rate, protection, meals: food?.meals, emptyOnArrival: remaining + (food?.satiety ?? 0) <= 0,
+    reason: road.cross && food.deficit > 0 ? '带的口粮还不够走完这段路。' : '' };
 }
 
 function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) {
@@ -128,14 +157,23 @@ function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) 
 export function travelRoad(state, id, kit) {
   const road = quoteRoad(state, id, kit);
   if (road.reason) return kit.refuse(road.reason);
-  const protection = !road.cross && !road.rescue && kit.roadProtection(state, provinceOf(kit.data, id));
+  const protection = road.protection;
   const baseRate = kit.rules.satietyDrainPerDay;
-  const satietyRate = protection ? baseRate * (1 - protection.field.roadSatiety.fraction) : baseRate;
+  const satietyRate = road.rate ?? baseRate;
   const unprotectedSatiety = Math.max(0, state.satiety - road.days * baseRate);
-  arrive(state, id, road.days, kit, { satietyRate });
+  const arrivalDay = state.day + road.days;
+  for (const [food, count] of Object.entries(road.meals ?? {})) {
+    for (let meal = 0; meal < count; meal++) {
+      kit.advance(state, Math.min(Math.max(0, arrivalDay - state.day), state.satiety / satietyRate), satietyRate);
+      kit.eatOnRoad(state, food);
+    }
+  }
+  arrive(state, id, Math.max(0, arrivalDay - state.day), kit, { satietyRate });
   const travelText = road.rescue ? '腹中没了力气，沿路慢走了一程。'
     : protection && state.satiety > unprotectedSatiety ? `裹紧${kit.nameOf(protection.id)}的衣襟挡住风沙，这一程没那么耗力。` : '';
-  return kit.say(state, `抵达${kit.records.regions[id].name}。${travelText}`);
+  const used = road.meals && kit.goodsText(road.meals);
+  return { ...kit.say(state, `抵达${kit.records.regions[id].name}。${used ? `途中吃了${used}。` : ''}${travelText}`),
+    ...(used ? { travelMeals: road.meals } : {}) };
 }
 
 function gateQuote(state, id, kit, scroll) {
@@ -401,14 +439,19 @@ export function worldView(state, kit) {
   const actual = kit.records.regions[state.region];
   const here = detail(kit.data, state.region);
   const discovered = kit.data.regions.filter((region) => marked(state, region.id));
-  const roads = discovered.flatMap((region) => {
+  const routesFromHere = knownRoutes(state, kit);
+  const journeys = discovered.flatMap((region) => {
     if (region.id === state.region) return [];
-    const quote = quoteRoad(state, region.id, kit);
+    const quote = quoteRoad(state, region.id, kit, routesFromHere);
     const ordinary = directRoad(state.region, region.id, kit);
-    return quote.days === undefined || (!ordinary && !quote.rescue) ? [] :
-      [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue) })];
+    const via = (quote.via ?? []).map((id) => kit.records.regions[id].name);
+    return quote.days === undefined ? [] :
+      [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue),
+        direct: Boolean(ordinary), via, path: [state.region, ...(quote.via ?? []), region.id],
+        meals: quote.meals, emptyOnArrival: quote.emptyOnArrival })];
   });
-  const roadsById = Object.fromEntries(roads.map((road) => [road.id, road]));
+  const roads = journeys.filter((road) => road.direct || road.rescue);
+  const roadsById = Object.fromEntries(journeys.map((road) => [road.id, road]));
   const closedSidePaths = crossings.filter((edge) => {
     const other = otherside(edge, state.region);
     return other && kit.records.regions[other] && !marked(state, other) && crossBlocker(state, edge);
@@ -429,7 +472,7 @@ export function worldView(state, kit) {
   const affiliation = kit.data.sects?.find(({ id }) => state.world.affiliation === id);
   return { settlement: settlementOf(kit.data, state.region), localMarket: localMarket(state, kit), sect: sectView(state, kit),
     affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit: pledge(state, affiliation).credit } : null,
-    world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, crossings: closedSidePaths,
+    world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, journeys, crossings: closedSidePaths,
       here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: here.x, y: here.y, description: here.description ?? actual.desc },
       scrollCount: kit.owns(state, 'gate_scroll'), gates, localGate: here.portal ? { attuned: state.world.gates.includes(state.region) } : null,
       localArray: arrayView(state, state.region, kit), arrays } };

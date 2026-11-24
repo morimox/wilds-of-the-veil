@@ -252,6 +252,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .atlas-zhaoyuan { background-color: #273d35; }
 .atlas-mingsha { background-color: #413b2b; }
 .atlas-road { position: absolute; z-index: -1; left: var(--x); top: var(--y); width: var(--length); border-top: 1px dashed #aec2a080; transform: rotate(var(--angle)); transform-origin: left center; }
+.atlas-road.chosen { border-top: 2px solid #e6c48d; }
 .atlas-mark { position: absolute; left: var(--x); top: var(--y); display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #dbe6d5; transform: translate(-50%, -50%); cursor: pointer; }
 .atlas-mark:hover, .atlas-mark:focus-visible, .atlas-mark[aria-pressed="true"] { z-index: 2; }
 .atlas-dot { width: 8px; height: 8px; border-radius: 50%; background: #b3c5ad; box-shadow: 0 0 0 2px #213b2e; }
@@ -469,7 +470,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=19" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=20" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -530,10 +531,10 @@ const regions = [
 ];
 
 const regionDetails = {
-  village: { province: 'wuliang', x: 14, y: 53, links: ['marsh', 'reed_meadows'], portal: true, array: true,
+  village: { province: 'wuliang', x: 14, y: 53, links: ['marsh', 'reed_meadows', 'pine_ridge'], portal: true, array: true,
     settlement: { type: '村庄', repair: { name: '落灯村工坊', description: '裴匠和迟师傅轮着照看炉火。磨刃、补甲和修佩件都可以拿过去。', surcharge: 0 } } },
-  marsh: { province: 'wuliang', x: 28, y: 68, links: ['village', 'ridge', 'reed_meadows', 'pale_shoal', 'undertow_grotto'] },
-  ridge: { province: 'wuliang', x: 47, y: 60, links: ['marsh', 'ford', 'screen_slope', 'counter_bell'] },
+  marsh: { province: 'wuliang', x: 28, y: 68, links: ['village', 'ridge', 'ford', 'reed_meadows', 'pale_shoal', 'undertow_grotto'] },
+  ridge: { province: 'wuliang', x: 47, y: 60, links: ['marsh', 'ford', 'screen_slope', 'counter_bell', 'black_mine'] },
   ford: { province: 'wuliang', x: 73, y: 74, links: ['ridge', 'hidden', 'pine_ridge', 'fish_ladder', 'willow_post', 'zhao_city'] },
   hidden: { province: 'wuliang', x: 91, y: 89, links: ['ford'] },
   pine_ridge: { province: 'wuliang', x: 66, y: 45, links: ['ford', 'kiln_valley', 'screen_slope', 'lantern_court'] },
@@ -649,7 +650,7 @@ const events = [
   { id: 'shoal_baskets', name: '灰鹭晒篮处', text: '岸边水浅，鹭草露着细根。下游的石缝里常积些水冲上来的灵晶。白宜坐在两处中间，拿针给旧鞋补眼。', choices: [
     { label: '拔岸边露根的鹭草', days: 0.5, insight: 1, loot: { reed: 2 }, outcome: '抓住露头的草叶轻轻一拽，草根上成团的白泥落回水边。' },
     { label: '拨开浅石捡晶砂', days: 0.625, insight: 2, loot: { core: 1 }, outcome: '阳光照进浅滩，洗过的砂里有些灵晶能捡。' },
-    { label: '问白宜哪边的滩好走', days: 0.25, insight: 1, loot: {}, outcome: '白宜把鞋上的线咬断。「沿干石走。白苇后有人高的石缝，我年轻时进去过，潮一转，人又被挤回原岸。照原有个管水的也去看过。」她指了指旧渡，说那边还有给人送木料的商船。' },
+    { label: '问白宜哪边的滩好走', days: 0.25, insight: 1, loot: {}, outcome: '白宜把鞋上的线咬断。「回白苇滩，沿干石绕到深水背后，芦苇里有半扇石门。我年轻时进去过，潮一转，人又被推回岸上。照原有个管水的也去看过。」她指了指旧渡，说那边还有给人送木料的商船。' },
   ] },
   { id: 'ladder_drop', name: '第三级闸口', text: '上头的木梁低，涨水时漂来的枝条容易挂在上面。第二级阶没在及膝的水里，再往下才是排矿渣的槽。钓客岑响坐在水边的石凳上。', choices: [
     { label: '取上层木梁上的枯枝', days: 0.75, insight: 1, loot: { wood: 3 }, outcome: '枝条一松，露出木梁被水泡深的纹路。' },
@@ -720,7 +721,8 @@ const events = [
 ];
 
 const extendSites = [
-  { id: 'undertow_door', region: 'marsh', name: '反潮石门', once: [1, 2],
+  { id: 'undertow_door', region: 'marsh', name: '反潮石门', afterChoices: ['shoal_baskets:2', 'marsh_pole_lesson:0'],
+    reveal: { item: 'undertow_wedge' }, once: [1, 2],
     afterOnceText: { 1: '新铁楔卡在旧槽里，绳子通向高处的石阶。外侧的潮水还会倒流，过洞口时可以抓住绳子。' } },
   { id: 'marsh_pole_lesson', region: 'marsh', name: '封乔的护堤木台', once: [0, 2], protectedArena: true,
     creatures: { river_spar_captain: animal(1, 1, 5, 1) },
@@ -743,7 +745,7 @@ const extendEvents = [
     { label: '用校潮亭的印纸对照潮水方向', desc: '石槽边的浅痕正对着倒流的潮水，和印纸最下面几道痕同向。', hidden: true, need: { river_gauge_copy: 1 }, days: 0.25, insight: 2, outcome: '印纸贴在槽边，最后两道线只从内侧湿起。绳子会随水换方向，固定它的铁件得同时卡住槽的两头。' },
   ] },
   { id: 'marsh_pole_lesson', name: '封乔的护堤木台', text: '护堤人封乔常年领村里的河工。他把湿麻绳拴在矮台外，留下近处一截给练手的人扶。台边立着长杆和软头杆。', choices: [
-    { label: '问封乔河里出了什么事', days: 0.125, insight: 1, outcome: '封乔指着台下被卷碎的苇筏。「深水里有条大兽，爱伏在石门旁。它不来浅岸。我守的是河工，你别顺深水去追。」' },
+    { label: '问封乔河里出了什么事', days: 0.125, insight: 1, outcome: '封乔指着台下被卷碎的苇筏。「沿岸过第三丛高苇，浅石后就是石门。里头有条大兽，浅岸它倒不来。我守的是河工，你别顺深水去追。」' },
     { label: '拿练习杆，和封乔切磋', desc: '他把麻绳放松一截。「站不稳就叫停，别跌进水里。」', days: 0.25, enemy: 'river_spar_captain', outcome: '河工守在台边。封乔换了根软头短杆，朝你让出几步。' },
     { label: '接过封乔的试杆签', desc: '封乔放下短杆，取了一支先前用红布系好的木签。', afterFight: 'river_spar_captain', days: 0.125, insight: 4, loot: { river_trial_writ: 1 }, outcome: '封乔在木签上按了手印。「夜里水响，赶路靠脚稳。折水驿要托人带急信，你肯帮忙，就拿这个给他们看。」' },
   ] },
@@ -907,8 +909,8 @@ const enemies = [
     loot: { beast_meat: 5, hide: 3, foundation_core: 1 } },
   { id: 'zhao_moss_turtle', name: '苔背泽鳖', tier: 2, hp: 54, atk: 13, def: 7, tags: ['beast', 'scaled'], insight: 4,
     intents: [{ kind: 'guard', name: '缩颈顶起背甲', mult: 1.35 }, attack('侧转咬向脚腕'), heavy('抬甲掀开脚下的泥')],
-    desc: '远看像一截生了苔的浮石。它缩颈时背甲朝上，侧转探头咬人时，肩边会露一道甲缝。',
-    loot: { beast_meat: 4, beast_eye: 1, qi_core: 3 } },
+    desc: '远看像一截生了苔的浮石。它侧转探头时，肩边会露一道甲缝。甲缘那圈厚皮浸水也折不断，裁下来能给护具包边。',
+    loot: { beast_meat: 3, hide: 4, qi_core: 2 } },
   { id: 'zhao_rush_eel', name: '缠藻泥鳗', tier: 1, hp: 36, atk: 11, def: 3, tags: ['beast', 'scaled'], insight: 3,
     intents: [attack('从藻下叼住鞋边'), attack('翻尾把人拖进浅沟', 1.12), heavy('缠住脚后猛拽', 1.48)],
     desc: '这鳗在水藻下贴泥而游。咬住东西就会把尾绕在石根上，借那一绕往回拖。',
@@ -989,7 +991,9 @@ scene('flood_market', 'zhao_float_goods', '三姓木码头', '船腹贴着木台
   gather('捡码头木台下的松枝', '撞断的枝条在台下随水摇晃。', 'wood', 4, 0.5, '你抽出还能用的松枝，掰掉泡烂的皮。'),
   { label: '问余节那只布袋怎么装得下渔网', afterChoice: 0, days: 0.125, loot: { qiankun_pattern: 1 },
     outcome: '余节解开袋口，翻出一截里衬。「这叫乾坤袋。我上一只给鱼钩划烂了，袋底还在。你带去给会缝皮子的人看看。」他从木箱里取出那块旧袋底递给你。' },
-], { once: [0, 2], stocks: { wood: stock('晒台松枝', 5, 9, 4, 3, 1) },
+  { label: '问晒网上的晶砂从哪来', desc: '摊开的湿网里嵌着几粒透亮的砂。', days: 0.125, stay: true,
+    outcome: '余节拈出一粒放到掌心。「往南过粮仓，就是碎琉璃滩。我妹妹常去，两三筛便够磨刀用。若是要暗金，往关前走，认拴着绳的沙洼。踩在绳外就能筛。」' },
+], { once: [0, 2, 3], stocks: { wood: stock('晒台松枝', 5, 9, 4, 3, 1) },
   afterOnceText: { 0: '新木撑稳了晒架。余节正收另一张齐肩高的干网，往腰间的布袋里一送，网全进去了。那袋才一掌宽，仍旧瘪着。', 2: '余节束起布袋口，拍掉新木撑上的木屑。木台下有两根横梁，上游的漂枝常卡在缝里。' } });
 
 scene('measuring_hall', 'zhao_bamboo_duel', '竹尺庭', '砖圈外的弟子喊了声「傅师父」。那人双脚没挪，竹尺一挑，滚到背后的石珠便落进他左手。他把珠子搁回窗台，示意你进来说话。', [
@@ -1040,7 +1044,7 @@ scene('scale_bog', 'zhao_scales', '青膜硬埂', '一条硬埂把浅水和泥�
   { label: '踩上土堤，循爪印往前找', desc: '两行带蹼的足印进了水藻，再往外就断了。', days: 0.25, enemy: 'mud_shrike' },
   { ...gather('挖浅水边的铁砂', '站在岸边，弯腰就够得着泥。', 'ore', 6, 1, '你淘出不少裹在水藻里的寒铁。'),
     ambush: { enemy: 'mud_shrike', chance: 0.3, outcome: '水藻下面突然溅起一脸泥。一只鬃犬跳上浅岸，挡了过来。' } },
-  { label: '沿水湾的露石去看浮起的背甲', desc: '那块生苔的背甲往深处沉了一寸，又抬起来。', days: 0.25, enemy: 'zhao_moss_turtle',
+  { label: '沿水湾的露石去看浮起的背甲', desc: '生苔的背甲往深处沉了一寸，又抬起来。甲缘有一圈厚皮，擦过露石也没见破。', days: 0.25, enemy: 'zhao_moss_turtle',
     outcome: '背甲转了半圈，苔底先露出一双眼。泽鳖贴着脚下的泥扑了过来。' },
   { label: '到北边浅滩寻火斑大蛙', desc: '蛙背塘流来的水刚没过碎石，踩在水里也看得到腿边。', days: 0.125, enemy: 'glass_frog',
     outcome: '一团红斑从齐脚深的水里跃出来，两腮一鼓，就跳到了石脊上。' },
@@ -2359,7 +2363,7 @@ const items = [
   { id: 'wood', name: '松木', kind: 'material', price: 3, sell: 1, desc: '干透的松枝和松片。带脂的能引火，削去树皮后可做杆、柄和屋里的架子。' },
   { id: 'reed', name: '灵草', kind: 'material', price: 6, sell: 2, desc: '滩边采的白苇芯或内山长的银脉叶，拣紧实的留下。煎药、炼丹和育苗都用得上。' },
   { id: 'hide', name: '兽革', kind: 'material', price: 0, sell: 3, desc: '从妖兽身上取下的皮，也包括雪蜥换下的厚皮。能做护甲、皮绳和弓弦，也可以卖给收皮商。' },
-  { id: 'beast_meat', name: '生兽肉', kind: 'material', price: 0, sell: 0, desc: '刚剖下来的兽肉。带回村用灶煮熟就能做成顶饿的行粮。' },
+  { id: 'beast_meat', name: '生兽肉', kind: 'material', price: 0, sell: 0, desc: '刚剖下来的兽肉。到能生火的灶边煮透，才能当行粮。' },
   { id: 'qi_core', name: '炼气期妖丹', kind: 'material', price: 0, sell: 7, desc: '炼气妖兽或精怪体内凝出的丹核。收货的人肯出钱，丹方也有用它稳火的做法。' },
   { id: 'foundation_core', name: '筑基期妖丹', kind: 'material', price: 0, sell: 21, desc: '筑基期妖兽体内凝成的硬珠。高级丹方会用到，也能卖个好价。' },
   { id: 'beast_eye', name: '妖目', kind: 'material', price: 0, sell: 0, desc: '妖兽的眼珠，离体后还有灵力。能入药，也能做成帮助稳住气息的饰物。' },
@@ -2394,10 +2398,10 @@ const items = [
   { id: 'millet_grain', name: '新收的谷子', kind: 'material', price: 0, sell: 1, desc: '外壳一捻就开，里面是浅黄的粟米。' },
   { id: 'kiln_clay', name: '耐火泥', kind: 'material', price: 0, sell: 3, desc: '云炉石谷里的灰白硬泥，干透以后不容易裂。' },
   { id: 'black_iron', name: '暗金', kind: 'material', price: 0, sell: 7, desc: '细密黑砂包着的深金色矿粒。淘净后能加固器件，也是炉火里罕见的引药料。' },
-  { id: 'pine_pass', name: '松场驮道图', kind: 'key', price: 0, sell: 0, desc: '图沿岭脚画出一段不淹水的旧驮道。断桥过后，照着三棵青松便能认路。' },
+  { id: 'pine_pass', name: '松场驮道图', kind: 'key', price: 0, sell: 0, desc: '图上从落灯村北坡画出一条旧驮道，沿岭脚直通松场。断桥过后，三棵青松并排立着。' },
   { id: 'kiln_tracks', name: '窑车辙样', kind: 'key', price: 0, sell: 0, desc: '窑车走的窄道。图上两道车轮印在松树根旁一转，就出了山坳。' },
   { id: 'herb_tie', name: '篁泽的药篓绳', kind: 'key', price: 0, sell: 0, desc: '赶车人从旧药篓上解下的绑绳。绳结旁缝着一小块丝布，画着去药谷要过的竹桥。' },
-  { id: 'mine_guide', name: '玄砂引矿签', kind: 'key', price: 0, sell: 0, desc: '药谷换来的窄木签。三道墨线分别指向石槽、冷井和矿口的外梯。' },
+  { id: 'mine_guide', name: '玄砂引矿签', kind: 'key', price: 0, sell: 0, desc: '药谷换来的窄木签。照着墨线，可以从药谷过石槽，也可以从沉钟岭走运矿的窄道。两条路都接到冷井的外梯。' },
   { id: 'snow_token', name: '翻雪关的栈牌', kind: 'key', price: 0, sell: 0, desc: '照着栈牌刻出的踏脚位，能从矿山背后的巡道避开雪崩沟。' },
   { id: 'sky_cord', name: '三峰引绳结', kind: 'key', price: 0, sell: 0, desc: '一根打了三个结的短绳。雪关的三条木梁各系着一段路标，绳上的结能和它们依次对上。' },
   { id: 'pine_ledge_note', name: '松崖背阴旧址', kind: 'key', price: 0, sell: 0, desc: '木贩旧账单背面画了崖边的缺口。过松场后沿背阴石壁才认得出。' },
@@ -2454,6 +2458,7 @@ const items = [
   { id: 'star_blade', name: '暗星刀', kind: 'gear', price: 0, sell: 29, desc: '照偏井护矿人留下的旧图打成。刃厚而短，寻常力道也能掌控。' },
   { id: 'star_blade_pattern', name: '暗星刀匣底图', kind: 'key', price: 0, sell: 0, desc: '偏井护矿人留下的锻打寸图。断刀的三处裂口旁注明了哪边该留厚。' },
   { id: 'hide_shield', name: '包革小盾', kind: 'gear', price: 0, sell: 9, desc: '用松木弯成的圆盾，外包两层兽革。' },
+  { id: 'miner_pick', name: '短柄矿镐', kind: 'gear', price: 0, sell: 4, desc: '窄镐头能钩进矿缝，短柄在陡坡和低井里也抡得开。' },
   { id: 'coil_spear', name: '绕脊枪', kind: 'gear', price: 0, sell: 25, desc: '用配重翻过的长枪。刃近手心，长柄仍能顺畅回收。' },
   { id: 'reed_bow', name: '苇弦弓', kind: 'gear', price: 0, sell: 8, desc: '将削薄的苇片贴在韧木上制成的猎弓。' },
   { id: 'iron_sword', name: '寒铁剑', kind: 'gear', price: 33, sell: 14, desc: '用沉钟岭的铁打成，兼顾出手和耐用。' },
@@ -2504,6 +2509,7 @@ const gear = [
   { id: 'trail_cutter', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0, durability: 33, repair: 5, entry: '索棚比手的奖刀。护手宽，敢把刃从对手手边送过去。' },
   { id: 'star_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 37, repair: 11, entry: '照护矿人的旧式锻成，刀背厚，劈硬物时刃口容易吃住石缝。养气浅些也能握得稳。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
   { id: 'hide_shield', slot: 'offhand', tier: 0, atk: 0, def: 0, brace: 3, durability: 28, repair: 5, entry: '空出一只手便能用。防住蓄力后砸来的重招时，盾面能卸开一股力。' },
+  { id: 'miner_pick', slot: 'offhand', tier: 0, durability: 18, repair: 4, entry: '拿在副手。沉钟岭冲沟可以站稳后撬坡矿，玄砂偏井里也可少花些工夫。镐头要磨，腾不出手持盾。' },
   { id: 'coil_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 45, repair: 10, entry: '练得不深也能贯穿整段枪势的重兵。枪杆经用，锻造却要吃掉一匣硬料。' },
   { id: 'reed_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 3, def: 0, hp: 0, qi: 0, retreat: 0, durability: 28, repair: 4, entry: '寻常猎弓，弓力温和。可用削苇箭或包铁箭，射入厚毛不易滑脱。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 2 } },
   { id: 'iron_sword', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '不挑修为的实用剑。厚脊让劈刺都稳，常年巡矿也不用总补剑身。' },
@@ -2619,6 +2625,7 @@ const recipes = [
   { id: 'r_jade_pendant', result: 'jade_pendant', count: 1, tier: 3, facility: 'forge', facilityLevel: 2, cost: 26, need: { core: 5, hide: 3, beast_eye: 1 }, days: 3, reveal: { item: 'axis_tuning' } },
   { id: 'r_star_blade', result: 'star_blade', count: 1, tier: 2, facility: 'forge', facilityLevel: 2, cost: 35, need: { black_iron: 9, ore: 5, core: 4, wood: 3 }, days: 4, reveal: { item: 'star_blade_pattern' } },
   { id: 'r_hide_shield', result: 'hide_shield', count: 1, tier: 0, facility: 'forge', cost: 8, need: { wood: 4, hide: 3 }, days: 1.25, requiresShownHide: true },
+  { id: 'r_miner_pick', result: 'miner_pick', count: 1, tier: 0, facility: 'forge', cost: 8, need: { ore: 4, wood: 2 }, days: 1.5, reveal: { item: 'blade_template' } },
   { id: 'r_resin_pill', result: 'resin_pill', count: 3, tier: 1, facility: 'furnace', formula: 'formula_resin', cost: 6, need: { wood: 3, reed: 3, qi_core: 1 }, days: 2 },
   { id: 'r_leaf_pill', result: 'leaf_pill', count: 3, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_leaf', cost: 10, need: { reed: 4, kiln_clay: 2, wood: 2, qi_core: 2 }, days: 3 },
   { id: 'r_jade_pill', result: 'jade_pill', count: 3, tier: 3, facility: 'furnace', facilityLevel: 3, formula: 'formula_jade', cost: 16, need: { reed: 5, core: 2, wood: 2, foundation_core: 1, beast_eye: 1 }, days: 4 },
@@ -2640,7 +2647,7 @@ const regions = [
 ];
 
 const sites = [
-  { id: 'reed_banks', region: 'marsh', name: '浅水苇丛',
+  { id: 'reed_banks', region: 'marsh', name: '浅水苇丛', once: [2],
     stocks: {
       reed: { label: '浅处苇芯', start: 2, cap: 3, interval: 5, growth: 1, depletedFactor: 1.5, choices: [0] },
       reed_deep: { item: 'reed', label: '深处苇芯', start: 3, cap: 5, interval: 5, growth: 1, depletedFactor: 1.5, choices: [1] },
@@ -2671,7 +2678,7 @@ const sites = [
       2: { before: '炉边的灰里露着一角破瓦。', after: '拿掉瓦角的地方还留着个浅印。' },
       3: { before: '炉沿的缝里夹着一点纸边。', after: '抽走折纸的砖缝里留下一缕松灰。' },
     } },
-  { id: 'reed_ferryman', region: 'marsh', name: '渡工的刨木滩', afterChoices: ['sunk_pack:1', 'bank_watch:1'], once: [0, 2],
+  { id: 'reed_ferryman', region: 'marsh', name: '渡工的刨木滩', afterChoices: ['reed_banks:2', 'sunk_pack:1', 'bank_watch:1'], once: [0, 2],
     stocks: { reed: { start: 3, cap: 5, interval: 5, growth: 2, choices: [3] } },
     creatures: { marsh_ghost: { start: 1, cap: 2, interval: 5, growth: 1 } },
     creatureText: { marsh_ghost: { present: '对岸的影子贴着白苇的浅滩来回走，把过水的石路挡住了。渡工停了刀，往对岸看。', absent: '对岸的石路空下来。水从白苇间流走。' } },
@@ -2688,7 +2695,7 @@ const sites = [
   { id: 'ore_rain', region: 'ridge', name: '落矿的冲沟', once: [2],
     stocks: {
       ore: { label: '沟边寒铁', start: 3, cap: 4, interval: 3.5, growth: 1, choices: [0] },
-      ore_slope: { item: 'ore', label: '坡壁寒铁', start: 4, cap: 6, interval: 3.5, growth: 2, choices: [1] },
+      ore_slope: { item: 'ore', label: '坡壁寒铁', start: 4, cap: 6, interval: 3.5, growth: 2, choices: [1, 4] },
       core: { label: '砂槽灵晶', start: 2, cap: 4, interval: 5, growth: 1, choices: [3] },
     },
     emptyText: '沟底已翻过一遍，没有松动的矿块了。护篷下还坐着一位验矿的老人。' },
@@ -2718,7 +2725,8 @@ const sites = [
 
   { id: 'low_tide', region: 'ford', name: '闸外浅阶',
     stocks: { core: { label: '浅阶灵晶', start: 2, cap: 3, interval: 2, growth: 1, choices: [0] },
-      core_silt: { item: 'core', label: '槽底灵晶', start: 2, cap: 3, interval: 2, growth: 1, choices: [2] } },
+      core_silt: { item: 'core', label: '槽底灵晶', start: 2, cap: 3, interval: 2, growth: 1, choices: [2, 6] } },
+    ebbText: { low: '水退过了外侧的石脊，背后那块能站人的石板露出水面。', high: '外侧石脊只露出细细一线，背后的石板还淹着。' },
     creatures: {
       rope_eel: { start: 1, cap: 3, interval: 2.5, growth: 1, curve: 'wild' },
       ford_silver_dace: { start: 3, cap: 5, interval: 3.25, growth: 1, curve: 'wild' },
@@ -2816,10 +2824,10 @@ const sites = [
     },
     emptyText: '石槽里只剩碎砂。激流过后，有颜色的石块才会再卡进来。' },
   { id: 'winch_house', region: 'black_mine', name: '断榫绞盘屋', once: [0, 1],
-    afterOnceText: { 0: '收绳的转盘转起来了。矿工在窗边收拾零件，架外的石阶顺坡而下。', 1: '矿工把量尺寸的铁零件给了你。断木接头还搁在转盘边，架外的石阶顺坡而下。' } },
+    afterOnceText: { 0: '绞盘已经能提上矿筐。矿工把筛出的灵晶装进布袋，手边的风炉等着添柴。', 1: '矿工把量尺寸的铁零件给了你。架外的石阶顺坡而下。' } },
   { id: 'deep_vein', region: 'black_mine', name: '横肩偏井', once: [2],
-    stocks: { black_iron: { start: 4, cap: 6, interval: 8, growth: 2, choices: [3] },
-      core: { start: 1, cap: 3, interval: 8, growth: 1, choices: [3] } },
+    stocks: { black_iron: { start: 4, cap: 6, interval: 8, growth: 2, choices: [3, 4] },
+      core: { start: 1, cap: 3, interval: 8, growth: 1, choices: [3, 4] } },
     creatures: { vein_sentinel: { start: 1, cap: 2, interval: 9, growth: 1, depletedFactor: 1.7 } },
     creatureText: { vein_sentinel: { present: '井口两面黑岩像肩骨似地拢到一起，车轮被挤得裂了一道缝。每次岩肩移动，石身中间就会闪一下。', absent: '井口只剩几块倒下的黑纹石，往碎车槽的路空出来了。' } },
     afterWinText: { vein_sentinel: '旧工具柜被撞上了井外的窄台。碎车槽内侧仍是一道露在石壁上的矿脉。' },
@@ -2865,9 +2873,10 @@ const sites = [
 ];
 
 const events = [
-  { id: 'reed_banks', name: '浅水苇丛', text: '岸边铺着几块踏石。水越往里越深，在低处绕出一个回水湾。', choices: [
+  { id: 'reed_banks', name: '浅水苇丛', text: '岸边铺着几块踏石。往深处是个回水湾。沿岸绕开深水，能望见一座旧船棚，那里不时传来刨木声。', choices: [
     { label: '挖浅处的苇芯', desc: '站在踏石上，手能伸到近岸的泥边。', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 2, loot: { reed: 2 }, enemy: null, outcome: '你从踏石边的泥里挑出长实的白苇芯。' },
     { label: '蹚过去挖深处的苇芯', desc: '露水沾在水湾那丛苇叶上。', days: 0.5, coins: 0, hp: -4, qi: 0, insight: 3, loot: { reed: 3 }, enemy: null, outcome: '你蹚到水湾，抽出底下发白的嫩芯。', injury: '泥里埋着碎蚌壳，拔脚时划破了小腿。' },
+    { label: '沿岸去看看谁在刨木', days: 0.125, stay: true, outcome: '一个老渡工把裂桨架在石头上。「真会挑苇芯？匀些给我补桨，我手头有张旧山路图。」沿岸走过船棚，就到他的刨木滩。' },
   ] },
   { id: 'sunk_pack', name: '烂木桩浅汊', text: '河边岔出一条浅水道，几根歪木桩从水里探出来。最外头那根卡着一只竹篓，桩内侧有条石路，沿着河弯往前。', choices: [
     { label: '把竹篓拉上岸', desc: '篓子的背带露在水面上，伸手够得着。', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 1, loot: { lost_basket: 1 }, enemy: null, outcome: '你攥住背带，把竹篓从木桩旁拉起来。水顺着竹条滴下，篓口的扣还紧着。' },
@@ -2881,11 +2890,13 @@ const events = [
     { label: '捡起土路边的油纸包', desc: '那只狐败退时蹬断了几根苇秆，油纸包从低处滚到了土路边。', afterFight: 'reed_fox', days: 0, loot: { ration: 1 }, outcome: '油纸里有过路人落下的一份干粮，系绳还好好的。' },
     { label: '到背水坡猎白耳兔', days: 0.25, enemy: 'reed_hare', outcome: '一对白耳从短苇里抬起。野兔绕过苇根，沿着斜坡猛蹬过来。' },
   ] },
-  { id: 'old_fire', name: '背雨石渠', text: '半截石渠能挡雨。砌进渠脚的小石炉朝水开口，几片瓦挡着风，炉沿留着浅浅的烟痕。', choices: [
+  { id: 'old_fire', name: '背雨石渠', text: '半截石渠能挡雨。小石炉砌在背风处，炉边搁着一口陶锅，锅沿的缺口高过水线。', choices: [
     { label: '添柴歇脚', desc: '石炉还通风，挨着背风一侧便能烤火。', need: { wood: 1 }, consume: true, days: 0.5, coins: 0, hp: 6, qi: 4, insight: 0, loot: {}, enemy: null, outcome: '火把石壁烘热，湿鞋上慢慢蒸出白气。' },
     { label: '捆些干柴', desc: '有人把松枝藏在渠边石板下，风吹不着。', days: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 3 }, enemy: null, outcome: '压在石渠里的松枝还干着，折一下便响。' },
     { label: '掀开渠底的破瓦', desc: '灰里露着瓦沿，边上像有划痕。', days: 0, coins: 0, hp: 0, qi: 0, insight: 1, loot: { kiln_shard: 1 }, enemy: null, outcome: '瓦上的字是反着刻的。抹掉一层灰，才辨出「敲两下，停一停」。' },
     { label: '从冷炉边取下残纸', desc: '炉沿的砖缝夹着一点纸边。', days: 0.25, insight: 1, loot: { ember_fold: 1 }, outcome: '残纸还存着三道折痕。最里一层的松灰没散开，纸边却烧穿了。' },
+    { label: '借石炉把猎物煮熟', desc: '锅还能用。烧一根干松枝，能把两份兽肉煮成两罐路上吃的浓汤。', need: { beast_meat: 2, wood: 1 },
+      consume: true, stay: true, days: 0.75, loot: { meat_broth: 2 }, outcome: '你用清水刷了锅，把兽肉煮透，连汤撇进两只空陶罐。灶火灭了，只剩干松枝的香味。' },
   ] },
   { id: 'reed_ferryman', name: '渡工的刨木滩', text: '渡工把一柄裂桨架在石头上。脚下还有把旧桨，桨背露出几道刻线。对岸浅石围着一丛白苇。', choices: [
     { label: '把补桨的料递给渡工', desc: '「两份苇芯塞进裂口，再削一根松枝卡紧。我拿进山的路图跟你换。」', need: { reed: 2, wood: 1 }, consume: true, days: 0.25, coins: 0, hp: 0, qi: 0, insight: 3, loot: { ration: 1, ridge_rubbing: 1 }, enemy: null, outcome: '渡工从斗笠夹层取出沉钟岭的路图。新桨接牢后，他拿脚边那把旧桨比了比，又瞧了眼桨背上的刻线。' },
@@ -2895,7 +2906,7 @@ const events = [
   ] },
   { id: 'bank_watch', name: '矮石堤', text: '有人在堤边歇脚，腰间别着一张折图，身边的石面上搁着一把钩刃。', choices: [
     { label: '跟拦滩客过招', desc: '「想借图？跟我过两招，赢了连这把备刀也拿去。撑不住就抬手，我收杖。」', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'bank_runner', outcome: '拦滩客把备刀留在石上，紧了紧腰带，横着木杖站稳。' },
-    { label: '问他渡工在哪儿', desc: '他顺口提起那张图是河弯的渡工画的。', days: 0, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '他朝那几根歪木桩一抬下巴。「拐过弯就是刨木滩。他给断桨接新柄呢。」' },
+    { label: '问有没有别的进山办法', desc: '那张折图上的船桨印像个记号，也许是渡工画的。', days: 0, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '他朝那几根歪木桩一抬下巴。「不必非跟我打。刨木滩的老渡工总往沉钟岭捎信。他正缺补桨的料，说不准肯跟你换张图。」' },
     { label: '等拦滩客兑现交手的约定', desc: '他解开腰间缚住折图的细绳，招手让你过去。', afterFight: 'bank_runner', days: 0, loot: { ridge_rubbing: 1, hook_blade: 1 }, outcome: '拦滩客把折图和备刀一起推过来。「说过的算数。走到北边倒钟下，细看图上那道岔。」' },
   ] },
   { id: 'drowned_mast', name: '沉桅高埂', text: '一根折断的船桅斜插在木桩外。从高岸往下看，露出水面的石头把浅水分成两股。', choices: [
@@ -2920,8 +2931,9 @@ const events = [
   { id: 'ore_rain', name: '落矿的冲沟', text: '泥水顺坡洗进冲沟，地上有一条碎石带。坡壁半腰是露出岩层的断口，沟底留着一道冲低的砂槽。沟边护篷下坐着个验矿人。', choices: [
     { label: '在沟边拾铁', days: 1, coins: 0, hp: 0, qi: 0, insight: 2, loot: { ore: 2 }, enemy: null, outcome: '洗掉浮泥，底下是寒铁。' },
     { label: '爬上坡去撬矿块', days: 1, coins: 0, hp: -6, qi: 0, insight: 3, loot: { ore: 3 }, enemy: null, outcome: '坡上有大块寒铁，连着石皮撬了下来。', injury: '下坡时一块松石滚下来，撞在膝上。' },
-    { label: '问护篷下敲的是什么坯', desc: '验矿人在护篷里敲打半块旧剑坯。', days: 0.5, insight: 2, loot: { blade_template: 1 }, outcome: '验矿人把两种锤痕指给你看，捡一块断坯送你。「厚背那一段得留着，锻薄了剑容易崩。」' },
+    { label: '问护篷下敲的是什么坯', desc: '验矿人在护篷里敲打半块旧剑坯，椅背上挂着一把磨窄了头的矿镐。', days: 0.5, insight: 2, loot: { blade_template: 1 }, outcome: '验矿人指给你看旧坯上的锤痕。「剑要留厚背。镐倒要打窄，站在坡脚的石沿上，一伸手正好够到矿缝。」他把断坯翻过来，给你看背面拓下的矿镐样子。' },
     { label: '捞洗砂槽里反光的碎石', days: 0.75, insight: 1, loot: { core: 2 }, outcome: '泥砂漏下手掌，只有几块透着光的灵晶沉在筛底。' },
+    { label: '站在石沿上，用矿镐撬坡矿', afterChoice: 2, fieldTool: 'miner_pick', days: 0.75, loot: { ore: 4 }, outcome: '镐头钩住岩缝，寒铁连一小层石皮落到脚边。你站在石沿上，避开了滚石的道。' },
   ] },
   { id: 'empty_oven', name: '歇炉的茶棚', text: '棚檐还能挡雨。石灶留着烧过的痕，旁边一块薄板挡着没淋湿的柴。', choices: [
     { label: '在石灶里添柴，烤衣歇脚', need: { wood: 1 }, consume: true, days: 0.5, coins: 0, hp: 9, qi: 6, insight: 1, loot: {}, enemy: null, outcome: '湿衣蒸出了白气，烤过火才慢慢暖透。' },
@@ -2970,6 +2982,8 @@ const events = [
     { label: '去东边浅湾捉银背鱼', days: 0.375, enemy: 'ford_silver_dace', outcome: '你截在回水边。银背鱼跳出水面，背鳍朝掌心刮过来。' },
     { label: '从闸墩石缝引出黑纹蟹', days: 0.5, enemy: 'ford_shale_crab', outcome: '石缝里伸出一对黑钳，蟹拖着满身湿砂横挤出来。' },
     { label: '沿外滩拖印找泥鳞兽', days: 0.5, enemy: 'mud_beast', outcome: '压倒的芦苇突然掀开，泥鳞兽从根下扑上硬地。' },
+    { label: '趁退水绕过石脊，从背面淘灵晶', desc: '绕到船绳对岸，站上那块平石，也能够到同一道槽底。', ebbOnly: true, days: 0.375, loot: { core: 2 },
+      outcome: '你从外侧的平石上伸筛去淘槽底，船绳那头的水声隔着整道石脊。' },
   ] },
   { id: 'boat_shade', name: '没篷的渡舟', revisit: true, text: '老船卡在闸边，船舷正好挡着风。旧船绳挂在外侧，绳圈上结了一层白盐。船头的灯架熏黑了一半。', choices: [
     { label: '坐上船里的凳子歇脚', days: 1, coins: 0, hp: 13, qi: 8, insight: 1, loot: {}, enemy: null, outcome: '船舷挡住了风。你坐到水势变缓，手脚才不再发冷。' },
@@ -3096,12 +3110,18 @@ const events = [
     { label: '给矿工材料修转盘', desc: '「盘转得起来，才够得着外头的梯子。给我点好铁和硬泥，我把翻雪关用的木牌给你。」',
       need: { black_iron: 6, kiln_clay: 4 }, consume: true, days: 1.25, insight: 4, loot: { snow_token: 1, ration: 4 }, outcome: '转盘动了一圈。矿工爬到外梯旁，从石架上取下翻雪关的木牌递给你。' },
     { label: '翻过铁零件看看接头', days: 0.5, insight: 3, loot: { vein_pattern: 1, arrow_pattern: 1 }, outcome: '矿工让你带走那块短铁样，又把从矿壁拔下的一根包铁箭递给你比对。' },
+    { label: '替矿工烧炉、换一袋灵晶', afterChoice: 0, stay: true, cooldown: 4,
+      desc: '「绞盘能走，一趟多筛出四枚晶。给夜里的弟兄带两罐肉汤，再添根干柴、留五钱，我们换着拿。」',
+      days: 0.5, need: { meat_broth: 2, wood: 1 }, coins: -5, consume: true, loot: { core: 4 },
+      outcome: '矿工把肉汤放到炉边温着，从刚提上来的湿布里倒出四枚筛净的灵晶。' },
   ] },
   { id: 'deep_vein', name: '横肩偏井', text: '井边挤着两道肩形黑岩，遮住一只倒扣的旧工具柜。碎车槽尽头有裸露的矿脉，窄槽从右边还能绕到石井外。', choices: [
     { label: '进偏井敲开卡住的车槽', days: 1, enemy: 'vein_sentinel', outcome: '一声钝响落地。两片黑岩并成一道石身，挡住了车眼。' },
     { label: '沿旧窄槽绕回路面', days: 0.125, insight: 1, loot: {}, outcome: '鞋底踏出了湿亮的车痕，你绕回宽一些的路。' },
     { label: '翻开井外的旧工具柜', desc: '败退的矿傀撞开了柜架，柜子滑到了井外，盖子裂出一道缝。', afterFight: 'vein_sentinel', days: 0, loot: { star_blade_pattern: 1 }, outcome: '木托里是一把断成三截的矿刀，刀身已经锈穿。油布倒还护着锻打图，连断口两边该锻多厚都标了。' },
     { label: '顺碎车槽去剔松矿脉', desc: '碎车槽内侧是一条暗金细脉，旁边挨着夹在石里的亮晶。', guardedBy: 'vein_sentinel', days: 1, insight: 2, loot: { black_iron: 4, core: 1 }, outcome: '你清开碎车边的松屑，从石壁剔下暗金和独立成片的灵晶。' },
+    { label: '从车辙边用矿镐剔矿', desc: '碎车原先贴着石壁走，轮子在矿脉边留下了一道可落镐的缺口。', guardedBy: 'vein_sentinel',
+      fieldTool: 'miner_pick', days: 0.625, loot: { black_iron: 4, core: 1 }, outcome: '镐头顺着车辙进去，暗金和亮晶朝槽外松下来。' },
   ] },
 
   { id: 'silk_bough', name: '背风雪蜥径', text: '石绳沿着矮石窝一路牵过去，雪蜥常在背风的石隙换皮。更上面横出一道冰沿，挡住了吹来的雪沫。', choices: [
@@ -3420,8 +3440,12 @@ function directRoad(from, to, kit) {
   if (!fromRegion || !toRegion || from === to) return null;
   const cross = crossRoute(from, to);
   if (cross) return { days: cross.days, cross };
-  if (legacy.has(from) && legacy.has(to)) return { days: (to === home ? fromRegion : toRegion).travel ?? 0 };
   if (provinceOf(kit.data, from) !== provinceOf(kit.data, to) || !signedRoad(kit.data, from, to)) return null;
+  if (legacy.has(from) && legacy.has(to)) {
+    const days = from === home || to === home ? (from === home ? toRegion : fromRegion).travel
+      : Math.max(0.75, Math.round((fromRegion.travel ?? 1) + (toRegion.travel ?? 1)) / 4);
+    return { days };
+  }
   const days = Math.max(0.5, Math.round(((fromRegion.travel ?? 1) + (toRegion.travel ?? 1)) * 2) / 4);
   return { days };
 }
@@ -3440,35 +3464,53 @@ function learnAdjacentRegions(state, kit) {
   }
 }
 
-function safeRoad(state, target, kit) {
-  if (!settlementOf(kit.data, target)?.inn || provinceOf(kit.data, target) !== provinceOf(kit.data, state.region)) return null;
-  const cost = new Map([[state.region, 0]]);
-  const unvisited = new Set(state.discovered);
+function knownRoutes(state, kit) {
+  const routes = new Map([[state.region, { days: 0, via: [] }]]);
+  const here = provinceOf(kit.data, state.region);
+  const unvisited = new Set([state.region, ...state.discovered.filter((id) => provinceOf(kit.data, id) === here)]);
   while (unvisited.size) {
     let nearest;
     let nearestCost = Infinity;
     for (const id of unvisited) {
-      if ((cost.get(id) ?? Infinity) < nearestCost) { nearest = id; nearestCost = cost.get(id); }
+      if ((routes.get(id)?.days ?? Infinity) < nearestCost) { nearest = id; nearestCost = routes.get(id).days; }
     }
-    if (!nearest) return null;
-    if (nearest === target) return { days: nearestCost, rescue: true };
+    if (!nearest) break;
     unvisited.delete(nearest);
     for (const id of unvisited) {
       const road = directRoad(nearest, id, kit);
       if (!road || road.cross) continue;
       const nextCost = nearestCost + road.days;
-      if (nextCost < (cost.get(id) ?? Infinity)) cost.set(id, nextCost);
+      if (nextCost < (routes.get(id)?.days ?? Infinity)) {
+        const via = nearest === state.region ? [] : [...routes.get(nearest).via, nearest];
+        routes.set(id, { days: nextCost, via });
+      }
     }
   }
-  return null;
+  return routes;
 }
 
-function quoteRoad(state, id, kit) {
+function roadFood(state, required, kit) {
+  let deficit = Math.max(0, required - state.satiety);
+  const meals = {};
+  let satiety = 0;
+  const foods = [...kit.data.foods].sort((a, b) => a.satiety - b.satiety);
+  for (const food of foods) {
+    const count = Math.min(kit.owns(state, food.id), Math.ceil(deficit / food.satiety));
+    if (!count) continue;
+    meals[food.id] = count;
+    const foodSatiety = count * food.satiety;
+    satiety += foodSatiety;
+    deficit = Math.max(0, deficit - foodSatiety);
+  }
+  return { meals, deficit, satiety };
+}
+
+function quoteRoad(state, id, kit, routes) {
   if (!kit.records.regions[id]) return { reason: '找不到这条路。' };
   if (!marked(state, id)) return { reason: '你还没有找到那条路。' };
   if (state.region === id) return { reason: '你已经在这里。' };
-  const road = directRoad(state.region, id, kit) ?? (state.satiety === 0 ? safeRoad(state, id, kit) : null);
-  if (!road) return { reason: '此处没有直达的路。' };
+  const road = directRoad(state.region, id, kit) ?? (routes ?? knownRoutes(state, kit)).get(id);
+  if (!road) return { reason: '没找到能从这里接上的路。' };
   const blockedCrossing = crossBlocker(state, road.cross);
   if (blockedCrossing) return { ...road, reason: blockedCrossing };
   if (state.satiety === 0) {
@@ -3476,7 +3518,14 @@ function quoteRoad(state, id, kit) {
     if (!settlementOf(kit.data, id)?.inn) return { ...road, reason: '腹中空空，先吃些东西。' };
     return { ...road, days: road.days + kit.rules.emptyReturnDays, rescue: true, reason: '' };
   }
-  return { ...road, reason: '' };
+  const protection = road.cross ? null : kit.roadProtection(state, provinceOf(kit.data, id));
+  const rate = kit.rules.satietyDrainPerDay * (1 - (protection?.field.roadSatiety.fraction ?? 0));
+  const remaining = state.satiety - road.days * rate;
+  const longWalk = road.via?.length && road.days >= 2.5;
+  const reserve = longWalk ? 20 : 0;
+  const food = road.cross || longWalk ? roadFood(state, road.days * rate + reserve, kit) : null;
+  return { ...road, rate, protection, meals: food?.meals, emptyOnArrival: remaining + (food?.satiety ?? 0) <= 0,
+    reason: road.cross && food.deficit > 0 ? '带的口粮还不够走完这段路。' : '' };
 }
 
 function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) {
@@ -3494,14 +3543,23 @@ function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) 
 function travelRoad(state, id, kit) {
   const road = quoteRoad(state, id, kit);
   if (road.reason) return kit.refuse(road.reason);
-  const protection = !road.cross && !road.rescue && kit.roadProtection(state, provinceOf(kit.data, id));
+  const protection = road.protection;
   const baseRate = kit.rules.satietyDrainPerDay;
-  const satietyRate = protection ? baseRate * (1 - protection.field.roadSatiety.fraction) : baseRate;
+  const satietyRate = road.rate ?? baseRate;
   const unprotectedSatiety = Math.max(0, state.satiety - road.days * baseRate);
-  arrive(state, id, road.days, kit, { satietyRate });
+  const arrivalDay = state.day + road.days;
+  for (const [food, count] of Object.entries(road.meals ?? {})) {
+    for (let meal = 0; meal < count; meal++) {
+      kit.advance(state, Math.min(Math.max(0, arrivalDay - state.day), state.satiety / satietyRate), satietyRate);
+      kit.eatOnRoad(state, food);
+    }
+  }
+  arrive(state, id, Math.max(0, arrivalDay - state.day), kit, { satietyRate });
   const travelText = road.rescue ? '腹中没了力气，沿路慢走了一程。'
     : protection && state.satiety > unprotectedSatiety ? `裹紧${kit.nameOf(protection.id)}的衣襟挡住风沙，这一程没那么耗力。` : '';
-  return kit.say(state, `抵达${kit.records.regions[id].name}。${travelText}`);
+  const used = road.meals && kit.goodsText(road.meals);
+  return { ...kit.say(state, `抵达${kit.records.regions[id].name}。${used ? `途中吃了${used}。` : ''}${travelText}`),
+    ...(used ? { travelMeals: road.meals } : {}) };
 }
 
 function gateQuote(state, id, kit, scroll) {
@@ -3767,14 +3825,19 @@ function worldView(state, kit) {
   const actual = kit.records.regions[state.region];
   const here = detail(kit.data, state.region);
   const discovered = kit.data.regions.filter((region) => marked(state, region.id));
-  const roads = discovered.flatMap((region) => {
+  const routesFromHere = knownRoutes(state, kit);
+  const journeys = discovered.flatMap((region) => {
     if (region.id === state.region) return [];
-    const quote = quoteRoad(state, region.id, kit);
+    const quote = quoteRoad(state, region.id, kit, routesFromHere);
     const ordinary = directRoad(state.region, region.id, kit);
-    return quote.days === undefined || (!ordinary && !quote.rescue) ? [] :
-      [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue) })];
+    const via = (quote.via ?? []).map((id) => kit.records.regions[id].name);
+    return quote.days === undefined ? [] :
+      [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue),
+        direct: Boolean(ordinary), via, path: [state.region, ...(quote.via ?? []), region.id],
+        meals: quote.meals, emptyOnArrival: quote.emptyOnArrival })];
   });
-  const roadsById = Object.fromEntries(roads.map((road) => [road.id, road]));
+  const roads = journeys.filter((road) => road.direct || road.rescue);
+  const roadsById = Object.fromEntries(journeys.map((road) => [road.id, road]));
   const closedSidePaths = crossings.filter((edge) => {
     const other = otherside(edge, state.region);
     return other && kit.records.regions[other] && !marked(state, other) && crossBlocker(state, edge);
@@ -3795,7 +3858,7 @@ function worldView(state, kit) {
   const affiliation = kit.data.sects?.find(({ id }) => state.world.affiliation === id);
   return { settlement: settlementOf(kit.data, state.region), localMarket: localMarket(state, kit), sect: sectView(state, kit),
     affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit: pledge(state, affiliation).credit } : null,
-    world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, crossings: closedSidePaths,
+    world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, journeys, crossings: closedSidePaths,
       here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: here.x, y: here.y, description: here.description ?? actual.desc },
       scrollCount: kit.owns(state, 'gate_scroll'), gates, localGate: here.portal ? { attuned: state.world.gates.includes(state.region) } : null,
       localArray: arrayView(state, state.region, kit), arrays } };
@@ -4267,10 +4330,14 @@ const backpackExpansions = [
 ];
 const setupDays = 0.25;
 const collectDays = 0.25;
+const consumableBatchLimit = 4;
+const facilityOrderMultiplier = 2;
+const batchKinds = new Set(['ammo', 'food', 'pill', 'talisman']);
 
 const economyData = {
   facilities, projects, merchantOrders, warehouseStack, warehouseCap, backpackExpansions,
-  setupDays, collectDays, jobSlots: '等于设施等级',
+  setupDays, collectDays, consumableBatchLimit, facilityOrderMultiplier,
+  jobSlots: '同时制作数等于设施等级，含待领取的在册总数最多为等级的两倍',
 };
 
 function initialEconomyState() {
@@ -4328,13 +4395,19 @@ function spaceInWarehouse(state) {
   return warehouseCap[state.economy?.buildings.warehouse ?? 1];
 }
 
-function depositReason(state, id, count, kit) {
+function warehouseSpaceReason(state, goods, kit, stored = storedItems(state)) {
+  const combined = { ...stored };
+  for (const [id, count] of Object.entries(goods)) {
+    if (stored[id] && kit.records.gear[id]) return '仓库已有同名装备。';
+    combined[id] = (combined[id] ?? 0) + count;
+  }
+  return goodsVolume(combined, kit) > spaceInWarehouse(state) ? '仓架放不下了。' : '';
+}
+
+function depositReason(state, id, count, kit, stored) {
   const held = depositable(state, id, kit);
   if (held < count) return '手头没有这么多能入库的东西。';
-  const stored = storedItems(state);
-  if (stored[id] && kit.records.gear[id]) return '仓库已有同名装备。';
-  if (goodsVolume({ ...stored, [id]: (stored[id] ?? 0) + count }, kit) > spaceInWarehouse(state)) return '仓架放不下了。';
-  return '';
+  return warehouseSpaceReason(state, { [id]: count }, kit, stored);
 }
 
 function withdrawalReason(state, id, count, kit) {
@@ -4355,15 +4428,46 @@ function transferable(count, rejects) {
   return low;
 }
 
+function storeInWarehouse(state, goods, kit, wear = {}) {
+  const economy = normalizeEconomy(state);
+  for (const [id, count] of Object.entries(goods)) {
+    economy.warehouse[id] = (economy.warehouse[id] ?? 0) + count;
+    if (kit.records.gear[id]) economy.warehouseWear[id] = wear[id] ?? kit.records.gear[id].durability;
+    if (!state.knownItems.includes(id)) state.knownItems.push(id);
+  }
+}
+
+function materialStoragePlan(state, kit) {
+  const stored = { ...storedItems(state) };
+  const candidates = Object.keys(state.inventory)
+    .filter((id) => kit.records.items[id]?.kind === 'material')
+    .sort((a, b) => Number(Boolean(stored[b])) - Number(Boolean(stored[a])));
+  const plan = {};
+  for (const id of candidates) {
+    const maximum = transferable(depositable(state, id, kit), (count) => depositReason(state, id, count, kit, stored));
+    if (!maximum) continue;
+    plan[id] = maximum;
+    stored[id] = (stored[id] ?? 0) + maximum;
+  }
+  return plan;
+}
+
+function storeMaterials(state, kit) {
+  const goods = materialStoragePlan(state, kit);
+  if (!Object.keys(goods).length) return kit.refuse('没有可存的材料，或仓架已经放满。');
+  storeInWarehouse(state, goods, kit);
+  for (const [id, count] of Object.entries(goods)) kit.removeItem(state, id, count, false);
+  return kit.say(state, '存入' + kit.goodsText(goods) + '。');
+}
+
 function transfer(state, id, count, deposit, kit) {
   if (!kit.records.items[id] || !Number.isSafeInteger(count) || count < 1) return kit.refuse('请选择实际物件和件数。');
   const why = deposit ? depositReason(state, id, count, kit) : withdrawalReason(state, id, count, kit);
   if (why) return kit.refuse(why);
   const economy = normalizeEconomy(state);
   if (deposit) {
-    if (kit.records.gear[id]) economy.warehouseWear[id] = state.durability[id];
+    storeInWarehouse(state, { [id]: count }, kit, state.durability);
     kit.removeItem(state, id, count, false);
-    economy.warehouse[id] = (economy.warehouse[id] ?? 0) + count;
   } else {
     kit.addItems(state, { [id]: count });
     economy.warehouse[id] -= count;
@@ -4392,8 +4496,27 @@ function nextUpgrade(state, facility, kit) {
   return row ? { ...row, reason: kit.homeRequirements(state, row.cost, row.need) || '' } : null;
 }
 
-function activeProjects(state, id) {
+function facilityJobs(state, id) {
   return (state.economy?.jobs ?? []).filter((job) => job.facility === id);
+}
+
+const daysRemaining = (state, job) => job.readyDay - state.day > 1e-9 ? job.readyDay - state.day : 0;
+
+function productionWait(state, facility, kit) {
+  const pending = facilityJobs(state, facility).map((job) => daysRemaining(state, job)).filter(Boolean);
+  if (!pending.length) return null;
+  const remaining = Math.round(Math.min(...pending) * 1000) / 1000;
+  const affordable = Math.floor((state.satiety / kit.rules.satietyDrainPerDay) * 1000 + 1e-9) / 1000;
+  const days = Math.min(remaining, affordable);
+  return { days, ready: days === remaining, satiety: days * kit.rules.satietyDrainPerDay };
+}
+
+function waitForProduction(state, facility, kit) {
+  const wait = productionWait(state, facility, kit);
+  if (!wait) return kit.refuse('这处没有正在做的活。');
+  if (!wait.days) return kit.refuse('腹中空空，先吃点东西。');
+  kit.advance(state, wait.days);
+  return kit.say(state, wait.ready ? '等到这一单完工。' : '等了一阵，肚里没了力气。');
 }
 
 function heldGear(state, loot, kit) {
@@ -4403,8 +4526,9 @@ function heldGear(state, loot, kit) {
 function projectBlocker(state, project, facility, kit) {
   const level = effectiveLevel(state, facility);
   if (project.level > level) return `需${facility.name}${project.level}级。`;
-  const active = activeProjects(state, facility.id);
-  if (active.length >= level) return '这处还在忙。';
+  const jobs = facilityJobs(state, facility.id);
+  if (jobs.filter((job) => daysRemaining(state, job) > 0).length >= level) return '这处还在忙。';
+  if (jobs.length >= level * facilityOrderMultiplier) return '案上堆满成品了，先收一单。';
   const pending = (state.economy?.jobs ?? []).some(({ loot }) =>
     Object.keys(project.loot).some((id) => kit.records.gear[id] && loot[id]));
   if (heldGear(state, project.loot, kit) || pending) {
@@ -4413,17 +4537,45 @@ function projectBlocker(state, project, facility, kit) {
   return kit.homeRequirements(state, project.cost, project.need) || '';
 }
 
-function collectionBlocker(state, job, kit) {
+function batchLimit(project, kit) {
+  return Object.keys(project.loot).every((id) => batchKinds.has(kit.records.items[id]?.kind)) ? consumableBatchLimit : 1;
+}
+
+function orderedProject(project, count) {
+  const times = (goods) => Object.fromEntries(Object.entries(goods ?? {}).map(([id, amount]) => [id, amount * count]));
+  return { ...project, days: project.days * count, cost: project.cost * count, need: times(project.need), loot: times(project.loot) };
+}
+
+function projectOptions(state, project, facility, kit) {
+  const reason = projectBlocker(state, project, facility, kit);
+  const limit = batchLimit(project, kit);
+  const batches = !reason && limit > 1
+    ? Array.from({ length: limit - 1 }, (_, i) => {
+      const count = i + 2;
+      const order = orderedProject(project, count);
+      return { count, cost: order.cost, days: order.days, need: order.need };
+    }).filter(({ cost, need }) => !kit.homeRequirements(state, cost, need))
+    : [];
+  return { ...project, reason, batches };
+}
+
+function collectionBlocker(state, job, kit, store) {
   if (heldGear(state, job.loot, kit)) return '身边已有同名器具，先把它处置妥当。';
+  if (store) {
+    if (Object.keys(job.loot).some((id) => kit.isEvidence(kit.records.items[id]))) return '要亲手收好这批东西。';
+    return warehouseSpaceReason(state, job.loot, kit);
+  }
   if (!kit.hasRoom(state, job.loot)) return '先在行囊腾出空位。';
   return '';
 }
 
 function projectView(state, job, kit) {
-  const remaining = job.readyDay - state.day > 1e-9 ? job.readyDay - state.day : 0;
+  const remaining = daysRemaining(state, job);
   return {
     id: job.id, name: job.name, remaining, ready: remaining === 0, loot: job.loot,
     reason: remaining === 0 ? collectionBlocker(state, job, kit) : '',
+    storeReason: remaining === 0 ? collectionBlocker(state, job, kit, true) : '',
+    batches: job.batches ?? 1,
   };
 }
 
@@ -4461,8 +4613,9 @@ function economyView(state, kit) {
   for (const facility of localFacilities) {
     const definition = facilities.find(({ id }) => id === facility.id);
     facility.projects = plans.filter(({ facility: id }) => id === facility.id)
-      .map((plan) => ({ ...plan, reason: projectBlocker(state, plan, definition, kit) }));
-    facility.jobs = activeProjects(state, facility.id).map((job) => projectView(state, job, kit));
+      .map((plan) => projectOptions(state, plan, definition, kit));
+    facility.jobs = facilityJobs(state, facility.id).map((job) => projectView(state, job, kit));
+    facility.wait = productionWait(state, facility.id, kit);
   }
   const stored = storedItems(state);
   const row = (id, count, check) => ({
@@ -4470,6 +4623,7 @@ function economyView(state, kit) {
   });
   const warehouse = {
     used: goodsVolume(stored, kit), capacity: spaceInWarehouse(state),
+    materialPlan: materialStoragePlan(state, kit),
     stored: Object.entries(stored).map(([id, count]) => row(id, count, (quantity) => withdrawalReason(state, id, quantity, kit))),
     carried: Object.keys(state.inventory).map((id) => {
       const count = depositable(state, id, kit);
@@ -4491,35 +4645,38 @@ function buildFacility(state, id, kit) {
   return kit.say(state, `${facility.name}已收拾到${effectiveLevel(state, facility)}级。`);
 }
 
-function startProject(state, id, kit) {
-  const project = allProjects(state, kit).find((row) => row.id === id);
-  const facility = project && facilities.find((row) => row.id === project.facility);
+function startProject(state, id, count, kit) {
+  const plan = allProjects(state, kit).find((row) => row.id === id);
+  const facility = plan && facilities.find((row) => row.id === plan.facility);
   if (!facility || !knowsFacility(state, facility, kit)) return kit.refuse('这道作法还没打听清楚。');
+  if (!Number.isSafeInteger(count) || count < 1 || count > batchLimit(plan, kit)) return kit.refuse('这道活不能这样合批。');
+  const project = count === 1 ? plan : orderedProject(plan, count);
   const blocked = projectBlocker(state, project, facility, kit);
   if (blocked) return kit.refuse(blocked);
   kit.spendHome(state, project.cost, project.need);
   const economy = normalizeEconomy(state);
   const job = {
     id: `job-${economy.nextJob++}`, facility: facility.id, name: project.name,
-    loot: project.loot, readyDay: state.day + setupDays + project.days,
+    loot: project.loot, readyDay: state.day + setupDays + project.days, batches: count,
   };
   economy.jobs.push(job);
   kit.advance(state, setupDays);
-  return kit.say(state, `${project.name}已经开始了。过些时候再来收。`);
+  return kit.say(state, count > 1 ? project.name + '，共做' + count + '批，完工后一并收取。' : project.name + '已经开始了。过些时候再来收。');
 }
 
-function collectProject(state, id, kit) {
+function collectProject(state, id, kit, store = false) {
   const economy = normalizeEconomy(state);
   const index = economy.jobs.findIndex((job) => job.id === id);
   if (index < 0) return kit.refuse('这炉或这一畦已经收过了。');
   const job = economy.jobs[index];
-  if (job.readyDay - state.day > 1e-9) return kit.refuse('还没做完，过些时候再来收。');
-  const blocked = collectionBlocker(state, job, kit);
+  if (daysRemaining(state, job) > 0) return kit.refuse('还没做完，过些时候再来收。');
+  const blocked = collectionBlocker(state, job, kit, store);
   if (blocked) return kit.refuse(blocked);
   economy.jobs.splice(index, 1);
-  kit.addItems(state, job.loot);
+  if (store) storeInWarehouse(state, job.loot, kit);
+  else kit.addItems(state, job.loot);
   kit.advance(state, collectDays);
-  return kit.say(state, `收好${kit.goodsText(job.loot)}。`);
+  return kit.say(state, (store ? '存入仓库' : '收好') + kit.goodsText(job.loot) + '。');
 }
 
 function stockEntry(state, stallId, offer) {
@@ -4618,9 +4775,12 @@ function economyAction(state, action, { id, count = 1 }, kit) {
   const actions = {
     econDeposit: () => transfer(state, id, count, true, kit),
     econWithdraw: () => transfer(state, id, count, false, kit),
+    econStoreMaterials: () => storeMaterials(state, kit),
     econBuild: () => buildFacility(state, id, kit),
-    econStart: () => startProject(state, id, kit),
+    econStart: () => startProject(state, id, count, kit),
     econCollect: () => collectProject(state, id, kit),
+    econStoreJob: () => collectProject(state, id, kit, true),
+    econWait: () => waitForProduction(state, id, kit),
     econExpandPack: () => expandBackpack(state, id, kit),
     merchantTalk: () => merchantTalk(state, id, kit),
     merchantOrder: () => fulfillOrder(state, id, kit),
@@ -4827,6 +4987,8 @@ const rules = Object.freeze({
   pressureQi: 1,
   battleDays: 0.125,
   harvestEncounterDays: 0.125,
+  ebbCycleDays: 2,
+  ebbWindowDays: 0.625,
   retreatDays: 0.25,
   retreatDamageFactor: 0.5,
   emptyReturnDays: 0.25,
@@ -4839,6 +5001,7 @@ const rules = Object.freeze({
   guardBonus: 3,
   heavyGuardBonus: 4,
   guardCounter: 3,
+  guardQiRecovery: 2,
   enemyGuardBonus: 2,
   minAttackDamage: 1,
   durabilityLoss: 1,
@@ -5311,7 +5474,8 @@ function siteText(state, site, event) {
     state.seenChoices.includes(`${event.id}:${index}`) ? words.after : words.before);
   const stockDetails = Object.entries(site.stockText ?? {}).map(([id, words]) => stocks[id] ? words.present : words.absent);
   const creatureDetails = Object.entries(site.creatureText ?? {}).map(([id, words]) => creatures[id] ? words.present : words.absent);
-  return [changed?.[1] ?? opened?.[1] ?? event.text, ...choiceDetails, ...stockDetails, ...creatureDetails].filter(Boolean).join('');
+  const tide = site.ebbText && (ebbTimeLeft(state) > 0 ? site.ebbText.low : site.ebbText.high);
+  return [changed?.[1] ?? opened?.[1] ?? event.text, tide, ...choiceDetails, ...stockDetails, ...creatureDetails].filter(Boolean).join('');
 }
 
 function availableExperiment(state, event) {
@@ -5403,6 +5567,8 @@ function view(state) {
     combatWeapon: weaponView(state),
     intent,
     intentDamage: enemy && intent ? estimatedHit(enemy, intent) : 0,
+    retreatRisk: enemy && !inProtectedBout(state) ? retreatRisk(state, enemy, intent) : null,
+    breathingQi: intent?.kind === 'guard' ? breathingQi(state) : 0,
     discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
       (!art.prizeOnly && (!inSettlement || atHome(state)) && services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
     discoveredRecipes: knownRecipes.map(({ id }) => id),
@@ -5510,10 +5676,21 @@ function rollHarvestAmbush(state, site, ambush) {
   return state.encounterSeed / 0x100000000 < ambush.chance;
 }
 
+function ebbTimeLeft(state) {
+  return rules.ebbWindowDays - state.day % rules.ebbCycleDays;
+}
+
+function fieldToolWear(state, item) {
+  return state.equipment.offhand === item ? state.durability[item] ?? 0 : 0;
+}
+
 function gatherOptions(state, choice, site, index) {
   const foodPerBatch = (choice.days ?? 0) * rules.satietyDrainPerDay;
   // A final batch can use up the remaining food, but an empty stomach cannot start a new batch.
-  const batches = foodPerBatch ? Math.ceil(state.satiety / foodPerBatch) : Infinity;
+  const foodBatches = foodPerBatch ? Math.ceil(state.satiety / foodPerBatch) : Infinity;
+  const toolBatches = choice.fieldTool ? fieldToolWear(state, choice.fieldTool) : Infinity;
+  const tideBatches = choice.ebbOnly ? Math.max(0, Math.floor(ebbTimeLeft(state) / choice.days)) : Infinity;
+  const batches = Math.min(foodBatches, toolBatches, tideBatches);
   return choiceStocks(site, choice, index).map(({ key, id }) => {
     const yieldPerBatch = choice.loot[id];
     const maximum = Math.min(poolAt(state, site, 'stocks', key).count, yieldPerBatch * batches);
@@ -5524,6 +5701,14 @@ function gatherOptions(state, choice, site, index) {
 function choiceBlocker(state, choice, site, index) {
   if (completedSiteChoice(state, site, index)) return { reason: '这件事已经办过了。' };
   if (choice.phase === 'night' && state.day % 1 < 0.5) return { reason: choice.phaseReason ?? '等到夜里再来。' };
+  const cooldown = (state.siteCooldowns?.[site.id]?.[index] ?? 0) - state.day;
+  if (cooldown > 0) return { reason: `矿队要等下一趟下井，${Math.ceil(cooldown * 8) / 8} 日后再来。` };
+  if (choice.ebbOnly && ebbTimeLeft(state) < choice.days) {
+    return { reason: ebbTimeLeft(state) > 0 ? '水已经开始回涨，来不及绕过去再采一遍。' : '水盖过了石脊。每隔两日会退一次。' };
+  }
+  if (choice.fieldTool && !fieldToolWear(state, choice.fieldTool)) {
+    return { reason: `副手要装备完好的${nameOf(choice.fieldTool)}。` };
+  }
   if ((state.world.recovery[`${site?.id}:${choice.enemy}`] ?? 0) > state.day) return { reason: '教习收了练兵，先歇一歇再来。' };
   if (site?.creatures?.[choice.enemy] && poolAt(state, site, 'creatures', choice.enemy).count === 0) {
     const reason = records.enemies[choice.enemy]?.sparring
@@ -5603,6 +5788,7 @@ function choose(state, { index, itemId, count }) {
   let interrupted = false;
   let ambush = null;
   let completedBatches = 0;
+  let toolMessage = '';
   const coins = choice.coins ?? 0;
   const healthBefore = state.hp;
   for (let batch = 0; batch < batches; batch += 1) {
@@ -5628,6 +5814,7 @@ function choose(state, { index, itemId, count }) {
       }
     }
     advance(state, choice.days);
+    if (choice.fieldTool) toolMessage += wear(state, 'offhand');
     state.hp += hpChange;
     state.qi += choice.qi ?? 0;
     normalize(state);
@@ -5644,6 +5831,7 @@ function choose(state, { index, itemId, count }) {
     state.insight = Math.max(0, state.insight + insight);
   }
   if (completedBatches && choice.perWin) (state.siteClaims[site.id] ??= {})[index] = siteWins(state, site, choice.afterFight);
+  if (completedBatches && choice.cooldown) ((state.siteCooldowns ??= {})[site.id] ??= {})[index] = state.day + choice.cooldown;
   const { accepted, spilled } = addItems(state, completedBatches ? lootAvailable : {}, true);
   const gatheredRegion = state.region;
   const gatheredGoods = goodsText(gathered);
@@ -5661,7 +5849,7 @@ function choose(state, { index, itemId, count }) {
   const outcome = ambushText ?? choice.outcome;
   const protectedFromInjury = completedBatches > 0 && padding > 0 && `${nameOf(gatherArmor.id)}卸掉了一些力道。`;
   const detail = [completedBatches > 0 && choice.outcome, interrupted && '看守又回来了，你收手退到外面。', gatheredGoods && `采得${gatheredGoods}，留在脚边。`,
-    protectedFromInjury, ambushText, loot && `获得${loot}。`,
+    toolMessage, protectedFromInjury, ambushText, loot && `获得${loot}。`,
     insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
   const result = say(state, detail || choice.label);
   return {
@@ -5755,6 +5943,19 @@ function estimatedHit(enemy, intent) {
   return Math.ceil(enemy.atk * (intent.mult ?? 1));
 }
 
+function breathingQi(state) {
+  return Math.min(rules.guardQiRecovery, Math.max(0, stats(state).maxQi - state.qi));
+}
+
+function retreatRisk(state, enemy, intent, bonus = 0, guard = 0) {
+  const { defense, retreat: retreatBonus } = stats(state);
+  const training = trainingPerks(state, enemy, intent);
+  const reduction = clamp(retreatBonus + (state.combat.escapeBonus ?? 0) + bonus, 0, 1);
+  const damage = Math.max(0, Math.ceil(estimatedHit(enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
+    - defense - guard - training.guard);
+  return { damage, wouldFall: damage > 0 && damage >= state.hp, retreatBonus };
+}
+
 function crossRealmFactor(state, enemy) {
   return data.realms
     .filter(({ id }) => id > state.realm && id <= enemy.tier)
@@ -5838,7 +6039,9 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
   if (intent.kind === 'heal') {
     const before = state.combat.hp;
     state.combat.hp = Math.min(enemy.hp, before + Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt));
-    summary += `${enemy.name}恢复了${state.combat.hp - before}点生命。`;
+    const restored = state.combat.hp - before;
+    summary += interrupt && !restored ? `${enemy.name}调息被打断。`
+      : `${enemy.name}${interrupt ? '调息受阻，只' : ''}恢复了${restored}点生命。`;
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
   } else {
@@ -5876,11 +6079,7 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
   }
   const intent = currentIntent(state);
-  const { defense, retreat: retreatBonus } = stats(state);
-  const training = trainingPerks(state, enemy, intent);
-  const reduction = clamp(retreatBonus + state.combat.escapeBonus + bonus, 0, 1);
-  const received = Math.max(0, Math.ceil(estimatedHit(enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
-    - defense - guard - training.guard);
+  const { damage: received, retreatBonus } = retreatRisk(state, enemy, intent, bonus, guard);
   advance(state, rules.retreatDays);
   const charmDamage = retreatBonus > 0 ? wear(state, 'charm') : '';
   const armorDamage = received ? wear(state, 'armor') : '';
@@ -5907,11 +6106,12 @@ function cast(state, id) {
   state.qi -= cost;
   const focus = state.focus >= 1 ? 1 : 0;
   state.focus -= focus;
+  const { kind } = currentIntent(state);
   return combatTurn(state, {
     damage: stats(state).attack - (weaponBased ? 0 : weapon?.atk ?? 0) + (art.power ?? 0) + focus * rules.focusDamage,
     pierce: art.pierce,
     guard: art.guard,
-    interrupt: currentIntent(state).kind === 'heavy' ? art.break : 0,
+    interrupt: kind === 'heavy' || kind === 'heal' ? art.break : 0,
     wearWeapon: weaponBased && Boolean(weapon),
     hungerAffected: weaponBased,
     ammo: weaponBased ? ammo : null,
@@ -6417,6 +6617,7 @@ const economyKit = {
   data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem, startCombat,
   missingItems, payItems, hasRoom, backpackSlots, leaveOnGround, groundAt, nameOf, goodsText, normalize,
   isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure, roadProtection,
+  eatOnRoad: (state, id) => eat(state, false, id),
 };
 
 function canUseVillageAction(state, action, payload) {
@@ -6470,12 +6671,16 @@ const combatActions = {
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   combatEquip: (state, { id }) => equip(state, id, true),
   guard: (state) => {
-    const heavy = currentIntent(state).kind === 'heavy';
+    const { kind } = currentIntent(state);
+    const heavy = kind === 'heavy';
+    const recovered = kind === 'guard' ? breathingQi(state) : 0;
+    state.qi += recovered;
     return combatTurn(state, {
       guard: rules.guardBonus + (heavy ? rules.heavyGuardBonus : 0),
       counter: heavy ? rules.guardCounter : 0,
       brace: true,
-      message: heavy ? '你挡住重招，趁对手还没收招打了回去。' : '你收回手，挡在身前。',
+      message: heavy ? '你挡住重招，趁对手还没收招打了回去。'
+        : recovered ? '你趁对手守势收招调息。' : '你收回手，挡在身前。',
     });
   },
   art: (state, { id }) => cast(state, id),
@@ -6734,9 +6939,12 @@ function stats(s) {
 }
 
 function routeAction(road) {
-  const label = road.id === "village" ? "回村" : road.rescue ? `慢慢走到${road.name}` : `去${road.name}`;
+  const label = road.rescue ? `慢慢走到${road.name}` : road.id === "village" ? "回村" : `去${road.name}`;
+  const note = road.reason || [`${road.days} 日`, road.via?.length && `经 ${road.via.join("、")}`,
+    road.meals && Object.keys(road.meals).length && `途中吃 ${supplies(road.meals)}`,
+    road.emptyOnArrival && !road.rescue && "到时会空腹"].filter(Boolean).join(" · ");
   return `<div class="route-action">${linkButton(label, "travel", road.id, "", !road.available)}
-    <span class="fine">${escape(road.reason || `${road.days} 日`)}</span></div>`;
+    <span class="fine">${escape(note)}</span></div>`;
 }
 
 function siteResources(s, site) {
@@ -6794,9 +7002,10 @@ function journey(s) {
   ${s.world.crossings.map(({ label, reason }) => `<p class="fine crossing">${escape(label)} · ${escape(reason)}</p>`).join("")}`);
 }
 
-function atlasMap(province, points, selected) {
+function atlasMap(province, points, selected, route) {
   const byId = Object.fromEntries(points.map((point) => [point.id, point]));
   const paths = new Set();
+  const routeLegs = new Set((route?.path ?? []).slice(1).map((id, index) => [route.path[index], id].sort().join("/")));
   const lines = [];
   for (const point of points) {
     for (const id of data.regionDetails[point.id]?.links ?? []) {
@@ -6806,7 +7015,7 @@ function atlasMap(province, points, selected) {
       paths.add(path);
       const dx = neighbor.x - point.x;
       const dy = (neighbor.y - point.y) / 1.45;
-      lines.push(`<i aria-hidden="true" class="atlas-road" style="--x:${point.x}%;--y:${point.y}%;--length:${Math.hypot(dx, dy)}%;--angle:${Math.atan2(dy, dx)}rad"></i>`);
+      lines.push(`<i aria-hidden="true" class="atlas-road${routeLegs.has(path) ? " chosen" : ""}" style="--x:${point.x}%;--y:${point.y}%;--length:${Math.hypot(dx, dy)}%;--angle:${Math.atan2(dy, dx)}rad"></i>`);
     }
   }
   const marks = points.map(point => `<button type="button" class="atlas-mark${point.current ? " here" : ""}${point.settlement ? " town" : ""}${point.attuned ? " linked" : ""}"
@@ -6836,7 +7045,7 @@ function atlas(s) {
     `<button type="button" class="button ${id === province ? "primary" : "quiet"}" data-atlas-province="${escape(id)}" aria-pressed="${id === province}">${escape(name)}</button>`).join("");
   if (!selected) return panel("山河图", "");
   const idle = s.mode !== "event";
-  const road = idle && world.roads.find(({ id }) => id === selected.id);
+  const road = idle && world.journeys.find(({ id }) => id === selected.id);
   const gate = world.gates.find(({ id }) => id === selected.id);
   const array = idle && world.arrays.find(({ id }) => id === selected.id);
   const marks = [selected.current ? "你在这里" : "", selected.settlement ? "可歇息" : "", selected.attuned ? "传送门已点亮" : ""].filter(Boolean).join(" · ");
@@ -6854,7 +7063,7 @@ function atlas(s) {
       ${makeScroll && selected.current ? linkButton(scrollBlocker || "制备传送卷轴", "craft", recipe.id, "quiet", Boolean(scrollBlocker)) : ""}
     </div>`;
   return panel("山河图", `<div class="actions atlas-tabs" aria-label="州">${tabs}</div>
-    ${atlasMap(province, points, selected)}
+    ${atlasMap(province, points, selected, road)}
     <details class="atlas-index"${atlasIndexOpen ? " open" : ""}><summary>查已知地点</summary><div class="actions">${points.map(({ id, name }) =>
       `<button type="button" class="button quiet" data-atlas-point="${escape(id)}">${escape(name)}</button>`).join("")}</div></details>
     <div class="atlas-place"><h3>${escape(selected.name)}</h3>${marks ? tag(marks) : ""}
@@ -6936,7 +7145,7 @@ function talismanSummary(row) {
 }
 
 function artSummary(row) {
-  return ["消耗真气", row.pierce && "能穿甲", row.guard && "少受伤", row.break && "能化解重招"].filter(Boolean).join(" · ");
+  return ["消耗真气", row.pierce && "能穿甲", row.guard && "少受伤", row.break && "能截断重招与调息"].filter(Boolean).join(" · ");
 }
 
 function combatScreen(s) {
@@ -6952,18 +7161,22 @@ function combatScreen(s) {
     )).join("")}</div>
   </div>` : "";
   const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
+  const guardLabel = intent.kind === "heavy" ? "挡住重招" : s.breathingQi ? "收势调息" : "防御";
+  const retreatLabel = enemy.sparring ? "认输" : s.retreatRisk?.wouldFall ? "撤退会倒下"
+    : s.retreatRisk?.damage ? `撤退 · 追伤 ${s.retreatRisk.damage}` : "撤退 · 无追伤";
   const observation = enemy.desc ? `<details class="field-note"${combatObservation === state.combat ? " open" : ""}><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
   const techniques = arts.map(row => {
     const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" :
       weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽" : "";
-    return card(row.name, "", "", linkButton(reason || "施展", "art", row.id, "", Boolean(reason)), row.desc);
+    const action = intent.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
+    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), row.desc);
   });
   return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
     ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
-    <div class="actions">${linkButton(weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手", "attack", "", "primary")}${linkButton(intent.kind === "heavy" ? "挡住重招" : "防御", "guard")}${linkButton(enemy.sparring ? "认输" : "撤退", "retreat", "", enemy.sparring ? "quiet" : "danger")}
+    <div class="actions">${linkButton(weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手", "attack", "", "primary")}${linkButton(guardLabel, "guard")}${linkButton(retreatLabel, "retreat", "", !enemy.sparring && s.retreatRisk?.damage ? "danger" : "quiet")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
       ${s.spiritSense ? linkButton("预看再下一招", "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
     </div>
@@ -7146,8 +7359,12 @@ function storageRows(rows, action) {
 }
 
 function warehouseScreen(warehouse) {
+  const unload = Object.keys(warehouse.materialPlan).length ? `<div class="actions">
+    ${linkButton("存放原料", "econStoreMaterials", "", "quiet")}
+    <span class="fine">${escape(supplies(warehouse.materialPlan))}</span>
+  </div>` : "";
   return `<div class="storage-columns">
-    <section><h3>行囊可存</h3>${storageRows(warehouse.carried, "econDeposit")}</section>
+    <section><h3>行囊可存</h3>${unload}${storageRows(warehouse.carried, "econDeposit")}</section>
     <section><h3>仓中存货 <span class="fine">${warehouse.used}/${warehouse.capacity} 格</span></h3>
       ${storageRows(warehouse.stored, "econWithdraw")}
     </section>
@@ -7161,15 +7378,29 @@ function productionScreen(facility) {
     <div class="actions">${linkButton(upgrade.reason || (facility.level ? "扩建" : "搭建"), "econBuild", facility.id, "", Boolean(upgrade.reason))}</div>
   </div>` : "";
   const jobs = facility.jobs.map(job => card(
-    job.name, "", job.ready ? tag("已可领取") : tag(`还需 ${Number(job.remaining.toFixed(2))} 日`, "off"),
-    job.ready ? linkButton(job.reason || "收取", "econCollect", job.id, "", Boolean(job.reason)) : "",
+    job.name, "", tag(`${job.batches > 1 ? `${job.batches} 批 · ` : ""}${job.ready ? "已完工" : `还需 ${Number(job.remaining.toFixed(2))} 日`}`, job.ready ? "" : "off"),
+    `<span class="fine">${escape(supplies(job.loot))}</span>` + (job.ready ?
+      linkButton(job.reason || "收进行囊", "econCollect", job.id, "", Boolean(job.reason)) +
+      (!job.storeReason || job.storeReason === "仓架放不下了。"
+        ? linkButton(job.storeReason || "收进仓库", "econStoreJob", job.id, "quiet", Boolean(job.storeReason)) : "") : ""),
   )).join("");
+  const wait = facility.wait;
+  const waitAction = wait ? `<div class="actions">
+    ${linkButton(wait.days ? `${wait.ready ? "等到完工" : "等一阵"} · ${wait.days} 日` : "先吃点东西", "econWait", facility.id, "quiet", !wait.days)}
+    ${wait.days ? `<span class="fine">饱腹 −${Number(wait.satiety.toFixed(3))}</span>` : ""}
+  </div>` : "";
   const projects = facility.projects.map(project => {
     const badge = [project.days && `${project.days} 日`, project.cost && `${project.cost} 灵钱`].filter(Boolean).join(" · ");
+    const bulk = project.batches.length ? `<details class="route-list">
+      <summary>合批做</summary>${project.batches.map(batch => `<div class="actions">
+        ${linkButton(`做 ${batch.count} 批`, "econStart", project.id, "quiet", false, batch.count)}
+        <span class="fine">${escape([supplies(batch.need), batch.cost && `${batch.cost} 灵钱`, `${batch.days} 日`].filter(Boolean).join(" · "))}</span>
+      </div>`).join("")}
+    </details>` : "";
     return card(project.name, project.description, badge ? tag(badge, "off") : "",
-      linkButton(project.reason || "开始", "econStart", project.id, "", Boolean(project.reason)), "", project.need);
+      linkButton(project.reason || "做一批", "econStart", project.id, "", Boolean(project.reason)) + bulk, "", project.need);
   }).join("");
-  return upgradePanel + (jobs ? `<div class="card-grid">${jobs}</div>` : "") +
+  return upgradePanel + (jobs ? `<div class="card-grid">${jobs}</div>${waitAction}` : "") +
     (projects ? `<div class="card-grid">${projects}</div>` : "");
 }
 
@@ -7530,8 +7761,10 @@ function feedback(before, after, result, action) {
   if (result.ok && ["travel", "visit", "revisit"].includes(action)) {
     narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
   }
+  if (result.travelMeals) narrative = narrative.replace(/途中吃了[^。]+。/, "");
   narrative = publicText(narrative).replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
+  if (result.travelMeals) lines.push(`途中吃了${supplies(result.travelMeals)}。抵达时饱腹 ${Math.floor(after.satiety)} 点。`);
   if (gathered) {
     const place = result.gatheredRegion && result.gatheredRegion !== after.region
       ? data.sites.find(({ id }) => id === result.gatheredSite)?.name ?? data.regions.find(({ id }) => id === result.gatheredRegion)?.name
@@ -7544,11 +7777,12 @@ function feedback(before, after, result, action) {
   const didRecover = ["choose", "eat", "use", "rest"].includes(action) && after.hp > before.hp && !result.injury;
   const changes = [
     didRecover && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
+    action === "guard" && after.qi > before.qi && `真气回升 ${after.qi - before.qi} 点`,
     after.qi > before.qi && ["choose", "use", "rest"].includes(action) && !narrative.includes("真气") && "真气恢复",
     after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
     after.satiety > before.satiety && ["eat", "use"].includes(action) && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
     action === "finishGather" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
-    action === "travel" && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
+    action === "travel" && !result.travelMeals && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
     after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",
     after.coins < before.coins && ["alchemyBuyFormula", "alchemyAdvance"].includes(action) && `付出 ${before.coins - after.coins} 灵钱`,
   ].filter(Boolean);

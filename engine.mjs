@@ -33,6 +33,8 @@ export const rules = Object.freeze({
   pressureQi: 1,
   battleDays: 0.125,
   harvestEncounterDays: 0.125,
+  ebbCycleDays: 2,
+  ebbWindowDays: 0.625,
   retreatDays: 0.25,
   retreatDamageFactor: 0.5,
   emptyReturnDays: 0.25,
@@ -45,6 +47,7 @@ export const rules = Object.freeze({
   guardBonus: 3,
   heavyGuardBonus: 4,
   guardCounter: 3,
+  guardQiRecovery: 2,
   enemyGuardBonus: 2,
   minAttackDamage: 1,
   durabilityLoss: 1,
@@ -517,7 +520,8 @@ function siteText(state, site, event) {
     state.seenChoices.includes(`${event.id}:${index}`) ? words.after : words.before);
   const stockDetails = Object.entries(site.stockText ?? {}).map(([id, words]) => stocks[id] ? words.present : words.absent);
   const creatureDetails = Object.entries(site.creatureText ?? {}).map(([id, words]) => creatures[id] ? words.present : words.absent);
-  return [changed?.[1] ?? opened?.[1] ?? event.text, ...choiceDetails, ...stockDetails, ...creatureDetails].filter(Boolean).join('');
+  const tide = site.ebbText && (ebbTimeLeft(state) > 0 ? site.ebbText.low : site.ebbText.high);
+  return [changed?.[1] ?? opened?.[1] ?? event.text, tide, ...choiceDetails, ...stockDetails, ...creatureDetails].filter(Boolean).join('');
 }
 
 function availableExperiment(state, event) {
@@ -609,6 +613,8 @@ export function view(state) {
     combatWeapon: weaponView(state),
     intent,
     intentDamage: enemy && intent ? estimatedHit(enemy, intent) : 0,
+    retreatRisk: enemy && !inProtectedBout(state) ? retreatRisk(state, enemy, intent) : null,
+    breathingQi: intent?.kind === 'guard' ? breathingQi(state) : 0,
     discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
       (!art.prizeOnly && (!inSettlement || atHome(state)) && services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
     discoveredRecipes: knownRecipes.map(({ id }) => id),
@@ -716,10 +722,21 @@ function rollHarvestAmbush(state, site, ambush) {
   return state.encounterSeed / 0x100000000 < ambush.chance;
 }
 
+function ebbTimeLeft(state) {
+  return rules.ebbWindowDays - state.day % rules.ebbCycleDays;
+}
+
+function fieldToolWear(state, item) {
+  return state.equipment.offhand === item ? state.durability[item] ?? 0 : 0;
+}
+
 function gatherOptions(state, choice, site, index) {
   const foodPerBatch = (choice.days ?? 0) * rules.satietyDrainPerDay;
   // A final batch can use up the remaining food, but an empty stomach cannot start a new batch.
-  const batches = foodPerBatch ? Math.ceil(state.satiety / foodPerBatch) : Infinity;
+  const foodBatches = foodPerBatch ? Math.ceil(state.satiety / foodPerBatch) : Infinity;
+  const toolBatches = choice.fieldTool ? fieldToolWear(state, choice.fieldTool) : Infinity;
+  const tideBatches = choice.ebbOnly ? Math.max(0, Math.floor(ebbTimeLeft(state) / choice.days)) : Infinity;
+  const batches = Math.min(foodBatches, toolBatches, tideBatches);
   return choiceStocks(site, choice, index).map(({ key, id }) => {
     const yieldPerBatch = choice.loot[id];
     const maximum = Math.min(poolAt(state, site, 'stocks', key).count, yieldPerBatch * batches);
@@ -730,6 +747,14 @@ function gatherOptions(state, choice, site, index) {
 function choiceBlocker(state, choice, site, index) {
   if (completedSiteChoice(state, site, index)) return { reason: '这件事已经办过了。' };
   if (choice.phase === 'night' && state.day % 1 < 0.5) return { reason: choice.phaseReason ?? '等到夜里再来。' };
+  const cooldown = (state.siteCooldowns?.[site.id]?.[index] ?? 0) - state.day;
+  if (cooldown > 0) return { reason: `矿队要等下一趟下井，${Math.ceil(cooldown * 8) / 8} 日后再来。` };
+  if (choice.ebbOnly && ebbTimeLeft(state) < choice.days) {
+    return { reason: ebbTimeLeft(state) > 0 ? '水已经开始回涨，来不及绕过去再采一遍。' : '水盖过了石脊。每隔两日会退一次。' };
+  }
+  if (choice.fieldTool && !fieldToolWear(state, choice.fieldTool)) {
+    return { reason: `副手要装备完好的${nameOf(choice.fieldTool)}。` };
+  }
   if ((state.world.recovery[`${site?.id}:${choice.enemy}`] ?? 0) > state.day) return { reason: '教习收了练兵，先歇一歇再来。' };
   if (site?.creatures?.[choice.enemy] && poolAt(state, site, 'creatures', choice.enemy).count === 0) {
     const reason = records.enemies[choice.enemy]?.sparring
@@ -809,6 +834,7 @@ function choose(state, { index, itemId, count }) {
   let interrupted = false;
   let ambush = null;
   let completedBatches = 0;
+  let toolMessage = '';
   const coins = choice.coins ?? 0;
   const healthBefore = state.hp;
   for (let batch = 0; batch < batches; batch += 1) {
@@ -834,6 +860,7 @@ function choose(state, { index, itemId, count }) {
       }
     }
     advance(state, choice.days);
+    if (choice.fieldTool) toolMessage += wear(state, 'offhand');
     state.hp += hpChange;
     state.qi += choice.qi ?? 0;
     normalize(state);
@@ -850,6 +877,7 @@ function choose(state, { index, itemId, count }) {
     state.insight = Math.max(0, state.insight + insight);
   }
   if (completedBatches && choice.perWin) (state.siteClaims[site.id] ??= {})[index] = siteWins(state, site, choice.afterFight);
+  if (completedBatches && choice.cooldown) ((state.siteCooldowns ??= {})[site.id] ??= {})[index] = state.day + choice.cooldown;
   const { accepted, spilled } = addItems(state, completedBatches ? lootAvailable : {}, true);
   const gatheredRegion = state.region;
   const gatheredGoods = goodsText(gathered);
@@ -867,7 +895,7 @@ function choose(state, { index, itemId, count }) {
   const outcome = ambushText ?? choice.outcome;
   const protectedFromInjury = completedBatches > 0 && padding > 0 && `${nameOf(gatherArmor.id)}卸掉了一些力道。`;
   const detail = [completedBatches > 0 && choice.outcome, interrupted && '看守又回来了，你收手退到外面。', gatheredGoods && `采得${gatheredGoods}，留在脚边。`,
-    protectedFromInjury, ambushText, loot && `获得${loot}。`,
+    toolMessage, protectedFromInjury, ambushText, loot && `获得${loot}。`,
     insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
   const result = say(state, detail || choice.label);
   return {
@@ -961,6 +989,19 @@ function estimatedHit(enemy, intent) {
   return Math.ceil(enemy.atk * (intent.mult ?? 1));
 }
 
+function breathingQi(state) {
+  return Math.min(rules.guardQiRecovery, Math.max(0, stats(state).maxQi - state.qi));
+}
+
+function retreatRisk(state, enemy, intent, bonus = 0, guard = 0) {
+  const { defense, retreat: retreatBonus } = stats(state);
+  const training = trainingPerks(state, enemy, intent);
+  const reduction = clamp(retreatBonus + (state.combat.escapeBonus ?? 0) + bonus, 0, 1);
+  const damage = Math.max(0, Math.ceil(estimatedHit(enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
+    - defense - guard - training.guard);
+  return { damage, wouldFall: damage > 0 && damage >= state.hp, retreatBonus };
+}
+
 function crossRealmFactor(state, enemy) {
   return data.realms
     .filter(({ id }) => id > state.realm && id <= enemy.tier)
@@ -1044,7 +1085,9 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
   if (intent.kind === 'heal') {
     const before = state.combat.hp;
     state.combat.hp = Math.min(enemy.hp, before + Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt));
-    summary += `${enemy.name}恢复了${state.combat.hp - before}点生命。`;
+    const restored = state.combat.hp - before;
+    summary += interrupt && !restored ? `${enemy.name}调息被打断。`
+      : `${enemy.name}${interrupt ? '调息受阻，只' : ''}恢复了${restored}点生命。`;
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
   } else {
@@ -1082,11 +1125,7 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
   }
   const intent = currentIntent(state);
-  const { defense, retreat: retreatBonus } = stats(state);
-  const training = trainingPerks(state, enemy, intent);
-  const reduction = clamp(retreatBonus + state.combat.escapeBonus + bonus, 0, 1);
-  const received = Math.max(0, Math.ceil(estimatedHit(enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
-    - defense - guard - training.guard);
+  const { damage: received, retreatBonus } = retreatRisk(state, enemy, intent, bonus, guard);
   advance(state, rules.retreatDays);
   const charmDamage = retreatBonus > 0 ? wear(state, 'charm') : '';
   const armorDamage = received ? wear(state, 'armor') : '';
@@ -1113,11 +1152,12 @@ function cast(state, id) {
   state.qi -= cost;
   const focus = state.focus >= 1 ? 1 : 0;
   state.focus -= focus;
+  const { kind } = currentIntent(state);
   return combatTurn(state, {
     damage: stats(state).attack - (weaponBased ? 0 : weapon?.atk ?? 0) + (art.power ?? 0) + focus * rules.focusDamage,
     pierce: art.pierce,
     guard: art.guard,
-    interrupt: currentIntent(state).kind === 'heavy' ? art.break : 0,
+    interrupt: kind === 'heavy' || kind === 'heal' ? art.break : 0,
     wearWeapon: weaponBased && Boolean(weapon),
     hungerAffected: weaponBased,
     ammo: weaponBased ? ammo : null,
@@ -1623,6 +1663,7 @@ const economyKit = {
   data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem, startCombat,
   missingItems, payItems, hasRoom, backpackSlots, leaveOnGround, groundAt, nameOf, goodsText, normalize,
   isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure, roadProtection,
+  eatOnRoad: (state, id) => eat(state, false, id),
 };
 
 function canUseVillageAction(state, action, payload) {
@@ -1676,12 +1717,16 @@ const combatActions = {
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   combatEquip: (state, { id }) => equip(state, id, true),
   guard: (state) => {
-    const heavy = currentIntent(state).kind === 'heavy';
+    const { kind } = currentIntent(state);
+    const heavy = kind === 'heavy';
+    const recovered = kind === 'guard' ? breathingQi(state) : 0;
+    state.qi += recovered;
     return combatTurn(state, {
       guard: rules.guardBonus + (heavy ? rules.heavyGuardBonus : 0),
       counter: heavy ? rules.guardCounter : 0,
       brace: true,
-      message: heavy ? '你挡住重招，趁对手还没收招打了回去。' : '你收回手，挡在身前。',
+      message: heavy ? '你挡住重招，趁对手还没收招打了回去。'
+        : recovered ? '你趁对手守势收招调息。' : '你收回手，挡在身前。',
     });
   },
   art: (state, { id }) => cast(state, id),

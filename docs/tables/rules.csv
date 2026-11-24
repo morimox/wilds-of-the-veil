@@ -12,6 +12,8 @@ pressureThreshold,3,探索压力高于此值时开始额外消耗真气（点）
 pressureQi,1,压力超限的每次探索所消耗的真气（点）
 battleDays,0.125,战斗操作每回合用时（天）
 harvestEncounterDays,0.125,采集中遭遇伏击时开打前用时（天）
+ebbCycleDays,2,闭潮渡退水循环（游戏日）
+ebbWindowDays,0.625,每次退水维持时间（游戏日）
 retreatDays,0.25,撤出战斗所需用时（天）
 retreatDamageFactor,0.5,脱身时先乘此值，再计算减伤和防御
 emptyReturnDays,0.25,空腹返村额外用时（天）
@@ -24,6 +26,7 @@ unpackBasketDays,0.25,拆开药篓所用的游戏天数
 guardBonus,3,主动格挡增加的防御（点）
 heavyGuardBonus,4,主动格挡遇到重招时再增加的防御（点）
 guardCounter,3,格挡重招时的反击伤害（点）
+guardQiRecovery,2,对方守势时调息恢复的真气（点）
 enemyGuardBonus,2,敌方防御意图至少增加的防御（点）
 minAttackDamage,1,有攻击伤害的行动经防御结算后的最小伤害（点）
 durabilityLoss,1,每次触发装备磨损扣除的耐久（点）
@@ -51,3 +54,5 @@ backpackCapacity,12,行囊格数。已装备物品和关键线索不占格
 backpackStackSize,20,同种可堆叠物品每格上限
 setupDays,0.25,每次开启生产的操作耗时（日）
 collectDays,0.25,每次领取成品的操作耗时（日）
+consumableBatchLimit,4,常用消耗品每单合批数上限；材料、灵钱和工期照批数累加
+facilityOrderMultiplier,2,工位开工及待领总单数上限为设施等级乘此数

@@ -25,7 +25,7 @@ test('each patch of reeds describes its own depletion and regrowth', () => {
   assert.match(scene(state), /能挖芯的白苇.*长实的苇芯/);
   gather(state, 0, 'reed');
   assert.match(scene(state), /踏石边翻过的泥里只剩.*回水湾里还有长实/);
-  assert.deepEqual(view(state).visibleChoices.map(({ available }) => available), [false, true]);
+  assert.deepEqual(view(state).visibleChoices.map(({ available }) => available), [false, true, true]);
   gather(state, 1, 'reed');
   assert.match(scene(state), /踏石边翻过的泥.*回水湾那丛采过了/);
 

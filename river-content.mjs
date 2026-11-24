@@ -11,10 +11,10 @@ const regions = [
 ];
 
 const regionDetails = {
-  village: { province: 'wuliang', x: 14, y: 53, links: ['marsh', 'reed_meadows'], portal: true, array: true,
+  village: { province: 'wuliang', x: 14, y: 53, links: ['marsh', 'reed_meadows', 'pine_ridge'], portal: true, array: true,
     settlement: { type: '村庄', repair: { name: '落灯村工坊', description: '裴匠和迟师傅轮着照看炉火。磨刃、补甲和修佩件都可以拿过去。', surcharge: 0 } } },
-  marsh: { province: 'wuliang', x: 28, y: 68, links: ['village', 'ridge', 'reed_meadows', 'pale_shoal', 'undertow_grotto'] },
-  ridge: { province: 'wuliang', x: 47, y: 60, links: ['marsh', 'ford', 'screen_slope', 'counter_bell'] },
+  marsh: { province: 'wuliang', x: 28, y: 68, links: ['village', 'ridge', 'ford', 'reed_meadows', 'pale_shoal', 'undertow_grotto'] },
+  ridge: { province: 'wuliang', x: 47, y: 60, links: ['marsh', 'ford', 'screen_slope', 'counter_bell', 'black_mine'] },
   ford: { province: 'wuliang', x: 73, y: 74, links: ['ridge', 'hidden', 'pine_ridge', 'fish_ladder', 'willow_post', 'zhao_city'] },
   hidden: { province: 'wuliang', x: 91, y: 89, links: ['ford'] },
   pine_ridge: { province: 'wuliang', x: 66, y: 45, links: ['ford', 'kiln_valley', 'screen_slope', 'lantern_court'] },
@@ -130,7 +130,7 @@ const events = [
   { id: 'shoal_baskets', name: '灰鹭晒篮处', text: '岸边水浅，鹭草露着细根。下游的石缝里常积些水冲上来的灵晶。白宜坐在两处中间，拿针给旧鞋补眼。', choices: [
     { label: '拔岸边露根的鹭草', days: 0.5, insight: 1, loot: { reed: 2 }, outcome: '抓住露头的草叶轻轻一拽，草根上成团的白泥落回水边。' },
     { label: '拨开浅石捡晶砂', days: 0.625, insight: 2, loot: { core: 1 }, outcome: '阳光照进浅滩，洗过的砂里有些灵晶能捡。' },
-    { label: '问白宜哪边的滩好走', days: 0.25, insight: 1, loot: {}, outcome: '白宜把鞋上的线咬断。「沿干石走。白苇后有人高的石缝，我年轻时进去过，潮一转，人又被挤回原岸。照原有个管水的也去看过。」她指了指旧渡，说那边还有给人送木料的商船。' },
+    { label: '问白宜哪边的滩好走', days: 0.25, insight: 1, loot: {}, outcome: '白宜把鞋上的线咬断。「回白苇滩，沿干石绕到深水背后，芦苇里有半扇石门。我年轻时进去过，潮一转，人又被推回岸上。照原有个管水的也去看过。」她指了指旧渡，说那边还有给人送木料的商船。' },
   ] },
   { id: 'ladder_drop', name: '第三级闸口', text: '上头的木梁低，涨水时漂来的枝条容易挂在上面。第二级阶没在及膝的水里，再往下才是排矿渣的槽。钓客岑响坐在水边的石凳上。', choices: [
     { label: '取上层木梁上的枯枝', days: 0.75, insight: 1, loot: { wood: 3 }, outcome: '枝条一松，露出木梁被水泡深的纹路。' },
@@ -201,7 +201,8 @@ const events = [
 ];
 
 export const extendSites = [
-  { id: 'undertow_door', region: 'marsh', name: '反潮石门', once: [1, 2],
+  { id: 'undertow_door', region: 'marsh', name: '反潮石门', afterChoices: ['shoal_baskets:2', 'marsh_pole_lesson:0'],
+    reveal: { item: 'undertow_wedge' }, once: [1, 2],
     afterOnceText: { 1: '新铁楔卡在旧槽里，绳子通向高处的石阶。外侧的潮水还会倒流，过洞口时可以抓住绳子。' } },
   { id: 'marsh_pole_lesson', region: 'marsh', name: '封乔的护堤木台', once: [0, 2], protectedArena: true,
     creatures: { river_spar_captain: animal(1, 1, 5, 1) },
@@ -224,7 +225,7 @@ export const extendEvents = [
     { label: '用校潮亭的印纸对照潮水方向', desc: '石槽边的浅痕正对着倒流的潮水，和印纸最下面几道痕同向。', hidden: true, need: { river_gauge_copy: 1 }, days: 0.25, insight: 2, outcome: '印纸贴在槽边，最后两道线只从内侧湿起。绳子会随水换方向，固定它的铁件得同时卡住槽的两头。' },
   ] },
   { id: 'marsh_pole_lesson', name: '封乔的护堤木台', text: '护堤人封乔常年领村里的河工。他把湿麻绳拴在矮台外，留下近处一截给练手的人扶。台边立着长杆和软头杆。', choices: [
-    { label: '问封乔河里出了什么事', days: 0.125, insight: 1, outcome: '封乔指着台下被卷碎的苇筏。「深水里有条大兽，爱伏在石门旁。它不来浅岸。我守的是河工，你别顺深水去追。」' },
+    { label: '问封乔河里出了什么事', days: 0.125, insight: 1, outcome: '封乔指着台下被卷碎的苇筏。「沿岸过第三丛高苇，浅石后就是石门。里头有条大兽，浅岸它倒不来。我守的是河工，你别顺深水去追。」' },
     { label: '拿练习杆，和封乔切磋', desc: '他把麻绳放松一截。「站不稳就叫停，别跌进水里。」', days: 0.25, enemy: 'river_spar_captain', outcome: '河工守在台边。封乔换了根软头短杆，朝你让出几步。' },
     { label: '接过封乔的试杆签', desc: '封乔放下短杆，取了一支先前用红布系好的木签。', afterFight: 'river_spar_captain', days: 0.125, insight: 4, loot: { river_trial_writ: 1 }, outcome: '封乔在木签上按了手印。「夜里水响，赶路靠脚稳。折水驿要托人带急信，你肯帮忙，就拿这个给他们看。」' },
   ] },

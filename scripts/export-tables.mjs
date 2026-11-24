@@ -58,6 +58,9 @@ const ruleDescriptions = {
   emptyAttackMultiplier: '空腹交手时对普通与兵刃术诀出伤的倍率',
   unpackBasketDays: '拆开药篓所用的游戏天数',
   guardBonus: '主动格挡增加的防御（点）',
+  guardQiRecovery: '对方守势时调息恢复的真气（点）',
+  ebbCycleDays: '闭潮渡退水循环（游戏日）',
+  ebbWindowDays: '每次退水维持时间（游戏日）',
   heavyGuardBonus: '主动格挡遇到重招时再增加的防御（点）',
   guardCounter: '格挡重招时的反击伤害（点）',
   enemyGuardBonus: '敌方防御意图至少增加的防御（点）',
@@ -310,6 +313,8 @@ const ruleRows = Object.entries({ ...data.rules, ...rules })
 ruleRows.push(
   { id: 'setupDays', value: economyData.setupDays, desc: '每次开启生产的操作耗时（日）' },
   { id: 'collectDays', value: economyData.collectDays, desc: '每次领取成品的操作耗时（日）' },
+  { id: 'consumableBatchLimit', value: economyData.consumableBatchLimit, desc: '常用消耗品每单合批数上限；材料、灵钱和工期照批数累加' },
+  { id: 'facilityOrderMultiplier', value: economyData.facilityOrderMultiplier, desc: '工位开工及待领总单数上限为设施等级乘此数' },
 );
 const normalHit = (enemy) => [...new Set(enemy.intents.filter(({ kind }) => kind === 'attack')
   .map(({ mult }) => Math.ceil(enemy.atk * (mult ?? 1))))].join(' / ');
@@ -393,7 +398,7 @@ const tables = [
     'id', 'name', ['level', '设施等级'], ['slots', '仓储格数或并行工位数'],
     ['stack', '仓库每格堆叠上限'], ['reveal', '看见设施需实际取得的物件', ref], ['alternateReveal', '另一件可引出设施的物件', ref],
     'need', ['cost', '搭建扩建费用（灵钱）'], 'days', 'desc',
-  ], { note: '起始仓库已经可用。等级 0 的生产设施需要先搭建。生产工位数与等级相等，仓库单列实际格数。' }),
+  ], { note: '起始仓库已经可用。等级 0 的生产设施需要先搭建。生产工位数与等级相等，完工单移出工位。开工及待领总单数最多为设施等级的两倍，仓库单列实际格数。' }),
   table('backpack-expansions', '行囊和乾坤袋', [
     { name: '行囊', capacity: rules.backpackCapacity, source: '初来落灯村' },
     ...economyData.backpackExpansions,
@@ -405,7 +410,7 @@ const tables = [
     'id', 'name', ['facility', '使用设施', facilityRef], ['level', '所需设施等级'],
     'need', 'loot', ['cost', '费用（灵钱）'], ['days', '等待成熟天数'],
     ['reveal', '来源线索', ref], ['description', '现场说明'],
-  ], { note: '炼丹和锻造的批次产量与投入见制作用方。操作后世界时间继续走，成熟后需要当面收取。' }),
+  ], { note: '炼丹和锻造的批次产量与投入见制作用方。常用品可合批，产量、材料、灵钱和工期按批数结算。成熟后可到后院收取，普通成品也可直接入仓。' }),
   table('gear', '装备', gated(described(data.gear)), [
     'id', 'name', 'slot', ['weaponClass', '兵刃类别', (id) => weaponClass[id] ?? id],
     ['hands', '用几只手'], ['brace', '主动架重招减伤'],
@@ -496,7 +501,7 @@ const tables = [
     ['emptyText', '地点耗尽时可见情形'], ['afterOnceText', '一次性行动后的场景'],
     ['afterWinText', '当地胜利后的场景', (entries) => Object.entries(entries).map(([id, text]) => `${ref(id)}：${text}`).join('、')],
     ['stockText', '依各处资源存量出现的景象'], ['choiceText', '可同时出现的行动前后景象'],
-    ['creatureText', '动物存在或耗尽时的景象'],
+    ['creatureText', '动物存在或耗尽时的景象'], ['ebbText', '退水及涨水景象'],
   ], { omit: ['stocks', 'creatures'], note: '发现条件为空即是入境可见的地标。隐蔽地点需遇到相应的指路、岔路或物证。发现后会持续显示。' }),
   table('world-regrowth', '各地点库存与种群', worldPools, [
     ['site', '地点', siteRef], ['kind', '类型', valueText], ['object', '资源或敌人', ref],
@@ -521,7 +526,9 @@ const tables = [
     'need', 'consume', 'hidden', 'loot', 'enemy', ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
     ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
     ['guardedBy', '在场会挡住选择的对手', ref], ['ambush', '有对手时每批采集伏击', ({ enemy, chance }) => `${ref(enemy)} · ${percent(chance)}`],
-    ['phase', '昼夜要求', (phase) => phase === 'night' ? '入夜后' : phase], ['phaseReason', '未到时的提示'], ['stay', '执行后留在原地'],
+    ['phase', '昼夜要求', (phase) => phase === 'night' ? '入夜后' : phase], ['phaseReason', '未到时的提示'],
+    ['ebbOnly', '须在退水期间做完'], ['fieldTool', '副手须持完好采集工具', ref], ['cooldown', '完成后复做间隔（游戏日）'],
+    ['stay', '执行后留在原地'],
     ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
   ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排。每点一次、完成一批，所得先放在当前具体地点。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),
   table('mechanisms', '现场机关与试错', mechanismRows, [

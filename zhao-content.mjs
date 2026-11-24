@@ -78,8 +78,8 @@ const enemies = [
     loot: { beast_meat: 5, hide: 3, foundation_core: 1 } },
   { id: 'zhao_moss_turtle', name: '苔背泽鳖', tier: 2, hp: 54, atk: 13, def: 7, tags: ['beast', 'scaled'], insight: 4,
     intents: [{ kind: 'guard', name: '缩颈顶起背甲', mult: 1.35 }, attack('侧转咬向脚腕'), heavy('抬甲掀开脚下的泥')],
-    desc: '远看像一截生了苔的浮石。它缩颈时背甲朝上，侧转探头咬人时，肩边会露一道甲缝。',
-    loot: { beast_meat: 4, beast_eye: 1, qi_core: 3 } },
+    desc: '远看像一截生了苔的浮石。它侧转探头时，肩边会露一道甲缝。甲缘那圈厚皮浸水也折不断，裁下来能给护具包边。',
+    loot: { beast_meat: 3, hide: 4, qi_core: 2 } },
   { id: 'zhao_rush_eel', name: '缠藻泥鳗', tier: 1, hp: 36, atk: 11, def: 3, tags: ['beast', 'scaled'], insight: 3,
     intents: [attack('从藻下叼住鞋边'), attack('翻尾把人拖进浅沟', 1.12), heavy('缠住脚后猛拽', 1.48)],
     desc: '这鳗在水藻下贴泥而游。咬住东西就会把尾绕在石根上，借那一绕往回拖。',
@@ -160,7 +160,9 @@ scene('flood_market', 'zhao_float_goods', '三姓木码头', '船腹贴着木台
   gather('捡码头木台下的松枝', '撞断的枝条在台下随水摇晃。', 'wood', 4, 0.5, '你抽出还能用的松枝，掰掉泡烂的皮。'),
   { label: '问余节那只布袋怎么装得下渔网', afterChoice: 0, days: 0.125, loot: { qiankun_pattern: 1 },
     outcome: '余节解开袋口，翻出一截里衬。「这叫乾坤袋。我上一只给鱼钩划烂了，袋底还在。你带去给会缝皮子的人看看。」他从木箱里取出那块旧袋底递给你。' },
-], { once: [0, 2], stocks: { wood: stock('晒台松枝', 5, 9, 4, 3, 1) },
+  { label: '问晒网上的晶砂从哪来', desc: '摊开的湿网里嵌着几粒透亮的砂。', days: 0.125, stay: true,
+    outcome: '余节拈出一粒放到掌心。「往南过粮仓，就是碎琉璃滩。我妹妹常去，两三筛便够磨刀用。若是要暗金，往关前走，认拴着绳的沙洼。踩在绳外就能筛。」' },
+], { once: [0, 2, 3], stocks: { wood: stock('晒台松枝', 5, 9, 4, 3, 1) },
   afterOnceText: { 0: '新木撑稳了晒架。余节正收另一张齐肩高的干网，往腰间的布袋里一送，网全进去了。那袋才一掌宽，仍旧瘪着。', 2: '余节束起布袋口，拍掉新木撑上的木屑。木台下有两根横梁，上游的漂枝常卡在缝里。' } });
 
 scene('measuring_hall', 'zhao_bamboo_duel', '竹尺庭', '砖圈外的弟子喊了声「傅师父」。那人双脚没挪，竹尺一挑，滚到背后的石珠便落进他左手。他把珠子搁回窗台，示意你进来说话。', [
@@ -211,7 +213,7 @@ scene('scale_bog', 'zhao_scales', '青膜硬埂', '一条硬埂把浅水和泥�
   { label: '踩上土堤，循爪印往前找', desc: '两行带蹼的足印进了水藻，再往外就断了。', days: 0.25, enemy: 'mud_shrike' },
   { ...gather('挖浅水边的铁砂', '站在岸边，弯腰就够得着泥。', 'ore', 6, 1, '你淘出不少裹在水藻里的寒铁。'),
     ambush: { enemy: 'mud_shrike', chance: 0.3, outcome: '水藻下面突然溅起一脸泥。一只鬃犬跳上浅岸，挡了过来。' } },
-  { label: '沿水湾的露石去看浮起的背甲', desc: '那块生苔的背甲往深处沉了一寸，又抬起来。', days: 0.25, enemy: 'zhao_moss_turtle',
+  { label: '沿水湾的露石去看浮起的背甲', desc: '生苔的背甲往深处沉了一寸，又抬起来。甲缘有一圈厚皮，擦过露石也没见破。', days: 0.25, enemy: 'zhao_moss_turtle',
     outcome: '背甲转了半圈，苔底先露出一双眼。泽鳖贴着脚下的泥扑了过来。' },
   { label: '到北边浅滩寻火斑大蛙', desc: '蛙背塘流来的水刚没过碎石，踩在水里也看得到腿边。', days: 0.125, enemy: 'glass_frog',
     outcome: '一团红斑从齐脚深的水里跃出来，两腮一鼓，就跳到了石脊上。' },

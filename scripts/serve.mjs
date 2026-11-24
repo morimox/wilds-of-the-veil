@@ -5,14 +5,13 @@ import { extname } from "node:path";
 const root = new URL("../", import.meta.url);
 const port = Number(process.env.PORT || 4173);
 const types = { ".html": "text/html", ".css": "text/css", ".mjs": "text/javascript", ".webp": "image/webp", ".png": "image/png" };
-const pages = new Set([
-  "/index.html", "/game.html", "/app.mjs", "/engine.mjs", "/data.mjs", "/economy.mjs", "/alchemy.mjs", "/style.css", "/intro.css",
-  "/world.mjs", "/training.mjs", "/river-content.mjs", "/zhao-content.mjs", "/sand-content.mjs", "/late-content.mjs", "/puzzle-content.mjs", "/mechanisms.mjs", "/tournament.mjs",
-]);
+const pages = new Set(["/index.html", "/game.html", "/style.css", "/intro.css"]);
+const sourceModule = /^\/[a-z][a-z-]*\.mjs$/;
+const gameImage = /^\/assets\/[a-z-]+\.(webp|png)$/;
 
 createServer(async (request, response) => {
   const pathname = new URL(request.url, "http://localhost").pathname.replace(/^\/$/, "/game.html");
-  if (!pages.has(pathname) && !/^\/assets\/[a-z-]+\.(webp|png)$/.test(pathname)) {
+  if (!pages.has(pathname) && !sourceModule.test(pathname) && !gameImage.test(pathname)) {
     response.writeHead(404).end("Not found");
     return;
   }

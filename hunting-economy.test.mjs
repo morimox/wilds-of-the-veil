@@ -84,7 +84,7 @@ test('the renewable snow beast yields two foundation cores that sell for 21 each
   // Start with earned equipment already fitted to isolate the snow fight and its population clock.
   state.realm = 3;
   state.region = 'snow_pass';
-  state.discovered.push('snow_pass');
+  state.discovered.push('ridge', 'black_mine', 'snow_pass');
   state.equipment = { weapon: 'sky_sword', armor: 'sky_cloak', charm: 'jade_pendant' };
   state.inventory = { ration: 14, sky_sword: 1, sky_cloak: 1, jade_pendant: 1 };
   for (const id of Object.values(state.equipment)) {

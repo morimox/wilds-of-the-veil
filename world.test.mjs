@@ -68,6 +68,8 @@ test('three provinces expose only situationally known points and roads with exac
   deniedWithoutChanges(state, 'travel', { id: 'mingsha_city' }, /找.*路/);
   state.knownItems.push('sand_writ');
   play(state, 'wait');
+  state.satiety = 100;
+  state.inventory.ration = 1;
   const west = view(state).world.roads.find(({ id }) => id === 'mingsha_city');
   assert.equal(west.days, 6.5);
   assert.ok(west.available);
@@ -80,6 +82,7 @@ test('all sixty world points sit on real connected roads once all clues are know
   state.knownItems.push(...data.items.map(({ id }) => id));
   state.completedQuests.push(...data.quests.map(({ id }) => id));
   state.inventory = Object.fromEntries(data.items.filter(({ kind }) => kind === 'key').map(({ id }) => [id, 1]));
+  state.inventory.ration = 2;
   const reachable = new Set([state.region]);
   const arrivals = [state];
   for (let index = 0; index < arrivals.length; index += 1) {
@@ -103,6 +106,48 @@ test('all sixty world points sit on real connected roads once all clues are know
     assert.ok(points.some(({ settlement }) => settlement));
     assert.equal(points.filter(({ array }) => array).length, 1);
   }
+});
+
+test('a known distant destination shows its intermediate roads and cannot skip an unknown link', () => {
+  const state = createGame();
+  state.discovered.push('sky_terrace');
+  assert.equal(view(state).world.journeys.some(({ id }) => id === 'sky_terrace'), false);
+  deniedWithoutChanges(state, 'travel', { id: 'sky_terrace' }, /接不上|接上/);
+  state.discovered.push('ridge', 'black_mine', 'snow_pass');
+  const journey = view(state).world.journeys.find(({ id }) => id === 'sky_terrace');
+  assert.deepEqual(journey.path, ['village', 'marsh', 'ridge', 'black_mine', 'snow_pass', 'sky_terrace']);
+  assert.deepEqual(journey.via, ['白苇滩', '沉钟岭', '玄砂矿脉', '碎云雪关']);
+  assert.ok(journey.days > data.regions.find(({ id }) => id === 'sky_terrace').travel);
+  assert.equal(view(state).world.roads.some(({ id }) => id === 'sky_terrace'), false);
+  assert.deepEqual(journey.meals, { ration: 2 });
+  const day = state.day;
+  play(state, 'travel', { id: 'sky_terrace' });
+  assert.equal(state.region, 'sky_terrace');
+  assert.equal(state.day - day, journey.days);
+  assert.equal(state.inventory.ration, 1);
+  assert.ok(state.satiety >= 20);
+  assert.deepEqual(state.eventsSeen, {});
+});
+
+test('a cross-province passage consumes only the quoted meals and rejects an underprepared departure', () => {
+  const state = createGame();
+  state.region = 'zhao_pass';
+  state.discovered.push('zhao_pass', 'mingsha_city');
+  state.knownItems.push('sand_writ');
+  state.satiety = 100;
+  delete state.inventory.ration;
+  const route = () => view(state).world.roads.find(({ id }) => id === 'mingsha_city');
+  assert.equal(route().available, false);
+  deniedWithoutChanges(state, 'travel', { id: 'mingsha_city' }, /口粮还不够/);
+  state.inventory.ration = 2;
+  const day = state.day;
+  const quoted = route();
+  assert.deepEqual(quoted.meals, { ration: 1 });
+  assert.equal(quoted.days, 6.5);
+  assert.match(play(state, 'travel', { id: 'mingsha_city' }).message, /途中吃了干粮×1/);
+  assert.equal(state.day - day, quoted.days);
+  assert.equal(state.satiety, 28);
+  assert.equal(state.inventory.ration, 1);
 });
 
 test('the Zhaoyuan city seller gives the physical scale clue once without requiring a purchase or bag slot', () => {

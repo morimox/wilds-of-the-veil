@@ -38,6 +38,7 @@ r_sky_cloak,合纹披甲（sky_cloak）,1,3,筑基初期,36,兽革（hide）×8�
 r_jade_pendant,照腕佩（jade_pendant）,1,3,筑基初期,26,灵晶（core）×5、兽革（hide）×3、妖目（beast_eye）×1,3,得知物品 落影调枢图（axis_tuning）,,,锻炉（forge）,2
 r_star_blade,暗星刀（star_blade）,1,2,炼气后期,35,暗金（black_iron）×9、寒铁（ore）×5、灵晶（core）×4、松木（wood）×3,4,得知物品 暗星刀匣底图（star_blade_pattern）,,,锻炉（forge）,2
 r_hide_shield,包革小盾（hide_shield）,1,0,炼气初期,8,松木（wood）×4、兽革（hide）×3,1.25,,是,,锻炉（forge）,
+r_miner_pick,短柄矿镐（miner_pick）,1,0,炼气初期,8,寒铁（ore）×4、松木（wood）×2,1.5,得知物品 厚脊剑坯样（blade_template）,,,锻炉（forge）,
 r_resin_pill,温枝丸（resin_pill）,3,1,炼气中期,6,松木（wood）×3、灵草（reed）×3、炼气期妖丹（qi_core）×1,2,,,温枝丸丹方（formula_resin）,炼丹炉（furnace）,
 r_leaf_pill,清脉饮（leaf_pill）,3,2,炼气后期,10,灵草（reed）×4、耐火泥（kiln_clay）×2、松木（wood）×2、炼气期妖丹（qi_core）×2,3,,,清脉饮丹方（formula_leaf）,炼丹炉（furnace）,2
 r_jade_pill,照心露（jade_pill）,3,3,筑基初期,16,灵草（reed）×5、灵晶（core）×2、松木（wood）×2、筑基期妖丹（foundation_core）×1、妖目（beast_eye）×1,4,,,照心露丹方（formula_jade）,炼丹炉（furnace）,3

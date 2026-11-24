@@ -32,8 +32,8 @@ const offerFor = (state, item) => view(state).localMarket.offers.find(({ id }) =
 
 test('an empty-bellied traveler can reach a local bed and recover before taking a cross-province road', () => {
   const state = reachZhaoCity();
-  play(state, 'eat', { id: 'ration' });
-  play(state, 'eat', { id: 'ration' });
+  play(state, 'rest');
+  while (state.inventory.ration && state.satiety < 55) play(state, 'eat', { id: 'ration' });
   play(state, 'travel', { id: 'flood_market' });
   play(state, 'travel', { id: 'zhao_pass' });
   state.knownItems.push('sand_writ');
@@ -53,9 +53,11 @@ test('an empty-bellied traveler can reach a local bed and recover before taking 
   const day = state.day;
   play(state, 'travel', { id: 'zhao_city' });
   assert.equal(state.day - day, emergency.days);
-  play(state, 'rest');
+  for (let i = 0; i < 2; i++) {
+    play(state, 'rest');
+    while (state.inventory.ration && state.satiety < 65) play(state, 'eat', { id: 'ration' });
+  }
   assert.ok(state.inventory.ration > 0);
-  while (state.inventory.ration && state.satiety < 75) play(state, 'eat', { id: 'ration' });
   play(state, 'travel', { id: 'flood_market' });
   play(state, 'travel', { id: 'zhao_pass' });
   const fare = roadTo(state, 'mingsha_city');

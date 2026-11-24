@@ -270,14 +270,18 @@ test('the bog has four repeatable hunts and one species can regrow without spend
     if (state.satiety < 35) play(state, 'eat');
     choose(state, index);
     assert.equal(state.combat.id, id);
+    let result;
     for (let turns = 0; state.combat && turns < 12; turns += 1) {
-      play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+      result = play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
     }
     assert.equal(state.event, site);
+    return result.gathered;
   };
-  hunt(0, 'mud_shrike');
-  hunt(2, 'zhao_moss_turtle');
-  hunt(3, 'glass_frog');
+  assert.match(choice(state, 2).desc, /甲缘.*厚皮/);
+  assert.deepEqual(hunt(0, 'mud_shrike'), { beast_meat: 5, hide: 3, foundation_core: 1 });
+  assert.deepEqual(hunt(2, 'zhao_moss_turtle'), { beast_meat: 3, hide: 4, qi_core: 2 });
+  assert.deepEqual(hunt(3, 'glass_frog'), { beast_meat: 3, beast_eye: 1, qi_core: 2 });
+  assert.deepEqual(view(state).groundLoot, { beast_meat: 11, hide: 7, foundation_core: 1, qi_core: 4, beast_eye: 1 });
   assert.equal(state.localPools.zhao_frog_shelf, undefined);
   const eel = 'zhao_rush_eel';
   hunt(4, eel);

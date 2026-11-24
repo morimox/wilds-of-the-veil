@@ -101,7 +101,7 @@ function uncoverFerryman(state) {
   return chooseAt(state, 'bank_watch', 1);
 }
 
-const marshLandmarks = ['reed_banks', 'sunk_pack', 'mud_track', 'bank_watch', 'undertow_door', 'marsh_pole_lesson'];
+const marshLandmarks = ['reed_banks', 'sunk_pack', 'mud_track', 'bank_watch', 'marsh_pole_lesson'];
 const siteIds = (state) => view(state).sites.map(({ id }) => id);
 const marketStock = (state) => view(state).market.stalls.flatMap(({ offers }) => offers.map(({ id }) => id));
 
@@ -299,7 +299,7 @@ test('harvesting only gives materials and reveals damage strictly after an actio
   walk(state, 'marsh');
   seek(state, 'reed_banks');
   const choices = view(state).visibleChoices;
-  assert.deepEqual(choices.map(({ index }) => index), [0, 1]);
+  assert.deepEqual(choices.map(({ index }) => index), [0, 1, 2]);
   assert.ok(choices.every((choice) =>
     !['hp', 'injury', 'outcome', 'loot', 'enemy'].some((field) => Object.hasOwn(choice, field))));
   assert.doesNotMatch(JSON.stringify(choices), /割伤|划伤|划破|受伤|蚌壳/);

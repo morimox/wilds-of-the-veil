@@ -1,7 +1,7 @@
 ﻿标识,名称,州,横坐标,纵坐标,标定邻路,定居点类型,有普通传送门,有州阵,威胁参考阶,威胁参考境界,行程（天）,发现条件,说明,跳过通常的去向提示
-village,落灯村,雾梁州（wuliang）,14,53,白苇滩（marsh）、蒲湾圩田（reed_meadows）,村庄,是,是,0,炼气初期,1,,旧渡停了之后，村人每晚仍点一盏灯。这里可问路、休整、补给。,
-marsh,白苇滩,雾梁州（wuliang）,28,68,落灯村（village）、沉钟岭（ridge）、蒲湾圩田（reed_meadows）、灰鹭矶（pale_shoal）、回潮母洞（undertow_grotto）,,否,否,0,炼气初期,1,,白苇贴着浅岸长。碎石间冒着水泡，再远一点的河岔里竖着几根木桩。干地上还有一道矮石堤。,
-ridge,沉钟岭,雾梁州（wuliang）,47,60,白苇滩（marsh）、闭潮渡（ford）、晒盘坡（screen_slope）、反声钟窟（counter_bell）,,否,否,1,炼气中期,2,得知物品 沉钟岭路图（ridge_rubbing）,旧矿口朝着山路，茶棚、冲沟和断绳坡都在坡面上。岩壁还留着这里曾经通水的痕迹。,
+village,落灯村,雾梁州（wuliang）,14,53,白苇滩（marsh）、蒲湾圩田（reed_meadows）、青崖松场（pine_ridge）,村庄,是,是,0,炼气初期,1,,旧渡停了之后，村人每晚仍点一盏灯。这里可问路、休整、补给。,
+marsh,白苇滩,雾梁州（wuliang）,28,68,落灯村（village）、沉钟岭（ridge）、闭潮渡（ford）、蒲湾圩田（reed_meadows）、灰鹭矶（pale_shoal）、回潮母洞（undertow_grotto）,,否,否,0,炼气初期,1,,白苇贴着浅岸长。碎石间冒着水泡，再远一点的河岔里竖着几根木桩。干地上还有一道矮石堤。,
+ridge,沉钟岭,雾梁州（wuliang）,47,60,白苇滩（marsh）、闭潮渡（ford）、晒盘坡（screen_slope）、反声钟窟（counter_bell）、玄砂矿脉（black_mine）,,否,否,1,炼气中期,2,得知物品 沉钟岭路图（ridge_rubbing）,旧矿口朝着山路，茶棚、冲沟和断绳坡都在坡面上。岩壁还留着这里曾经通水的痕迹。,
 ford,闭潮渡,雾梁州（wuliang）,73,74,沉钟岭（ridge）、回灯埠（hidden）、青崖松场（pine_ridge）、跃鱼旧渠（fish_ladder）、折水驿（willow_post）、照原城（zhao_city）,,否,否,2,炼气后期,2,得知物品 旧渡水图（ford_chart）,旧闸还随潮开合。浅阶从刻着水痕的石壁下伸入渡口，前头搁着渡舟与吊着铁环的木排。,
 hidden,回灯埠,雾梁州（wuliang）,91,89,闭潮渡（ford）,,否,否,2,炼气后期,2,得知物品 伏流路引（secret_pass）,夹在两道水流间的避风小码头，渡工从前在这里换灯，让乘客下船。,是
 pine_ridge,青崖松场,雾梁州（wuliang）,66,45,闭潮渡（ford）、云炉石谷（kiln_valley）、晒盘坡（screen_slope）、系灯院（lantern_court）,,否,否,1,炼气中期,2,得知物品 松场驮道图（pine_pass）,山路从收松脂的木架旁下到一座摇晃的桥。窑车倒在背坡，桥头棚子外铺着几张练武的草垫。,

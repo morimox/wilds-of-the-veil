@@ -31,7 +31,7 @@ function expedition(id, seed = 500) {
   }
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;
-  play(state, 'travel', { id: site.region });
+  state.region = site.region;
   return state;
 }
 

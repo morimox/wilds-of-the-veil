@@ -243,6 +243,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .atlas-zhaoyuan { background-color: #273d35; }
 .atlas-mingsha { background-color: #413b2b; }
 .atlas-road { position: absolute; z-index: -1; left: var(--x); top: var(--y); width: var(--length); border-top: 1px dashed #aec2a080; transform: rotate(var(--angle)); transform-origin: left center; }
+.atlas-road.chosen { border-top: 2px solid #e6c48d; }
 .atlas-mark { position: absolute; left: var(--x); top: var(--y); display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #dbe6d5; transform: translate(-50%, -50%); cursor: pointer; }
 .atlas-mark:hover, .atlas-mark:focus-visible, .atlas-mark[aria-pressed="true"] { z-index: 2; }
 .atlas-dot { width: 8px; height: 8px; border-radius: 50%; background: #b3c5ad; box-shadow: 0 0 0 2px #213b2e; }

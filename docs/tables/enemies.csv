@@ -34,7 +34,7 @@ dyke_marten,黄沿水貂,0,炼气初期,22,7,7,2,beast、furred,,2,生兽肉（b
 zhao_reed_duck,灰苇灵鸭,0,炼气初期,19,6,6 / 7,1,beast,,2,生兽肉（beast_meat）×2、炼气期妖丹（qi_core）×1,常在蒲叶下拣螺。它先伸颈啄手，一双蹼掌踩住浅石时，才会振翅扑来。
 glass_frog,火斑大蛙,1,炼气中期,33,10,10 / 11,3,beast,,3,生兽肉（beast_meat）×3、妖目（beast_eye）×1、炼气期妖丹（qi_core）×2,
 mud_shrike,泥鳞鬃犬,3,筑基初期,73,15,15 / 17,7,furred、beast,,4,生兽肉（beast_meat）×5、兽革（hide）×3、筑基期妖丹（foundation_core）×1,
-zhao_moss_turtle,苔背泽鳖,2,炼气后期,54,13,13,7,beast、scaled,,4,生兽肉（beast_meat）×4、妖目（beast_eye）×1、炼气期妖丹（qi_core）×3,远看像一截生了苔的浮石。它缩颈时背甲朝上，侧转探头咬人时，肩边会露一道甲缝。
+zhao_moss_turtle,苔背泽鳖,2,炼气后期,54,13,13,7,beast、scaled,,4,生兽肉（beast_meat）×3、兽革（hide）×4、炼气期妖丹（qi_core）×2,远看像一截生了苔的浮石。它侧转探头时，肩边会露一道甲缝。甲缘那圈厚皮浸水也折不断，裁下来能给护具包边。
 zhao_rush_eel,缠藻泥鳗,1,炼气中期,36,11,11 / 13,3,beast、scaled,,3,生兽肉（beast_meat）×3、炼气期妖丹（qi_core）×1,这鳗在水藻下贴泥而游。咬住东西就会把尾绕在石根上，借那一绕往回拖。
 lab_crawler,槽背水魁,4,筑基中期,95,18,18,8,stoneborn,,8,妖目（beast_eye）×1、筑基期妖丹（foundation_core）×3,
 ember_yak,伏灰炭魈,6,金丹初期,119,24,24 / 27,10,beast、furred,,9,生兽肉（beast_meat）×7、兽革（hide）×4、金丹期妖丹（gold_core）×1,
