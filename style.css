@@ -41,6 +41,7 @@ h3 { font-size: 15px; }
 .layout:has(.atlas-view) { width: min(1030px, calc(100% - 32px)); }
 .travel-column, .kit { min-width: 0; }
 .topbar { display: flex; align-items: center; gap: 12px; }
+.topbar:has([data-open-encyclopedia]:not([hidden])) { flex-wrap: wrap; }
 .clock { margin-left: auto; color: var(--muted); font-size: 13px; }
 .boot-status { max-width: 520px; padding: 24px; margin: 45px auto; }
 .boot-status p { margin: 12px 0; color: var(--muted); }
@@ -157,6 +158,8 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
   overflow-wrap: anywhere;
   pointer-events: none;
 }
+.item-description, .item-tip { white-space: pre-wrap; }
+.item-status { flex-basis: 100%; }
 .entry-anchor, .action-hint { position: relative; display: inline-block; max-width: 100%; }
 .action-hint > .item-tip { position: absolute; z-index: 3; top: 100%; left: 50%; width: min(190px, 50vw); transform: translateX(-50%); }
 .action-hint > button:focus-visible + .item-tip { display: block; }
@@ -434,6 +437,20 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 dialog { width: min(414px, calc(100% - 26px)); color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
 dialog::backdrop { background: #08100bd1; }
 .dialog-head { display: flex; align-items: center; justify-content: space-between; }
+.encyclopedia { width: min(710px, calc(100% - 24px)); max-height: min(76dvh, 680px); overflow: auto; }
+.book-status { margin-top: 6px; }
+.book-status:empty { display: none; }
+.book-categories { border-bottom: 1px solid var(--line); padding-bottom: 9px; }
+.book-entries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 17px; }
+.book-entry { min-width: 0; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.book-entry > p { color: var(--muted); margin-top: 4px; overflow-wrap: anywhere; }
+.book-entry .actions { gap: 5px; margin-top: 6px; }
+.book-entry .button { padding-inline: 7px; font-size: 13px; }
+.book-entry:has(.book-form) { grid-column: 1 / -1; }
+.book-form textarea {
+  display: block; width: 100%; margin-top: 5px; padding: 7px; resize: vertical;
+  border: 1px solid #526857; border-radius: 5px; background: var(--bg); color: var(--text);
+}
 .sect-affiliation { margin-top: 6px; }
 .guide-topic { margin: 5px 0 8px; }
 .guide-topic > summary { color: var(--jade); cursor: pointer; }
@@ -446,6 +463,7 @@ dialog::backdrop { background: #08100bd1; }
   .button, .navigation button, .item-trigger { min-height: 38px; }
   .ground-row > .button { min-height: 38px; }
   .storage-columns { grid-template-columns: minmax(0, 1fr); }
+  .book-entries { grid-template-columns: minmax(0, 1fr); }
   .notices { width: min(345px, calc(100% - 24px)); }
   .toast:not(:last-child) { display: none; }
 }

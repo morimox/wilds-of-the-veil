@@ -86,11 +86,13 @@ const enemies = [
     loot: { beast_meat: 3, qi_core: 1 } },
   { id: 'lab_crawler', name: '槽背水魁', tier: 4, hp: 95, atk: 18, def: 8, tags: ['stoneborn'], insight: 8,
     intents: [attack('撑着水槽扬起砂子'), { kind: 'drain', name: '从铜槽喷出冷气', mult: 1.15 }, heavy('翻身用背甲压起水浪', 1.57), { kind: 'guard', name: '伏进两道石槽' }],
+    desc: '湿石甲下只有一只圆眼，亮得像灯芯。它一拱肩，水就从甲缝挤出来。',
     loot: { beast_eye: 1, foundation_core: 3 } },
   { id: 'ember_yak', name: '伏灰炭魈', tier: 6, hp: 119, atk: 24, def: 10, tags: ['beast', 'furred'], insight: 9,
     intents: [attack('踏碎灰层'), heavy('抱地窜起', 1.63), attack('甩尾卷火', 1.12), { kind: 'guard', name: '护住抱在胸前的灰团' }],
     loot: { beast_meat: 7, hide: 4, gold_core: 2 } },
   { id: 'fault_warden', name: '分柱水君', tier: 7, hp: 163, atk: 29, def: 13, tags: ['spirit'], insight: 16,
+    desc: '他的身形由水聚拢，唯有一双白眼凝得像石子。剑尖轻转时，两根柱子间的浪也跟着转向。',
     intents: [attack('借水柱跃起拍向岸边'), { kind: 'guard', name: '退到两根水柱中间' }, heavy('双手挥下两道水刃', 1.59),
       { kind: 'drain', name: '引来水流抽走真气', mult: 1.17 }, attack('顺着回潮斜劈', 1.1)], loot: { beast_eye: 2, gold_core: 4 } },
   { id: 'zhao_spar', name: '教尺法的傅澄', tier: 5, hp: 103, atk: 20, def: 8, tags: ['human'], insight: 6, sparring: true, loot: {},
@@ -268,10 +270,10 @@ scene('sunken_lab', 'zhao_submerged_table', '铜槽旁', '低挂的灯在岩壁�
   { label: '提灯沿水槽走到深处', days: 0.25, enemy: 'lab_crawler',
     outcome: '灯一晃，湿漉漉的石甲从槽里拱起来。堵在出水孔里的东西侧过身，水打湿了你半条裤腿。' },
   { label: '拔掉铜板的插销，印下刻图', afterFight: 'lab_crawler', days: 0.75, loot: { phase_chart: 1 }, insight: 6,
-    outcome: '水魁退进岩缝，水槽另一头终于能抬起来。铜板背面刻着水滴该隔多久落下。你把图印到纸上，原板留在旧站。' },
+    outcome: '压住槽沿的石甲已经裂开，水槽另一头终于能抬起来。铜板背面刻着水滴该隔多久落下。你把图印到纸上，原板留在旧站。' },
   gather('在外围收晶屑', '灯旁有一块高台，槽里的水挤不到这边。', 'core', 7, 1.25, '干台的一层短晶透过水汽露出了棱。'),
 ], { once: [1], stocks: { core: stock('量槽外晶屑', 9, 15, 8, 4, 2) }, creatures: { lab_crawler: { start: 1, cap: 1, interval: 0, growth: 0 } },
-  afterWinText: { lab_crawler: '那团石甲退进岩缝，出水口空了。铜板侧面的插销露在外面，入口边仍有块干台。' },
+  afterWinText: { lab_crawler: '水魁撞上槽沿，石甲碎开，出水口随即露出。铜板侧面的插销也露在外面，入口边仍有块干台。' },
   afterOnceText: { 1: '铜板已经印过，插销被你搁回槽边。水顺出水口落下，靠入口的台子还干着。' } });
 
 scene('night_pit', 'zhao_bank_fire', '赤泥横穴', '湿帘贴住地面，帘脚下有一小堆发亮的黑砂。往里两步，左壁并排开着两个透风孔。', [
@@ -300,7 +302,7 @@ scene('fault_lake', 'zhao_deep_pillars', '分水三柱', '三根石柱并排露�
   { label: '掀开石台上的槽盖', afterFight: 'fault_warden', days: 0.75, loot: { fault_receipt: 1 }, insight: 7,
     outcome: '你抬起暗槽一侧还能活动的盖，里头压着一份旧约。纸上除了三州的水位，还记着田地淹过以后，三户船家分头把船送到了哪儿。' },
 ], { once: [1], creatures: { fault_warden: { start: 1, cap: 1, interval: 0, growth: 0 } },
-  afterWinText: { fault_warden: '水君退进湖底的石缝，水面渐渐平了。石台露出来，台上有道窄槽，槽盖只有一头还被钉着。' },
+  afterWinText: { fault_warden: '水君的身形散了。浪流进湖底的石缝，石台渐渐露出来。台上有道窄槽，槽盖只有一头还被钉着。' },
   afterOnceText: { 1: '石台上的窄槽空了，一边盖子斜敞着。水绕开半沉的断柱，缓缓流向远处。' } });
 
 scene('rope_sands', 'zhao_rope_sound', '拴着石坠的探路绳', '石坠沉在几处沙坑里，探绳从坑口伸出来。晒得干的两根颜色浅，背阴那根摸起来还湿。', [

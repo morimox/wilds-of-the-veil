@@ -290,4 +290,8 @@
 兽革（hide）,架风板（wind_slate）,挡风板后的旧弓弦库（ridge_armory_refuge）,弯角岩羚（ridge_armory_ram）,金丹中期,3,,,3,1,1,0,0,不回补,梁师傅的旧弓架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外侧的石梁绕到仓门对面
 坚韧兽筋（battle_sinew）,架风板（wind_slate）,挡风板后的旧弓弦库（ridge_armory_refuge）,弯角岩羚（ridge_armory_ram）,金丹中期,3,,,3,1,1,0,0,不回补,梁师傅的旧弓架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外侧的石梁绕到仓门对面
 弯角岩羚的弯角（ridge_ramhorn）,架风板（wind_slate）,挡风板后的旧弓弦库（ridge_armory_refuge）,弯角岩羚（ridge_armory_ram）,金丹中期,1,,,1,1,1,0,0,不回补,梁师傅的旧弓架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外侧的石梁绕到仓门对面
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,2,,,2,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,3,,,3,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
+厚甲片（hard_scale）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,1,,,1,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,1,,,1,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
 筑基期妖丹（foundation_core）,闭潮渡（ford）,闸下无灯梯（ford_below_steps）,拖梯水影（ford_lower_spirit）,筑基中期,2,,,2,2,4,11,1,固定间隔,,沿短绳下到第二根栏杆

@@ -13,13 +13,14 @@
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=33" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=34" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
       <header class="topbar">
         <h1>雾渡山河</h1>
         <span class="clock" id="clock"></span>
+        <button type="button" class="top-button" data-open-encyclopedia hidden>百科全书</button>
         <button type="button" class="top-button" data-help aria-label="行旅菜单">菜单</button>
       </header>
       <div id="player-status" aria-label="角色状态"></div>
@@ -47,6 +48,11 @@
     <button type="button" class="intro-skip" data-skip-transfer>跳过</button>
   </section>
   <div id="notices" class="notices" role="status" aria-live="polite" aria-relevant="additions"></div>
+  <dialog id="encyclopedia" class="encyclopedia" aria-labelledby="book-title">
+    <div class="dialog-head"><h2 id="book-title">百科全书</h2><button type="button" data-close-encyclopedia aria-label="合上百科全书">×</button></div>
+    <p class="book-status fine" data-book-status role="status"></p>
+    <div data-book-body></div>
+  </dialog>
   <dialog id="help" aria-labelledby="guide-title">
     <div class="dialog-head"><h2 id="guide-title">行旅菜单</h2><button type="button" data-close aria-label="关闭菜单">×</button></div>
     <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习进度</button></div>

@@ -2,7 +2,7 @@ import * as moduleData from './data.mjs';
 import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem, containerCarryReason } from './economy.mjs';
 import { hazardView, hazardAction, hazardVictory } from './hazards.mjs';
 import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
-import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView } from './world.mjs';
+import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, localGoods, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView } from './world.mjs';
 import { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead } from './training.mjs';
 import { initialMechanisms, mechanismView, mechanismAction } from './mechanisms.mjs';
 import { tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution } from './tournament.mjs';
@@ -20,6 +20,8 @@ const supply = 'ration';
 const hub = 'village';
 const slots = Object.keys(data.equipmentSlots);
 const hypothesisLimit = 180;
+const guideBookId = 'encyclopedia';
+const guideNoteLimit = 480;
 
 export const rules = Object.freeze({
   restDays: 0.5,
@@ -228,10 +230,11 @@ function fittingItems(state, resources, spent = {}) {
   for (const [id, count] of resourceEntries(resources)) {
     if (count <= 0 || !records.items[id]) continue;
     const current = inventory[id] ?? 0;
-    const gear = records.gear[id];
-    const bag = records.items[id].kind === 'container';
-    if (gear && current) continue;
-    const desired = gear ? 1 : count;
+    const kind = records.items[id].kind;
+    const single = Boolean(records.gear[id]) || kind === 'reference';
+    const bag = kind === 'container';
+    if (single && current) continue;
+    const desired = single ? 1 : count;
     const occupies = occupiesBackpack(state, id);
     const used = Math.ceil(current / stackSize);
     const room = occupies ? (available + used) * stackSize - current : desired;
@@ -266,12 +269,15 @@ function groundAt(state, place = groundPlace(state)) {
 }
 
 function groundPickupLimit(state, id, available = groundAt(state)[id]) {
-  if (!available || (records.gear[id] && gearReserved(state, id))) return 0;
+  if (!available || (records.gear[id] && gearReserved(state, id)) || groundPickupReason(state, id)) return 0;
   return fittingItems(state, { [id]: available }).accepted[id] ?? 0;
 }
 
 function groundPickupReason(state, id, count) {
-  return records.items[id]?.kind === 'container' ? containerCarryReason(state.inventory, count) : '';
+  const kind = records.items[id]?.kind;
+  if (kind === 'container') return containerCarryReason(state.inventory, count);
+  if (kind === 'reference' && gearReserved(state, id)) return '你已有这本书。';
+  return '';
 }
 
 function leaveOnGround(state, resources, durability = {}, place = groundPlace(state)) {
@@ -416,6 +422,69 @@ function isEvidence(item) {
   return item?.kind === 'key' || item?.evidence === true;
 }
 
+function itemIdsWithCount(goods) {
+  return resourceEntries(goods).filter(([id, count]) => count > 0 && Object.hasOwn(records.items, id)).map(([id]) => id);
+}
+
+function rememberSeenItems(state, ids) {
+  const seen = new Set(state.itemSightings);
+  const previous = seen.size;
+  for (const id of ids) seen.add(id);
+  if (seen.size === previous) return false;
+  state.itemSightings = [...seen];
+  return true;
+}
+
+function recordItemSightings(state, result) {
+  const visibleGround = !state.banditDeath && !state.combat && !state.victoryPending &&
+    (!state.roadBandit || state.roadBandit.aftermath);
+  rememberSeenItems(state, [
+    ...itemIdsWithCount(state.inventory),
+    ...itemIdsWithCount(state.economy?.warehouse),
+    ...itemIdsWithCount(result?.gathered),
+    ...(visibleGround ? itemIdsWithCount(groundAt(state)) : []),
+  ]);
+}
+
+function guideBookView(state) {
+  if (!owns(state, guideBookId) || state.banditDeath) return null;
+  return { noteLimit: guideNoteLimit, entries: guideItemIds(state).map((id) => ({ id, note: state.itemNotes?.[id] ?? '' })) };
+}
+
+function guideItemIds(state) {
+  return [...new Set([...(state.itemSightings ?? []), ...itemIdsWithCount(state.inventory)])];
+}
+
+function editGuideNote(state, { id, text }) {
+  if (!owns(state, guideBookId) || state.banditDeath) return refuse('得把百科全书带在身上。');
+  if (!Object.hasOwn(records.items, id) || !guideItemIds(state).includes(id)) return refuse('书上还没有这件物品。');
+  if (typeof text !== 'string' || text.length > guideNoteLimit) return refuse(`一条说明最多写${guideNoteLimit}字。`);
+  const notes = state.itemNotes ??= {};
+  if (text === '') delete notes[id];
+  else notes[id] = text;
+  return { ok: true };
+}
+
+function offeredObservationIds(state, source) {
+  if (state.banditDeath || state.victoryPending || state.combat || state.roadTrip || state.event || state.gathering) return [];
+  if (source === 'market' && atHome(state) && knowsService(state, 'market')) {
+    return data.market.stalls.flatMap(({ offers }) => stockedOffers(state, offers).map(({ id }) => id));
+  }
+  if (source === 'localMarket' && !atHome(state)) {
+    const place = settlementOf(data, state.region);
+    return place ? Object.keys(localGoods(place)).filter((id) => records.items[id] && !isEvidence(records.items[id])) : [];
+  }
+  if (source === 'alchemy' && atHome(state)) return alchemyView(state, economyKit)?.offers.map(({ id }) => id) ?? [];
+  return [];
+}
+
+function observeGuideItems(state, { source, ids }) {
+  if (!Array.isArray(ids) || ids.length > data.items.length) return refuse('没有看见这些东西。');
+  const visible = new Set(offeredObservationIds(state, source));
+  if (ids.some((id) => !visible.has(id))) return refuse('没有看见这些东西。');
+  return { ok: true, changed: rememberSeenItems(state, ids) };
+}
+
 function knowsDeduction(state, entry) {
   return (entry.tier ?? 0) <= state.realm && isRevealed(state, entry.reveal);
 }
@@ -445,6 +514,8 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     focus: 0,
     inventory: {},
     knownItems: [],
+    itemSightings: [],
+    itemNotes: {},
     reliefRations: 0,
     equipment: Object.fromEntries(slots.map((slot) => [slot, null])),
     durability: {},
@@ -508,6 +579,7 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
       state.equipment[records.gear[id].slot] = id;
     }
   }
+  recordItemSightings(state);
   const { maxHp, maxQi } = stats(state);
   state.hp = maxHp;
   state.qi = maxQi;
@@ -730,10 +802,12 @@ export function view(state) {
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
     knowsChoice(state, currentEvent.choices[index], currentSite));
   const { combatSeed, evadeSeed, enemyEvadeSeed, roadSeed, banditLootSeed, banditLossSeed, escapeSeed, combat, roadTrip,
-    roadBandit, banditCrews, banditSpoils, resolvedBandits, banditLeads, ...visibleState } = state;
+    roadBandit, banditCrews, banditSpoils, resolvedBandits, banditLeads, itemSightings, itemNotes, ...visibleState } = state;
   return {
     ...visibleState,
     ...stats(state),
+    guideBook: guideBookView(state),
+    itemNotes: { ...itemNotes },
     ...worldView(state, economyKit),
     roadTrip: roadTrip ? { ...roadTripView(state, economyKit), bandit: roadBanditView(state, economyKit) } : null,
     localHazard: hazardView(state, economyKit),
@@ -1280,8 +1354,9 @@ function finishCombat(state, enemy) {
   const rescuedGear = isDenBattle ? recoverBanditSpoils(state, site.id, economyKit, chiefFell) : '';
   const roadNews = chiefFell
     ? '把守几条路的人撤走了，往后这一伙人不再出来拦路。' : '';
+  const winText = protectedBout ? '试招中胜过' : isDenBattle || enemy.tags.includes('beast') ? '击杀了' : '击败了';
   return {
-    message: `${protectedBout ? '试招中胜过' : isDenBattle ? '击杀了' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}${roadNews}${rescuedGear}`,
+    message: `${winText}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}${roadNews}${rescuedGear}`,
     ...(loot ? { gathered, gatheredRegion: state.region, gatheredSite: site?.id } : {}),
   };
 }
@@ -1534,6 +1609,7 @@ function combatTurn(state, move) {
       : `${enemy.name}${interrupt ? '调息受阻，只' : ''}恢复了${restored}点生命。`;
   } else if (intent.kind === 'remedy') {
     const dose = enemyMedicine(state);
+    if (dose) rememberSeenItems(state, [dose.id]);
     if (!dose) {
       enemyMove.name = '摸了摸空药袋';
       summary += `${enemy.name}摸了摸药袋，已经空了。`;
@@ -2509,11 +2585,14 @@ function takeTurn(state, action, payload) {
 }
 
 export function act(state, action, payload = {}) {
+  if (action === 'observeGuideItems') return observeGuideItems(state, payload ?? {});
+  if (action === 'editGuideNote') return editGuideNote(state, payload ?? {});
   prepareCombatRound(state);
   const result = takeTurn(state, action, payload);
   if (result.ok) {
     prepareCombatRound(state);
     refreshDiscovery(state);
+    recordItemSightings(state, result);
   }
   return result;
 }

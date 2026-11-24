@@ -16,6 +16,7 @@ import { huntMaterialContent } from './hunt-materials.mjs';
 import { dykeArmoryContent } from './dyke-armory.mjs';
 import { ridgeArmoryContent } from './ridge-armory.mjs';
 import { explorerKitContent } from './explorer-kit.mjs';
+import { encyclopediaContent } from './encyclopedia-content.mjs';
 
 const realms = [
   { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, perception: 10, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
@@ -629,7 +630,7 @@ const events = [
     { label: '去干土路边捡松枝', desc: '碎石堆横在水边，漂来的枝条都卡在这里。', days: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 2 }, enemy: null, outcome: '你沿干土路绕过水眼，捡走卡在碎石间的松枝。' },
     { label: '沿土路上的脚印看看', desc: '脚印从苇丛里出来，要绕过一段光秃的干土。', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', openingRange: true, outcome: '一只苇尾狐从对面的苇丛里蹿出来，隔着一段干地朝你扑来。' },
     { label: '踩着石头往苇后探', desc: '水眼背后有几块石头排成一线，像是有人铺过。', days: 0.125, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '拨开最后一丛苇，露出背雨的半截石渠，里面有旧柴火的焦痕。' },
-    { label: '捡起土路边的油纸包', desc: '那只狐败退时蹬断了几根苇秆，油纸包从低处滚到了土路边。', afterFight: 'reed_fox', days: 0, loot: { ration: 1 }, outcome: '油纸里有过路人落下的一份干粮，系绳还好好的。' },
+    { label: '捡起土路边的油纸包', desc: '狐狸倒下时撞断了几根苇秆，油纸包从低处滚到了土路边。', afterFight: 'reed_fox', days: 0, loot: { ration: 1 }, outcome: '油纸里有过路人落下的一份干粮，系绳还好好的。' },
     { label: '到背水坡猎白耳兔', days: 0.25, enemy: 'reed_hare', openingRange: true, outcome: '一对白耳从坡下的短苇里抬起。野兔沿着没有遮挡的斜坡猛蹬过来。' },
   ] },
   { id: 'old_fire', name: '背雨石渠', text: '半截石渠能挡雨。小石炉砌在背风处，炉边搁着一口陶锅，锅沿的缺口高过水线。', choices: [
@@ -801,7 +802,7 @@ const events = [
   { id: 'pine_hollow', name: '翻车的松沟', text: '旧窑车翻在树沟。车轴上绑着看不清的木签，车边踩出来的爪印很深。', choices: [
     { label: '靠近树沟里翻倒的窑车', days: 0.75, enemy: 'pitch_bear', outcome: '一只灰脊松熊从车后滚下来，先把车轴压进湿土。' },
     { label: '沿斜沟绕回松架', days: 0.125, insight: 1, loot: {}, outcome: '你沿沟边走稳脚。转过土脊，回头已看不见窑车。' },
-    { label: '拾起小路边的木签', desc: '松熊败退时撞歪了车轴，绳上的木签掉到沟外。', afterFight: 'pitch_bear', days: 0, loot: { kiln_tracks: 1 }, outcome: '车签背后刻着窑车出入的双车辙。老道在贴着松根的那一边转向窑谷。' },
+    { label: '拾起小路边的木签', desc: '松熊倒下时撞歪了车轴，绳上的木签掉到沟外。', afterFight: 'pitch_bear', days: 0, loot: { kiln_tracks: 1 }, outcome: '车签背后刻着窑车出入的双车辙。老道在贴着松根的那一边转向窑谷。' },
   ] },
   { id: 'pine_ledges', name: '背阴的断肩崖', text: '风折的松杈落到旧凿痕里，背阴处的松脂凝在木皮上。崖口朝外的一边常被风吹空。', choices: [
     { label: '从松枝之间拣厚木片', days: 1, insight: 2, loot: { wood: 4 }, outcome: '背阴处不晒，松木上的厚脂还粘手，几片能带回去做活。' },
@@ -1175,7 +1176,7 @@ const roadBandits = { ...banditContent.roadBandits, fixed: [...banditContent.roa
 
 for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
   ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent,
-  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent, banditContent, banditTaleContent]) {
+  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent, banditContent, banditTaleContent, encyclopediaContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));

@@ -50,6 +50,7 @@ h3 { font-size: 15px; }
 .layout:has(.atlas-view) { width: min(1030px, calc(100% - 32px)); }
 .travel-column, .kit { min-width: 0; }
 .topbar { display: flex; align-items: center; gap: 12px; }
+.topbar:has([data-open-encyclopedia]:not([hidden])) { flex-wrap: wrap; }
 .clock { margin-left: auto; color: var(--muted); font-size: 13px; }
 .boot-status { max-width: 520px; padding: 24px; margin: 45px auto; }
 .boot-status p { margin: 12px 0; color: var(--muted); }
@@ -166,6 +167,8 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
   overflow-wrap: anywhere;
   pointer-events: none;
 }
+.item-description, .item-tip { white-space: pre-wrap; }
+.item-status { flex-basis: 100%; }
 .entry-anchor, .action-hint { position: relative; display: inline-block; max-width: 100%; }
 .action-hint > .item-tip { position: absolute; z-index: 3; top: 100%; left: 50%; width: min(190px, 50vw); transform: translateX(-50%); }
 .action-hint > button:focus-visible + .item-tip { display: block; }
@@ -443,6 +446,20 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 dialog { width: min(414px, calc(100% - 26px)); color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
 dialog::backdrop { background: #08100bd1; }
 .dialog-head { display: flex; align-items: center; justify-content: space-between; }
+.encyclopedia { width: min(710px, calc(100% - 24px)); max-height: min(76dvh, 680px); overflow: auto; }
+.book-status { margin-top: 6px; }
+.book-status:empty { display: none; }
+.book-categories { border-bottom: 1px solid var(--line); padding-bottom: 9px; }
+.book-entries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 17px; }
+.book-entry { min-width: 0; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.book-entry > p { color: var(--muted); margin-top: 4px; overflow-wrap: anywhere; }
+.book-entry .actions { gap: 5px; margin-top: 6px; }
+.book-entry .button { padding-inline: 7px; font-size: 13px; }
+.book-entry:has(.book-form) { grid-column: 1 / -1; }
+.book-form textarea {
+  display: block; width: 100%; margin-top: 5px; padding: 7px; resize: vertical;
+  border: 1px solid #526857; border-radius: 5px; background: var(--bg); color: var(--text);
+}
 .sect-affiliation { margin-top: 6px; }
 .guide-topic { margin: 5px 0 8px; }
 .guide-topic > summary { color: var(--jade); cursor: pointer; }
@@ -455,6 +472,7 @@ dialog::backdrop { background: #08100bd1; }
   .button, .navigation button, .item-trigger { min-height: 38px; }
   .ground-row > .button { min-height: 38px; }
   .storage-columns { grid-template-columns: minmax(0, 1fr); }
+  .book-entries { grid-template-columns: minmax(0, 1fr); }
   .notices { width: min(345px, calc(100% - 24px)); }
   .toast:not(:last-child) { display: none; }
 }
@@ -594,13 +612,14 @@ dialog::backdrop { background: #08100bd1; }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=33" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=34" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
       <header class="topbar">
         <h1>雾渡山河</h1>
         <span class="clock" id="clock"></span>
+        <button type="button" class="top-button" data-open-encyclopedia hidden>百科全书</button>
         <button type="button" class="top-button" data-help aria-label="行旅菜单">菜单</button>
       </header>
       <div id="player-status" aria-label="角色状态"></div>
@@ -628,6 +647,11 @@ dialog::backdrop { background: #08100bd1; }
     <button type="button" class="intro-skip" data-skip-transfer>跳过</button>
   </section>
   <div id="notices" class="notices" role="status" aria-live="polite" aria-relevant="additions"></div>
+  <dialog id="encyclopedia" class="encyclopedia" aria-labelledby="book-title">
+    <div class="dialog-head"><h2 id="book-title">百科全书</h2><button type="button" data-close-encyclopedia aria-label="合上百科全书">×</button></div>
+    <p class="book-status fine" data-book-status role="status"></p>
+    <div data-book-body></div>
+  </dialog>
   <dialog id="help" aria-labelledby="guide-title">
     <div class="dialog-head"><h2 id="guide-title">行旅菜单</h2><button type="button" data-close aria-label="关闭菜单">×</button></div>
     <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习进度</button></div>
@@ -1066,11 +1090,13 @@ const enemies = [
     loot: { beast_meat: 3, qi_core: 1 } },
   { id: 'lab_crawler', name: '槽背水魁', tier: 4, hp: 95, atk: 18, def: 8, tags: ['stoneborn'], insight: 8,
     intents: [attack('撑着水槽扬起砂子'), { kind: 'drain', name: '从铜槽喷出冷气', mult: 1.15 }, heavy('翻身用背甲压起水浪', 1.57), { kind: 'guard', name: '伏进两道石槽' }],
+    desc: '湿石甲下只有一只圆眼，亮得像灯芯。它一拱肩，水就从甲缝挤出来。',
     loot: { beast_eye: 1, foundation_core: 3 } },
   { id: 'ember_yak', name: '伏灰炭魈', tier: 6, hp: 119, atk: 24, def: 10, tags: ['beast', 'furred'], insight: 9,
     intents: [attack('踏碎灰层'), heavy('抱地窜起', 1.63), attack('甩尾卷火', 1.12), { kind: 'guard', name: '护住抱在胸前的灰团' }],
     loot: { beast_meat: 7, hide: 4, gold_core: 2 } },
   { id: 'fault_warden', name: '分柱水君', tier: 7, hp: 163, atk: 29, def: 13, tags: ['spirit'], insight: 16,
+    desc: '他的身形由水聚拢，唯有一双白眼凝得像石子。剑尖轻转时，两根柱子间的浪也跟着转向。',
     intents: [attack('借水柱跃起拍向岸边'), { kind: 'guard', name: '退到两根水柱中间' }, heavy('双手挥下两道水刃', 1.59),
       { kind: 'drain', name: '引来水流抽走真气', mult: 1.17 }, attack('顺着回潮斜劈', 1.1)], loot: { beast_eye: 2, gold_core: 4 } },
   { id: 'zhao_spar', name: '教尺法的傅澄', tier: 5, hp: 103, atk: 20, def: 8, tags: ['human'], insight: 6, sparring: true, loot: {},
@@ -1248,10 +1274,10 @@ scene('sunken_lab', 'zhao_submerged_table', '铜槽旁', '低挂的灯在岩壁�
   { label: '提灯沿水槽走到深处', days: 0.25, enemy: 'lab_crawler',
     outcome: '灯一晃，湿漉漉的石甲从槽里拱起来。堵在出水孔里的东西侧过身，水打湿了你半条裤腿。' },
   { label: '拔掉铜板的插销，印下刻图', afterFight: 'lab_crawler', days: 0.75, loot: { phase_chart: 1 }, insight: 6,
-    outcome: '水魁退进岩缝，水槽另一头终于能抬起来。铜板背面刻着水滴该隔多久落下。你把图印到纸上，原板留在旧站。' },
+    outcome: '压住槽沿的石甲已经裂开，水槽另一头终于能抬起来。铜板背面刻着水滴该隔多久落下。你把图印到纸上，原板留在旧站。' },
   gather('在外围收晶屑', '灯旁有一块高台，槽里的水挤不到这边。', 'core', 7, 1.25, '干台的一层短晶透过水汽露出了棱。'),
 ], { once: [1], stocks: { core: stock('量槽外晶屑', 9, 15, 8, 4, 2) }, creatures: { lab_crawler: { start: 1, cap: 1, interval: 0, growth: 0 } },
-  afterWinText: { lab_crawler: '那团石甲退进岩缝，出水口空了。铜板侧面的插销露在外面，入口边仍有块干台。' },
+  afterWinText: { lab_crawler: '水魁撞上槽沿，石甲碎开，出水口随即露出。铜板侧面的插销也露在外面，入口边仍有块干台。' },
   afterOnceText: { 1: '铜板已经印过，插销被你搁回槽边。水顺出水口落下，靠入口的台子还干着。' } });
 
 scene('night_pit', 'zhao_bank_fire', '赤泥横穴', '湿帘贴住地面，帘脚下有一小堆发亮的黑砂。往里两步，左壁并排开着两个透风孔。', [
@@ -1280,7 +1306,7 @@ scene('fault_lake', 'zhao_deep_pillars', '分水三柱', '三根石柱并排露�
   { label: '掀开石台上的槽盖', afterFight: 'fault_warden', days: 0.75, loot: { fault_receipt: 1 }, insight: 7,
     outcome: '你抬起暗槽一侧还能活动的盖，里头压着一份旧约。纸上除了三州的水位，还记着田地淹过以后，三户船家分头把船送到了哪儿。' },
 ], { once: [1], creatures: { fault_warden: { start: 1, cap: 1, interval: 0, growth: 0 } },
-  afterWinText: { fault_warden: '水君退进湖底的石缝，水面渐渐平了。石台露出来，台上有道窄槽，槽盖只有一头还被钉着。' },
+  afterWinText: { fault_warden: '水君的身形散了。浪流进湖底的石缝，石台渐渐露出来。台上有道窄槽，槽盖只有一头还被钉着。' },
   afterOnceText: { 1: '石台上的窄槽空了，一边盖子斜敞着。水绕开半沉的断柱，缓缓流向远处。' } });
 
 scene('rope_sands', 'zhao_rope_sound', '拴着石坠的探路绳', '石坠沉在几处沙坑里，探绳从坑口伸出来。晒得干的两根颜色浅，背阴那根摸起来还湿。', [
@@ -4297,7 +4323,93 @@ const banditTaleContent = { items, sites, events, innerStyles, fixed };
 
 return banditTaleContent;
 })();
+const encyclopediaContent = (() => {
+const request = 'encyclopedia_clerk_note';
+const weirLeaf = 'encyclopedia_weir_leaf';
+const kilnProof = 'encyclopedia_kiln_proof';
+const snake = 'encyclopedia_weir_snake';
+const desk = 'encyclopedia_copy_desk';
+const beam = 'encyclopedia_weir_beam';
+const shed = 'encyclopedia_paper_shed';
+const lead = { item: request };
+
+const encyclopediaContent = {
+  items: [
+    { id: request, name: '周简的字条', kind: 'key', price: 0, sell: 0,
+      desc: '周简列了两件事。断齿内堰的第三根断柱下，找一只裹油布的匣子。再到冷炉院找阮杪，看看关于鸣沙的校样。' },
+    { id: weirLeaf, name: '内堰旧路图', kind: 'key', price: 0, sell: 0,
+      desc: '匣中有一张折得发白的路图。洪水淹过的旧道旁添了一行小字，签名正是周简说的那位巡堤人。' },
+    { id: kilnProof, name: '鸣沙校样', kind: 'key', price: 0, sell: 0,
+      desc: '晾好的纸上有阮杪校过的批注。几味药草和盐井的去向各占一栏，最左边也印着往来三州的路。' },
+    { id: 'encyclopedia', name: '百科全书', kind: 'reference', price: 0, sell: 0, keepOnFall: true,
+      desc: '守尺观校订的随身查阅本。扉页有索引，按条目可以翻到里面相应的记载。' },
+  ],
+  sites: [
+    { id: desk, region: 'measuring_hall', name: '西廊书案', once: [0, 1],
+      afterOnceText: {
+        0: '周简把写着两处地址的纸搁在案边，抬手去压险些被风吹走的旧图。',
+        1: '周简把案角擦出一块空处，用砚台压住旧稿。廊下还有一串洗净的木夹，等着夹带回来的纸。',
+      } },
+    { id: beam, region: 'burnt_weir', name: '断柱下的横梁', reveal: lead, once: [1],
+      creatures: { [snake]: { start: 1, cap: 1, interval: 0, growth: 0 } },
+      creatureText: { [snake]: {
+        present: '油布包卡在梁下，一条灰背水蟒盘在离它最近的石槽里。',
+        absent: '石槽空了。横梁下面还夹着半角油布。',
+      } },
+      afterOnceText: { 1: '匣子取走了。水从横梁下面穿过去，石槽里只剩一截烂麻绳。' } },
+    { id: shed, region: 'cold_kiln', name: '档房外的晒纸棚', reveal: lead, once: [0],
+      afterOnceText: { 0: '新木撑稳了纸架。跟着阮杪做事的两个孩子压好纸角，再把悬空那头的绳结收紧。' } },
+  ],
+  events: [
+    { id: desk, name: '西廊书案',
+      text: '两幅路图压在砚台下，都写着往断齿内堰，岔路却拐向两边。周简把其中一幅抽了出来。桌角几册散开的旧稿间，还夹着草药和飞兽的图样。',
+      choices: [
+        { label: '问周简哪一幅路图出了错', days: 0.125,
+          outcome: '周简指着图上一排断柱。「下过大水，两幅都未必对。巡堤人的新图用油布裹着，要是没冲远，多半卡在内堰。阮杪那头还有一份校样。你若愿意替我跑一趟，这儿有两处地址。」' },
+        { label: '接过字条，答应跑一趟', desc: '周简把纸放在案边，等你拿主意。', afterChoice: 0,
+          days: 0.125, loot: { [request]: 1 }, outcome: '你收下字条。周简在堰图上点了点第三根断柱，又叮嘱你去冷炉院找阮杪。' },
+      ] },
+    { id: beam, name: '断柱下的横梁',
+      text: '第三根断柱边斜着一根横梁，石槽紧挨梁脚。水一退，踩着断柱就能够到那根梁。',
+      choices: [
+        { label: '上梁去够油布包', desc: '横梁离水不高，一只手得始终扶着断柱。', days: 0.25, enemy: snake,
+          outcome: '你才踏上横梁，水蟒已从石槽抬起半身，顺着梁面扑来。' },
+        { label: '从梁下抽出油布匣', desc: '油布角还挂在两块木头之间，顺着缝能一点点抽出来。', afterFight: snake, days: 0.25,
+          loot: { [weirLeaf]: 1 }, outcome: '油布里是一个窄木匣。匣底有巡堤人签过字的路图，折角上还沾着干透的河泥。' },
+      ] },
+    { id: shed, name: '档房外的晒纸棚',
+      text: '阮杪用两块平砖压住刚揭下的湿纸。晒架被风吹歪了，内侧的绳一碰就散，湿纸差点翻进灰土里。',
+      choices: [
+        { label: '帮阮杪撑好纸架，等校样晾干', desc: '她要四份松木作撑脚、三份兽革包住磨纸的木角，再用两份坚韧兽筋绑牢架子。',
+          need: { wood: 4, hide: 3, battle_sinew: 2 }, consume: true, days: 0.75, loot: { [kilnProof]: 1 },
+          outcome: '新架在风里晃了几下，纸角没有再卷起来。阮杪把校样揭下，用一片薄板夹好。「批过的给周简。我留张没印好的，回去重排。」' },
+      ] },
+  ],
+  enemies: [
+    { id: snake, name: '灰背水蟒', tags: ['beast', 'scaled'], tier: 4, hp: 87, atk: 17, def: 6, perception: 19, accuracy: 0.11,
+      strategy: 'predator', insight: 5,
+      intents: [
+        { name: '探头咬向梁上的脚', kind: 'attack', mult: 1 },
+        { name: '盘住横梁，甩尾扫来', kind: 'heavy', mult: 1.56 },
+        { name: '顺石槽回身再咬', kind: 'attack', mult: 1.07 },
+        { name: '缩回梁柱后护住颈子', kind: 'guard', mult: 1.35 },
+      ],
+      loot: { beast_meat: 3, foundation_core: 2, hard_scale: 1, battle_sinew: 1 },
+      desc: '伏在旧木梁下的灰蟒。它抬头时嘴尖已经越过梁边，尾巴在石槽里拨一下，整根梁都跟着颤。' },
+  ],
+  quests: [
+    { id: 'encyclopedia_compile', region: 'measuring_hall', name: '替周简核对旧档', reveal: lead, recommendedTier: 4,
+      desc: '把断齿内堰的旧路图和冷炉院的校样一起带回守尺观。周简等这两份纸来改西廊书案上的旧稿。',
+      need: { [weirLeaf]: 1, [kilnProof]: 1 }, reward: { encyclopedia: 1 },
+      outcome: '周简对着两份纸涂掉一条废路，又在盐井旁补了记号。几册零散的图稿已订在一起。他从案下取出另一本，推到你手边。「我多订了一部。一个人走远路，忘了什么就翻一翻。」你翻开扉页，上面题着「百科全书」。',
+    },
+  ],
+};
+
+return encyclopediaContent;
+})();
 const moduleData = (() => {
+
 
 
 
@@ -4929,7 +5041,7 @@ const events = [
     { label: '去干土路边捡松枝', desc: '碎石堆横在水边，漂来的枝条都卡在这里。', days: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 2 }, enemy: null, outcome: '你沿干土路绕过水眼，捡走卡在碎石间的松枝。' },
     { label: '沿土路上的脚印看看', desc: '脚印从苇丛里出来，要绕过一段光秃的干土。', days: 0.5, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'reed_fox', openingRange: true, outcome: '一只苇尾狐从对面的苇丛里蹿出来，隔着一段干地朝你扑来。' },
     { label: '踩着石头往苇后探', desc: '水眼背后有几块石头排成一线，像是有人铺过。', days: 0.125, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '拨开最后一丛苇，露出背雨的半截石渠，里面有旧柴火的焦痕。' },
-    { label: '捡起土路边的油纸包', desc: '那只狐败退时蹬断了几根苇秆，油纸包从低处滚到了土路边。', afterFight: 'reed_fox', days: 0, loot: { ration: 1 }, outcome: '油纸里有过路人落下的一份干粮，系绳还好好的。' },
+    { label: '捡起土路边的油纸包', desc: '狐狸倒下时撞断了几根苇秆，油纸包从低处滚到了土路边。', afterFight: 'reed_fox', days: 0, loot: { ration: 1 }, outcome: '油纸里有过路人落下的一份干粮，系绳还好好的。' },
     { label: '到背水坡猎白耳兔', days: 0.25, enemy: 'reed_hare', openingRange: true, outcome: '一对白耳从坡下的短苇里抬起。野兔沿着没有遮挡的斜坡猛蹬过来。' },
   ] },
   { id: 'old_fire', name: '背雨石渠', text: '半截石渠能挡雨。小石炉砌在背风处，炉边搁着一口陶锅，锅沿的缺口高过水线。', choices: [
@@ -5101,7 +5213,7 @@ const events = [
   { id: 'pine_hollow', name: '翻车的松沟', text: '旧窑车翻在树沟。车轴上绑着看不清的木签，车边踩出来的爪印很深。', choices: [
     { label: '靠近树沟里翻倒的窑车', days: 0.75, enemy: 'pitch_bear', outcome: '一只灰脊松熊从车后滚下来，先把车轴压进湿土。' },
     { label: '沿斜沟绕回松架', days: 0.125, insight: 1, loot: {}, outcome: '你沿沟边走稳脚。转过土脊，回头已看不见窑车。' },
-    { label: '拾起小路边的木签', desc: '松熊败退时撞歪了车轴，绳上的木签掉到沟外。', afterFight: 'pitch_bear', days: 0, loot: { kiln_tracks: 1 }, outcome: '车签背后刻着窑车出入的双车辙。老道在贴着松根的那一边转向窑谷。' },
+    { label: '拾起小路边的木签', desc: '松熊倒下时撞歪了车轴，绳上的木签掉到沟外。', afterFight: 'pitch_bear', days: 0, loot: { kiln_tracks: 1 }, outcome: '车签背后刻着窑车出入的双车辙。老道在贴着松根的那一边转向窑谷。' },
   ] },
   { id: 'pine_ledges', name: '背阴的断肩崖', text: '风折的松杈落到旧凿痕里，背阴处的松脂凝在木皮上。崖口朝外的一边常被风吹空。', choices: [
     { label: '从松枝之间拣厚木片', days: 1, insight: 2, loot: { wood: 4 }, outcome: '背阴处不晒，松木上的厚脂还粘手，几片能带回去做活。' },
@@ -5475,7 +5587,7 @@ const roadBandits = { ...banditContent.roadBandits, fixed: [...banditContent.roa
 
 for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
   ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent,
-  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent, banditContent, banditTaleContent]) {
+  dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent, banditContent, banditTaleContent, encyclopediaContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -5613,7 +5725,7 @@ const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, ta
 return { default: data, ...data };
 })();
 const { data } = (() => ({ data: moduleData.default }))();
-const { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView } = (() => {
+const { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView, localGoods } = (() => {
 
 
 const home = 'village';
@@ -6387,7 +6499,7 @@ function worldAction(state, action, payload, kit) {
   return null;
 }
 
-return { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView };
+return { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView, localGoods };
 })();
 const { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, banditDefeat, recoverBanditSpoils } = (() => {
 const banditRules = Object.freeze({
@@ -7380,7 +7492,7 @@ function knowsFacility(state, facility, kit) {
 }
 
 function storageUnique(id, kit) {
-  return Boolean(kit.records.gear[id] || kit.records.items[id]?.kind === 'container');
+  return Boolean(kit.records.gear[id] || ['container', 'reference'].includes(kit.records.items[id]?.kind));
 }
 
 function goodsVolume(goods, kit, stackSize = warehouseStack) {
@@ -7394,7 +7506,7 @@ function storedItems(state) {
 
 function depositable(state, id, kit) {
   const item = kit.records.items[id];
-  if (!item || kit.isEvidence(item) || (item.keepOnFall && !['manual', 'gear', 'container'].includes(item.kind)) ||
+  if (!item || kit.isEvidence(item) || (item.keepOnFall && !['manual', 'gear', 'container', 'reference'].includes(item.kind)) ||
       Object.values(state.equipment).includes(id)) return 0;
   return Math.max(0, kit.owns(state, id) - (id === 'ration' ? (state.reliefRations ?? 0) : 0));
 }
@@ -7527,7 +7639,7 @@ function containerTransferReason(state, plan, id, count, deposit, kit) {
   if (state.activeManual === id) return '先停下这门内功，再把书收入袋里。';
   if (depositable(state, id, kit) < count) return '手头没有这么多能放进袋里的东西。';
   const combined = { ...contents, [id]: (contents[id] ?? 0) + count };
-  if (storageUnique(id, kit) && combined[id] > 1) return '袋里已经有同样的装备。';
+  if (storageUnique(id, kit) && combined[id] > 1) return '袋里已经有同样的物件。';
   return goodsVolume(combined, kit, kit.rules.backpackStackSize) > plan.capacity ? '这只乾坤袋装不下了。' : '';
 }
 
@@ -8220,6 +8332,8 @@ const supply = 'ration';
 const hub = 'village';
 const slots = Object.keys(data.equipmentSlots);
 const hypothesisLimit = 180;
+const guideBookId = 'encyclopedia';
+const guideNoteLimit = 480;
 
 const rules = Object.freeze({
   restDays: 0.5,
@@ -8428,10 +8542,11 @@ function fittingItems(state, resources, spent = {}) {
   for (const [id, count] of resourceEntries(resources)) {
     if (count <= 0 || !records.items[id]) continue;
     const current = inventory[id] ?? 0;
-    const gear = records.gear[id];
-    const bag = records.items[id].kind === 'container';
-    if (gear && current) continue;
-    const desired = gear ? 1 : count;
+    const kind = records.items[id].kind;
+    const single = Boolean(records.gear[id]) || kind === 'reference';
+    const bag = kind === 'container';
+    if (single && current) continue;
+    const desired = single ? 1 : count;
     const occupies = occupiesBackpack(state, id);
     const used = Math.ceil(current / stackSize);
     const room = occupies ? (available + used) * stackSize - current : desired;
@@ -8466,12 +8581,15 @@ function groundAt(state, place = groundPlace(state)) {
 }
 
 function groundPickupLimit(state, id, available = groundAt(state)[id]) {
-  if (!available || (records.gear[id] && gearReserved(state, id))) return 0;
+  if (!available || (records.gear[id] && gearReserved(state, id)) || groundPickupReason(state, id)) return 0;
   return fittingItems(state, { [id]: available }).accepted[id] ?? 0;
 }
 
 function groundPickupReason(state, id, count) {
-  return records.items[id]?.kind === 'container' ? containerCarryReason(state.inventory, count) : '';
+  const kind = records.items[id]?.kind;
+  if (kind === 'container') return containerCarryReason(state.inventory, count);
+  if (kind === 'reference' && gearReserved(state, id)) return '你已有这本书。';
+  return '';
 }
 
 function leaveOnGround(state, resources, durability = {}, place = groundPlace(state)) {
@@ -8616,6 +8734,69 @@ function isEvidence(item) {
   return item?.kind === 'key' || item?.evidence === true;
 }
 
+function itemIdsWithCount(goods) {
+  return resourceEntries(goods).filter(([id, count]) => count > 0 && Object.hasOwn(records.items, id)).map(([id]) => id);
+}
+
+function rememberSeenItems(state, ids) {
+  const seen = new Set(state.itemSightings);
+  const previous = seen.size;
+  for (const id of ids) seen.add(id);
+  if (seen.size === previous) return false;
+  state.itemSightings = [...seen];
+  return true;
+}
+
+function recordItemSightings(state, result) {
+  const visibleGround = !state.banditDeath && !state.combat && !state.victoryPending &&
+    (!state.roadBandit || state.roadBandit.aftermath);
+  rememberSeenItems(state, [
+    ...itemIdsWithCount(state.inventory),
+    ...itemIdsWithCount(state.economy?.warehouse),
+    ...itemIdsWithCount(result?.gathered),
+    ...(visibleGround ? itemIdsWithCount(groundAt(state)) : []),
+  ]);
+}
+
+function guideBookView(state) {
+  if (!owns(state, guideBookId) || state.banditDeath) return null;
+  return { noteLimit: guideNoteLimit, entries: guideItemIds(state).map((id) => ({ id, note: state.itemNotes?.[id] ?? '' })) };
+}
+
+function guideItemIds(state) {
+  return [...new Set([...(state.itemSightings ?? []), ...itemIdsWithCount(state.inventory)])];
+}
+
+function editGuideNote(state, { id, text }) {
+  if (!owns(state, guideBookId) || state.banditDeath) return refuse('得把百科全书带在身上。');
+  if (!Object.hasOwn(records.items, id) || !guideItemIds(state).includes(id)) return refuse('书上还没有这件物品。');
+  if (typeof text !== 'string' || text.length > guideNoteLimit) return refuse(`一条说明最多写${guideNoteLimit}字。`);
+  const notes = state.itemNotes ??= {};
+  if (text === '') delete notes[id];
+  else notes[id] = text;
+  return { ok: true };
+}
+
+function offeredObservationIds(state, source) {
+  if (state.banditDeath || state.victoryPending || state.combat || state.roadTrip || state.event || state.gathering) return [];
+  if (source === 'market' && atHome(state) && knowsService(state, 'market')) {
+    return data.market.stalls.flatMap(({ offers }) => stockedOffers(state, offers).map(({ id }) => id));
+  }
+  if (source === 'localMarket' && !atHome(state)) {
+    const place = settlementOf(data, state.region);
+    return place ? Object.keys(localGoods(place)).filter((id) => records.items[id] && !isEvidence(records.items[id])) : [];
+  }
+  if (source === 'alchemy' && atHome(state)) return alchemyView(state, economyKit)?.offers.map(({ id }) => id) ?? [];
+  return [];
+}
+
+function observeGuideItems(state, { source, ids }) {
+  if (!Array.isArray(ids) || ids.length > data.items.length) return refuse('没有看见这些东西。');
+  const visible = new Set(offeredObservationIds(state, source));
+  if (ids.some((id) => !visible.has(id))) return refuse('没有看见这些东西。');
+  return { ok: true, changed: rememberSeenItems(state, ids) };
+}
+
 function knowsDeduction(state, entry) {
   return (entry.tier ?? 0) <= state.realm && isRevealed(state, entry.reveal);
 }
@@ -8645,6 +8826,8 @@ function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     focus: 0,
     inventory: {},
     knownItems: [],
+    itemSightings: [],
+    itemNotes: {},
     reliefRations: 0,
     equipment: Object.fromEntries(slots.map((slot) => [slot, null])),
     durability: {},
@@ -8708,6 +8891,7 @@ function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
       state.equipment[records.gear[id].slot] = id;
     }
   }
+  recordItemSightings(state);
   const { maxHp, maxQi } = stats(state);
   state.hp = maxHp;
   state.qi = maxQi;
@@ -8930,10 +9114,12 @@ function view(state) {
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
     knowsChoice(state, currentEvent.choices[index], currentSite));
   const { combatSeed, evadeSeed, enemyEvadeSeed, roadSeed, banditLootSeed, banditLossSeed, escapeSeed, combat, roadTrip,
-    roadBandit, banditCrews, banditSpoils, resolvedBandits, banditLeads, ...visibleState } = state;
+    roadBandit, banditCrews, banditSpoils, resolvedBandits, banditLeads, itemSightings, itemNotes, ...visibleState } = state;
   return {
     ...visibleState,
     ...stats(state),
+    guideBook: guideBookView(state),
+    itemNotes: { ...itemNotes },
     ...worldView(state, economyKit),
     roadTrip: roadTrip ? { ...roadTripView(state, economyKit), bandit: roadBanditView(state, economyKit) } : null,
     localHazard: hazardView(state, economyKit),
@@ -9480,8 +9666,9 @@ function finishCombat(state, enemy) {
   const rescuedGear = isDenBattle ? recoverBanditSpoils(state, site.id, economyKit, chiefFell) : '';
   const roadNews = chiefFell
     ? '把守几条路的人撤走了，往后这一伙人不再出来拦路。' : '';
+  const winText = protectedBout ? '试招中胜过' : isDenBattle || enemy.tags.includes('beast') ? '击杀了' : '击败了';
   return {
-    message: `${protectedBout ? '试招中胜过' : isDenBattle ? '击杀了' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}${roadNews}${rescuedGear}`,
+    message: `${winText}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}${roadNews}${rescuedGear}`,
     ...(loot ? { gathered, gatheredRegion: state.region, gatheredSite: site?.id } : {}),
   };
 }
@@ -9734,6 +9921,7 @@ function combatTurn(state, move) {
       : `${enemy.name}${interrupt ? '调息受阻，只' : ''}恢复了${restored}点生命。`;
   } else if (intent.kind === 'remedy') {
     const dose = enemyMedicine(state);
+    if (dose) rememberSeenItems(state, [dose.id]);
     if (!dose) {
       enemyMove.name = '摸了摸空药袋';
       summary += `${enemy.name}摸了摸药袋，已经空了。`;
@@ -10709,11 +10897,14 @@ function takeTurn(state, action, payload) {
 }
 
 function act(state, action, payload = {}) {
+  if (action === 'observeGuideItems') return observeGuideItems(state, payload ?? {});
+  if (action === 'editGuideNote') return editGuideNote(state, payload ?? {});
   prepareCombatRound(state);
   const result = takeTurn(state, action, payload);
   if (result.ok) {
     prepareCombatRound(state);
     refreshDiscovery(state);
+    recordItemSightings(state, result);
   }
   return result;
 }
@@ -10728,6 +10919,12 @@ return { act, createGame, handConflict, rules, view };
 const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
 const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [recipe.formula] : []));
+const gearRows = new Map(data.gear.map(row => [row.id, row]));
+const pillRows = new Map(data.pills.map(row => [row.id, row]));
+const talismanRows = new Map(data.talismans.map(row => [row.id, row]));
+const manualRows = new Map(data.innerStyles.map(row => [row.id, row]));
+const bookCategories = ["武器", "装备", "弹药", "丹药", "内功", "符箓", "口粮", "材料", "丹方", "线索", "其他"];
+const bookNames = new Intl.Collator("zh-CN");
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
 const slotNames = data.equipmentSlots;
 const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", dodge: "闪避", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
@@ -10739,6 +10936,10 @@ const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterl
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
 const guide = document.querySelector("#help");
+const encyclopedia = document.querySelector("#encyclopedia");
+const bookBody = encyclopedia.querySelector("[data-book-body]");
+const bookStatus = encyclopedia.querySelector("[data-book-status]");
+const bookToggle = app.querySelector(".topbar [data-open-encyclopedia]");
 const guideDeduction = guide.querySelector("[data-guide-deduction]");
 const guideAffiliation = document.createElement("p");
 guideAffiliation.className = "fine sect-affiliation";
@@ -10778,6 +10979,9 @@ let atlasPoint = null;
 let atlasEdge = null;
 let atlasIndexOpen = false;
 let atlasRoadsOpen = false;
+let bookCategory = null;
+let bookEditing = null;
+const bookDrafts = new Map();
 const deductionDrafts = new Map();
 const experimentDrafts = new Map();
 
@@ -10844,8 +11048,14 @@ function tag(text, tone = "") {
   return `<span class="tag ${tone}">${escape(text)}</span>`;
 }
 
+function entryLabel(title, entry) {
+  const item = entry?.id ? ` data-item-description="${escape(entry.id)}"` : "";
+  return entry ? `<span class="entry-anchor"><button class="item-trigger" type="button" data-entry aria-expanded="false">${escape(title)}</button>
+    <span class="item-tip" role="tooltip"${item}>${escape(entry.text ?? entry)}</span></span>` : escape(title);
+}
+
 function card(title, desc, badge = "", actions = "", entry = "", need = null) {
-  const name = entry ? `<span class="entry-anchor"><button class="item-trigger" type="button" data-entry aria-expanded="false">${escape(title)}</button><span class="item-tip" role="tooltip">${escape(publicText(entry))}</span></span>` : escape(title);
+  const name = entryLabel(title, entry);
   const required = need ? supplies(need) : "";
   return `<article class="card"><div class="card-head"><h3>${name}</h3>${badge}</div>${desc ? `<p>${escape(publicText(desc))}</p>` : ""}${required ? `<p>需${escape(required)}</p>` : ""}${actions ? `<div class="actions">${actions}</div>` : ""}</article>`;
 }
@@ -10990,7 +11200,7 @@ function roadPosition(road) {
   return `<p class="road-position" aria-label="行程进度"><strong>去${escape(road.destinationName ?? road.destination)}</strong><span>还剩 ${distance(road.remainingUnits)}</span>${location ? `<small>${escape(location)}</small>` : ""}</p>`;
 }
 
-function banditOffers(bandit) {
+function banditOffers(s, bandit) {
   if (bandit.remaining <= 0) return "";
   const offers = (bandit.offers ?? []).filter(offer => offer.count > 0 && offer.price > 0);
   if (!offers.length) return "";
@@ -11000,7 +11210,7 @@ function banditOffers(bandit) {
     const entry = `road-offer-${id}`;
     const first = linkButton("选 1 件", "banditPayItem", id, "quiet", false, 1, entry);
     const batch = quantity > 1 ? linkButton(`选 ${quantity} 件`, "banditPayItem", id, "quiet", false, quantity, entry) : "";
-    return `<div class="road-offer"><span id="${escape(entry)}">${escape(name)} <small class="fine">×${held ?? count} · 每件抵 ${price} 灵钱</small></span><div class="actions">${first}${batch}</div></div>`;
+    return `<div class="road-offer"><span id="${escape(entry)}">${entryLabel(name, itemEntry(s, id))} <small class="fine">×${held ?? count} · 每件抵 ${price} 灵钱</small></span><div class="actions">${first}${batch}</div></div>`;
   });
   return `<details class="road-offers" data-road-offers${expanded ? " open" : ""}><summary>拿东西抵价</summary>${rows.join("")}</details>`;
 }
@@ -11016,7 +11226,7 @@ function banditDraft(bandit) {
       ${linkButton("重新选", "banditClearOffer", "", "quiet")}</div></div>`;
 }
 
-function banditScreen(bandit, preparation = "") {
+function banditScreen(s, bandit, preparation = "") {
   const remaining = bandit.remaining;
   const askingForMoney = !bandit.aftermath && remaining != null;
   const directCash = askingForMoney && !bandit.offerValue && bandit.coins >= bandit.fee;
@@ -11035,7 +11245,7 @@ function banditScreen(bandit, preparation = "") {
     ${askingForMoney ? `<p class="road-demand">开价 ${bandit.fee} 灵钱<span class="fine">钱袋 ${bandit.coins} 灵钱</span></p>` : ""}
     ${pay || surrender || fight ? `<div class="actions">${pay}${surrender}${fight}</div>` : ""}
     ${surrender ? '<p class="fine road-surrender" id="road-surrender-note">他会拿走灵钱、能抵价的东西，以及身上和包里的装备。</p>' : ""}
-    ${askingForMoney ? banditDraft(bandit) + banditOffers(bandit) : ""}${preparation}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
+    ${askingForMoney ? banditDraft(bandit) + banditOffers(s, bandit) : ""}${preparation}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
 }
 
 function roadScreen(s) {
@@ -11045,7 +11255,7 @@ function roadScreen(s) {
     ${ground.length ? `<h3>脚边的战利品</h3>${ground.join("")}` : '<p class="fine">脚边没有物品可捡。</p>'}
     <p class="fine">可以先用药，或点行囊里的装备换上。</p>
   </section>` : "";
-  if (road.bandit) return banditScreen(road.bandit, preparation);
+  if (road.bandit) return banditScreen(s, road.bandit, preparation);
   const turnBack = road.fromName ? `折回${road.fromName}` : "沿原路折返";
   return panel(road.afterBattle ? "交手之后" : "路上", `${preparation}<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
     ${linkButton(turnBack, "roadBack", "", "quiet")}</div>`);
@@ -11343,7 +11553,7 @@ function combatScreen(s) {
         : mainBlocked && row.weaponBased !== false ? "先取消蓄力"
           : weapon?.chargeRequired && !mainCharged && row.weaponBased !== false ? "兵器须先蓄力" : "";
     const action = intent?.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
-    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), row.desc);
+    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), publicText(row.desc));
   });
   return panel(enemy.name, `
     ${intentLine}
@@ -11374,7 +11584,7 @@ function gearCondition(remaining, total) {
   return !remaining ? "损坏" : remaining / total < 0.25 ? "将坏" : remaining < total ? "磨损" : "完好";
 }
 
-function gearDescription(item, gear, remaining) {
+function gearDescription(item, gear) {
   const entry = gear.entry || `${tierName(gear.tier)}散修可用。${item.desc}`;
   const ranged = gear.ammo?.length ? "遇上从远处冲来的对手，可放箭拦住它的头一扑。" : "";
   const perception = gear.perception >= 5 ? "完好时，持用它能明显帮你察觉来招。"
@@ -11385,21 +11595,38 @@ function gearDescription(item, gear, remaining) {
   const reflect = reflection && !/反伤|反震/.test(entry)
     ? `挨下近身${reflection.intent === "heavy" ? "重招" : "普攻"}而受伤时，能把部分力道震回去。` : "";
   const charge = gear.chargeRequired && !/蓄势|蓄力/.test(entry) ? "得先蓄势才能用它出招。" : "";
-  const description = entry + perception + reflect + ranged + charge + (gear.hands === 2 ? "须双手使用，副手要空出来。" : "");
-  return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
+  return entry + perception + reflect + ranged + charge + (gear.hands === 2 ? "须双手使用，副手要空出来。" : "");
 }
 
-function itemSlot(item, location, description, actions = "", label = "", count = 0, controls = {}) {
+function itemDescription(s, id) {
+  if (Object.hasOwn(s.itemNotes ?? {}, id)) return s.itemNotes[id];
+  const item = itemRows[id];
+  const gear = gearRows.get(id);
+  const pill = pillRows.get(id);
+  const seal = talismanRows.get(id);
+  const manual = manualRows.get(id);
+  const original = gear ? gearDescription(item, gear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal)
+    : manual ? manualDescription(manual, s.manualRanks?.[id] ?? 1) : item?.desc;
+  return publicText(original);
+}
+
+function itemEntry(s, id) {
+  return { id, text: itemDescription(s, id) };
+}
+
+function itemSlot(s, item, location, actions = "", label = "", count = 0, controls = {}) {
   const key = `${location}-${item.id}`;
   const open = controls.openBag ? openBagId === item.id : selectedItem === key;
   const openAction = controls.openBag ? ` data-open-bag="${escape(item.id)}"${open ? ` aria-controls="kit-bag-${escape(item.id)}"` : ""}` : "";
   const shortcut = controls.shortcut
     ? ` data-bag-action="${controls.shortcut.action}" data-bag-id="${escape(controls.shortcut.bagId)}" data-bag-item="${escape(item.id)}"` : "";
+  const gear = gearRows.get(item.id);
+  const status = gear && controls.wear != null ? `目前${gearCondition(controls.wear, gear.durability)}。` : controls.status ?? "";
   return `<div class="item-row" data-item-row="${escape(key)}">
     ${label ? `<span class="slot-label">${escape(label)}</span>` : ""}
     <button type="button" class="item-trigger" data-item="${escape(key)}"${openAction}${shortcut} aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
-    <span class="item-tip" id="tip-${escape(key)}" role="tooltip">${escape(publicText(description))}</span>
-    ${actions ? `<div class="item-tools"${open ? "" : " hidden"}>${actions}</div>` : ""}
+    <span class="item-tip" id="tip-${escape(key)}" role="tooltip" data-item-description="${escape(item.id)}">${escape(itemDescription(s, item.id))}</span>
+    ${actions || status ? `<div class="item-tools"${open ? "" : " hidden"}>${status ? `<span class="fine item-status">${escape(status)}</span>` : ""}${actions}</div>` : ""}
   </div>`;
 }
 
@@ -11419,19 +11646,15 @@ function bagTransferControls(action, bagId, row) {
     shortcut: { action, bagId } };
 }
 
-function bagContents(bag, canMove) {
+function bagContents(s, bag, canMove) {
   if (!bag) return "";
   const rows = { "材料": [], "补给": [], "装备和功谱": [], "其他物件": [] };
   for (const row of bag.stored) {
     const item = itemRows[row.id];
-    const gear = data.gear.find(entry => entry.id === row.id);
-    const pill = data.pills.find(entry => entry.id === row.id);
-    const seal = data.talismans.find(entry => entry.id === row.id);
-    const description = gear ? gearDescription(item, gear, row.wear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
     const category = item.kind === "material" ? "材料" : ["food", "pill", "ammo", "talisman"].includes(item.kind) ? "补给"
       : ["gear", "manual"].includes(item.kind) ? "装备和功谱" : "其他物件";
     const controls = canMove ? bagTransferControls("econBagWithdraw", bag.id, row) : {};
-    rows[category].push(itemSlot(item, `bag-${bag.id}`, description, controls.actions, "", row.count, controls));
+    rows[category].push(itemSlot(s, item, `bag-${bag.id}`, controls.actions, "", row.count, { ...controls, wear: row.wear }));
   }
   const storage = Object.entries(rows).map(([category, entries]) => kitDetails(`bag-${bag.id}-${category}`, category, entries, entries.length <= 6)).join("");
   return `<section class="kit-section container-kit" id="kit-bag-${escape(bag.id)}"><div class="kit-head">
@@ -11440,13 +11663,13 @@ function bagContents(bag, canMove) {
     ${storage || '<p class="fine">空</p>'}</section>`;
 }
 
-function manualDescription(book, active = false) {
+function manualDescription(book, level) {
   const specialty = [...new Set(book.specialty.map(kind => weaponNames[kind]).filter(Boolean))].join("、");
-  const rank = manualRankName.format(book.rank);
-  const rankText = book.rank >= book.maxRank ? `已练到最高的第${rank}层。`
-    : `已练到第${rank}层，可练至第${manualRankName.format(book.maxRank)}层。`;
-  return [book.grade && `${book.grade}内功。`, book.desc, book.effect, specialty && `专练${specialty}。`,
-    active && book.aligned && "手头的打法合它的路数。", rankText].filter(Boolean).join(" ");
+  const max = book.ranks.length;
+  const rank = manualRankName.format(level);
+  const rankText = level >= max ? `已练到最高的第${rank}层。`
+    : `已练到第${rank}层，可练至第${manualRankName.format(max)}层。`;
+  return [book.grade && `${book.grade}内功。`, book.desc, book.ranks[level - 1]?.effect, specialty && `专练${specialty}。`, rankText].filter(Boolean).join(" ");
 }
 
 function manualActions(book, active, canManage, canTrain) {
@@ -11467,13 +11690,13 @@ function manualActions(book, active, canManage, canTrain) {
 function groundRows(s) {
   return Object.entries(s.groundLoot ?? {}).map(([id, count]) => {
     const item = itemRows[id];
-    const gear = data.gear.find(row => row.id === id);
+    const gear = gearRows.get(id);
     const maximum = s.groundPickup?.[id] ?? 0;
     const reason = s.groundPickupReasons?.[id];
     const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
     const cue = maximum ? `${label} · ${item.name}` : reason ? `${item.name} · ${reason}` : gear ? `${item.name}暂时拿不了` : `${item.name} · 行囊已满`;
     return `<div class="ground-row">
-      ${itemSlot(item, "ground", gear ? gearDescription(item, gear, s.groundWear[id]) : item.desc, "", "", count)}
+      ${itemSlot(s, item, "ground", "", "", count, { wear: s.groundWear[id] })}
       <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
       ${reason ? `<p class="fine ground-reason">${escape(reason)}</p>` : ""}
     </div>`;
@@ -11495,21 +11718,22 @@ function pack(s) {
     return linkButton(`修理 · ${price}钱`, "repair", id, "quiet", s.coins < price);
   }
   const worn = Object.entries(s.equipment).filter(([, id]) => id).map(([slot, id]) => {
-    const gear = data.gear.find(row => row.id === id);
+    const gear = gearRows.get(id);
     const remaining = s.durability[id] ?? gear.durability;
-    return itemSlot(itemRows[id], "worn", gearDescription(itemRows[id], gear, remaining),
+    return itemSlot(s, itemRows[id], "worn",
       (canEquip ? linkButton("卸下", "unequip", slot) : "") + repairAction(id, remaining, gear.durability),
-      slotNames[slot]);
+      slotNames[slot], 0, { wear: remaining });
   });
   const manuals = new Map((s.innerStyle?.books ?? []).map(book => [book.id, book]));
   const activeManual = s.innerStyle?.active;
-  if (activeManual) worn.push(itemSlot(itemRows[activeManual.id], "worn", manualDescription(activeManual, true),
-    manualActions(activeManual, true, canManageManual, !onOpenRoad(s)), "内功"));
+  if (activeManual) worn.push(itemSlot(s, itemRows[activeManual.id], "worn",
+    manualActions(activeManual, true, canManageManual, !onOpenRoad(s)), "内功", 0,
+    { status: activeManual.aligned ? "手头的打法合它的路数。" : "" }));
   const carried = data.items.filter(row => s.inventory[row.id] && row.id !== activeManual?.id && !Object.values(s.equipment).includes(row.id));
   const inventory = carried.filter(row => row.kind !== "key" || row.breakthrough).map(row => {
-    const gear = data.gear.find(g => g.id === row.id);
-    const pill = data.pills.find(g => g.id === row.id);
-    const seal = data.talismans.find(g => g.id === row.id);
+    const gear = gearRows.get(row.id);
+    const pill = pillRows.get(row.id);
+    const seal = talismanRows.get(row.id);
     const book = manuals.get(row.id);
     const controls = row.kind === "container" ? { openBag: true } : canManageManual && openBag
       ? bagTransferControls("econBagDeposit", openBag.id, bagSources.get(row.id)) : {};
@@ -11541,13 +11765,13 @@ function pack(s) {
       actions += linkButton("拆篓取药", "unpackBasket", "", "danger");
     }
     if (row.id === "gate_scroll" && canEquip && !s.gathering && !onOpenRoad(s)) actions += tabButton("展开卷轴", "atlas");
+    if (row.id === "encyclopedia") actions += '<button type="button" class="button quiet" data-open-encyclopedia>翻开全书</button>';
     actions += controls.actions ?? "";
     if (canEquip && !row.breakthrough) actions += linkButton("放下", "discard", row.id, "quiet");
-    const description = book ? manualDescription(book) : gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
-    return itemSlot(row, "held", description, actions, "", s.inventory[row.id], controls);
+    return itemSlot(s, row, "held", actions, "", s.inventory[row.id], { ...controls, wear: gear ? s.durability[row.id] ?? gear.durability : undefined });
   });
   const keys = carried.filter(row => row.kind === "key" && !row.breakthrough);
-  const keySlot = row => itemSlot(row, "clue", row.desc, "", "", s.inventory[row.id]);
+  const keySlot = row => itemSlot(s, row, "clue", "", "", s.inventory[row.id]);
   const clues = keys.filter(row => !formulaIds.has(row.id)).map(keySlot);
   const formulae = keys.filter(row => formulaIds.has(row.id)).map(keySlot);
   const ground = canEquip && !s.roadTrip?.afterBattle ? groundRows(s) : [];
@@ -11562,7 +11786,7 @@ function pack(s) {
       ${meter}
       ${inventory.join("") || '<p class="fine">空</p>'}
     </section>
-    ${bagContents(openBag, canManageManual)}
+    ${bagContents(s, openBag, canManageManual)}
     ${kitDetails("clues", "线索", clues, clues.length <= 5)}
     ${kitDetails("formulae", "丹方", formulae)}
     ${ground.length ? `<section class="kit-section"><h2>脚边</h2>${ground.join("")}</section>` : ""}`;
@@ -11573,6 +11797,89 @@ function kitDetails(id, label, rows, defaultOpen = false) {
   return `<details class="kit-section formula-kit"${(kitSectionOpen.get(id) ?? defaultOpen) ? " open" : ""}>
     <summary data-kit-section="${id}">${label} · ${rows.length}</summary>${rows.join("")}
   </details>`;
+}
+
+function categoryOf(item) {
+  const gear = gearRows.get(item.id);
+  if (gear) return gear.slot === "weapon" || gear.sideAtk ? "武器" : "装备";
+  if (item.breakthrough) return "丹药";
+  if (formulaIds.has(item.id)) return "丹方";
+  const category = kindNames[item.kind];
+  return bookCategories.includes(category) ? category : "其他";
+}
+
+function encyclopediaEntry(s, item, noteLimit) {
+  const id = escape(item.id);
+  const description = itemDescription(s, item.id);
+  const editing = bookEditing === item.id;
+  const modified = Object.hasOwn(s.itemNotes ?? {}, item.id);
+  const body = editing ? `<form class="book-form" data-book-note="${id}">
+    <label class="sr-only" for="book-note-text">${escape(item.name)}的介绍</label>
+    <textarea id="book-note-text" maxlength="${noteLimit}" rows="4">
+${escape(bookDrafts.get(item.id) ?? description)}</textarea>
+    <div class="actions"><button type="submit" class="button primary">保存介绍</button>
+      <button type="button" class="button quiet" data-book-cancel="${id}">取消</button>
+      ${modified ? `<button type="button" class="button quiet" data-book-reset="${id}">恢复原文</button>` : ""}
+    </div></form>` : `<p class="item-description">${escape(description)}</p>
+    <div class="actions"><button type="button" class="button quiet" data-book-edit="${id}">改介绍</button>
+      ${modified ? `<button type="button" class="button quiet" data-book-reset="${id}">恢复原文</button>` : ""}</div>`;
+  return `<article class="book-entry" data-book-entry="${id}"><h3>${escape(item.name)}</h3>${body}</article>`;
+}
+
+function renderEncyclopedia(s) {
+  const book = s.guideBook;
+  if (!book) return;
+  const editor = bookBody.querySelector("textarea:focus");
+  const selection = editor && [editor.selectionStart, editor.selectionEnd, editor.selectionDirection];
+  const scroll = encyclopedia.scrollTop;
+  const categories = new Map(bookCategories.map(category => [category, []]));
+  for (const { id } of book.entries) {
+    const item = itemRows[id];
+    if (item) categories.get(categoryOf(item)).push(item);
+  }
+  const filled = [...categories].filter(([, entries]) => entries.length);
+  if (!filled.length) {
+    bookBody.innerHTML = '<p class="intro">书页还空着。</p>';
+    return;
+  }
+  if (!categories.get(bookCategory)?.length) bookCategory = filled[0][0];
+  const list = categories.get(bookCategory).sort((left, right) => bookNames.compare(left.name, right.name));
+  const tabs = filled.map(([category]) => `<button type="button" class="button ${category === bookCategory ? "primary" : "quiet"}"
+    data-book-category="${escape(category)}" aria-pressed="${category === bookCategory}">${escape(category)}</button>`).join("");
+  bookBody.innerHTML = `<nav class="actions book-categories" aria-label="物品分类">${tabs}</nav>
+    <div class="book-entries">${list.map(item => encyclopediaEntry(s, item, book.noteLimit)).join("")}</div>`;
+  encyclopedia.scrollTop = scroll;
+  if (selection) {
+    const next = bookBody.querySelector("textarea");
+    next?.focus({ preventScroll: true });
+    next?.setSelectionRange(...selection);
+  }
+}
+
+function saveEncyclopediaNote(id, text) {
+  const result = act(state, "editGuideNote", { id, text });
+  if (!result.ok) {
+    bookStatus.textContent = result.message;
+    return;
+  }
+  bookDrafts.delete(id);
+  bookEditing = null;
+  const s = view(state);
+  const description = itemDescription(s, id);
+  for (const tip of app.querySelectorAll(`[data-item-description="${CSS.escape(id)}"]`)) {
+    tip.textContent = description;
+  }
+  renderEncyclopedia(s);
+  bookBody.querySelector(`[data-book-edit="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+  bookStatus.textContent = text ? "介绍已保存。" : "已恢复原文。";
+}
+
+function observeShopItems(s, tab) {
+  const rows = tab === "alchemy" ? s.alchemy.offers
+    : marketMode !== "buy" ? [] : tab === "market" ? s.market.stalls.flatMap(stall => stall.offers)
+      : tab === "localMarket" ? s.localMarket.offers : [];
+  const ids = rows.filter(row => (row.stock ?? row.count ?? 1) > 0).map(row => row.id);
+  return ids.length && act(state, "observeGuideItems", { source: tab, ids }).changed;
 }
 
 function villageServices(s) {
@@ -11595,7 +11902,7 @@ function cultivation(s) {
   return training + (visibleArts.length ? panel("术诀", `<div class="card-grid">${visibleArts.map(row => {
     const known = s.knownArts.includes(row.id);
     return card(row.name, "", known ? tag("已习得") : "",
-      known ? "" : linkButton(s.coins < row.price ? "灵钱不足" : "习得", "learn", row.id, "", s.coins < row.price), `${artSummary(row)}。 ${row.desc}`);
+      known ? "" : linkButton(s.coins < row.price ? "灵钱不足" : "习得", "learn", row.id, "", s.coins < row.price), publicText(`${artSummary(row)}。 ${row.desc}`));
   }).join("")}</div>`) : "");
 }
 
@@ -11615,22 +11922,18 @@ function workshop(s) {
     ${remarks}${mapTrade}
     <div class="card-grid">${recipes.map(row => {
     const result = itemRows[row.result];
-    const gear = data.gear.find(g => g.id === row.result);
-    const pill = data.pills.find(g => g.id === row.result);
-    const talisman = data.talismans.find(g => g.id === row.result);
     const reason = s.craftReasons[row.id];
-    const entry = gear ? gearDescription(result, gear) : pill ? pillSummary(pill) : talisman ? talismanSummary(talisman) : result.desc;
     return card(result.name, `${row.cost} 灵钱 · ${row.days} 日`, tag(kindNames[result.kind] ?? ""),
-      linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), entry, row.need);
+      linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), itemEntry(s, row.result), row.need);
   }).join("")}</div>`);
 }
 
-function storageRows(rows, action) {
+function storageRows(s, rows, action) {
   const depositing = action === "econDeposit";
   const label = depositing ? "存入" : "取出";
   return rows.length ? rows.map(row => {
     const bulk = Math.min(row.count, row.maximum ?? row.count);
-    return `<div class="storage-row"><span>${escape(row.name)} <small>×${row.count}</small></span>
+    return `<div class="storage-row"><span>${entryLabel(row.name, itemEntry(s, row.id))} <small>×${row.count}</small></span>
       <div class="actions">
         ${linkButton(row.reason || `${label}一份`, action, row.id, "quiet", Boolean(row.reason))}
         ${!row.reason && bulk > 1 ? linkButton(`${label} ×${bulk}`, action, row.id, "", false, bulk) : ""}
@@ -11639,15 +11942,15 @@ function storageRows(rows, action) {
   }).join("") : '<p class="fine">空</p>';
 }
 
-function warehouseScreen(warehouse) {
+function warehouseScreen(s, warehouse) {
   const unload = Object.keys(warehouse.materialPlan).length ? `<div class="actions">
     ${linkButton("存放原料", "econStoreMaterials", "", "quiet")}
     <span class="fine">${escape(supplies(warehouse.materialPlan))}</span>
   </div>` : "";
   return `<div class="storage-columns">
-    <section><h3>行囊可存</h3>${unload}${storageRows(warehouse.carried, "econDeposit")}</section>
+    <section><h3>行囊可存</h3>${unload}${storageRows(s, warehouse.carried, "econDeposit")}</section>
     <section><h3>仓中存货 <span class="fine">${warehouse.used}/${warehouse.capacity} 格</span></h3>
-      ${storageRows(warehouse.stored, "econWithdraw")}
+      ${storageRows(s, warehouse.stored, "econWithdraw")}
     </section>
   </div>`;
 }
@@ -11695,7 +11998,7 @@ function yard(s) {
   const entrances = options.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
     data-facility="${escape(facility.id)}" aria-pressed="${facility.id === current.id}">${escape(facility.name)}</button>`).join("");
   const inside = current.id === "backpack" ? backpackScreen(s, backpack, containerPlans) : (
-    (current.id === "warehouse" ? warehouseScreen(warehouse) : "") + productionScreen(current));
+    (current.id === "warehouse" ? warehouseScreen(s, warehouse) : "") + productionScreen(current));
   return panel("后院", `<div class="actions facility-tabs">${entrances}</div>
     <p class="intro facility-intro">${escape(current.desc)}</p>${inside}`, current.level > 0 ? tag(`${current.name} · ${current.level} 级`) : "");
 }
@@ -11739,22 +12042,19 @@ function regularSaleButton(entry, action, batch) {
 
 function marketItem(s, entry, selling) {
   const item = itemRows[entry.id];
-  const gear = data.gear.find(row => row.id === item.id);
-  const pill = data.pills.find(row => row.id === item.id);
-  const seal = data.talismans.find(row => row.id === item.id);
+  const gear = gearRows.get(item.id);
   const allowed = selling ? entry.canSell : entry.canBuy;
   const label = allowed ? (selling ? "卖出" : "购入") : entry.blockedReason;
-  const detail = gear ? gearDescription(item, gear, selling ? s.durability[item.id] : undefined) :
-    pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
   const price = selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`);
-  const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}</span>` : "";
+  const wear = gear && s.durability[item.id];
+  const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}${wear != null && gear ? ` · ${gearCondition(wear, gear.durability)}` : ""}</span>` : "";
   const action = selling ? "sell" : "buy";
   const batch = Math.min(entry.demand ? rules.maxTradeCount : 5, selling ? entry.count : entry.maximum);
   const batchLabel = `${selling ? "卖出" : "购入"} ×${batch}`;
   const bulk = allowed && !gear && batch > 1 ? linkButton(saleButtonLabel(batchLabel, entry, batch), action, item.id, "quiet", false, batch) : "";
   const regular = selling && allowed ? regularSaleButton(entry, action, batch) : "";
   const stock = !selling && Number.isFinite(entry.stock) ? `<span class="fine">摊上余 ${entry.stock}</span>` : "";
-  return card(item.name, "", price, `${linkButton(allowed ? saleButtonLabel(label, entry, 1) : label, action, item.id, "", !allowed)}${regular}${bulk}${quantity}${stock}${saleDemandNote(entry)}`, detail);
+  return card(item.name, "", price, `${linkButton(allowed ? saleButtonLabel(label, entry, 1) : label, action, item.id, "", !allowed)}${regular}${bulk}${quantity}${stock}${saleDemandNote(entry)}`, itemEntry(s, item.id));
 }
 
 function merchantOffer(stall) {
@@ -11773,7 +12073,7 @@ function market(s) {
   const specialized = s.market.sales.filter(({ canSell }) => canSell);
   const fallback = s.localMarket?.buys.filter((entry) => !specialized.some(({ id }) => id === entry.id)) ?? [];
   const contents = marketMode === "sell"
-    ? (specialized.length || fallback.length ? `<div class="card-grid">${specialized.map(entry => marketItem(s, entry, true)).join("")}${fallback.map(entry => localMarketItem(entry, true)).join("")}</div>`
+    ? (specialized.length || fallback.length ? `<div class="card-grid">${specialized.map(entry => marketItem(s, entry, true)).join("")}${fallback.map(entry => localMarketItem(s, entry, true)).join("")}</div>`
       : '<p class="intro">行囊里暂时没有能卖的东西。</p>')
     : s.market.stalls.map(stall => `<section class="market-stall">
       <h3>${escape(stall.name)}</h3>
@@ -11789,10 +12089,8 @@ function marketSwitcher() {
   return `<div class="actions market-switch">${button("buy", "摊上的货")}${button("sell", "卖手里的货")}</div>`;
 }
 
-function localMarketItem(entry, selling) {
+function localMarketItem(s, entry, selling) {
   const item = itemRows[entry.id];
-  const gear = data.gear.find(({ id }) => id === item.id);
-  const pill = data.pills.find(({ id }) => id === item.id);
   const maximum = selling ? Math.min(entry.count, rules.maxTradeCount) : entry.maximum;
   const label = selling ? "卖出" : "购入";
   const action = selling ? "localSell" : "localBuy";
@@ -11802,14 +12100,14 @@ function localMarketItem(entry, selling) {
     (maximum > 1 ? linkButton(saleButtonLabel(`${label} ×${maximum}`, entry, maximum), action, item.id, "quiet", false, maximum) : "");
   const stock = `<span class="fine">${selling ? "可卖" : "在摊"} ×${entry.count}</span>`;
   return card(item.name, "", selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`), `${buttons}${stock}${saleDemandNote(entry)}`,
-    gear ? gearDescription(item, gear) : pill ? pillSummary(pill) : item.desc);
+    itemEntry(s, item.id));
 }
 
 function localMarketScreen(s) {
   const selling = marketMode === "sell";
   const rows = selling ? s.localMarket.buys : s.localMarket.offers;
   const talk = s.localMarket.talk;
-  return panel(`${s.region.name}集市`, `${marketSwitcher()}${talk ? `<div class="actions">${linkButton(talk.label, "localAsk", "", "quiet")}</div>` : ""}${rows.length ? `<div class="card-grid">${rows.map(entry => localMarketItem(entry, selling)).join("")}</div>` :
+  return panel(`${s.region.name}集市`, `${marketSwitcher()}${talk ? `<div class="actions">${linkButton(talk.label, "localAsk", "", "quiet")}</div>` : ""}${rows.length ? `<div class="card-grid">${rows.map(entry => localMarketItem(s, entry, selling)).join("")}</div>` :
     '<p class="intro">行囊里暂时没有能卖的东西。</p>'}`, tag(`灵钱 ${s.coins}`));
 }
 
@@ -11874,9 +12172,9 @@ function trainingScreen(s) {
 function alchemy(s) {
   const teacher = s.alchemy;
   const commission = teacher.inquiry;
-  const formulae = teacher.offers.map(({ id, name, price, desc, known, reason }) => card(
+  const formulae = teacher.offers.map(({ id, name, price, known, reason }) => card(
     name, "", known ? tag("已学会") : tag(`${price} 灵钱`),
-    known ? "" : linkButton(reason || "买下丹方", "alchemyBuyFormula", id, "", Boolean(reason)), desc,
+    known ? "" : linkButton(reason || "买下丹方", "alchemyBuyFormula", id, "", Boolean(reason)), itemEntry(s, id),
   )).join("");
   const inquiry = commission ? `<section class="alchemy-inquiry"><h3>${escape(commission.label)}</h3>
     <p class="intro">${escape(commission.text)}</p>
@@ -11931,7 +12229,7 @@ function deductionBoard(s) {
   const draft = deductionDrafts.get(current.id) ?? current.thought;
   const casesBar = cases.length > 1 ? `<div class="actions deduction-cases">${cases.map(row => `<button type="button" class="button ${row.id === current.id ? "primary" : ""}" data-case="${escape(row.id)}" aria-pressed="${row.id === current.id}">${escape(row.name)}${row.completed ? " ✓" : ""}</button>`).join("")}</div>` : "";
   const evidence = (s.evidence ?? []).map(item => `<label class="evidence-option"><input type="checkbox" name="evidence" value="${escape(item.id)}"${draft?.evidence.includes(item.id) ? " checked" : ""}>
-    <span><strong>${escape(item.name)}</strong><small>${escape(publicText(item.desc))}</small></span></label>`).join("");
+    <span><strong>${escape(item.name)}</strong><small class="item-description" data-item-description="${escape(item.id)}">${escape(itemDescription(s, item.id))}</small></span></label>`).join("");
   return panel("沙盘", casesBar + `<h3>${escape(current.name)}</h3><p class="intro training-note">${escape(publicText(current.desc))}</p>` +
     (current.completed ? `<p class="intent">${escape(publicText(current.observation))}</p>${thoughtDetails(current.thought)}` :
       `<form class="deduction" data-deduction="${escape(current.id)}">
@@ -11979,7 +12277,7 @@ function restoreKeyboardFocus(focus) {
 
 function render() {
   const focus = keyboardFocus();
-  const s = view(state);
+  let s = view(state);
   const carriedBags = s.economy?.containers ?? [];
   if (openBagId && !carriedBags.some(row => row.id === openBagId)) openBagId = null;
   if (s.mode !== "combat") combatObservation = null;
@@ -11997,6 +12295,7 @@ function render() {
   };
   for (const service of services) available[service] = true;
   const tab = inEncounter || !available[screen] || (inEvent && screen !== "atlas") ? "journey" : screen;
+  if (observeShopItems(s, tab)) s = view(state);
   const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, yard, alchemy, quests: questBoard,
     deduction: deductionBoard, atlas, localMarket: localMarketScreen, sect: sectScreen, tournament: tournamentScreen, training: trainingScreen };
   document.querySelector("#clock").textContent = `第${Math.floor(s.day)}日 · ${s.day % 1 < 0.5 ? "白昼" : "夜里"}`;
@@ -12006,7 +12305,12 @@ function render() {
   kit.hidden = dead;
   kit.innerHTML = dead ? "" : pack(s);
   app.querySelector("[data-help]").hidden = dead;
+  bookToggle.hidden = dead || !s.guideBook;
   if (dead && guide.open) guide.close();
+  if (encyclopedia.open) {
+    if (bookToggle.hidden) encyclopedia.close();
+    else renderEncyclopedia(s);
+  }
   for (const button of document.querySelectorAll("#player-status [data-action], #kit [data-action]")) {
     if (s.gathering) button.disabled = true;
   }
@@ -12240,12 +12544,18 @@ function readExperiment(form) {
 
 document.addEventListener("input", event => {
   const form = event.target.form;
+  if (form?.dataset.bookNote) bookDrafts.set(form.dataset.bookNote, event.target.value);
   if (form?.dataset.deduction) deductionDrafts.set(form.dataset.deduction, readDeduction(form));
   if (form?.dataset.experiment) experimentDrafts.set(form.dataset.experiment, readExperiment(form).settings);
 });
 
 document.addEventListener("submit", event => {
   const form = event.target;
+  if (form.dataset.bookNote) {
+    event.preventDefault();
+    saveEncyclopediaNote(form.dataset.bookNote, form.querySelector("textarea").value);
+    return;
+  }
   if (!form.matches("[data-deduction], [data-experiment]")) return;
   event.preventDefault();
   if (form.dataset.deduction) {
@@ -12300,6 +12610,45 @@ document.addEventListener("click", event => {
     button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
     return;
   }
+  if (button.hasAttribute("data-open-encyclopedia")) {
+    const s = view(state);
+    if (!s.guideBook || s.mode === "death") return;
+    bookStatus.textContent = "";
+    renderEncyclopedia(s);
+    encyclopedia.showModal();
+    return;
+  }
+  if (button.hasAttribute("data-close-encyclopedia")) {
+    encyclopedia.close();
+    return;
+  }
+  if (button.dataset.bookCategory) {
+    bookCategory = button.dataset.bookCategory;
+    bookEditing = null;
+    bookStatus.textContent = "";
+    renderEncyclopedia(view(state));
+    bookBody.querySelector(`[data-book-category="${CSS.escape(bookCategory)}"]`)?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.dataset.bookEdit) {
+    bookEditing = button.dataset.bookEdit;
+    bookStatus.textContent = "";
+    renderEncyclopedia(view(state));
+    bookBody.querySelector("textarea")?.focus();
+    return;
+  }
+  if (button.dataset.bookCancel) {
+    const id = button.dataset.bookCancel;
+    bookDrafts.delete(id);
+    bookEditing = null;
+    renderEncyclopedia(view(state));
+    bookBody.querySelector(`[data-book-edit="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.dataset.bookReset) {
+    saveEncyclopediaNote(button.dataset.bookReset, "");
+    return;
+  }
   if (button.hasAttribute("data-help")) {
     guide.showModal();
     return;
@@ -12320,6 +12669,9 @@ document.addEventListener("click", event => {
     atlasEdge = null;
     atlasIndexOpen = false;
     atlasRoadsOpen = false;
+    bookCategory = null;
+    bookEditing = null;
+    bookDrafts.clear();
     selectedItem = null;
     openBagId = null;
     for (const topic of guide.querySelectorAll("details")) topic.open = false;
@@ -12327,6 +12679,7 @@ document.addEventListener("click", event => {
     deductionDrafts.clear();
     experimentDrafts.clear();
     notices.replaceChildren();
+    if (encyclopedia.open) encyclopedia.close();
     guide.close();
     render();
     restartNotice = true;

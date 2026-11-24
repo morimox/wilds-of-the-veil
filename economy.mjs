@@ -287,7 +287,7 @@ function knowsFacility(state, facility, kit) {
 }
 
 function storageUnique(id, kit) {
-  return Boolean(kit.records.gear[id] || kit.records.items[id]?.kind === 'container');
+  return Boolean(kit.records.gear[id] || ['container', 'reference'].includes(kit.records.items[id]?.kind));
 }
 
 function goodsVolume(goods, kit, stackSize = warehouseStack) {
@@ -301,7 +301,7 @@ function storedItems(state) {
 
 function depositable(state, id, kit) {
   const item = kit.records.items[id];
-  if (!item || kit.isEvidence(item) || (item.keepOnFall && !['manual', 'gear', 'container'].includes(item.kind)) ||
+  if (!item || kit.isEvidence(item) || (item.keepOnFall && !['manual', 'gear', 'container', 'reference'].includes(item.kind)) ||
       Object.values(state.equipment).includes(id)) return 0;
   return Math.max(0, kit.owns(state, id) - (id === 'ration' ? (state.reliefRations ?? 0) : 0));
 }
@@ -434,7 +434,7 @@ function containerTransferReason(state, plan, id, count, deposit, kit) {
   if (state.activeManual === id) return '先停下这门内功，再把书收入袋里。';
   if (depositable(state, id, kit) < count) return '手头没有这么多能放进袋里的东西。';
   const combined = { ...contents, [id]: (contents[id] ?? 0) + count };
-  if (storageUnique(id, kit) && combined[id] > 1) return '袋里已经有同样的装备。';
+  if (storageUnique(id, kit) && combined[id] > 1) return '袋里已经有同样的物件。';
   return goodsVolume(combined, kit, kit.rules.backpackStackSize) > plan.capacity ? '这只乾坤袋装不下了。' : '';
 }
 

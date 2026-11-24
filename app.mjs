@@ -6,6 +6,12 @@ import { banditRules } from "./bandits.mjs";
 const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
 const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [recipe.formula] : []));
+const gearRows = new Map(data.gear.map(row => [row.id, row]));
+const pillRows = new Map(data.pills.map(row => [row.id, row]));
+const talismanRows = new Map(data.talismans.map(row => [row.id, row]));
+const manualRows = new Map(data.innerStyles.map(row => [row.id, row]));
+const bookCategories = ["武器", "装备", "弹药", "丹药", "内功", "符箓", "口粮", "材料", "丹方", "线索", "其他"];
+const bookNames = new Intl.Collator("zh-CN");
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
 const slotNames = data.equipmentSlots;
 const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", dodge: "闪避", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
@@ -17,6 +23,10 @@ const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterl
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
 const guide = document.querySelector("#help");
+const encyclopedia = document.querySelector("#encyclopedia");
+const bookBody = encyclopedia.querySelector("[data-book-body]");
+const bookStatus = encyclopedia.querySelector("[data-book-status]");
+const bookToggle = app.querySelector(".topbar [data-open-encyclopedia]");
 const guideDeduction = guide.querySelector("[data-guide-deduction]");
 const guideAffiliation = document.createElement("p");
 guideAffiliation.className = "fine sect-affiliation";
@@ -56,6 +66,9 @@ let atlasPoint = null;
 let atlasEdge = null;
 let atlasIndexOpen = false;
 let atlasRoadsOpen = false;
+let bookCategory = null;
+let bookEditing = null;
+const bookDrafts = new Map();
 const deductionDrafts = new Map();
 const experimentDrafts = new Map();
 
@@ -122,8 +135,14 @@ function tag(text, tone = "") {
   return `<span class="tag ${tone}">${escape(text)}</span>`;
 }
 
+function entryLabel(title, entry) {
+  const item = entry?.id ? ` data-item-description="${escape(entry.id)}"` : "";
+  return entry ? `<span class="entry-anchor"><button class="item-trigger" type="button" data-entry aria-expanded="false">${escape(title)}</button>
+    <span class="item-tip" role="tooltip"${item}>${escape(entry.text ?? entry)}</span></span>` : escape(title);
+}
+
 function card(title, desc, badge = "", actions = "", entry = "", need = null) {
-  const name = entry ? `<span class="entry-anchor"><button class="item-trigger" type="button" data-entry aria-expanded="false">${escape(title)}</button><span class="item-tip" role="tooltip">${escape(publicText(entry))}</span></span>` : escape(title);
+  const name = entryLabel(title, entry);
   const required = need ? supplies(need) : "";
   return `<article class="card"><div class="card-head"><h3>${name}</h3>${badge}</div>${desc ? `<p>${escape(publicText(desc))}</p>` : ""}${required ? `<p>需${escape(required)}</p>` : ""}${actions ? `<div class="actions">${actions}</div>` : ""}</article>`;
 }
@@ -268,7 +287,7 @@ function roadPosition(road) {
   return `<p class="road-position" aria-label="行程进度"><strong>去${escape(road.destinationName ?? road.destination)}</strong><span>还剩 ${distance(road.remainingUnits)}</span>${location ? `<small>${escape(location)}</small>` : ""}</p>`;
 }
 
-function banditOffers(bandit) {
+function banditOffers(s, bandit) {
   if (bandit.remaining <= 0) return "";
   const offers = (bandit.offers ?? []).filter(offer => offer.count > 0 && offer.price > 0);
   if (!offers.length) return "";
@@ -278,7 +297,7 @@ function banditOffers(bandit) {
     const entry = `road-offer-${id}`;
     const first = linkButton("选 1 件", "banditPayItem", id, "quiet", false, 1, entry);
     const batch = quantity > 1 ? linkButton(`选 ${quantity} 件`, "banditPayItem", id, "quiet", false, quantity, entry) : "";
-    return `<div class="road-offer"><span id="${escape(entry)}">${escape(name)} <small class="fine">×${held ?? count} · 每件抵 ${price} 灵钱</small></span><div class="actions">${first}${batch}</div></div>`;
+    return `<div class="road-offer"><span id="${escape(entry)}">${entryLabel(name, itemEntry(s, id))} <small class="fine">×${held ?? count} · 每件抵 ${price} 灵钱</small></span><div class="actions">${first}${batch}</div></div>`;
   });
   return `<details class="road-offers" data-road-offers${expanded ? " open" : ""}><summary>拿东西抵价</summary>${rows.join("")}</details>`;
 }
@@ -294,7 +313,7 @@ function banditDraft(bandit) {
       ${linkButton("重新选", "banditClearOffer", "", "quiet")}</div></div>`;
 }
 
-function banditScreen(bandit, preparation = "") {
+function banditScreen(s, bandit, preparation = "") {
   const remaining = bandit.remaining;
   const askingForMoney = !bandit.aftermath && remaining != null;
   const directCash = askingForMoney && !bandit.offerValue && bandit.coins >= bandit.fee;
@@ -313,7 +332,7 @@ function banditScreen(bandit, preparation = "") {
     ${askingForMoney ? `<p class="road-demand">开价 ${bandit.fee} 灵钱<span class="fine">钱袋 ${bandit.coins} 灵钱</span></p>` : ""}
     ${pay || surrender || fight ? `<div class="actions">${pay}${surrender}${fight}</div>` : ""}
     ${surrender ? '<p class="fine road-surrender" id="road-surrender-note">他会拿走灵钱、能抵价的东西，以及身上和包里的装备。</p>' : ""}
-    ${askingForMoney ? banditDraft(bandit) + banditOffers(bandit) : ""}${preparation}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
+    ${askingForMoney ? banditDraft(bandit) + banditOffers(s, bandit) : ""}${preparation}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
 }
 
 function roadScreen(s) {
@@ -323,7 +342,7 @@ function roadScreen(s) {
     ${ground.length ? `<h3>脚边的战利品</h3>${ground.join("")}` : '<p class="fine">脚边没有物品可捡。</p>'}
     <p class="fine">可以先用药，或点行囊里的装备换上。</p>
   </section>` : "";
-  if (road.bandit) return banditScreen(road.bandit, preparation);
+  if (road.bandit) return banditScreen(s, road.bandit, preparation);
   const turnBack = road.fromName ? `折回${road.fromName}` : "沿原路折返";
   return panel(road.afterBattle ? "交手之后" : "路上", `${preparation}<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
     ${linkButton(turnBack, "roadBack", "", "quiet")}</div>`);
@@ -621,7 +640,7 @@ function combatScreen(s) {
         : mainBlocked && row.weaponBased !== false ? "先取消蓄力"
           : weapon?.chargeRequired && !mainCharged && row.weaponBased !== false ? "兵器须先蓄力" : "";
     const action = intent?.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
-    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), row.desc);
+    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), publicText(row.desc));
   });
   return panel(enemy.name, `
     ${intentLine}
@@ -652,7 +671,7 @@ function gearCondition(remaining, total) {
   return !remaining ? "损坏" : remaining / total < 0.25 ? "将坏" : remaining < total ? "磨损" : "完好";
 }
 
-function gearDescription(item, gear, remaining) {
+function gearDescription(item, gear) {
   const entry = gear.entry || `${tierName(gear.tier)}散修可用。${item.desc}`;
   const ranged = gear.ammo?.length ? "遇上从远处冲来的对手，可放箭拦住它的头一扑。" : "";
   const perception = gear.perception >= 5 ? "完好时，持用它能明显帮你察觉来招。"
@@ -663,21 +682,38 @@ function gearDescription(item, gear, remaining) {
   const reflect = reflection && !/反伤|反震/.test(entry)
     ? `挨下近身${reflection.intent === "heavy" ? "重招" : "普攻"}而受伤时，能把部分力道震回去。` : "";
   const charge = gear.chargeRequired && !/蓄势|蓄力/.test(entry) ? "得先蓄势才能用它出招。" : "";
-  const description = entry + perception + reflect + ranged + charge + (gear.hands === 2 ? "须双手使用，副手要空出来。" : "");
-  return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
+  return entry + perception + reflect + ranged + charge + (gear.hands === 2 ? "须双手使用，副手要空出来。" : "");
 }
 
-function itemSlot(item, location, description, actions = "", label = "", count = 0, controls = {}) {
+function itemDescription(s, id) {
+  if (Object.hasOwn(s.itemNotes ?? {}, id)) return s.itemNotes[id];
+  const item = itemRows[id];
+  const gear = gearRows.get(id);
+  const pill = pillRows.get(id);
+  const seal = talismanRows.get(id);
+  const manual = manualRows.get(id);
+  const original = gear ? gearDescription(item, gear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal)
+    : manual ? manualDescription(manual, s.manualRanks?.[id] ?? 1) : item?.desc;
+  return publicText(original);
+}
+
+function itemEntry(s, id) {
+  return { id, text: itemDescription(s, id) };
+}
+
+function itemSlot(s, item, location, actions = "", label = "", count = 0, controls = {}) {
   const key = `${location}-${item.id}`;
   const open = controls.openBag ? openBagId === item.id : selectedItem === key;
   const openAction = controls.openBag ? ` data-open-bag="${escape(item.id)}"${open ? ` aria-controls="kit-bag-${escape(item.id)}"` : ""}` : "";
   const shortcut = controls.shortcut
     ? ` data-bag-action="${controls.shortcut.action}" data-bag-id="${escape(controls.shortcut.bagId)}" data-bag-item="${escape(item.id)}"` : "";
+  const gear = gearRows.get(item.id);
+  const status = gear && controls.wear != null ? `目前${gearCondition(controls.wear, gear.durability)}。` : controls.status ?? "";
   return `<div class="item-row" data-item-row="${escape(key)}">
     ${label ? `<span class="slot-label">${escape(label)}</span>` : ""}
     <button type="button" class="item-trigger" data-item="${escape(key)}"${openAction}${shortcut} aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
-    <span class="item-tip" id="tip-${escape(key)}" role="tooltip">${escape(publicText(description))}</span>
-    ${actions ? `<div class="item-tools"${open ? "" : " hidden"}>${actions}</div>` : ""}
+    <span class="item-tip" id="tip-${escape(key)}" role="tooltip" data-item-description="${escape(item.id)}">${escape(itemDescription(s, item.id))}</span>
+    ${actions || status ? `<div class="item-tools"${open ? "" : " hidden"}>${status ? `<span class="fine item-status">${escape(status)}</span>` : ""}${actions}</div>` : ""}
   </div>`;
 }
 
@@ -697,19 +733,15 @@ function bagTransferControls(action, bagId, row) {
     shortcut: { action, bagId } };
 }
 
-function bagContents(bag, canMove) {
+function bagContents(s, bag, canMove) {
   if (!bag) return "";
   const rows = { "材料": [], "补给": [], "装备和功谱": [], "其他物件": [] };
   for (const row of bag.stored) {
     const item = itemRows[row.id];
-    const gear = data.gear.find(entry => entry.id === row.id);
-    const pill = data.pills.find(entry => entry.id === row.id);
-    const seal = data.talismans.find(entry => entry.id === row.id);
-    const description = gear ? gearDescription(item, gear, row.wear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
     const category = item.kind === "material" ? "材料" : ["food", "pill", "ammo", "talisman"].includes(item.kind) ? "补给"
       : ["gear", "manual"].includes(item.kind) ? "装备和功谱" : "其他物件";
     const controls = canMove ? bagTransferControls("econBagWithdraw", bag.id, row) : {};
-    rows[category].push(itemSlot(item, `bag-${bag.id}`, description, controls.actions, "", row.count, controls));
+    rows[category].push(itemSlot(s, item, `bag-${bag.id}`, controls.actions, "", row.count, { ...controls, wear: row.wear }));
   }
   const storage = Object.entries(rows).map(([category, entries]) => kitDetails(`bag-${bag.id}-${category}`, category, entries, entries.length <= 6)).join("");
   return `<section class="kit-section container-kit" id="kit-bag-${escape(bag.id)}"><div class="kit-head">
@@ -718,13 +750,13 @@ function bagContents(bag, canMove) {
     ${storage || '<p class="fine">空</p>'}</section>`;
 }
 
-function manualDescription(book, active = false) {
+function manualDescription(book, level) {
   const specialty = [...new Set(book.specialty.map(kind => weaponNames[kind]).filter(Boolean))].join("、");
-  const rank = manualRankName.format(book.rank);
-  const rankText = book.rank >= book.maxRank ? `已练到最高的第${rank}层。`
-    : `已练到第${rank}层，可练至第${manualRankName.format(book.maxRank)}层。`;
-  return [book.grade && `${book.grade}内功。`, book.desc, book.effect, specialty && `专练${specialty}。`,
-    active && book.aligned && "手头的打法合它的路数。", rankText].filter(Boolean).join(" ");
+  const max = book.ranks.length;
+  const rank = manualRankName.format(level);
+  const rankText = level >= max ? `已练到最高的第${rank}层。`
+    : `已练到第${rank}层，可练至第${manualRankName.format(max)}层。`;
+  return [book.grade && `${book.grade}内功。`, book.desc, book.ranks[level - 1]?.effect, specialty && `专练${specialty}。`, rankText].filter(Boolean).join(" ");
 }
 
 function manualActions(book, active, canManage, canTrain) {
@@ -745,13 +777,13 @@ function manualActions(book, active, canManage, canTrain) {
 function groundRows(s) {
   return Object.entries(s.groundLoot ?? {}).map(([id, count]) => {
     const item = itemRows[id];
-    const gear = data.gear.find(row => row.id === id);
+    const gear = gearRows.get(id);
     const maximum = s.groundPickup?.[id] ?? 0;
     const reason = s.groundPickupReasons?.[id];
     const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
     const cue = maximum ? `${label} · ${item.name}` : reason ? `${item.name} · ${reason}` : gear ? `${item.name}暂时拿不了` : `${item.name} · 行囊已满`;
     return `<div class="ground-row">
-      ${itemSlot(item, "ground", gear ? gearDescription(item, gear, s.groundWear[id]) : item.desc, "", "", count)}
+      ${itemSlot(s, item, "ground", "", "", count, { wear: s.groundWear[id] })}
       <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
       ${reason ? `<p class="fine ground-reason">${escape(reason)}</p>` : ""}
     </div>`;
@@ -773,21 +805,22 @@ function pack(s) {
     return linkButton(`修理 · ${price}钱`, "repair", id, "quiet", s.coins < price);
   }
   const worn = Object.entries(s.equipment).filter(([, id]) => id).map(([slot, id]) => {
-    const gear = data.gear.find(row => row.id === id);
+    const gear = gearRows.get(id);
     const remaining = s.durability[id] ?? gear.durability;
-    return itemSlot(itemRows[id], "worn", gearDescription(itemRows[id], gear, remaining),
+    return itemSlot(s, itemRows[id], "worn",
       (canEquip ? linkButton("卸下", "unequip", slot) : "") + repairAction(id, remaining, gear.durability),
-      slotNames[slot]);
+      slotNames[slot], 0, { wear: remaining });
   });
   const manuals = new Map((s.innerStyle?.books ?? []).map(book => [book.id, book]));
   const activeManual = s.innerStyle?.active;
-  if (activeManual) worn.push(itemSlot(itemRows[activeManual.id], "worn", manualDescription(activeManual, true),
-    manualActions(activeManual, true, canManageManual, !onOpenRoad(s)), "内功"));
+  if (activeManual) worn.push(itemSlot(s, itemRows[activeManual.id], "worn",
+    manualActions(activeManual, true, canManageManual, !onOpenRoad(s)), "内功", 0,
+    { status: activeManual.aligned ? "手头的打法合它的路数。" : "" }));
   const carried = data.items.filter(row => s.inventory[row.id] && row.id !== activeManual?.id && !Object.values(s.equipment).includes(row.id));
   const inventory = carried.filter(row => row.kind !== "key" || row.breakthrough).map(row => {
-    const gear = data.gear.find(g => g.id === row.id);
-    const pill = data.pills.find(g => g.id === row.id);
-    const seal = data.talismans.find(g => g.id === row.id);
+    const gear = gearRows.get(row.id);
+    const pill = pillRows.get(row.id);
+    const seal = talismanRows.get(row.id);
     const book = manuals.get(row.id);
     const controls = row.kind === "container" ? { openBag: true } : canManageManual && openBag
       ? bagTransferControls("econBagDeposit", openBag.id, bagSources.get(row.id)) : {};
@@ -819,13 +852,13 @@ function pack(s) {
       actions += linkButton("拆篓取药", "unpackBasket", "", "danger");
     }
     if (row.id === "gate_scroll" && canEquip && !s.gathering && !onOpenRoad(s)) actions += tabButton("展开卷轴", "atlas");
+    if (row.id === "encyclopedia") actions += '<button type="button" class="button quiet" data-open-encyclopedia>翻开全书</button>';
     actions += controls.actions ?? "";
     if (canEquip && !row.breakthrough) actions += linkButton("放下", "discard", row.id, "quiet");
-    const description = book ? manualDescription(book) : gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
-    return itemSlot(row, "held", description, actions, "", s.inventory[row.id], controls);
+    return itemSlot(s, row, "held", actions, "", s.inventory[row.id], { ...controls, wear: gear ? s.durability[row.id] ?? gear.durability : undefined });
   });
   const keys = carried.filter(row => row.kind === "key" && !row.breakthrough);
-  const keySlot = row => itemSlot(row, "clue", row.desc, "", "", s.inventory[row.id]);
+  const keySlot = row => itemSlot(s, row, "clue", "", "", s.inventory[row.id]);
   const clues = keys.filter(row => !formulaIds.has(row.id)).map(keySlot);
   const formulae = keys.filter(row => formulaIds.has(row.id)).map(keySlot);
   const ground = canEquip && !s.roadTrip?.afterBattle ? groundRows(s) : [];
@@ -840,7 +873,7 @@ function pack(s) {
       ${meter}
       ${inventory.join("") || '<p class="fine">空</p>'}
     </section>
-    ${bagContents(openBag, canManageManual)}
+    ${bagContents(s, openBag, canManageManual)}
     ${kitDetails("clues", "线索", clues, clues.length <= 5)}
     ${kitDetails("formulae", "丹方", formulae)}
     ${ground.length ? `<section class="kit-section"><h2>脚边</h2>${ground.join("")}</section>` : ""}`;
@@ -851,6 +884,89 @@ function kitDetails(id, label, rows, defaultOpen = false) {
   return `<details class="kit-section formula-kit"${(kitSectionOpen.get(id) ?? defaultOpen) ? " open" : ""}>
     <summary data-kit-section="${id}">${label} · ${rows.length}</summary>${rows.join("")}
   </details>`;
+}
+
+function categoryOf(item) {
+  const gear = gearRows.get(item.id);
+  if (gear) return gear.slot === "weapon" || gear.sideAtk ? "武器" : "装备";
+  if (item.breakthrough) return "丹药";
+  if (formulaIds.has(item.id)) return "丹方";
+  const category = kindNames[item.kind];
+  return bookCategories.includes(category) ? category : "其他";
+}
+
+function encyclopediaEntry(s, item, noteLimit) {
+  const id = escape(item.id);
+  const description = itemDescription(s, item.id);
+  const editing = bookEditing === item.id;
+  const modified = Object.hasOwn(s.itemNotes ?? {}, item.id);
+  const body = editing ? `<form class="book-form" data-book-note="${id}">
+    <label class="sr-only" for="book-note-text">${escape(item.name)}的介绍</label>
+    <textarea id="book-note-text" maxlength="${noteLimit}" rows="4">
+${escape(bookDrafts.get(item.id) ?? description)}</textarea>
+    <div class="actions"><button type="submit" class="button primary">保存介绍</button>
+      <button type="button" class="button quiet" data-book-cancel="${id}">取消</button>
+      ${modified ? `<button type="button" class="button quiet" data-book-reset="${id}">恢复原文</button>` : ""}
+    </div></form>` : `<p class="item-description">${escape(description)}</p>
+    <div class="actions"><button type="button" class="button quiet" data-book-edit="${id}">改介绍</button>
+      ${modified ? `<button type="button" class="button quiet" data-book-reset="${id}">恢复原文</button>` : ""}</div>`;
+  return `<article class="book-entry" data-book-entry="${id}"><h3>${escape(item.name)}</h3>${body}</article>`;
+}
+
+function renderEncyclopedia(s) {
+  const book = s.guideBook;
+  if (!book) return;
+  const editor = bookBody.querySelector("textarea:focus");
+  const selection = editor && [editor.selectionStart, editor.selectionEnd, editor.selectionDirection];
+  const scroll = encyclopedia.scrollTop;
+  const categories = new Map(bookCategories.map(category => [category, []]));
+  for (const { id } of book.entries) {
+    const item = itemRows[id];
+    if (item) categories.get(categoryOf(item)).push(item);
+  }
+  const filled = [...categories].filter(([, entries]) => entries.length);
+  if (!filled.length) {
+    bookBody.innerHTML = '<p class="intro">书页还空着。</p>';
+    return;
+  }
+  if (!categories.get(bookCategory)?.length) bookCategory = filled[0][0];
+  const list = categories.get(bookCategory).sort((left, right) => bookNames.compare(left.name, right.name));
+  const tabs = filled.map(([category]) => `<button type="button" class="button ${category === bookCategory ? "primary" : "quiet"}"
+    data-book-category="${escape(category)}" aria-pressed="${category === bookCategory}">${escape(category)}</button>`).join("");
+  bookBody.innerHTML = `<nav class="actions book-categories" aria-label="物品分类">${tabs}</nav>
+    <div class="book-entries">${list.map(item => encyclopediaEntry(s, item, book.noteLimit)).join("")}</div>`;
+  encyclopedia.scrollTop = scroll;
+  if (selection) {
+    const next = bookBody.querySelector("textarea");
+    next?.focus({ preventScroll: true });
+    next?.setSelectionRange(...selection);
+  }
+}
+
+function saveEncyclopediaNote(id, text) {
+  const result = act(state, "editGuideNote", { id, text });
+  if (!result.ok) {
+    bookStatus.textContent = result.message;
+    return;
+  }
+  bookDrafts.delete(id);
+  bookEditing = null;
+  const s = view(state);
+  const description = itemDescription(s, id);
+  for (const tip of app.querySelectorAll(`[data-item-description="${CSS.escape(id)}"]`)) {
+    tip.textContent = description;
+  }
+  renderEncyclopedia(s);
+  bookBody.querySelector(`[data-book-edit="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+  bookStatus.textContent = text ? "介绍已保存。" : "已恢复原文。";
+}
+
+function observeShopItems(s, tab) {
+  const rows = tab === "alchemy" ? s.alchemy.offers
+    : marketMode !== "buy" ? [] : tab === "market" ? s.market.stalls.flatMap(stall => stall.offers)
+      : tab === "localMarket" ? s.localMarket.offers : [];
+  const ids = rows.filter(row => (row.stock ?? row.count ?? 1) > 0).map(row => row.id);
+  return ids.length && act(state, "observeGuideItems", { source: tab, ids }).changed;
 }
 
 function villageServices(s) {
@@ -873,7 +989,7 @@ function cultivation(s) {
   return training + (visibleArts.length ? panel("术诀", `<div class="card-grid">${visibleArts.map(row => {
     const known = s.knownArts.includes(row.id);
     return card(row.name, "", known ? tag("已习得") : "",
-      known ? "" : linkButton(s.coins < row.price ? "灵钱不足" : "习得", "learn", row.id, "", s.coins < row.price), `${artSummary(row)}。 ${row.desc}`);
+      known ? "" : linkButton(s.coins < row.price ? "灵钱不足" : "习得", "learn", row.id, "", s.coins < row.price), publicText(`${artSummary(row)}。 ${row.desc}`));
   }).join("")}</div>`) : "");
 }
 
@@ -893,22 +1009,18 @@ function workshop(s) {
     ${remarks}${mapTrade}
     <div class="card-grid">${recipes.map(row => {
     const result = itemRows[row.result];
-    const gear = data.gear.find(g => g.id === row.result);
-    const pill = data.pills.find(g => g.id === row.result);
-    const talisman = data.talismans.find(g => g.id === row.result);
     const reason = s.craftReasons[row.id];
-    const entry = gear ? gearDescription(result, gear) : pill ? pillSummary(pill) : talisman ? talismanSummary(talisman) : result.desc;
     return card(result.name, `${row.cost} 灵钱 · ${row.days} 日`, tag(kindNames[result.kind] ?? ""),
-      linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), entry, row.need);
+      linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), itemEntry(s, row.result), row.need);
   }).join("")}</div>`);
 }
 
-function storageRows(rows, action) {
+function storageRows(s, rows, action) {
   const depositing = action === "econDeposit";
   const label = depositing ? "存入" : "取出";
   return rows.length ? rows.map(row => {
     const bulk = Math.min(row.count, row.maximum ?? row.count);
-    return `<div class="storage-row"><span>${escape(row.name)} <small>×${row.count}</small></span>
+    return `<div class="storage-row"><span>${entryLabel(row.name, itemEntry(s, row.id))} <small>×${row.count}</small></span>
       <div class="actions">
         ${linkButton(row.reason || `${label}一份`, action, row.id, "quiet", Boolean(row.reason))}
         ${!row.reason && bulk > 1 ? linkButton(`${label} ×${bulk}`, action, row.id, "", false, bulk) : ""}
@@ -917,15 +1029,15 @@ function storageRows(rows, action) {
   }).join("") : '<p class="fine">空</p>';
 }
 
-function warehouseScreen(warehouse) {
+function warehouseScreen(s, warehouse) {
   const unload = Object.keys(warehouse.materialPlan).length ? `<div class="actions">
     ${linkButton("存放原料", "econStoreMaterials", "", "quiet")}
     <span class="fine">${escape(supplies(warehouse.materialPlan))}</span>
   </div>` : "";
   return `<div class="storage-columns">
-    <section><h3>行囊可存</h3>${unload}${storageRows(warehouse.carried, "econDeposit")}</section>
+    <section><h3>行囊可存</h3>${unload}${storageRows(s, warehouse.carried, "econDeposit")}</section>
     <section><h3>仓中存货 <span class="fine">${warehouse.used}/${warehouse.capacity} 格</span></h3>
-      ${storageRows(warehouse.stored, "econWithdraw")}
+      ${storageRows(s, warehouse.stored, "econWithdraw")}
     </section>
   </div>`;
 }
@@ -973,7 +1085,7 @@ function yard(s) {
   const entrances = options.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
     data-facility="${escape(facility.id)}" aria-pressed="${facility.id === current.id}">${escape(facility.name)}</button>`).join("");
   const inside = current.id === "backpack" ? backpackScreen(s, backpack, containerPlans) : (
-    (current.id === "warehouse" ? warehouseScreen(warehouse) : "") + productionScreen(current));
+    (current.id === "warehouse" ? warehouseScreen(s, warehouse) : "") + productionScreen(current));
   return panel("后院", `<div class="actions facility-tabs">${entrances}</div>
     <p class="intro facility-intro">${escape(current.desc)}</p>${inside}`, current.level > 0 ? tag(`${current.name} · ${current.level} 级`) : "");
 }
@@ -1017,22 +1129,19 @@ function regularSaleButton(entry, action, batch) {
 
 function marketItem(s, entry, selling) {
   const item = itemRows[entry.id];
-  const gear = data.gear.find(row => row.id === item.id);
-  const pill = data.pills.find(row => row.id === item.id);
-  const seal = data.talismans.find(row => row.id === item.id);
+  const gear = gearRows.get(item.id);
   const allowed = selling ? entry.canSell : entry.canBuy;
   const label = allowed ? (selling ? "卖出" : "购入") : entry.blockedReason;
-  const detail = gear ? gearDescription(item, gear, selling ? s.durability[item.id] : undefined) :
-    pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
   const price = selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`);
-  const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}</span>` : "";
+  const wear = gear && s.durability[item.id];
+  const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}${wear != null && gear ? ` · ${gearCondition(wear, gear.durability)}` : ""}</span>` : "";
   const action = selling ? "sell" : "buy";
   const batch = Math.min(entry.demand ? rules.maxTradeCount : 5, selling ? entry.count : entry.maximum);
   const batchLabel = `${selling ? "卖出" : "购入"} ×${batch}`;
   const bulk = allowed && !gear && batch > 1 ? linkButton(saleButtonLabel(batchLabel, entry, batch), action, item.id, "quiet", false, batch) : "";
   const regular = selling && allowed ? regularSaleButton(entry, action, batch) : "";
   const stock = !selling && Number.isFinite(entry.stock) ? `<span class="fine">摊上余 ${entry.stock}</span>` : "";
-  return card(item.name, "", price, `${linkButton(allowed ? saleButtonLabel(label, entry, 1) : label, action, item.id, "", !allowed)}${regular}${bulk}${quantity}${stock}${saleDemandNote(entry)}`, detail);
+  return card(item.name, "", price, `${linkButton(allowed ? saleButtonLabel(label, entry, 1) : label, action, item.id, "", !allowed)}${regular}${bulk}${quantity}${stock}${saleDemandNote(entry)}`, itemEntry(s, item.id));
 }
 
 function merchantOffer(stall) {
@@ -1051,7 +1160,7 @@ function market(s) {
   const specialized = s.market.sales.filter(({ canSell }) => canSell);
   const fallback = s.localMarket?.buys.filter((entry) => !specialized.some(({ id }) => id === entry.id)) ?? [];
   const contents = marketMode === "sell"
-    ? (specialized.length || fallback.length ? `<div class="card-grid">${specialized.map(entry => marketItem(s, entry, true)).join("")}${fallback.map(entry => localMarketItem(entry, true)).join("")}</div>`
+    ? (specialized.length || fallback.length ? `<div class="card-grid">${specialized.map(entry => marketItem(s, entry, true)).join("")}${fallback.map(entry => localMarketItem(s, entry, true)).join("")}</div>`
       : '<p class="intro">行囊里暂时没有能卖的东西。</p>')
     : s.market.stalls.map(stall => `<section class="market-stall">
       <h3>${escape(stall.name)}</h3>
@@ -1067,10 +1176,8 @@ function marketSwitcher() {
   return `<div class="actions market-switch">${button("buy", "摊上的货")}${button("sell", "卖手里的货")}</div>`;
 }
 
-function localMarketItem(entry, selling) {
+function localMarketItem(s, entry, selling) {
   const item = itemRows[entry.id];
-  const gear = data.gear.find(({ id }) => id === item.id);
-  const pill = data.pills.find(({ id }) => id === item.id);
   const maximum = selling ? Math.min(entry.count, rules.maxTradeCount) : entry.maximum;
   const label = selling ? "卖出" : "购入";
   const action = selling ? "localSell" : "localBuy";
@@ -1080,14 +1187,14 @@ function localMarketItem(entry, selling) {
     (maximum > 1 ? linkButton(saleButtonLabel(`${label} ×${maximum}`, entry, maximum), action, item.id, "quiet", false, maximum) : "");
   const stock = `<span class="fine">${selling ? "可卖" : "在摊"} ×${entry.count}</span>`;
   return card(item.name, "", selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`), `${buttons}${stock}${saleDemandNote(entry)}`,
-    gear ? gearDescription(item, gear) : pill ? pillSummary(pill) : item.desc);
+    itemEntry(s, item.id));
 }
 
 function localMarketScreen(s) {
   const selling = marketMode === "sell";
   const rows = selling ? s.localMarket.buys : s.localMarket.offers;
   const talk = s.localMarket.talk;
-  return panel(`${s.region.name}集市`, `${marketSwitcher()}${talk ? `<div class="actions">${linkButton(talk.label, "localAsk", "", "quiet")}</div>` : ""}${rows.length ? `<div class="card-grid">${rows.map(entry => localMarketItem(entry, selling)).join("")}</div>` :
+  return panel(`${s.region.name}集市`, `${marketSwitcher()}${talk ? `<div class="actions">${linkButton(talk.label, "localAsk", "", "quiet")}</div>` : ""}${rows.length ? `<div class="card-grid">${rows.map(entry => localMarketItem(s, entry, selling)).join("")}</div>` :
     '<p class="intro">行囊里暂时没有能卖的东西。</p>'}`, tag(`灵钱 ${s.coins}`));
 }
 
@@ -1152,9 +1259,9 @@ function trainingScreen(s) {
 function alchemy(s) {
   const teacher = s.alchemy;
   const commission = teacher.inquiry;
-  const formulae = teacher.offers.map(({ id, name, price, desc, known, reason }) => card(
+  const formulae = teacher.offers.map(({ id, name, price, known, reason }) => card(
     name, "", known ? tag("已学会") : tag(`${price} 灵钱`),
-    known ? "" : linkButton(reason || "买下丹方", "alchemyBuyFormula", id, "", Boolean(reason)), desc,
+    known ? "" : linkButton(reason || "买下丹方", "alchemyBuyFormula", id, "", Boolean(reason)), itemEntry(s, id),
   )).join("");
   const inquiry = commission ? `<section class="alchemy-inquiry"><h3>${escape(commission.label)}</h3>
     <p class="intro">${escape(commission.text)}</p>
@@ -1209,7 +1316,7 @@ function deductionBoard(s) {
   const draft = deductionDrafts.get(current.id) ?? current.thought;
   const casesBar = cases.length > 1 ? `<div class="actions deduction-cases">${cases.map(row => `<button type="button" class="button ${row.id === current.id ? "primary" : ""}" data-case="${escape(row.id)}" aria-pressed="${row.id === current.id}">${escape(row.name)}${row.completed ? " ✓" : ""}</button>`).join("")}</div>` : "";
   const evidence = (s.evidence ?? []).map(item => `<label class="evidence-option"><input type="checkbox" name="evidence" value="${escape(item.id)}"${draft?.evidence.includes(item.id) ? " checked" : ""}>
-    <span><strong>${escape(item.name)}</strong><small>${escape(publicText(item.desc))}</small></span></label>`).join("");
+    <span><strong>${escape(item.name)}</strong><small class="item-description" data-item-description="${escape(item.id)}">${escape(itemDescription(s, item.id))}</small></span></label>`).join("");
   return panel("沙盘", casesBar + `<h3>${escape(current.name)}</h3><p class="intro training-note">${escape(publicText(current.desc))}</p>` +
     (current.completed ? `<p class="intent">${escape(publicText(current.observation))}</p>${thoughtDetails(current.thought)}` :
       `<form class="deduction" data-deduction="${escape(current.id)}">
@@ -1257,7 +1364,7 @@ function restoreKeyboardFocus(focus) {
 
 function render() {
   const focus = keyboardFocus();
-  const s = view(state);
+  let s = view(state);
   const carriedBags = s.economy?.containers ?? [];
   if (openBagId && !carriedBags.some(row => row.id === openBagId)) openBagId = null;
   if (s.mode !== "combat") combatObservation = null;
@@ -1275,6 +1382,7 @@ function render() {
   };
   for (const service of services) available[service] = true;
   const tab = inEncounter || !available[screen] || (inEvent && screen !== "atlas") ? "journey" : screen;
+  if (observeShopItems(s, tab)) s = view(state);
   const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, yard, alchemy, quests: questBoard,
     deduction: deductionBoard, atlas, localMarket: localMarketScreen, sect: sectScreen, tournament: tournamentScreen, training: trainingScreen };
   document.querySelector("#clock").textContent = `第${Math.floor(s.day)}日 · ${s.day % 1 < 0.5 ? "白昼" : "夜里"}`;
@@ -1284,7 +1392,12 @@ function render() {
   kit.hidden = dead;
   kit.innerHTML = dead ? "" : pack(s);
   app.querySelector("[data-help]").hidden = dead;
+  bookToggle.hidden = dead || !s.guideBook;
   if (dead && guide.open) guide.close();
+  if (encyclopedia.open) {
+    if (bookToggle.hidden) encyclopedia.close();
+    else renderEncyclopedia(s);
+  }
   for (const button of document.querySelectorAll("#player-status [data-action], #kit [data-action]")) {
     if (s.gathering) button.disabled = true;
   }
@@ -1518,12 +1631,18 @@ function readExperiment(form) {
 
 document.addEventListener("input", event => {
   const form = event.target.form;
+  if (form?.dataset.bookNote) bookDrafts.set(form.dataset.bookNote, event.target.value);
   if (form?.dataset.deduction) deductionDrafts.set(form.dataset.deduction, readDeduction(form));
   if (form?.dataset.experiment) experimentDrafts.set(form.dataset.experiment, readExperiment(form).settings);
 });
 
 document.addEventListener("submit", event => {
   const form = event.target;
+  if (form.dataset.bookNote) {
+    event.preventDefault();
+    saveEncyclopediaNote(form.dataset.bookNote, form.querySelector("textarea").value);
+    return;
+  }
   if (!form.matches("[data-deduction], [data-experiment]")) return;
   event.preventDefault();
   if (form.dataset.deduction) {
@@ -1578,6 +1697,45 @@ document.addEventListener("click", event => {
     button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
     return;
   }
+  if (button.hasAttribute("data-open-encyclopedia")) {
+    const s = view(state);
+    if (!s.guideBook || s.mode === "death") return;
+    bookStatus.textContent = "";
+    renderEncyclopedia(s);
+    encyclopedia.showModal();
+    return;
+  }
+  if (button.hasAttribute("data-close-encyclopedia")) {
+    encyclopedia.close();
+    return;
+  }
+  if (button.dataset.bookCategory) {
+    bookCategory = button.dataset.bookCategory;
+    bookEditing = null;
+    bookStatus.textContent = "";
+    renderEncyclopedia(view(state));
+    bookBody.querySelector(`[data-book-category="${CSS.escape(bookCategory)}"]`)?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.dataset.bookEdit) {
+    bookEditing = button.dataset.bookEdit;
+    bookStatus.textContent = "";
+    renderEncyclopedia(view(state));
+    bookBody.querySelector("textarea")?.focus();
+    return;
+  }
+  if (button.dataset.bookCancel) {
+    const id = button.dataset.bookCancel;
+    bookDrafts.delete(id);
+    bookEditing = null;
+    renderEncyclopedia(view(state));
+    bookBody.querySelector(`[data-book-edit="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.dataset.bookReset) {
+    saveEncyclopediaNote(button.dataset.bookReset, "");
+    return;
+  }
   if (button.hasAttribute("data-help")) {
     guide.showModal();
     return;
@@ -1598,6 +1756,9 @@ document.addEventListener("click", event => {
     atlasEdge = null;
     atlasIndexOpen = false;
     atlasRoadsOpen = false;
+    bookCategory = null;
+    bookEditing = null;
+    bookDrafts.clear();
     selectedItem = null;
     openBagId = null;
     for (const topic of guide.querySelectorAll("details")) topic.open = false;
@@ -1605,6 +1766,7 @@ document.addEventListener("click", event => {
     deductionDrafts.clear();
     experimentDrafts.clear();
     notices.replaceChildren();
+    if (encyclopedia.open) encyclopedia.close();
     guide.close();
     render();
     restartNotice = true;

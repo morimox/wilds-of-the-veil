@@ -94,5 +94,6 @@
 晒盘坡（screen_slope）,灰沟坡寨（bandit_slope_den）,巡寨刀客（bandit_den_sentry）,把棚门边的药匣拎出来,获胜一次后可办理一次,,松脂膏（salve）×2,,8,8,32,1,固定间隔,,已获胜便可回来办理，领取后关闭选项
 碎琉璃滩（glass_bank）,芦湾棚船（bandit_red_rope_den）,芦湾船主邵苹（bandit_red_rope_chief）,进后舱清点铜匣,获胜一次后可办理一次,,寒铁（ore）×4、兽革（hide）×3、裹布铜铃（bandit_ford_bell）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
 空音桥（dry_sound_bridge）,断磴盐窟（bandit_salt_cave_den）,盐窟魁首封霁（bandit_salt_cave_chief）,去亮着灯的货室开柜,获胜一次后可办理一次,,暗金（black_iron）×3、灵晶（core）×5、厚底踏砂靴（bandit_salt_boots）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
+断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,从梁下抽出油布匣,获胜一次后可办理一次,,内堰旧路图（encyclopedia_weir_leaf）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
 白苇滩（marsh）,封乔的护堤木台（marsh_pole_lesson）,护堤人封乔（river_spar_captain）,接过封乔按印的木签,获胜一次后可办理一次,,封乔按印的木签（river_trial_writ）×1,,1,1,5,1,固定间隔,,已获胜便可回来办理，领取后关闭选项
 闭潮渡（ford）,闸下无灯梯（ford_below_steps）,拖梯水影（ford_lower_spirit）,翻看松动的修闸名牌,获胜一次后可办理一次,,,,2,4,11,1,固定间隔,,已获胜便可回来办理，领取后关闭选项

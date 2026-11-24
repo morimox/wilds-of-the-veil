@@ -119,7 +119,7 @@ const resources = (entries = {}) => Object.entries(entries)
   .map(([id, count]) => `${ref(id)}×${count}`).join('、');
 const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
-  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书', container: '容器',
+  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书', container: '容器', reference: '奇物',
   attack: '普通攻势', heavy: '重招', guard: '防御', dodge: '闪避', drain: '吸取真气', heal: '恢复', focus: '蓄势', remedy: '服药',
 };
 const slotNames = data.equipmentSlots;
@@ -392,7 +392,12 @@ ruleRows.push(
 );
 const normalHit = (enemy) => [...new Set(enemy.intents.filter(({ kind }) => kind === 'attack')
   .map(({ mult }) => Math.ceil(enemy.atk * (mult ?? 1))))].join(' / ');
-const enemyRows = gated(data.enemies.map((enemy) => ({ ...enemy, normalHits: normalHit(enemy), escapeChance: baseEscapeChance(enemy) })));
+const enemyRows = gated(data.enemies.map((enemy) => {
+  const hasSpoils = Object.keys(enemy.loot ?? {}).length || Object.keys(enemy.chanceLoot ?? {}).length;
+  return { ...enemy, normalHits: normalHit(enemy), escapeChance: baseEscapeChance(enemy),
+    spoilsSource: !hasSpoils ? '' : enemy.tags.includes('human') ? '对手随身物品'
+      : enemy.tags.includes('beast') ? '兽身解取' : enemy.tags.includes('spirit') ? '灵形遗留' : '实体解取' };
+}));
 const foodRows = described(data.foods).map((meal) => {
   const project = meal.grade > 0 ? economyData.projects.find((row) => row.loot?.[meal.id]) : undefined;
   return { ...meal, need: project?.need, level: project?.level, cost: project?.cost, days: project?.days, count: project?.loot[meal.id] };
@@ -729,13 +734,14 @@ const tables = [
       instinct: '本能', predator: '抢攻', bulwark: '守中求进', duelist: '见招拆招', schemer: '耗气与破势',
     })[id] ?? id], ['medicine', '单场携带补药', ({ id, count }) => `${ref(id)}×${count}`],
     ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'],
-    ['loot', '固定解取的身体掉落', resources], ['chanceLoot', '概率额外掉落', formatChanceLoot], 'desc',
+    ['spoilsSource', '物品从哪里来'], ['loot', '战后固定所得', resources], ['chanceLoot', '战后概率额外所得', formatChanceLoot], 'desc',
   ], { omit: ['intents'], note: '普攻取所列攻击乘招式倍率后向上取整。攻击等基础值已算入内功，出招专攻护持另列，差距至少三小境时另有压制。命中和被动闪避空白表示无该项加成。补药只由明确带药的对手使用。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '常用动作序号'], 'name', 'kind', 'mult', ['ranged', '远程出手'],
   ], { note: '普通妖兽大多按这些习性出招。人物和部分大妖用自己承受过的伤害估计威胁。抽中洞察后能看到玩家这回合动作的类别。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
-    'id', 'name', 'region', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['learnArts', '当面传授的术诀', (ids) => ids.map(ref).join('、')], ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
+    'id', 'name', 'region', ['tier', '标注境界'], tier, ['recommendedTier', '建议交手境界', realm],
+    'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['learnArts', '当面传授的术诀', (ids) => ids.map(ref).join('、')], ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),
   table('services', '村务发现条件', data.services, [
     'id', 'name', ['public', '开局已有入口'], ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],
