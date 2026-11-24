@@ -27,6 +27,7 @@ const encyclopedia = document.querySelector("#encyclopedia");
 const bookBody = encyclopedia.querySelector("[data-book-body]");
 const bookStatus = encyclopedia.querySelector("[data-book-status]");
 const bookToggle = app.querySelector(".topbar [data-open-encyclopedia]");
+const disposal = document.querySelector("#disposal");
 const guideDeduction = guide.querySelector("[data-guide-deduction]");
 const guideAffiliation = document.createElement("p");
 guideAffiliation.className = "fine sect-affiliation";
@@ -69,6 +70,7 @@ let atlasRoadsOpen = false;
 let bookCategory = null;
 let bookEditing = null;
 const bookDrafts = new Map();
+let pendingDisposal = null;
 const deductionDrafts = new Map();
 const experimentDrafts = new Map();
 
@@ -790,6 +792,16 @@ function groundRows(s) {
   });
 }
 
+function discardActions(s, id) {
+  const { maximum, relief } = s.discardOptions[id] ?? {};
+  if (!maximum) return "";
+  const reliefOnly = relief === maximum;
+  const label = reliefOnly ? "舍弃救济干粮" : "放下";
+  const first = linkButton(maximum > 1 ? reliefOnly ? "舍弃 1 份救济干粮" : "放下 1 件" : label, "discard", id, "quiet");
+  const all = reliefOnly ? `舍弃全部救济干粮（${maximum} 份）` : `放下全部（${maximum} 件）${relief ? " · 舍弃救济粮" : ""}`;
+  return first + (maximum > 1 ? linkButton(all, "discard", id, "quiet", false, maximum) : "");
+}
+
 function pack(s) {
   const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event" || onOpenRoad(s);
   const canManageManual = canEquip && !s.gathering;
@@ -802,7 +814,11 @@ function pack(s) {
   function repairAction(id, remaining, durability) {
     const price = repair?.prices[id];
     if (price == null || remaining >= durability) return "";
-    return linkButton(`修理 · ${price}钱`, "repair", id, "quiet", s.coins < price);
+    const coins = linkButton(`付钱修理 · ${price}钱`, "repair", id, "quiet", s.coins < price);
+    const parts = repair.materials[id];
+    if (!parts) return coins;
+    return coins + linkButton(`自备料修理 · ${supplies(parts.need)}`, "repairMaterials", id, "quiet", Boolean(parts.reason)) +
+      (parts.reason ? `<p class="fine">${escape(parts.reason)}</p>` : "");
   }
   const worn = Object.entries(s.equipment).filter(([, id]) => id).map(([slot, id]) => {
     const gear = gearRows.get(id);
@@ -814,7 +830,7 @@ function pack(s) {
   const manuals = new Map((s.innerStyle?.books ?? []).map(book => [book.id, book]));
   const activeManual = s.innerStyle?.active;
   if (activeManual) worn.push(itemSlot(s, itemRows[activeManual.id], "worn",
-    manualActions(activeManual, true, canManageManual, !onOpenRoad(s)), "内功", 0,
+    manualActions(activeManual, true, canManageManual, !onOpenRoad(s)) + discardActions(s, activeManual.id), "内功", 0,
     { status: activeManual.aligned ? "手头的打法合它的路数。" : "" }));
   const carried = data.items.filter(row => s.inventory[row.id] && row.id !== activeManual?.id && !Object.values(s.equipment).includes(row.id));
   const inventory = carried.filter(row => row.kind !== "key" || row.breakthrough).map(row => {
@@ -854,11 +870,11 @@ function pack(s) {
     if (row.id === "gate_scroll" && canEquip && !s.gathering && !onOpenRoad(s)) actions += tabButton("展开卷轴", "atlas");
     if (row.id === "encyclopedia") actions += '<button type="button" class="button quiet" data-open-encyclopedia>翻开全书</button>';
     actions += controls.actions ?? "";
-    if (canEquip && !row.breakthrough) actions += linkButton("放下", "discard", row.id, "quiet");
+    actions += discardActions(s, row.id);
     return itemSlot(s, row, "held", actions, "", s.inventory[row.id], { ...controls, wear: gear ? s.durability[row.id] ?? gear.durability : undefined });
   });
   const keys = carried.filter(row => row.kind === "key" && !row.breakthrough);
-  const keySlot = row => itemSlot(s, row, "clue", "", "", s.inventory[row.id]);
+  const keySlot = row => itemSlot(s, row, "clue", discardActions(s, row.id), "", s.inventory[row.id]);
   const clues = keys.filter(row => !formulaIds.has(row.id)).map(keySlot);
   const formulae = keys.filter(row => formulaIds.has(row.id)).map(keySlot);
   const ground = canEquip && !s.roadTrip?.afterBattle ? groundRows(s) : [];
@@ -1398,7 +1414,7 @@ function render() {
     if (bookToggle.hidden) encyclopedia.close();
     else renderEncyclopedia(s);
   }
-  for (const button of document.querySelectorAll("#player-status [data-action], #kit [data-action]")) {
+  for (const button of document.querySelectorAll('#player-status [data-action], #kit [data-action]:not([data-action="discard"])')) {
     if (s.gathering) button.disabled = true;
   }
   for (const button of document.querySelectorAll(".navigation button")) {
@@ -1440,6 +1456,7 @@ function showNotice(lines, warning) {
 }
 
 function feedback(before, after, result, action, presentation, payload) {
+  if (result.ok && action === "discard") return [result.message];
   if (result.ok && banditOfferActions.includes(action)) return [];
   const ate = action === "eat" || action === "batchEat";
   const rested = action === "rest" || action === "restUntilRecovered";
@@ -1522,7 +1539,7 @@ function feedback(before, after, result, action, presentation, payload) {
     narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
   }
   if (result.travelMeals) narrative = narrative.replace(/途中吃了[^。]+。/, "");
-  if (!result.ok || (action !== "batchEat" && action !== "restUntilRecovered")) narrative = publicText(narrative);
+  if (!result.ok || !["batchEat", "restUntilRecovered", "repairMaterials"].includes(action)) narrative = publicText(narrative);
   narrative = narrative.replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
   const medicineEffect = [restored?.hp > 0 && `气血回了${restored.hp}点。`, restored?.sense > 0 && `神识回了${restored.sense}点。`].filter(Boolean).join("");
@@ -1567,6 +1584,26 @@ function feedback(before, after, result, action, presentation, payload) {
   return [...new Set(lines)];
 }
 
+function confirmDisposal(options, message) {
+  pendingDisposal = options;
+  const verb = options.action === "discard" ? "放下" : "卖出";
+  disposal.querySelector("#disposal-title").textContent = `确认${verb}`;
+  disposal.querySelector("[data-disposal-item]").textContent = options.name;
+  disposal.querySelector("#disposal-description").textContent = options.action === "discard"
+    ? `这件物品无法重新取得。放下后仍可回${options.placeName}找。` : message;
+  const quantity = disposal.querySelector('[name="count"]');
+  quantity.value = options.count;
+  quantity.max = options.maximum;
+  quantity.readOnly = options.maximum === 1;
+  disposal.querySelector("[data-disposal-submit]").textContent = `确认${verb}`;
+  disposal.showModal();
+}
+
+function closeDisposal() {
+  pendingDisposal = null;
+  disposal.close();
+}
+
 function performAction(action, payload) {
   const before = {
     inventory: { ...state.inventory }, discovered: [...state.discovered],
@@ -1574,6 +1611,10 @@ function performAction(action, payload) {
     hp: state.hp, qi: state.qi, satiety: state.satiety, coins: state.coins,
   };
   const result = act(state, action, payload);
+  if (result.confirmation) {
+    confirmDisposal(result.confirmation, result.message);
+    return;
+  }
   const transferred = result.ok && instantRoutes.includes(action);
   if ((result.ok && roadTravelActions.includes(action)) || ["visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
   if (transferred || (result.ok && roadTravelActions.includes(action))) {
@@ -1603,13 +1644,14 @@ function runGatherProgress(job) {
   bar.focus({ preventScroll: true });
   function tick(now) {
     if (state.gathering !== job) return;
-    bar.value = Math.min(1, (now - startedAt) / duration);
+    const progress = main.querySelector("[data-gather-progress]");
+    if (progress) progress.value = Math.min(1, (now - startedAt) / duration);
     if (bar.value < 1) requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
   setTimeout(() => {
     if (state.gathering !== job) return;
-    const restoreFocus = document.activeElement === bar;
+    const restoreFocus = document.activeElement === main.querySelector("[data-gather-progress]");
     performAction("finishGather");
     if (restoreFocus && state.event === job.siteId) {
       const next = main.querySelector(`[data-action="beginGather"][data-value="${job.index}"]:enabled`) ??
@@ -1638,6 +1680,15 @@ document.addEventListener("input", event => {
 
 document.addEventListener("submit", event => {
   const form = event.target;
+  if (form.hasAttribute("data-disposal-confirm")) {
+    event.preventDefault();
+    if (!pendingDisposal) return;
+    const { action, id, place } = pendingDisposal;
+    const count = form.elements.count.valueAsNumber;
+    closeDisposal();
+    performAction(action, { id, count, confirmed: true, expectedPlace: place });
+    return;
+  }
   if (form.dataset.bookNote) {
     event.preventDefault();
     saveEncyclopediaNote(form.dataset.bookNote, form.querySelector("textarea").value);
@@ -1656,6 +1707,8 @@ document.addEventListener("submit", event => {
     performAction("experiment", trial);
   }
 });
+
+disposal.addEventListener("cancel", () => { pendingDisposal = null; });
 
 kit.addEventListener("contextmenu", event => {
   const trigger = event.target.closest("button[data-bag-action]");
@@ -1681,6 +1734,10 @@ document.addEventListener("click", event => {
   }
   if (button.hasAttribute("data-skip-transfer")) {
     dismissTransfer();
+    return;
+  }
+  if (button.hasAttribute("data-disposal-cancel")) {
+    closeDisposal();
     return;
   }
   if (button.dataset.openBag) {
@@ -1767,6 +1824,7 @@ document.addEventListener("click", event => {
     experimentDrafts.clear();
     notices.replaceChildren();
     if (encyclopedia.open) encyclopedia.close();
+    if (disposal.open) closeDisposal();
     guide.close();
     render();
     restartNotice = true;

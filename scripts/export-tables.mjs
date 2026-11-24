@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import data from '../data.mjs';
-import { baseEscapeChance, createGame, rules, view } from '../engine.mjs';
+import { baseEscapeChance, createGame, rules, view, weaponRepairNeed } from '../engine.mjs';
 import { banditRules, roadKey } from '../bandits.mjs';
 import { bulkSaleRules, economyData } from '../economy.mjs';
 import { alchemyData } from '../alchemy.mjs';
@@ -424,6 +424,7 @@ const localRepairRows = towns.flatMap(({ id: region }) => {
   if (!repair) return [];
   return Object.entries(repair.prices).map(([id, price]) => ({
     region, service: repair.name, id, name: name(id), surcharge: repair.surcharge, price,
+    repairMaterials: weaponRepairNeed(id),
   }));
 });
 const sectJobs = data.sects.flatMap((sect) => sect.jobs.map((job) => ({ region: sect.region, sect: sect.name, ...job })));
@@ -497,7 +498,8 @@ const tables = [
     ['requireQuest', '所需世界进程', ref], ['requireDefeated', '须亲自击败的对手', (ids) => ids.map(ref).join('、')],
     ['pressure', '越过本境的出伤倍率'], 'days',
   ], { note: '出伤倍率用于向更高境界进攻。相隔两境时，两档倍率连乘。' }),
-  table('items', '物品与交易', itemTradeRows, ['id', 'name', 'kind', 'price', 'sell', 'desc'],
+  table('items', '物品与交易', itemTradeRows, ['id', 'name', 'kind', 'price', 'sell',
+    ['oneOfAKind', '不可重复获得的支线独件'], ['discardable', '此关键实物可放下并补办'], 'desc'],
     { note: '价格为 0 表示无对应买卖渠道。买入的货源与到货条件见坊市货单。卖出按手中符合规则的物件结算。' }),
   table('common-materials', '常用原料跨系统用途', stapleRows, [
     'id', 'name', ['pools', '可回生的现场'], ['enemySources', '解取的对手'],
@@ -551,14 +553,15 @@ const tables = [
     ['reveal', '来源线索', ref], ['description', '现场说明'],
   ], { note: '炼丹和锻造的批次产量与投入见制作用方。常用品可合批，产量、材料、灵钱和工期按批数结算。成熟后可到后院收取，普通成品也可直接入仓。' }),
   table('gear', '装备', gated(described(data.gear.map(({ trait, traits = [], ...item }) =>
-    ({ ...item, effects: [trait, ...traits].filter(Boolean) })))), [
+    ({ ...item, effects: [trait, ...traits].filter(Boolean), repairMaterials: weaponRepairNeed(item.id) })))), [
     'id', 'name', 'slot', ['weaponClass', '兵刃类别', (id) => weaponClass[id] ?? id],
     ['hands', '用几只手'], ['brace', '主动架重招减伤'],
     ['chargeRequired', '蓄力与出招共占两回合'], ['chargePierce', '主武器完成蓄力时穿甲'],
     ['sideAtk', '副武器出手攻击修正'], ['sidePierce', '副武器出手穿甲'], ['sideGuard', '副武器出手护持'],
     ['ammo', '适用弹药', (ids) => ids.map(ref).join('、')],
     'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'], ['perception', '洞察加成'],
-    'retreat', 'durability', 'repair', ['entry', '玩家主动查读的词条'], ['effects', '特殊作用与具体数值', (entries) => entries.map(traitText).join('、')],
+    'retreat', 'durability', 'repair', ['repairMaterials', '兵器从零耐久修满的材料', resources],
+    ['entry', '玩家主动查读的词条'], ['effects', '特殊作用与具体数值', (entries) => entries.map(traitText).join('、')],
     ['field', '野外作用', (field) => [
       field.fogTolerance && '开始耗气的雾压上限 +' + field.fogTolerance,
       field.gatherPadding && '每批采集减伤 ' + field.gatherPadding + '，至少受 1 点伤',
@@ -599,6 +602,14 @@ const tables = [
     'id', ['label', '步骤'], ['price', '费用（灵钱）'], 'days', 'tier', ['proof', '需带回的实物', ref],
     ['defeated', '需胜过的对手', ref], 'reward', 'text', ['reply', '交付结果'], ['progress', '离村前一站提示'],
   ], { note: '依序完成。合方后仍须用炼丹炉投料、等待并领取筑基丹。' }),
+  table('foundation-refill', '封炉药引的再次配制', [alchemyData.refill], [
+    'id', 'label', ['price', '灵钱'], 'days', 'need', 'reward', 'text', ['reply', '交付结果'],
+  ], { note: '初次完成访查后，缺封炉药引时可以付费请安蒲再配。继续使用原来的筑基丹方和炼丹炉。' }),
+  table('progression-recovery', '必经实物的补办', choices.filter(({ reissue }) => reissue)
+    .map(({ event, label, days, need, loot, reissue, outcome }) => ({ site: event, label, days, need, loot, ...reissue, outcome })), [
+    ['item', '补办实物', ref], ['site', '补办地点', siteRef], 'label', 'days', 'need',
+    ['beforeQuest', '到此委托完成为止', ref], ['beforeItem', '到实物推进至此为止', ref], 'outcome',
+  ], { omit: ['loot'], note: '已经实际取过原件、当前又未带在身上时才出现。部分凭据被后续成果接替后无需再补。' }),
   table('talismans', '符箓', gated(described(data.talismans)), [
     'id', 'name', 'tier', tier, 'damage', 'guard', 'retreat',
   ]),
@@ -648,9 +659,10 @@ const tables = [
   table('settlement-buyback', '各定居点收购价与常价收量', localSaleRows, ['region', 'id', 'name', ['price', '常价（每件）'],
     ['reserve', '当期超量价（每件）'], ['capacity', '常价收满件数'], ['replenished', '每期恢复件数'], ['days', '恢复间隔（日）']],
     { note: '关键物品、装备中的物品与救济干粮的收取限制另行校验。旧坊市专门商人的实际报价见对应表。' }),
-  table('settlement-repairs', '接修地点与逐件工钱', localRepairRows,
-    ['region', ['service', '修具处'], 'id', 'name', ['surcharge', '异地加价（灵钱）'], ['price', '修满费用（灵钱）']],
-    { note: '只接修玩家随身或穿在身上的装备。报价按件，支付灵钱后立即修满。' }),
+  table('settlement-repairs', '接修地点、工钱与材料', localRepairRows,
+    ['region', ['service', '修具处'], 'id', 'name', ['surcharge', '异地加价（灵钱）'], ['price', '修满费用（灵钱）'],
+      ['repairMaterials', '从零耐久修满的材料', resources]],
+    { note: '只接修随身或穿在身上的装备。兵器可选自备料，按损失耐久比例向上取整，用料后立即修满。落灯村接修时可调用本村仓库。' }),
   table('regional-incidents', '地方灾情与善后', Object.entries(hazardData.jobs).map(([id, job]) => ({
     id, name: incidentJobNames[id], days: job.days, need: job.need, pay: job.reward,
     warning: id === 'report' ? hazardData.warningDays : undefined,

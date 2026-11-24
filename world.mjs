@@ -560,7 +560,7 @@ function localAsk(state, kit) {
   return kit.say(state, talk.outcome);
 }
 
-function localTrade(state, id, count, kit, buying) {
+function localTrade(state, id, count, kit, buying, confirmationOptions) {
   const place = settlementOf(kit.data, state.region);
   const record = kit.records.items[id];
   if (!place || !record || !Number.isSafeInteger(count) || count < 1 || count > kit.rules.maxTradeCount) return kit.refuse('这桩买卖办不成。');
@@ -569,6 +569,8 @@ function localTrade(state, id, count, kit, buying) {
     if (!price) return kit.refuse('这件东西不能卖。');
     const sale = localSaleTerms(state, id, kit, count);
     if (sale.reason) return kit.refuse(sale.reason);
+    const confirmation = kit.disposalConfirmation(state, 'localSell', record, count, Math.min(sale.count, kit.rules.maxTradeCount), confirmationOptions);
+    if (confirmation) return confirmation;
     const quote = saleQuote(state, id, price);
     const total = saleTotal(quote, count);
     kit.removeItem(state, id, count);
@@ -765,7 +767,7 @@ export function worldAction(state, action, payload, kit) {
   if (action === 'arrayContribute') return contributeArray(state, id, count, kit);
   if (action === 'arrayJump') return jumpArray(state, id, kit);
   if (action === 'localBuy') return localTrade(state, id, count, kit, true);
-  if (action === 'localSell') return localTrade(state, id, count, kit, false);
+  if (action === 'localSell') return localTrade(state, id, count, kit, false, payload);
   if (action === 'localAsk') return localAsk(state, kit);
   if (['sectJoin', 'sectLeave', 'sectWork', 'sectClaim'].includes(action)) return actSect(state, action, id, kit);
   return null;

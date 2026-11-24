@@ -12,7 +12,7 @@ const items = [
   key(sackTag, '旧粮袋签', '木签上刻着三家寄粮人的姓氏。仓里替人保管的种粮袋都用青线封口，这三枚签就系在封口外。'),
   key(handover, '柳荷的粮袋字据', '柳荷照袋签逐一写下粮重，并承认是自己把侧门钥匙交给了苏苇。她只认这三袋。'),
   key(receipt, '同号的两张粮单', '两张单子背面是同一个货号，指的都是这三袋粮。一张写的是三家寄存，另一张却写成了石茂自己要卖的粮。'),
-  { id: manual, name: '过堤换肩法', kind: 'manual', price: 0, sell: 0, keepOnFall: true,
+  { id: manual, name: '过堤换肩法', kind: 'manual', price: 0, sell: 0, keepOnFall: true, oneOfAKind: true,
     desc: '苏苇给挑粮人画的几张图。扁担压在一侧时，脚下先挪半步，再慢慢换肩。' },
 ];
 

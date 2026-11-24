@@ -1,0 +1,16 @@
+﻿补办实物,补办地点,选项,时间（天）,所需物品,到此委托完成为止,到实物推进至此为止,outcome
+镇渡印（seal）,旧闸深槽（tide_keeper）,请听潮人照石槽里的印样补铸一枚,0.75,寒铁（ore）×2、松木（wood）×2,把旧渡的印带回来（last_lantern）,,听潮人拿松木封好石槽边沿，再把烧软的寒铁压进印样。「内槽有初铸时留下的凹纹。拿这枚补印去村里，文书上盖出来是一样的。」
+焦痕丹窑账页（foundation_ledger）,废窑烟道（kiln_flue）,再拓一份碎砖上的收药账,0.375,灵草（reed）×1,,背钟亭借卷帖（foundation_letter）,移开粘在石砖上的焦纸碎角，下边还能印出缺角的三枚旧印。你用苇纸拓下一份。
+镜门衡印（sky_seal）,反峰镜门（mirror_gate）,照印座的反纹重制一枚衡印,0.75,寒铁（ore）×2、灵晶（core）×1,沿新路把衡印带回村（sky_treaty）,,印座最深处还留着完整的反纹。你用灵晶照清边线，压好一枚寒铁补印，每一条水线都能对上原位。
+守卷剑客的试剑印（foundation_spar_mark）,背钟试剑亭（foundation_duel）,请守书人补盖试剑印,0.25,灵草（reed）×1,,丹窑移灰牌（foundation_delivery）,守书人翻开夹着借卷帖的册子，翻到你的页签。「这场早记过了。」他取印补盖一张。
+丹窑旧印半片（foundation_kiln_seal）,旧丹窑内壁（foundation_kiln）,用挡板浅槽里的印痕重铸半枚旧印,0.5,寒铁（ore）×1、耐火泥（kiln_clay）×1,,封石之约（foundation_snow_order）,你用耐火泥从浅槽取样，再用寒铁压出同样的半印。原先缺去的那一角仍和安蒲手上的纹能接拢。
+验药室的留火印（foundation_warden_proof）,封石验药室（foundation_court）,请护炉人补一枚留火印,0.375,寒铁（ore）×1,,筑基丹方（formula_foundation）,护炉人从灯脚下取出母印，顺着熄火的刻线压出一枚补印。「你早过了试验，这枚拿稳些。」
+漏潮货签（zhao_sand_chit）,三姓木码头（zhao_float_goods）,请余节照留底再刻一张货签,0.25,松木（wood）×1,,叠石关的通行牌（sand_writ）,余节翻到秋天的货账，照原号刻好木签，在背面补上柯伯认得的署名。
+旧碑上的退潮印纸（return_tide_note）,刻着退潮水纹的石碑（zhao_retreat_marks）,在碑背重拓退潮印纸,0.375,灵草（reed）×1,,带槽铁楔（undertow_wedge）,你照着退向白苇滩的刻纹重新拓了一遍，沿原纸的折角写上施荀的名字。
+带槽铁楔（undertow_wedge）,斜漏驿棚（zhao_leak_bench）,请施荀照原样削一枚铁楔,0.5,寒铁（ore）×2、松木（wood）×1,,回潮洞引线（undertow_entry）,施荀把记凹槽的旧尺贴在寒铁上，留出三道一样宽的槽。你拆下木模，新的铁楔便能带走。
+叠石关的通行牌（sand_writ）,青瓦下的验牌房（zhao_ridge_permit）,请柯伯照关册补验通行牌,0.25,松木（wood）×1,,,柯伯翻到原先登记的那一页，换了块木牌，两头各补盖一枚关印。
+铜板上的滴水图（phase_chart）,铜槽旁（zhao_submerged_table）,在留下的铜板上重新印滴水图,0.375,灵草（reed）×1,,,铜板上的插销还松着。你翻出背面，把两排滴水记号重新印在纸上。
+盐井换班册（sand_watch_register）,登记井票的屋子（sand_city_registry）,请鲁勤再抄一份盐井换班册,0.25,灵草（reed）×1,,静盐井的井票（sand_well_chit）,鲁勤从原册里核对当值的三人，将换班页抄好，再盖一次原来的印。
+静盐井的井票（sand_well_chit）,井边老秤（sand_salt_ledger）,请邢茧照旧存联补一张井票,0.25,灵草（reed）×1,,冷炉验火册（cold_kiln_record）,邢茧展开上次验过的存联，在新票上斜盖两道印。「拿去给闻銮看，他那头也留着票根。」
+冷炉验火册（cold_kiln_record）,阮杪的档房（sand_cold_kiln_house）,请阮杪重新誊抄冷炉验火册,0.75,灵草（reed）×2、松木（wood）×1,,,阮杪解开压住墙上原件的井绳，重新抄下火候和三枚印，压进两片木板之间。
+商船货单（ferry_manifest）,外桩商船（ford_packet_boat）,请夏狄给货单再抄一份,0.25,灵草（reed）×1,把旧渡的印带回来（last_lantern）,,夏狄从船案的留底上抄了一份，照旧写上你的名字，再沿签名盖印。

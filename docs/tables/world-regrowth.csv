@@ -87,6 +87,7 @@
 双灯照到的旧吊板（slope_lantern_high）,资源,暗金（black_iron）,black_iron,吊板尽头石缝里的暗金,4,6,8,2,,,,3
 双灯照到的旧吊板（slope_lantern_high）,种群,石鹞（river_cliff_kite）,river_cliff_kite,,1,1,8,1,随种群密度变化,,,
 退水石脊（undertow_bed）,资源,灵晶（core）,core,侧洞灵晶,5,9,7,2,,,,3
+退水石脊（undertow_bed）,资源,回潮洞的黑泥（heart_silt）,heart_silt,潮沟新泥,1,2,9,1,,,,4
 退水石脊（undertow_bed）,种群,驮泥大蛇（undertow_moundback）,undertow_moundback,,1,1,0,0,不回补,,,
 古钟旁的信架（counter_bell_score）,资源,暗金（black_iron）,black_iron,钟座暗金,4,8,7,2,,,,3
 古钟旁的信架（counter_bell_score）,种群,屈膝铜影（river_copper_echo）,river_copper_echo,,1,1,0,0,不回补,,,
@@ -123,6 +124,7 @@
 试声石台（sand_cloister_trial）,种群,叩石师姐袁息（sand_tuner）,sand_tuner,,1,1,,,不回补,,,
 晾绳矮帐（sand_tent_watch）,资源,灵草（reed）,reed,湿帐沿的灵草,4,6,4,2,,,,2
 井边老秤（sand_salt_ledger）,资源,松木（wood）,wood,坡脚挑盐用的旧木,4,7,5,2,,,,2
+挂陶罐的井壁（sand_stillwell_vault）,资源,静盐井的盐霜（stillwell_salt）,stillwell_salt,井壁新盐,1,2,11,1,,,,3
 挂陶罐的井壁（sand_stillwell_vault）,种群,静井伏鳞（sand_well_basilisk）,sand_well_basilisk,,1,1,,,不回补,,,
 井底隔水板（sand_stillwell_sill）,资源,灵晶（core）,core,盐痕下的灵晶,3,6,6,2,,,,1
 刻着反向蹄印的白石（sand_approach_hoof）,资源,寒铁（ore）,ore,白石下的寒铁片,3,5,5,1,,,,3

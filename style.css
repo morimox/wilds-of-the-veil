@@ -451,6 +451,12 @@ dialog::backdrop { background: #08100bd1; }
   display: block; width: 100%; margin-top: 5px; padding: 7px; resize: vertical;
   border: 1px solid #526857; border-radius: 5px; background: var(--bg); color: var(--text);
 }
+.disposal-item { margin: 6px 0 2px; color: var(--amber); }
+[data-disposal-confirm] { margin-top: 10px; }
+[data-disposal-confirm] input {
+  width: 5em; padding: 4px 6px; border: 1px solid #526857;
+  border-radius: 4px; background: var(--bg); color: var(--text);
+}
 .sect-affiliation { margin-top: 6px; }
 .guide-topic { margin: 5px 0 8px; }
 .guide-topic > summary { color: var(--jade); cursor: pointer; }

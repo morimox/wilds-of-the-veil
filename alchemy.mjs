@@ -52,12 +52,19 @@ const inquiry = [
     text: '验药印背面刻着熄火的时机，正好补上丹方缺的一段。安蒲得买一只没开裂的密封药盒，再用自己的炉试一遍，才能备好那份药引。',
     proof: 'foundation_warden_proof', defeated: 'foundation_warden', price: 86, days: 1.25,
     reward: { formula_foundation: 1, foundation_charge: 1 },
-    reply: '安蒲交给你补全的筑基丹方和一剂封炉药引。「这味药引只够一炉。得备足炼气妖丹添在炉心，几轮炉火才稳得住。」',
-    progress: '筑基丹方已经补全。备齐炼气妖丹和辅料，和药引一起放进二级丹炉。',
+    reply: '安蒲交给你补全的筑基丹方和一剂封炉药引。「这剂只够一炉。配法我留了一份，往后缺了可以再来找我。」',
+    progress: '备齐炼气妖丹和辅料，和药引一起放进二级丹炉。药引用完后可以找安蒲补配。',
   },
 ];
 
-export const alchemyData = { town, offers, inquiry };
+const refill = {
+  id: 'refill_foundation_charge', label: '请安蒲再配一剂封炉药引',
+  text: '安蒲把当初试炉留下的药纸翻开。「药引得先闷火煨透。我给你重新配一剂，你把料和炉钱备好。」',
+  price: 78, days: 1.5, need: { reed: 4, kiln_clay: 3, core: 2 }, reward: { foundation_charge: 1 },
+  reply: '安蒲揭开小炉的盖子，试过药团没有透气，才包进油纸交给你。「够用一炉，照旧方投料就行。」',
+};
+
+export const alchemyData = { town, offers, inquiry, refill };
 
 export function initialAlchemyState() {
   return { inquiryIndex: 0 };
@@ -81,6 +88,16 @@ function inquiryBlocker(state, step, kit) {
   if ((step.tier ?? 0) > state.realm) return '安蒲搭了搭脉，等你到了炼气后期，再谈试药。';
   if (!hasInquiryProof(state, step, kit)) return `等你带回${kit.nameOf(step.proof)}。`;
   return kit.homeRequirements(state, step.price, {}) || '';
+}
+
+function knowsRefill(state) {
+  return (state.alchemy?.inquiryIndex ?? 0) >= inquiry.length && state.knownItems.includes('formula_foundation');
+}
+
+function refillBlocker(state, kit) {
+  if (!knowsRefill(state)) return '三印还没有对完，安蒲配不出药引。';
+  if (kit.homeSupplies(state, 'foundation_charge')) return '你已经备了一剂封炉药引。';
+  return kit.homeRequirements(state, refill.price, refill.need) || '';
 }
 
 function knowsOffer(state, offer) {
@@ -109,6 +126,7 @@ export function alchemyView(state, kit) {
   const index = state.alchemy?.inquiryIndex ?? 0;
   const step = currentInquiry(state);
   const canDiscuss = step && hasInquiryProof(state, step, kit);
+  const canRefill = knowsRefill(state) && !kit.homeSupplies(state, 'foundation_charge');
   return {
     name: town.name,
     intro: state.knownItems.some((id) => id === 'qi_core' || id === 'foundation_core')
@@ -119,7 +137,7 @@ export function alchemyView(state, kit) {
     inquiry: canDiscuss ? {
       id: step.id, label: step.label, text: step.text, price: step.price,
       need: { [step.proof]: 1 }, reason: inquiryBlocker(state, step, kit),
-    } : null,
+    } : canRefill ? { ...refill, reason: refillBlocker(state, kit) } : null,
     progressText: inquiryProgress(state, index, canDiscuss, kit),
   };
 }
@@ -135,6 +153,14 @@ function buyFormula(state, id, kit) {
 }
 
 function advanceInquiry(state, id, kit) {
+  if (id === refill.id) {
+    const reason = refillBlocker(state, kit);
+    if (reason) return kit.refuse(reason);
+    kit.spendHome(state, refill.price, refill.need);
+    kit.advance(state, refill.days);
+    kit.addItems(state, refill.reward);
+    return kit.say(state, refill.reply);
+  }
   const step = currentInquiry(state);
   if (!step || step.id !== id) return kit.refuse('这桩事还没有做到这一步。');
   const reason = inquiryBlocker(state, step, kit);

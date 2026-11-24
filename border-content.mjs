@@ -1,7 +1,7 @@
 const items = [
   { id: 'border_warehouse_ledger', name: '劫货人的分账簿', kind: 'key', price: 0, sell: 0,
     desc: '一本夹着驿站封绳的薄簿。几笔盐包和粮袋的去向还圈在纸上。鸣沙城的宋禾正在清点这些货。' },
-  { id: 'border_watch_charm', name: '挡沙铜腕扣', kind: 'gear', price: 0, sell: 0,
+  { id: 'border_watch_charm', name: '挡沙铜腕扣', kind: 'gear', price: 0, sell: 39, keepOnFall: true, oneOfAKind: true,
     desc: '驿差绑在腕上的厚铜扣。抬臂能垫住重招，内侧镶着一小块摸起来温热的铜。' },
 ];
 

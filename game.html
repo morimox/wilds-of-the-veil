@@ -13,7 +13,7 @@
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=34" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=35" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -53,6 +53,18 @@
     <p class="book-status fine" data-book-status role="status"></p>
     <div data-book-body></div>
   </dialog>
+  <dialog id="disposal" aria-labelledby="disposal-title" aria-describedby="disposal-description">
+    <div class="dialog-head"><h2 id="disposal-title"></h2></div>
+    <p class="intro disposal-item" data-disposal-item></p>
+    <p class="fine" id="disposal-description"></p>
+    <form data-disposal-confirm>
+      <label>数量 <input type="number" name="count" min="1" step="1" required></label>
+      <div class="actions">
+        <button type="button" class="button quiet" data-disposal-cancel autofocus>取消</button>
+        <button type="submit" class="button danger" data-disposal-submit></button>
+      </div>
+    </form>
+  </dialog>
   <dialog id="help" aria-labelledby="guide-title">
     <div class="dialog-head"><h2 id="guide-title">行旅菜单</h2><button type="button" data-close aria-label="关闭菜单">×</button></div>
     <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习进度</button></div>
@@ -68,6 +80,7 @@
     </details>
     <details class="guide-topic"><summary>行囊与仓库</summary>
       <p class="fine">把鼠标放在物品上可以看用途，点一下可以使用或整理。备用的物品可以存进落灯村后院的仓库。</p>
+      <p class="fine">兵器磨损后，带去修具匠处。点开兵器可以选择付钱，或自备材料修好。</p>
     </details>
     <details class="guide-topic" data-guide-deduction hidden><summary>线索与沙盘</summary>
       <p class="fine">可以在沙盘上摊开随身的证物，写下猜想，再回现场试一试。</p>

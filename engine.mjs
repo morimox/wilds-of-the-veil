@@ -260,7 +260,7 @@ function groundPlace(state) {
 }
 
 const roadsideActions = new Set(['eat', 'batchEat', 'use', 'equip', 'unequip', 'equipManual',
-  'unequipManual', 'selectAmmo', 'take', 'discard']);
+  'unequipManual', 'selectAmmo', 'take']);
 const containerTransfers = new Set(['econBagDeposit', 'econBagWithdraw']);
 const equipmentChanges = new Set(['equip', 'unequip', 'combatEquip', 'equipManual', 'unequipManual', 'upgradeManual']);
 
@@ -648,6 +648,10 @@ const choiceExcluded = (state, choice, site) =>
 
 function knowsChoice(state, choice, site) {
   const previous = choice.afterChoice ?? choice.afterVisitChoice;
+  const reissue = choice.reissue;
+  if (reissue && (!state.knownItems.includes(reissue.item) || owns(state, reissue.item) ||
+      (reissue.beforeQuest && state.completedQuests.includes(reissue.beforeQuest)) ||
+      (reissue.beforeItem && state.knownItems.includes(reissue.beforeItem)))) return false;
   return (previous === undefined || state.seenChoices.includes(`${site?.id}:${previous}`)) &&
     (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
     (!choice.hideWhenExcluded || !choiceExcluded(state, choice, site)) &&
@@ -843,6 +847,7 @@ export function view(state) {
     backpackUsed: backpackSlots(state),
     backpackCapacity: backpackCapacity(state, rules.backpackCapacity),
     backpackName: backpackName(state, rules.backpackCapacity),
+    discardOptions: Object.fromEntries(itemIdsWithCount(state.inventory).map((id) => [id, discardTerms(state, id)])),
     groundLoot,
     groundWear: Object.fromEntries(resourceEntries(groundLoot).filter(([id]) => records.gear[id])
       .map(([id]) => [id, state.groundDurability?.[groundPlace(state)]?.[id]?.[0] ?? records.gear[id].durability])),
@@ -1098,6 +1103,7 @@ function choiceBlocker(state, choice, site, index) {
   const coins = choice.coins ?? 0;
   const missing = missingItems(state, choice.need);
   if (Object.keys(missing).length) return { reason: `还缺${goodsText(missing)}。` };
+  if (choice.reissue && !hasRoom(state, choice.loot, choice.need)) return { reason: '行囊放不下，先腾一格。' };
   if (state.coins + coins < 0) return { reason: `还需${-coins}枚灵钱。` };
   return null;
 }
@@ -1966,14 +1972,45 @@ function unequip(state, slot) {
   return say(state, `收起${nameOf(id)}。`);
 }
 
-function discard(state, id, count = owns(state, id)) {
-  if (!records.items[id] || !Number.isInteger(count) || count < 1 || count > owns(state, id)) return refuse('行囊里没有这件东西。');
-  if (isEvidence(records.items[id])) return refuse('随身信物不能放到地上。');
-  if (!occupiesBackpack(state, id)) return refuse('先把装备收下。');
-  if (id === supply && owns(state, id) - state.reliefRations < count) return refuse('村里匀给你的口粮只供自用。');
-  leaveOnGround(state, { [id]: count }, state.durability);
+function discardPlace(state) {
+  return state.combat && inProtectedBout(state) ? state.region : groundPlace(state);
+}
+
+function discardTerms(state, id) {
+  const item = records.items[id];
+  const held = owns(state, id);
+  const busy = state.combat || state.gathering || (state.roadBandit && !state.roadBandit.aftermath);
+  const reason = !item || held < 1 ? '行囊里没有这件东西。'
+    : isEvidence(item) && !item.breakthrough && !item.discardable ? '随身线索不用占行囊，也不必放下。'
+      : Object.values(state.equipment).includes(id) ? '先把装备收下。'
+        : busy && state.activeManual === id ? '先停下运功，再放下功谱。' : '';
+  return { maximum: reason ? 0 : held, relief: id === supply ? Math.min(held, state.reliefRations ?? 0) : 0, reason };
+}
+
+function disposalConfirmation(state, action, item, count, maximum, { confirmed, expectedPlace } = {}) {
+  if (!item.oneOfAKind) return null;
+  const dropping = action === 'discard';
+  const place = dropping ? discardPlace(state) : state.region;
+  if (confirmed === true) return expectedPlace !== undefined && expectedPlace !== place
+    ? refuse('已经离开原处，请重新确认。') : null;
+  const placeName = records.sites[place]?.name ?? records.regions[place]?.name ?? '这段路边';
+  const message = dropping ? '这件物品无法重新取得。放下后，仍可回这里找。' : '这件物品无法重新取得。卖出后就收不回来了。';
+  return { ...refuse(message), confirmation: { action, id: item.id, name: item.name, count, maximum, place, placeName } };
+}
+
+function discard(state, { id, count = owns(state, id), confirmed, expectedPlace }) {
+  const { maximum, relief, reason } = discardTerms(state, id);
+  if (reason) return refuse(reason);
+  if (!Number.isSafeInteger(count) || count < 1 || count > maximum) return refuse('行囊里没有这么多。');
+  const confirmation = disposalConfirmation(state, 'discard', records.items[id], count, maximum, { confirmed, expectedPlace });
+  if (confirmation) return confirmation;
+  const dropped = Math.min(count, maximum - relief);
+  const forgone = count - dropped;
+  if (dropped) leaveOnGround(state, { [id]: dropped }, state.durability, discardPlace(state));
   removeItem(state, id, count, false);
-  return say(state, `把${nameOf(id)}放到地上。`);
+  if (forgone) state.reliefRations -= forgone;
+  return say(state, (dropped ? `把${nameOf(id)}${dropped > 1 ? ` ×${dropped}` : ''}放到地上。` : '')
+    + (forgone ? `舍弃了 ${forgone} 份救济干粮。` : ''));
 }
 
 function takeFromGround(state, id, requested) {
@@ -2296,7 +2333,7 @@ function marketView(state) {
   return { stalls, sales };
 }
 
-function trade(state, id, count, buying, stallId) {
+function trade(state, id, count, buying, stallId, confirmationOptions) {
   const item = records.items[id];
   if (!item || !Number.isInteger(count) || count < 1 || count > rules.maxTradeCount) return refuse('请选择交易物品及数量。');
   const price = buying ? item.price : item.sell;
@@ -2314,8 +2351,10 @@ function trade(state, id, count, buying, stallId) {
     addItems(state, { [id]: count });
     merchantMessage = recordPurchase(state, stall.id, count, offer);
   } else {
-    const { blockedReason } = saleTerms(state, id, count);
+    const { blockedReason, count: owned } = saleTerms(state, id, count);
     if (blockedReason) return refuse(blockedReason);
+    const confirmation = disposalConfirmation(state, 'sell', item, count, Math.min(owned, rules.maxTradeCount), confirmationOptions);
+    if (confirmation) return confirmation;
     const quote = saleQuote(state, id, price);
     total = saleTotal(quote, count);
     removeItem(state, id, count, false);
@@ -2325,13 +2364,60 @@ function trade(state, id, count, buying, stallId) {
   return { ...say(state, `${buying ? '买入' : '卖出'}${item.name}×${count}，${total}枚灵钱。${merchantMessage}`), merchantMessage };
 }
 
+const repairStockByClass = {
+  staff: { wood: 2 },
+  blade: { ore: 2 },
+  sword: { ore: 2 },
+  spear: { ore: 2, wood: 2 },
+  bow: { wood: 2, reed: 1 },
+  crossbow: { wood: 1, ore: 2, hide: 1 },
+  hammer: { ore: 2, wood: 1 },
+  fist: { hide: 1, ore: 1 },
+};
+
+const repairStockByWeapon = {
+  knife: { ore: 1 },
+  reed_bow: { wood: 1, reed: 1 },
+  pine_bow: { wood: 2, hide: 1 },
+  resin_staff: { wood: 2, ore: 1 },
+  tide_spear: { ore: 2, wood: 1, core: 1 },
+  star_blade: { black_iron: 1, ore: 1 },
+  coil_spear: { wood: 2, black_iron: 1 },
+  black_crossbow: { wood: 1, black_iron: 1, hide: 1 },
+  snow_halberd: { wood: 2, black_iron: 1 },
+  sky_sword: { black_iron: 1, core: 1 },
+  sky_bow: { wood: 2, hide: 1, core: 1 },
+  weir_knife: { ore: 2, core: 1 },
+  coil_pole: { wood: 2, black_iron: 1 },
+  foil_sword: { ore: 2, black_iron: 2, core: 1 },
+  lake_bow: { wood: 2, hide: 2, core: 1 },
+  quarry_spear: { black_iron: 2, hard_scale: 1 },
+  side_hook: { ore: 1, wood: 1 },
+  scale_chisel: { black_iron: 1, hard_scale: 1 },
+  echo_knuckles: { black_iron: 1, battle_sinew: 1 },
+  gully_king_blade: { ore: 2, black_iron: 1 },
+};
+
+export function weaponRepairNeed(id, remaining = 0) {
+  const gear = records.gear[id];
+  if (!gear || !(gear.slot === 'weapon' || gear.sideAtk > 0)) return null;
+  const stock = repairStockByWeapon[id] ?? repairStockByClass[gear.weaponClass] ?? repairStockByClass.blade;
+  const lost = gear.durability - clamp(remaining, 0, gear.durability);
+  return lost > 0 ? Object.fromEntries(resourceEntries(stock)
+    .map(([part, count]) => [part, Math.ceil(count * lost / gear.durability)])) : {};
+}
+
 function repairServiceView(state) {
   const service = settlementOf(data, state.region)?.repair;
   if (!service) return null;
+  const carried = resourceEntries(state.inventory).filter(([id, count]) => records.gear[id] && count > 0);
   return {
     ...service,
-    prices: Object.fromEntries(resourceEntries(state.inventory).filter(([id]) => records.gear[id])
-      .map(([id]) => [id, repairPrice(records.gear[id], service)])),
+    prices: Object.fromEntries(carried.map(([id]) => [id, repairPrice(records.gear[id], service)])),
+    materials: Object.fromEntries(carried.flatMap(([id]) => {
+      const need = weaponRepairNeed(id, state.durability[id] ?? records.gear[id].durability);
+      return need && Object.keys(need).length ? [[id, { need, reason: homeRequirements(state, 0, need) }]] : [];
+    })),
   };
 }
 
@@ -2339,12 +2425,22 @@ function repairPrice(gear, service) {
   return (gear.repair ?? 1) + service.surcharge;
 }
 
-function repair(state, id) {
+function repair(state, id, useMaterials = false) {
   const service = settlementOf(data, state.region)?.repair;
   if (!service) return refuse('这里没有接活的修具匠。');
   const gear = records.gear[id];
   if (!gear || !owns(state, id)) return refuse('行囊里没有这件装备。');
-  if (state.durability[id] >= gear.durability) return refuse('这件装备已经完好。');
+  const remaining = state.durability[id] ?? gear.durability;
+  if (remaining >= gear.durability) return refuse('这件装备已经完好。');
+  if (useMaterials) {
+    const need = weaponRepairNeed(id, remaining);
+    if (!need) return refuse('自备料只接兵器的活。');
+    const why = homeRequirements(state, 0, need);
+    if (why) return refuse(why);
+    spendHome(state, 0, need);
+    state.durability[id] = gear.durability;
+    return say(state, `用${goodsText(need)}修好${nameOf(id)}，耐久已满。`);
+  }
   const cost = repairPrice(gear, service);
   if (state.coins < cost) return refuse(`修这件装备要${cost}枚灵钱。`);
   state.coins -= cost;
@@ -2437,7 +2533,7 @@ const economyKit = {
   data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem, startCombat, readableIntent,
   missingItems, payItems, hasRoom, backpackSlots, leaveOnGround, groundAt, nameOf, goodsText, normalize,
   isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure, roadProtection,
-  saleTerms, activeGear, checkRoadStep: (state, leg, index) => checkRoadBanditStep(state, leg, index, economyKit),
+  saleTerms, disposalConfirmation, activeGear, checkRoadStep: (state, leg, index) => checkRoadBanditStep(state, leg, index, economyKit),
   roadRisk: (state, leg) => roadBanditRisk(state, leg, economyKit),
   banditDenPopulation: (state, id) => Object.values(poolCounts(state, records.sites[id], 'creatures')).reduce((sum, count) => sum + count, 0),
   eatOnRoad: (state, id) => eat(state, false, id),
@@ -2446,7 +2542,7 @@ const economyKit = {
 
 function canUseVillageAction(state, action, payload) {
   if (action === 'rest' || action === 'restUntilRecovered') return settlementOf(data, state.region)?.inn;
-  if (action === 'repair') return Boolean(settlementOf(data, state.region)?.repair);
+  if (action === 'repair' || action === 'repairMaterials') return Boolean(settlementOf(data, state.region)?.repair);
   if (atHome(state)) return true;
   if (!isSettlement(state)) return false;
   return action === 'breakthrough' || action === 'research' || action === 'handin' ||
@@ -2462,8 +2558,9 @@ const villageActions = {
   craft: (state, { id }) => craft(state, id),
   showHideToSmith,
   buy: (state, { id, count = 1, stallId }) => trade(state, id, count, true, stallId),
-  sell: (state, { id, count = 1 }) => trade(state, id, count, false),
+  sell: (state, { id, count = 1, confirmed, expectedPlace }) => trade(state, id, count, false, undefined, { confirmed, expectedPlace }),
   repair: (state, { id }) => repair(state, id),
+  repairMaterials: (state, { id }) => repair(state, id, true),
   handin: (state, { id }) => handin(state, id),
 };
 
@@ -2487,7 +2584,6 @@ const generalActions = {
   equipManual: (state, { id }) => equipManual(state, id),
   unequipManual,
   upgradeManual: (state, { id }) => upgradeManual(state, id),
-  discard: (state, { id, count }) => discard(state, id, count),
   take: (state, { id, count }) => takeFromGround(state, id, count),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   deduce,
@@ -2516,6 +2612,7 @@ const combatActions = {
 
 function takeTurn(state, action, payload) {
   if (state.banditDeath) return refuse('这一局已经结束。');
+  if (action === 'discard') return discard(state, payload);
   if (state.gathering) {
     if (action !== 'finishGather') return refuse('这次采集还没结束。');
     const { siteId, index } = state.gathering;
@@ -2562,7 +2659,6 @@ function takeTurn(state, action, payload) {
     if (action === 'unpackBasket') return unpackBasket(state);
     if (action === 'selectAmmo') return selectAmmo(state, payload.id);
     if (action === 'take') return takeFromGround(state, payload.id, payload.count);
-    if (action === 'discard') return discard(state, payload.id, payload.count);
     if (action === 'beginGather') return beginGather(state, payload.index);
     if (action === 'choose') return choose(state, payload);
     if (action === 'experiment') return tryExperiment(state, payload);

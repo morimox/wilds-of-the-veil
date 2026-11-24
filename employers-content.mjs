@@ -8,7 +8,7 @@ const items = [
   key('zhao_sluice_receipt', '浅洲水闸的试水回条', '樊娘试过水闸，盖了拇指印。卡住闸板的碎石来自缺轮磨台，她在回条背面画了磨台的引水口。'),
   key('zhao_sluice_witness', '磨坊的通水回条', '樊娘试过水才签了条。两道闸都通了，把回条交给照原城的谷惟，她就能安排给田里放水。'),
   key('zhao_sluice_verse', '谷惟的借水手法', '谷惟把教你的手势画下来，箭头指向来劲更弱的一边。筑基后可依这势推偏一记重招。'),
-  { id: 'zhao_cargo_brace', name: '缠绳护腕', kind: 'gear', price: 0, sell: 0,
+  { id: 'zhao_cargo_brace', name: '缠绳护腕', kind: 'gear', price: 0, sell: 25, keepOnFall: true, oneOfAKind: true,
     desc: '码头押货人用的厚护腕。皮环内缠了船索，空一只手架住来势时尤其稳。' },
 ];
 

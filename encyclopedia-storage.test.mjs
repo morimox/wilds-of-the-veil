@@ -15,7 +15,10 @@ function play(state, action, payload = {}) {
 test('a book its owner set down stays on the ground if they fill the freed slot', () => {
   const state = createGame(34);
   state.inventory[book] = 1;
-  play(state, 'discard', { id: book, count: 1 });
+  const warning = act(state, 'discard', { id: book, count: 1 });
+  assert.equal(warning.confirmation.id, book);
+  assert.equal(state.inventory[book], 1);
+  play(state, 'discard', { id: book, count: 1, confirmed: true, expectedPlace: warning.confirmation.place });
   const pack = view(state);
   const extraSlots = pack.backpackCapacity - pack.backpackUsed;
   state.inventory.ration += rules.backpackStackSize * extraSlots;
@@ -48,7 +51,7 @@ test('the reference book can move through the warehouse, a space bag, and the gr
   play(state, 'econBagDeposit', { bagId: bag, id: book, count: 1 });
   assert.equal(view(state).guideBook, null);
   play(state, 'econBagWithdraw', { bagId: bag, id: book, count: 1 });
-  play(state, 'discard', { id: book, count: 1 });
+  play(state, 'discard', { id: book, count: 1, confirmed: true });
   assert.equal(view(state).guideBook, null);
   play(state, 'take', { id: book });
   assert.equal(view(state).guideBook.entries.find(({ id }) => id === 'ration').note, '走远路前可以带着。');

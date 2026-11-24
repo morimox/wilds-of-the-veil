@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { act, view } from './engine.mjs';
+import { act, view, weaponRepairNeed } from './engine.mjs';
 import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 function play(state, action, payload) {
@@ -117,4 +117,69 @@ test('only designated local smiths repair the gear in hand at the quoted price',
   assert.equal(view(state).repairService, null);
   assert.equal(act(state, 'repair', { id: 'cudgel' }).ok, false);
   assert.equal(state.durability.cudgel, worn);
+});
+
+test('a staff worn to zero by a real strike can be fixed with carried and stored material', () => {
+  const state = createGame(31);
+  play(state, 'buy', { id: 'wood', count: 2 });
+  play(state, 'econDeposit', { id: 'wood', count: 1 });
+  play(state, 'travel', { id: 'marsh' });
+  play(state, 'visit', { id: 'mud_track' });
+  play(state, 'choose', { index: 0 });
+  state.durability.cudgel = 1;
+  const strike = play(state, 'attack');
+  assert.match(strike.message, /枣木杖.*损坏/);
+  assert.equal(state.durability.cudgel, 0);
+  assert.equal(act(state, 'repairMaterials', { id: 'cudgel' }).ok, false);
+  stageRetreatOpening(state);
+  assert.equal(play(state, 'retreat').retreated, true);
+  assert.equal(act(state, 'repairMaterials', { id: 'cudgel' }).ok, false);
+  play(state, 'travel', { id: 'village' });
+  state.coins = 0;
+
+  assert.deepEqual(view(state).repairService.materials.cudgel, { need: { wood: 2 }, reason: '' });
+  play(state, 'repairMaterials', { id: 'cudgel' });
+  assert.equal(state.durability.cudgel, 26);
+  assert.deepEqual(weaponRepairNeed('cudgel', 26), {});
+  assert.equal(view(state).repairService.materials.cudgel, undefined);
+  assert.equal(state.inventory.wood, undefined);
+  assert.equal(state.economy.warehouse.wood, undefined);
+  assert.equal(state.coins, 0);
+  assert.equal(act(state, 'repairMaterials', { id: 'cudgel' }).ok, false);
+});
+
+test('a remote smith consumes only carried parts for rare and off-hand weapons and scales the quote to wear', () => {
+  const state = createGame(81);
+  state.region = 'zhao_city';
+  state.inventory.foil_sword = 1;
+  state.inventory.side_hook = 1;
+  state.inventory.hide_shield = 1;
+  Object.assign(state.durability, { foil_sword: 0, side_hook: 25, hide_shield: 0 });
+  state.economy.warehouse = { ore: 10, black_iron: 10, core: 10 };
+  const book = () => view(state).repairService.materials;
+  const required = { ore: 2, black_iron: 2, core: 1 };
+  assert.deepEqual(book().foil_sword.need, required);
+  assert.match(book().foil_sword.reason, /还缺/);
+  const before = structuredClone(state);
+  assert.equal(act(state, 'repairMaterials', { id: 'foil_sword' }).ok, false);
+  assert.deepEqual(state, before);
+  assert.equal(book().hide_shield, undefined);
+  assert.equal(act(state, 'repairMaterials', { id: 'hide_shield' }).ok, false);
+
+  Object.assign(state.inventory, required);
+  assert.equal(book().foil_sword.reason, '');
+  play(state, 'repairMaterials', { id: 'foil_sword' });
+  assert.equal(state.durability.foil_sword, 66);
+  assert.deepEqual(state.economy.warehouse, before.economy.warehouse);
+  assert.equal(state.coins, before.coins);
+  assert.equal(state.inventory.ore, undefined);
+  state.durability.foil_sword = 64;
+  assert.deepEqual(book().foil_sword.need, { ore: 1, black_iron: 1, core: 1 });
+
+  state.inventory.ore = 1;
+  state.inventory.wood = 2;
+  assert.deepEqual(book().side_hook, { need: { ore: 1, wood: 1 }, reason: '' });
+  play(state, 'repairMaterials', { id: 'side_hook' });
+  assert.equal(state.durability.side_hook, 30);
+  assert.equal(state.inventory.wood, 1);
 });

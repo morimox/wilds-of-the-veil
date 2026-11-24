@@ -381,13 +381,13 @@ const events = [
 ];
 
 const items = [
-  { id: sleeve, name: '守车短袖诀', kind: 'manual', price: 0, sell: 0, keepOnFall: true,
+  { id: sleeve, name: '守车短袖诀', kind: 'manual', price: 0, sell: 0, keepOnFall: true, oneOfAKind: true,
     desc: '灰褂人的护车薄册，封面抹过一层油。纸角压得很平，翻开就看见几笔将刀拢在半臂之内的画。' },
-  { id: kingBlade, name: '许涧的宽背刀', kind: 'gear', price: 0, sell: 0, keepOnFall: true,
+  { id: kingBlade, name: '许涧的宽背刀', kind: 'gear', price: 0, sell: 33, keepOnFall: true, oneOfAKind: true,
     desc: '刀背厚，刀尖收得窄。前半截磨得雪亮，靠护手那段却全是长年蹭在木头上的细痕。' },
-  { id: fordBell, name: '裹布铜铃', kind: 'gear', price: 0, sell: 0, keepOnFall: true,
+  { id: fordBell, name: '裹布铜铃', kind: 'gear', price: 0, sell: 26, keepOnFall: true, oneOfAKind: true,
     desc: '邵苹挂在舵边的铜铃，裹着两层厚布，听得清近处脚步。' },
-  { id: saltBoots, name: '厚底踏砂靴', kind: 'gear', price: 0, sell: 0, keepOnFall: true,
+  { id: saltBoots, name: '厚底踏砂靴', kind: 'gear', price: 0, sell: 44, keepOnFall: true, oneOfAKind: true,
     desc: '封霁常穿的软底靴，靴筒扎得紧，踩过薄盐壳也很少响。' },
 ];
 

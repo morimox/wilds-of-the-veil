@@ -61,11 +61,18 @@ test('the six mechanisms use separate scenes and outside clues have their own so
     const item = data.items.find(({ id }) => id === mechanism.lead.item);
     assert.ok(item?.kind === 'key' || item?.keepOnFall);
     assert.equal(item.price, 0);
-    const sources = data.events.flatMap(({ id, choices }) => choices.flatMap(({ loot }, index) =>
-      loot?.[item.id] ? [{ id, index }] : []));
-    assert.equal(sources.length, 1);
+    const sources = data.events.flatMap(({ id, choices }) => choices.flatMap((choice, index) =>
+      choice.loot?.[item.id] ? [{ id, index, choice }] : []));
+    assert.equal(new Set(sources.map(({ id }) => id)).size, 1);
     const source = data.sites.find(({ id }) => id === sources[0].id);
-    assert.ok(source && source.once.includes(sources[0].index));
+    const first = sources.filter(({ index }) => source.once.includes(index));
+    assert.equal(first.length, 1);
+    for (const { index, choice } of sources) {
+      if (index === first[0].index) continue;
+      assert.equal(choice.afterChoice, first[0].index);
+      assert.ok(Object.entries(source.stocks ?? {}).some(([id, pool]) =>
+        (pool.item ?? id) === item.id && pool.choices.includes(index) && pool.growth > 0));
+    }
     assert.notEqual(source.region, data.sites.find(({ id }) => id === mechanism.site).region);
   }
   for (const action of ['mechanismMove', 'mechanismReset', 'mechanismTry']) refuseWithoutMutation(state, action);

@@ -15,7 +15,7 @@ export const encyclopediaContent = {
       desc: '匣中有一张折得发白的路图。洪水淹过的旧道旁添了一行小字，签名正是周简说的那位巡堤人。' },
     { id: kilnProof, name: '鸣沙校样', kind: 'key', price: 0, sell: 0,
       desc: '晾好的纸上有阮杪校过的批注。几味药草和盐井的去向各占一栏，最左边也印着往来三州的路。' },
-    { id: 'encyclopedia', name: '百科全书', kind: 'reference', price: 0, sell: 0, keepOnFall: true,
+    { id: 'encyclopedia', name: '百科全书', kind: 'reference', price: 0, sell: 0, keepOnFall: true, oneOfAKind: true,
       desc: '守尺观校订的随身查阅本。扉页有索引，按条目可以翻到里面相应的记载。' },
   ],
   sites: [

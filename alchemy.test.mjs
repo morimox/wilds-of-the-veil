@@ -144,7 +144,7 @@ test('the late recovery formula uses a gold core for each batch after the old ag
   assert.equal(state.inventory.return_breath_pill, 2);
 });
 
-test('foundation payments reveal only the next earned site and the final charge can brew once', () => {
+test('foundation payments reveal only the next earned site and award an initial charge for one batch', () => {
   const state = createGame(0);
   state.realm = 2;
   state.insight = 120;
@@ -203,7 +203,8 @@ test('foundation payments reveal only the next earned site and the final charge 
   assert.equal(state.inventory.foundation_pill, 1);
   assert.equal(view(state).evidence.some(({ id }) => id === 'foundation_pill'), false);
   deny(state, 'use', { id: 'foundation_pill' });
-  deny(state, 'discard', { id: 'foundation_pill' });
+  play(state, 'discard', { id: 'foundation_pill' });
+  play(state, 'take', { id: 'foundation_pill' });
   play(state, 'breakthrough');
   assert.equal(view(state).realm.name, '筑基初期');
   assert.equal(state.inventory.foundation_pill, undefined);

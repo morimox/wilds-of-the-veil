@@ -17,6 +17,7 @@ import { dykeArmoryContent } from './dyke-armory.mjs';
 import { ridgeArmoryContent } from './ridge-armory.mjs';
 import { explorerKitContent } from './explorer-kit.mjs';
 import { encyclopediaContent } from './encyclopedia-content.mjs';
+import { addProgressionRecovery } from './progression-recovery.mjs';
 
 const realms = [
   { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, perception: 10, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
@@ -121,7 +122,7 @@ const items = [
   { id: 'foundation_kiln_seal', name: '丹窑旧印半片', kind: 'key', price: 0, sell: 0, desc: '从旧丹窑挡板的浅槽里取出的半枚印。擦开灰，上面的花纹和账页上的第二枚残印对得上。' },
   { id: 'foundation_snow_order', name: '封石之约', kind: 'key', price: 0, sell: 0, desc: '安蒲用两枚旧印合成的信帖。带它去碎云雪关的短桥外，便能看见验药室的门缝。' },
   { id: 'foundation_warden_proof', name: '验药室的留火印', kind: 'key', price: 0, sell: 0, desc: '通过护炉人的考验后拿到的信物。印背上的线条能跟前两枚印接在一起。' },
-  { id: 'foundation_charge', name: '封炉药引', kind: 'key', price: 0, sell: 0, desc: '安蒲依三印验出的唯一一剂引火料，在炉里会与其余材料一并耗尽。' },
+  { id: 'foundation_charge', name: '封炉药引', kind: 'key', price: 0, sell: 0, discardable: true, desc: '安蒲依三印验出的引火料，一剂只够一炉。合方后可找安蒲另付炉钱和材料补配。' },
   { id: 'foundation_pill', name: '筑基丹', kind: 'key', price: 0, sell: 0, breakthrough: true, desc: '三火合炼所得的一丸。闭关突破时服用，药力会随吐纳逐步散入经脉。' },
   { id: 'reed_arrow', name: '削苇箭', kind: 'ammo', price: 2, sell: 1, desc: '苇秆做的箭杆很轻。木箭头扎不穿厚甲。' },
   { id: 'iron_arrow', name: '包铁箭', kind: 'ammo', price: 0, sell: 2, desc: '箭头包着一层薄铁，容易扎进鳞片之间。' },
@@ -1185,6 +1186,7 @@ for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzz
 sites.push(...extendSites);
 events.push(...extendEvents);
 innerStyleContent.extendScenes(sites, events, gear, enemies);
+addProgressionRecovery(items, events);
 const roadsideEnemyIds = new Set([...roadBandits.pools, ...roadBandits.fixed].map(({ enemy }) => enemy));
 for (const enemy of banditContent.enemies) {
   enemy.tags.push('bandit');
