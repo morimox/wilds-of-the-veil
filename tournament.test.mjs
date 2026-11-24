@@ -64,11 +64,16 @@ test('three real arena opponents, rest between bouts, and a one-time first place
     play(state, 'tournamentFight');
     assert.equal(view(state).currentEnemy.id, match.enemy);
     assert.equal(view(state).currentEnemy.sparring, true);
+    assert.equal(view(state).currentEnemy.medicineRestricted, true);
     assert.equal(act(state, 'rest').ok, false);
     assert.equal(act(state, 'tournamentFight').ok, false);
     winCurrentBout(state);
     assert.equal(view(state).tournament.wins, index + 1);
     if (index < 2) {
+      const blocked = view(state).tournament;
+      assert.equal(blocked.canFight, false);
+      assert.equal(act(state, 'tournamentFight').message, blocked.fightReason);
+      assert.match(blocked.fightReason, /先在场边歇/);
       state.qi = 0;
       play(state, 'rest');
       assert.equal(state.qi, rules.restQi);
@@ -113,7 +118,7 @@ test('loss preserves score validity and possessions; one consolation with a four
   assert.equal(state.region, 'measuring_hall');
   assert.equal(state.combat, null);
   assert.equal(state.event, null);
-  assert.ok(state.hp >= 1);
+  assert.equal(state.hp, 1);
   assert.equal(state.wounds, 0);
   assert.deepEqual(state.inventory, belongings);
   assert.equal(state.coins, purse);
@@ -125,6 +130,12 @@ test('loss preserves score validity and possessions; one consolation with a four
   assert.equal(act(state, 'tournamentClaim').ok, false);
   while (state.day < state.tournament.until) play(state, 'wait');
   play(state, 'tournamentEnroll');
+  if (state.satiety === 0) play(state, 'eat');
+  assert.equal(view(state).tournament.canFight, false);
+  assert.match(view(state).tournament.fightReason, /气血还没到一半/);
+  play(state, 'restUntilRecovered');
+  if (state.satiety === 0) play(state, 'eat');
+  assert.equal(view(state).tournament.canFight, true);
   play(state, 'tournamentWithdraw');
   assert.equal(act(state, 'tournamentClaim').ok, false);
   assert.equal(state.coins, purse - tournamentData.fee);
@@ -137,6 +148,7 @@ test('ordinary retreat concedes a live official match, and legit earlier wins st
   play(state, 'tournamentEnroll');
   play(state, 'tournamentFight');
   winCurrentBout(state);
+  play(state, 'wait');
   play(state, 'tournamentFight');
   const health = state.hp;
   play(state, 'retreat');
@@ -148,6 +160,75 @@ test('ordinary retreat concedes a live official match, and legit earlier wins st
   play(state, 'tournamentClaim');
   assert.equal(state.inventory.iron_talisman, 1);
   assert.equal(state.inventory.tournament_citation, undefined);
+});
+
+test('the brick ring prohibits applying medicine and meal recovery until the fighter steps down', () => {
+  const state = atTheHall();
+  state.inventory.salve = 2;
+  state.inventory.qi_powder = 2;
+  state.inventory.grain_pill = 1;
+  state.realm = 1;
+  state.hp = view(state).maxHp;
+  const site = 'zhao_bamboo_duel';
+  play(state, 'visit', { id: site });
+  assert.match(view(state).visibleChoices.find(({ index }) => index === 1).desc, /药和口粮留在场下/);
+  play(state, 'choose', { index: 1 });
+  assert.equal(view(state).currentEnemy.medicineRestricted, true);
+  for (const [action, id] of [['use', 'salve'], ['use', 'qi_powder'], ['use', 'grain_pill'], ['use', 'ration'], ['eat', 'ration']]) {
+    const before = structuredClone(state);
+    const blocked = act(state, action, { id });
+    assert.equal(blocked.ok, false);
+    assert.match(blocked.message, /禁用药物和饮食/);
+    assert.deepEqual(state, before);
+  }
+  const purse = state.coins;
+  state.hp = 1;
+  play(state, 'attack');
+  assert.equal(state.hp, 1);
+  assert.equal(state.event, null);
+  assert.equal(state.combat, null);
+  assert.equal(state.coins, purse);
+  assert.equal(state.inventory.salve, 2);
+  assert.equal(state.wounds, 0);
+  assert.equal(view(state).boutPause, rules.regulatedBoutCooldown);
+  play(state, 'visit', { id: site });
+  assert.match(act(state, 'choose', { index: 1 }).message, /先在场边歇/);
+  play(state, 'leave');
+  play(state, 'wait');
+  play(state, 'visit', { id: site });
+  assert.match(act(state, 'choose', { index: 1 }).message, /气血还没到一半/);
+  play(state, 'leave');
+  play(state, 'use', { id: 'salve' });
+  assert.equal(state.inventory.salve, 1);
+  play(state, 'restUntilRecovered');
+  if (state.satiety < rules.rationSatiety) play(state, 'eat');
+  play(state, 'visit', { id: site });
+  play(state, 'choose', { index: 1 });
+  play(state, 'retreat');
+  assert.equal(view(state).boutPause, rules.regulatedBoutCooldown);
+});
+
+test('enemy medicine is withheld by strict referee rules even when an opponent carries a dose', () => {
+  const state = atTheHall();
+  getInvitation(state);
+  play(state, 'tournamentEnroll');
+  play(state, 'tournamentFight');
+  const enemy = data.enemies.find(({ id }) => id === state.combat.id);
+  const original = enemy.medicine;
+  try {
+    enemy.medicine = { id: 'heal_pill', count: 1 };
+    Object.assign(state.combat, { round: 2, hp: 10, observedHits: [{ damage: 2 }], lastEnemyIntent: { kind: 'attack' } });
+    const unrestricted = structuredClone(state);
+    unrestricted.combat.siteId = 'bank_watch';
+    act(unrestricted, 'use', { id: 'wood' });
+    assert.equal(unrestricted.combat.plan.intent.kind, 'remedy');
+    act(state, 'use', { id: 'wood' });
+    assert.notEqual(state.combat.plan.intent.kind, 'remedy');
+    assert.equal(state.combat.medicineLeft, undefined);
+  } finally {
+    if (original) enemy.medicine = original;
+    else delete enemy.medicine;
+  }
 });
 
 test('the real cave swordsman has no official referee protection on defeat', () => {

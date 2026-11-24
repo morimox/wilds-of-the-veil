@@ -40,6 +40,7 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   play(full, 'choose', { index: 0 });
   assert.equal(full.combat.id, actors[0]);
   const randomAfterFirst = full.encounterSeed;
+  full.enemyEvadeSeed = 0; // Make the trail recovery case land the first hit.
   play(full, 'attack');
   const previousFoeHealth = full.combat.hp;
   const observed = structuredClone(full.combat.observedHits);

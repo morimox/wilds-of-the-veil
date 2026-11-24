@@ -113,9 +113,12 @@ test('opponents with the same observations answer the same action even when the 
   const first = strong.combat.observedHits[0].damage;
   strong.inventory.cudgel = 1;
   strong.durability.cudgel = gear.cudgel.durability;
-  play(strong, 'combatEquip', { id: 'cudgel' });
+  strong.knownArts.push('mist_press');
+  const locked = structuredClone(strong);
+  assert.match(act(strong, 'combatEquip', { id: 'cudgel' }).message, /交手中不能换装备/);
+  assert.deepEqual(strong, locked);
   assert.equal(strong.combat.observedHits.length, 1);
-  const next = play(strong, 'attack');
+  const next = play(strong, 'art', { id: 'mist_press' });
   assert.equal(strong.combat.observedHits[1].damage, next.damageDealt - next.reflectedDamage);
   assert.notEqual(first, strong.combat.observedHits[1].damage);
 });
@@ -188,6 +191,117 @@ test('an injured human spends a carried medicine in one turn and cannot use it a
   }
 });
 
+test('a completed charged strike can stop a dose, while a miss or a normal strike leaves room to take it', () => {
+  const id = 'sand_basket_mender';
+  const guard = enemies[id].intents.find(({ kind }) => kind === 'guard');
+  const remedy = { kind: 'remedy', name: '服下济潮丹' };
+  const prepared = staged(id, { realm: 5, hp: 68, items: ['anvil_hammer'] });
+  prepared.combat.plan = { round: 0, reader: null, intent: guard };
+  play(prepared, 'attack');
+  assert.equal(prepared.combat.round, 1);
+  assert.equal(view(prepared).chargingWeapon.id, 'anvil_hammer');
+  prepared.combat.plan = { round: 1, reader: null, intent: remedy };
+  prepared.combat.medicineLeft = 1;
+  const missed = structuredClone(prepared);
+  const day = prepared.day;
+  prepared.enemyEvadeSeed = seedBetween(0.80, 0.83);
+  const hit = play(prepared, 'attack');
+  assert.ok(hit.damageDealt > 0);
+  assert.match(hit.message, /这一击打断/);
+  assert.equal(hit.enemyMove.name, '取药时被打断');
+  assert.equal(prepared.combat.hp, 68 - hit.damageDealt);
+  assert.equal(prepared.combat.medicineLeft, 1);
+  assert.equal(prepared.combat.round, 2);
+  assert.equal(prepared.day - day, rules.battleDays);
+  assert.equal(view(prepared).chargingWeapon, null);
+
+  missed.enemyEvadeSeed = seedBetween(0.02, 0.03);
+  const whiff = play(missed, 'attack');
+  assert.equal(whiff.missed, true);
+  assert.equal(missed.combat.hp, 68 + 24);
+  assert.equal(missed.combat.medicineLeft, 0);
+
+  const ordinary = staged(id, { realm: 5, hp: 68 });
+  ordinary.combat.plan = { round: 0, reader: null, intent: remedy };
+  ordinary.enemyEvadeSeed = seedBetween(0.80, 0.83);
+  const quick = play(ordinary, 'attack');
+  assert.ok(quick.damageDealt > 0);
+  assert.equal(ordinary.combat.hp, 68 - quick.damageDealt + 24);
+  assert.equal(ordinary.combat.medicineLeft, 0);
+});
+
+test('a bandit who reads medicine releases a prepared strike, but a dodge lets the dose through', () => {
+  const id = 'bandit_den_leader';
+  const target = enemies[id];
+  const state = staged(id, { realm: 7, items: ['frost_robe', 'bandit_salt_boots'] });
+  const priorGuard = target.intents.find(({ kind }) => kind === 'guard');
+  const focus = target.intents.find(({ kind }) => kind === 'focus');
+  state.combat.plan = { round: 0, reader: null, intent: focus };
+  play(state, 'guard');
+  assert.equal(state.combat.enemyCharged, true);
+  state.combat.plan = { round: 1, reader: 'enemy', intent: priorGuard };
+  state.hp = 40;
+  state.qi = 10;
+  state.wounds = 1;
+  state.toxin = 5;
+  state.inventory.jade_pill = 1;
+  const miss = structuredClone(state);
+  const unread = structuredClone(state);
+  const meal = structuredClone(state);
+  const day = state.day;
+  state.evadeSeed = seedBetween(0.80, 0.83);
+  miss.evadeSeed = seedBetween(0.01, 0.02);
+  meal.evadeSeed = state.evadeSeed;
+  unread.combat.plan.reader = null;
+
+  const blocked = play(state, 'use', { id: 'jade_pill' });
+  assert.equal(blocked.enemyMove.kind, 'heavy');
+  assert.ok(blocked.damageTaken > 0);
+  assert.match(blocked.message, /看破了你的起手.*打断。药还在手里/);
+  assert.equal(state.hp, 40 - blocked.damageTaken);
+  assert.equal(state.qi, 10);
+  assert.equal(state.wounds, 1);
+  assert.equal(state.toxin, 5);
+  assert.equal(state.inventory.jade_pill, 1);
+  assert.equal(state.combat.enemyCharged, false);
+  assert.equal(state.combat.round, 2);
+  assert.equal(state.day - day, rules.battleDays);
+
+  const evaded = play(miss, 'use', { id: 'jade_pill' });
+  assert.equal(evaded.dodged, true);
+  assert.equal(miss.hp, 70);
+  assert.equal(miss.qi, 25);
+  assert.equal(miss.inventory.jade_pill, undefined);
+  assert.equal(miss.combat.enemyCharged, false);
+  const noDose = act(miss, 'use', { id: 'jade_pill' });
+  assert.equal(noDose.ok, false);
+  assert.equal(miss.hp, 70);
+  assert.equal(miss.combat.round, 2);
+
+  const closed = play(unread, 'use', { id: 'jade_pill' });
+  assert.equal(closed.enemyMove.kind, 'guard');
+  assert.equal(unread.hp, 70);
+  assert.equal(unread.inventory.jade_pill, undefined);
+  assert.equal(unread.combat.enemyCharged, true);
+
+  const supplies = meal.inventory.ration;
+  assert.doesNotMatch(play(meal, 'eat', { id: 'ration' }).message, /打断/);
+  assert.equal(meal.inventory.ration, supplies - 1);
+});
+
+test('an empty medicine supply cannot restore health even if a dose was already planned', () => {
+  const state = staged('sand_sundial_master', { realm: 7, hp: 40 });
+  state.combat.medicineLeft = 0;
+  state.combat.plan = { round: 0, reader: null, intent: { kind: 'remedy', name: '喝下照心露' } };
+  const result = play(state, 'guard');
+  assert.match(result.message, /药袋，已经空了/);
+  assert.equal(state.combat.hp, 40);
+  assert.equal(state.combat.medicineLeft, 0);
+  for (let turn = 0; state.combat && turn < 5; turn++) {
+    assert.notEqual(play(state, 'guard').enemyMove?.kind, 'remedy');
+  }
+});
+
 test('passive dodge combines compatible worn items with diminishing returns', () => {
   const duel = staged('sand_spine_lizard', { realm: 6, items: ['frost_robe', 'path_charm', 'reed_boots'] });
   const attack = enemies.sand_spine_lizard.intents.find(({ kind }) => kind === 'attack');
@@ -218,12 +332,35 @@ test('an active dodge can evade fast or heavy attacks, with worse odds against a
   const attainable = structuredClone(duel);
   const close = structuredClone(duel);
   close.combat.plan.intent.ranged = false;
-  duel.evadeSeed = seedBetween(0.21, 0.23);
+  // With his accuracy, a roll between the shot and close-quarters odds separates the two.
+  duel.evadeSeed = seedBetween(0.13, 0.15);
   close.evadeSeed = duel.evadeSeed;
   attainable.evadeSeed = seedBetween(0.01, 0.04);
   assert.equal(play(duel, 'dodge').dodged, false);
   assert.equal(play(close, 'dodge').dodged, true);
   assert.equal(play(attainable, 'dodge').dodged, true);
+});
+
+test('enemy specialties lead to different dodge, aim, and insight outcomes on the same rolls', () => {
+  const agile = staged('sand_quarry_skink', { realm: 4 });
+  const plated = staged('sand_quarry_rockscorpion', { realm: 4 });
+  agile.enemyEvadeSeed = plated.enemyEvadeSeed = seedBetween(0.07, 0.09);
+  assert.equal(play(agile, 'attack').damageDealt, 0);
+  assert.ok(play(plated, 'attack').damageDealt > 0);
+
+  const viper = staged('sand_rattle_viper', { realm: 1 });
+  const fox = staged('sand_salt_fox', { realm: 1 });
+  viper.evadeSeed = fox.evadeSeed = seedBetween(0.20, 0.22);
+  assert.equal(play(viper, 'dodge').dodged, false);
+  assert.equal(play(fox, 'dodge').dodged, true);
+
+  const seed = seedBetween(0.10, 0.12);
+  const scorpion = staged('sand_riven_scorpion', { realm: 7, seed });
+  const matriarch = staged('sand_quarry_matriarch', { realm: 7, seed });
+  assert.equal(act(scorpion, 'selectAmmo', { id: 'bad_ammo' }).ok, false);
+  assert.equal(act(matriarch, 'selectAmmo', { id: 'bad_ammo' }).ok, false);
+  assert.equal(view(scorpion).combatRead, 'player');
+  assert.equal(view(matriarch).combatRead, 'enemy');
 });
 
 test('both ordinary and charge-only weapons can be paired and selected in either hand', () => {

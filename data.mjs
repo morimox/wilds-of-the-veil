@@ -105,10 +105,12 @@ const items = [
   { id: 'formula_grain', name: '暖谷丸丹方', kind: 'key', price: 0, sell: 0, desc: '干粮浸软之后分团，两边火口只留靠里的那一孔。' },
   { id: 'formula_focus', name: '定息丹方', kind: 'key', price: 0, sell: 0, desc: '草汁与微火要同时入盏。松木快烧完时从边上刮下结露。' },
   { id: 'formula_resin', name: '温枝丸丹方', kind: 'key', price: 0, sell: 0, desc: '只用松木最靠外的嫩脂。开炉前先用湿草熄主火。' },
+  { id: 'formula_sense', name: '凝神散丹方', kind: 'key', price: 0, sell: 0, desc: '先筛去灵晶的硬粒。灵草焙干，拌进石粉后再过细筛。' },
   { id: 'formula_detox', name: '清露丸丹方', kind: 'key', price: 0, sell: 0, desc: '熟药过清叶，吹开浮灰，留下盏壁上一道没有药涩的露。' },
   { id: 'formula_heal', name: '合络丹丹方', kind: 'key', price: 0, sell: 0, desc: '药团放在新绷的兽革上收汁。每一次收边都要换掉浸透的皮。' },
   { id: 'formula_tide', name: '济潮丹丹方', kind: 'key', price: 0, sell: 0, desc: '捞洗潮床的灵晶，退水时下药。窄炉缝上升的白气可以判火候。' },
   { id: 'formula_leaf', name: '清脉饮丹方', kind: 'key', price: 0, sell: 0, desc: '篁泽药匣里的煎药札。药汁沸后要将长、短木槽依次架进火口。' },
+  { id: 'formula_heart', name: '养心丸丹方', kind: 'key', price: 0, sell: 0, desc: '泽医照滴水图抄的方子。罐口各引一条细槽，两边药汁要滴得一样快。' },
   { id: 'formula_jade', name: '照心露丹方', kind: 'key', price: 0, sell: 0, desc: '温火焙灵晶，白露顺斜槽流入底盏。火心太大就没有露。' },
   { id: 'formula_foundation', name: '筑基丹方', kind: 'key', price: 0, sell: 0, desc: '安蒲重新排定的三篇合方。两次短火分开入料，第三道长火得靠封炉药引维持。' },
   { id: 'foundation_ledger', name: '焦痕丹窑账页', kind: 'key', price: 0, sell: 0, desc: '半页熏焦的取还账。镇上丹师安蒲的名字旁压着三枚缺了一角的印。' },
@@ -166,6 +168,8 @@ const items = [
   { id: 'focus_pill', name: '定息丹', kind: 'pill', price: 12, sell: 5, desc: '收拢散乱的气息，使下一次术法伤害增加3点。' },
   { id: 'tide_pill', name: '济潮丹', kind: 'pill', price: 19, sell: 8, desc: '气血与真气一并恢复，药力很重。' },
   { id: 'resin_pill', name: '温枝丸', kind: 'pill', price: 0, sell: 6, desc: '药丸入口先苦，随后才感到胸口热。适合远行后恢复气血。' },
+  { id: 'sense_powder', name: '凝神散', kind: 'pill', price: 0, sell: 4, desc: '细粉含在舌下有股凉意。练过神识的人可以借它收拢心神，留出余力观招。' },
+  { id: 'heart_pill', name: '养心丸', kind: 'pill', price: 0, sell: 6, desc: '泽医把两味药收进一丸，既能补些气血，也能缓一缓神识的疲乏。' },
   { id: 'leaf_pill', name: '清脉饮', kind: 'pill', price: 0, sell: 8, desc: '一小囊苦药汁。能卸去丹毒，再理顺紊乱的真气。' },
   { id: 'jade_pill', name: '照心露', kind: 'pill', price: 0, sell: 16, desc: '用温火从晶屑中引出的药露。恢复真气和气血，服多容易积毒。' },
 
@@ -239,6 +243,8 @@ const pills = [
   { id: 'focus_pill', tier: 0, hp: 0, qi: 0, toxin: 6, wound: 0, focus: 1 },
   { id: 'tide_pill', tier: 2, hp: 24, qi: 10, toxin: 18, wound: 1, focus: 0 },
   { id: 'resin_pill', tier: 1, hp: 15, qi: 4, toxin: 9, wound: 0, focus: 0 },
+  { id: 'sense_powder', tier: 1, hp: 0, qi: 0, sense: 2, toxin: 6, wound: 0, focus: 0 },
+  { id: 'heart_pill', tier: 2, hp: 14, qi: 0, sense: 1, toxin: 10, wound: 0, focus: 0 },
   { id: 'leaf_pill', tier: 2, hp: 4, qi: 8, toxin: -28, wound: 0, focus: 0 },
   { id: 'jade_pill', tier: 3, hp: 30, qi: 15, toxin: 16, wound: 1, focus: 1 },
 ];
@@ -309,6 +315,8 @@ const recipes = [
   { id: 'r_hide_shield', result: 'hide_shield', count: 1, tier: 0, facility: 'forge', cost: 8, need: { wood: 4, hide: 3 }, days: 1.25, requiresShownHide: true },
   { id: 'r_miner_pick', result: 'miner_pick', count: 1, tier: 0, facility: 'forge', cost: 8, need: { ore: 4, wood: 2 }, days: 1.5, reveal: { item: 'blade_template' } },
   { id: 'r_resin_pill', result: 'resin_pill', count: 3, tier: 1, facility: 'furnace', formula: 'formula_resin', cost: 6, need: { wood: 2, reed: 3, qi_core: 2 }, days: 2 },
+  { id: 'r_sense_powder', result: 'sense_powder', count: 2, tier: 1, facility: 'furnace', formula: 'formula_sense', cost: 4, need: { reed: 2, core: 1 }, days: 1.25 },
+  { id: 'r_heart_pill', result: 'heart_pill', count: 2, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_heart', cost: 6, need: { reed: 3, hide: 1, qi_core: 1 }, days: 2 },
   { id: 'r_leaf_pill', result: 'leaf_pill', count: 3, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_leaf', cost: 10, need: { reed: 4, kiln_clay: 1, wood: 2, qi_core: 3 }, days: 3 },
   { id: 'r_jade_pill', result: 'jade_pill', count: 3, tier: 3, facility: 'furnace', facilityLevel: 3, formula: 'formula_jade', cost: 16, need: { reed: 4, core: 2, wood: 1, foundation_core: 2, beast_eye: 1 }, days: 4 },
   { id: 'r_foundation', result: 'foundation_pill', count: 1, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_foundation', cost: 45, need: { foundation_charge: 1, reed: 6, core: 5, black_iron: 4, qi_core: 24 }, days: 4 },
@@ -496,8 +504,9 @@ const sites = [
   { id: 'herb_beds', region: 'herb_basin', name: '银纹药田',
     stocks: { reed: { start: 8, cap: 12, interval: 6, growth: 2, depletedFactor: 1.5, choices: [0] } },
     emptyText: '药田里的老叶已经剪尽。细芽还贴着湿泥，只等抽出来。' },
-  { id: 'mist_shelter', region: 'herb_basin', name: '垫高脚的药棚', once: [0, 1],
-    afterOnceText: { 0: '泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。', 1: '席上的捣药板已经腾出来了。泽医身边还放着几只给矿队装药的篓。' } },
+  { id: 'mist_shelter', region: 'herb_basin', name: '垫高脚的药棚', once: [0, 1, 2],
+    afterOnceText: { 0: '泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。', 1: '席上的捣药板已经腾出来了。给矿队装药的篓旁，并着两只滴药的小罐。',
+      2: '两只小药罐分立在木槽两端。泽医垫在罐脚下的竹片还在，落进碗里的两股药汁滴得一样快。' } },
   { id: 'herb_den', region: 'herb_basin', name: '蒲根下的水洞', afterChoices: ['mist_shelter:1'], once: [1, 4],
     stocks: { reed_water: { item: 'reed', label: '引水槽边的灵草', start: 3, cap: 6, interval: 5, growth: 2, choices: [5] } },
     choiceText: { 1: { after: '靠棚的板沿有块干石。从那里扶着粗蒲根，可以沿洞壁绕向里面。' } },
@@ -832,6 +841,10 @@ const events = [
     { label: '给泽医交叶和烘干用的枝条', desc: '「阴雨浸坏了这一批，我得给矿队重扎几包药。你若进矿脉，带我的引矿签过去。」',
       need: { reed: 8, wood: 4 }, consume: true, days: 1, insight: 4, loot: { mine_guide: 1, ration: 3 }, outcome: '泽医把木片从药匣上拆下，指给你看哪边的石槽连着玄砂矿脉。' },
     { label: '问泽医板上的凹槽怎么用', desc: '木板上刻了几道不同深浅的槽，中间压着一张试药的便条。', days: 0.5, insight: 2, loot: { herb_press: 1, formula_leaf: 1 }, outcome: '泽医递来一页清脉饮丹方，又指着板上新刻的那道。「原本从蒲根底下取水，最近底下成了窝。蒲根旁还搭着两块旧木板，你过去当心。」' },
+    { label: '拿滴水图和泽医对一对药槽', afterChoice: 1, hidden: true, need: { phase_chart: 1 }, days: 0.25, stay: true,
+      desc: '眼前的两只药罐都接着细槽。泽医拿起碗尝了一点，又搁回去。「一边补血，一边定神。补血这罐滴得太快，两味配不匀。」',
+      loot: { formula_heart: 1, heart_pill: 1 },
+      outcome: '泽医照着图挪了挪罐脚下的竹片。等两股药汁一起滴进碗里，他才把碗移到小炉边。「这回两味能收到一丸里了。」他包好一枚养心丸，又将抄下的方子递给你。' },
   ] },
   { id: 'herb_den', name: '蒲根下的水洞', text: '两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。取水槽斜卡在洞口，槽尾接着一排药草。板头旁有灶眼，沿干岸几步就能回到药棚。', choices: [
     { label: '踏上木板，朝水洞里探', desc: '走板面中间最省脚力。底下的石缝都通着，水一搅就看不清来的是谁。', days: 0.125,
@@ -1185,33 +1198,69 @@ for (const item of gear) {
 }
 const eventsBySite = new Map(events.map((event) => [event.id, event]));
 const enemyCombatProfiles = {
+  // 雾梁。壳硬的敌手容易看穿，轻巧的伏兽与看得准的猎手各有用力处。
   reed_hare: { perception: 4 },
   ford_silver_dace: { perception: 3 },
+  ford_shale_crab: { perception: 4 },
+  stone_badger: { perception: 5 },
   bank_runner: { perception: 12, strategy: 'predator' },
   caravan_lookout: { perception: 11 },
+  caravan_guard_hound: { dodge: 0.08 },
+  caravan_hook_guard: { accuracy: 0.08 },
+  caravan_broker: { strategy: 'schemer' },
+  herb_den_toad: { perception: 5 },
+  herb_den_sawfish: { perception: 6, dodge: 0.09 },
+  herb_den_elder: { perception: 21, strategy: 'bulwark' },
+  vine_stag: { dodge: 0.07 },
   vine_king: { perception: 17, strategy: 'predator' },
   tide_spirit: { strategy: 'bulwark' },
-  foundation_duelist: { perception: 18 },
+  vein_sentinel: { perception: 8 },
+  snow_rail_lynx: { perception: 7, dodge: 0.14 },
+  snow_rail_hawk: { perception: 11, accuracy: 0.18 },
+  snow_rail_shell: { perception: 6 },
+  snow_rail_matron: { accuracy: 0.07 },
+  snow_gully_otter: { dodge: 0.12 },
+  snow_seam_crab: { perception: 9 },
+  foundation_duelist: { perception: 18, accuracy: 0.07 },
   foundation_warden: { perception: 17, strategy: 'bulwark' },
   mirror_warden: { perception: 25, strategy: 'schemer' },
-  herb_den_elder: { perception: 21, strategy: 'bulwark' },
   river_spar_captain: { perception: 27, strategy: 'bulwark' },
   undertow_moundback: { perception: 22, strategy: 'predator' },
+
+  // 照原。滑水的猎物、岸上的弩手、守着狭处的重甲各有不同的破法。
+  zhao_reed_duck: { perception: 5 },
+  zhao_moss_turtle: { perception: 5 },
+  zhao_cargo_archer: { perception: 17, accuracy: 0.17 },
+  zhao_cargo_shield: { perception: 16, strategy: 'bulwark' },
+  zhao_cargo_hook: { perception: 18, dodge: 0.11 },
+  zhao_cargo_keeper: { strategy: 'schemer', medicine: { id: 'heal_pill', count: 1 } },
+  dyke_yard_otter: { perception: 10, dodge: 0.16 },
+  dyke_yard_croc: { accuracy: 0.09 },
+  dyke_yard_boar: { perception: 10 },
+  dyke_old_croc: { accuracy: 0.08 },
   zhao_spar: { perception: 27 },
   fault_warden: { perception: 32, strategy: 'schemer' },
   ember_yak: { strategy: 'predator' },
-  sand_well_basilisk: { perception: 22, strategy: 'predator' },
-  sand_glass_lynx: { perception: 27, strategy: 'predator' },
+
+  // 鸣沙。崖间的猞猁善闪，桥蝰与弩手善追招，真正会读招的对手另有出处。
+  sand_salt_fox: { dodge: 0.10 },
+  sand_rattle_viper: { accuracy: 0.12 },
+  sand_silo_marten: { dodge: 0.06 },
+  sand_iron_skink: { perception: 6 },
+  sand_well_basilisk: { perception: 22, accuracy: 0.16, strategy: 'predator' },
+  sand_glass_lynx: { perception: 23, dodge: 0.22, strategy: 'predator' },
+  sand_anchor_scorpion: { perception: 12 },
   sand_riven_scorpion: { perception: 21, strategy: 'bulwark' },
+  sand_quarry_skink: { dodge: 0.12 },
+  sand_quarry_rockscorpion: { perception: 10 },
   sand_quarry_matriarch: { perception: 29, strategy: 'schemer' },
-  sand_basket_mender: { perception: 33, strategy: 'duelist' },
-  sand_sundial_master: { perception: 35, strategy: 'schemer', medicine: { id: 'jade_pill', count: 1 } },
-  caravan_broker: { strategy: 'schemer' },
-  zhao_cargo_shield: { strategy: 'bulwark' },
-  zhao_cargo_keeper: { strategy: 'schemer' },
+  ridge_armory_lynx: { dodge: 0.19 },
+  ridge_armory_ram: { accuracy: 0.075 },
+  sand_basket_mender: { perception: 33, strategy: 'duelist', medicine: { id: 'tide_pill', count: 1 } },
+  sand_sundial_master: { perception: 35, strategy: 'schemer', medicine: { id: 'jade_pill', count: 3 } },
   border_axle_poleman: { perception: 14, strategy: 'predator' },
-  border_wind_ambusher: { strategy: 'schemer' },
-  border_kiln_shield: { strategy: 'bulwark' },
+  border_wind_ambusher: { accuracy: 0.17, strategy: 'schemer' },
+  border_kiln_shield: { perception: 18, strategy: 'bulwark' },
   border_silo_leader: { perception: 27, strategy: 'schemer' },
 };
 for (const enemy of enemies) {
@@ -1221,10 +1270,9 @@ for (const enemy of enemies) {
   const tier = enemy.tier ?? 0;
   enemy.perception = profile.perception ?? enemy.perception ?? baseline + 2 * tier;
   enemy.strategy = profile.strategy ?? enemy.strategy ?? (human ? 'duelist' : 'instinct');
-  if (human) {
-    const medicineId = tier < 2 ? 'salve' : tier < 5 ? 'heal_pill' : 'tide_pill';
-    enemy.medicine = profile.medicine ?? { id: medicineId, count: 1 };
-  }
+  if (profile.dodge !== undefined) enemy.dodge = profile.dodge;
+  if (profile.accuracy !== undefined) enemy.accuracy = profile.accuracy;
+  if (profile.medicine) enemy.medicine = profile.medicine;
   const practice = enemyInnerStyles[enemy.id];
   if (practice) {
     const manual = innerStyles.find(({ id }) => id === practice.id);

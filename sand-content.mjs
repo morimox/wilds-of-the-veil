@@ -394,7 +394,7 @@ const enemies = [
   { id: 'sand_sundial_master', name: '照壁刀师邢既横', tags: ['human'], tier: 8, hp: 128, atk: 25, def: 10, insight: 13,
     intents: [{ name: '沿石壁拖刀逼近', kind: 'attack', mult: 1 }, { name: '横刀顺气', kind: 'guard', mult: 1.48 },
       { name: '从墙角里猛挥一刀', kind: 'heavy', mult: 1.6 }, { name: '连拖三步', kind: 'drain', mult: 0.7 }, { name: '借石光从下往上挑刀', kind: 'attack', mult: 1.15 }],
-    loot: {}, desc: '刀刃借石壁返光藏住一半。看清他从墙角横挥的那刀再架招，石门边仍有一线退路。' },
+    loot: {}, desc: '刀刃借石壁返光藏住一半。他收刀时，腰间的几只窄口药瓶轻轻相碰。石门边仍有退路。' },
 ];
 
 const sects = [

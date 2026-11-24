@@ -29,6 +29,105 @@ function combat(state, id, round = 0) {
   return enemy;
 }
 
+test('a focused medicine restores spent spirit without healing or adding true qi', () => {
+  const state = createGame(7);
+  state.realm = 2;
+  state.inventory.sense_powder = 2;
+  assert.match(view(state).medicineUseReasons.sense_powder, /先学会神识/);
+  assert.equal(act(state, 'use', { id: 'sense_powder' }).ok, false);
+  assert.equal(state.inventory.sense_powder, 2);
+  teachable(state, 'spirit');
+  play(state, 'trainStudy', { id: 'spirit' });
+  const enemy = combat(state, 'mud_beast');
+  for (let i = 0; i < 2; i++) {
+    play(state, 'readSpirit');
+    play(state, 'guard');
+  }
+  assert.equal(view(state).spiritSense.current, 0);
+  const round = state.combat.round;
+  const guard = enemy.intents.find(({ kind }) => kind === 'guard');
+  state.combat.plan = { round, reader: null, intent: guard };
+  const day = state.day;
+  const hp = state.hp;
+  const qi = state.qi;
+  const dose = play(state, 'use', { id: 'sense_powder' });
+  assert.match(dose.message, /神识回了2点/);
+  assert.equal(state.combat.round, round + 1);
+  assert.equal(state.day - day, rules.battleDays);
+  assert.equal(view(state).spiritSense.current, 2);
+  assert.equal(view(state).spiritSense.canRead, true);
+  assert.equal(state.hp, hp);
+  assert.equal(state.qi, qi);
+  assert.equal(state.inventory.sense_powder, 1);
+  const ready = structuredClone(state);
+  assert.match(act(state, 'use', { id: 'sense_powder' }).message, /神识已经养足/);
+  assert.deepEqual(state, ready);
+});
+
+test('a mixed medicine restores both resources in one round and can restore only the missing one', () => {
+  const state = createGame(11);
+  state.realm = 2;
+  state.inventory.heart_pill = 2;
+  teachable(state, 'spirit');
+  play(state, 'trainStudy', { id: 'spirit' });
+  state.training.sense = 0;
+  const maxHp = view(state).maxHp;
+  state.hp = maxHp - 18;
+  const enemy = combat(state, 'mud_beast');
+  state.combat.plan.intent = enemy.intents.find(({ kind }) => kind === 'guard');
+  const fullSpirit = structuredClone(state);
+  fullSpirit.training.sense = 2;
+  const fullHealth = structuredClone(state);
+  fullHealth.hp = maxHp;
+  const untrained = structuredClone(state);
+  untrained.training.levels.spirit = 0;
+
+  const day = state.day;
+  const dose = play(state, 'use', { id: 'heart_pill' });
+  assert.match(dose.message, /气血回了14点。神识回了1点/);
+  assert.equal(state.inventory.heart_pill, 1);
+  assert.equal(state.combat.round, 1);
+  assert.equal(state.day - day, rules.battleDays);
+  assert.equal(state.hp, maxHp - 4);
+  assert.equal(state.training.sense, 1);
+  assert.equal(state.toxin, 10);
+
+  play(fullSpirit, 'use', { id: 'heart_pill' });
+  assert.equal(fullSpirit.hp, maxHp - 4);
+  assert.equal(fullSpirit.training.sense, 2);
+  play(fullHealth, 'use', { id: 'heart_pill' });
+  assert.equal(fullHealth.hp, maxHp);
+  assert.equal(fullHealth.training.sense, 1);
+  play(untrained, 'use', { id: 'heart_pill' });
+  assert.equal(untrained.hp, maxHp - 4);
+  assert.equal(view(untrained).spiritSense, null);
+});
+
+test('a charged hit stops the spirit and health effects of a mixed medicine before its dose is spent', () => {
+  const state = createGame(15);
+  state.realm = 2;
+  teachable(state, 'spirit');
+  play(state, 'trainStudy', { id: 'spirit' });
+  state.inventory.heart_pill = 1;
+  state.training.sense = 1;
+  const enemy = combat(state, 'bandit_den_leader');
+  state.combat.plan.intent = enemy.intents.find(({ kind }) => kind === 'focus');
+  play(state, 'guard');
+  assert.equal(state.combat.enemyCharged, true);
+  state.combat.plan = { round: 1, reader: null, intent: enemy.intents.find(({ kind }) => kind === 'heavy') };
+  const hp = state.hp;
+  const day = state.day;
+  const result = play(state, 'use', { id: 'heart_pill' });
+  assert.match(result.message, /药还在手里/);
+  assert.ok(result.damageTaken > 0);
+  assert.equal(state.hp, hp - result.damageTaken);
+  assert.equal(state.training.sense, 1);
+  assert.equal(state.toxin, 0);
+  assert.equal(state.inventory.heart_pill, 1);
+  assert.equal(state.combat.round, 2);
+  assert.equal(state.day - day, rules.battleDays);
+});
+
 test('teachers only appear after their particular leads; each rank consumes its own materials and time', () => {
   const state = createGame(6);
   assert.deepEqual(view(state).training, []);

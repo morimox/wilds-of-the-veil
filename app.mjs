@@ -27,7 +27,8 @@ guideBags.className = "guide-topic guide-bags";
 guideBags.hidden = true;
 guideBags.innerHTML = `<summary>整理乾坤袋</summary>
   <p class="fine">点行囊里的乾坤袋打开。右键点行囊物品会尽量装入袋中，右键点袋里的物品会尽量取回。按住 Shift 再右键只移一件。</p>
-  <p class="fine">触屏或用键盘时，点开物品，再选「装入」或「取回」。要用袋里的东西，先取回行囊。</p>`;
+  <p class="fine">触屏或用键盘时，点开物品，再选「装入」或「取回」。要用袋里的东西，先取回行囊。</p>
+  <p class="fine">行囊只能带一只乾坤袋。换袋前，把原来的整只存仓或放在脚边。</p>`;
 guide.querySelector("[data-reset]").before(guideBags);
 const kit = document.querySelector("#kit");
 const notices = document.querySelector("#notices");
@@ -52,7 +53,9 @@ const kitSectionOpen = new Map();
 let activeDeduction = null;
 let atlasProvince = null;
 let atlasPoint = null;
+let atlasEdge = null;
 let atlasIndexOpen = false;
+let atlasRoadsOpen = false;
 const deductionDrafts = new Map();
 const experimentDrafts = new Map();
 
@@ -174,7 +177,7 @@ function inVillage(s) {
 }
 
 function onOpenRoad(s) {
-  return s.mode === "road" && !s.roadTrip?.bandit;
+  return s.mode === "road" && (!s.roadTrip?.bandit || s.roadTrip.bandit.aftermath);
 }
 
 function atLanding(s) {
@@ -203,8 +206,9 @@ function stats(s) {
     <summary>${danger ? "雾压过重" : "雾压"} <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
     <span>雾积满后，再探索会耗真气。到有人歇脚的地方就会散去。</span>
   </details>` : "";
-  const canEat = s.mode !== "victory" && (s.mode !== "road" || onOpenRoad(s)) && meal && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
-  const canUseSalve = s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
+  const medicineAllowed = !s.currentEnemy?.medicineRestricted;
+  const canEat = medicineAllowed && s.mode !== "victory" && (s.mode !== "road" || onOpenRoad(s)) && meal && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
+  const canUseSalve = medicineAllowed && s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
   const sense = s.spiritSense;
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
     ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。敷伤药或在据点歇息都能恢复。")}
@@ -212,7 +216,7 @@ function stats(s) {
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
     ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施展术诀、打出部分招式或在雾中久留会消耗真气。歇息时能恢复。") : ""}
-    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息能恢复神识。</p></details>` : ""}
+    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息或服补神识的药都能恢复。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
@@ -220,8 +224,7 @@ function distance(units) {
   return `${units * banditRules.distanceUnit} 里`;
 }
 
-function routeAction(road, edges = []) {
-  const label = road.rescue ? `慢慢走到${road.name}` : road.id === "village" ? "回村" : `去${road.name}`;
+function routeAction(road, edges = [], label = road.rescue ? `慢慢走到${road.name}` : road.id === "village" ? "回村" : `去${road.name}`) {
   const forecast = [road.meals && Object.keys(road.meals).length && `途中吃 ${supplies(road.meals)}`,
     road.emptyOnArrival && !road.rescue && "到时会空腹"].filter(Boolean).join(" · ");
   const note = [road.units != null && distance(road.units), `${road.days} 日`, road.via?.length && `经 ${road.via.join("、")}`,
@@ -291,7 +294,7 @@ function banditDraft(bandit) {
       ${linkButton("重新选", "banditClearOffer", "", "quiet")}</div></div>`;
 }
 
-function banditScreen(bandit) {
+function banditScreen(bandit, preparation = "") {
   const remaining = bandit.remaining;
   const askingForMoney = !bandit.aftermath && remaining != null;
   const directCash = askingForMoney && !bandit.offerValue && bandit.coins >= bandit.fee;
@@ -310,14 +313,19 @@ function banditScreen(bandit) {
     ${askingForMoney ? `<p class="road-demand">开价 ${bandit.fee} 灵钱<span class="fine">钱袋 ${bandit.coins} 灵钱</span></p>` : ""}
     ${pay || surrender || fight ? `<div class="actions">${pay}${surrender}${fight}</div>` : ""}
     ${surrender ? '<p class="fine road-surrender" id="road-surrender-note">他会拿走灵钱、能抵价的东西，以及身上和包里的装备。</p>' : ""}
-    ${askingForMoney ? banditDraft(bandit) + banditOffers(bandit) : ""}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
+    ${askingForMoney ? banditDraft(bandit) + banditOffers(bandit) : ""}${preparation}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
 }
 
 function roadScreen(s) {
   const road = s.roadTrip;
-  if (road.bandit) return banditScreen(road.bandit);
+  const ground = road.afterBattle ? groundRows(s) : [];
+  const preparation = road.afterBattle ? `<section class="road-aftermath" aria-label="战后整备">
+    ${ground.length ? `<h3>脚边的战利品</h3>${ground.join("")}` : '<p class="fine">脚边没有物品可捡。</p>'}
+    <p class="fine">可以先用药，或点行囊里的装备换上。</p>
+  </section>` : "";
+  if (road.bandit) return banditScreen(road.bandit, preparation);
   const turnBack = road.fromName ? `折回${road.fromName}` : "沿原路折返";
-  return panel("路上", `<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
+  return panel(road.afterBattle ? "交手之后" : "路上", `${preparation}<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
     ${linkButton(turnBack, "roadBack", "", "quiet")}</div>`);
 }
 
@@ -358,30 +366,72 @@ function journey(s) {
     ${s.sect ? tabButton("找宗门管事", "sect") : ""}
     ${s.tournament ? tabButton("去看宗门大比", "tournament") : ""}
     ${isHome && s.training?.some(({ region }) => region === s.region.id) ? tabButton("请教修习", "training") : ""}
-    ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) : ""}
+    ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) :
+      s.region.id === data.tournament.region && s.boutPause > 0 && !needRest ? linkButton("在场边等半日", "wait", "", "quiet") : ""}
   </div>${further.length ? `<details class="route-list"><summary>其他已知去路</summary><div class="actions">${further.map(road => routeAction(road, s.world.edges)).join("")}</div></details>` : ""}
   ${s.world.crossings.map(({ label, reason }) => `<p class="fine crossing">${escape(label)} · ${escape(reason)}</p>`).join("")}`);
 }
 
-function atlasMap(province, points, selected, route, edges) {
-  const byId = Object.fromEntries(points.map((point) => [point.id, point]));
-  const paths = new Set();
-  const routeLegs = new Set((route?.path ?? []).slice(1).map((id, index) => [route.path[index], id].sort().join("/")));
-  const lines = [];
-  for (const { from, to } of edges ?? []) {
-    const point = byId[from];
-    const neighbor = byId[to];
-    const path = [from, to].sort().join("/");
-    if (!point || !neighbor || paths.has(path)) continue;
-    paths.add(path);
-    const dx = neighbor.x - point.x;
-    const dy = (neighbor.y - point.y) / 1.45;
-    lines.push(`<i aria-hidden="true" class="atlas-road${routeLegs.has(path) ? " chosen" : ""}" style="--x:${point.x}%;--y:${point.y}%;--length:${Math.hypot(dx, dy)}%;--angle:${Math.atan2(dy, dx)}rad"></i>`);
-  }
+function atlasOverview(world) {
+  const provinces = world.provinces.map(({ id, name }) =>
+    `<button type="button" class="atlas-province atlas-province-${escape(id)}" data-atlas-province="${escape(id)}"${id === world.province ? ' aria-current="location"' : ""}><span>${escape(name)}</span></button>`).join("");
+  return panel("山河总图", `<div class="atlas-view atlas-overview" aria-label="各州地图">${provinces}</div>`);
+}
+
+function atlasRoadName(edge, points) {
+  return edge.province ? `${points[edge.from].name} · 往${edge.name}` : `${points[edge.from].name} — ${points[edge.to].name}`;
+}
+
+function atlasRoadMark(edge, start, end, chosen, name) {
+  const dx = end.x - start.x;
+  const dy = (end.y - start.y) / 1.45;
+  const style = `--x:${start.x}%;--y:${start.y}%;--length:${Math.hypot(dx, dy)}%;--angle:${Math.atan2(dy, dx)}rad`;
+  const pressed = edge.key === atlasEdge;
+  return `<button type="button" class="atlas-road${edge.avoided ? " avoided" : ""}${chosen ? " chosen" : ""}${!edge.available ? " closed" : ""}${edge.province ? " cross" : ""}"
+    style="${style}" data-atlas-edge="${escape(edge.key)}" aria-label="${escape(name + (edge.avoided ? "，已避开" : ""))}" aria-pressed="${pressed}" title="${escape(name)}"><i></i></button>`;
+}
+
+function atlasMap(province, points, byId, selected, route, edges, provinces) {
+  const routeLegs = new Set((route?.path ?? []).slice(1).map((id, index) => [route.path[index], id].sort().join("|")));
+  const ranks = Object.fromEntries(provinces.map(({ id }, index) => [id, index]));
+  const lines = edges.map(edge => {
+    const start = byId[edge.from];
+    const sign = ranks[edge.province] > ranks[province] ? 1 : -1;
+    const end = edge.province ? { x: Math.max(3, Math.min(97, start.x + sign * 13)), y: start.y } : byId[edge.to];
+    const line = atlasRoadMark(edge, start, end, routeLegs.has(edge.key), atlasRoadName(edge, byId));
+    if (!edge.province) return line;
+    const labelX = Math.max(14, Math.min(86, end.x));
+    const labelY = start.y < 20 ? end.y + 5 : end.y - 5;
+    return `${line}<span class="atlas-cross-label${edge.avoided ? " avoided" : ""}" aria-hidden="true" style="--x:${labelX}%;--y:${labelY}%">往${escape(edge.name)}</span>`;
+  }).join("");
   const marks = points.map(point => `<button type="button" class="atlas-mark${point.current ? " here" : ""}${point.settlement ? " town" : ""}${point.attuned ? " linked" : ""}"
     style="--x:${point.x}%;--y:${point.y}%" data-atlas-point="${escape(point.id)}" aria-label="${escape(point.name)}" aria-pressed="${point.id === selected.id}">
     <span class="atlas-dot"></span><span class="atlas-label">${escape(point.name)}</span></button>`).join("");
-  return `<div class="atlas-map atlas-${escape(province)}" aria-label="已知地点位置">${lines.join("")}${marks}</div>`;
+  return `<div class="atlas-map atlas-${escape(province)}" aria-label="已知地点和道路">${lines}${marks}</div>`;
+}
+
+function atlasRoadDetail(edge, points, canChange) {
+  const name = atlasRoadName(edge, points);
+  const notes = [edge.label, edge.units && distance(edge.units), edge.avoided && "已避开", edge.riskText].filter(Boolean).join(" · ");
+  const reason = edge.reason || edge.avoidReason || (!canChange ? "离开当前地点后可调整避开的路。" : "");
+  const options = edge.avoided || edge.canAvoid;
+  return `<section class="atlas-road-detail" id="atlas-edge-detail" aria-label="选中的道路">
+    <div><h3>${escape(name)}</h3>${notes ? `<p class="fine">${escape(notes)}</p>` : ""}</div>
+    ${linkButton(edge.avoided ? "恢复此路" : "避开此路", "roadAvoid", edge.key, edge.avoided ? "quiet" : "danger",
+      !canChange || !options, 1, reason ? "atlas-edge-reason" : "")}
+    ${reason ? `<p class="fine atlas-road-reason" id="atlas-edge-reason">${escape(reason)}</p>` : ""}
+  </section>`;
+}
+
+function atlasRoadIndex(edges, points, selected) {
+  if (!edges.length) return "";
+  const touches = ({ from, to }) => from === selected.id || to === selected.id;
+  const rows = [...edges].sort((a, b) => Number(touches(b)) - Number(touches(a))
+    || atlasRoadName(a, points).localeCompare(atlasRoadName(b, points), "zh-CN"));
+  return `<details class="atlas-road-index"${atlasRoadsOpen ? " open" : ""}><summary>选道路</summary>
+    <div class="atlas-road-list">${rows.map(edge => `<button type="button" class="button quiet${edge.avoided ? " danger" : ""}"
+      data-atlas-edge="${escape(edge.key)}" aria-pressed="${edge.key === atlasEdge}">${escape(atlasRoadName(edge, points))}${edge.avoided ? "　已避开" : ""}</button>`).join("")}
+    </div></details>`;
 }
 
 function arrayLedger(array) {
@@ -398,14 +448,18 @@ function arrayLedger(array) {
 
 function atlas(s) {
   const world = s.world;
-  const province = atlasProvince && world.points.some(({ province: id }) => id === atlasProvince) ? atlasProvince : world.province;
-  const points = world.points.filter((point) => point.province === province);
+  const province = world.provinces.find(({ id }) => id === atlasProvince);
+  if (!province) return atlasOverview(world);
+  const points = world.points.filter((point) => point.province === province.id);
+  const byId = Object.fromEntries(points.map((point) => [point.id, point]));
+  const edges = [...world.edges.filter(({ from, to }) => byId[from] && byId[to]),
+    ...(world.crossLinks ?? []).filter(({ from }) => byId[from])];
   const selected = points.find(({ id }) => id === atlasPoint) ?? points.find(({ current }) => current) ?? points[0];
-  const tabs = world.provinces.filter(({ id }) => world.points.some(({ province: known }) => known === id)).map(({ id, name }) =>
-    `<button type="button" class="button ${id === province ? "primary" : "quiet"}" data-atlas-province="${escape(id)}" aria-pressed="${id === province}">${escape(name)}</button>`).join("");
-  if (!selected) return panel("山河图", "");
+  const up = '<button class="button quiet atlas-up" type="button" data-atlas-overview>返回总图</button>';
+  if (!selected) return panel(province.name, '<div class="atlas-view"><p class="intro">还没听说州里的去处。</p></div>', up);
   const idle = s.mode !== "event";
   const road = idle && world.journeys.find(({ id }) => id === selected.id);
+  const edge = edges.find(({ key }) => key === atlasEdge);
   const gate = world.gates.find(({ id }) => id === selected.id);
   const array = idle && world.arrays.find(({ id }) => id === selected.id);
   const marks = [selected.current ? "你在这里" : "", selected.settlement ? "可歇息" : "", selected.attuned ? "传送门已点亮" : ""].filter(Boolean).join(" · ");
@@ -414,23 +468,31 @@ function atlas(s) {
   const makeScroll = idle && s.settlement && s.discoveredRecipes.includes(recipe.id);
   const scrollBlocker = makeScroll && s.craftReasons[recipe.id];
   const usable = gate && !selected.current;
+  const doorToDoor = idle && usable && world.localGate?.attuned && selected.province === world.province;
+  const reasons = [idle && !road && !selected.current && (selected.travelReason || "目前没有已知的走法。"),
+    selected.portal && !selected.current && !selected.attuned && "亲自点亮这里的传送门后，才能传到这里。",
+    doorToDoor && !gate.available && gate.reason,
+    usable && !gate.byScroll && gate.scrollReason,
+    array && !array.available && selected.id !== s.region.id && world.localArray?.active && array.reason].filter(Boolean);
   const transport = `<div class="actions atlas-actions">
-      ${road ? routeAction(road, world.edges) : ""}
+      ${road ? routeAction(road, world.edges, road.rescue ? "慢慢走过去" : "走过去") : ""}
       ${currentGate ? linkButton("点亮传送门", "attuneGate") : ""}
-      ${idle && usable && world.localGate?.attuned && selected.province === world.province ? linkButton(`门间传送 · ${gate.price} 灵钱`, "gateJump", gate.id, "", !gate.available) : ""}
-      ${usable && world.scrollCount ? linkButton(`展开卷轴 · 余 ${world.scrollCount} 张`, "gateScroll", gate.id, "", !gate.byScroll) : ""}
+      ${doorToDoor ? linkButton(`门间传送 · ${gate.price} 灵钱`, "gateJump", gate.id, "", !gate.available) : ""}
+      ${usable ? linkButton(`用卷轴传送 · 1 张 + ${gate.scrollPrice} 灵钱`, "gateScroll", gate.id, "", !gate.byScroll) : ""}
       ${array && selected.id !== s.region.id && world.localArray?.active ? linkButton(`跨州传送 · ${array.price} 灵钱`, "arrayJump", array.id, "", !array.available) : ""}
       ${makeScroll && selected.current ? linkButton(scrollBlocker || "制备传送卷轴", "craft", recipe.id, "quiet", Boolean(scrollBlocker)) : ""}
     </div>`;
-  return panel("山河图", `<div class="actions atlas-tabs" aria-label="州">${tabs}</div>
-    ${atlasMap(province, points, selected, road, world.edges)}
-    <details class="atlas-index"${atlasIndexOpen ? " open" : ""}><summary>查已知地点</summary><div class="actions">${points.map(({ id, name }) =>
-      `<button type="button" class="button quiet" data-atlas-point="${escape(id)}">${escape(name)}</button>`).join("")}</div></details>
+  return panel(province.name, `<div class="atlas-view">
+    ${atlasMap(province.id, points, byId, selected, road, edges, world.provinces)}
+    ${edge ? atlasRoadDetail(edge, byId, idle) : ""}
+    <div class="atlas-tools"><details class="atlas-index"${atlasIndexOpen ? " open" : ""}><summary>选地点</summary><div class="actions">${points.map(({ id, name }) =>
+      `<button type="button" class="button quiet" data-atlas-point="${escape(id)}" aria-pressed="${selected.id === id}">${escape(name)}</button>`).join("")}</div></details>
+    ${atlasRoadIndex(edges, byId, selected)}</div>
     <div class="atlas-place"><h3>${escape(selected.name)}</h3>${marks ? tag(marks) : ""}
     <p class="intro">${escape(selected.description)}</p>${transport}
+    ${[...new Set(reasons)].map(reason => `<p class="fine">${escape(reason)}</p>`).join("")}
     ${makeScroll && selected.current ? `<p class="fine">每批 ${recipe.count} 张 · ${recipe.cost} 灵钱 · ${escape(supplies(recipe.need))}</p>` : ""}
-    ${array && !array.available && selected.id !== s.region.id && world.localArray?.active ? `<p class="fine">${escape(array.reason)}</p>` : ""}
-    </div>${idle && selected.current ? arrayLedger(world.localArray) : ""}`);
+    </div>${idle && selected.current ? arrayLedger(world.localArray) : ""}</div>`, up);
 }
 
 function eventScreen(s) {
@@ -497,7 +559,7 @@ function experimentForm(experiment) {
 }
 
 function pillSummary(row) {
-  return [row.hp && "恢复气血", row.qi && "恢复真气", row.satiety && "充饥", row.toxin < 0 && "减轻丹毒", row.wound && "减轻伤势", row.focus && "加强下一次术诀"].filter(Boolean).join(" · ");
+  return [row.hp && "恢复气血", row.qi && "恢复真气", row.sense && "恢复神识", row.satiety && "充饥", row.toxin < 0 && "减轻丹毒", row.wound && "减轻伤势", row.focus && "加强下一次术诀"].filter(Boolean).join(" · ");
 }
 
 function talismanSummary(row) {
@@ -524,7 +586,6 @@ function combatScreen(s) {
       `${ammo.name} ×${ammo.count}`, "selectAmmo", ammo.id, ammo.selected ? "primary" : "quiet", ammo.count <= 0 || ammo.selected,
     )).join("")}</div>
   </div>` : "";
-  const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
   const openingShot = intent && s.openingShotReady;
   const charging = s.chargingWeapon;
   const mainCharged = charging?.slot === "weapon" && charging.id === weapon?.id;
@@ -566,7 +627,7 @@ function combatScreen(s) {
     ${intentLine}
     ${openingNote ? `<p class="fine">${openingNote}</p>` : ""}
     ${chargeNote ? `<p class="fine">${escape(chargeNote)}</p>` : ""}
-    ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
+    ${enemy.sparring ? `<p class="fine">${enemy.medicineRestricted ? "裁判叫停就收招。双方在场上不能用药或吃东西。" : "约好点到为止，一方撑不住就收招。"}</p>` : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
     <div class="actions">${linkButton(attackLabel, !canMainAttack && fist ? "fistAttack" : "attack", "", fistCharged ? "" : "primary", mainBlocked)}
@@ -578,7 +639,6 @@ function combatScreen(s) {
       <span class="action-hint">${linkButton("闪避", "dodge", "", "", false, 1, "dodge-explanation")}<span class="item-tip" id="dodge-explanation" role="tooltip">侧身躲开来招。若被击中，照常受伤。</span></span>
       ${charging ? linkButton("取消蓄力", "cancelCharge", "", "quiet") : ""}
       ${linkButton(retreatLabel, "retreat", "", flight?.blocked ? "danger" : "quiet", false, 1, retreatCue ? "retreat-cue" : "")}
-      ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
       ${s.spiritSense ? linkButton(spiritLabel, "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
     </div>
     ${retreatCue ? `<p class="fine retreat-cue" id="retreat-cue">${escape(retreatCue)}</p>` : ""}
@@ -682,13 +742,29 @@ function manualActions(book, active, canManage, canTrain) {
     (requirements ? `<p class="fine manual-upgrade-note">${escape(requirements)}</p>` : "");
 }
 
+function groundRows(s) {
+  return Object.entries(s.groundLoot ?? {}).map(([id, count]) => {
+    const item = itemRows[id];
+    const gear = data.gear.find(row => row.id === id);
+    const maximum = s.groundPickup?.[id] ?? 0;
+    const reason = s.groundPickupReasons?.[id];
+    const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
+    const cue = maximum ? `${label} · ${item.name}` : reason ? `${item.name} · ${reason}` : gear ? `${item.name}暂时拿不了` : `${item.name} · 行囊已满`;
+    return `<div class="ground-row">
+      ${itemSlot(item, "ground", gear ? gearDescription(item, gear, s.groundWear[id]) : item.desc, "", "", count)}
+      <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
+      ${reason ? `<p class="fine ground-reason">${escape(reason)}</p>` : ""}
+    </div>`;
+  });
+}
+
 function pack(s) {
   const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event" || onOpenRoad(s);
   const canManageManual = canEquip && !s.gathering;
   const containers = s.economy?.containers ?? [];
   const openBag = containers.find(row => row.id === openBagId);
   const bagSources = new Map((openBag?.carried ?? []).map(row => [row.id, row]));
-  const canUse = canEquip || s.mode === "combat";
+  const canUse = canEquip || (s.mode === "combat" && !s.currentEnemy?.medicineRestricted);
   const canEat = canUse;
   const repair = s.mode === "village" ? s.repairService : null;
   function repairAction(id, remaining, durability) {
@@ -722,13 +798,13 @@ function pack(s) {
       const disabled = Boolean(conflict) || gear.tier > s.realm.id || remaining <= 0;
       const reason = conflict.slice(0, -1);
       actions = (canEquip ? linkButton(reason || "装备", "equip", row.id, "", disabled) : "") +
-        (s.mode === "combat" && gear.slot === "weapon" ? linkButton(reason || "换用兵刃", "combatEquip", row.id, "", disabled) : "") +
         repairAction(row.id, remaining, gear.durability);
     }
     if (pill && canUse) {
       const healthy = row.id === "salve" && s.hp >= s.maxHp;
-      const label = row.id === "salve" ? (healthy ? "气血已满" : "敷伤药") : "服用";
-      actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy);
+      const reason = s.medicineUseReasons[row.id];
+      const label = reason ? reason.slice(0, -1) : row.id === "salve" ? (healthy ? "气血已满" : "敷伤药") : "服用";
+      actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy || Boolean(reason));
     }
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
     if (book) actions = manualActions(book, false, canManageManual, !onOpenRoad(s));
@@ -752,17 +828,7 @@ function pack(s) {
   const keySlot = row => itemSlot(row, "clue", row.desc, "", "", s.inventory[row.id]);
   const clues = keys.filter(row => !formulaIds.has(row.id)).map(keySlot);
   const formulae = keys.filter(row => formulaIds.has(row.id)).map(keySlot);
-  const ground = canEquip ? Object.entries(s.groundLoot ?? {}).map(([id, count]) => {
-    const item = itemRows[id];
-    const gear = data.gear.find(row => row.id === id);
-    const maximum = s.groundPickup?.[id] ?? 0;
-    const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
-    const cue = maximum ? `${label} · ${item.name}` : gear ? `${item.name}暂时拿不了` : `${item.name} · 行囊已满`;
-    return `<div class="ground-row">
-      ${itemSlot(item, "ground", gear ? gearDescription(item, gear, s.groundWear[id]) : item.desc, "", "", count)}
-      <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
-    </div>`;
-  }) : [];
+  const ground = canEquip && !s.roadTrip?.afterBattle ? groundRows(s) : [];
   const capacityLabel = `已用${s.backpackUsed}格，共${s.backpackCapacity}格`;
   const useProgress = s.backpackCapacity > 20;
   const meter = useProgress
@@ -1058,6 +1124,7 @@ function tournamentScreen(s) {
     <div class="actions">
       ${!match.enrolled ? linkButton(`报名 · ${match.fee} 灵钱`, "tournamentEnroll", "", "", !match.canEnroll) : ""}
       ${match.enrolled ? linkButton("登台过招", "tournamentFight", "", "primary", !match.canFight) : ""}
+      ${match.enrolled && s.boutPause > 0 ? linkButton("去场边歇半日", s.restSessions ? "rest" : "wait", "", "quiet") : ""}
       ${match.canWithdraw ? linkButton("跟裁判说退赛", "tournamentWithdraw", "", "quiet") : ""}
       ${match.canClaim ? linkButton(match.claimName || "领取奖品", "tournamentClaim") : ""}
     </div>`, match.enrolled ? tag(`已胜 ${match.wins} 场`) : "");
@@ -1155,7 +1222,7 @@ function deductionBoard(s) {
 }
 
 const focusKeys = ["data-action", "data-value", "data-count", "data-bag-id", "data-tab", "data-facility",
-  "data-market-mode", "data-case", "data-item", "data-atlas-province", "data-atlas-point"];
+  "data-market-mode", "data-case", "data-item", "data-atlas-province", "data-atlas-point", "data-atlas-edge", "data-atlas-overview"];
 
 function keyboardFocus() {
   const control = document.activeElement;
@@ -1199,12 +1266,11 @@ function render() {
   const inEncounter = dead || s.mode === "combat" || s.mode === "victory" || s.mode === "road" || Boolean(s.gathering);
   const services = inVillage(s) ? villageServices(s) : [];
   const originalHome = atLanding(s);
-  const knowMap = s.region.id !== "village" || s.discovered.length > 2 || Object.keys(s.eventsSeen).length > 0;
   const available = {
     journey: true, village: Boolean(services.length), apprentice: originalHome, deduction: Boolean(s.deductions?.length),
     workshop: originalHome && s.services.includes("workshop"), market: originalHome && s.services.includes("market"),
     yard: originalHome && Boolean(s.economy), alchemy: originalHome && Boolean(s.alchemy),
-    atlas: knowMap && (!inEvent || s.world.scrollCount > 0), localMarket: inVillage(s) && !originalHome && Boolean(s.localMarket),
+    atlas: !inEvent || s.world.scrollCount > 0, localMarket: inVillage(s) && !originalHome && Boolean(s.localMarket),
     sect: inVillage(s) && Boolean(s.sect), tournament: inVillage(s) && Boolean(s.tournament), training: Boolean(s.training?.length),
   };
   for (const service of services) available[service] = true;
@@ -1238,7 +1304,7 @@ function render() {
 
 function selectItem(key) {
   selectedItem = selectedItem === key ? null : key;
-  for (const trigger of kit.querySelectorAll("[data-item]")) {
+  for (const trigger of app.querySelectorAll("#kit [data-item], .road-aftermath [data-item]")) {
     const open = trigger.dataset.openBag ? trigger.dataset.openBag === openBagId : trigger.dataset.item === selectedItem;
     trigger.setAttribute("aria-expanded", String(open));
     const tools = trigger.parentElement.querySelector(".item-tools");
@@ -1316,6 +1382,8 @@ function feedback(before, after, result, action, presentation, payload) {
   const picking = result.ok && action === "take";
   const gathered = supplies(result.gathered);
   let narrative = result.message ?? "";
+  const restored = result.medicineRecovery;
+  if (restored || result.enemyMedicineRecovery) narrative = narrative.replace(/(?:气血|神识)回了\d+点。/g, "");
   const roadEncounter = result.ok && before.roadBandit !== after.roadBandit && presentation.roadTrip?.bandit;
   if (roadEncounter) {
     lines.push(`路上遇见${roadEncounter.name}。`);
@@ -1344,6 +1412,9 @@ function feedback(before, after, result, action, presentation, payload) {
   if (!result.ok || (action !== "batchEat" && action !== "restUntilRecovered")) narrative = publicText(narrative);
   narrative = narrative.replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
+  const medicineEffect = [restored?.hp > 0 && `气血回了${restored.hp}点。`, restored?.sense > 0 && `神识回了${restored.sense}点。`].filter(Boolean).join("");
+  if (medicineEffect) lines.push(medicineEffect);
+  if (result.enemyMedicineRecovery) lines.push(`对手气血回了${result.enemyMedicineRecovery}点。`);
   if (supplies(result.travelMeals)) lines.push(`途中吃了${supplies(result.travelMeals)}。${result.roadInterrupted ? "停步" : "抵达"}时饱腹 ${Math.floor(after.satiety)} 点。`);
   if (gathered) {
     const place = result.gatheredRegion && result.gatheredRegion !== after.region
@@ -1356,7 +1427,7 @@ function feedback(before, after, result, action, presentation, payload) {
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
   const didRecover = (ate || rested || action === "choose" || action === "use") && after.hp > before.hp && !result.injury;
   const changes = [
-    didRecover && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
+    didRecover && !restored?.hp && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
     action === "guard" && after.qi > before.qi && `真气回升 ${after.qi - before.qi} 点`,
     after.qi > before.qi && (rested || action === "choose" || action === "use") && !narrative.includes("真气") && "真气恢复",
     after.qi < before.qi && ["choose", "visit", "revisit", "art", "fistCharge"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
@@ -1391,10 +1462,11 @@ function performAction(action, payload) {
   };
   const result = act(state, action, payload);
   const transferred = result.ok && instantRoutes.includes(action);
-  if ([...roadTravelActions, "visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
+  if ((result.ok && roadTravelActions.includes(action)) || ["visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
   if (transferred || (result.ok && roadTravelActions.includes(action))) {
     atlasProvince = null;
     atlasPoint = null;
+    atlasEdge = null;
   }
   if ([...roadTravelActions, "discard", "take", "equip", "unequip"].includes(action)) selectedItem = null;
   if (result.ok && action === "equipManual") selectedItem = `worn-${payload.id}`;
@@ -1480,6 +1552,8 @@ document.addEventListener("click", event => {
   if (summary) kitSectionOpen.set(summary.dataset.kitSection, !summary.parentElement.open);
   const atlasSummary = event.target.closest(".atlas-index > summary");
   if (atlasSummary) atlasIndexOpen = !atlasSummary.parentElement.open;
+  const roadSummary = event.target.closest(".atlas-road-index > summary");
+  if (roadSummary) atlasRoadsOpen = !roadSummary.parentElement.open;
   const button = event.target.closest("button");
   if (!button) return;
   if (button.hasAttribute("data-skip-opening")) {
@@ -1521,7 +1595,9 @@ document.addEventListener("click", event => {
     kitSectionOpen.clear();
     atlasProvince = null;
     atlasPoint = null;
+    atlasEdge = null;
     atlasIndexOpen = false;
+    atlasRoadsOpen = false;
     selectedItem = null;
     openBagId = null;
     for (const topic of guide.querySelectorAll("details")) topic.open = false;
@@ -1548,20 +1624,45 @@ document.addEventListener("click", event => {
   if (button.dataset.atlasProvince) {
     atlasProvince = button.dataset.atlasProvince;
     atlasPoint = null;
+    atlasEdge = null;
     render();
-    main.querySelector(`[data-atlas-province="${atlasProvince}"]`)?.focus({ preventScroll: true });
+    (main.querySelector('.atlas-map [aria-pressed="true"]') ?? main.querySelector("[data-atlas-overview]"))?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.hasAttribute("data-atlas-overview")) {
+    const province = atlasProvince;
+    atlasProvince = null;
+    atlasPoint = null;
+    atlasEdge = null;
+    render();
+    main.querySelector(`[data-atlas-province="${CSS.escape(province)}"]`)?.focus({ preventScroll: true });
     return;
   }
   if (button.dataset.atlasPoint) {
     const origin = button.closest(".atlas-index") ? ".atlas-index" : ".atlas-map";
     atlasPoint = button.dataset.atlasPoint;
     atlasProvince = data.regionDetails[atlasPoint].province;
+    atlasEdge = null;
     render();
-    main.querySelector(`${origin} [data-atlas-point="${atlasPoint}"]`)?.focus({ preventScroll: true });
+    main.querySelector(`${origin} [data-atlas-point="${CSS.escape(atlasPoint)}"]`)?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.dataset.atlasEdge) {
+    atlasEdge = button.dataset.atlasEdge;
+    render();
+    const detail = main.querySelector("#atlas-edge-detail");
+    (detail?.querySelector("button:enabled") ?? main.querySelector(`.atlas-map [data-atlas-edge="${CSS.escape(atlasEdge)}"]`))
+      ?.focus({ preventScroll: true });
+    detail?.scrollIntoView({ block: "nearest" });
     return;
   }
   if (button.dataset.tab) {
     screen = button.dataset.tab;
+    if (screen === "atlas") {
+      atlasProvince = null;
+      atlasPoint = null;
+      atlasEdge = null;
+    }
     if (guide.open) guide.close();
     if (screen === "workshop" && !state.showedHideToSmith) {
       act(state, "showHideToSmith");

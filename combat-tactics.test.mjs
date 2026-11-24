@@ -61,6 +61,14 @@ test('opponents spend an opening on recovery only while injured and do not heal 
   assert.equal(chooseEnemyIntent({ ...fighter, strategy: 'schemer' }, { ...exposed, hp: 60 }), drain);
 });
 
+test('reading a medicine attempt can cash in a held charge, unlike a guard or generic recovery', () => {
+  const ready = { ...context, hp: 30, charged: true, round: 1 };
+  assert.equal(chooseEnemyIntent(defender, { ...ready, read: { kind: 'medicine' } }), heavy);
+  assert.equal(chooseEnemyIntent(defender, { ...ready, charged: false, read: { kind: 'medicine' } }), hit);
+  assert.equal(chooseEnemyIntent(defender, { ...ready, read: { kind: 'recover' } }), heal);
+  assert.equal(chooseEnemyIntent(defender, { ...ready, read: { kind: 'brace' } }), heal);
+});
+
 test('a wounded opponent takes a safe opening to use a dose or weighs it against observed danger', () => {
   const medicine = { id: 'heal_pill', name: '合络丹', hp: 16, action: '吞了一枚合络丹' };
   const recovery = { kind: 'remedy', name: medicine.action };

@@ -560,9 +560,13 @@ test('a crafted shield gives up two-handed weapons and wears only when bracing a
   const initialWear = state.durability.hide_shield;
   play(state, 'guard');
   assert.equal(state.durability.hide_shield, initialWear);
+  const locked = structuredClone(state);
+  for (const [action, payload] of [['combatEquip', { id: 'reed_bow' }], ['equip', { id: 'reed_bow' }], ['unequip', { slot: 'offhand' }]]) {
+    assert.match(act(state, action, payload).message, /交手中不能换装备/);
+    assert.deepEqual(state, locked);
+  }
   const before = structuredClone(state);
   before.equipment.offhand = null;
-  assert.match(act(state, 'combatEquip', { id: 'reed_bow' }).message, /先卸下副手/);
   const protectedHit = play(state, 'guard');
   const bareHit = play(before, 'guard');
   assert.equal(state.durability.hide_shield, initialWear - 1);
@@ -1599,7 +1603,7 @@ test('paid purchases reveal only that specialist’s order and the planted seed 
   assert.equal(state.inventory.ration, rationCount + 6);
 });
 
-test('ranged weapon arts spend compatible ammo and independent arts and defensive swaps still work with an empty quiver', () => {
+test('ranged weapon arts spend compatible ammo, empty bows stay equipped, and independent arts still work', () => {
   const state = createGame();
   state.realm = 2;
   state.hp = 47;
@@ -1639,12 +1643,10 @@ test('ranged weapon arts spend compatible ammo and independent arts and defensiv
   assert.equal(state.durability.reed_bow, bowWear);
   assert.equal(qi - state.qi, data.arts.find(({ id }) => id === 'mist_press').cost);
   if (view(state).mode === 'combat') {
-    assert.equal(view(state).combatWeapon.meleeAlternative.id, 'cudgel');
-    const round = state.combat.round;
-    play(state, 'combatEquip', { id: 'cudgel' });
-    assert.equal(view(state).combatWeapon.id, 'cudgel');
-    assert.equal(state.combat.round, round + 1);
-    play(state, 'art', { id: 'reed_cleave' });
+    const locked = structuredClone(state);
+    assert.match(act(state, 'combatEquip', { id: 'cudgel' }).message, /交手中不能换装备/);
+    assert.deepEqual(state, locked);
+    assert.equal(view(state).combatWeapon.id, 'reed_bow');
   }
   assert.equal(state.inventory.black_bolt, 3);
 });

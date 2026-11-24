@@ -131,6 +131,7 @@ test('the armguard cushions braced hits and occupies the same hand as a shield o
 test('the spear trades a point of ordinary damage for penetration against scaled opponents', () => {
   for (const [enemy, difference] of [['sand_quarry_guard', 3], ['sand_glass_lynx', -1]]) {
     const state = duel(enemy, 5);
+    state.enemyEvadeSeed = 0; // Compare two actual hits, including against the agile lynx.
     const sword = structuredClone(state);
     sword.combat = null;
     equip(sword, 'foil_sword');

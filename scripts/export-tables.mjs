@@ -48,6 +48,8 @@ const ruleDescriptions = {
   pressureThreshold: '探索压力高于此值时开始额外消耗真气（点）',
   pressureQi: '压力超限的每次探索所消耗的真气（点）',
   battleDays: '战斗操作每回合用时（天）',
+  regulatedBoutCooldown: '禁药比试结束后到下次开场的最短间歇（天）',
+  regulatedBoutHpFraction: '禁药比试开场所需的最低气血比例',
   perceptionScale: '洞察概率曲线分母的固定项。洞察差除以固定项与洞察差之和',
   perceptionCap: '洞察优势转化为看破的概率上限',
   observedHitLimit: '敌人参考最近几次实际承受的主动出招伤害',
@@ -383,7 +385,6 @@ ruleRows.push(
   { id: 'banditFatalDefeatCap', value: banditRules.fatalDefeatCap, desc: '普通强盗战败后死亡概率上限' },
   { id: 'banditFatalChiefDefeat', value: banditRules.fatalChiefDefeat, desc: '战败于灰沟贼王时的死亡概率' },
   { id: 'banditIgnoreUnarmedChance', value: banditRules.ignoreUnarmedChance, desc: '普通拦路人直接放过无穿戴旅客的概率' },
-  { id: 'banditRepeatFactors', value: banditRules.repeatEncounterFactors.join(' / '), desc: '当趟已遇零人、一人、两人以上后，下一格路的遭遇倍率' },
   { id: 'setupDays', value: economyData.setupDays, desc: '每次开启生产的操作耗时（日）' },
   { id: 'collectDays', value: economyData.collectDays, desc: '每次领取成品的操作耗时（日）' },
   { id: 'consumableBatchLimit', value: economyData.consumableBatchLimit, desc: '常用消耗品每单合批数上限；材料、灵钱和工期照批数累加' },
@@ -427,7 +428,7 @@ const transportRows = [
   ...transportRules.crossings.map(({ a, b, label, days, item, quest, reason }) => ({ label, a, b, days, item, quest, reason })),
   ...transportRules.shortcuts.map(({ a, b, label, days, openedBy }) => ({ label, a, b, days, reason: describeChoice(openedBy) })),
   { label: '州内门至门', price: transportRules.gatePrice, days: transportRules.gateDays, reason: '亲自认下两端传送门。' },
-  { label: '传送卷轴', days: transportRules.scrollDays, item: 'gate_scroll', reason: '每次使用一张，从任意安全停靠点传往已认门。' },
+  { label: '传送卷轴', price: transportRules.scrollPrice, days: transportRules.scrollDays, item: 'gate_scroll', reason: '每次使用一张，从任意安全停靠点传往已认门。' },
   { label: '跨州阵至阵', price: transportRules.arrayPrice, days: transportRules.arrayDays, reason: '两端州阵已修通。' },
 ];
 const roadProfiles = new Map(data.roadBandits.roads.map((profile) => [roadKey(profile.a, profile.b), profile]));
@@ -435,6 +436,7 @@ const roadRows = roadGraph(data).map((edge) => {
   const profile = roadProfiles.get(edge.key);
   return { ...edge, distance: edge.units * banditRules.distanceUnit, chance: profile?.chance ?? 0, crew: profile?.crew,
     mode: edge.water ? '渡船' : edge.cross ? '跨州陆路' : edge.openedBy ? '支路' : '普通陆路',
+    mainCrossing: Boolean(edge.cross?.guarded),
     open: edge.openedBy ? describeChoice(edge.openedBy)
       : [edge.cross?.item, edge.cross?.quest].filter(Boolean).map(ref).join(' 或 '), riskText: profile?.riskText };
 });
@@ -537,7 +539,7 @@ const tables = [
   table('space-bags', '独立乾坤袋和制作费用', economyData.containerPlans, [
     'id', 'name', ['capacity', '袋内格数'], ['source', '来历'], ['lead', '袋样', ref], 'need',
     ['cost', '制作费用（灵钱）'], 'days',
-  ], { note: '每只成品占用行囊一格，袋内同种物品每格最多堆 20 件。装备按件占格。各袋分别存取，袋内物品取出后参与制作、交易、作战和交付。' }),
+  ], { note: '行囊限带一只乾坤袋，占一格。各袋可以完整存仓或放下，袋内同种物品每格最多堆 20 件，装备按件占格。物品取出后参与制作、交易、作战和交付。' }),
   table('yard-projects', '后院种植与备粮', economyData.projects, [
     'id', 'name', ['facility', '使用设施', facilityRef], ['level', '所需设施等级'],
     'need', 'loot', ['cost', '费用（灵钱）'], ['days', '等待成熟天数'],
@@ -582,8 +584,8 @@ const tables = [
     ['level', '备粮灶等级'], 'need', 'count', ['cost', '每批费用（灵钱）'], 'days',
   ], { note: '生兽肉须带回备粮灶。恢复值按角色当下上限封顶。干粮也可向摊主买，备粮灶的两种干粮制法列于后院项目。' }),
   table('pills', '丹药', gated(described(data.pills.map((pill) => ({ satiety: 0, ...pill })))), [
-    'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['satiety', '食用恢复饱腹'], 'toxin', 'wound', 'focus',
-  ], { note: '暖谷丸吃下后直接补饱腹，饱腹按上限封顶。筑基丹用于突破，实际制作配方和各阶段成本见筑基丹访查及制作用方。' }),
+    'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['sense', '恢复神识'], ['satiety', '食用恢复饱腹'], 'toxin', 'wound', 'focus',
+  ], { note: '神识只补充已修习的神识点数。战中服药占一回合，可以被蓄力命中打断。筑基丹用于突破，制作成本见筑基丹访查及制作用方。' }),
   table('alchemy-formulas', '丹方与取得方式', alchemyFormulae, [
     'id', 'name', 'result', ['recipe', '制法标识'], ['source', '来源'], ['price', '丹方买价（灵钱）'],
     ['reveal', '丹师愿出示前提', ref], 'need',
@@ -613,8 +615,9 @@ const tables = [
   ]),
   table('roads', '实际路段、距离和拦路概率', roadRows, [
     ['from', '一端', ref], ['to', '另一端', ref], ['mode', '路段类型'], 'label', ['units', '路格'], ['distance', '里程（里）'],
-    'days', ['chance', '满员时每完整路格的基础拦路概率', percent], ['crew', '管这片路的团伙'], ['open', '启用条件'], ['riskText', '路边所见'],
-  ], { note: '一个完整路格为 2 里、0.25 日。短半格按距离比例判定。已知且可走的路按里程选最短；零概率路段、渡船、传送门、卷轴与州阵不会掷拦路签。' }),
+    'days', ['chance', '满员时每完整路格的基础拦路概率', percent], ['crew', '管这片路的团伙'],
+    ['mainCrossing', '安全且不可标红的主跨州边'], ['open', '启用条件'], ['riskText', '路边所见'],
+  ], { note: '一个完整路格为 2 里、0.25 日。同一段路的完整路格独立用同一个概率，不足一格按经过长度折算。已知可走且未标红的边用来计算最短路。相邻两州间较短的直连边安全且不可标红。' }),
   table('bandit-crews', '强盗团伙和常驻人数', crewRows, [
     'id', 'name', ['roads', '共享当场人数的路段'], ['count', '初始外出人数'],
     ['members', '炼气初期至金丹后期各小境人数', (counts) => counts.join(' / ')],
@@ -622,7 +625,7 @@ const tables = [
     ['inside', '寨内人数'], ['minFactor', '寨主仍在时，巡路概率的下限倍率', percent],
     ['delay', '首个空缺补员用时（日）'], ['interval', '之后补一人用时（日）'],
     ['boss', '击败后永久清空关联道路', ref],
-  ], { note: '每个窝都有人手名册。子路段概率按实际外出人数调整，灰沟还受寨内守卫存量影响。许涧败退后灰沟五条道路概率永久归零。' }),
+  ], { note: '每伙都有实际外出名册。进入路段时以剩余人手和闪避算出该段概率。攻得进去的藏身处还受留守人数影响，首领败后，该伙管辖道路概率永久归零。' }),
   table('bandit-pools', '拦路要价、财物和装备', gated(data.roadBandits.pools), [
     'tier', tier, ['enemy', '对手', ref], ['fee', '索要灵钱范围', banditRanges], ['cash', '一般胜后灵钱范围', banditRanges],
     ['richChance', '富裕成员概率', percent], ['richCash', '富裕成员灵钱范围', banditRanges],
@@ -666,7 +669,7 @@ const tables = [
     ['sealDamage', '符伤加成'], ['sealGuard', '符护加成'], ['element', '对应五行单项增量'], ['senseMax', '神识上限'], ['senseGuard', '读势减伤'],
   ], { note: '同一修习的各阶段效果不叠加，以当前最高一阶为准。消费当前一级所列材料和时间。当地导师才可升级。' }),
   table('region-encounters', '地区内的可选地点', data.sites, [
-    'region', 'id', 'name', ['protectedArena', '是否约定保护性切磋'],
+    'region', 'id', 'name', ['protectedArena', '是否约定保护性切磋'], ['regulatedBout', '禁用药物与饮食的比试'],
     ['afterChoices', '发现路线的具体动作', (keys) => keys.map(describeChoice).join('、')],
     'reveal', ['once', '一次性选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
     ['emptyText', '地点耗尽时可见情形'], ['afterOnceText', '一次性行动后的场景'],
@@ -727,7 +730,7 @@ const tables = [
     })[id] ?? id], ['medicine', '单场携带补药', ({ id, count }) => `${ref(id)}×${count}`],
     ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'],
     ['loot', '固定解取的身体掉落', resources], ['chanceLoot', '概率额外掉落', formatChanceLoot], 'desc',
-  ], { omit: ['intents'], note: '普攻取所列攻击乘招式倍率后向上取整。攻击等基础值已经算入敌方内功，出招专攻护持另列，差距至少三小境时另有压制。概率掉落与固定掉落分别结算。' }),
+  ], { omit: ['intents'], note: '普攻取所列攻击乘招式倍率后向上取整。攻击等基础值已算入内功，出招专攻护持另列，差距至少三小境时另有压制。命中和被动闪避空白表示无该项加成。补药只由明确带药的对手使用。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '常用动作序号'], 'name', 'kind', 'mult', ['ranged', '远程出手'],
   ], { note: '普通妖兽大多按这些习性出招。人物和部分大妖用自己承受过的伤害估计威胁。抽中洞察后能看到玩家这回合动作的类别。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),

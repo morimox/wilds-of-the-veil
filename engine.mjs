@@ -1,5 +1,5 @@
 import * as moduleData from './data.mjs';
-import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem } from './economy.mjs';
+import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem, containerCarryReason } from './economy.mjs';
 import { hazardView, hazardAction, hazardVictory } from './hazards.mjs';
 import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
 import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView } from './world.mjs';
@@ -34,6 +34,8 @@ export const rules = Object.freeze({
   pressureThreshold: 3,
   pressureQi: 1,
   battleDays: 0.125,
+  regulatedBoutCooldown: 0.5,
+  regulatedBoutHpFraction: 0.5,
   perceptionScale: 12,
   perceptionCap: 0.7,
   observedHitLimit: 3,
@@ -86,7 +88,6 @@ export const rules = Object.freeze({
   researchLimit: 2,
   practicePerDay: 1,
   worthyFightPractice: 2,
-  combatSwitchGuard: 1,
   mealHeal: records.foods.ration.hp,
   fallDays: 1,
   fallMaxCoinLoss: 4,
@@ -107,6 +108,8 @@ const realmOf = (state) => records.realms[state.realm];
 const regionOf = (state) => records.regions[state.region];
 const enemyOf = (state) => state.combat ? records.enemies[state.combat.id] : null;
 const inProtectedBout = (state) => Boolean(enemyOf(state)?.sparring && records.sites[state.combat.siteId]?.protectedArena);
+const inRegulatedBout = (state) => inProtectedBout(state) && Boolean(records.sites[state.combat.siteId].regulatedBout);
+const regulatedBoutRestriction = '这场切磋禁用药物和饮食。';
 const atHome = (state) => state.region === hub;
 const isSettlement = (state) => Boolean(settlementOf(data, state.region));
 const nameOf = (id) => records.items[id]?.name ?? id;
@@ -177,6 +180,21 @@ function normalize(state) {
   state.qi = clamp(state.qi, 0, maxQi);
 }
 
+const regulatedBoutWaitDays = (state) => Math.max(0, Math.round(((state.regulatedBoutUntil ?? 0) - state.day) * 1000) / 1000);
+
+function regulatedBoutBlocker(state) {
+  const remaining = regulatedBoutWaitDays(state);
+  if (remaining > 0) return `裁判请你先在场边歇一歇。还要等 ${remaining} 日。`;
+  if (state.hp < Math.ceil(stats(state).maxHp * rules.regulatedBoutHpFraction)) {
+    return '裁判见你气血还没到一半，请先歇息养伤。';
+  }
+  return '';
+}
+
+function setRegulatedBoutRecovery(state) {
+  state.regulatedBoutUntil = state.day + rules.regulatedBoutCooldown;
+}
+
 function advance(state, days, satietyRate = rules.satietyDrainPerDay) {
   const elapsed = days ?? 0;
   state.day = Math.round((state.day + elapsed) * 1000) / 1000;
@@ -203,6 +221,7 @@ function fittingItems(state, resources, spent = {}) {
   const inventory = { ...state.inventory };
   for (const [id, count] of resourceEntries(spent)) inventory[id] = Math.max(0, (inventory[id] ?? 0) - count);
   let available = Math.max(0, backpackCapacity(state, rules.backpackCapacity) - backpackSlots(state, inventory));
+  let bagPlaces = Number(!containerCarryReason(inventory));
   const accepted = {};
   const spilled = {};
   const stackSize = rules.backpackStackSize;
@@ -210,14 +229,17 @@ function fittingItems(state, resources, spent = {}) {
     if (count <= 0 || !records.items[id]) continue;
     const current = inventory[id] ?? 0;
     const gear = records.gear[id];
+    const bag = records.items[id].kind === 'container';
     if (gear && current) continue;
     const desired = gear ? 1 : count;
     const occupies = occupiesBackpack(state, id);
     const used = Math.ceil(current / stackSize);
-    const fits = occupies ? Math.min(desired, (available + used) * stackSize - current) : desired;
+    const room = occupies ? (available + used) * stackSize - current : desired;
+    const fits = Math.min(desired, room, bag ? bagPlaces : desired);
     if (fits) accepted[id] = fits;
     if (fits < desired) spilled[id] = desired - fits;
     if (occupies) available -= Math.ceil((current + fits) / stackSize) - used;
+    if (bag) bagPlaces -= fits;
   }
   return { accepted, spilled };
 }
@@ -237,6 +259,7 @@ function groundPlace(state) {
 const roadsideActions = new Set(['eat', 'batchEat', 'use', 'equip', 'unequip', 'equipManual',
   'unequipManual', 'selectAmmo', 'take', 'discard']);
 const containerTransfers = new Set(['econBagDeposit', 'econBagWithdraw']);
+const equipmentChanges = new Set(['equip', 'unequip', 'combatEquip', 'equipManual', 'unequipManual', 'upgradeManual']);
 
 function groundAt(state, place = groundPlace(state)) {
   return state.ground?.[place] ?? {};
@@ -245,6 +268,10 @@ function groundAt(state, place = groundPlace(state)) {
 function groundPickupLimit(state, id, available = groundAt(state)[id]) {
   if (!available || (records.gear[id] && gearReserved(state, id))) return 0;
   return fittingItems(state, { [id]: available }).accepted[id] ?? 0;
+}
+
+function groundPickupReason(state, id, count) {
+  return records.items[id]?.kind === 'container' ? containerCarryReason(state.inventory, count) : '';
 }
 
 function leaveOnGround(state, resources, durability = {}, place = groundPlace(state)) {
@@ -405,6 +432,7 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     manualRanks: {},
     mechanisms: initialMechanisms(),
     tournament: initialTournament(),
+    regulatedBoutUntil: 0,
     hp: 0,
     satiety: clamp(settings.satiety ?? rules.maxSatiety, 0, rules.maxSatiety),
     didEat: false,
@@ -496,6 +524,7 @@ function readableIntent(state) {
 }
 
 function enemyMedicine(state) {
+  if (inRegulatedBout(state)) return null;
   const carried = enemyOf(state)?.medicine;
   if (!carried || (state.combat.medicineLeft ?? carried.count) <= 0) return null;
   const { id, count } = carried;
@@ -712,10 +741,14 @@ export function view(state) {
     innerStyle: innerStyleView(state, combatWeapon, side),
     mechanism: mechanismView(state, economyKit),
     spiritSense: studies.spiritSense,
+    medicineUseReasons: Object.fromEntries(resourceEntries(state.inventory).flatMap(([id]) => {
+      const reason = senseMedicineBlocker(state, records.pills[id]);
+      return reason ? [[id, reason]] : [];
+    })),
     tournament: tournamentView(state, economyKit),
     maxSatiety: rules.maxSatiety,
     restSessions: mode === 'village' && settlementOf(data, state.region)?.inn ? recoverySessions(state) : 0,
-    batchMeals: (['field', 'village', 'event'].includes(mode) || (mode === 'road' && !roadBandit)) && !state.gathering
+    batchMeals: (['field', 'village', 'event'].includes(mode) || (mode === 'road' && (!roadBandit || roadBandit.aftermath))) && !state.gathering
       ? Object.fromEntries(data.foods.map(({ id }) => [id, batchMealCount(state, id)]).filter(([, count]) => count > 1))
       : {},
     fogTolerance: totalFogTolerance(state, fogProtection(state)),
@@ -740,6 +773,10 @@ export function view(state) {
     groundWear: Object.fromEntries(resourceEntries(groundLoot).filter(([id]) => records.gear[id])
       .map(([id]) => [id, state.groundDurability?.[groundPlace(state)]?.[id]?.[0] ?? records.gear[id].durability])),
     groundPickup: Object.fromEntries(resourceEntries(groundLoot).map(([id, count]) => [id, groundPickupLimit(state, id, count)])),
+    groundPickupReasons: Object.fromEntries(resourceEntries(groundLoot).flatMap(([id]) => {
+      const reason = groundPickupReason(state, id);
+      return reason ? [[id, reason]] : [];
+    })),
     sites: currentSites(state).map((site) => viewSite(state, site)),
     currentEvent: currentEvent ? { id: currentEvent.id, name: currentEvent.name, text: siteText(state, currentSite, currentEvent), choices: visibleChoices } : null,
     visibleChoices,
@@ -754,7 +791,8 @@ export function view(state) {
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
     combat: combat ? { id: combat.id, siteId: combat.siteId, round: combat.round } : null,
     currentEnemy: enemy ? { id: enemy.id, name: enemy.name, tier: enemy.tier, desc: enemy.desc,
-      sparring: inProtectedBout(state), maxHp: enemy.hp, hp: combat.hp } : null,
+      sparring: inProtectedBout(state), medicineRestricted: inRegulatedBout(state), maxHp: enemy.hp, hp: combat.hp } : null,
+    boutPause: regulatedBoutWaitDays(state),
     combatWeapon,
     combatOffhand: side ? { id: side.id, name: nameOf(side.id), chargeRequired: Boolean(side.chargeRequired) } : null,
     combatFist: combat ? { name: fist ? nameOf(fist.id) : '徒手出拳',
@@ -952,6 +990,10 @@ function choiceBlocker(state, choice, site, index) {
   if (choice.fieldTool && !fieldToolWear(state, choice.fieldTool)) {
     return { reason: `副手要装备完好的${nameOf(choice.fieldTool)}。` };
   }
+  if (site?.regulatedBout && records.enemies[choice.enemy]?.sparring) {
+    const reason = regulatedBoutBlocker(state);
+    if (reason) return { reason };
+  }
   if ((state.world.recovery[`${site?.id}:${choice.enemy}`] ?? 0) > state.day) return { reason: '教习收了练兵，先歇一歇再来。' };
   if (site?.creatures?.[choice.enemy] && poolAt(state, site, 'creatures', choice.enemy).count === 0) {
     const reason = records.enemies[choice.enemy]?.sparring
@@ -1130,15 +1172,18 @@ function choose(state, { index, itemId, count }) {
 function endSparring(state, enemy) {
   const combat = state.combat;
   const siteId = combat?.siteId;
-  state.event = siteId ?? null;
+  const regulated = inRegulatedBout(state);
+  state.event = regulated ? null : siteId ?? null;
   state.combat = null;
   state.focus = 0;
-  state.hp = Math.max(1, Math.floor(stats(state).maxHp * 0.25));
+  state.hp = regulated ? 1 : Math.max(1, Math.floor(stats(state).maxHp * 0.25));
   advance(state, 0.5);
+  if (regulated) setRegulatedBoutRecovery(state);
   const tournament = tournamentResolution(state, combat, false);
   if (tournament) state.event = null;
-  else if (siteId) state.world.recovery[`${siteId}:${enemy.id}`] = state.day + 0.5;
-  return say(state, `${enemy.name}在最后一式收手。你坐到场边歇过半日，这场试招输了。${tournament}`);
+  else if (!regulated && siteId) state.world.recovery[`${siteId}:${enemy.id}`] = state.day + 0.5;
+  const result = regulated ? '你到场边坐了半日，起身时仍只剩一口气。' : '你坐到场边歇过半日，这场试招输了。';
+  return say(state, `${enemy.name}在最后一式收手。${tournament || (regulated ? '裁判叫停，判你这场负。' : '')}${result}`);
 }
 
 function fall(state, place = groundPlace(state)) {
@@ -1201,6 +1246,7 @@ function finishCombat(state, enemy) {
   }
   const site = records.sites[combat.siteId];
   const protectedBout = inProtectedBout(state);
+  if (inRegulatedBout(state)) setRegulatedBoutRecovery(state);
   if (site?.creatures?.[enemy.id]) {
     spendPool(state, site, 'creatures', enemy.id, 1);
     const wins = (state.siteVictories[site.id] ??= {});
@@ -1233,7 +1279,7 @@ function finishCombat(state, enemy) {
   const chiefFell = data.roadBandits.dens[site?.id]?.boss === enemy.id;
   const rescuedGear = isDenBattle ? recoverBanditSpoils(state, site.id, economyKit, chiefFell) : '';
   const roadNews = chiefFell
-    ? '守在岔路口的人拔了哨旗，退回坡寨。往后这一带的山道可以放心走了。' : '';
+    ? '把守几条路的人撤走了，往后这一伙人不再出来拦路。' : '';
   return {
     message: `${protectedBout ? '试招中胜过' : isDenBattle ? '击杀了' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}${roadNews}${rescuedGear}`,
     ...(loot ? { gathered, gatheredRegion: state.region, gatheredSite: site?.id } : {}),
@@ -1313,8 +1359,6 @@ function fistWeapon(state) {
 
 function weaponView(state) {
   const { weapon, compatible, ammo } = weaponLoadout(state);
-  const meleeAlternative = data.gear.find(({ id, slot, ammo: needs, tier }) =>
-    slot === 'weapon' && !needs?.length && id !== weapon?.id && tier <= state.realm && owns(state, id) > 0 && state.durability[id] > 0);
   return {
     id: weapon?.id ?? null,
     name: weapon ? nameOf(weapon.id) : '徒手',
@@ -1324,7 +1368,6 @@ function weaponView(state) {
     isLoaded: !compatible.length || Boolean(ammo),
     selectedAmmo: ammo?.id ?? null,
     ammo: compatible.map((id) => ({ id, name: nameOf(id), count: owns(state, id), selected: id === ammo?.id })),
-    meleeAlternative: meleeAlternative ? { id: meleeAlternative.id, name: nameOf(meleeAlternative.id) } : null,
   };
 }
 
@@ -1390,11 +1433,8 @@ function combatEffects(state, enemy, intent, move) {
       - guard - traits.guard - training.guard - interrupt);
   const shield = heavyBrace && incoming > 0 ? activeGear(state).find(({ slot, brace }) => slot === 'offhand' && brace) : null;
   const received = Math.max(0, incoming - (shield?.brace ?? 0));
-  const qiToPlayer = intent.kind === 'drain' ? Math.min(state.qi, received) : 0;
-  const damageToPlayer = received - qiToPlayer;
   const healing = intent.kind === 'heal' ? Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt) : 0;
-  const reflect = damageToPlayer > 0 && damageToPlayer < state.hp && !intent.ranged &&
-    (intent.kind === 'attack' || intent.kind === 'heavy') ? traits.reflect : 0;
+  const reflect = !intent.ranged && (intent.kind === 'attack' || intent.kind === 'heavy') ? traits.reflect : 0;
   const quick = intent.ranged || intent.kind === 'drain';
   const hardToEvade = quick || intent.kind === 'heavy';
   const passive = (traits.dodge + (activeManualRank(state)?.base.dodge ?? 0)) * (hardToEvade ? rules.combatQuickDodgeFactor : 1);
@@ -1402,7 +1442,7 @@ function combatEffects(state, enemy, intent, move) {
   const accuracy = (enemy.accuracy ?? 0) + (intent.accuracy ?? 0) + excessRealmGap(state, enemy) * rules.largeRealmAccuracy;
   const dodge = received > 0
     ? dodgeChance(passive + active, accuracy, move.evade ? rules.combatActiveDodgeCap : rules.combatDodgeCap) : 0;
-  return { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer };
+  return { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, received };
 }
 
 function dodgeChance(evasion, accuracy, cap) {
@@ -1435,10 +1475,17 @@ function combatVictory(state, enemy, summary, results) {
 
 function combatTurn(state, move) {
   const enemy = enemyOf(state);
-  const { kind = 'recover', brace, wearWeapon, ammo, message } = move;
+  const { kind = 'recover', brace, wearWeapon, ammo, medicine, message } = move;
   const intent = respondToMove(state, enemy, kind);
   const result = combatEffects(state, enemy, intent, move);
-  const { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer } = result;
+  const { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, received } = result;
+  const incoming = state.combat.hp > dealt + counter && !hit && received > 0;
+  const dodged = incoming && combatEvaded(state, 'player', dodge);
+  const interruptedMedicine = medicine && state.combat.enemyCharged && incoming && !dodged;
+  const doseTaken = medicine && !interruptedMedicine ? applyMedicine(state, medicine) : null;
+  const { message: doseMessage, ...medicineResult } = doseTaken ?? {};
+  const qiToPlayer = intent.kind === 'drain' ? Math.min(state.qi, received) : 0;
+  const damageToPlayer = received - qiToPlayer;
   const healthBefore = state.hp;
   const enemyMove = { name: intent.name, kind: intent.kind };
   const read = state.combat.plan.reader === 'enemy' ? `${enemy.name}看破了你的起手。` : '';
@@ -1462,14 +1509,14 @@ function combatTurn(state, move) {
   if (ammo) removeItem(state, ammo.id, 1);
   const playerMove = brace ? counter ? '你挡住重招，趁对手还没收招打了回去。'
     : recovered ? `你趁对手守势回了${recovered}点真气。` : '你收回手，挡在身前。' : message;
-  let summary = `${read}${abandoned ? '你收住了方才蓄着的劲。' : ''}${playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${missed ? `${enemy.name}侧身闪过了这一击。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
+  const medicineMove = interruptedMedicine ? `你刚取出${nameOf(medicine)}，便被对手蓄好的招打断。药还在手里。` : doseMessage;
+  let summary = `${read}${abandoned ? '你收住了方才蓄着的劲。' : ''}${medicineMove ?? playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${missed ? `${enemy.name}侧身闪过了这一击。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
   if (state.combat.hp <= 0) {
     if (counter) summary += `「${intent.name}」被你截住了。`;
     return combatVictory(state, enemy, summary, { damageDealt, damageTaken: 0, ...(counter ? { enemyMove } : {}) });
   }
-  summary += intent.kind === 'remedy' ? `${enemy.name}${intent.name}。` : `${enemy.name}使出「${intent.name}」。`;
+  if (intent.kind !== 'remedy') summary += `${enemy.name}使出「${intent.name}」。`;
   if (attackingIntent(intent)) state.combat.enemyCharged = false;
-  const dodged = !hit && (qiToPlayer > 0 || damageToPlayer > 0) && combatEvaded(state, 'player', dodge);
   if (hit) {
     summary += `这一箭拦住了${enemy.name}的冲势。`;
   } else if (dodged) {
@@ -1487,10 +1534,22 @@ function combatTurn(state, move) {
       : `${enemy.name}${interrupt ? '调息受阻，只' : ''}恢复了${restored}点生命。`;
   } else if (intent.kind === 'remedy') {
     const dose = enemyMedicine(state);
-    state.combat.medicineLeft = dose.left - 1;
-    const restored = Math.min(enemy.hp - state.combat.hp, dose.hp);
-    state.combat.hp += restored;
-    summary += `气血回了${restored}点。`;
+    if (!dose) {
+      enemyMove.name = '摸了摸空药袋';
+      summary += `${enemy.name}摸了摸药袋，已经空了。`;
+    } else if (charge && dealt > 0) {
+      enemyMove.name = '取药时被打断';
+      summary += `${enemy.name}刚取出${dose.name}，便被你这一击打断，药仍攥在手里。`;
+    } else {
+      state.combat.medicineLeft = dose.left - 1;
+      const restored = Math.min(enemy.hp - state.combat.hp, dose.hp);
+      state.combat.hp += restored;
+      summary += `${enemy.name}${intent.name}。`;
+      if (restored > 0) {
+        summary += `气血回了${restored}点。`;
+        medicineResult.enemyMedicineRecovery = restored;
+      }
+    }
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
   } else if (intent.kind === 'dodge') {
@@ -1513,21 +1572,23 @@ function combatTurn(state, move) {
       state.combat.playerCharge = null;
       summary += '你蓄着的劲被打散了。';
     }
-    if (reflect > 0) {
+    if (reflect > 0 && damageToPlayer > 0 && state.hp > 0) {
       reflectedDamage = Math.min(state.combat.hp, reflect);
       state.combat.hp -= reflectedDamage;
       damageDealt += reflectedDamage;
       summary += `护具把来劲弹了回去，造成${reflectedDamage}点反伤。`;
     }
   }
-  if (state.combat.hp <= 0) return combatVictory(state, enemy, summary, { damageDealt, damageTaken: healthBefore - state.hp, enemyMove, reflectedDamage, dodged, missed });
+  if (state.combat.hp <= 0) {
+    return combatVictory(state, enemy, summary, { ...medicineResult, damageDealt, damageTaken: healthBefore - state.hp, enemyMove, reflectedDamage, dodged, missed });
+  }
   state.combat.lastEnemyIntent = enemyMove;
   state.combat.round += 1;
   normalize(state);
   const damageTaken = Math.max(0, healthBefore - state.hp);
   say(state, summary);
   const fell = state.hp === 0 ? fall(state) : null;
-  return { ...fell, ok: true, message: summary + (fell?.message ?? ''), damageDealt, damageTaken, enemyMove, reflectedDamage, dodged, missed };
+  return { ...fell, ...medicineResult, ok: true, message: summary + (fell?.message ?? ''), damageDealt, damageTaken, enemyMove, reflectedDamage, dodged, missed };
 }
 
 function retreat(state, bonus = 0, lead = '', guard = 0) {
@@ -1535,6 +1596,10 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   const enemy = enemyOf(state);
   if (inProtectedBout(state)) {
     advance(state, rules.retreatDays);
+    if (inRegulatedBout(state)) {
+      setRegulatedBoutRecovery(state);
+      state.event = null;
+    }
     state.combat = null;
     state.focus = 0;
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
@@ -1551,8 +1616,7 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   const charmDamage = activeGear(state).some(({ slot, retreat }) => slot === 'charm' && retreat > 0) ? wear(state, 'charm') : '';
   const outerEdge = state.combat.huntChoice !== undefined ? state.combat.siteId : null;
   const road = state.combat.roadBandit;
-  const position = outerEdge ? '退回了这处猎场的外沿' : road ? '折回先前走过的路口' : `仍在${regionOf(state).name}`;
-  const summary = `${lead}趁${enemy.name}使出「${intent.name}」，你脱开身，${position}。${charmDamage}`;
+  const escaped = `${lead}趁${enemy.name}使出「${intent.name}」，你脱开身`;
   if (outerEdge) {
     saveHuntTrack(state);
     state.event = outerEdge;
@@ -1561,8 +1625,11 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   state.focus = 0;
   if (road) {
     state.roadBandit = null;
-    backFromRoad(state, economyKit);
+    const returning = backFromRoad(state, economyKit);
+    return { ...returning, ...say(state, `${escaped}。${charmDamage}${returning.message}`), damageDealt: 0, damageTaken: 0, retreated: true };
   }
+  const position = outerEdge ? '退回了这处猎场的外沿' : `仍在${regionOf(state).name}`;
+  const summary = `${escaped}，${position}。${charmDamage}`;
   return { ...say(state, summary), damageDealt: 0, damageTaken: 0, retreated: true };
 }
 
@@ -1690,6 +1757,7 @@ function batchMealCount(state, id) {
 }
 
 function eat(state, inCombat, id = supply, batch = false) {
+  if (inCombat && inRegulatedBout(state)) return refuse(regulatedBoutRestriction);
   if (id === 'beast_meat' && owns(state, id)) return refuse('肉还生着。带回村用灶煮熟就能吃。');
   const food = records.foods[id];
   if (!food || !owns(state, id)) return refuse('没有这份可吃的口粮。');
@@ -1727,40 +1795,58 @@ function unpackBasket(state) {
   return { ...say(state, basket.unpack.outcome), outcome: basket.unpack.outcome, spilled };
 }
 
+function senseMedicineBlocker(state, pill) {
+  if (!pill?.sense || needsSenseRest(state) || (pill.hp > 0 && state.hp < stats(state).maxHp)) return '';
+  if (!state.training?.levels?.spirit) return '先学会神识。';
+  return pill.hp > 0 ? '气血和神识都养足了。' : '神识已经养足。';
+}
+
+function applyMedicine(state, id) {
+  const pill = records.pills[id];
+  removeItem(state, id, 1);
+  const hp = state.hp;
+  state.hp += pill.hp ?? 0;
+  state.qi += pill.qi ?? 0;
+  state.toxin += pill.toxin ?? 0;
+  state.wounds -= pill.wound ?? 0;
+  state.focus += pill.focus ?? 0;
+  if (pill.satiety > 0) {
+    state.satiety = Math.min(rules.maxSatiety, state.satiety + pill.satiety);
+    state.didEat = true;
+  }
+  normalize(state);
+  const restored = state.hp - hp;
+  const sense = restoreTrainingSense(state, pill.sense ?? 0);
+  const toxic = state.toxin >= rules.toxinThreshold;
+  const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
+  state.hp -= toxinDamage;
+  const applied = id === 'salve' ? '你把松脂膏敷在伤口上。' : `你服下${nameOf(id)}。`;
+  const message = applied + (restored > 0 ? `气血回了${restored}点。` : '') + (sense > 0 ? `神识回了${sense}点。` : '')
+    + (toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : '');
+  return { message, medicineRecovery: { hp: Math.max(0, restored), sense },
+    injury: toxinDamage ? { cause: '丹毒发作。', amount: toxinDamage } : undefined };
+}
+
 function use(state, id, inCombat) {
   if (records.foods[id] || id === 'beast_meat') return eat(state, inCombat, id);
   if (!owns(state, id)) return refuse('行囊里没有这件物品。');
   if (records.items[id]?.breakthrough) return refuse(`${nameOf(id)}要在闭关突破时服下。`);
   const pill = records.pills[id];
+  if (pill && inCombat && inRegulatedBout(state)) return refuse(regulatedBoutRestriction);
   const talisman = records.talismans[id];
   const entry = pill ?? talisman;
   if (!entry) return refuse('这件物品不能直接使用。');
   if (entry.tier > state.realm) return refuse('你目前承受不了这件物品的效力。');
   if (talisman && !inCombat) return refuse('这道符要在战斗中用。');
   if (pill?.satiety && state.satiety >= rules.maxSatiety) return refuse('你还很饱。');
-  removeItem(state, id, 1);
   if (pill) {
-    state.hp += pill.hp ?? 0;
-    state.qi += pill.qi ?? 0;
-    state.toxin += pill.toxin ?? 0;
-    state.wounds -= pill.wound ?? 0;
-    state.focus += pill.focus ?? 0;
-    if (pill.satiety > 0) {
-      state.satiety = Math.min(rules.maxSatiety, state.satiety + pill.satiety);
-      state.didEat = true;
-    }
-    normalize(state);
-    const toxic = state.toxin >= rules.toxinThreshold;
-    const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
-    state.hp -= toxinDamage;
-    const applied = id === 'salve' ? '你把松脂膏敷在伤口上。' : `你服下${nameOf(id)}。`;
-    const message = applied + (toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : '');
-    const result = inCombat ? combatTurn(state, { message }) : say(state, message);
-    return {
-      ...result,
-      injury: toxinDamage ? { cause: '丹毒发作。', amount: toxinDamage } : undefined,
-    };
+    const reason = senseMedicineBlocker(state, pill);
+    if (reason) return refuse(reason);
+    if (inCombat) return combatTurn(state, { kind: 'medicine', medicine: id });
+    const { message, ...dose } = applyMedicine(state, id);
+    return { ...say(state, message), ...dose };
   }
+  removeItem(state, id, 1);
   const message = `你催动${nameOf(id)}。`;
   const training = trainingPerks(state);
   const guard = talisman.guard > 0 ? talisman.guard + training.sealGuard : 0;
@@ -1782,10 +1868,9 @@ export function handConflict(equipment, id) {
   return '';
 }
 
-function equip(state, id, inCombat = false) {
+function equip(state, id) {
   const gear = records.gear[id];
   if (!gear || !owns(state, id)) return refuse('行囊里没有这件装备。');
-  if (inCombat && gear.slot !== 'weapon') return refuse('交手时只能换兵器。');
   if (state.realm < gear.tier) return refuse('这件装备需要更高境界。');
   if (!state.durability[id]) return refuse('这件装备需要先修理。');
   if (state.equipment[gear.slot] === id) return refuse('你已经穿戴了这件装备。');
@@ -1793,8 +1878,7 @@ function equip(state, id, inCombat = false) {
   if (conflict) return refuse(conflict);
   state.equipment[gear.slot] = id;
   normalize(state);
-  const message = `换上${nameOf(id)}。`;
-  return inCombat ? combatTurn(state, { kind: 'switch', guard: rules.combatSwitchGuard, message }) : say(state, message);
+  return say(state, `换上${nameOf(id)}。`);
 }
 
 function unequip(state, slot) {
@@ -1823,6 +1907,8 @@ function takeFromGround(state, id, requested) {
       (!Number.isSafeInteger(requested) || requested < 1 || requested > available))) return refuse('这里没有这么多东西可捡。');
   const gear = records.gear[id];
   if (gear && gearReserved(state, id)) return refuse('同名装备已在手上、仓里或锻炉里。');
+  const reason = groundPickupReason(state, id, requested);
+  if (reason) return refuse(reason);
   const maximum = groundPickupLimit(state, id);
   const count = requested ?? maximum;
   if (count > maximum) return refuse(maximum ? `行囊只装得下${maximum}份。` : '行囊已满。');
@@ -2279,6 +2365,7 @@ const economyKit = {
   roadRisk: (state, leg) => roadBanditRisk(state, leg, economyKit),
   banditDenPopulation: (state, id) => Object.values(poolCounts(state, records.sites[id], 'creatures')).reduce((sum, count) => sum + count, 0),
   eatOnRoad: (state, id) => eat(state, false, id),
+  regulatedBoutBlocker, setRegulatedBoutRecovery,
 };
 
 function canUseVillageAction(state, action, payload) {
@@ -2338,7 +2425,6 @@ const combatActions = {
   tournamentWithdraw: (state) => tournamentAction(state, 'tournamentWithdraw', economyKit),
   readSpirit: (state) => recordTrainingRead(state, economyKit),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
-  combatEquip: (state, { id }) => equip(state, id, true),
   guard: (state) => combatTurn(state, { kind: 'brace', brace: true }),
   dodge: (state) => combatTurn(state, { kind: 'dodge', evade: true, message: '你侧身挪步。' }),
   cancelCharge: (state) => {
@@ -2367,15 +2453,18 @@ function takeTurn(state, action, payload) {
     return say(state, state.completionPhase === 'final' ? '诸处商旅复行。山河仍可继续探访。' : '旧渡照常开船。你仍可留在村里，或再去寻路。');
   }
   if (state.combat) {
+    if (equipmentChanges.has(action)) return refuse('交手中不能换装备。');
     if (Object.hasOwn(combatActions, action)) return combatActions[action](state, payload);
     return refuse('先处理眼前的对手。');
   }
   if (state.roadTrip) {
+    if (!state.roadBandit || state.roadBandit.aftermath) {
+      if (containerTransfers.has(action)) return economyAction(state, action, payload, economyKit);
+      if (roadsideActions.has(action)) return generalActions[action](state, payload);
+    }
     if (state.roadBandit) return banditAction(state, action, payload, economyKit) ?? refuse('先处理眼前拦路的人。');
     if (action === 'roadContinue') return continueRoad(state, economyKit);
     if (action === 'roadBack') return backFromRoad(state, economyKit);
-    if (containerTransfers.has(action)) return economyAction(state, action, payload, economyKit);
-    if (roadsideActions.has(action)) return generalActions[action](state, payload);
     return refuse('先走完这段路，或折回先前的路口。');
   }
   if (action === 'gateScroll') return worldAction(state, action, payload, economyKit);

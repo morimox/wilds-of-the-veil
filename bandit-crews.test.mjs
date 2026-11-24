@@ -122,7 +122,7 @@ test('all hazardous edges belong to populated crews with a headquarters and most
     if (den) {
       const hideout = data.sites.find(({ id, region }) => id === den && region === headquarters.region);
       assert.ok(hideout);
-      const { [greyLeader]: leader, ...guards } = hideout.creatures;
+      const { [data.roadBandits.dens[den].boss]: leader, ...guards } = hideout.creatures;
       assert.equal(leader.growth, 0);
       assert.ok(Object.values(guards).every(({ interval, growth }) => interval >= 28 && growth > 0));
       assert.equal(Object.values(hideout.creatures).reduce((sum, { start }) => sum + start, 0), data.roadBandits.dens[den].heads);
@@ -131,9 +131,45 @@ test('all hazardous edges belong to populated crews with a headquarters and most
     local.region = headquarters.region;
     assert.ok(!view(local).sites.some(({ name }) => name === headquarters.name));
   }
-  assert.equal(Object.values(crews).filter(({ den }) => den).length, 1);
+  assert.equal(Object.values(crews).filter(({ den }) => den).length, 3);
   const state = readyTraveler();
   assert.equal(risk(state, map.find(({ key }) => key === 'marsh|village')), 0);
+});
+
+test('regional witnesses point to a hidden den, where the chief alone opens the cache and clears its roads', () => {
+  const outings = [
+    { crew: 'ferryWood', witness: 'bandit_net_keeper', prize: 'bandit_ford_bell', money: 145 },
+    { crew: 'windBridge', witness: 'bandit_salt_carrier', prize: 'bandit_salt_boots', money: 240 },
+  ];
+  for (const { crew, witness, prize, money } of outings) {
+    const { den, headquarters } = data.roadBandits.crews[crew];
+    const { heads, boss } = data.roadBandits.dens[den];
+    const roads = data.roadBandits.roads.filter((row) => row.crew === crew)
+      .map(({ a, b }) => map.find(({ key }) => key === [a, b].sort().join('|')));
+    const traveler = readyTraveler();
+    traveler.region = headquarters.region;
+    traveler.realm = 8;
+    equip(traveler, 'fault_coat');
+    equip(traveler, 'foil_sword');
+    traveler.hp = view(traveler).maxHp;
+    assert.ok(roads.every((road) => risk(traveler, road) > 0));
+    assert.equal(act(traveler, 'visit', { id: den }).ok, false);
+    play(traveler, 'visit', { id: witness });
+    play(traveler, 'choose', { index: 0 });
+    play(traveler, 'leave');
+    play(traveler, 'visit', { id: den });
+    assert.equal(act(traveler, 'choose', { index: 1 }).ok, false);
+    assert.equal(encounterInDen(traveler, seedFor([1 - 0.5 / heads, 1])), boss);
+    finishFight(traveler);
+    assert.equal(traveler.siteVictories[den][boss], 1);
+    assert.ok(roads.every((road) => risk(traveler, road) === 0));
+    const prior = traveler.coins;
+    play(traveler, 'choose', { index: 1 });
+    assert.equal(traveler.coins, prior + money);
+    assert.equal(traveler.inventory[prize], 1);
+    assert.equal(act(traveler, 'choose', { index: 1 }).ok, false);
+    assert.notEqual(encounterInDen(traveler, seedFor([0.95, 1])), boss);
+  }
 });
 
 test('the third actual encounter shares its count across roads and a stronger traveler can ask about the hideout', () => {
@@ -467,6 +503,19 @@ test('the wounded bandit can be spared or killed after defeating him and either 
   assert.equal(act(state, 'roadContinue').ok, false);
   const choices = view(state).roadTrip.bandit.actions.filter(({ available }) => available).map(({ id }) => id);
   assert.deepEqual(choices, ['spare_slate_robber', 'kill_slate_robber']);
+
+  const preparing = structuredClone(state);
+  preparing.inventory.salve = 1;
+  preparing.hp = 20;
+  preparing.ground[preparing.roadTrip.stop] = { wood: 1 };
+  play(preparing, 'use', { id: 'salve' });
+  play(preparing, 'take', { id: 'wood' });
+  assert.equal(preparing.roadBandit.aftermath, true);
+  assert.equal(view(preparing).roadTrip.afterBattle, true);
+  assert.equal(act(preparing, 'roadContinue').ok, false);
+  play(preparing, 'banditPlot', { id: 'spare_slate_robber' });
+  assert.equal(preparing.roadBandit, null);
+  assert.equal(view(preparing).roadTrip.afterBattle, true);
 
   const spared = structuredClone(state);
   const killed = structuredClone(state);

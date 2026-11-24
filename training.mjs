@@ -66,11 +66,12 @@ export function trainingPerks(state, enemy, intent) {
   };
 }
 
-export function restoreTrainingSense(state) {
+export function restoreTrainingSense(state, amount = Infinity) {
   const maximum = trainedRank(state, 'spirit').senseMax ?? 0;
-  const gained = maximum - (state.training?.sense ?? 0);
-  if (gained > 0) state.training.sense = maximum;
-  return Math.max(0, gained);
+  const current = state.training?.sense ?? 0;
+  const gained = Math.max(0, Math.min(amount, maximum - current));
+  if (gained > 0) state.training.sense = current + gained;
+  return gained;
 }
 
 export function needsSenseRest(state) {
@@ -132,7 +133,7 @@ export function trainingAction(state, action, { id }, kit) {
 export function recordTrainingRead(state, kit) {
   const sense = spiritView(state, kit);
   if (!sense || !state.combat) return kit.refuse('学会神识后，可以在战斗中预看对手的招式。');
-  if (!sense.canRead) return kit.refuse(sense.current ? '这回合已经用神识看过了。' : '神识已经耗尽，歇脚后再用。');
+  if (!sense.canRead) return kit.refuse(sense.current ? '这回合已经用神识看过了。' : '神识已经耗尽，可以歇脚或用药养回来。');
   state.training.sense -= 1;
   state.combat.spiritReadRound = state.combat.round;
   state.combat.spiritGuard = trainedRank(state, 'spirit').senseGuard;

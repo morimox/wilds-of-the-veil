@@ -2,9 +2,39 @@ import { saleQuote, saleTotal, recordSale } from './economy.mjs';
 
 const home = 'village';
 const legacy = new Set(['village', 'marsh', 'ridge', 'ford', 'hidden', 'pine_ridge', 'kiln_valley', 'herb_basin', 'black_mine', 'snow_pass', 'sky_terrace']);
+const ferryPass = { ferry: true, item: 'ferry_manifest', quest: 'last_lantern',
+  reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' };
+const sandPass = { item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' };
 const crossings = [
-  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, ferry: true, item: 'ferry_manifest', quest: 'last_lantern', reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' },
-  { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' },
+  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, ...ferryPass, onPermit: true, guarded: true },
+  { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, ...sandPass, onPermit: true, guarded: true },
+  { a: 'willow_post', b: 'flood_market', label: '折水驿的货船线', days: 6.75, ...ferryPass },
+  { a: 'rope_sands', b: 'cinder_inn', label: '沿沙坡的驿路', days: 7.25, ...sandPass },
+];
+const regionalRoads = [
+  ['reed_meadows', 'pale_shoal', '蒲湾外堤'],
+  ['gauge_tower', 'willow_post', '水尺下的旧堤'],
+  ['screen_slope', 'kiln_valley', '晒盘坡北面的窑路'],
+  ['kiln_valley', 'snow_pass', '窑谷上雪关的石阶'],
+  ['herb_basin', 'snow_pass', '背风山道'],
+  ['pine_ridge', 'ridge', '松场南坡路'],
+  ['fish_ladder', 'willow_post', '沿旧渠的纤道'],
+  ['green_dyke', 'measuring_hall', '守尺观外的堤路'],
+  ['frog_pond', 'ring_isles', '浅塘东岸路'],
+  ['old_marker', 'scale_bog', '石碑后的小堤'],
+  ['zhao_hermit', 'charcoal_ridge', '水驿南面的山道'],
+  ['zhao_hermit', 'burnt_weir', '内堰西路'],
+  ['glass_bank', 'rope_sands', '晒网滩外的沙脊'],
+  ['glass_bank', 'burnt_weir', '碎沙堤'],
+  ['flood_market', 'measuring_hall', '运尺的河堤路'],
+  ['cinder_inn', 'silk_tent_road', '炭篷驿外的帐道'],
+  ['silk_tent_road', 'sand_bell_cloister', '背向风口的挑担路'],
+  ['salt_ledger_barrows', 'sand_bell_cloister', '担盐岗南坡路'],
+  ['chalk_hoof_trail', 'stillwell_mouth', '白石脊上的井道'],
+  ['stillwell_mouth', 'wind_slate', '井口南边的背风路'],
+  ['wind_slate', 'hanging_vein', '矿梁下的碎石路'],
+  ['guest_mill', 'camel_grass_dunes', '磨坊南边的沙坡路'],
+  ['hollow_silo', 'glass_hail_sink', '空仓外的石坡'],
 ];
 const shortcuts = [
   { a: 'village', b: 'ford', label: '旧灯渠', days: 0.5, openedBy: 'ford_lamp_channel:0' },
@@ -15,11 +45,11 @@ const arrayPlans = {
   zhaoyuan: { coins: 115, need: { wood: 32, ore: 28, core: 24, black_iron: 18 } },
   mingsha: { coins: 140, need: { wood: 28, ore: 32, core: 32, black_iron: 25 } },
 };
-export const transportRules = Object.freeze({ gatePrice: 2, gateDays: 0.125, arrayPrice: 4, arrayDays: 0.25, scrollDays: 0.125,
+export const transportRules = Object.freeze({ gatePrice: 2, gateDays: 0.125, arrayPrice: 4, arrayDays: 0.25, scrollPrice: 2, scrollDays: 0.125,
   roadUnitDays: 0.25, arrayPlans, crossings, shortcuts });
 
 export function initialWorld() {
-  return { lastSettlement: home, gates: [], arrays: {}, shops: {}, recovery: {}, affiliation: null, memberships: {} };
+  return { lastSettlement: home, gates: [], arrays: {}, avoidedRoads: [], shops: {}, recovery: {}, affiliation: null, memberships: {} };
 }
 
 const detail = (data, id) => data.regionDetails?.[id] ?? {};
@@ -41,10 +71,6 @@ export function alwaysKnownRegion(id) {
 export function rescueSettlement(state, kit) {
   const last = state.world?.lastSettlement;
   return last && settlementOf(kit.data, last) ? last : home;
-}
-
-function crossRoute(from, to) {
-  return crossings.find((edge) => otherside(edge, from) === to);
 }
 
 function crossBlocker(state, edge) {
@@ -76,6 +102,9 @@ export function roadGraph(data, { state } = {}) {
       if (regions.has(b) && provinceOf(data, a) === provinceOf(data, b)) add(a, b, localRoadDays(from, regions.get(b)));
     }
   }
+  for (const [a, b, label] of regionalRoads) {
+    if (regions.has(a) && regions.has(b)) add(a, b, localRoadDays(regions.get(a), regions.get(b)), { label });
+  }
   for (const cross of crossings) add(cross.a, cross.b, cross.days, { cross, label: cross.label, water: Boolean(cross.ferry) });
   for (const shortcut of shortcuts) {
     if (!state || state.seenChoices.includes(shortcut.openedBy)) {
@@ -92,22 +121,85 @@ function directRoad(from, to, edges) {
 export function learnAdjacentRegions(state, kit) {
   const edges = roadGraph(kit.data, { state });
   for (const region of kit.data.regions) {
-    if (marked(state, region.id) || !directRoad(state.region, region.id, edges)) continue;
-    const cross = crossRoute(state.region, region.id);
-    if (cross ? crossBlocker(state, cross) : region.reveal || region.secret) continue;
+    const edge = directRoad(state.region, region.id, edges);
+    if (marked(state, region.id) || !edge || crossBlocker(state, edge.cross) || region.reveal || region.secret) continue;
     state.discovered.push(region.id);
+    if (edge.cross && !edge.cross.onPermit) {
+      kit.say(state, `路牌写着「${edge.label}」，顺着走可以到${region.name}。`);
+    }
   }
-  // A permit describes both landing points. Merely seeing a locked crossing never reveals its destination.
+  // The permits name the main crossings. Secondary crossings are learned at their entrances.
   for (const edge of crossings) {
-    if (crossBlocker(state, edge)) continue;
+    if (!edge.onPermit || crossBlocker(state, edge)) continue;
     for (const id of [edge.a, edge.b]) if (kit.records.regions[id] && !marked(state, id)) state.discovered.push(id);
   }
+}
+
+function openKnownRoads(state, edges) {
+  const known = new Set([state.region, ...state.discovered]);
+  const avoided = new Set(state.world.avoidedRoads);
+  return edges.filter((edge) => known.has(edge.from) && known.has(edge.to) && !isAvoidedRoad(edge, avoided) && !crossBlocker(state, edge.cross));
+}
+
+function isAvoidedRoad(edge, avoided) {
+  return !edge.cross?.guarded && avoided.has(edge.key);
+}
+
+function roadNeighbors(edges) {
+  const neighbors = new Map();
+  for (const edge of edges) {
+    for (const point of [edge.from, edge.to]) {
+      if (!neighbors.has(point)) neighbors.set(point, []);
+      neighbors.get(point).push(edge);
+    }
+  }
+  return neighbors;
+}
+
+function hasDetour(edge, neighbors) {
+  const reached = new Set([edge.from]);
+  for (const point of reached) {
+    for (const leg of neighbors.get(point) ?? []) {
+      if (leg.key === edge.key) continue;
+      const next = leg.from === point ? leg.to : leg.from;
+      if (next === edge.to) return true;
+      reached.add(next);
+    }
+  }
+  return false;
+}
+
+function roadAvoidance(state, edge, neighbors) {
+  if (!marked(state, edge.from) || !marked(state, edge.to)) return '认清这条路的两头后，才能选择绕行。';
+  if (edge.cross?.guarded) return '这条跨州通路有人巡守，不能标红。';
+  if (state.roadTrip || state.event || state.combat || state.gathering) return '停在地图地点时才能改走法。';
+  if (state.world.avoidedRoads?.includes(edge.key)) return '';
+  const closed = crossBlocker(state, edge.cross);
+  if (closed) return closed;
+  return hasDetour(edge, neighbors) ? '' : '绕开这条路会让已知去路断开。';
+}
+
+function toggleRoadAvoidance(state, id, kit) {
+  const edges = roadGraph(kit.data, { state });
+  const edge = edges.find(({ key }) => key === id);
+  if (!edge || !marked(state, edge.from) || !marked(state, edge.to)) return kit.refuse('图上还没有这条路。');
+  const reason = roadAvoidance(state, edge, roadNeighbors(openKnownRoads(state, edges)));
+  if (reason) return kit.refuse(reason);
+  const avoided = state.world.avoidedRoads ??= [];
+  const index = avoided.indexOf(edge.key);
+  const ends = [edge.from, edge.to].map((point) => kit.records.regions[point].name).join('到');
+  if (index >= 0) {
+    avoided.splice(index, 1);
+    return kit.say(state, `已恢复${ends}这条路。`);
+  }
+  avoided.push(edge.key);
+  return kit.say(state, `将绕过${ends}这条路。`);
 }
 
 function knownRoutes(state, edges) {
   const routes = new Map([[state.region, { units: 0, legs: [] }]]);
   const unvisited = new Set([state.region, ...state.discovered]);
-  const permitted = edges.filter((edge) => !crossBlocker(state, edge.cross));
+  const neighbors = roadNeighbors(openKnownRoads(state, edges));
   while (unvisited.size) {
     let nearest;
     let nearestCost = Infinity;
@@ -116,9 +208,9 @@ function knownRoutes(state, edges) {
     }
     if (!nearest) break;
     unvisited.delete(nearest);
-    for (const edge of permitted) {
-      const id = otherside({ a: edge.from, b: edge.to }, nearest);
-      if (!id || !unvisited.has(id)) continue;
+    for (const edge of neighbors.get(nearest) ?? []) {
+      const id = edge.from === nearest ? edge.to : edge.from;
+      if (!unvisited.has(id)) continue;
       const units = nearestCost + edge.units;
       if (units < (routes.get(id)?.units ?? Infinity)) {
         routes.set(id, { units, legs: [...routes.get(nearest).legs, { ...edge, from: nearest, to: id }] });
@@ -228,13 +320,16 @@ function finishRoad(state, trip, kit) {
   const used = kit.goodsText(trip.meals);
   const travelText = trip.extraDays ? '腹中没了力气，沿路慢走了一程。'
     : trip.protection && state.satiety > 0 ? `裹紧${kit.nameOf(trip.protection)}的衣襟挡住风沙，这一程没那么耗力。` : '';
-  return { ...kit.say(state, `抵达${kit.records.regions[trip.destination].name}。${labels.length ? `这次走的是${labels.join('、')}。` : ''}${used ? `途中吃了${used}。` : ''}${travelText}`),
+  const destination = kit.records.regions[trip.destination].name;
+  const arrival = trip.backtrack ? `你沿着刚走过的路折回${destination}。` : `抵达${destination}。`;
+  return { ...kit.say(state, `${arrival}${labels.length && !trip.backtrack ? `这次走的是${labels.join('、')}。` : ''}${used ? `途中吃了${used}。` : ''}${travelText}`),
     ...(used ? { travelMeals: trip.meals } : {}) };
 }
 
 function walkRoad(state, kit) {
   const trip = state.roadTrip;
   trip.stop = null;
+  delete trip.afterBattle;
   while (trip.legIndex < trip.legs.length) {
     const leg = trip.legs[trip.legIndex];
     const { rate, protection } = legDiet(state, leg, kit);
@@ -273,7 +368,7 @@ export function continueRoad(state, kit) {
   if (!trip) return kit.refuse('你当前没有在路上。');
   if (state.combat) return kit.refuse('先处理眼前的对手。');
   const remaining = trip.legs.slice(trip.legIndex);
-  if (remaining.some(({ cross }) => cross)) {
+  if (!trip.backtrack && remaining.some(({ cross }) => cross)) {
     const provisions = remaining.reduce((cost, leg, i) => cost + (leg.units - (i === 0 ? trip.progress : 0))
       * transportRules.roadUnitDays * legDiet(state, leg, kit).rate, 0);
     if (roadFood(state, provisions, kit).deficit > 0) return kit.refuse('带的口粮还不够走完这段路。');
@@ -286,11 +381,11 @@ export function backFromRoad(state, kit) {
   if (!trip) return kit.refuse('你当前没有在路上。');
   if (state.combat) return kit.refuse('先处理眼前的对手。');
   const leg = trip.legs[trip.legIndex];
-  const { rate } = legDiet(state, { ...leg, from: leg.to, to: leg.from }, kit);
-  advanceRoad(state, trip, trip.progress * transportRules.roadUnitDays, rate, kit);
-  arrive(state, state.region, 0, kit);
-  state.roadTrip = null;
-  return kit.say(state, `你沿着刚走过的路折回${kit.records.regions[state.region].name}。`);
+  const returnLeg = { ...leg, from: leg.to, to: leg.from };
+  state.roadTrip = { ...trip, destination: returnLeg.to, legs: [returnLeg], legIndex: 0,
+    progress: leg.units - trip.progress, unitsWalked: 0, totalUnits: trip.progress,
+    reserve: 0, extraDays: 0, meals: {}, backtrack: true };
+  return walkRoad(state, kit);
 }
 
 export function roadTripView(state, kit) {
@@ -301,16 +396,20 @@ export function roadTripView(state, kit) {
     from: leg.from, fromName: kit.records.regions[leg.from].name, to: leg.to, toName: kit.records.regions[leg.to].name,
     key: leg.key, progress: trip.progress, legUnits: leg.units, unitsWalked: trip.unitsWalked, totalUnits: trip.totalUnits,
     remainingUnits: trip.totalUnits - trip.unitsWalked,
-    stop: trip.stop, backDays: trip.progress * transportRules.roadUnitDays };
+    stop: trip.stop, afterBattle: Boolean(trip.afterBattle), backDays: trip.progress * transportRules.roadUnitDays };
 }
 
 function gateQuote(state, id, kit, scroll) {
-  if (!detail(kit.data, id).portal || !state.world.gates.includes(id)) return '要先到那里点亮传送门。';
+  if (!marked(state, id) || !detail(kit.data, id).portal || !state.world.gates.includes(id)) return '要先到那里点亮传送门。';
   if (id === state.region) return '你已经在这处门旁。';
-  if (scroll) return kit.owns(state, 'gate_scroll') > 0 ? '' : '行囊里没有传送卷轴。';
-  if (!detail(kit.data, state.region).portal || !state.world.gates.includes(state.region)) return '先站到一座已经点亮的传送门旁。';
-  if (provinceOf(kit.data, id) !== provinceOf(kit.data, state.region)) return '普通传送门只能连到本州。';
-  if (state.coins < transportRules.gatePrice) return `还差${transportRules.gatePrice - state.coins}枚灵钱。`;
+  if (scroll) {
+    if (!kit.owns(state, 'gate_scroll')) return '行囊里没有传送卷轴。';
+  } else {
+    if (!detail(kit.data, state.region).portal || !state.world.gates.includes(state.region)) return '先站到一座已经点亮的传送门旁。';
+    if (provinceOf(kit.data, id) !== provinceOf(kit.data, state.region)) return '普通传送门只能连到本州。';
+  }
+  const price = scroll ? transportRules.scrollPrice : transportRules.gatePrice;
+  if (state.coins < price) return `还差${price - state.coins}枚灵钱。`;
   return '';
 }
 
@@ -325,7 +424,7 @@ function jumpGate(state, id, kit, scroll) {
   const reason = gateQuote(state, id, kit, scroll);
   if (reason) return kit.refuse(reason);
   if (scroll) kit.removeItem(state, 'gate_scroll', 1);
-  else state.coins -= transportRules.gatePrice;
+  state.coins -= scroll ? transportRules.scrollPrice : transportRules.gatePrice;
   arrive(state, id, scroll ? transportRules.scrollDays : transportRules.gateDays, kit, { clearEvent: true });
   return kit.say(state, scroll ? `卷轴化成灰。抬头已经到了${kit.records.regions[id].name}。` : `门框一亮，转眼已到${kit.records.regions[id].name}。`);
 }
@@ -589,6 +688,7 @@ export function worldView(state, kit) {
   const here = detail(kit.data, state.region);
   const discovered = kit.data.regions.filter((region) => marked(state, region.id));
   const edges = roadGraph(kit.data, { state });
+  const avoidedRoads = new Set(state.world.avoidedRoads);
   const routesFromHere = knownRoutes(state, edges);
   const journeys = discovered.flatMap((region) => {
     if (region.id === state.region) return [];
@@ -597,14 +697,33 @@ export function worldView(state, kit) {
     const via = (quote.legs ?? []).slice(0, -1).map(({ to }) => to);
     return quote.days === undefined ? [] :
       [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue),
-        units: quote.units, direct: Boolean(ordinary), via: via.map((id) => kit.records.regions[id].name), path: [state.region, ...via, region.id],
+        units: quote.units, direct: Boolean(ordinary && !isAvoidedRoad(ordinary, avoidedRoads)), via: via.map((id) => kit.records.regions[id].name), path: [state.region, ...via, region.id],
         meals: quote.meals, emptyOnArrival: quote.emptyOnArrival })];
   });
   const roads = journeys.filter((road) => road.direct || road.rescue);
-  const knownEdges = edges.filter(({ from, to }) => marked(state, from) && marked(state, to)).map((edge) => {
+  const neighbors = roadNeighbors(openKnownRoads(state, edges));
+  const roadStatus = (edge) => {
     const reason = crossBlocker(state, edge.cross);
+    const avoidReason = roadAvoidance(state, edge, neighbors);
+    return { available: !reason, reason, avoided: isAvoidedRoad(edge, avoidedRoads), canAvoid: !avoidReason, avoidReason };
+  };
+  const knownEdges = edges.filter(({ from, to }) => marked(state, from) && marked(state, to)).map((edge) => {
     const riskText = kit.roadRisk?.(state, edge)?.riskText;
-    return { ...edge, available: !reason, reason, ...(riskText ? { riskText } : {}) };
+    return { ...edge, ...roadStatus(edge), ...(riskText ? { riskText } : {}) };
+  });
+  const provinceNames = new Map((kit.data.provinces ?? []).map(({ id, name }) => [id, name]));
+  const knownProvinces = new Set([provinceOf(kit.data, state.region), ...discovered.map(({ id }) => provinceOf(kit.data, id))]);
+  const provinces = (kit.data.provinces ?? []).map((province) => ({ ...province, known: knownProvinces.has(province.id) }));
+  const crossLinks = edges.filter((edge) => edge.cross && !crossBlocker(state, edge.cross)).flatMap((edge) => {
+    const status = roadStatus(edge);
+    const riskText = kit.roadRisk?.(state, edge)?.riskText;
+    return [edge.from, edge.to].flatMap((from) => {
+      const other = from === edge.from ? edge.to : edge.from;
+      const province = provinceOf(kit.data, other);
+      if (!marked(state, from) || !knownProvinces.has(province)) return [];
+      return [{ from, province, name: provinceNames.get(province), key: edge.key, label: edge.label,
+        units: edge.units, ...(riskText ? { riskText } : {}), ...status }];
+    });
   });
   const roadsById = Object.fromEntries(journeys.map((road) => [road.id, road]));
   const closedSidePaths = crossings.filter((edge) => {
@@ -614,7 +733,8 @@ export function worldView(state, kit) {
   const gates = discovered.filter(({ id }) => state.world.gates.includes(id)).map((region) => {
     const scrollReason = gateQuote(state, region.id, kit, true);
     return targetSummary(region, kit.data, gateQuote(state, region.id, kit, false),
-      { days: transportRules.gateDays, price: transportRules.gatePrice, scrollDays: transportRules.scrollDays, byScroll: !scrollReason, scrollReason });
+      { days: transportRules.gateDays, price: transportRules.gatePrice, scrollDays: transportRules.scrollDays,
+        scrollPrice: transportRules.scrollPrice, byScroll: !scrollReason, scrollReason });
   });
   const arrays = discovered.filter(({ id }) => Boolean(arrayPlan(kit.data, id))).map((region) => targetSummary(region, kit.data, arrayQuote(state, region.id, kit),
     { days: transportRules.arrayDays, price: transportRules.arrayPrice, active: arrayView(state, region.id, kit).active }));
@@ -622,13 +742,15 @@ export function worldView(state, kit) {
     const { x, y, portal, array, description } = detail(kit.data, region.id);
     return { id: region.id, name: region.name, province: provinceOf(kit.data, region.id), x, y, description: description ?? region.desc,
       settlement: Boolean(settlementOf(kit.data, region.id)), portal: Boolean(portal), array: Boolean(array), attuned: state.world.gates.includes(region.id),
-      current: region.id === state.region, travelable: Boolean(roadsById[region.id]?.available) };
+      current: region.id === state.region, travelable: Boolean(roadsById[region.id]?.available),
+      travelReason: roadsById[region.id]?.reason ?? '还不知道从这里接上的路。' };
   });
   const affiliation = kit.data.sects?.find(({ id }) => state.world.affiliation === id);
   const credit = affiliation ? pledge(state, affiliation)?.credit ?? 0 : 0;
   return { settlement: settlementOf(kit.data, state.region), localMarket: localMarket(state, kit), sect: sectView(state, kit),
     affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit, disciple: discipleStanding(affiliation, credit) } : null,
-    world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, edges: knownEdges, journeys, crossings: closedSidePaths,
+    world: { province: provinceOf(kit.data, state.region), provinces, points, roads, edges: knownEdges, journeys,
+      crossings: closedSidePaths, crossLinks,
       here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: here.x, y: here.y, description: here.description ?? actual.desc },
       scrollCount: kit.owns(state, 'gate_scroll'), gates, localGate: here.portal ? { attuned: state.world.gates.includes(state.region) } : null,
       localArray: arrayView(state, state.region, kit), arrays } };
@@ -636,6 +758,7 @@ export function worldView(state, kit) {
 
 export function worldAction(state, action, payload, kit) {
   const { id, count = 1 } = payload;
+  if (action === 'roadAvoid') return toggleRoadAvoidance(state, id, kit);
   if (action === 'attuneGate') return attune(state, kit);
   if (action === 'gateJump') return jumpGate(state, id, kit, false);
   if (action === 'gateScroll') return jumpGate(state, id, kit, true);

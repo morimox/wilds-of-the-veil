@@ -1,7 +1,7 @@
 export const tournamentData = {
   id: 'waterline_trials', name: '守尺观大比', region: 'measuring_hall', site: 'zhao_terrace_arena',
   lead: 'body_breath_note', fee: 12, cooldown: 4, boutDays: 0.125,
-  desc: '傅澄说，来观里做客的人也能报名。比试有三场，每场打完可以先下台歇息，再来打下一场。',
+  desc: '傅澄说，来观里做客的人也能报名。擂台上双方不得用药饮食。每场打完至少歇半日，气血够一半才再点名。',
   matches: [
     { name: '第一场 · 试步法', enemy: 'terrace_stride', note: '陆黍拿着一把短木尺。他会贴着你走，用小步把你逼到红线边。' },
     { name: '第二场 · 防侧击', enemy: 'terrace_crossbeam', note: '田素功会先把尺横在胸前。你刚抬手，他就可能绕到侧面。' },
@@ -32,11 +32,11 @@ const enemies = [
 
 export const tournamentContent = {
   enemies,
-  sites: [{ id: tournamentData.site, region: tournamentData.region, name: '观内的红线擂台', protectedArena: true,
+  sites: [{ id: tournamentData.site, region: tournamentData.region, name: '观内的红线擂台', protectedArena: true, regulatedBout: true,
     reveal: { item: tournamentData.lead } }],
     events: [{ id: tournamentData.site, name: '观内的红线擂台', text: '台上画着三道红线，两侧坐着裁判。候场的人把木尺靠在名单旁，坐到长凳上绑护腕。',
     choices: [{ label: '问裁判怎么报名', days: 0.125,
-      outcome: '裁判指着桌上的名单。「报了名就等我们叫你上台。撑不住时敲一下台边的铜片，算认输，我们会让双方停手。」' }] }],
+      outcome: '裁判指着桌上的名单。「药和口粮都留在台下。撑不住就敲一下台边的铜片，我们叫停。两场之间至少歇半日。」' }] }],
   items: [{ id: 'tournament_citation', name: '大比头名帖', kind: 'key', price: 0, sell: 0,
     desc: '三场全胜才会拿到的名帖，上面有三位裁判的印和卫箬的签名。' }],
   arts: [{ id: 'terrace_reversing_stance', name: '架尺反击', tier: 3, cost: 5, power: 4, pierce: 3, guard: 6, break: 12,
@@ -58,11 +58,11 @@ function enrollmentBlocker(state, score) {
   return '';
 }
 
-function boutBlocker(state, match) {
+function boutBlocker(state, match, kit) {
   if (!atRegistration(state)) return occupied;
   if (!match) return '现在没有轮到你的比赛。';
   if (state.satiety <= 0) return '裁判见你空腹，先请你去吃些东西。';
-  return '';
+  return kit.regulatedBoutBlocker(state);
 }
 
 export function initialTournament() {
@@ -79,7 +79,7 @@ export function tournamentView(state, kit) {
   const canClaim = Boolean(claim && locationOpen);
   const claimFits = canClaim && kit.hasRoom(state, claim.reward);
   const enrollReason = score.enrolled ? '' : enrollmentBlocker(state, score);
-  const fightReason = score.enrolled ? boutBlocker(state, next) : '';
+  const fightReason = score.enrolled ? boutBlocker(state, next, kit) : '';
   return {
     ...score, name: tournamentData.name, desc: tournamentData.desc, fee: tournamentData.fee,
     cooldown: tournamentData.cooldown, matchCount: tournamentData.matches.length,
@@ -132,7 +132,7 @@ export function tournamentAction(state, action, kit) {
   }
   if (action === 'tournamentFight') {
     const match = score.enrolled && tournamentData.matches[score.wins];
-    const reason = boutBlocker(state, match);
+    const reason = boutBlocker(state, match, kit);
     if (reason) return kit.refuse(reason);
     kit.advance(state, tournamentData.boutDays);
     state.event = null;
@@ -142,7 +142,10 @@ export function tournamentAction(state, action, kit) {
   }
   if (action === 'tournamentWithdraw') {
     if (!score.enrolled) return kit.refuse('你现在没有报名。');
-    if (inMatch) kit.advance(state, tournamentData.boutDays);
+    if (inMatch) {
+      kit.advance(state, tournamentData.boutDays);
+      kit.setRegulatedBoutRecovery(state);
+    }
     state.combat = null;
     state.event = null;
     state.focus = 0;

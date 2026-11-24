@@ -168,8 +168,8 @@ scene('flood_market', 'zhao_float_goods', '三姓木码头', '船腹贴着木台
 scene('measuring_hall', 'zhao_bamboo_duel', '竹尺庭', '砖圈外的弟子喊了声「傅师父」。那人双脚没挪，竹尺一挑，滚到背后的石珠便落进他左手。他把珠子搁回窗台，示意你进来说话。', [
   { label: '问傅师父练尺时怎么站稳', days: 0.125, insight: 3, loot: { body_breath_note: 1 },
     outcome: '他把竹尺靠回台沿。「刚来的人先稳脚。」他教你从低木凳扶膝起身，再把沾了汗渍的讲义给你。「想学站得稳的法子，得先给庭里添一袋压脚石。」' },
-  { label: '进砖圈切磋', desc: '只要有人跪倒，圈外的弟子就会上前叫停。', days: 0.125, enemy: 'zhao_spar', outcome: '弟子把身后的木门合上。傅澄换了根没钉铜片的竹尺。' },
-], { once: [0], protectedArena: true, creatures: { zhao_spar: { start: 1, cap: 1, interval: 6, growth: 1 } },
+  { label: '进砖圈切磋', desc: '圈外执裁的弟子指了指长凳。「药和口粮留在场下。谁站不稳就叫停，下场至少歇半日，气血不到一半不再开打。」', days: 0.125, enemy: 'zhao_spar', outcome: '弟子把身后的木门合上。傅澄换了根没钉铜片的竹尺。' },
+], { once: [0], protectedArena: true, regulatedBout: true, creatures: { zhao_spar: { start: 1, cap: 1, interval: 6, growth: 1 } },
   creatureText: { zhao_spar: { present: '砖圈旁立着几根待客的竹尺。', absent: '砖圈已经扫净，竹尺收回架上。傅澄坐在廊下歇手。' } } });
 
 scene('frog_pond', 'zhao_frog_shelf', '浮萍边的浅水窝', '塘边的低石围出一口浅窝。沿外圈的踏脚石走，伸手便能碰到水边。', [

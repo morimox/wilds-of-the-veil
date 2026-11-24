@@ -21,13 +21,12 @@ function deny(state, action, payload = {}) {
   assert.deepEqual(state, before);
 }
 
-function equippedBags({ fold = false } = {}) {
+function equippedBag() {
   const state = createGame(331);
   state.knownItems.push('qiankun_pattern', 'qiankun_fold_pattern');
   state.economy.warehouse = { hide: 22, black_iron: 8, core: 12, foundation_core: 2 };
   state.coins = 180;
   play(state, 'econCraftBag', { id: bagId });
-  if (fold) play(state, 'econCraftBag', { id: foldId });
   return state;
 }
 
@@ -55,7 +54,7 @@ function fillMainWithRations(state) {
 }
 
 test('the extra bag holds separate stacks, trims an all-transfer, and rejects an exact overflow', () => {
-  const state = equippedBags();
+  const state = equippedBag();
   const capacity = bag(state).capacity;
   const slotSize = rules.backpackStackSize;
   assert.equal(view(state).backpackCapacity, 12);
@@ -89,32 +88,57 @@ test('the extra bag holds separate stacks, trims an all-transfer, and rejects an
   deny(state, 'econBagWithdraw', { bagId, id: 'wood', count: 'all' });
 });
 
-test('two actual bags stay independent and use, trading, and making still need items in hand', () => {
-  const state = equippedBags({ fold: true });
+test('independent bags can be exchanged without sharing contents; usable items still need to be in the pack', () => {
+  const state = equippedBag();
   state.inventory.wood = 3;
   state.inventory.reed = 2;
   state.knownItems.push('wood', 'reed');
   put(state, 'ration');
-  put(state, 'wood', 'all', foldId);
   assert.equal(heldInside(state, 'ration'), 3);
+  deny(state, 'econBagDeposit', { bagId, id: bagId, count: 1 });
+  deny(state, 'econCraftBag', { id: foldId });
+  deny(state, 'eat', { id: 'ration' });
+  play(state, 'econDeposit', { id: bagId, count: 1 });
+  play(state, 'econCraftBag', { id: foldId });
+  put(state, 'wood', 'all', foldId);
   assert.equal(heldInside(state, 'ration', foldId), 0);
-  assert.equal(heldInside(state, 'wood'), 0);
   assert.equal(heldInside(state, 'wood', foldId), 3);
   assert.equal(view(state).backpackCapacity, 12);
-  assert.equal(view(state).backpackUsed, 3);
-  deny(state, 'econBagDeposit', { bagId, id: foldId, count: 1 });
-  deny(state, 'econBagDeposit', { bagId, id: bagId, count: 1 });
-  deny(state, 'eat', { id: 'ration' });
+  assert.equal(view(state).backpackUsed, 2);
+  assert.match(view(state).economy.warehouse.stored.find((row) => row.id === bagId).reason, /已有一只乾坤袋/);
+  deny(state, 'econWithdraw', { id: bagId, count: 1 });
   deny(state, 'sell', { id: 'wood' });
   deny(state, 'craft', { id: 'r_reed_bow' });
 
-  pull(state, 'ration', 1);
-  play(state, 'eat', { id: 'ration' });
-  assert.equal(heldInside(state, 'ration'), 2);
   pull(state, 'wood', 1, foldId);
   play(state, 'craft', { id: 'r_reed_bow' });
   assert.equal(state.inventory.reed_bow, 1);
   assert.equal(heldInside(state, 'wood', foldId), 2);
+
+  play(state, 'econDeposit', { id: foldId, count: 1 });
+  play(state, 'econWithdraw', { id: bagId, count: 1 });
+  assert.equal(heldInside(state, 'wood'), 0);
+  pull(state, 'ration', 1);
+  play(state, 'eat', { id: 'ration' });
+  assert.equal(heldInside(state, 'ration'), 2);
+});
+
+test('ground pickups enforce the shared single-bag limit while leaving the other bag on the ground', () => {
+  const state = equippedBag();
+  put(state, 'ration');
+  play(state, 'discard', { id: bagId, count: 1 });
+  play(state, 'econCraftBag', { id: foldId });
+  assert.equal(view(state).groundPickup[bagId], 0);
+  assert.match(view(state).groundPickupReasons[bagId], /已有一只乾坤袋/);
+  deny(state, 'take', { id: bagId });
+  assert.equal(state.ground.village[bagId], 1);
+
+  play(state, 'discard', { id: foldId, count: 1 });
+  assert.equal(view(state).groundPickup[bagId], 1);
+  play(state, 'take', { id: bagId });
+  assert.equal(heldInside(state, 'ration'), 3);
+  deny(state, 'take', { id: foldId, count: 1 });
+  assert.equal(state.ground.village[foldId], 1);
 });
 
 test('making a bag in a full pack requires the carried materials to free a slot', () => {
@@ -136,7 +160,7 @@ test('making a bag in a full pack requires the carried materials to free a slot'
 });
 
 test('a bag keeps its contents through warehouse and ground storage and reserves its equipped-kind items', () => {
-  const state = equippedBags({ fold: true });
+  const state = equippedBag();
   state.inventory.qiankun_pattern = 1;
   state.reliefRations = state.inventory.ration;
   deny(state, 'econBagDeposit', { bagId, id: 'cudgel', count: 1 });
@@ -154,7 +178,7 @@ test('a bag keeps its contents through warehouse and ground storage and reserves
   deny(state, 'buy', { id: 'knife' });
 
   const warehouseCapacity = view(state).economy.warehouse.capacity;
-  state.economy.warehouse.hide = warehouseCapacity * economyData.warehouseStack;
+  state.economy.warehouse = { hide: warehouseCapacity * economyData.warehouseStack };
   deny(state, 'econDeposit', { id: bagId, count: 1 });
   state.economy.warehouse.hide -= economyData.warehouseStack;
   play(state, 'econDeposit', { id: bagId, count: 1 });
@@ -180,7 +204,7 @@ test('a bag keeps its contents through warehouse and ground storage and reserves
 });
 
 test('carried bag storage works in the field and stays closed while gathering or fighting', () => {
-  const state = equippedBags();
+  const state = equippedBag();
   state.inventory.wood = 2;
   put(state, 'wood', 1);
   play(state, 'travel', { id: 'marsh' });
@@ -213,7 +237,7 @@ test('carried bag storage works in the field and stays closed while gathering or
 });
 
 test('a trophy protected from falling can still be moved out of the pack', () => {
-  const state = equippedBags();
+  const state = equippedBag();
   const id = 'gully_king_blade';
   state.ground.village = { [id]: 1 };
   play(state, 'take', { id });
@@ -226,7 +250,7 @@ test('a trophy protected from falling can still be moved out of the pack', () =>
 });
 
 test('bandit robbery strips ordinary carried gear and leaves the bag and its contents intact', () => {
-  const state = equippedBags();
+  const state = equippedBag();
   state.inventory.knife = 1;
   state.durability.knife = 17;
   put(state, 'knife');
@@ -251,7 +275,7 @@ test('bandit robbery strips ordinary carried gear and leaves the bag and its con
 });
 
 test('an active manual has to stop before storage, and repacking preserves the learned rank', () => {
-  const state = equippedBags();
+  const state = equippedBag();
   const manual = 'eaves_breath_manual';
   state.realm = 3;
   state.inventory[manual] = 1;

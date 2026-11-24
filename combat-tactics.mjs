@@ -40,10 +40,11 @@ export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, rea
   const attack = available.find(({ kind }) => kind === 'attack') ?? available.find(({ kind }) => isAttack(kind));
   const heavy = previousKind === 'heavy' ? null : available.find(({ kind }) => kind === 'heavy');
   const strategy = Object.hasOwn(strategies, enemy.strategy) ? strategies[enemy.strategy] : null;
+  if (read?.kind === 'medicine' && charged) return heavy ?? attack;
 
   if (!strategy) {
     if (!read) return planned;
-    if (read.kind === 'focus' || read.kind === 'recover') return attack;
+    if (read.kind === 'focus' || read.kind === 'recover' || read.kind === 'medicine') return attack;
     if (planned.kind === 'guard' && read.kind !== 'strike') return attack;
     return planned;
   }
@@ -54,7 +55,7 @@ export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, rea
   const threat = incomingEstimate(enemy, guard ?? order.find(({ kind }) => kind === 'guard'), observedHits);
   const open = threat?.open ?? 0;
 
-  const safeWindow = ['brace', 'dodge', 'focus', 'recover', 'switch'].includes(read?.kind);
+  const safeWindow = ['brace', 'dodge', 'focus', 'recover', 'switch', 'medicine'].includes(read?.kind);
   const recentlyPassive = previousKind === 'guard' || recentlyRecovered || previousKind === 'focus';
   if (medicine?.hp > 0 && !recentlyRecovered && read?.kind !== 'retreat' &&
       (safeWindow || (threat && !recentlyPassive && open < hp))) {

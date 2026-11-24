@@ -327,6 +327,8 @@ function depositReason(state, id, count, kit, stored) {
 
 function withdrawalReason(state, id, count, kit) {
   if ((storedItems(state)[id] ?? 0) < count) return '仓库里没有这么多。';
+  const bagReason = kit.records.items[id].kind === 'container' ? containerCarryReason(state.inventory, count) : '';
+  if (bagReason) return bagReason;
   if (storageUnique(id, kit) && kit.owns(state, id)) return '行囊已有同样的物件。';
   if (!kit.hasRoom(state, { [id]: count })) return '行囊装不下。';
   return '';
@@ -353,6 +355,13 @@ function containerContents(state, bagId) {
 
 export function containerHasItem(state, id) {
   return Object.values(state.economy?.containers ?? {}).some(({ items }) => (items?.[id] ?? 0) > 0);
+}
+
+export function containerCarryReason(inventory, count = 1) {
+  if (containerPlans.some(({ id }) => (inventory[id] ?? 0) > 0)) {
+    return '行囊里已有一只乾坤袋，先把它存入仓库或放下。';
+  }
+  return count > 1 ? '行囊一次只能带一只乾坤袋。' : '';
 }
 
 function carriedContainerPlans(state, kit) {
@@ -610,7 +619,7 @@ function containerPlanReason(state, plan, kit) {
       Object.values(state.ground ?? {}).some((pile) => (pile[plan.id] ?? 0) > 0)) {
     return '这张样布已经用来缝过这只袋子。';
   }
-  return kit.homeRequirements(state, plan.cost, plan.need) ||
+  return containerCarryReason(state.inventory) || kit.homeRequirements(state, plan.cost, plan.need) ||
     (kit.hasRoom(state, { [plan.id]: 1 }, kit.homeBagSpend(state, plan.need)) ? '' : '先在行囊里腾出一格来收袋子。');
 }
 

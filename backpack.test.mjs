@@ -74,7 +74,7 @@ test('the leatherworker sews side pockets and makes a separate patterned bag, ch
   deny(state, 'econCraftBag', { id: 'qiankun_bag' });
 });
 
-test('separately known patterns can be crafted in any order and every bag takes its own pack slot', () => {
+test('separate patterns can be used in any order while only one finished bag fits in the pack', () => {
   const state = createGame(216);
   assert.equal(view(state).backpackCapacity, 12);
   state.ground.village = { qiankun_pattern: 1, qiankun_fold_pattern: 1, qiankun_inner_pattern: 1 };
@@ -85,16 +85,24 @@ test('separately known patterns can be crafted in any order and every bag takes 
   state.economy.warehouse = { hide: 38, black_iron: 16, core: 24, foundation_core: 2, gold_core: 2 };
   state.coins = 160;
   const bagIds = ['qiankun_fold_bag', 'qiankun_bag', 'qiankun_deep_bag'];
-  for (const [index, id] of bagIds.entries()) {
+  for (const id of bagIds) {
     play(state, 'econCraftBag', { id });
     assert.equal(state.inventory[id], 1);
     assert.equal(view(state).backpackCapacity, 12);
-    assert.equal(view(state).backpackUsed, index + 2);
+    assert.equal(view(state).backpackUsed, 2);
+    assert.deepEqual(view(state).economy.containers.map((bag) => bag.id), [id]);
     deny(state, 'econCraftBag', { id });
+    const anotherBag = bagIds.find((candidate) => candidate !== id && !state.economy.warehouse[candidate]);
+    if (anotherBag) {
+      assert.match(view(state).economy.containerPlans.find((plan) => plan.id === anotherBag).reason, /已有一只乾坤袋/);
+      deny(state, 'econCraftBag', { id: anotherBag });
+    }
+    play(state, 'econDeposit', { id, count: 1 });
+    assert.equal(view(state).backpackUsed, 1);
   }
   assert.equal(view(state).backpackName, '行囊');
-  assert.deepEqual(view(state).economy.containers.map(({ capacity }) => capacity).sort((a, b) => a - b), [16, 28, 44]);
-  assert.deepEqual(state.economy.warehouse, {});
+  assert.deepEqual(view(state).economy.containers, []);
+  assert.deepEqual(state.economy.warehouse, Object.fromEntries(bagIds.map((id) => [id, 1])));
   assert.equal(state.coins, 14);
   assert.equal(state.day, 7);
 });

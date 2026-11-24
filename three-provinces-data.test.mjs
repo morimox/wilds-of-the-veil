@@ -66,8 +66,11 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
     }
     if (tags.includes('human')) {
       assert.ok([...loot].every((key) => key === denSupplies[id]), id);
-      assert.ok(data.pills.some((item) => item.id === enemy.medicine?.id && item.tier <= tier), id);
-      assert.ok(enemy.medicine.count > 0 && enemy.strategy !== 'instinct', id);
+      assert.notEqual(enemy.strategy, 'instinct', id);
+      if (enemy.medicine) {
+        assert.ok(data.pills.some((item) => item.id === enemy.medicine.id && item.tier <= tier), id);
+        assert.ok(Number.isSafeInteger(enemy.medicine.count) && enemy.medicine.count > 0, id);
+      }
     } else assert.equal(enemy.medicine, undefined, id);
     const core = tier < 3 ? 'qi_core' : tier < 6 ? 'foundation_core' : 'gold_core';
     const hasThickArmor = tier >= 3 && (tags.includes('scaled') || tags.includes('stoneborn'));

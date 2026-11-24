@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { act, rules, view } from './engine.mjs';
 import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 import { data } from './data.mjs';
-import { transportRules } from './world.mjs';
+import { roadBanditRisk } from './bandits.mjs';
+import { roadGraph, transportRules } from './world.mjs';
 
 function play(state, action, payload) {
   const response = act(state, action, payload);
@@ -128,6 +129,96 @@ test('a known distant destination shows its intermediate roads and cannot skip a
   assert.equal(state.inventory.ration, 1);
   assert.ok(state.satiety >= 20);
   assert.deepEqual(state.eventsSeen, {});
+});
+
+test('marking a known edge red detours along the remaining shortest road and preserves connections', () => {
+  const state = createGame();
+  const edge = (id) => view(state).world.edges.find(({ key }) => key === id);
+  const journey = (id) => view(state).world.journeys.find((road) => road.id === id);
+  deniedWithoutChanges(state, 'roadAvoid', { id: 'pale_shoal|reed_meadows' }, /还没有/);
+  assert.equal(edge('marsh|village').canAvoid, false);
+  deniedWithoutChanges(state, 'roadAvoid', { id: 'marsh|village' }, /断开/);
+  walk(state, 'marsh');
+  assert.deepEqual(journey('pale_shoal').path, ['marsh', 'pale_shoal']);
+  const day = state.day;
+  assert.equal(edge('marsh|pale_shoal').canAvoid, true);
+  play(state, 'roadAvoid', { id: 'marsh|pale_shoal' });
+  assert.equal(edge('marsh|pale_shoal').avoided, true);
+  assert.deepEqual(journey('pale_shoal').path, ['marsh', 'reed_meadows', 'pale_shoal']);
+  play(state, 'roadAvoid', { id: 'marsh|reed_meadows' });
+  assert.equal(state.day, day);
+  const detour = journey('pale_shoal');
+  assert.deepEqual(detour.path, ['marsh', 'village', 'reed_meadows', 'pale_shoal']);
+  deniedWithoutChanges(state, 'roadAvoid', { id: 'pale_shoal|reed_meadows' }, /断开/);
+  walk(state, 'pale_shoal');
+  assert.equal(state.day - day, detour.days);
+  play(state, 'roadAvoid', { id: 'marsh|pale_shoal' });
+  assert.equal(edge('marsh|pale_shoal').avoided, false);
+  assert.deepEqual(journey('marsh').path, ['pale_shoal', 'marsh']);
+});
+
+test('secondary crossings follow the same permits and draw stubs without revealing remote landmarks', () => {
+  const state = createGame();
+  const points = () => view(state).world.points.map(({ id }) => id);
+  const stub = (key, from) => view(state).world.crossLinks.find((edge) => edge.key === key && edge.from === from);
+  const permit = (id) => {
+    state.knownItems.push(id);
+    play(state, 'wait');
+    state.inventory.ration = 20;
+  };
+  for (const id of ['marsh', 'pale_shoal']) walk(state, id);
+  assert.ok(points().includes('willow_post'));
+  assert.equal(stub('flood_market|willow_post', 'willow_post'), undefined);
+  assert.equal(view(state).world.provinces.find(({ id }) => id === 'zhaoyuan').known, false);
+  permit('ferry_manifest');
+  assert.equal(view(state).world.provinces.find(({ id }) => id === 'zhaoyuan').known, true);
+  assert.ok(points().includes('zhao_city'));
+  assert.ok(!points().includes('flood_market'));
+  assert.equal(stub('flood_market|willow_post', 'willow_post').name, '照原州');
+  assert.equal(stub('flood_market|willow_post', 'willow_post').canAvoid, false);
+  assert.equal(stub('flood_market|willow_post', 'willow_post').to, undefined);
+  walk(state, 'willow_post');
+  assert.ok(points().includes('flood_market'));
+  walk(state, 'flood_market');
+  walk(state, 'zhao_pass');
+  assert.ok(points().includes('rope_sands'));
+  assert.equal(stub('cinder_inn|rope_sands', 'rope_sands'), undefined);
+  permit('sand_writ');
+  assert.ok(!points().includes('cinder_inn'));
+  assert.equal(stub('cinder_inn|rope_sands', 'rope_sands').name, '鸣沙州');
+  walk(state, 'rope_sands');
+  assert.ok(points().includes('cinder_inn'));
+  walk(state, 'cinder_inn');
+  assert.equal(view(state).world.province, 'mingsha');
+});
+
+test('the shorter border edges stay safe and active while a secondary crossing can be marked', () => {
+  const passages = [
+    { from: 'ford', to: 'zhao_city', main: 'ford|zhao_city', alternate: 'flood_market|willow_post' },
+    { from: 'zhao_pass', to: 'mingsha_city', main: 'mingsha_city|zhao_pass', alternate: 'cinder_inn|rope_sands' },
+  ];
+  for (const { from, to, main, alternate } of passages) {
+    const state = createGame();
+    state.knownItems.push('ferry_manifest', 'sand_writ');
+    state.discovered.push(from, to, ...alternate.split('|'));
+    state.region = from;
+    state.inventory.ration = 20;
+    const short = roadGraph(data).find(({ key }) => key === main);
+    const hypothetical = { data: { roadBandits: { roads: [{ a: from, b: to, chance: 1 }] } } };
+    assert.equal(roadBanditRisk(state, short, hypothetical), null);
+    const world = () => view(state).world;
+    const stub = world().crossLinks.find(({ key, from: local }) => key === main && local === from);
+    assert.equal(stub.canAvoid, false);
+    assert.match(stub.avoidReason, /不能标红/);
+    deniedWithoutChanges(state, 'roadAvoid', { id: main }, /不能标红/);
+    play(state, 'roadAvoid', { id: alternate });
+    assert.equal(world().edges.find(({ key }) => key === alternate).avoided, true);
+    assert.deepEqual(world().journeys.find(({ id }) => id === to).path, [from, to]);
+    const roadSeed = state.roadSeed;
+    walk(state, to);
+    assert.equal(state.region, to);
+    assert.equal(state.roadSeed, roadSeed);
+  }
 });
 
 test('a cross-province passage consumes only the quoted meals and rejects an underprepared departure', () => {
@@ -301,7 +392,7 @@ test('an ordinary settlement can make the known scroll formula without using ano
   assert.equal(state.coins, 70 - recipe.cost);
 });
 
-test('a gate needs attunement, scrolls work from an idle scene, and the cheapest gate fare stays local', () => {
+test('a gate needs attunement, scrolls spend coins and a scroll in idle scenes, and the local gate spends only coins', () => {
   const state = createGame();
   state.coins = 40;
   state.inventory.gate_scroll = 2;
@@ -323,6 +414,7 @@ test('a gate needs attunement, scrolls work from an idle scene, and the cheapest
   assert.equal(view(state).world.localArray.active, false);
   play(state, 'gateScroll', { id: 'village' });
   assert.equal(state.world.lastSettlement, 'village');
+  assert.equal(state.coins, 38 - transportRules.scrollPrice);
   walk(state, 'marsh');
   play(state, 'visit', { id: 'reed_banks' });
   const date = state.day;
@@ -333,12 +425,17 @@ test('a gate needs attunement, scrolls work from an idle scene, and the cheapest
   assert.ok(gatheredTime > 0);
   assert.equal(state.event, 'reed_banks');
   const scrollTime = state.day;
+  const cash = state.coins;
+  state.coins = 0;
+  assert.equal(view(state).world.gates.find(({ id }) => id === 'zhao_city').byScroll, false);
+  deniedWithoutChanges(state, 'gateScroll', { id: 'zhao_city' }, /还差.*灵钱/);
+  state.coins = cash;
   play(state, 'gateScroll', { id: 'zhao_city' });
   assert.equal(state.day - scrollTime, transportRules.scrollDays);
   assert.equal(state.event, null);
   assert.equal(state.inventory.gate_scroll, undefined);
   assert.equal(state.region, 'zhao_city');
-  assert.equal(state.coins, 38);
+  assert.equal(state.coins, 38 - 2 * transportRules.scrollPrice);
   assert.equal(view(state).world.localArray.active, false);
 });
 

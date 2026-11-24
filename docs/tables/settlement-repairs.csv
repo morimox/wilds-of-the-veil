@@ -54,6 +54,8 @@
 落灯村（village）,落灯村工坊,leather_knuckles,缠皮指虎,0,4
 落灯村（village）,落灯村工坊,echo_knuckles,叩石指虎,0,15
 落灯村（village）,落灯村工坊,gully_king_blade,许涧的宽背刀,0,12
+落灯村（village）,落灯村工坊,bandit_ford_bell,裹布铜铃,0,12
+落灯村（village）,落灯村工坊,bandit_salt_boots,厚底踏砂靴,0,17
 照原城（zhao_city）,蒲霖的后炉,cudgel,枣木杖,2,5
 照原城（zhao_city）,蒲霖的后炉,knife,割苇短刀,2,7
 照原城（zhao_city）,蒲霖的后炉,split_axe,劈柴小钺,2,6
@@ -109,6 +111,8 @@
 照原城（zhao_city）,蒲霖的后炉,leather_knuckles,缠皮指虎,2,6
 照原城（zhao_city）,蒲霖的后炉,echo_knuckles,叩石指虎,2,17
 照原城（zhao_city）,蒲霖的后炉,gully_king_blade,许涧的宽背刀,2,14
+照原城（zhao_city）,蒲霖的后炉,bandit_ford_bell,裹布铜铃,2,14
+照原城（zhao_city）,蒲霖的后炉,bandit_salt_boots,厚底踏砂靴,2,19
 叩石院（sand_bell_cloister）,梁弦的外院修具台,cudgel,枣木杖,3,6
 叩石院（sand_bell_cloister）,梁弦的外院修具台,knife,割苇短刀,3,8
 叩石院（sand_bell_cloister）,梁弦的外院修具台,split_axe,劈柴小钺,3,7
@@ -164,3 +168,5 @@
 叩石院（sand_bell_cloister）,梁弦的外院修具台,leather_knuckles,缠皮指虎,3,7
 叩石院（sand_bell_cloister）,梁弦的外院修具台,echo_knuckles,叩石指虎,3,18
 叩石院（sand_bell_cloister）,梁弦的外院修具台,gully_king_blade,许涧的宽背刀,3,15
+叩石院（sand_bell_cloister）,梁弦的外院修具台,bandit_ford_bell,裹布铜铃,3,15
+叩石院（sand_bell_cloister）,梁弦的外院修具台,bandit_salt_boots,厚底踏砂靴,3,20

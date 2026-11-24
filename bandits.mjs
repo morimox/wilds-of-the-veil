@@ -13,7 +13,6 @@ export const banditRules = Object.freeze({
   fatalDefeatCap: 0.32,
   fatalChiefDefeat: 0.30,
   ignoreUnarmedChance: 0.65,
-  repeatEncounterFactors: Object.freeze([1, 0.10, 0.02]),
 });
 
 export const roadKey = (a, b) => [a, b].sort().join('|');
@@ -94,7 +93,7 @@ export function apparentBanditGrade(state, kit) {
 }
 
 export function roadBanditRisk(state, leg, kit) {
-  if (leg.cross?.ferry) return null;
+  if (leg.cross?.ferry || leg.cross?.guarded) return null;
   const profile = kit.data.roadBandits.roads.find(({ a, b }) => roadKey(a, b) === leg.key);
   if (!profile) return null;
   const crew = kit.data.roadBandits.crews[profile.crew];
@@ -119,11 +118,13 @@ export function roadBanditRisk(state, leg, kit) {
 }
 
 function pickBandit(state, grade, crewId, kit) {
-  const stages = banditRules.gearGradeOdds[grade].map((weight, index) => ({ index, weight }));
-  const stage = chooseWeighted(state, stages, ({ weight }) => weight).index;
   const crew = kit.data.roadBandits.crews[crewId];
-  return chooseWeighted(state, unresolvedBandit(crewId, crew, state).filter(({ tier }) => Math.floor(tier / 3) === stage),
-    ({ tier }) => [4, 3, 2][tier % 3]);
+  const roster = unresolvedBandit(crewId, crew, state);
+  const stages = banditRules.gearGradeOdds[grade].map((weight, index) => ({
+    weight, members: roster.filter(({ tier }) => Math.floor(tier / 3) === index),
+  })).filter(({ weight, members }) => weight > 0 && members.length);
+  const stage = chooseWeighted(state, stages, ({ weight }) => weight);
+  return stage && chooseWeighted(state, stage.members, ({ tier }) => [4, 3, 2][tier % 3]);
 }
 
 function roadStory(state, leg, crewId, grade, kit) {
@@ -167,10 +168,11 @@ function stopForBandit(state, leg, crewId, kit) {
 }
 
 export function checkRoadBanditStep(state, leg, index, kit) {
-  const profile = roadBanditRisk(state, leg, kit);
-  const prior = state.roadTrip.banditsMet?.length ?? 0;
-  const factor = banditRules.repeatEncounterFactors[Math.min(prior, banditRules.repeatEncounterFactors.length - 1)];
-  if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1) * factor) {
+  const risks = (state.roadTrip.banditRiskByLeg ??= {});
+  if (!Object.hasOwn(risks, leg.key)) risks[leg.key] = roadBanditRisk(state, leg, kit);
+  const profile = risks[leg.key];
+  const units = Math.min(1, leg.stepUnits ?? 1);
+  if (profile?.chance > 0 && draw(state) < 1 - (1 - profile.chance) ** units) {
     const roster = recruitsByNow(state, profile.crew, kit);
     if (roster) state.banditCrews[profile.crew] = roster;
     const pause = stopForBandit(state, leg, profile.crew, kit);
@@ -405,6 +407,7 @@ export function banditAction(state, action, { id, count = 1 }, kit) {
 
 export function winRoadBandit(state, enemy, kit) {
   const bandit = state.roadBandit;
+  state.roadTrip.afterBattle = true;
   const story = storyOf(state, kit);
   const pool = kit.data.roadBandits.pools.find(({ enemy: id }) => id === enemy.id);
   const recovered = recoverBanditSpoils(state, null, kit);

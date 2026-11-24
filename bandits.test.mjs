@@ -93,11 +93,16 @@ test('interrupted progress resumes after the exact step; returning revisits only
   assert.equal(state.roadTrip.stop, 'road:marsh|ridge:2');
   assert.equal(state.region, 'ridge');
   assert.equal(state.day, day + 1.25);
-  assert.ok(backFromRoad(state, kit).ok);
+  const turnBack = backFromRoad(state, kit);
+  assert.equal(turnBack.roadInterrupted, true);
+  assert.equal(state.roadTrip.stop, 'road:marsh|ridge:2');
+  assert.equal(state.roadTrip.destination, 'ridge');
+  assert.equal(state.day, day + 1.5);
+  assert.ok(continueRoad(state, kit).ok);
   assert.equal(state.region, 'ridge');
   assert.equal(state.roadTrip, null);
   assert.equal(state.day, day + 1.75);
-  assert.deepEqual(checked.slice(3).map(([, index]) => index), [3, 2]);
+  assert.deepEqual(checked.slice(3).map(([, index]) => index), [3, 2, 2, 3]);
 });
 
 test('an unlocked fractional shortcut uses the same cache positions in both directions', () => {
@@ -148,6 +153,9 @@ const roadPolicyKit = { data, records: { gear: allGear },
     Object.values(state.siteVictories[id] ?? {}).reduce((sum, won) => sum + won, 0),
   activeGear: (state) => Object.values(state.equipment).filter((id) => state.durability[id] > 0).map((id) => allGear[id]) };
 const riskyLeg = { key: 'marsh|ridge' };
+const banditStepKit = { ...roadPolicyKit, records: {
+  ...roadPolicyKit.records, enemies: Object.fromEntries(data.enemies.map((enemy) => [enemy.id, enemy])),
+}, groundAt: () => ({}), say: (_state, message) => ({ ok: true, message }) };
 
 function seedWith(...limits) {
   for (let seed = 0; seed < 100000; seed++) {
@@ -169,26 +177,32 @@ function interrupted({ fixed = true } = {}) {
   return state;
 }
 
-test('a walk keeps its first-encounter risk and sharply reduces each further encounter', () => {
-  const kit = { ...roadPolicyKit, records: {
-    ...roadPolicyKit.records, enemies: Object.fromEntries(data.enemies.map((enemy) => [enemy.id, enemy])),
-  }, groundAt: () => ({}), say: (_state, message) => ({ ok: true, message }) };
+test('each full road unit uses the same threshold regardless of earlier encounters', () => {
   const leg = { ...riskyLeg, stepUnits: 1 };
-  const rolls = [
-    { seed: 2023, hit: [true, false, false] }, // First draw: 2.01%
-    { seed: 1977, hit: [true, true, false] },  // First draw: 0.23%
-    { seed: 1972, hit: [true, true, true] },   // First draw: 0.032%
-  ];
-  for (const { seed, hit } of rolls) {
-    for (const [prior, shouldStop] of hit.entries()) {
+  for (const [seed, shouldStop] of [[2023, true], [2075, false]]) {
+    for (const prior of [0, 1, 2, 4]) {
       const state = traveler('marsh', ['ridge']);
       state.resolvedBandits.push('road_slate_peg');
       state.roadSeed = seed;
       state.roadTrip = { banditsMet: Array.from({ length: prior }, (_, i) => `already-met-${i}`) };
-      assert.equal(Boolean(checkRoadBanditStep(state, leg, 1, kit)?.roadInterrupted), shouldStop);
+      assert.equal(Boolean(checkRoadBanditStep(state, leg, 1, banditStepKit)?.roadInterrupted), shouldStop);
       assert.equal(state.roadTrip.banditsMet.length, prior + Number(shouldStop));
     }
   }
+});
+
+test('an entered edge keeps its threshold until the player starts a new crossing', () => {
+  const state = traveler('marsh', ['ridge']);
+  state.resolvedBandits.push('road_slate_peg');
+  state.roadTrip = {};
+  state.roadSeed = 2075;
+  assert.equal(checkRoadBanditStep(state, riskyLeg, 1, banditStepKit), null);
+  const defeated = Array.from({ length: 16 }, (_, index) => `0:${index}`);
+  state.banditCrews.grey_gully = { encounters: 0, defeated };
+  assert.ok(roadBanditRisk(state, riskyLeg, banditStepKit).chance < 0.020);
+  state.roadSeed = 2023;
+  assert.ok(checkRoadBanditStep(state, riskyLeg, 2, banditStepKit)?.roadInterrupted);
+  assert.equal(state.roadTrip.banditRiskByLeg[riskyLeg.key].chance, 0.027);
 });
 
 test('village paths, guarded city roads, ferries and teleport scrolls do not roll a road encounter', () => {
@@ -356,11 +370,11 @@ test('helping the wounded road bandit teaches the manual once and the den leader
   assert.equal(state.inventory.salve, undefined);
   assert.equal(state.inventory.road_sleeve_manual, 1);
   assert.equal(act(state, 'banditPlot', { id: 'bind_road_arm' }).ok, false);
-  assert.equal(roadBanditRisk(state, riskyLeg, roadPolicyKit).chance, 0.055);
+  assert.equal(roadBanditRisk(state, riskyLeg, roadPolicyKit).chance, 0.027);
   const den = data.sites.find(({ id }) => id === 'bandit_slope_den');
   state.siteVictories[den.id] = { bandit_den_scout: 1 };
   const firstChance = roadBanditRisk(state, riskyLeg, roadPolicyKit).chance;
-  assert.ok(firstChance < 0.055 && firstChance > 0.052);
+  assert.ok(firstChance < 0.027 && firstChance > 0.025);
   state.siteVictories[den.id].bandit_den_leader = 1;
   assert.equal(roadBanditRisk(state, riskyLeg, roadPolicyKit).chance, 0);
 });
@@ -393,6 +407,14 @@ test('attacking bandits block escape and make their normal strike; known opening
   state.combat.plan.intent = { kind: 'guard', name: '横刀护身' };
   const opportunity = view(state).retreatRisk;
   assert.ok(opportunity.chance > 0 && opportunity.chance < 0.13);
+  const interruptedReturn = structuredClone(state);
+  interruptedReturn.roadSeed = seedWith(0.035, 0.75, 0.4);
+  const chased = act(interruptedReturn, 'retreat');
+  assert.equal(chased.retreated, true);
+  assert.equal(chased.roadInterrupted, true);
+  assert.equal(interruptedReturn.roadTrip.destination, 'marsh');
+  assert.ok(interruptedReturn.roadBandit);
+  assert.doesNotMatch(chased.message, /沿着刚走过的路折回/);
   const success = act(state, 'retreat');
   assert.equal(success.retreated, true);
   assert.equal(state.roadTrip, null);
@@ -400,21 +422,26 @@ test('attacking bandits block escape and make their normal strike; known opening
   assert.equal(state.region, 'marsh');
 });
 
-test('road battle rewards stay at one reversible roadside coordinate and never become free duplicates', () => {
+test('a road win pauses for manual pickups, medicine and a change of gear at that roadside coordinate', () => {
   const state = interrupted({ fixed: false });
   const coordinate = state.roadTrip.stop;
   state.realm = 8;
-  state.hp = 110;
+  state.hp = 75;
+  state.inventory.salve = 1;
   state.inventory.iron_sword = 1;
   state.equipment.weapon = 'iron_sword';
   state.durability.iron_sword = 38;
   state.banditLootSeed = 3;
   assert.ok(act(state, 'banditFight').ok);
+  const combat = structuredClone(state);
+  assert.match(act(state, 'combatEquip', { id: 'cudgel' }).message, /交手中不能换装备/);
+  assert.deepEqual(state, combat);
   let win;
   for (let i = 0; state.combat && i < 8; i++) win = act(state, 'attack');
   assert.ok(!state.combat);
   assert.ok(win.roadCoins > 0);
   assert.equal(state.roadTrip.stop, coordinate);
+  assert.equal(view(state).roadTrip.afterBattle, true);
   assert.equal(state.roadBandit, null);
   assert.deepEqual(view(state).groundLoot, { knife: 1 });
   for (const [id, amount] of Object.entries(view(state).groundLoot)) {
@@ -422,7 +449,21 @@ test('road battle rewards stay at one reversible roadside coordinate and never b
     assert.equal(amount, 1);
     assert.ok(act(state, 'take', { id }).ok);
   }
+  const day = state.day;
+  const wounds = state.hp;
+  assert.ok(act(state, 'use', { id: 'salve' }).ok);
+  assert.ok(state.hp > wounds);
+  assert.equal(state.inventory.salve, undefined);
+  assert.ok(act(state, 'equip', { id: 'knife' }).ok);
+  assert.equal(state.equipment.weapon, 'knife');
+  assert.equal(state.day, day);
+  assert.equal(state.roadTrip.stop, coordinate);
+  assert.equal(view(state).roadTrip.afterBattle, true);
   assert.equal(act(state, 'banditFight').ok, false);
+  state.roadSeed = 172102;
+  assert.ok(act(state, 'roadContinue').ok);
+  assert.equal(state.region, 'ridge');
+  assert.equal(view(state).roadTrip, null);
 });
 
 test('clearing a draft, negotiating separately, or fighting leaves the unconfirmed toll in hand', () => {

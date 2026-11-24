@@ -17,6 +17,8 @@ const offers = [
     desc: '「这丹入口苦，你若接着用术法，打出去就更有劲。」' },
   { id: 'formula_resin', recipe: 'r_resin_pill', name: '温枝丸丹方', price: 28, reveal: 'kiln_manual',
     desc: '安蒲比了比你带回的火候牌。石谷人会把炉口盖住，让小火慢慢把药温透。到炼气中期才能服用。' },
+  { id: 'formula_sense', recipe: 'r_sense_powder', name: '凝神散丹方', price: 22, reveal: 'phase_chart',
+    desc: '安蒲看过滴水图，从案下抽出一页抄方。「照原教人闭眼观水。我曾替他们配过这味药。用神识用得眼花时，把细末含在舌下，等一等就能缓过来。」' },
   { id: 'formula_return_breath', recipe: 'r_return_breath', name: '归元丹方', price: 38, reveal: 'fault_receipt',
     desc: '安蒲用两只碗照旧约的画法分水。「一枚金丹妖丹能炼三颗。赶远路连打几阵，气跟不上时吃一颗。」' },
 ];

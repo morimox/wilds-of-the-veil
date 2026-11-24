@@ -112,6 +112,12 @@ test('an outer bank provides range while an ambush or cave removes it', () => {
   hunt(hunter, 'vine_pond', 0);
   assert.equal(hunter.combat.id, 'vine_stag');
   assert.equal(view(hunter).openingShotPossible, true);
+  const missedShot = structuredClone(hunter);
+  missedShot.enemyEvadeSeed = 1972;
+  const missed = play(missedShot, 'attack');
+  assert.match(missed.message, /侧身闪过/);
+  assert.ok(missed.damageTaken > 0);
+  hunter.enemyEvadeSeed = 0;
   assert.equal(play(hunter, 'attack').damageTaken, 0);
   play(gatherer, 'visit', { id: 'vine_pond' });
   play(gatherer, 'beginGather', { index: 2 });

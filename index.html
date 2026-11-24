@@ -47,6 +47,7 @@ h3 { font-size: 15px; }
   border-radius: 10px;
   background: var(--surface);
 }
+.layout:has(.atlas-view) { width: min(1030px, calc(100% - 32px)); }
 .travel-column, .kit { min-width: 0; }
 .topbar { display: flex; align-items: center; gap: 12px; }
 .clock { margin-left: auto; color: var(--muted); font-size: 13px; }
@@ -101,6 +102,8 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .road-position { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; padding: 0 0 7px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 .road-position strong { color: var(--jade); font-weight: 600; }
 .road-position small { font-size: inherit; }
+.road-aftermath { margin: 8px 0 12px; }
+.road-aftermath > .fine { margin-top: 6px; }
 .road-demand { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; margin-top: 10px; color: var(--amber); }
 .road-draft { margin-top: 10px; padding: 8px 0 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
 .road-surrender { margin-top: 4px; }
@@ -215,6 +218,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .ground-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 3px 5px; padding: 3px 0; }
 .ground-row + .ground-row { border-top: 1px solid var(--line); }
 .ground-row > .button { min-height: 32px; padding: 3px 7px; font-size: 13px; }
+.ground-reason { grid-column: 1 / -1; }
 .card p { margin-top: 3px; }
 .local-incident { padding: 10px 0; margin: 8px 0; border-block: 1px solid var(--line); }
 .local-incident .actions { margin-top: 8px; }
@@ -259,7 +263,60 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .sense .meter-track { height: 3px; margin: 2px 0 0; }
 .sense .meter-track i { background: #a8c6dc; }
 .crossing { margin-top: 7px; }
-.atlas-tabs { margin-bottom: 8px; }
+.atlas-overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 2px;
+  aspect-ratio: 2.13;
+  min-height: 156px;
+  padding: 9px 5px;
+  border: 1px solid #526857;
+  border-radius: 7px;
+  background: radial-gradient(ellipse at 48% 64%, #283f39 5%, #182a27 72%);
+}
+.atlas-province {
+  position: relative;
+  isolation: isolate;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  color: #e3eee1;
+  background: transparent;
+  font-size: clamp(15px, 2.65vw, 25px);
+  cursor: pointer;
+}
+.atlas-province::before, .atlas-province::after {
+  position: absolute;
+  z-index: -1;
+  inset: 6% 0;
+  clip-path: var(--province-outline);
+  content: "";
+}
+.atlas-province::before { background: #809b83; }
+.atlas-province::after {
+  inset: 6% 0;
+  transform: scale(.974);
+  background: repeating-linear-gradient(157deg, #e9eddb07 0 1px, transparent 2px 10px), var(--province-fill);
+}
+.atlas-province-wuliang {
+  --province-outline: polygon(1% 42%, 13% 29%, 19% 26%, 27% 9%, 40% 14%, 48% 7%, 60% 14%, 72% 12%, 81% 25%, 91% 26%, 96% 38%, 90% 49%, 99% 59%, 88% 69%, 89% 81%, 72% 89%, 58% 85%, 44% 95%, 35% 90%, 21% 87%, 18% 74%, 7% 70%, 13% 57%);
+  --province-fill: radial-gradient(ellipse at 38% 32%, #48665a 0%, #263f37 68%);
+}
+.atlas-province-zhaoyuan {
+  --province-outline: polygon(1% 39%, 9% 32%, 18% 36%, 29% 19%, 43% 22%, 54% 12%, 68% 17%, 77% 25%, 91% 22%, 98% 36%, 89% 47%, 99% 59%, 92% 71%, 77% 75%, 75% 87%, 56% 91%, 49% 83%, 33% 89%, 21% 82%, 7% 84%, 4% 70%, 12% 58%, 3% 50%);
+  --province-fill: radial-gradient(ellipse at 36% 37%, #50643f 0%, #354833 66%);
+}
+.atlas-province-mingsha {
+  --province-outline: polygon(3% 35%, 14% 23%, 25% 25%, 34% 16%, 50% 21%, 60% 7%, 71% 13%, 85% 10%, 97% 23%, 91% 37%, 99% 49%, 90% 59%, 93% 72%, 81% 79%, 70% 89%, 58% 84%, 49% 91%, 39% 84%, 31% 74%, 16% 79%, 13% 68%, 5% 61%, 10% 50%);
+  --province-fill: radial-gradient(ellipse at 70% 33%, #6b5940 0%, #423c30 74%);
+}
+.atlas-province:hover::before, .atlas-province:focus-visible::before { background: #e1edc3; }
+.atlas-province:hover::after, .atlas-province:focus-visible::after { filter: brightness(1.2); }
+.atlas-province[aria-current="location"] { color: #f4f4be; font-weight: 600; }
+.atlas-province[aria-current="location"]::before { background: #c5d9a2; }
+.atlas-province span { text-shadow: 0 1px 5px #111f1a; }
+.atlas-up { white-space: nowrap; }
 .atlas-map {
   position: relative;
   isolation: isolate;
@@ -275,8 +332,40 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 }
 .atlas-zhaoyuan { background-color: #273d35; }
 .atlas-mingsha { background-color: #413b2b; }
-.atlas-road { position: absolute; z-index: -1; left: var(--x); top: var(--y); width: var(--length); border-top: 1px dashed #aec2a080; transform: rotate(var(--angle)); transform-origin: left center; }
-.atlas-road.chosen { border-top: 2px solid #e6c48d; }
+.atlas-road {
+  position: absolute;
+  z-index: 0;
+  left: var(--x);
+  top: var(--y);
+  width: var(--length);
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  transform: translateY(-50%) rotate(var(--angle));
+  transform-origin: left center;
+  cursor: pointer;
+}
+.atlas-road > i { display: block; min-width: 0; border-top: 1px solid #b4c6ada3; pointer-events: none; }
+.atlas-road.cross > i { border-style: dashed; border-color: #a7c8cc; }
+.atlas-road.cross > i::after {
+  position: absolute; right: 0; top: 50%; width: 5px; height: 5px;
+  transform: translateY(-50%) rotate(45deg); border-top: 1px solid; border-right: 1px solid;
+  color: #a7c8cc; content: "";
+}
+.atlas-road.closed > i { opacity: .55; border-style: dotted; }
+.atlas-road.chosen > i { border: 1px solid #f2cf95; }
+.atlas-road.avoided > i { border: 1px solid #f48d7f; }
+.atlas-road.avoided > i::after { color: #f48d7f; }
+.atlas-road:hover, .atlas-road:focus-visible, .atlas-road[aria-pressed="true"] { z-index: 1; background: #d1e2c32e; }
+.atlas-road[aria-pressed="true"] > i { box-shadow: 0 0 0 2px #e4e8d076; }
+.atlas-cross-label {
+  position: absolute; z-index: 1; left: var(--x); top: var(--y);
+  padding: 1px 4px; border-radius: 3px; background: #16282be8; color: #c3e3e4;
+  font-size: 11px; white-space: nowrap; transform: translate(-50%, -50%); pointer-events: none;
+}
+.atlas-cross-label.avoided { color: #ffc2b3; }
 .atlas-mark { position: absolute; left: var(--x); top: var(--y); display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #dbe6d5; transform: translate(-50%, -50%); cursor: pointer; }
 .atlas-mark:hover, .atlas-mark:focus-visible, .atlas-mark[aria-pressed="true"] { z-index: 2; }
 .atlas-dot { width: 8px; height: 8px; border-radius: 50%; background: #b3c5ad; box-shadow: 0 0 0 2px #213b2e; }
@@ -288,8 +377,16 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .atlas-mark.here .atlas-label, .atlas-mark.town .atlas-label, .atlas-mark:hover .atlas-label, .atlas-mark:focus-visible .atlas-label, .atlas-mark[aria-pressed="true"] .atlas-label { display: block; }
 .atlas-place { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; }
 .atlas-place > p, .atlas-place > .actions { grid-column: 1 / -1; }
-.atlas-index { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
-.atlas-index .actions { margin-top: 6px; }
+.atlas-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 0 0 10px; }
+.atlas-tools > details[open] { grid-column: 1 / -1; }
+.atlas-tools > details[open] + details:not([open]), .atlas-tools:has(details:last-child[open]) > details:first-child:not([open]) { grid-column: 1 / -1; }
+.atlas-tools summary { color: var(--jade); cursor: pointer; }
+.atlas-tools .actions { margin-top: 6px; }
+.atlas-tools button[aria-pressed="true"] { border-color: #849e89; background-color: #2a3a2f; }
+.atlas-road-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 190px; margin-top: 6px; overflow-y: auto; }
+.atlas-road-list button { text-align: left; }
+.atlas-road-detail { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 7px; align-items: center; padding: 6px 8px; margin: 0 0 10px; border: 1px solid var(--line); border-radius: 5px; }
+.atlas-road-reason { grid-column: 1 / -1; }
 .atlas-local { margin-top: 13px; padding-top: 9px; border-top: 1px solid var(--line); }
 .array-row { display: grid; grid-template-columns: minmax(6em, 1fr) auto auto; align-items: center; gap: 4px 7px; padding: 5px 0; }
 .array-row b { color: var(--muted); font-size: 13px; font-weight: normal; }
@@ -353,7 +450,7 @@ dialog::backdrop { background: #08100bd1; }
 .dialog-head button, .text-danger { color: var(--red); background: transparent; border: 1px solid #654e44; border-radius: 5px; padding: 4px 8px; cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 610px) {
-  .layout { grid-template-columns: minmax(0, 1fr); width: calc(100% - 24px); margin: 12px; padding: 13px; gap: 14px; }
+  .layout, .layout:has(.atlas-view) { grid-template-columns: minmax(0, 1fr); width: calc(100% - 24px); margin: 12px; padding: 13px; gap: 14px; }
   .kit { padding: 12px 0 0; border-width: 1px 0 0; border-style: solid; border-color: var(--line); }
   .button, .navigation button, .item-trigger { min-height: 38px; }
   .ground-row > .button { min-height: 38px; }
@@ -497,7 +594,7 @@ dialog::backdrop { background: #08100bd1; }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=32" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=33" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -535,7 +632,8 @@ dialog::backdrop { background: #08100bd1; }
     <div class="dialog-head"><h2 id="guide-title">行旅菜单</h2><button type="button" data-close aria-label="关闭菜单">×</button></div>
     <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习进度</button></div>
     <details class="guide-topic"><summary>赶路与补给</summary>
-      <p class="fine">在山河图上查已知去路和里程。快空腹时先吃些口粮，负伤可以到歇脚处休息。</p>
+      <p class="fine">在总图上点州名，进州图查看已知地点和里程。点一条路可避开或恢复，避开后会另算去路。</p>
+      <p class="fine">快空腹时先吃些口粮，负伤可以到歇脚处休息。</p>
     </details>
     <details class="guide-topic"><summary>交手与脱身</summary>
       <p class="fine">看清对方来招时，可以据此出手或防御。要撤退，尽量等对方收招的空当。</p>
@@ -1050,8 +1148,8 @@ scene('flood_market', 'zhao_float_goods', '三姓木码头', '船腹贴着木台
 scene('measuring_hall', 'zhao_bamboo_duel', '竹尺庭', '砖圈外的弟子喊了声「傅师父」。那人双脚没挪，竹尺一挑，滚到背后的石珠便落进他左手。他把珠子搁回窗台，示意你进来说话。', [
   { label: '问傅师父练尺时怎么站稳', days: 0.125, insight: 3, loot: { body_breath_note: 1 },
     outcome: '他把竹尺靠回台沿。「刚来的人先稳脚。」他教你从低木凳扶膝起身，再把沾了汗渍的讲义给你。「想学站得稳的法子，得先给庭里添一袋压脚石。」' },
-  { label: '进砖圈切磋', desc: '只要有人跪倒，圈外的弟子就会上前叫停。', days: 0.125, enemy: 'zhao_spar', outcome: '弟子把身后的木门合上。傅澄换了根没钉铜片的竹尺。' },
-], { once: [0], protectedArena: true, creatures: { zhao_spar: { start: 1, cap: 1, interval: 6, growth: 1 } },
+  { label: '进砖圈切磋', desc: '圈外执裁的弟子指了指长凳。「药和口粮留在场下。谁站不稳就叫停，下场至少歇半日，气血不到一半不再开打。」', days: 0.125, enemy: 'zhao_spar', outcome: '弟子把身后的木门合上。傅澄换了根没钉铜片的竹尺。' },
+], { once: [0], protectedArena: true, regulatedBout: true, creatures: { zhao_spar: { start: 1, cap: 1, interval: 6, growth: 1 } },
   creatureText: { zhao_spar: { present: '砖圈旁立着几根待客的竹尺。', absent: '砖圈已经扫净，竹尺收回架上。傅澄坐在廊下歇手。' } } });
 
 scene('frog_pond', 'zhao_frog_shelf', '浮萍边的浅水窝', '塘边的低石围出一口浅窝。沿外圈的踏脚石走，伸手便能碰到水边。', [
@@ -1664,7 +1762,7 @@ const enemies = [
   { id: 'sand_sundial_master', name: '照壁刀师邢既横', tags: ['human'], tier: 8, hp: 128, atk: 25, def: 10, insight: 13,
     intents: [{ name: '沿石壁拖刀逼近', kind: 'attack', mult: 1 }, { name: '横刀顺气', kind: 'guard', mult: 1.48 },
       { name: '从墙角里猛挥一刀', kind: 'heavy', mult: 1.6 }, { name: '连拖三步', kind: 'drain', mult: 0.7 }, { name: '借石光从下往上挑刀', kind: 'attack', mult: 1.15 }],
-    loot: {}, desc: '刀刃借石壁返光藏住一半。看清他从墙角横挥的那刀再架招，石门边仍有一线退路。' },
+    loot: {}, desc: '刀刃借石壁返光藏住一半。他收刀时，腰间的几只窄口药瓶轻轻相碰。石门边仍有退路。' },
 ];
 
 const sects = [
@@ -2035,7 +2133,7 @@ const { tournamentContent, tournamentData, initialTournament, tournamentView, to
 const tournamentData = {
   id: 'waterline_trials', name: '守尺观大比', region: 'measuring_hall', site: 'zhao_terrace_arena',
   lead: 'body_breath_note', fee: 12, cooldown: 4, boutDays: 0.125,
-  desc: '傅澄说，来观里做客的人也能报名。比试有三场，每场打完可以先下台歇息，再来打下一场。',
+  desc: '傅澄说，来观里做客的人也能报名。擂台上双方不得用药饮食。每场打完至少歇半日，气血够一半才再点名。',
   matches: [
     { name: '第一场 · 试步法', enemy: 'terrace_stride', note: '陆黍拿着一把短木尺。他会贴着你走，用小步把你逼到红线边。' },
     { name: '第二场 · 防侧击', enemy: 'terrace_crossbeam', note: '田素功会先把尺横在胸前。你刚抬手，他就可能绕到侧面。' },
@@ -2066,11 +2164,11 @@ const enemies = [
 
 const tournamentContent = {
   enemies,
-  sites: [{ id: tournamentData.site, region: tournamentData.region, name: '观内的红线擂台', protectedArena: true,
+  sites: [{ id: tournamentData.site, region: tournamentData.region, name: '观内的红线擂台', protectedArena: true, regulatedBout: true,
     reveal: { item: tournamentData.lead } }],
     events: [{ id: tournamentData.site, name: '观内的红线擂台', text: '台上画着三道红线，两侧坐着裁判。候场的人把木尺靠在名单旁，坐到长凳上绑护腕。',
     choices: [{ label: '问裁判怎么报名', days: 0.125,
-      outcome: '裁判指着桌上的名单。「报了名就等我们叫你上台。撑不住时敲一下台边的铜片，算认输，我们会让双方停手。」' }] }],
+      outcome: '裁判指着桌上的名单。「药和口粮都留在台下。撑不住就敲一下台边的铜片，我们叫停。两场之间至少歇半日。」' }] }],
   items: [{ id: 'tournament_citation', name: '大比头名帖', kind: 'key', price: 0, sell: 0,
     desc: '三场全胜才会拿到的名帖，上面有三位裁判的印和卫箬的签名。' }],
   arts: [{ id: 'terrace_reversing_stance', name: '架尺反击', tier: 3, cost: 5, power: 4, pierce: 3, guard: 6, break: 12,
@@ -2092,11 +2190,11 @@ function enrollmentBlocker(state, score) {
   return '';
 }
 
-function boutBlocker(state, match) {
+function boutBlocker(state, match, kit) {
   if (!atRegistration(state)) return occupied;
   if (!match) return '现在没有轮到你的比赛。';
   if (state.satiety <= 0) return '裁判见你空腹，先请你去吃些东西。';
-  return '';
+  return kit.regulatedBoutBlocker(state);
 }
 
 function initialTournament() {
@@ -2113,7 +2211,7 @@ function tournamentView(state, kit) {
   const canClaim = Boolean(claim && locationOpen);
   const claimFits = canClaim && kit.hasRoom(state, claim.reward);
   const enrollReason = score.enrolled ? '' : enrollmentBlocker(state, score);
-  const fightReason = score.enrolled ? boutBlocker(state, next) : '';
+  const fightReason = score.enrolled ? boutBlocker(state, next, kit) : '';
   return {
     ...score, name: tournamentData.name, desc: tournamentData.desc, fee: tournamentData.fee,
     cooldown: tournamentData.cooldown, matchCount: tournamentData.matches.length,
@@ -2166,7 +2264,7 @@ function tournamentAction(state, action, kit) {
   }
   if (action === 'tournamentFight') {
     const match = score.enrolled && tournamentData.matches[score.wins];
-    const reason = boutBlocker(state, match);
+    const reason = boutBlocker(state, match, kit);
     if (reason) return kit.refuse(reason);
     kit.advance(state, tournamentData.boutDays);
     state.event = null;
@@ -2176,7 +2274,10 @@ function tournamentAction(state, action, kit) {
   }
   if (action === 'tournamentWithdraw') {
     if (!score.enrolled) return kit.refuse('你现在没有报名。');
-    if (inMatch) kit.advance(state, tournamentData.boutDays);
+    if (inMatch) {
+      kit.advance(state, tournamentData.boutDays);
+      kit.setRegulatedBoutRecovery(state);
+    }
     state.combat = null;
     state.event = null;
     state.focus = 0;
@@ -3684,7 +3785,7 @@ const evade = (name) => ({ kind: 'dodge', name });
 
 const roadEnemy = (id, name, tier, hp, atk, def, perception, strategy, desc, intents, escapeChance = 0.07) => ({
   id, name, tier, hp, atk, def, perception, strategy, tags: ['human'],
-  insight: 0, loot: {}, desc, intents, escapeChance,
+  insight: 0, loot: {}, desc, intents, escapeChance, medicine: null,
 });
 
 const commonEnemies = [
@@ -3694,24 +3795,28 @@ const commonEnemies = [
   roadEnemy('road_spear_taker', '磨杆短矛手', 1, 32, 9, 3, 13, 'predator',
     '矛杆有两处握出来的光。把手挪到后头，就会迎面送出一矛。',
     [cut('短矛推向肩头'), slam('跨步直刺', 1.45), cover('拽回矛杆挡身')]),
-  roadEnemy('road_bow_robber', '绳肩劫弓手', 2, 38, 10, 3, 15, 'duelist',
+  { ...roadEnemy('road_bow_robber', '绳肩劫弓手', 2, 38, 10, 3, 15, 'duelist',
     '弓把有一道用麻绳缠好的裂口。把箭搭在弓弦上时，他还望着你脚下的位置。',
     [shoot('朝脚边试一箭'), cover('退开半步，举弓护身'), { ...slam('搭硬箭射来', 1.45), ranged: true }, evade('贴着树身往侧面一闪')], 0.11),
+    accuracy: 0.09 },
   roadEnemy('road_salt_cutter', '盐袋刀手', 3, 51, 12, 5, 19, 'duelist',
     '他把旧盐袋折厚垫在左肩，刀顺着衣摆拖，手上没有多余的动作。',
     [cut('平刀抵到臂侧'), cover('以厚肩偏开半步'), slam('反手提刀斩下')]),
   roadEnemy('road_piked_guard', '绳鞘钩枪客', 4, 61, 14, 5, 21, 'predator',
     '枪尖下有个收绳的钩，脚步很稳。枪从身后抬高时，横着也够得远。',
     [cut('贴杆扎向腰侧'), slam('倒握枪杆横扫', 1.5), cover('把枪身架在眼前')]),
-  roadEnemy('road_shield_broker', '旧甲劫货人', 5, 71, 15, 6, 24, 'bulwark',
+  { ...roadEnemy('road_shield_broker', '旧甲劫货人', 5, 71, 15, 6, 24, 'bulwark',
     '成排的甲片有好几块是从别处补来的。每次换手，盾沿总朝着可能出招的那边。',
     [cut('沿盾边探刀'), cover('并手稳住盾面', 1.45), slam('提盾压肩后下刀', 1.47)], 0.05),
-  roadEnemy('road_wind_swordsman', '避风劫剑客', 6, 79, 18, 7, 27, 'duelist',
+    medicine: { id: 'heal_pill', count: 1 } },
+  { ...roadEnemy('road_wind_swordsman', '避风劫剑客', 6, 75, 18, 6, 27, 'duelist',
     '他将披风束在背后，剑鞘空着。剑尖一低，他便能从你让开的那侧进步。',
     [cut('递剑点向手肘'), cover('回剑守肋'), slam('贴身旋剑回斩', 1.54), evade('收剑错开一步')], 0.1),
-  roadEnemy('road_black_bowist', '冷弦夺货人', 7, 87, 20, 7, 30, 'schemer',
+    dodge: 0.14 },
+  { ...roadEnemy('road_black_bowist', '冷弦夺货人', 7, 87, 20, 7, 30, 'schemer',
     '他的弩搁在肩窝，指腹只按着一枚短矢。看见你靠近，他会反向让开半步把弩抬平。',
     [shoot('抬弩射出短箭'), cover('躲到石后拉紧弩弦'), { ...slam('扣动扳机，射出一支重箭', 1.55), ranged: true }], 0.09),
+    accuracy: 0.19, medicine: { id: 'tide_pill', count: 1 } },
   roadEnemy('road_sandal_halberd', '沉靴劫道客', 8, 104, 22, 9, 33, 'predator',
     '短靴裹了几层硬皮，一步踩下几乎没有声响。他把短戟立在身侧，尖刃只露出一截。',
     [cut('挑戟向膝下扫'), slam('沉肩挑起短戟', 1.62), cover('立戟压住地面', 1.5)]),
@@ -3727,6 +3832,18 @@ const kingBlade = 'gully_king_blade';
 const sleeve = 'road_sleeve_manual';
 const roadsideCart = 'bandit_marsh_lamp';
 const greyGully = 'grey_gully';
+const redRopeDen = 'bandit_red_rope_den';
+const redRopeWatch = 'bandit_red_rope_watch';
+const redRopeKnife = 'bandit_red_rope_knife';
+const redRopeChief = 'bandit_red_rope_chief';
+const windDen = 'bandit_salt_cave_den';
+const windWatch = 'bandit_salt_cave_watch';
+const windBow = 'bandit_salt_cave_bow';
+const windChief = 'bandit_salt_cave_chief';
+const fordBell = 'bandit_ford_bell';
+const saltBoots = 'bandit_salt_boots';
+const netKeeper = 'bandit_net_keeper';
+const saltCarrier = 'bandit_salt_carrier';
 
 const crews = {
   [greyGully]: { name: '灰沟坡寨', members: [16, 12, 8, 5, 4, 2, 0, 0, 0], den,
@@ -3735,14 +3852,14 @@ const crews = {
     headquarters: { region: 'pine_ridge', name: '断桥下的挡雨棚' }, recruit: { delay: 16, interval: 6 } },
   quarryTracks: { name: '旧矿道的散伙矿客', members: [2, 2, 3, 4, 5, 5, 10, 8, 5],
     headquarters: { region: 'black_mine', name: '废绞车后屋' } },
-  ferryWood: { name: '浅水红绳帮', members: [10, 10, 7, 5, 4, 3, 2, 1, 0],
-    headquarters: { region: 'glass_bank', name: '晒网滩外的棚船' } },
+  ferryWood: { name: '浅水红绳帮', members: [10, 10, 7, 5, 4, 3, 2, 1, 0], den: redRopeDen,
+    headquarters: { region: 'glass_bank', name: '芦湾棚船' } },
   reedBank: { name: '青埂芦窝的伙计', members: [13, 11, 8, 6, 3, 1, 0, 0, 0],
     headquarters: { region: 'green_dyke', name: '青埂北面的堆草房' } },
   weirReef: { name: '断堰捆船帮', members: [6, 7, 7, 7, 6, 5, 4, 3, 2],
     headquarters: { region: 'burnt_weir', name: '堰柱上的旧守水屋' } },
-  windBridge: { name: '盐路背风帮', members: [10, 9, 9, 8, 6, 5, 3, 2, 1],
-    headquarters: { region: 'dry_sound_bridge', name: '空音桥底的石屋' } },
+  windBridge: { name: '盐路背风帮', members: [10, 9, 9, 8, 6, 5, 3, 2, 1], den: windDen,
+    headquarters: { region: 'dry_sound_bridge', name: '断磴盐窟' } },
   glassRidge: { name: '落琉洼的黑篷客', members: [0, 0, 0, 0, 0, 0, 6, 5, 3],
     headquarters: { region: 'glass_hail_sink', name: '暗晶壁下的黑篷' }, recruit: { delay: 26, interval: 11 } },
   tentDunes: { name: '断帐沟的过夜客', members: [19, 15, 10, 0, 0, 0, 0, 0, 0],
@@ -3751,56 +3868,59 @@ const crews = {
 
 const crewRoads = {
   [greyGully]: [
-    ['marsh', 'ridge', 0.055, '倒钟前的山道有几处能藏人的矮石墙。'],
-    ['ridge', 'ford', 0.06, '旧商道只须过一道山口，两侧却都有荒屋。'],
-    ['ridge', 'screen_slope', 0.09, '晒盘后侧的石径狭窄，路旁矮石墙边常见新脚印。'],
-    ['pine_ridge', 'screen_slope', 0.06, '枯松遮住了筛盘背后的一段坡路。'],
-    ['screen_slope', 'herb_basin', 0.055, '药谷外的黄草遮到膝头，枝干上勾着一段新布。'],
+    ['marsh', 'ridge', 0.027, '倒钟前的山道有几处能藏人的矮石墙。'],
+    ['ridge', 'ford', 0.030, '旧商道只须过一道山口，两侧却都有荒屋。'],
+    ['ridge', 'screen_slope', 0.043, '晒盘后侧的石径狭窄，路旁矮石墙边常见新脚印。'],
+    ['pine_ridge', 'screen_slope', 0.029, '枯松遮住了筛盘背后的一段坡路。'],
+    ['screen_slope', 'herb_basin', 0.027, '药谷外的黄草遮到膝头，枝干上勾着一段新布。'],
+    ['screen_slope', 'kiln_valley', 0.023, '窑灰上有新脚印，几串都在坡口停过。'],
   ],
   ferryHills: [
-    ['marsh', 'ford', 0.05, '旧渡的下坡贴着一道看不清底的土沟。'],
-    ['ford', 'pine_ridge', 0.045, '桥索外头还有一片旧车辙，最近被人踩乱了。'],
-    ['pine_ridge', 'kiln_valley', 0.055, '林脚这边松枝太密，从路上看不见坡底。'],
-    ['kiln_valley', 'herb_basin', 0.05, '两间废窑的后墙之间只容一人穿过。'],
+    ['marsh', 'ford', 0.024, '旧渡的下坡贴着一道看不清底的土沟。'],
+    ['ford', 'pine_ridge', 0.022, '桥索外头还有一片旧车辙，最近被人踩乱了。'],
+    ['pine_ridge', 'kiln_valley', 0.028, '林脚这边松枝太密，从路上看不见坡底。'],
+    ['kiln_valley', 'herb_basin', 0.024, '两间废窑的后墙之间只容一人穿过。'],
   ],
   quarryTracks: [
-    ['ridge', 'black_mine', 0.055, '废矿车正挡在矿脊便道的一处拐角。'],
-    ['herb_basin', 'black_mine', 0.055, '废掉的矿道窄，沿路几个旧窝棚近日有火星。'],
-    ['black_mine', 'snow_pass', 0.05, '越过裸岩后风大，背石的那侧有人走过的痕迹。'],
+    ['ridge', 'black_mine', 0.028, '废矿车正挡在矿脊便道的一处拐角。'],
+    ['herb_basin', 'black_mine', 0.026, '废掉的矿道窄，沿路几个旧窝棚近日有火星。'],
+    ['black_mine', 'snow_pass', 0.024, '越过裸岩后风大，背石的那侧有人走过的痕迹。'],
   ],
   ferryWood: [
-    ['flood_market', 'glass_bank', 0.065, '碎琉璃滩外有一道简陋的横杆，水上看不清谁在守。'],
-    ['flood_market', 'crane_granary', 0.045, '粮仓的后路绕过一排平日没人看的空高脚屋。'],
-    ['crane_granary', 'glass_bank', 0.055, '枯芦把下岸的路挤成一条单行窄道。'],
-    ['ring_isles', 'glass_bank', 0.055, '白石和晒网之间有几条人走出来的岔。'],
+    ['flood_market', 'glass_bank', 0.033, '碎琉璃滩外有一道简陋的横杆，水上看不清谁在守。'],
+    ['flood_market', 'crane_granary', 0.023, '粮仓的后路绕过一排平日没人看的空高脚屋。'],
+    ['crane_granary', 'glass_bank', 0.028, '枯芦把下岸的路挤成一条单行窄道。'],
+    ['ring_isles', 'glass_bank', 0.027, '白石和晒网之间有几条人走出来的岔。'],
   ],
   reedBank: [
-    ['green_dyke', 'old_marker', 0.04, '堤下水浅，夹布的空篮卡在半截矮桩上。'],
-    ['green_dyke', 'ring_isles', 0.05, '一连串踏石中间有两处看不见对岸。'],
-    ['frog_pond', 'scale_bog', 0.065, '苔堤狭长，沿线有几处能从泥滩绕到身后。'],
+    ['green_dyke', 'old_marker', 0.021, '堤下水浅，夹布的空篮卡在半截矮桩上。'],
+    ['green_dyke', 'ring_isles', 0.026, '一连串踏石中间有两处看不见对岸。'],
+    ['frog_pond', 'scale_bog', 0.032, '苔堤狭长，沿线有几处能从泥滩绕到身后。'],
   ],
   weirReef: [
-    ['ring_isles', 'beacon_reefs', 0.045, '离岗灯还有一段下坡，低处的礁缝能避风。'],
-    ['glass_bank', 'beacon_reefs', 0.065, '浅岸边的破船壳一直卡在两块礁中间。'],
-    ['charcoal_ridge', 'burnt_weir', 0.06, '挂炭袋的树一直排到堰边。最远两只背后有窄坎。'],
-    ['rope_sands', 'burnt_weir', 0.07, '沙路越过几根拴索的木桩，堰脚还有一排断柱。'],
-    ['burnt_weir', 'beacon_reefs', 0.085, '内堰到外礁的岸坎下捆过货箱，沙里还埋着新断的绳。'],
+    ['ring_isles', 'beacon_reefs', 0.023, '离岗灯还有一段下坡，低处的礁缝能避风。'],
+    ['glass_bank', 'beacon_reefs', 0.032, '浅岸边的破船壳一直卡在两块礁中间。'],
+    ['charcoal_ridge', 'burnt_weir', 0.030, '挂炭袋的树一直排到堰边。最远两只背后有窄坎。'],
+    ['rope_sands', 'burnt_weir', 0.034, '沙路越过几根拴索的木桩，堰脚还有一排断柱。'],
+    ['burnt_weir', 'beacon_reefs', 0.042, '内堰到外礁的岸坎下捆过货箱，沙里还埋着新断的绳。'],
+    ['glass_bank', 'burnt_weir', 0.023, '废堰旁一条碎石坡绕在树后，坡底有盖过脚印的新沙。'],
   ],
   windBridge: [
-    ['salt_ledger_barrows', 'stillwell_mouth', 0.055, '背阴的盐袋架旁有两道窄脚印。'],
-    ['salt_ledger_barrows', 'chalk_hoof_trail', 0.05, '过山的白石道绕过一层风积沙，旁边有歇过脚的痕迹。'],
-    ['stillwell_mouth', 'dry_sound_bridge', 0.055, '盐井外拴着运货绳，绳后有一面裂开的石墙。'],
-    ['wind_slate', 'dry_sound_bridge', 0.065, '石板夹出的路一直通到桥肩，最窄处不好回身。'],
-    ['dry_sound_bridge', 'cold_kiln', 0.095, '冷窑坡下那几个雨棚，近日有人重新补了草帘。'],
-    ['wind_slate', 'cold_kiln', 0.06, '石板背风的一排小孔边积着新鞋印。'],
+    ['salt_ledger_barrows', 'stillwell_mouth', 0.027, '背阴的盐袋架旁有两道窄脚印。'],
+    ['salt_ledger_barrows', 'chalk_hoof_trail', 0.025, '过山的白石道绕过一层风积沙，旁边有歇过脚的痕迹。'],
+    ['stillwell_mouth', 'dry_sound_bridge', 0.027, '盐井外拴着运货绳，绳后有一面裂开的石墙。'],
+    ['wind_slate', 'dry_sound_bridge', 0.033, '石板夹出的路一直通到桥肩，最窄处不好回身。'],
+    ['dry_sound_bridge', 'cold_kiln', 0.046, '冷窑坡下那几个雨棚，近日有人重新补了草帘。'],
+    ['wind_slate', 'cold_kiln', 0.029, '石板背风的一排小孔边积着新鞋印。'],
+    ['stillwell_mouth', 'wind_slate', 0.024, '石壁下的背风处能看见几堆刚压灭的柴火。'],
   ],
   glassRidge: [
-    ['cold_kiln', 'glass_hail_sink', 0.055, '窑道被砂流冲出几道浅岔口，地面没有新路牌。'],
-    ['hanging_vein', 'glass_hail_sink', 0.06, '浅梁下的矿包曾有人打开过，麻绳留在石上。'],
+    ['cold_kiln', 'glass_hail_sink', 0.028, '窑道被砂流冲出几道浅岔口，地面没有新路牌。'],
+    ['hanging_vein', 'glass_hail_sink', 0.031, '浅梁下的矿包曾有人打开过，麻绳留在石上。'],
   ],
   tentDunes: [
-    ['silk_tent_road', 'camel_grass_dunes', 0.05, '沿途有松垮的旧帐布，看不清矮丘背面。'],
-    ['silk_tent_road', 'guest_mill', 0.055, '石磨上游的低沟能一直绕到路旁。'],
+    ['silk_tent_road', 'camel_grass_dunes', 0.025, '沿途有松垮的旧帐布，看不清矮丘背面。'],
+    ['silk_tent_road', 'guest_mill', 0.028, '石磨上游的低沟能一直绕到路旁。'],
   ],
 };
 
@@ -3870,7 +3990,29 @@ const specialEnemies = [
     [cut('贴着桌沿递刀'), cover('贴住桌角，以刀护身'),
       { kind: 'focus', name: '把空凳拨到身前，藏刀攒劲' },
       slam('踢开木凳，跟着一刀斩下', 1.56), cut('绕过桌角横扫腰侧', 1.1)]),
-    accuracy: 0.07 },
+    accuracy: 0.07, medicine: { id: 'heal_pill', count: 1 } },
+  roadEnemy(redRopeWatch, '芦湾放哨人', 2, 41, 10, 3, 16, 'predator',
+    '他坐在篙头旁，手里还拎着没点着的灯。见船板一晃，就抓起身边的短矛。',
+    [cut('贴船板出矛'), cover('收矛护住胸口'), slam('踏稳船板直刺', 1.45)]),
+  { ...roadEnemy(redRopeKnife, '红绳把头', 3, 53, 12, 4, 20, 'duelist',
+    '两根红绳系在肘后。他先用刀背拨开垂网，给自己腾出半边身子。',
+    [cut('贴着网边削腕'), cover('横刀退到篷柱边'), evade('贴柱错身'), slam('顺柱跨一步劈下', 1.5)]), dodge: 0.11 },
+  { ...roadEnemy(redRopeChief, '芦湾船主邵苹', 4, 79, 15, 6, 24, 'bulwark',
+    '棚里的人先看向掌舵处。那里站着个穿厚油衣的女人，刀柄贴住前臂，袖里缝着一只窄药袋。',
+    [cut('沿船舷斜削'), cover('借立柱护住手臂', 1.48), slam('抵住舱沿猛劈', 1.59), evade('侧身退到舱口')], 0.06),
+    medicine: { id: 'heal_pill', count: 1 } },
+  roadEnemy(windWatch, '盐窟守门刀客', 4, 63, 14, 5, 22, 'duelist',
+    '刀鞘挂在窟壁上。他弯腰从盐袋间挤出来，刀一直压在腰下。',
+    [cut('低刀扫向脚踝'), cover('贴墙护住一侧'), slam('近身抬刀斩下', 1.55), evade('闪到旧盐袋后')]),
+  { ...roadEnemy(windBow, '盐道灰翎弓手', 5, 64, 15, 4, 25, 'schemer',
+    '矮墙上排着两盏灭了的灯。弓手屈膝躲在暗处，箭羽几乎贴着砖沿。',
+    [shoot('从矮墙后放箭'), cover('蹲回墙后'), { ...slam('踩上砖沿射出重箭'), ranged: true }, evade('退进侧洞')]),
+    accuracy: 0.15 },
+  { ...roadEnemy(windChief, '盐窟魁首封霁', 6, 92, 18, 7, 29, 'schemer',
+    '石凳上摆着一双厚软底靴。封霁站在另一头，剑还藏在披风下，先将一枚药丸扣在腰间布囊里。',
+    [cut('贴身递剑'), cover('以披风遮住手臂'), { kind: 'focus', name: '收剑到披风后蓄力' },
+      slam('从披风后斜挑一剑', 1.6), evade('错步退进石隙')], 0.06),
+    medicine: { id: 'tide_pill', count: 1 }, accuracy: 0.08 },
 ];
 
 const fixed = [
@@ -3901,23 +4043,23 @@ const fixed = [
     },
   },
   {
-    id: 'road_reed_tariff', a: 'flood_market', b: 'glass_bank', enemy: 'road_ferry_tollman', chance: 0.52, fee: 8,
+    id: 'road_reed_tariff', a: 'flood_market', b: 'glass_bank', crew: 'ferryWood', enemy: 'road_ferry_tollman', chance: 0.52, fee: 8,
     intro: '拦水的横杆浮过来，后头接着一根泡裂的浮木。一个脚踝系红绳的篙手立在浅石上，说过杆交八枚钱。杆后有两艘等着靠岸的船。',
     actions: [{ id: 'repair_raft_bar', label: '给两截松木，帮他接住脱开的浮杆',
       desc: '横杆是旧榫，用两截结实的木头平撑住，船就不必一直停在急水边。', need: { wood: 2 },
-      loot: { ration: 1 }, outcome: '篙手把旧榫从水里勾起，接住你递下的松木。两边的船终于能靠紧。他朝船主招手。「先拢船。今天这趟不用给钱了。」等船的人塞给你一包干粮。' }],
-    afterPay: { outcome: '篙手把横杆朝旧桩一挂，招呼等着的两条船往浅处并拢，一起加木条固定松动的地方。' },
-    afterWin: { loot: { ration: 1, wood: 1 },
-      outcome: '篙手松开红绳，从侧边浅滩游开。船客剪去横杆上的私绳，把两条船靠到同一侧。一位船客让你带包干粮，另一位从舱里抽了一截干松木。' },
+      loot: { ration: 1 }, revealSite: redRopeDen, outcome: '篙手接住你递下的松木，赶紧去拢船。等船的人塞给你一包干粮，低声道：「真正扣我货的船藏在碎琉璃滩。沿晒网往下走，芦苇里吊着一盏白壳灯。」' }],
+    afterPay: { revealSite: redRopeDen, outcome: '篙手把横杆朝旧桩一挂。你从两条并拢的船旁走过，船客压低声说：「我家的货被扣在碎琉璃滩的芦湾，认晒网下头那盏白壳灯。」' },
+    afterWin: { loot: { ration: 1, wood: 1 }, revealSite: redRopeDen,
+      outcome: '篙手松开红绳，从侧边浅滩游开。船客解开两条船，又把压在舱底的托货单递给你。背面的兑货地写着：碎琉璃滩，晒网下走三十步，认白壳灯。' },
   },
   {
-    id: 'road_coil_rope', a: 'wind_slate', b: 'dry_sound_bridge', enemy: 'road_wind_cutman', chance: 0.48,
+    id: 'road_coil_rope', a: 'wind_slate', b: 'dry_sound_bridge', crew: 'windBridge', enemy: 'road_wind_cutman', chance: 0.48,
     intro: '桥肩的半扇栏动了一下。一人背靠石板握着刀，脚边摆着一只松脱的铜扣。他一只肩朝着桥中，鞋底沿着石缝蹭来蹭去。',
     actions: [{ id: 'pass_spare_tie', label: '递给他两份坚韧兽筋，帮他系回栏扣',
       desc: '他压低刀柄，「那根旧绳已经磨进铜眼。我只要两根新绳，叫它今晚别掉下去。」', need: { battle_sinew: 2 },
-      loot: { ore: 1 }, outcome: '绳在铜眼里穿了两圈，他往后拉紧，晃动的半扇栏攀住石肩。那人把拆掉的寒铁补片塞给你，转身去把桥那头的人叫来。' }],
-    afterWin: { loot: { ore: 1, salve: 1 },
-      outcome: '他弃下松扣，沿桥肩的石梯下去。扣边那捆旧垫片解开后还有一截好铁，布里裹着一罐补手的药膏。' },
+      loot: { ore: 1 }, revealSite: windDen, outcome: '栏杆终于不晃了。他递来拆下的寒铁补片，又朝桥下努嘴。「抢盐的傍晚就顺这道石梯回去。走到断处，右手有块竖起的白石，后头是他们藏货的门。」' }],
+    afterWin: { loot: { ore: 1, salve: 1 }, revealSite: windDen,
+      outcome: '他弃下松扣，沿桥肩的石梯下去。你望见他走到断阶，绕进一块竖白石后。石缝里透出灯光，远远传来数盐袋的声音。扣边另有一截好铁和一罐补手药膏。' },
   },
 ];
 
@@ -3942,6 +4084,20 @@ const sites = [
     },
     choiceText: { 1: { after: '货柜和钱匣早已搬下山。廊下那几块方方的柜脚印里落了新砂。' } },
   },
+  { id: netKeeper, name: '收晒网的船家', region: 'glass_bank', once: [0],
+    afterOnceText: { 0: '船家把好网收在肩上。空竹杆仍斜指下游的芦湾。' } },
+  { id: redRopeDen, name: '芦湾棚船', region: 'glass_bank', afterBandit: redRopeDen,
+    afterChoices: [`${netKeeper}:0`], once: [1],
+    creatures: { [redRopeWatch]: resident(9, 28), [redRopeKnife]: resident(8, 32), [redRopeChief]: resident(1) },
+    afterWinText: { [redRopeChief]: '带红绳的人从晒网后散开。邵苹身后的主舱已空出通道，案上压着收钱的铜匣。' },
+    choiceText: { 1: { after: '主舱的匣子已经拿去验过，桌上只留着几捆写了主人的旧网。' } } },
+  { id: saltCarrier, name: '桥头的盐车', region: 'dry_sound_bridge', once: [0],
+    afterOnceText: { 0: '盐车已经走了，桥栏下还挂着一小段拴车的草绳。' } },
+  { id: windDen, name: '断磴盐窟', region: 'dry_sound_bridge', afterBandit: windDen,
+    afterChoices: [`${saltCarrier}:0`], once: [1],
+    creatures: { [windWatch]: resident(10, 32), [windBow]: resident(9, 36), [windChief]: resident(1) },
+    afterWinText: { [windChief]: '封霁倒下后，外洞的人拖走灯架。最深的货室里还有一盏小油灯亮着。' },
+    choiceText: { 1: { after: '盐商领走了标过记号的货。货室里堆着空袋，封霁的石凳还在原处。' } } },
 ];
 
 const events = [
@@ -3971,6 +4127,36 @@ const events = [
         loot: { salve: 2 }, outcome: '门边没人伸手。你用脚把药匣勾出来，拣了两包干净的松脂膏。' },
     ],
   },
+  { id: netKeeper, name: '收晒网的船家',
+    text: '船家从晒到一半的网上抻出一截红绳，几处断口齐得像是用刀割的。',
+    choices: [{ label: '问船家网是在哪儿割破的', desc: '他刚往下水的竹杆上晾好一张新网。',
+      days: 0.125, stay: true,
+      outcome: '「下游一盏白壳灯过去，那条棚船就拴在芦里。他们砍我的网堵水，我记得板缝怎么走。」他拿空竹杆朝芦湾指了一遍。' }] },
+  { id: redRopeDen, name: '芦湾棚船',
+    text: '芦苇里的白壳灯照着两条并在一起的棚船。中间搭了块木板，前棚挂网，后舱紧靠掌舵的地方。',
+    choices: [
+      { label: '踩上木板，进前棚', desc: '木板会晃，棚里听得见人说话。', days: 0.25,
+        encounter: [redRopeWatch, redRopeKnife, redRopeChief], outcome: '板子擦过船舷。前棚的网掀起来，有人拦在你面前。' },
+      { label: '进后舱清点铜匣', afterFight: redRopeChief, days: 0.25, stay: true, coins: 145,
+        desc: '邵苹放钱的铜匣还开着，旁边一枚包布铜铃压住了船家的货单。',
+        loot: { ore: 4, hide: 3, [fordBell]: 1 },
+        outcome: '按货单交还鱼网和铜扣后，船家留下匣中找不到主人的灵钱。他把邵苹常挂在舵边的包布铃递给你。' },
+    ] },
+  { id: saltCarrier, name: '桥头的盐车',
+    text: '盐车在桥栏边歇着，半边车板空了。车夫拿着一根割断的系货绳。',
+    choices: [{ label: '问车夫盐货丢在了哪里', desc: '车夫一直往桥下的断石梯看。',
+      days: 0.125, stay: true,
+      outcome: '「他们把货拖到了桥底，走断石梯。阶断的那儿右手立着白石。我的车下不去，就听见石后头有人叫开门。」' }] },
+  { id: windDen, name: '断磴盐窟',
+    text: '桥下的石阶断在一块竖起的白石旁。躬身能从后头钻进去，洞口堆着把风吹开的空盐袋。',
+    choices: [
+      { label: '钻过白石，往盐袋后走', desc: '鞋一踩上盐粒就会响，外洞有一道半人高的矮墙。',
+        days: 0.25, encounter: [windWatch, windBow, windChief], outcome: '你踩碎脚下的盐壳。矮墙后有人应声拿起兵器。' },
+      { label: '去亮着灯的货室开柜', afterFight: windChief, days: 0.375, stay: true, coins: 240,
+        desc: '货柜底层有一只钱袋，封霁的靴子还放在石凳边。',
+        loot: { black_iron: 3, core: 5, [saltBoots]: 1 },
+        outcome: '照车板上的货号分还盐包后，车夫把余钱和石凳边的靴子给你。没记号的几块料也留在柜里。' },
+    ] },
 ];
 
 const items = [
@@ -3978,12 +4164,21 @@ const items = [
     desc: '灰褂人的护车薄册，封面抹过一层油。纸角压得很平，翻开就看见几笔将刀拢在半臂之内的画。' },
   { id: kingBlade, name: '许涧的宽背刀', kind: 'gear', price: 0, sell: 0, keepOnFall: true,
     desc: '刀背厚，刀尖收得窄。前半截磨得雪亮，靠护手那段却全是长年蹭在木头上的细痕。' },
+  { id: fordBell, name: '裹布铜铃', kind: 'gear', price: 0, sell: 0, keepOnFall: true,
+    desc: '邵苹挂在舵边的铜铃，裹着两层厚布，听得清近处脚步。' },
+  { id: saltBoots, name: '厚底踏砂靴', kind: 'gear', price: 0, sell: 0, keepOnFall: true,
+    desc: '封霁常穿的软底靴，靴筒扎得紧，踩过薄盐壳也很少响。' },
 ];
 
 const gear = [
   { id: kingBlade, slot: 'weapon', weaponClass: 'blade', tier: 3, atk: 7, perception: 3, retreat: 0.10, durability: 52, repair: 12,
     trait: { kind: 'accuracy', bonus: 0.12 }, traits: [{ kind: 'pierce', intent: 'guard', bonus: 2 }],
     entry: '筑基初期可握稳的宽背刀。刀尖跟得上错步的对手，也能探进他收紧的护身架。看准空当，还容易收刀抽身。' },
+  { id: fordBell, slot: 'charm', tier: 3, def: 2, qi: 3, perception: 4, durability: 48, repair: 12,
+    entry: '筑基初期可佩。用铃穗感觉气流和脚步，交手时更容易识出来招，也有些护身之效。' },
+  { id: saltBoots, slot: 'boots', tier: 5, def: 1, retreat: 0.10, durability: 58, repair: 17,
+    trait: { kind: 'dodge', bonus: 0.12 },
+    entry: '筑基后期可穿。进退时脚下更轻，既便于闪身，也能让赶路的动静小一些。' },
 ];
 
 const innerStyles = [
@@ -4004,7 +4199,11 @@ const innerStyles = [
 
 const banditContent = {
   items, gear, sites, events, enemies: [...commonEnemies, ...specialEnemies], innerStyles,
-  roadBandits: { roads, pools, fixed, crews, dens: { [den]: { heads: 23, minFactor: 0.13, boss: leader } } },
+  roadBandits: { roads, pools, fixed, crews, dens: {
+    [den]: { heads: 23, minFactor: 0.13, boss: leader },
+    [redRopeDen]: { heads: 18, minFactor: 0.18, boss: redRopeChief },
+    [windDen]: { heads: 20, minFactor: 0.16, boss: windChief },
+  } },
 };
 
 return banditContent;
@@ -4206,10 +4405,12 @@ const items = [
   { id: 'formula_grain', name: '暖谷丸丹方', kind: 'key', price: 0, sell: 0, desc: '干粮浸软之后分团，两边火口只留靠里的那一孔。' },
   { id: 'formula_focus', name: '定息丹方', kind: 'key', price: 0, sell: 0, desc: '草汁与微火要同时入盏。松木快烧完时从边上刮下结露。' },
   { id: 'formula_resin', name: '温枝丸丹方', kind: 'key', price: 0, sell: 0, desc: '只用松木最靠外的嫩脂。开炉前先用湿草熄主火。' },
+  { id: 'formula_sense', name: '凝神散丹方', kind: 'key', price: 0, sell: 0, desc: '先筛去灵晶的硬粒。灵草焙干，拌进石粉后再过细筛。' },
   { id: 'formula_detox', name: '清露丸丹方', kind: 'key', price: 0, sell: 0, desc: '熟药过清叶，吹开浮灰，留下盏壁上一道没有药涩的露。' },
   { id: 'formula_heal', name: '合络丹丹方', kind: 'key', price: 0, sell: 0, desc: '药团放在新绷的兽革上收汁。每一次收边都要换掉浸透的皮。' },
   { id: 'formula_tide', name: '济潮丹丹方', kind: 'key', price: 0, sell: 0, desc: '捞洗潮床的灵晶，退水时下药。窄炉缝上升的白气可以判火候。' },
   { id: 'formula_leaf', name: '清脉饮丹方', kind: 'key', price: 0, sell: 0, desc: '篁泽药匣里的煎药札。药汁沸后要将长、短木槽依次架进火口。' },
+  { id: 'formula_heart', name: '养心丸丹方', kind: 'key', price: 0, sell: 0, desc: '泽医照滴水图抄的方子。罐口各引一条细槽，两边药汁要滴得一样快。' },
   { id: 'formula_jade', name: '照心露丹方', kind: 'key', price: 0, sell: 0, desc: '温火焙灵晶，白露顺斜槽流入底盏。火心太大就没有露。' },
   { id: 'formula_foundation', name: '筑基丹方', kind: 'key', price: 0, sell: 0, desc: '安蒲重新排定的三篇合方。两次短火分开入料，第三道长火得靠封炉药引维持。' },
   { id: 'foundation_ledger', name: '焦痕丹窑账页', kind: 'key', price: 0, sell: 0, desc: '半页熏焦的取还账。镇上丹师安蒲的名字旁压着三枚缺了一角的印。' },
@@ -4267,6 +4468,8 @@ const items = [
   { id: 'focus_pill', name: '定息丹', kind: 'pill', price: 12, sell: 5, desc: '收拢散乱的气息，使下一次术法伤害增加3点。' },
   { id: 'tide_pill', name: '济潮丹', kind: 'pill', price: 19, sell: 8, desc: '气血与真气一并恢复，药力很重。' },
   { id: 'resin_pill', name: '温枝丸', kind: 'pill', price: 0, sell: 6, desc: '药丸入口先苦，随后才感到胸口热。适合远行后恢复气血。' },
+  { id: 'sense_powder', name: '凝神散', kind: 'pill', price: 0, sell: 4, desc: '细粉含在舌下有股凉意。练过神识的人可以借它收拢心神，留出余力观招。' },
+  { id: 'heart_pill', name: '养心丸', kind: 'pill', price: 0, sell: 6, desc: '泽医把两味药收进一丸，既能补些气血，也能缓一缓神识的疲乏。' },
   { id: 'leaf_pill', name: '清脉饮', kind: 'pill', price: 0, sell: 8, desc: '一小囊苦药汁。能卸去丹毒，再理顺紊乱的真气。' },
   { id: 'jade_pill', name: '照心露', kind: 'pill', price: 0, sell: 16, desc: '用温火从晶屑中引出的药露。恢复真气和气血，服多容易积毒。' },
 
@@ -4340,6 +4543,8 @@ const pills = [
   { id: 'focus_pill', tier: 0, hp: 0, qi: 0, toxin: 6, wound: 0, focus: 1 },
   { id: 'tide_pill', tier: 2, hp: 24, qi: 10, toxin: 18, wound: 1, focus: 0 },
   { id: 'resin_pill', tier: 1, hp: 15, qi: 4, toxin: 9, wound: 0, focus: 0 },
+  { id: 'sense_powder', tier: 1, hp: 0, qi: 0, sense: 2, toxin: 6, wound: 0, focus: 0 },
+  { id: 'heart_pill', tier: 2, hp: 14, qi: 0, sense: 1, toxin: 10, wound: 0, focus: 0 },
   { id: 'leaf_pill', tier: 2, hp: 4, qi: 8, toxin: -28, wound: 0, focus: 0 },
   { id: 'jade_pill', tier: 3, hp: 30, qi: 15, toxin: 16, wound: 1, focus: 1 },
 ];
@@ -4410,6 +4615,8 @@ const recipes = [
   { id: 'r_hide_shield', result: 'hide_shield', count: 1, tier: 0, facility: 'forge', cost: 8, need: { wood: 4, hide: 3 }, days: 1.25, requiresShownHide: true },
   { id: 'r_miner_pick', result: 'miner_pick', count: 1, tier: 0, facility: 'forge', cost: 8, need: { ore: 4, wood: 2 }, days: 1.5, reveal: { item: 'blade_template' } },
   { id: 'r_resin_pill', result: 'resin_pill', count: 3, tier: 1, facility: 'furnace', formula: 'formula_resin', cost: 6, need: { wood: 2, reed: 3, qi_core: 2 }, days: 2 },
+  { id: 'r_sense_powder', result: 'sense_powder', count: 2, tier: 1, facility: 'furnace', formula: 'formula_sense', cost: 4, need: { reed: 2, core: 1 }, days: 1.25 },
+  { id: 'r_heart_pill', result: 'heart_pill', count: 2, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_heart', cost: 6, need: { reed: 3, hide: 1, qi_core: 1 }, days: 2 },
   { id: 'r_leaf_pill', result: 'leaf_pill', count: 3, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_leaf', cost: 10, need: { reed: 4, kiln_clay: 1, wood: 2, qi_core: 3 }, days: 3 },
   { id: 'r_jade_pill', result: 'jade_pill', count: 3, tier: 3, facility: 'furnace', facilityLevel: 3, formula: 'formula_jade', cost: 16, need: { reed: 4, core: 2, wood: 1, foundation_core: 2, beast_eye: 1 }, days: 4 },
   { id: 'r_foundation', result: 'foundation_pill', count: 1, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_foundation', cost: 45, need: { foundation_charge: 1, reed: 6, core: 5, black_iron: 4, qi_core: 24 }, days: 4 },
@@ -4597,8 +4804,9 @@ const sites = [
   { id: 'herb_beds', region: 'herb_basin', name: '银纹药田',
     stocks: { reed: { start: 8, cap: 12, interval: 6, growth: 2, depletedFactor: 1.5, choices: [0] } },
     emptyText: '药田里的老叶已经剪尽。细芽还贴着湿泥，只等抽出来。' },
-  { id: 'mist_shelter', region: 'herb_basin', name: '垫高脚的药棚', once: [0, 1],
-    afterOnceText: { 0: '泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。', 1: '席上的捣药板已经腾出来了。泽医身边还放着几只给矿队装药的篓。' } },
+  { id: 'mist_shelter', region: 'herb_basin', name: '垫高脚的药棚', once: [0, 1, 2],
+    afterOnceText: { 0: '泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。', 1: '席上的捣药板已经腾出来了。给矿队装药的篓旁，并着两只滴药的小罐。',
+      2: '两只小药罐分立在木槽两端。泽医垫在罐脚下的竹片还在，落进碗里的两股药汁滴得一样快。' } },
   { id: 'herb_den', region: 'herb_basin', name: '蒲根下的水洞', afterChoices: ['mist_shelter:1'], once: [1, 4],
     stocks: { reed_water: { item: 'reed', label: '引水槽边的灵草', start: 3, cap: 6, interval: 5, growth: 2, choices: [5] } },
     choiceText: { 1: { after: '靠棚的板沿有块干石。从那里扶着粗蒲根，可以沿洞壁绕向里面。' } },
@@ -4933,6 +5141,10 @@ const events = [
     { label: '给泽医交叶和烘干用的枝条', desc: '「阴雨浸坏了这一批，我得给矿队重扎几包药。你若进矿脉，带我的引矿签过去。」',
       need: { reed: 8, wood: 4 }, consume: true, days: 1, insight: 4, loot: { mine_guide: 1, ration: 3 }, outcome: '泽医把木片从药匣上拆下，指给你看哪边的石槽连着玄砂矿脉。' },
     { label: '问泽医板上的凹槽怎么用', desc: '木板上刻了几道不同深浅的槽，中间压着一张试药的便条。', days: 0.5, insight: 2, loot: { herb_press: 1, formula_leaf: 1 }, outcome: '泽医递来一页清脉饮丹方，又指着板上新刻的那道。「原本从蒲根底下取水，最近底下成了窝。蒲根旁还搭着两块旧木板，你过去当心。」' },
+    { label: '拿滴水图和泽医对一对药槽', afterChoice: 1, hidden: true, need: { phase_chart: 1 }, days: 0.25, stay: true,
+      desc: '眼前的两只药罐都接着细槽。泽医拿起碗尝了一点，又搁回去。「一边补血，一边定神。补血这罐滴得太快，两味配不匀。」',
+      loot: { formula_heart: 1, heart_pill: 1 },
+      outcome: '泽医照着图挪了挪罐脚下的竹片。等两股药汁一起滴进碗里，他才把碗移到小炉边。「这回两味能收到一丸里了。」他包好一枚养心丸，又将抄下的方子递给你。' },
   ] },
   { id: 'herb_den', name: '蒲根下的水洞', text: '两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。取水槽斜卡在洞口，槽尾接着一排药草。板头旁有灶眼，沿干岸几步就能回到药棚。', choices: [
     { label: '踏上木板，朝水洞里探', desc: '走板面中间最省脚力。底下的石缝都通着，水一搅就看不清来的是谁。', days: 0.125,
@@ -5286,33 +5498,69 @@ for (const item of gear) {
 }
 const eventsBySite = new Map(events.map((event) => [event.id, event]));
 const enemyCombatProfiles = {
+  // 雾梁。壳硬的敌手容易看穿，轻巧的伏兽与看得准的猎手各有用力处。
   reed_hare: { perception: 4 },
   ford_silver_dace: { perception: 3 },
+  ford_shale_crab: { perception: 4 },
+  stone_badger: { perception: 5 },
   bank_runner: { perception: 12, strategy: 'predator' },
   caravan_lookout: { perception: 11 },
+  caravan_guard_hound: { dodge: 0.08 },
+  caravan_hook_guard: { accuracy: 0.08 },
+  caravan_broker: { strategy: 'schemer' },
+  herb_den_toad: { perception: 5 },
+  herb_den_sawfish: { perception: 6, dodge: 0.09 },
+  herb_den_elder: { perception: 21, strategy: 'bulwark' },
+  vine_stag: { dodge: 0.07 },
   vine_king: { perception: 17, strategy: 'predator' },
   tide_spirit: { strategy: 'bulwark' },
-  foundation_duelist: { perception: 18 },
+  vein_sentinel: { perception: 8 },
+  snow_rail_lynx: { perception: 7, dodge: 0.14 },
+  snow_rail_hawk: { perception: 11, accuracy: 0.18 },
+  snow_rail_shell: { perception: 6 },
+  snow_rail_matron: { accuracy: 0.07 },
+  snow_gully_otter: { dodge: 0.12 },
+  snow_seam_crab: { perception: 9 },
+  foundation_duelist: { perception: 18, accuracy: 0.07 },
   foundation_warden: { perception: 17, strategy: 'bulwark' },
   mirror_warden: { perception: 25, strategy: 'schemer' },
-  herb_den_elder: { perception: 21, strategy: 'bulwark' },
   river_spar_captain: { perception: 27, strategy: 'bulwark' },
   undertow_moundback: { perception: 22, strategy: 'predator' },
+
+  // 照原。滑水的猎物、岸上的弩手、守着狭处的重甲各有不同的破法。
+  zhao_reed_duck: { perception: 5 },
+  zhao_moss_turtle: { perception: 5 },
+  zhao_cargo_archer: { perception: 17, accuracy: 0.17 },
+  zhao_cargo_shield: { perception: 16, strategy: 'bulwark' },
+  zhao_cargo_hook: { perception: 18, dodge: 0.11 },
+  zhao_cargo_keeper: { strategy: 'schemer', medicine: { id: 'heal_pill', count: 1 } },
+  dyke_yard_otter: { perception: 10, dodge: 0.16 },
+  dyke_yard_croc: { accuracy: 0.09 },
+  dyke_yard_boar: { perception: 10 },
+  dyke_old_croc: { accuracy: 0.08 },
   zhao_spar: { perception: 27 },
   fault_warden: { perception: 32, strategy: 'schemer' },
   ember_yak: { strategy: 'predator' },
-  sand_well_basilisk: { perception: 22, strategy: 'predator' },
-  sand_glass_lynx: { perception: 27, strategy: 'predator' },
+
+  // 鸣沙。崖间的猞猁善闪，桥蝰与弩手善追招，真正会读招的对手另有出处。
+  sand_salt_fox: { dodge: 0.10 },
+  sand_rattle_viper: { accuracy: 0.12 },
+  sand_silo_marten: { dodge: 0.06 },
+  sand_iron_skink: { perception: 6 },
+  sand_well_basilisk: { perception: 22, accuracy: 0.16, strategy: 'predator' },
+  sand_glass_lynx: { perception: 23, dodge: 0.22, strategy: 'predator' },
+  sand_anchor_scorpion: { perception: 12 },
   sand_riven_scorpion: { perception: 21, strategy: 'bulwark' },
+  sand_quarry_skink: { dodge: 0.12 },
+  sand_quarry_rockscorpion: { perception: 10 },
   sand_quarry_matriarch: { perception: 29, strategy: 'schemer' },
-  sand_basket_mender: { perception: 33, strategy: 'duelist' },
-  sand_sundial_master: { perception: 35, strategy: 'schemer', medicine: { id: 'jade_pill', count: 1 } },
-  caravan_broker: { strategy: 'schemer' },
-  zhao_cargo_shield: { strategy: 'bulwark' },
-  zhao_cargo_keeper: { strategy: 'schemer' },
+  ridge_armory_lynx: { dodge: 0.19 },
+  ridge_armory_ram: { accuracy: 0.075 },
+  sand_basket_mender: { perception: 33, strategy: 'duelist', medicine: { id: 'tide_pill', count: 1 } },
+  sand_sundial_master: { perception: 35, strategy: 'schemer', medicine: { id: 'jade_pill', count: 3 } },
   border_axle_poleman: { perception: 14, strategy: 'predator' },
-  border_wind_ambusher: { strategy: 'schemer' },
-  border_kiln_shield: { strategy: 'bulwark' },
+  border_wind_ambusher: { accuracy: 0.17, strategy: 'schemer' },
+  border_kiln_shield: { perception: 18, strategy: 'bulwark' },
   border_silo_leader: { perception: 27, strategy: 'schemer' },
 };
 for (const enemy of enemies) {
@@ -5322,10 +5570,9 @@ for (const enemy of enemies) {
   const tier = enemy.tier ?? 0;
   enemy.perception = profile.perception ?? enemy.perception ?? baseline + 2 * tier;
   enemy.strategy = profile.strategy ?? enemy.strategy ?? (human ? 'duelist' : 'instinct');
-  if (human) {
-    const medicineId = tier < 2 ? 'salve' : tier < 5 ? 'heal_pill' : 'tide_pill';
-    enemy.medicine = profile.medicine ?? { id: medicineId, count: 1 };
-  }
+  if (profile.dodge !== undefined) enemy.dodge = profile.dodge;
+  if (profile.accuracy !== undefined) enemy.accuracy = profile.accuracy;
+  if (profile.medicine) enemy.medicine = profile.medicine;
   const practice = enemyInnerStyles[enemy.id];
   if (practice) {
     const manual = innerStyles.find(({ id }) => id === practice.id);
@@ -5371,9 +5618,39 @@ const { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, wor
 
 const home = 'village';
 const legacy = new Set(['village', 'marsh', 'ridge', 'ford', 'hidden', 'pine_ridge', 'kiln_valley', 'herb_basin', 'black_mine', 'snow_pass', 'sky_terrace']);
+const ferryPass = { ferry: true, item: 'ferry_manifest', quest: 'last_lantern',
+  reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' };
+const sandPass = { item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' };
 const crossings = [
-  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, ferry: true, item: 'ferry_manifest', quest: 'last_lantern', reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' },
-  { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' },
+  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, ...ferryPass, onPermit: true, guarded: true },
+  { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, ...sandPass, onPermit: true, guarded: true },
+  { a: 'willow_post', b: 'flood_market', label: '折水驿的货船线', days: 6.75, ...ferryPass },
+  { a: 'rope_sands', b: 'cinder_inn', label: '沿沙坡的驿路', days: 7.25, ...sandPass },
+];
+const regionalRoads = [
+  ['reed_meadows', 'pale_shoal', '蒲湾外堤'],
+  ['gauge_tower', 'willow_post', '水尺下的旧堤'],
+  ['screen_slope', 'kiln_valley', '晒盘坡北面的窑路'],
+  ['kiln_valley', 'snow_pass', '窑谷上雪关的石阶'],
+  ['herb_basin', 'snow_pass', '背风山道'],
+  ['pine_ridge', 'ridge', '松场南坡路'],
+  ['fish_ladder', 'willow_post', '沿旧渠的纤道'],
+  ['green_dyke', 'measuring_hall', '守尺观外的堤路'],
+  ['frog_pond', 'ring_isles', '浅塘东岸路'],
+  ['old_marker', 'scale_bog', '石碑后的小堤'],
+  ['zhao_hermit', 'charcoal_ridge', '水驿南面的山道'],
+  ['zhao_hermit', 'burnt_weir', '内堰西路'],
+  ['glass_bank', 'rope_sands', '晒网滩外的沙脊'],
+  ['glass_bank', 'burnt_weir', '碎沙堤'],
+  ['flood_market', 'measuring_hall', '运尺的河堤路'],
+  ['cinder_inn', 'silk_tent_road', '炭篷驿外的帐道'],
+  ['silk_tent_road', 'sand_bell_cloister', '背向风口的挑担路'],
+  ['salt_ledger_barrows', 'sand_bell_cloister', '担盐岗南坡路'],
+  ['chalk_hoof_trail', 'stillwell_mouth', '白石脊上的井道'],
+  ['stillwell_mouth', 'wind_slate', '井口南边的背风路'],
+  ['wind_slate', 'hanging_vein', '矿梁下的碎石路'],
+  ['guest_mill', 'camel_grass_dunes', '磨坊南边的沙坡路'],
+  ['hollow_silo', 'glass_hail_sink', '空仓外的石坡'],
 ];
 const shortcuts = [
   { a: 'village', b: 'ford', label: '旧灯渠', days: 0.5, openedBy: 'ford_lamp_channel:0' },
@@ -5384,11 +5661,11 @@ const arrayPlans = {
   zhaoyuan: { coins: 115, need: { wood: 32, ore: 28, core: 24, black_iron: 18 } },
   mingsha: { coins: 140, need: { wood: 28, ore: 32, core: 32, black_iron: 25 } },
 };
-const transportRules = Object.freeze({ gatePrice: 2, gateDays: 0.125, arrayPrice: 4, arrayDays: 0.25, scrollDays: 0.125,
+const transportRules = Object.freeze({ gatePrice: 2, gateDays: 0.125, arrayPrice: 4, arrayDays: 0.25, scrollPrice: 2, scrollDays: 0.125,
   roadUnitDays: 0.25, arrayPlans, crossings, shortcuts });
 
 function initialWorld() {
-  return { lastSettlement: home, gates: [], arrays: {}, shops: {}, recovery: {}, affiliation: null, memberships: {} };
+  return { lastSettlement: home, gates: [], arrays: {}, avoidedRoads: [], shops: {}, recovery: {}, affiliation: null, memberships: {} };
 }
 
 const detail = (data, id) => data.regionDetails?.[id] ?? {};
@@ -5410,10 +5687,6 @@ function alwaysKnownRegion(id) {
 function rescueSettlement(state, kit) {
   const last = state.world?.lastSettlement;
   return last && settlementOf(kit.data, last) ? last : home;
-}
-
-function crossRoute(from, to) {
-  return crossings.find((edge) => otherside(edge, from) === to);
 }
 
 function crossBlocker(state, edge) {
@@ -5445,6 +5718,9 @@ function roadGraph(data, { state } = {}) {
       if (regions.has(b) && provinceOf(data, a) === provinceOf(data, b)) add(a, b, localRoadDays(from, regions.get(b)));
     }
   }
+  for (const [a, b, label] of regionalRoads) {
+    if (regions.has(a) && regions.has(b)) add(a, b, localRoadDays(regions.get(a), regions.get(b)), { label });
+  }
   for (const cross of crossings) add(cross.a, cross.b, cross.days, { cross, label: cross.label, water: Boolean(cross.ferry) });
   for (const shortcut of shortcuts) {
     if (!state || state.seenChoices.includes(shortcut.openedBy)) {
@@ -5461,22 +5737,85 @@ function directRoad(from, to, edges) {
 function learnAdjacentRegions(state, kit) {
   const edges = roadGraph(kit.data, { state });
   for (const region of kit.data.regions) {
-    if (marked(state, region.id) || !directRoad(state.region, region.id, edges)) continue;
-    const cross = crossRoute(state.region, region.id);
-    if (cross ? crossBlocker(state, cross) : region.reveal || region.secret) continue;
+    const edge = directRoad(state.region, region.id, edges);
+    if (marked(state, region.id) || !edge || crossBlocker(state, edge.cross) || region.reveal || region.secret) continue;
     state.discovered.push(region.id);
+    if (edge.cross && !edge.cross.onPermit) {
+      kit.say(state, `路牌写着「${edge.label}」，顺着走可以到${region.name}。`);
+    }
   }
-  // A permit describes both landing points. Merely seeing a locked crossing never reveals its destination.
+  // The permits name the main crossings. Secondary crossings are learned at their entrances.
   for (const edge of crossings) {
-    if (crossBlocker(state, edge)) continue;
+    if (!edge.onPermit || crossBlocker(state, edge)) continue;
     for (const id of [edge.a, edge.b]) if (kit.records.regions[id] && !marked(state, id)) state.discovered.push(id);
   }
+}
+
+function openKnownRoads(state, edges) {
+  const known = new Set([state.region, ...state.discovered]);
+  const avoided = new Set(state.world.avoidedRoads);
+  return edges.filter((edge) => known.has(edge.from) && known.has(edge.to) && !isAvoidedRoad(edge, avoided) && !crossBlocker(state, edge.cross));
+}
+
+function isAvoidedRoad(edge, avoided) {
+  return !edge.cross?.guarded && avoided.has(edge.key);
+}
+
+function roadNeighbors(edges) {
+  const neighbors = new Map();
+  for (const edge of edges) {
+    for (const point of [edge.from, edge.to]) {
+      if (!neighbors.has(point)) neighbors.set(point, []);
+      neighbors.get(point).push(edge);
+    }
+  }
+  return neighbors;
+}
+
+function hasDetour(edge, neighbors) {
+  const reached = new Set([edge.from]);
+  for (const point of reached) {
+    for (const leg of neighbors.get(point) ?? []) {
+      if (leg.key === edge.key) continue;
+      const next = leg.from === point ? leg.to : leg.from;
+      if (next === edge.to) return true;
+      reached.add(next);
+    }
+  }
+  return false;
+}
+
+function roadAvoidance(state, edge, neighbors) {
+  if (!marked(state, edge.from) || !marked(state, edge.to)) return '认清这条路的两头后，才能选择绕行。';
+  if (edge.cross?.guarded) return '这条跨州通路有人巡守，不能标红。';
+  if (state.roadTrip || state.event || state.combat || state.gathering) return '停在地图地点时才能改走法。';
+  if (state.world.avoidedRoads?.includes(edge.key)) return '';
+  const closed = crossBlocker(state, edge.cross);
+  if (closed) return closed;
+  return hasDetour(edge, neighbors) ? '' : '绕开这条路会让已知去路断开。';
+}
+
+function toggleRoadAvoidance(state, id, kit) {
+  const edges = roadGraph(kit.data, { state });
+  const edge = edges.find(({ key }) => key === id);
+  if (!edge || !marked(state, edge.from) || !marked(state, edge.to)) return kit.refuse('图上还没有这条路。');
+  const reason = roadAvoidance(state, edge, roadNeighbors(openKnownRoads(state, edges)));
+  if (reason) return kit.refuse(reason);
+  const avoided = state.world.avoidedRoads ??= [];
+  const index = avoided.indexOf(edge.key);
+  const ends = [edge.from, edge.to].map((point) => kit.records.regions[point].name).join('到');
+  if (index >= 0) {
+    avoided.splice(index, 1);
+    return kit.say(state, `已恢复${ends}这条路。`);
+  }
+  avoided.push(edge.key);
+  return kit.say(state, `将绕过${ends}这条路。`);
 }
 
 function knownRoutes(state, edges) {
   const routes = new Map([[state.region, { units: 0, legs: [] }]]);
   const unvisited = new Set([state.region, ...state.discovered]);
-  const permitted = edges.filter((edge) => !crossBlocker(state, edge.cross));
+  const neighbors = roadNeighbors(openKnownRoads(state, edges));
   while (unvisited.size) {
     let nearest;
     let nearestCost = Infinity;
@@ -5485,9 +5824,9 @@ function knownRoutes(state, edges) {
     }
     if (!nearest) break;
     unvisited.delete(nearest);
-    for (const edge of permitted) {
-      const id = otherside({ a: edge.from, b: edge.to }, nearest);
-      if (!id || !unvisited.has(id)) continue;
+    for (const edge of neighbors.get(nearest) ?? []) {
+      const id = edge.from === nearest ? edge.to : edge.from;
+      if (!unvisited.has(id)) continue;
       const units = nearestCost + edge.units;
       if (units < (routes.get(id)?.units ?? Infinity)) {
         routes.set(id, { units, legs: [...routes.get(nearest).legs, { ...edge, from: nearest, to: id }] });
@@ -5597,13 +5936,16 @@ function finishRoad(state, trip, kit) {
   const used = kit.goodsText(trip.meals);
   const travelText = trip.extraDays ? '腹中没了力气，沿路慢走了一程。'
     : trip.protection && state.satiety > 0 ? `裹紧${kit.nameOf(trip.protection)}的衣襟挡住风沙，这一程没那么耗力。` : '';
-  return { ...kit.say(state, `抵达${kit.records.regions[trip.destination].name}。${labels.length ? `这次走的是${labels.join('、')}。` : ''}${used ? `途中吃了${used}。` : ''}${travelText}`),
+  const destination = kit.records.regions[trip.destination].name;
+  const arrival = trip.backtrack ? `你沿着刚走过的路折回${destination}。` : `抵达${destination}。`;
+  return { ...kit.say(state, `${arrival}${labels.length && !trip.backtrack ? `这次走的是${labels.join('、')}。` : ''}${used ? `途中吃了${used}。` : ''}${travelText}`),
     ...(used ? { travelMeals: trip.meals } : {}) };
 }
 
 function walkRoad(state, kit) {
   const trip = state.roadTrip;
   trip.stop = null;
+  delete trip.afterBattle;
   while (trip.legIndex < trip.legs.length) {
     const leg = trip.legs[trip.legIndex];
     const { rate, protection } = legDiet(state, leg, kit);
@@ -5642,7 +5984,7 @@ function continueRoad(state, kit) {
   if (!trip) return kit.refuse('你当前没有在路上。');
   if (state.combat) return kit.refuse('先处理眼前的对手。');
   const remaining = trip.legs.slice(trip.legIndex);
-  if (remaining.some(({ cross }) => cross)) {
+  if (!trip.backtrack && remaining.some(({ cross }) => cross)) {
     const provisions = remaining.reduce((cost, leg, i) => cost + (leg.units - (i === 0 ? trip.progress : 0))
       * transportRules.roadUnitDays * legDiet(state, leg, kit).rate, 0);
     if (roadFood(state, provisions, kit).deficit > 0) return kit.refuse('带的口粮还不够走完这段路。');
@@ -5655,11 +5997,11 @@ function backFromRoad(state, kit) {
   if (!trip) return kit.refuse('你当前没有在路上。');
   if (state.combat) return kit.refuse('先处理眼前的对手。');
   const leg = trip.legs[trip.legIndex];
-  const { rate } = legDiet(state, { ...leg, from: leg.to, to: leg.from }, kit);
-  advanceRoad(state, trip, trip.progress * transportRules.roadUnitDays, rate, kit);
-  arrive(state, state.region, 0, kit);
-  state.roadTrip = null;
-  return kit.say(state, `你沿着刚走过的路折回${kit.records.regions[state.region].name}。`);
+  const returnLeg = { ...leg, from: leg.to, to: leg.from };
+  state.roadTrip = { ...trip, destination: returnLeg.to, legs: [returnLeg], legIndex: 0,
+    progress: leg.units - trip.progress, unitsWalked: 0, totalUnits: trip.progress,
+    reserve: 0, extraDays: 0, meals: {}, backtrack: true };
+  return walkRoad(state, kit);
 }
 
 function roadTripView(state, kit) {
@@ -5670,16 +6012,20 @@ function roadTripView(state, kit) {
     from: leg.from, fromName: kit.records.regions[leg.from].name, to: leg.to, toName: kit.records.regions[leg.to].name,
     key: leg.key, progress: trip.progress, legUnits: leg.units, unitsWalked: trip.unitsWalked, totalUnits: trip.totalUnits,
     remainingUnits: trip.totalUnits - trip.unitsWalked,
-    stop: trip.stop, backDays: trip.progress * transportRules.roadUnitDays };
+    stop: trip.stop, afterBattle: Boolean(trip.afterBattle), backDays: trip.progress * transportRules.roadUnitDays };
 }
 
 function gateQuote(state, id, kit, scroll) {
-  if (!detail(kit.data, id).portal || !state.world.gates.includes(id)) return '要先到那里点亮传送门。';
+  if (!marked(state, id) || !detail(kit.data, id).portal || !state.world.gates.includes(id)) return '要先到那里点亮传送门。';
   if (id === state.region) return '你已经在这处门旁。';
-  if (scroll) return kit.owns(state, 'gate_scroll') > 0 ? '' : '行囊里没有传送卷轴。';
-  if (!detail(kit.data, state.region).portal || !state.world.gates.includes(state.region)) return '先站到一座已经点亮的传送门旁。';
-  if (provinceOf(kit.data, id) !== provinceOf(kit.data, state.region)) return '普通传送门只能连到本州。';
-  if (state.coins < transportRules.gatePrice) return `还差${transportRules.gatePrice - state.coins}枚灵钱。`;
+  if (scroll) {
+    if (!kit.owns(state, 'gate_scroll')) return '行囊里没有传送卷轴。';
+  } else {
+    if (!detail(kit.data, state.region).portal || !state.world.gates.includes(state.region)) return '先站到一座已经点亮的传送门旁。';
+    if (provinceOf(kit.data, id) !== provinceOf(kit.data, state.region)) return '普通传送门只能连到本州。';
+  }
+  const price = scroll ? transportRules.scrollPrice : transportRules.gatePrice;
+  if (state.coins < price) return `还差${price - state.coins}枚灵钱。`;
   return '';
 }
 
@@ -5694,7 +6040,7 @@ function jumpGate(state, id, kit, scroll) {
   const reason = gateQuote(state, id, kit, scroll);
   if (reason) return kit.refuse(reason);
   if (scroll) kit.removeItem(state, 'gate_scroll', 1);
-  else state.coins -= transportRules.gatePrice;
+  state.coins -= scroll ? transportRules.scrollPrice : transportRules.gatePrice;
   arrive(state, id, scroll ? transportRules.scrollDays : transportRules.gateDays, kit, { clearEvent: true });
   return kit.say(state, scroll ? `卷轴化成灰。抬头已经到了${kit.records.regions[id].name}。` : `门框一亮，转眼已到${kit.records.regions[id].name}。`);
 }
@@ -5958,6 +6304,7 @@ function worldView(state, kit) {
   const here = detail(kit.data, state.region);
   const discovered = kit.data.regions.filter((region) => marked(state, region.id));
   const edges = roadGraph(kit.data, { state });
+  const avoidedRoads = new Set(state.world.avoidedRoads);
   const routesFromHere = knownRoutes(state, edges);
   const journeys = discovered.flatMap((region) => {
     if (region.id === state.region) return [];
@@ -5966,14 +6313,33 @@ function worldView(state, kit) {
     const via = (quote.legs ?? []).slice(0, -1).map(({ to }) => to);
     return quote.days === undefined ? [] :
       [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue),
-        units: quote.units, direct: Boolean(ordinary), via: via.map((id) => kit.records.regions[id].name), path: [state.region, ...via, region.id],
+        units: quote.units, direct: Boolean(ordinary && !isAvoidedRoad(ordinary, avoidedRoads)), via: via.map((id) => kit.records.regions[id].name), path: [state.region, ...via, region.id],
         meals: quote.meals, emptyOnArrival: quote.emptyOnArrival })];
   });
   const roads = journeys.filter((road) => road.direct || road.rescue);
-  const knownEdges = edges.filter(({ from, to }) => marked(state, from) && marked(state, to)).map((edge) => {
+  const neighbors = roadNeighbors(openKnownRoads(state, edges));
+  const roadStatus = (edge) => {
     const reason = crossBlocker(state, edge.cross);
+    const avoidReason = roadAvoidance(state, edge, neighbors);
+    return { available: !reason, reason, avoided: isAvoidedRoad(edge, avoidedRoads), canAvoid: !avoidReason, avoidReason };
+  };
+  const knownEdges = edges.filter(({ from, to }) => marked(state, from) && marked(state, to)).map((edge) => {
     const riskText = kit.roadRisk?.(state, edge)?.riskText;
-    return { ...edge, available: !reason, reason, ...(riskText ? { riskText } : {}) };
+    return { ...edge, ...roadStatus(edge), ...(riskText ? { riskText } : {}) };
+  });
+  const provinceNames = new Map((kit.data.provinces ?? []).map(({ id, name }) => [id, name]));
+  const knownProvinces = new Set([provinceOf(kit.data, state.region), ...discovered.map(({ id }) => provinceOf(kit.data, id))]);
+  const provinces = (kit.data.provinces ?? []).map((province) => ({ ...province, known: knownProvinces.has(province.id) }));
+  const crossLinks = edges.filter((edge) => edge.cross && !crossBlocker(state, edge.cross)).flatMap((edge) => {
+    const status = roadStatus(edge);
+    const riskText = kit.roadRisk?.(state, edge)?.riskText;
+    return [edge.from, edge.to].flatMap((from) => {
+      const other = from === edge.from ? edge.to : edge.from;
+      const province = provinceOf(kit.data, other);
+      if (!marked(state, from) || !knownProvinces.has(province)) return [];
+      return [{ from, province, name: provinceNames.get(province), key: edge.key, label: edge.label,
+        units: edge.units, ...(riskText ? { riskText } : {}), ...status }];
+    });
   });
   const roadsById = Object.fromEntries(journeys.map((road) => [road.id, road]));
   const closedSidePaths = crossings.filter((edge) => {
@@ -5983,7 +6349,8 @@ function worldView(state, kit) {
   const gates = discovered.filter(({ id }) => state.world.gates.includes(id)).map((region) => {
     const scrollReason = gateQuote(state, region.id, kit, true);
     return targetSummary(region, kit.data, gateQuote(state, region.id, kit, false),
-      { days: transportRules.gateDays, price: transportRules.gatePrice, scrollDays: transportRules.scrollDays, byScroll: !scrollReason, scrollReason });
+      { days: transportRules.gateDays, price: transportRules.gatePrice, scrollDays: transportRules.scrollDays,
+        scrollPrice: transportRules.scrollPrice, byScroll: !scrollReason, scrollReason });
   });
   const arrays = discovered.filter(({ id }) => Boolean(arrayPlan(kit.data, id))).map((region) => targetSummary(region, kit.data, arrayQuote(state, region.id, kit),
     { days: transportRules.arrayDays, price: transportRules.arrayPrice, active: arrayView(state, region.id, kit).active }));
@@ -5991,13 +6358,15 @@ function worldView(state, kit) {
     const { x, y, portal, array, description } = detail(kit.data, region.id);
     return { id: region.id, name: region.name, province: provinceOf(kit.data, region.id), x, y, description: description ?? region.desc,
       settlement: Boolean(settlementOf(kit.data, region.id)), portal: Boolean(portal), array: Boolean(array), attuned: state.world.gates.includes(region.id),
-      current: region.id === state.region, travelable: Boolean(roadsById[region.id]?.available) };
+      current: region.id === state.region, travelable: Boolean(roadsById[region.id]?.available),
+      travelReason: roadsById[region.id]?.reason ?? '还不知道从这里接上的路。' };
   });
   const affiliation = kit.data.sects?.find(({ id }) => state.world.affiliation === id);
   const credit = affiliation ? pledge(state, affiliation)?.credit ?? 0 : 0;
   return { settlement: settlementOf(kit.data, state.region), localMarket: localMarket(state, kit), sect: sectView(state, kit),
     affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit, disciple: discipleStanding(affiliation, credit) } : null,
-    world: { province: provinceOf(kit.data, state.region), provinces: kit.data.provinces ?? [], points, roads, edges: knownEdges, journeys, crossings: closedSidePaths,
+    world: { province: provinceOf(kit.data, state.region), provinces, points, roads, edges: knownEdges, journeys,
+      crossings: closedSidePaths, crossLinks,
       here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: here.x, y: here.y, description: here.description ?? actual.desc },
       scrollCount: kit.owns(state, 'gate_scroll'), gates, localGate: here.portal ? { attuned: state.world.gates.includes(state.region) } : null,
       localArray: arrayView(state, state.region, kit), arrays } };
@@ -6005,6 +6374,7 @@ function worldView(state, kit) {
 
 function worldAction(state, action, payload, kit) {
   const { id, count = 1 } = payload;
+  if (action === 'roadAvoid') return toggleRoadAvoidance(state, id, kit);
   if (action === 'attuneGate') return attune(state, kit);
   if (action === 'gateJump') return jumpGate(state, id, kit, false);
   if (action === 'gateScroll') return jumpGate(state, id, kit, true);
@@ -6035,7 +6405,6 @@ const banditRules = Object.freeze({
   fatalDefeatCap: 0.32,
   fatalChiefDefeat: 0.30,
   ignoreUnarmedChance: 0.65,
-  repeatEncounterFactors: Object.freeze([1, 0.10, 0.02]),
 });
 
 const roadKey = (a, b) => [a, b].sort().join('|');
@@ -6116,7 +6485,7 @@ function apparentBanditGrade(state, kit) {
 }
 
 function roadBanditRisk(state, leg, kit) {
-  if (leg.cross?.ferry) return null;
+  if (leg.cross?.ferry || leg.cross?.guarded) return null;
   const profile = kit.data.roadBandits.roads.find(({ a, b }) => roadKey(a, b) === leg.key);
   if (!profile) return null;
   const crew = kit.data.roadBandits.crews[profile.crew];
@@ -6141,11 +6510,13 @@ function roadBanditRisk(state, leg, kit) {
 }
 
 function pickBandit(state, grade, crewId, kit) {
-  const stages = banditRules.gearGradeOdds[grade].map((weight, index) => ({ index, weight }));
-  const stage = chooseWeighted(state, stages, ({ weight }) => weight).index;
   const crew = kit.data.roadBandits.crews[crewId];
-  return chooseWeighted(state, unresolvedBandit(crewId, crew, state).filter(({ tier }) => Math.floor(tier / 3) === stage),
-    ({ tier }) => [4, 3, 2][tier % 3]);
+  const roster = unresolvedBandit(crewId, crew, state);
+  const stages = banditRules.gearGradeOdds[grade].map((weight, index) => ({
+    weight, members: roster.filter(({ tier }) => Math.floor(tier / 3) === index),
+  })).filter(({ weight, members }) => weight > 0 && members.length);
+  const stage = chooseWeighted(state, stages, ({ weight }) => weight);
+  return stage && chooseWeighted(state, stage.members, ({ tier }) => [4, 3, 2][tier % 3]);
 }
 
 function roadStory(state, leg, crewId, grade, kit) {
@@ -6189,10 +6560,11 @@ function stopForBandit(state, leg, crewId, kit) {
 }
 
 function checkRoadBanditStep(state, leg, index, kit) {
-  const profile = roadBanditRisk(state, leg, kit);
-  const prior = state.roadTrip.banditsMet?.length ?? 0;
-  const factor = banditRules.repeatEncounterFactors[Math.min(prior, banditRules.repeatEncounterFactors.length - 1)];
-  if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1) * factor) {
+  const risks = (state.roadTrip.banditRiskByLeg ??= {});
+  if (!Object.hasOwn(risks, leg.key)) risks[leg.key] = roadBanditRisk(state, leg, kit);
+  const profile = risks[leg.key];
+  const units = Math.min(1, leg.stepUnits ?? 1);
+  if (profile?.chance > 0 && draw(state) < 1 - (1 - profile.chance) ** units) {
     const roster = recruitsByNow(state, profile.crew, kit);
     if (roster) state.banditCrews[profile.crew] = roster;
     const pause = stopForBandit(state, leg, profile.crew, kit);
@@ -6427,6 +6799,7 @@ function banditAction(state, action, { id, count = 1 }, kit) {
 
 function winRoadBandit(state, enemy, kit) {
   const bandit = state.roadBandit;
+  state.roadTrip.afterBattle = true;
   const story = storyOf(state, kit);
   const pool = kit.data.roadBandits.pools.find(({ enemy: id }) => id === enemy.id);
   const recovered = recoverBanditSpoils(state, null, kit);
@@ -6534,11 +6907,12 @@ function trainingPerks(state, enemy, intent) {
   };
 }
 
-function restoreTrainingSense(state) {
+function restoreTrainingSense(state, amount = Infinity) {
   const maximum = trainedRank(state, 'spirit').senseMax ?? 0;
-  const gained = maximum - (state.training?.sense ?? 0);
-  if (gained > 0) state.training.sense = maximum;
-  return Math.max(0, gained);
+  const current = state.training?.sense ?? 0;
+  const gained = Math.max(0, Math.min(amount, maximum - current));
+  if (gained > 0) state.training.sense = current + gained;
+  return gained;
 }
 
 function needsSenseRest(state) {
@@ -6600,7 +6974,7 @@ function trainingAction(state, action, { id }, kit) {
 function recordTrainingRead(state, kit) {
   const sense = spiritView(state, kit);
   if (!sense || !state.combat) return kit.refuse('学会神识后，可以在战斗中预看对手的招式。');
-  if (!sense.canRead) return kit.refuse(sense.current ? '这回合已经用神识看过了。' : '神识已经耗尽，歇脚后再用。');
+  if (!sense.canRead) return kit.refuse(sense.current ? '这回合已经用神识看过了。' : '神识已经耗尽，可以歇脚或用药养回来。');
   state.training.sense -= 1;
   state.combat.spiritReadRound = state.combat.round;
   state.combat.spiritGuard = trainedRank(state, 'spirit').senseGuard;
@@ -7046,6 +7420,8 @@ function depositReason(state, id, count, kit, stored) {
 
 function withdrawalReason(state, id, count, kit) {
   if ((storedItems(state)[id] ?? 0) < count) return '仓库里没有这么多。';
+  const bagReason = kit.records.items[id].kind === 'container' ? containerCarryReason(state.inventory, count) : '';
+  if (bagReason) return bagReason;
   if (storageUnique(id, kit) && kit.owns(state, id)) return '行囊已有同样的物件。';
   if (!kit.hasRoom(state, { [id]: count })) return '行囊装不下。';
   return '';
@@ -7072,6 +7448,13 @@ function containerContents(state, bagId) {
 
 function containerHasItem(state, id) {
   return Object.values(state.economy?.containers ?? {}).some(({ items }) => (items?.[id] ?? 0) > 0);
+}
+
+function containerCarryReason(inventory, count = 1) {
+  if (containerPlans.some(({ id }) => (inventory[id] ?? 0) > 0)) {
+    return '行囊里已有一只乾坤袋，先把它存入仓库或放下。';
+  }
+  return count > 1 ? '行囊一次只能带一只乾坤袋。' : '';
 }
 
 function carriedContainerPlans(state, kit) {
@@ -7329,7 +7712,7 @@ function containerPlanReason(state, plan, kit) {
       Object.values(state.ground ?? {}).some((pile) => (pile[plan.id] ?? 0) > 0)) {
     return '这张样布已经用来缝过这只袋子。';
   }
-  return kit.homeRequirements(state, plan.cost, plan.need) ||
+  return containerCarryReason(state.inventory) || kit.homeRequirements(state, plan.cost, plan.need) ||
     (kit.hasRoom(state, { [plan.id]: 1 }, kit.homeBagSpend(state, plan.need)) ? '' : '先在行囊里腾出一格来收袋子。');
 }
 
@@ -7543,9 +7926,9 @@ function economyAction(state, action, { bagId, id, count = 1 }, kit) {
   return actions[action]();
 }
 
-return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem };
+return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem, containerCarryReason };
 })();
-const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem } = economyModule;
+const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem, containerCarryReason } = economyModule;
 const { alchemyData, initialAlchemyState, alchemyView, alchemyAction } = (() => {
 const town = {
   name: '丹师安蒲',
@@ -7566,6 +7949,8 @@ const offers = [
     desc: '「这丹入口苦，你若接着用术法，打出去就更有劲。」' },
   { id: 'formula_resin', recipe: 'r_resin_pill', name: '温枝丸丹方', price: 28, reveal: 'kiln_manual',
     desc: '安蒲比了比你带回的火候牌。石谷人会把炉口盖住，让小火慢慢把药温透。到炼气中期才能服用。' },
+  { id: 'formula_sense', recipe: 'r_sense_powder', name: '凝神散丹方', price: 22, reveal: 'phase_chart',
+    desc: '安蒲看过滴水图，从案下抽出一页抄方。「照原教人闭眼观水。我曾替他们配过这味药。用神识用得眼花时，把细末含在舌下，等一等就能缓过来。」' },
   { id: 'formula_return_breath', recipe: 'r_return_breath', name: '归元丹方', price: 38, reveal: 'fault_receipt',
     desc: '安蒲用两只碗照旧约的画法分水。「一枚金丹妖丹能炼三颗。赶远路连打几阵，气跟不上时吃一颗。」' },
 ];
@@ -7749,10 +8134,11 @@ function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, read, obse
   const attack = available.find(({ kind }) => kind === 'attack') ?? available.find(({ kind }) => isAttack(kind));
   const heavy = previousKind === 'heavy' ? null : available.find(({ kind }) => kind === 'heavy');
   const strategy = Object.hasOwn(strategies, enemy.strategy) ? strategies[enemy.strategy] : null;
+  if (read?.kind === 'medicine' && charged) return heavy ?? attack;
 
   if (!strategy) {
     if (!read) return planned;
-    if (read.kind === 'focus' || read.kind === 'recover') return attack;
+    if (read.kind === 'focus' || read.kind === 'recover' || read.kind === 'medicine') return attack;
     if (planned.kind === 'guard' && read.kind !== 'strike') return attack;
     return planned;
   }
@@ -7763,7 +8149,7 @@ function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, read, obse
   const threat = incomingEstimate(enemy, guard ?? order.find(({ kind }) => kind === 'guard'), observedHits);
   const open = threat?.open ?? 0;
 
-  const safeWindow = ['brace', 'dodge', 'focus', 'recover', 'switch'].includes(read?.kind);
+  const safeWindow = ['brace', 'dodge', 'focus', 'recover', 'switch', 'medicine'].includes(read?.kind);
   const recentlyPassive = previousKind === 'guard' || recentlyRecovered || previousKind === 'focus';
   if (medicine?.hp > 0 && !recentlyRecovered && read?.kind !== 'retreat' &&
       (safeWindow || (threat && !recentlyPassive && open < hp))) {
@@ -7848,6 +8234,8 @@ const rules = Object.freeze({
   pressureThreshold: 3,
   pressureQi: 1,
   battleDays: 0.125,
+  regulatedBoutCooldown: 0.5,
+  regulatedBoutHpFraction: 0.5,
   perceptionScale: 12,
   perceptionCap: 0.7,
   observedHitLimit: 3,
@@ -7900,7 +8288,6 @@ const rules = Object.freeze({
   researchLimit: 2,
   practicePerDay: 1,
   worthyFightPractice: 2,
-  combatSwitchGuard: 1,
   mealHeal: records.foods.ration.hp,
   fallDays: 1,
   fallMaxCoinLoss: 4,
@@ -7921,6 +8308,8 @@ const realmOf = (state) => records.realms[state.realm];
 const regionOf = (state) => records.regions[state.region];
 const enemyOf = (state) => state.combat ? records.enemies[state.combat.id] : null;
 const inProtectedBout = (state) => Boolean(enemyOf(state)?.sparring && records.sites[state.combat.siteId]?.protectedArena);
+const inRegulatedBout = (state) => inProtectedBout(state) && Boolean(records.sites[state.combat.siteId].regulatedBout);
+const regulatedBoutRestriction = '这场切磋禁用药物和饮食。';
 const atHome = (state) => state.region === hub;
 const isSettlement = (state) => Boolean(settlementOf(data, state.region));
 const nameOf = (id) => records.items[id]?.name ?? id;
@@ -7991,6 +8380,21 @@ function normalize(state) {
   state.qi = clamp(state.qi, 0, maxQi);
 }
 
+const regulatedBoutWaitDays = (state) => Math.max(0, Math.round(((state.regulatedBoutUntil ?? 0) - state.day) * 1000) / 1000);
+
+function regulatedBoutBlocker(state) {
+  const remaining = regulatedBoutWaitDays(state);
+  if (remaining > 0) return `裁判请你先在场边歇一歇。还要等 ${remaining} 日。`;
+  if (state.hp < Math.ceil(stats(state).maxHp * rules.regulatedBoutHpFraction)) {
+    return '裁判见你气血还没到一半，请先歇息养伤。';
+  }
+  return '';
+}
+
+function setRegulatedBoutRecovery(state) {
+  state.regulatedBoutUntil = state.day + rules.regulatedBoutCooldown;
+}
+
 function advance(state, days, satietyRate = rules.satietyDrainPerDay) {
   const elapsed = days ?? 0;
   state.day = Math.round((state.day + elapsed) * 1000) / 1000;
@@ -8017,6 +8421,7 @@ function fittingItems(state, resources, spent = {}) {
   const inventory = { ...state.inventory };
   for (const [id, count] of resourceEntries(spent)) inventory[id] = Math.max(0, (inventory[id] ?? 0) - count);
   let available = Math.max(0, backpackCapacity(state, rules.backpackCapacity) - backpackSlots(state, inventory));
+  let bagPlaces = Number(!containerCarryReason(inventory));
   const accepted = {};
   const spilled = {};
   const stackSize = rules.backpackStackSize;
@@ -8024,14 +8429,17 @@ function fittingItems(state, resources, spent = {}) {
     if (count <= 0 || !records.items[id]) continue;
     const current = inventory[id] ?? 0;
     const gear = records.gear[id];
+    const bag = records.items[id].kind === 'container';
     if (gear && current) continue;
     const desired = gear ? 1 : count;
     const occupies = occupiesBackpack(state, id);
     const used = Math.ceil(current / stackSize);
-    const fits = occupies ? Math.min(desired, (available + used) * stackSize - current) : desired;
+    const room = occupies ? (available + used) * stackSize - current : desired;
+    const fits = Math.min(desired, room, bag ? bagPlaces : desired);
     if (fits) accepted[id] = fits;
     if (fits < desired) spilled[id] = desired - fits;
     if (occupies) available -= Math.ceil((current + fits) / stackSize) - used;
+    if (bag) bagPlaces -= fits;
   }
   return { accepted, spilled };
 }
@@ -8051,6 +8459,7 @@ function groundPlace(state) {
 const roadsideActions = new Set(['eat', 'batchEat', 'use', 'equip', 'unequip', 'equipManual',
   'unequipManual', 'selectAmmo', 'take', 'discard']);
 const containerTransfers = new Set(['econBagDeposit', 'econBagWithdraw']);
+const equipmentChanges = new Set(['equip', 'unequip', 'combatEquip', 'equipManual', 'unequipManual', 'upgradeManual']);
 
 function groundAt(state, place = groundPlace(state)) {
   return state.ground?.[place] ?? {};
@@ -8059,6 +8468,10 @@ function groundAt(state, place = groundPlace(state)) {
 function groundPickupLimit(state, id, available = groundAt(state)[id]) {
   if (!available || (records.gear[id] && gearReserved(state, id))) return 0;
   return fittingItems(state, { [id]: available }).accepted[id] ?? 0;
+}
+
+function groundPickupReason(state, id, count) {
+  return records.items[id]?.kind === 'container' ? containerCarryReason(state.inventory, count) : '';
 }
 
 function leaveOnGround(state, resources, durability = {}, place = groundPlace(state)) {
@@ -8219,6 +8632,7 @@ function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     manualRanks: {},
     mechanisms: initialMechanisms(),
     tournament: initialTournament(),
+    regulatedBoutUntil: 0,
     hp: 0,
     satiety: clamp(settings.satiety ?? rules.maxSatiety, 0, rules.maxSatiety),
     didEat: false,
@@ -8310,6 +8724,7 @@ function readableIntent(state) {
 }
 
 function enemyMedicine(state) {
+  if (inRegulatedBout(state)) return null;
   const carried = enemyOf(state)?.medicine;
   if (!carried || (state.combat.medicineLeft ?? carried.count) <= 0) return null;
   const { id, count } = carried;
@@ -8526,10 +8941,14 @@ function view(state) {
     innerStyle: innerStyleView(state, combatWeapon, side),
     mechanism: mechanismView(state, economyKit),
     spiritSense: studies.spiritSense,
+    medicineUseReasons: Object.fromEntries(resourceEntries(state.inventory).flatMap(([id]) => {
+      const reason = senseMedicineBlocker(state, records.pills[id]);
+      return reason ? [[id, reason]] : [];
+    })),
     tournament: tournamentView(state, economyKit),
     maxSatiety: rules.maxSatiety,
     restSessions: mode === 'village' && settlementOf(data, state.region)?.inn ? recoverySessions(state) : 0,
-    batchMeals: (['field', 'village', 'event'].includes(mode) || (mode === 'road' && !roadBandit)) && !state.gathering
+    batchMeals: (['field', 'village', 'event'].includes(mode) || (mode === 'road' && (!roadBandit || roadBandit.aftermath))) && !state.gathering
       ? Object.fromEntries(data.foods.map(({ id }) => [id, batchMealCount(state, id)]).filter(([, count]) => count > 1))
       : {},
     fogTolerance: totalFogTolerance(state, fogProtection(state)),
@@ -8554,6 +8973,10 @@ function view(state) {
     groundWear: Object.fromEntries(resourceEntries(groundLoot).filter(([id]) => records.gear[id])
       .map(([id]) => [id, state.groundDurability?.[groundPlace(state)]?.[id]?.[0] ?? records.gear[id].durability])),
     groundPickup: Object.fromEntries(resourceEntries(groundLoot).map(([id, count]) => [id, groundPickupLimit(state, id, count)])),
+    groundPickupReasons: Object.fromEntries(resourceEntries(groundLoot).flatMap(([id]) => {
+      const reason = groundPickupReason(state, id);
+      return reason ? [[id, reason]] : [];
+    })),
     sites: currentSites(state).map((site) => viewSite(state, site)),
     currentEvent: currentEvent ? { id: currentEvent.id, name: currentEvent.name, text: siteText(state, currentSite, currentEvent), choices: visibleChoices } : null,
     visibleChoices,
@@ -8568,7 +8991,8 @@ function view(state) {
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
     combat: combat ? { id: combat.id, siteId: combat.siteId, round: combat.round } : null,
     currentEnemy: enemy ? { id: enemy.id, name: enemy.name, tier: enemy.tier, desc: enemy.desc,
-      sparring: inProtectedBout(state), maxHp: enemy.hp, hp: combat.hp } : null,
+      sparring: inProtectedBout(state), medicineRestricted: inRegulatedBout(state), maxHp: enemy.hp, hp: combat.hp } : null,
+    boutPause: regulatedBoutWaitDays(state),
     combatWeapon,
     combatOffhand: side ? { id: side.id, name: nameOf(side.id), chargeRequired: Boolean(side.chargeRequired) } : null,
     combatFist: combat ? { name: fist ? nameOf(fist.id) : '徒手出拳',
@@ -8766,6 +9190,10 @@ function choiceBlocker(state, choice, site, index) {
   if (choice.fieldTool && !fieldToolWear(state, choice.fieldTool)) {
     return { reason: `副手要装备完好的${nameOf(choice.fieldTool)}。` };
   }
+  if (site?.regulatedBout && records.enemies[choice.enemy]?.sparring) {
+    const reason = regulatedBoutBlocker(state);
+    if (reason) return { reason };
+  }
   if ((state.world.recovery[`${site?.id}:${choice.enemy}`] ?? 0) > state.day) return { reason: '教习收了练兵，先歇一歇再来。' };
   if (site?.creatures?.[choice.enemy] && poolAt(state, site, 'creatures', choice.enemy).count === 0) {
     const reason = records.enemies[choice.enemy]?.sparring
@@ -8944,15 +9372,18 @@ function choose(state, { index, itemId, count }) {
 function endSparring(state, enemy) {
   const combat = state.combat;
   const siteId = combat?.siteId;
-  state.event = siteId ?? null;
+  const regulated = inRegulatedBout(state);
+  state.event = regulated ? null : siteId ?? null;
   state.combat = null;
   state.focus = 0;
-  state.hp = Math.max(1, Math.floor(stats(state).maxHp * 0.25));
+  state.hp = regulated ? 1 : Math.max(1, Math.floor(stats(state).maxHp * 0.25));
   advance(state, 0.5);
+  if (regulated) setRegulatedBoutRecovery(state);
   const tournament = tournamentResolution(state, combat, false);
   if (tournament) state.event = null;
-  else if (siteId) state.world.recovery[`${siteId}:${enemy.id}`] = state.day + 0.5;
-  return say(state, `${enemy.name}在最后一式收手。你坐到场边歇过半日，这场试招输了。${tournament}`);
+  else if (!regulated && siteId) state.world.recovery[`${siteId}:${enemy.id}`] = state.day + 0.5;
+  const result = regulated ? '你到场边坐了半日，起身时仍只剩一口气。' : '你坐到场边歇过半日，这场试招输了。';
+  return say(state, `${enemy.name}在最后一式收手。${tournament || (regulated ? '裁判叫停，判你这场负。' : '')}${result}`);
 }
 
 function fall(state, place = groundPlace(state)) {
@@ -9015,6 +9446,7 @@ function finishCombat(state, enemy) {
   }
   const site = records.sites[combat.siteId];
   const protectedBout = inProtectedBout(state);
+  if (inRegulatedBout(state)) setRegulatedBoutRecovery(state);
   if (site?.creatures?.[enemy.id]) {
     spendPool(state, site, 'creatures', enemy.id, 1);
     const wins = (state.siteVictories[site.id] ??= {});
@@ -9047,7 +9479,7 @@ function finishCombat(state, enemy) {
   const chiefFell = data.roadBandits.dens[site?.id]?.boss === enemy.id;
   const rescuedGear = isDenBattle ? recoverBanditSpoils(state, site.id, economyKit, chiefFell) : '';
   const roadNews = chiefFell
-    ? '守在岔路口的人拔了哨旗，退回坡寨。往后这一带的山道可以放心走了。' : '';
+    ? '把守几条路的人撤走了，往后这一伙人不再出来拦路。' : '';
   return {
     message: `${protectedBout ? '试招中胜过' : isDenBattle ? '击杀了' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}${roadNews}${rescuedGear}`,
     ...(loot ? { gathered, gatheredRegion: state.region, gatheredSite: site?.id } : {}),
@@ -9127,8 +9559,6 @@ function fistWeapon(state) {
 
 function weaponView(state) {
   const { weapon, compatible, ammo } = weaponLoadout(state);
-  const meleeAlternative = data.gear.find(({ id, slot, ammo: needs, tier }) =>
-    slot === 'weapon' && !needs?.length && id !== weapon?.id && tier <= state.realm && owns(state, id) > 0 && state.durability[id] > 0);
   return {
     id: weapon?.id ?? null,
     name: weapon ? nameOf(weapon.id) : '徒手',
@@ -9138,7 +9568,6 @@ function weaponView(state) {
     isLoaded: !compatible.length || Boolean(ammo),
     selectedAmmo: ammo?.id ?? null,
     ammo: compatible.map((id) => ({ id, name: nameOf(id), count: owns(state, id), selected: id === ammo?.id })),
-    meleeAlternative: meleeAlternative ? { id: meleeAlternative.id, name: nameOf(meleeAlternative.id) } : null,
   };
 }
 
@@ -9204,11 +9633,8 @@ function combatEffects(state, enemy, intent, move) {
       - guard - traits.guard - training.guard - interrupt);
   const shield = heavyBrace && incoming > 0 ? activeGear(state).find(({ slot, brace }) => slot === 'offhand' && brace) : null;
   const received = Math.max(0, incoming - (shield?.brace ?? 0));
-  const qiToPlayer = intent.kind === 'drain' ? Math.min(state.qi, received) : 0;
-  const damageToPlayer = received - qiToPlayer;
   const healing = intent.kind === 'heal' ? Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt) : 0;
-  const reflect = damageToPlayer > 0 && damageToPlayer < state.hp && !intent.ranged &&
-    (intent.kind === 'attack' || intent.kind === 'heavy') ? traits.reflect : 0;
+  const reflect = !intent.ranged && (intent.kind === 'attack' || intent.kind === 'heavy') ? traits.reflect : 0;
   const quick = intent.ranged || intent.kind === 'drain';
   const hardToEvade = quick || intent.kind === 'heavy';
   const passive = (traits.dodge + (activeManualRank(state)?.base.dodge ?? 0)) * (hardToEvade ? rules.combatQuickDodgeFactor : 1);
@@ -9216,7 +9642,7 @@ function combatEffects(state, enemy, intent, move) {
   const accuracy = (enemy.accuracy ?? 0) + (intent.accuracy ?? 0) + excessRealmGap(state, enemy) * rules.largeRealmAccuracy;
   const dodge = received > 0
     ? dodgeChance(passive + active, accuracy, move.evade ? rules.combatActiveDodgeCap : rules.combatDodgeCap) : 0;
-  return { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer };
+  return { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, received };
 }
 
 function dodgeChance(evasion, accuracy, cap) {
@@ -9249,10 +9675,17 @@ function combatVictory(state, enemy, summary, results) {
 
 function combatTurn(state, move) {
   const enemy = enemyOf(state);
-  const { kind = 'recover', brace, wearWeapon, ammo, message } = move;
+  const { kind = 'recover', brace, wearWeapon, ammo, medicine, message } = move;
   const intent = respondToMove(state, enemy, kind);
   const result = combatEffects(state, enemy, intent, move);
-  const { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer } = result;
+  const { dealt, counter, missed, hit, charge, interrupt, shield, reflect, dodge, healing, received } = result;
+  const incoming = state.combat.hp > dealt + counter && !hit && received > 0;
+  const dodged = incoming && combatEvaded(state, 'player', dodge);
+  const interruptedMedicine = medicine && state.combat.enemyCharged && incoming && !dodged;
+  const doseTaken = medicine && !interruptedMedicine ? applyMedicine(state, medicine) : null;
+  const { message: doseMessage, ...medicineResult } = doseTaken ?? {};
+  const qiToPlayer = intent.kind === 'drain' ? Math.min(state.qi, received) : 0;
+  const damageToPlayer = received - qiToPlayer;
   const healthBefore = state.hp;
   const enemyMove = { name: intent.name, kind: intent.kind };
   const read = state.combat.plan.reader === 'enemy' ? `${enemy.name}看破了你的起手。` : '';
@@ -9276,14 +9709,14 @@ function combatTurn(state, move) {
   if (ammo) removeItem(state, ammo.id, 1);
   const playerMove = brace ? counter ? '你挡住重招，趁对手还没收招打了回去。'
     : recovered ? `你趁对手守势回了${recovered}点真气。` : '你收回手，挡在身前。' : message;
-  let summary = `${read}${abandoned ? '你收住了方才蓄着的劲。' : ''}${playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${missed ? `${enemy.name}侧身闪过了这一击。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
+  const medicineMove = interruptedMedicine ? `你刚取出${nameOf(medicine)}，便被对手蓄好的招打断。药还在手里。` : doseMessage;
+  let summary = `${read}${abandoned ? '你收住了方才蓄着的劲。' : ''}${medicineMove ?? playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${missed ? `${enemy.name}侧身闪过了这一击。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
   if (state.combat.hp <= 0) {
     if (counter) summary += `「${intent.name}」被你截住了。`;
     return combatVictory(state, enemy, summary, { damageDealt, damageTaken: 0, ...(counter ? { enemyMove } : {}) });
   }
-  summary += intent.kind === 'remedy' ? `${enemy.name}${intent.name}。` : `${enemy.name}使出「${intent.name}」。`;
+  if (intent.kind !== 'remedy') summary += `${enemy.name}使出「${intent.name}」。`;
   if (attackingIntent(intent)) state.combat.enemyCharged = false;
-  const dodged = !hit && (qiToPlayer > 0 || damageToPlayer > 0) && combatEvaded(state, 'player', dodge);
   if (hit) {
     summary += `这一箭拦住了${enemy.name}的冲势。`;
   } else if (dodged) {
@@ -9301,10 +9734,22 @@ function combatTurn(state, move) {
       : `${enemy.name}${interrupt ? '调息受阻，只' : ''}恢复了${restored}点生命。`;
   } else if (intent.kind === 'remedy') {
     const dose = enemyMedicine(state);
-    state.combat.medicineLeft = dose.left - 1;
-    const restored = Math.min(enemy.hp - state.combat.hp, dose.hp);
-    state.combat.hp += restored;
-    summary += `气血回了${restored}点。`;
+    if (!dose) {
+      enemyMove.name = '摸了摸空药袋';
+      summary += `${enemy.name}摸了摸药袋，已经空了。`;
+    } else if (charge && dealt > 0) {
+      enemyMove.name = '取药时被打断';
+      summary += `${enemy.name}刚取出${dose.name}，便被你这一击打断，药仍攥在手里。`;
+    } else {
+      state.combat.medicineLeft = dose.left - 1;
+      const restored = Math.min(enemy.hp - state.combat.hp, dose.hp);
+      state.combat.hp += restored;
+      summary += `${enemy.name}${intent.name}。`;
+      if (restored > 0) {
+        summary += `气血回了${restored}点。`;
+        medicineResult.enemyMedicineRecovery = restored;
+      }
+    }
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
   } else if (intent.kind === 'dodge') {
@@ -9327,21 +9772,23 @@ function combatTurn(state, move) {
       state.combat.playerCharge = null;
       summary += '你蓄着的劲被打散了。';
     }
-    if (reflect > 0) {
+    if (reflect > 0 && damageToPlayer > 0 && state.hp > 0) {
       reflectedDamage = Math.min(state.combat.hp, reflect);
       state.combat.hp -= reflectedDamage;
       damageDealt += reflectedDamage;
       summary += `护具把来劲弹了回去，造成${reflectedDamage}点反伤。`;
     }
   }
-  if (state.combat.hp <= 0) return combatVictory(state, enemy, summary, { damageDealt, damageTaken: healthBefore - state.hp, enemyMove, reflectedDamage, dodged, missed });
+  if (state.combat.hp <= 0) {
+    return combatVictory(state, enemy, summary, { ...medicineResult, damageDealt, damageTaken: healthBefore - state.hp, enemyMove, reflectedDamage, dodged, missed });
+  }
   state.combat.lastEnemyIntent = enemyMove;
   state.combat.round += 1;
   normalize(state);
   const damageTaken = Math.max(0, healthBefore - state.hp);
   say(state, summary);
   const fell = state.hp === 0 ? fall(state) : null;
-  return { ...fell, ok: true, message: summary + (fell?.message ?? ''), damageDealt, damageTaken, enemyMove, reflectedDamage, dodged, missed };
+  return { ...fell, ...medicineResult, ok: true, message: summary + (fell?.message ?? ''), damageDealt, damageTaken, enemyMove, reflectedDamage, dodged, missed };
 }
 
 function retreat(state, bonus = 0, lead = '', guard = 0) {
@@ -9349,6 +9796,10 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   const enemy = enemyOf(state);
   if (inProtectedBout(state)) {
     advance(state, rules.retreatDays);
+    if (inRegulatedBout(state)) {
+      setRegulatedBoutRecovery(state);
+      state.event = null;
+    }
     state.combat = null;
     state.focus = 0;
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
@@ -9365,8 +9816,7 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   const charmDamage = activeGear(state).some(({ slot, retreat }) => slot === 'charm' && retreat > 0) ? wear(state, 'charm') : '';
   const outerEdge = state.combat.huntChoice !== undefined ? state.combat.siteId : null;
   const road = state.combat.roadBandit;
-  const position = outerEdge ? '退回了这处猎场的外沿' : road ? '折回先前走过的路口' : `仍在${regionOf(state).name}`;
-  const summary = `${lead}趁${enemy.name}使出「${intent.name}」，你脱开身，${position}。${charmDamage}`;
+  const escaped = `${lead}趁${enemy.name}使出「${intent.name}」，你脱开身`;
   if (outerEdge) {
     saveHuntTrack(state);
     state.event = outerEdge;
@@ -9375,8 +9825,11 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   state.focus = 0;
   if (road) {
     state.roadBandit = null;
-    backFromRoad(state, economyKit);
+    const returning = backFromRoad(state, economyKit);
+    return { ...returning, ...say(state, `${escaped}。${charmDamage}${returning.message}`), damageDealt: 0, damageTaken: 0, retreated: true };
   }
+  const position = outerEdge ? '退回了这处猎场的外沿' : `仍在${regionOf(state).name}`;
+  const summary = `${escaped}，${position}。${charmDamage}`;
   return { ...say(state, summary), damageDealt: 0, damageTaken: 0, retreated: true };
 }
 
@@ -9504,6 +9957,7 @@ function batchMealCount(state, id) {
 }
 
 function eat(state, inCombat, id = supply, batch = false) {
+  if (inCombat && inRegulatedBout(state)) return refuse(regulatedBoutRestriction);
   if (id === 'beast_meat' && owns(state, id)) return refuse('肉还生着。带回村用灶煮熟就能吃。');
   const food = records.foods[id];
   if (!food || !owns(state, id)) return refuse('没有这份可吃的口粮。');
@@ -9541,40 +9995,58 @@ function unpackBasket(state) {
   return { ...say(state, basket.unpack.outcome), outcome: basket.unpack.outcome, spilled };
 }
 
+function senseMedicineBlocker(state, pill) {
+  if (!pill?.sense || needsSenseRest(state) || (pill.hp > 0 && state.hp < stats(state).maxHp)) return '';
+  if (!state.training?.levels?.spirit) return '先学会神识。';
+  return pill.hp > 0 ? '气血和神识都养足了。' : '神识已经养足。';
+}
+
+function applyMedicine(state, id) {
+  const pill = records.pills[id];
+  removeItem(state, id, 1);
+  const hp = state.hp;
+  state.hp += pill.hp ?? 0;
+  state.qi += pill.qi ?? 0;
+  state.toxin += pill.toxin ?? 0;
+  state.wounds -= pill.wound ?? 0;
+  state.focus += pill.focus ?? 0;
+  if (pill.satiety > 0) {
+    state.satiety = Math.min(rules.maxSatiety, state.satiety + pill.satiety);
+    state.didEat = true;
+  }
+  normalize(state);
+  const restored = state.hp - hp;
+  const sense = restoreTrainingSense(state, pill.sense ?? 0);
+  const toxic = state.toxin >= rules.toxinThreshold;
+  const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
+  state.hp -= toxinDamage;
+  const applied = id === 'salve' ? '你把松脂膏敷在伤口上。' : `你服下${nameOf(id)}。`;
+  const message = applied + (restored > 0 ? `气血回了${restored}点。` : '') + (sense > 0 ? `神识回了${sense}点。` : '')
+    + (toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : '');
+  return { message, medicineRecovery: { hp: Math.max(0, restored), sense },
+    injury: toxinDamage ? { cause: '丹毒发作。', amount: toxinDamage } : undefined };
+}
+
 function use(state, id, inCombat) {
   if (records.foods[id] || id === 'beast_meat') return eat(state, inCombat, id);
   if (!owns(state, id)) return refuse('行囊里没有这件物品。');
   if (records.items[id]?.breakthrough) return refuse(`${nameOf(id)}要在闭关突破时服下。`);
   const pill = records.pills[id];
+  if (pill && inCombat && inRegulatedBout(state)) return refuse(regulatedBoutRestriction);
   const talisman = records.talismans[id];
   const entry = pill ?? talisman;
   if (!entry) return refuse('这件物品不能直接使用。');
   if (entry.tier > state.realm) return refuse('你目前承受不了这件物品的效力。');
   if (talisman && !inCombat) return refuse('这道符要在战斗中用。');
   if (pill?.satiety && state.satiety >= rules.maxSatiety) return refuse('你还很饱。');
-  removeItem(state, id, 1);
   if (pill) {
-    state.hp += pill.hp ?? 0;
-    state.qi += pill.qi ?? 0;
-    state.toxin += pill.toxin ?? 0;
-    state.wounds -= pill.wound ?? 0;
-    state.focus += pill.focus ?? 0;
-    if (pill.satiety > 0) {
-      state.satiety = Math.min(rules.maxSatiety, state.satiety + pill.satiety);
-      state.didEat = true;
-    }
-    normalize(state);
-    const toxic = state.toxin >= rules.toxinThreshold;
-    const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
-    state.hp -= toxinDamage;
-    const applied = id === 'salve' ? '你把松脂膏敷在伤口上。' : `你服下${nameOf(id)}。`;
-    const message = applied + (toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : '');
-    const result = inCombat ? combatTurn(state, { message }) : say(state, message);
-    return {
-      ...result,
-      injury: toxinDamage ? { cause: '丹毒发作。', amount: toxinDamage } : undefined,
-    };
+    const reason = senseMedicineBlocker(state, pill);
+    if (reason) return refuse(reason);
+    if (inCombat) return combatTurn(state, { kind: 'medicine', medicine: id });
+    const { message, ...dose } = applyMedicine(state, id);
+    return { ...say(state, message), ...dose };
   }
+  removeItem(state, id, 1);
   const message = `你催动${nameOf(id)}。`;
   const training = trainingPerks(state);
   const guard = talisman.guard > 0 ? talisman.guard + training.sealGuard : 0;
@@ -9596,10 +10068,9 @@ function handConflict(equipment, id) {
   return '';
 }
 
-function equip(state, id, inCombat = false) {
+function equip(state, id) {
   const gear = records.gear[id];
   if (!gear || !owns(state, id)) return refuse('行囊里没有这件装备。');
-  if (inCombat && gear.slot !== 'weapon') return refuse('交手时只能换兵器。');
   if (state.realm < gear.tier) return refuse('这件装备需要更高境界。');
   if (!state.durability[id]) return refuse('这件装备需要先修理。');
   if (state.equipment[gear.slot] === id) return refuse('你已经穿戴了这件装备。');
@@ -9607,8 +10078,7 @@ function equip(state, id, inCombat = false) {
   if (conflict) return refuse(conflict);
   state.equipment[gear.slot] = id;
   normalize(state);
-  const message = `换上${nameOf(id)}。`;
-  return inCombat ? combatTurn(state, { kind: 'switch', guard: rules.combatSwitchGuard, message }) : say(state, message);
+  return say(state, `换上${nameOf(id)}。`);
 }
 
 function unequip(state, slot) {
@@ -9637,6 +10107,8 @@ function takeFromGround(state, id, requested) {
       (!Number.isSafeInteger(requested) || requested < 1 || requested > available))) return refuse('这里没有这么多东西可捡。');
   const gear = records.gear[id];
   if (gear && gearReserved(state, id)) return refuse('同名装备已在手上、仓里或锻炉里。');
+  const reason = groundPickupReason(state, id, requested);
+  if (reason) return refuse(reason);
   const maximum = groundPickupLimit(state, id);
   const count = requested ?? maximum;
   if (count > maximum) return refuse(maximum ? `行囊只装得下${maximum}份。` : '行囊已满。');
@@ -10093,6 +10565,7 @@ const economyKit = {
   roadRisk: (state, leg) => roadBanditRisk(state, leg, economyKit),
   banditDenPopulation: (state, id) => Object.values(poolCounts(state, records.sites[id], 'creatures')).reduce((sum, count) => sum + count, 0),
   eatOnRoad: (state, id) => eat(state, false, id),
+  regulatedBoutBlocker, setRegulatedBoutRecovery,
 };
 
 function canUseVillageAction(state, action, payload) {
@@ -10152,7 +10625,6 @@ const combatActions = {
   tournamentWithdraw: (state) => tournamentAction(state, 'tournamentWithdraw', economyKit),
   readSpirit: (state) => recordTrainingRead(state, economyKit),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
-  combatEquip: (state, { id }) => equip(state, id, true),
   guard: (state) => combatTurn(state, { kind: 'brace', brace: true }),
   dodge: (state) => combatTurn(state, { kind: 'dodge', evade: true, message: '你侧身挪步。' }),
   cancelCharge: (state) => {
@@ -10181,15 +10653,18 @@ function takeTurn(state, action, payload) {
     return say(state, state.completionPhase === 'final' ? '诸处商旅复行。山河仍可继续探访。' : '旧渡照常开船。你仍可留在村里，或再去寻路。');
   }
   if (state.combat) {
+    if (equipmentChanges.has(action)) return refuse('交手中不能换装备。');
     if (Object.hasOwn(combatActions, action)) return combatActions[action](state, payload);
     return refuse('先处理眼前的对手。');
   }
   if (state.roadTrip) {
+    if (!state.roadBandit || state.roadBandit.aftermath) {
+      if (containerTransfers.has(action)) return economyAction(state, action, payload, economyKit);
+      if (roadsideActions.has(action)) return generalActions[action](state, payload);
+    }
     if (state.roadBandit) return banditAction(state, action, payload, economyKit) ?? refuse('先处理眼前拦路的人。');
     if (action === 'roadContinue') return continueRoad(state, economyKit);
     if (action === 'roadBack') return backFromRoad(state, economyKit);
-    if (containerTransfers.has(action)) return economyAction(state, action, payload, economyKit);
-    if (roadsideActions.has(action)) return generalActions[action](state, payload);
     return refuse('先走完这段路，或折回先前的路口。');
   }
   if (action === 'gateScroll') return worldAction(state, action, payload, economyKit);
@@ -10274,7 +10749,8 @@ guideBags.className = "guide-topic guide-bags";
 guideBags.hidden = true;
 guideBags.innerHTML = `<summary>整理乾坤袋</summary>
   <p class="fine">点行囊里的乾坤袋打开。右键点行囊物品会尽量装入袋中，右键点袋里的物品会尽量取回。按住 Shift 再右键只移一件。</p>
-  <p class="fine">触屏或用键盘时，点开物品，再选「装入」或「取回」。要用袋里的东西，先取回行囊。</p>`;
+  <p class="fine">触屏或用键盘时，点开物品，再选「装入」或「取回」。要用袋里的东西，先取回行囊。</p>
+  <p class="fine">行囊只能带一只乾坤袋。换袋前，把原来的整只存仓或放在脚边。</p>`;
 guide.querySelector("[data-reset]").before(guideBags);
 const kit = document.querySelector("#kit");
 const notices = document.querySelector("#notices");
@@ -10299,7 +10775,9 @@ const kitSectionOpen = new Map();
 let activeDeduction = null;
 let atlasProvince = null;
 let atlasPoint = null;
+let atlasEdge = null;
 let atlasIndexOpen = false;
+let atlasRoadsOpen = false;
 const deductionDrafts = new Map();
 const experimentDrafts = new Map();
 
@@ -10421,7 +10899,7 @@ function inVillage(s) {
 }
 
 function onOpenRoad(s) {
-  return s.mode === "road" && !s.roadTrip?.bandit;
+  return s.mode === "road" && (!s.roadTrip?.bandit || s.roadTrip.bandit.aftermath);
 }
 
 function atLanding(s) {
@@ -10450,8 +10928,9 @@ function stats(s) {
     <summary>${danger ? "雾压过重" : "雾压"} <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
     <span>雾积满后，再探索会耗真气。到有人歇脚的地方就会散去。</span>
   </details>` : "";
-  const canEat = s.mode !== "victory" && (s.mode !== "road" || onOpenRoad(s)) && meal && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
-  const canUseSalve = s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
+  const medicineAllowed = !s.currentEnemy?.medicineRestricted;
+  const canEat = medicineAllowed && s.mode !== "victory" && (s.mode !== "road" || onOpenRoad(s)) && meal && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
+  const canUseSalve = medicineAllowed && s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
   const sense = s.spiritSense;
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
     ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。敷伤药或在据点歇息都能恢复。")}
@@ -10459,7 +10938,7 @@ function stats(s) {
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
     ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施展术诀、打出部分招式或在雾中久留会消耗真气。歇息时能恢复。") : ""}
-    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息能恢复神识。</p></details>` : ""}
+    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息或服补神识的药都能恢复。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
@@ -10467,8 +10946,7 @@ function distance(units) {
   return `${units * banditRules.distanceUnit} 里`;
 }
 
-function routeAction(road, edges = []) {
-  const label = road.rescue ? `慢慢走到${road.name}` : road.id === "village" ? "回村" : `去${road.name}`;
+function routeAction(road, edges = [], label = road.rescue ? `慢慢走到${road.name}` : road.id === "village" ? "回村" : `去${road.name}`) {
   const forecast = [road.meals && Object.keys(road.meals).length && `途中吃 ${supplies(road.meals)}`,
     road.emptyOnArrival && !road.rescue && "到时会空腹"].filter(Boolean).join(" · ");
   const note = [road.units != null && distance(road.units), `${road.days} 日`, road.via?.length && `经 ${road.via.join("、")}`,
@@ -10538,7 +11016,7 @@ function banditDraft(bandit) {
       ${linkButton("重新选", "banditClearOffer", "", "quiet")}</div></div>`;
 }
 
-function banditScreen(bandit) {
+function banditScreen(bandit, preparation = "") {
   const remaining = bandit.remaining;
   const askingForMoney = !bandit.aftermath && remaining != null;
   const directCash = askingForMoney && !bandit.offerValue && bandit.coins >= bandit.fee;
@@ -10557,14 +11035,19 @@ function banditScreen(bandit) {
     ${askingForMoney ? `<p class="road-demand">开价 ${bandit.fee} 灵钱<span class="fine">钱袋 ${bandit.coins} 灵钱</span></p>` : ""}
     ${pay || surrender || fight ? `<div class="actions">${pay}${surrender}${fight}</div>` : ""}
     ${surrender ? '<p class="fine road-surrender" id="road-surrender-note">他会拿走灵钱、能抵价的东西，以及身上和包里的装备。</p>' : ""}
-    ${askingForMoney ? banditDraft(bandit) + banditOffers(bandit) : ""}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
+    ${askingForMoney ? banditDraft(bandit) + banditOffers(bandit) : ""}${preparation}${plot ? `<div class="choice-list">${plot}</div>` : ""}${pass}`);
 }
 
 function roadScreen(s) {
   const road = s.roadTrip;
-  if (road.bandit) return banditScreen(road.bandit);
+  const ground = road.afterBattle ? groundRows(s) : [];
+  const preparation = road.afterBattle ? `<section class="road-aftermath" aria-label="战后整备">
+    ${ground.length ? `<h3>脚边的战利品</h3>${ground.join("")}` : '<p class="fine">脚边没有物品可捡。</p>'}
+    <p class="fine">可以先用药，或点行囊里的装备换上。</p>
+  </section>` : "";
+  if (road.bandit) return banditScreen(road.bandit, preparation);
   const turnBack = road.fromName ? `折回${road.fromName}` : "沿原路折返";
-  return panel("路上", `<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
+  return panel(road.afterBattle ? "交手之后" : "路上", `${preparation}<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
     ${linkButton(turnBack, "roadBack", "", "quiet")}</div>`);
 }
 
@@ -10605,30 +11088,72 @@ function journey(s) {
     ${s.sect ? tabButton("找宗门管事", "sect") : ""}
     ${s.tournament ? tabButton("去看宗门大比", "tournament") : ""}
     ${isHome && s.training?.some(({ region }) => region === s.region.id) ? tabButton("请教修习", "training") : ""}
-    ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) : ""}
+    ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) :
+      s.region.id === data.tournament.region && s.boutPause > 0 && !needRest ? linkButton("在场边等半日", "wait", "", "quiet") : ""}
   </div>${further.length ? `<details class="route-list"><summary>其他已知去路</summary><div class="actions">${further.map(road => routeAction(road, s.world.edges)).join("")}</div></details>` : ""}
   ${s.world.crossings.map(({ label, reason }) => `<p class="fine crossing">${escape(label)} · ${escape(reason)}</p>`).join("")}`);
 }
 
-function atlasMap(province, points, selected, route, edges) {
-  const byId = Object.fromEntries(points.map((point) => [point.id, point]));
-  const paths = new Set();
-  const routeLegs = new Set((route?.path ?? []).slice(1).map((id, index) => [route.path[index], id].sort().join("/")));
-  const lines = [];
-  for (const { from, to } of edges ?? []) {
-    const point = byId[from];
-    const neighbor = byId[to];
-    const path = [from, to].sort().join("/");
-    if (!point || !neighbor || paths.has(path)) continue;
-    paths.add(path);
-    const dx = neighbor.x - point.x;
-    const dy = (neighbor.y - point.y) / 1.45;
-    lines.push(`<i aria-hidden="true" class="atlas-road${routeLegs.has(path) ? " chosen" : ""}" style="--x:${point.x}%;--y:${point.y}%;--length:${Math.hypot(dx, dy)}%;--angle:${Math.atan2(dy, dx)}rad"></i>`);
-  }
+function atlasOverview(world) {
+  const provinces = world.provinces.map(({ id, name }) =>
+    `<button type="button" class="atlas-province atlas-province-${escape(id)}" data-atlas-province="${escape(id)}"${id === world.province ? ' aria-current="location"' : ""}><span>${escape(name)}</span></button>`).join("");
+  return panel("山河总图", `<div class="atlas-view atlas-overview" aria-label="各州地图">${provinces}</div>`);
+}
+
+function atlasRoadName(edge, points) {
+  return edge.province ? `${points[edge.from].name} · 往${edge.name}` : `${points[edge.from].name} — ${points[edge.to].name}`;
+}
+
+function atlasRoadMark(edge, start, end, chosen, name) {
+  const dx = end.x - start.x;
+  const dy = (end.y - start.y) / 1.45;
+  const style = `--x:${start.x}%;--y:${start.y}%;--length:${Math.hypot(dx, dy)}%;--angle:${Math.atan2(dy, dx)}rad`;
+  const pressed = edge.key === atlasEdge;
+  return `<button type="button" class="atlas-road${edge.avoided ? " avoided" : ""}${chosen ? " chosen" : ""}${!edge.available ? " closed" : ""}${edge.province ? " cross" : ""}"
+    style="${style}" data-atlas-edge="${escape(edge.key)}" aria-label="${escape(name + (edge.avoided ? "，已避开" : ""))}" aria-pressed="${pressed}" title="${escape(name)}"><i></i></button>`;
+}
+
+function atlasMap(province, points, byId, selected, route, edges, provinces) {
+  const routeLegs = new Set((route?.path ?? []).slice(1).map((id, index) => [route.path[index], id].sort().join("|")));
+  const ranks = Object.fromEntries(provinces.map(({ id }, index) => [id, index]));
+  const lines = edges.map(edge => {
+    const start = byId[edge.from];
+    const sign = ranks[edge.province] > ranks[province] ? 1 : -1;
+    const end = edge.province ? { x: Math.max(3, Math.min(97, start.x + sign * 13)), y: start.y } : byId[edge.to];
+    const line = atlasRoadMark(edge, start, end, routeLegs.has(edge.key), atlasRoadName(edge, byId));
+    if (!edge.province) return line;
+    const labelX = Math.max(14, Math.min(86, end.x));
+    const labelY = start.y < 20 ? end.y + 5 : end.y - 5;
+    return `${line}<span class="atlas-cross-label${edge.avoided ? " avoided" : ""}" aria-hidden="true" style="--x:${labelX}%;--y:${labelY}%">往${escape(edge.name)}</span>`;
+  }).join("");
   const marks = points.map(point => `<button type="button" class="atlas-mark${point.current ? " here" : ""}${point.settlement ? " town" : ""}${point.attuned ? " linked" : ""}"
     style="--x:${point.x}%;--y:${point.y}%" data-atlas-point="${escape(point.id)}" aria-label="${escape(point.name)}" aria-pressed="${point.id === selected.id}">
     <span class="atlas-dot"></span><span class="atlas-label">${escape(point.name)}</span></button>`).join("");
-  return `<div class="atlas-map atlas-${escape(province)}" aria-label="已知地点位置">${lines.join("")}${marks}</div>`;
+  return `<div class="atlas-map atlas-${escape(province)}" aria-label="已知地点和道路">${lines}${marks}</div>`;
+}
+
+function atlasRoadDetail(edge, points, canChange) {
+  const name = atlasRoadName(edge, points);
+  const notes = [edge.label, edge.units && distance(edge.units), edge.avoided && "已避开", edge.riskText].filter(Boolean).join(" · ");
+  const reason = edge.reason || edge.avoidReason || (!canChange ? "离开当前地点后可调整避开的路。" : "");
+  const options = edge.avoided || edge.canAvoid;
+  return `<section class="atlas-road-detail" id="atlas-edge-detail" aria-label="选中的道路">
+    <div><h3>${escape(name)}</h3>${notes ? `<p class="fine">${escape(notes)}</p>` : ""}</div>
+    ${linkButton(edge.avoided ? "恢复此路" : "避开此路", "roadAvoid", edge.key, edge.avoided ? "quiet" : "danger",
+      !canChange || !options, 1, reason ? "atlas-edge-reason" : "")}
+    ${reason ? `<p class="fine atlas-road-reason" id="atlas-edge-reason">${escape(reason)}</p>` : ""}
+  </section>`;
+}
+
+function atlasRoadIndex(edges, points, selected) {
+  if (!edges.length) return "";
+  const touches = ({ from, to }) => from === selected.id || to === selected.id;
+  const rows = [...edges].sort((a, b) => Number(touches(b)) - Number(touches(a))
+    || atlasRoadName(a, points).localeCompare(atlasRoadName(b, points), "zh-CN"));
+  return `<details class="atlas-road-index"${atlasRoadsOpen ? " open" : ""}><summary>选道路</summary>
+    <div class="atlas-road-list">${rows.map(edge => `<button type="button" class="button quiet${edge.avoided ? " danger" : ""}"
+      data-atlas-edge="${escape(edge.key)}" aria-pressed="${edge.key === atlasEdge}">${escape(atlasRoadName(edge, points))}${edge.avoided ? "　已避开" : ""}</button>`).join("")}
+    </div></details>`;
 }
 
 function arrayLedger(array) {
@@ -10645,14 +11170,18 @@ function arrayLedger(array) {
 
 function atlas(s) {
   const world = s.world;
-  const province = atlasProvince && world.points.some(({ province: id }) => id === atlasProvince) ? atlasProvince : world.province;
-  const points = world.points.filter((point) => point.province === province);
+  const province = world.provinces.find(({ id }) => id === atlasProvince);
+  if (!province) return atlasOverview(world);
+  const points = world.points.filter((point) => point.province === province.id);
+  const byId = Object.fromEntries(points.map((point) => [point.id, point]));
+  const edges = [...world.edges.filter(({ from, to }) => byId[from] && byId[to]),
+    ...(world.crossLinks ?? []).filter(({ from }) => byId[from])];
   const selected = points.find(({ id }) => id === atlasPoint) ?? points.find(({ current }) => current) ?? points[0];
-  const tabs = world.provinces.filter(({ id }) => world.points.some(({ province: known }) => known === id)).map(({ id, name }) =>
-    `<button type="button" class="button ${id === province ? "primary" : "quiet"}" data-atlas-province="${escape(id)}" aria-pressed="${id === province}">${escape(name)}</button>`).join("");
-  if (!selected) return panel("山河图", "");
+  const up = '<button class="button quiet atlas-up" type="button" data-atlas-overview>返回总图</button>';
+  if (!selected) return panel(province.name, '<div class="atlas-view"><p class="intro">还没听说州里的去处。</p></div>', up);
   const idle = s.mode !== "event";
   const road = idle && world.journeys.find(({ id }) => id === selected.id);
+  const edge = edges.find(({ key }) => key === atlasEdge);
   const gate = world.gates.find(({ id }) => id === selected.id);
   const array = idle && world.arrays.find(({ id }) => id === selected.id);
   const marks = [selected.current ? "你在这里" : "", selected.settlement ? "可歇息" : "", selected.attuned ? "传送门已点亮" : ""].filter(Boolean).join(" · ");
@@ -10661,23 +11190,31 @@ function atlas(s) {
   const makeScroll = idle && s.settlement && s.discoveredRecipes.includes(recipe.id);
   const scrollBlocker = makeScroll && s.craftReasons[recipe.id];
   const usable = gate && !selected.current;
+  const doorToDoor = idle && usable && world.localGate?.attuned && selected.province === world.province;
+  const reasons = [idle && !road && !selected.current && (selected.travelReason || "目前没有已知的走法。"),
+    selected.portal && !selected.current && !selected.attuned && "亲自点亮这里的传送门后，才能传到这里。",
+    doorToDoor && !gate.available && gate.reason,
+    usable && !gate.byScroll && gate.scrollReason,
+    array && !array.available && selected.id !== s.region.id && world.localArray?.active && array.reason].filter(Boolean);
   const transport = `<div class="actions atlas-actions">
-      ${road ? routeAction(road, world.edges) : ""}
+      ${road ? routeAction(road, world.edges, road.rescue ? "慢慢走过去" : "走过去") : ""}
       ${currentGate ? linkButton("点亮传送门", "attuneGate") : ""}
-      ${idle && usable && world.localGate?.attuned && selected.province === world.province ? linkButton(`门间传送 · ${gate.price} 灵钱`, "gateJump", gate.id, "", !gate.available) : ""}
-      ${usable && world.scrollCount ? linkButton(`展开卷轴 · 余 ${world.scrollCount} 张`, "gateScroll", gate.id, "", !gate.byScroll) : ""}
+      ${doorToDoor ? linkButton(`门间传送 · ${gate.price} 灵钱`, "gateJump", gate.id, "", !gate.available) : ""}
+      ${usable ? linkButton(`用卷轴传送 · 1 张 + ${gate.scrollPrice} 灵钱`, "gateScroll", gate.id, "", !gate.byScroll) : ""}
       ${array && selected.id !== s.region.id && world.localArray?.active ? linkButton(`跨州传送 · ${array.price} 灵钱`, "arrayJump", array.id, "", !array.available) : ""}
       ${makeScroll && selected.current ? linkButton(scrollBlocker || "制备传送卷轴", "craft", recipe.id, "quiet", Boolean(scrollBlocker)) : ""}
     </div>`;
-  return panel("山河图", `<div class="actions atlas-tabs" aria-label="州">${tabs}</div>
-    ${atlasMap(province, points, selected, road, world.edges)}
-    <details class="atlas-index"${atlasIndexOpen ? " open" : ""}><summary>查已知地点</summary><div class="actions">${points.map(({ id, name }) =>
-      `<button type="button" class="button quiet" data-atlas-point="${escape(id)}">${escape(name)}</button>`).join("")}</div></details>
+  return panel(province.name, `<div class="atlas-view">
+    ${atlasMap(province.id, points, byId, selected, road, edges, world.provinces)}
+    ${edge ? atlasRoadDetail(edge, byId, idle) : ""}
+    <div class="atlas-tools"><details class="atlas-index"${atlasIndexOpen ? " open" : ""}><summary>选地点</summary><div class="actions">${points.map(({ id, name }) =>
+      `<button type="button" class="button quiet" data-atlas-point="${escape(id)}" aria-pressed="${selected.id === id}">${escape(name)}</button>`).join("")}</div></details>
+    ${atlasRoadIndex(edges, byId, selected)}</div>
     <div class="atlas-place"><h3>${escape(selected.name)}</h3>${marks ? tag(marks) : ""}
     <p class="intro">${escape(selected.description)}</p>${transport}
+    ${[...new Set(reasons)].map(reason => `<p class="fine">${escape(reason)}</p>`).join("")}
     ${makeScroll && selected.current ? `<p class="fine">每批 ${recipe.count} 张 · ${recipe.cost} 灵钱 · ${escape(supplies(recipe.need))}</p>` : ""}
-    ${array && !array.available && selected.id !== s.region.id && world.localArray?.active ? `<p class="fine">${escape(array.reason)}</p>` : ""}
-    </div>${idle && selected.current ? arrayLedger(world.localArray) : ""}`);
+    </div>${idle && selected.current ? arrayLedger(world.localArray) : ""}</div>`, up);
 }
 
 function eventScreen(s) {
@@ -10744,7 +11281,7 @@ function experimentForm(experiment) {
 }
 
 function pillSummary(row) {
-  return [row.hp && "恢复气血", row.qi && "恢复真气", row.satiety && "充饥", row.toxin < 0 && "减轻丹毒", row.wound && "减轻伤势", row.focus && "加强下一次术诀"].filter(Boolean).join(" · ");
+  return [row.hp && "恢复气血", row.qi && "恢复真气", row.sense && "恢复神识", row.satiety && "充饥", row.toxin < 0 && "减轻丹毒", row.wound && "减轻伤势", row.focus && "加强下一次术诀"].filter(Boolean).join(" · ");
 }
 
 function talismanSummary(row) {
@@ -10771,7 +11308,6 @@ function combatScreen(s) {
       `${ammo.name} ×${ammo.count}`, "selectAmmo", ammo.id, ammo.selected ? "primary" : "quiet", ammo.count <= 0 || ammo.selected,
     )).join("")}</div>
   </div>` : "";
-  const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
   const openingShot = intent && s.openingShotReady;
   const charging = s.chargingWeapon;
   const mainCharged = charging?.slot === "weapon" && charging.id === weapon?.id;
@@ -10813,7 +11349,7 @@ function combatScreen(s) {
     ${intentLine}
     ${openingNote ? `<p class="fine">${openingNote}</p>` : ""}
     ${chargeNote ? `<p class="fine">${escape(chargeNote)}</p>` : ""}
-    ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
+    ${enemy.sparring ? `<p class="fine">${enemy.medicineRestricted ? "裁判叫停就收招。双方在场上不能用药或吃东西。" : "约好点到为止，一方撑不住就收招。"}</p>` : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
     <div class="actions">${linkButton(attackLabel, !canMainAttack && fist ? "fistAttack" : "attack", "", fistCharged ? "" : "primary", mainBlocked)}
@@ -10825,7 +11361,6 @@ function combatScreen(s) {
       <span class="action-hint">${linkButton("闪避", "dodge", "", "", false, 1, "dodge-explanation")}<span class="item-tip" id="dodge-explanation" role="tooltip">侧身躲开来招。若被击中，照常受伤。</span></span>
       ${charging ? linkButton("取消蓄力", "cancelCharge", "", "quiet") : ""}
       ${linkButton(retreatLabel, "retreat", "", flight?.blocked ? "danger" : "quiet", false, 1, retreatCue ? "retreat-cue" : "")}
-      ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
       ${s.spiritSense ? linkButton(spiritLabel, "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
     </div>
     ${retreatCue ? `<p class="fine retreat-cue" id="retreat-cue">${escape(retreatCue)}</p>` : ""}
@@ -10929,13 +11464,29 @@ function manualActions(book, active, canManage, canTrain) {
     (requirements ? `<p class="fine manual-upgrade-note">${escape(requirements)}</p>` : "");
 }
 
+function groundRows(s) {
+  return Object.entries(s.groundLoot ?? {}).map(([id, count]) => {
+    const item = itemRows[id];
+    const gear = data.gear.find(row => row.id === id);
+    const maximum = s.groundPickup?.[id] ?? 0;
+    const reason = s.groundPickupReasons?.[id];
+    const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
+    const cue = maximum ? `${label} · ${item.name}` : reason ? `${item.name} · ${reason}` : gear ? `${item.name}暂时拿不了` : `${item.name} · 行囊已满`;
+    return `<div class="ground-row">
+      ${itemSlot(item, "ground", gear ? gearDescription(item, gear, s.groundWear[id]) : item.desc, "", "", count)}
+      <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
+      ${reason ? `<p class="fine ground-reason">${escape(reason)}</p>` : ""}
+    </div>`;
+  });
+}
+
 function pack(s) {
   const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event" || onOpenRoad(s);
   const canManageManual = canEquip && !s.gathering;
   const containers = s.economy?.containers ?? [];
   const openBag = containers.find(row => row.id === openBagId);
   const bagSources = new Map((openBag?.carried ?? []).map(row => [row.id, row]));
-  const canUse = canEquip || s.mode === "combat";
+  const canUse = canEquip || (s.mode === "combat" && !s.currentEnemy?.medicineRestricted);
   const canEat = canUse;
   const repair = s.mode === "village" ? s.repairService : null;
   function repairAction(id, remaining, durability) {
@@ -10969,13 +11520,13 @@ function pack(s) {
       const disabled = Boolean(conflict) || gear.tier > s.realm.id || remaining <= 0;
       const reason = conflict.slice(0, -1);
       actions = (canEquip ? linkButton(reason || "装备", "equip", row.id, "", disabled) : "") +
-        (s.mode === "combat" && gear.slot === "weapon" ? linkButton(reason || "换用兵刃", "combatEquip", row.id, "", disabled) : "") +
         repairAction(row.id, remaining, gear.durability);
     }
     if (pill && canUse) {
       const healthy = row.id === "salve" && s.hp >= s.maxHp;
-      const label = row.id === "salve" ? (healthy ? "气血已满" : "敷伤药") : "服用";
-      actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy);
+      const reason = s.medicineUseReasons[row.id];
+      const label = reason ? reason.slice(0, -1) : row.id === "salve" ? (healthy ? "气血已满" : "敷伤药") : "服用";
+      actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy || Boolean(reason));
     }
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
     if (book) actions = manualActions(book, false, canManageManual, !onOpenRoad(s));
@@ -10999,17 +11550,7 @@ function pack(s) {
   const keySlot = row => itemSlot(row, "clue", row.desc, "", "", s.inventory[row.id]);
   const clues = keys.filter(row => !formulaIds.has(row.id)).map(keySlot);
   const formulae = keys.filter(row => formulaIds.has(row.id)).map(keySlot);
-  const ground = canEquip ? Object.entries(s.groundLoot ?? {}).map(([id, count]) => {
-    const item = itemRows[id];
-    const gear = data.gear.find(row => row.id === id);
-    const maximum = s.groundPickup?.[id] ?? 0;
-    const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
-    const cue = maximum ? `${label} · ${item.name}` : gear ? `${item.name}暂时拿不了` : `${item.name} · 行囊已满`;
-    return `<div class="ground-row">
-      ${itemSlot(item, "ground", gear ? gearDescription(item, gear, s.groundWear[id]) : item.desc, "", "", count)}
-      <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
-    </div>`;
-  }) : [];
+  const ground = canEquip && !s.roadTrip?.afterBattle ? groundRows(s) : [];
   const capacityLabel = `已用${s.backpackUsed}格，共${s.backpackCapacity}格`;
   const useProgress = s.backpackCapacity > 20;
   const meter = useProgress
@@ -11305,6 +11846,7 @@ function tournamentScreen(s) {
     <div class="actions">
       ${!match.enrolled ? linkButton(`报名 · ${match.fee} 灵钱`, "tournamentEnroll", "", "", !match.canEnroll) : ""}
       ${match.enrolled ? linkButton("登台过招", "tournamentFight", "", "primary", !match.canFight) : ""}
+      ${match.enrolled && s.boutPause > 0 ? linkButton("去场边歇半日", s.restSessions ? "rest" : "wait", "", "quiet") : ""}
       ${match.canWithdraw ? linkButton("跟裁判说退赛", "tournamentWithdraw", "", "quiet") : ""}
       ${match.canClaim ? linkButton(match.claimName || "领取奖品", "tournamentClaim") : ""}
     </div>`, match.enrolled ? tag(`已胜 ${match.wins} 场`) : "");
@@ -11402,7 +11944,7 @@ function deductionBoard(s) {
 }
 
 const focusKeys = ["data-action", "data-value", "data-count", "data-bag-id", "data-tab", "data-facility",
-  "data-market-mode", "data-case", "data-item", "data-atlas-province", "data-atlas-point"];
+  "data-market-mode", "data-case", "data-item", "data-atlas-province", "data-atlas-point", "data-atlas-edge", "data-atlas-overview"];
 
 function keyboardFocus() {
   const control = document.activeElement;
@@ -11446,12 +11988,11 @@ function render() {
   const inEncounter = dead || s.mode === "combat" || s.mode === "victory" || s.mode === "road" || Boolean(s.gathering);
   const services = inVillage(s) ? villageServices(s) : [];
   const originalHome = atLanding(s);
-  const knowMap = s.region.id !== "village" || s.discovered.length > 2 || Object.keys(s.eventsSeen).length > 0;
   const available = {
     journey: true, village: Boolean(services.length), apprentice: originalHome, deduction: Boolean(s.deductions?.length),
     workshop: originalHome && s.services.includes("workshop"), market: originalHome && s.services.includes("market"),
     yard: originalHome && Boolean(s.economy), alchemy: originalHome && Boolean(s.alchemy),
-    atlas: knowMap && (!inEvent || s.world.scrollCount > 0), localMarket: inVillage(s) && !originalHome && Boolean(s.localMarket),
+    atlas: !inEvent || s.world.scrollCount > 0, localMarket: inVillage(s) && !originalHome && Boolean(s.localMarket),
     sect: inVillage(s) && Boolean(s.sect), tournament: inVillage(s) && Boolean(s.tournament), training: Boolean(s.training?.length),
   };
   for (const service of services) available[service] = true;
@@ -11485,7 +12026,7 @@ function render() {
 
 function selectItem(key) {
   selectedItem = selectedItem === key ? null : key;
-  for (const trigger of kit.querySelectorAll("[data-item]")) {
+  for (const trigger of app.querySelectorAll("#kit [data-item], .road-aftermath [data-item]")) {
     const open = trigger.dataset.openBag ? trigger.dataset.openBag === openBagId : trigger.dataset.item === selectedItem;
     trigger.setAttribute("aria-expanded", String(open));
     const tools = trigger.parentElement.querySelector(".item-tools");
@@ -11563,6 +12104,8 @@ function feedback(before, after, result, action, presentation, payload) {
   const picking = result.ok && action === "take";
   const gathered = supplies(result.gathered);
   let narrative = result.message ?? "";
+  const restored = result.medicineRecovery;
+  if (restored || result.enemyMedicineRecovery) narrative = narrative.replace(/(?:气血|神识)回了\d+点。/g, "");
   const roadEncounter = result.ok && before.roadBandit !== after.roadBandit && presentation.roadTrip?.bandit;
   if (roadEncounter) {
     lines.push(`路上遇见${roadEncounter.name}。`);
@@ -11591,6 +12134,9 @@ function feedback(before, after, result, action, presentation, payload) {
   if (!result.ok || (action !== "batchEat" && action !== "restUntilRecovered")) narrative = publicText(narrative);
   narrative = narrative.replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
+  const medicineEffect = [restored?.hp > 0 && `气血回了${restored.hp}点。`, restored?.sense > 0 && `神识回了${restored.sense}点。`].filter(Boolean).join("");
+  if (medicineEffect) lines.push(medicineEffect);
+  if (result.enemyMedicineRecovery) lines.push(`对手气血回了${result.enemyMedicineRecovery}点。`);
   if (supplies(result.travelMeals)) lines.push(`途中吃了${supplies(result.travelMeals)}。${result.roadInterrupted ? "停步" : "抵达"}时饱腹 ${Math.floor(after.satiety)} 点。`);
   if (gathered) {
     const place = result.gatheredRegion && result.gatheredRegion !== after.region
@@ -11603,7 +12149,7 @@ function feedback(before, after, result, action, presentation, payload) {
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
   const didRecover = (ate || rested || action === "choose" || action === "use") && after.hp > before.hp && !result.injury;
   const changes = [
-    didRecover && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
+    didRecover && !restored?.hp && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
     action === "guard" && after.qi > before.qi && `真气回升 ${after.qi - before.qi} 点`,
     after.qi > before.qi && (rested || action === "choose" || action === "use") && !narrative.includes("真气") && "真气恢复",
     after.qi < before.qi && ["choose", "visit", "revisit", "art", "fistCharge"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
@@ -11638,10 +12184,11 @@ function performAction(action, payload) {
   };
   const result = act(state, action, payload);
   const transferred = result.ok && instantRoutes.includes(action);
-  if ([...roadTravelActions, "visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
+  if ((result.ok && roadTravelActions.includes(action)) || ["visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
   if (transferred || (result.ok && roadTravelActions.includes(action))) {
     atlasProvince = null;
     atlasPoint = null;
+    atlasEdge = null;
   }
   if ([...roadTravelActions, "discard", "take", "equip", "unequip"].includes(action)) selectedItem = null;
   if (result.ok && action === "equipManual") selectedItem = `worn-${payload.id}`;
@@ -11727,6 +12274,8 @@ document.addEventListener("click", event => {
   if (summary) kitSectionOpen.set(summary.dataset.kitSection, !summary.parentElement.open);
   const atlasSummary = event.target.closest(".atlas-index > summary");
   if (atlasSummary) atlasIndexOpen = !atlasSummary.parentElement.open;
+  const roadSummary = event.target.closest(".atlas-road-index > summary");
+  if (roadSummary) atlasRoadsOpen = !roadSummary.parentElement.open;
   const button = event.target.closest("button");
   if (!button) return;
   if (button.hasAttribute("data-skip-opening")) {
@@ -11768,7 +12317,9 @@ document.addEventListener("click", event => {
     kitSectionOpen.clear();
     atlasProvince = null;
     atlasPoint = null;
+    atlasEdge = null;
     atlasIndexOpen = false;
+    atlasRoadsOpen = false;
     selectedItem = null;
     openBagId = null;
     for (const topic of guide.querySelectorAll("details")) topic.open = false;
@@ -11795,20 +12346,45 @@ document.addEventListener("click", event => {
   if (button.dataset.atlasProvince) {
     atlasProvince = button.dataset.atlasProvince;
     atlasPoint = null;
+    atlasEdge = null;
     render();
-    main.querySelector(`[data-atlas-province="${atlasProvince}"]`)?.focus({ preventScroll: true });
+    (main.querySelector('.atlas-map [aria-pressed="true"]') ?? main.querySelector("[data-atlas-overview]"))?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.hasAttribute("data-atlas-overview")) {
+    const province = atlasProvince;
+    atlasProvince = null;
+    atlasPoint = null;
+    atlasEdge = null;
+    render();
+    main.querySelector(`[data-atlas-province="${CSS.escape(province)}"]`)?.focus({ preventScroll: true });
     return;
   }
   if (button.dataset.atlasPoint) {
     const origin = button.closest(".atlas-index") ? ".atlas-index" : ".atlas-map";
     atlasPoint = button.dataset.atlasPoint;
     atlasProvince = data.regionDetails[atlasPoint].province;
+    atlasEdge = null;
     render();
-    main.querySelector(`${origin} [data-atlas-point="${atlasPoint}"]`)?.focus({ preventScroll: true });
+    main.querySelector(`${origin} [data-atlas-point="${CSS.escape(atlasPoint)}"]`)?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.dataset.atlasEdge) {
+    atlasEdge = button.dataset.atlasEdge;
+    render();
+    const detail = main.querySelector("#atlas-edge-detail");
+    (detail?.querySelector("button:enabled") ?? main.querySelector(`.atlas-map [data-atlas-edge="${CSS.escape(atlasEdge)}"]`))
+      ?.focus({ preventScroll: true });
+    detail?.scrollIntoView({ block: "nearest" });
     return;
   }
   if (button.dataset.tab) {
     screen = button.dataset.tab;
+    if (screen === "atlas") {
+      atlasProvince = null;
+      atlasPoint = null;
+      atlasEdge = null;
+    }
     if (guide.open) guide.close();
     if (screen === "workshop" && !state.showedHideToSmith) {
       act(state, "showHideToSmith");

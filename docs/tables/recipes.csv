@@ -40,6 +40,8 @@ r_star_blade,暗星刀（star_blade）,1,2,炼气后期,35,暗金（black_iron�
 r_hide_shield,包革小盾（hide_shield）,1,0,炼气初期,8,松木（wood）×4、兽革（hide）×3,1.25,,是,,锻炉（forge）,,
 r_miner_pick,短柄矿镐（miner_pick）,1,0,炼气初期,8,寒铁（ore）×4、松木（wood）×2,1.5,得知物品 厚脊剑坯样（blade_template）,,,锻炉（forge）,,
 r_resin_pill,温枝丸（resin_pill）,3,1,炼气中期,6,松木（wood）×2、灵草（reed）×3、炼气期妖丹（qi_core）×2,2,,,温枝丸丹方（formula_resin）,炼丹炉（furnace）,,
+r_sense_powder,凝神散（sense_powder）,2,1,炼气中期,4,灵草（reed）×2、灵晶（core）×1,1.25,,,凝神散丹方（formula_sense）,炼丹炉（furnace）,,
+r_heart_pill,养心丸（heart_pill）,2,2,炼气后期,6,灵草（reed）×3、兽革（hide）×1、炼气期妖丹（qi_core）×1,2,,,养心丸丹方（formula_heart）,炼丹炉（furnace）,2,
 r_leaf_pill,清脉饮（leaf_pill）,3,2,炼气后期,10,灵草（reed）×4、耐火泥（kiln_clay）×1、松木（wood）×2、炼气期妖丹（qi_core）×3,3,,,清脉饮丹方（formula_leaf）,炼丹炉（furnace）,2,
 r_jade_pill,照心露（jade_pill）,3,3,筑基初期,16,灵草（reed）×4、灵晶（core）×2、松木（wood）×1、筑基期妖丹（foundation_core）×2、妖目（beast_eye）×1,4,,,照心露丹方（formula_jade）,炼丹炉（furnace）,3,
 r_foundation,筑基丹（foundation_pill）,1,2,炼气后期,45,封炉药引（foundation_charge）×1、灵草（reed）×6、灵晶（core）×5、暗金（black_iron）×4、炼气期妖丹（qi_core）×24,4,,,筑基丹方（formula_foundation）,炼丹炉（furnace）,2,

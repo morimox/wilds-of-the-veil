@@ -11,6 +11,8 @@ firstRegionInsight,1,首次探索一个地区获得的修为（点）
 pressureThreshold,3,探索压力高于此值时开始额外消耗真气（点）
 pressureQi,1,压力超限的每次探索所消耗的真气（点）
 battleDays,0.125,战斗操作每回合用时（天）
+regulatedBoutCooldown,0.5,禁药比试结束后到下次开场的最短间歇（天）
+regulatedBoutHpFraction,0.5,禁药比试开场所需的最低气血比例
 perceptionScale,12,洞察概率曲线分母的固定项。洞察差除以固定项与洞察差之和
 perceptionCap,0.7,洞察优势转化为看破的概率上限
 observedHitLimit,3,敌人参考最近几次实际承受的主动出招伤害
@@ -63,7 +65,6 @@ researchInsight,1,每次静修获得的修为（点）
 researchLimit,2,每一境界可进行的有效静修次数
 practicePerDay,1,
 worthyFightPractice,2,首次赢过某种同境或更强的野外对手，额外增加的历练进度
-combatSwitchGuard,1,
 mealHeal,2,吃一份干粮恢复的气血
 fallDays,1,战败或气血耗尽被救回村所用的时间（天）
 fallMaxCoinLoss,4,被救回时扣除灵钱的上限
@@ -80,7 +81,6 @@ banditFatalDefeatPerTier,0.02,强盗每高一小境的死亡概率加值
 banditFatalDefeatCap,0.32,普通强盗战败后死亡概率上限
 banditFatalChiefDefeat,0.3,战败于灰沟贼王时的死亡概率
 banditIgnoreUnarmedChance,0.65,普通拦路人直接放过无穿戴旅客的概率
-banditRepeatFactors,1 / 0.1 / 0.02,当趟已遇零人、一人、两人以上后，下一格路的遭遇倍率
 setupDays,0.25,每次开启生产的操作耗时（日）
 collectDays,0.25,每次领取成品的操作耗时（日）
 consumableBatchLimit,4,常用消耗品每单合批数上限；材料、灵钱和工期照批数累加

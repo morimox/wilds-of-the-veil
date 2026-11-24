@@ -72,6 +72,49 @@ test('bringing a real herb to the apprentice introduces the alchemist and a boug
   assert.equal(state.inventory.qi_powder, data.recipes.find(({ id }) => id === 'r_qi').count);
 });
 
+test('the water diagram leads to two different repeatable spirit medicines', () => {
+  const state = createGame(28);
+  state.realm = 3;
+  state.coins = 100;
+  state.knownItems.push('clinic_note');
+  deny(state, 'alchemyBuyFormula', { id: 'formula_sense' });
+
+  state.region = 'herb_basin';
+  state.discovered.push(state.region);
+  enter(state, 'mist_shelter', 1);
+  closeScene(state);
+  state.knownItems.push('phase_chart');
+  play(state, 'visit', { id: 'mist_shelter' });
+  assert.ok(!view(state).visibleChoices.some(({ index }) => index === 2));
+  deny(state, 'choose', { index: 2 });
+  state.inventory.phase_chart = 1;
+  play(state, 'choose', { index: 2 });
+  assert.equal(state.inventory.formula_heart, 1);
+  assert.equal(state.inventory.heart_pill, 1);
+  assert.equal(state.inventory.phase_chart, 1);
+  deny(state, 'choose', { index: 2 });
+  closeScene(state);
+
+  state.region = 'village';
+  deny(state, 'alchemyBuyFormula', { id: 'formula_heart' });
+  play(state, 'alchemyBuyFormula', { id: 'formula_sense' });
+  assert.equal(state.coins, 78);
+  play(state, 'alchemyTalk');
+  state.economy.buildings.furnace = 1;
+  state.economy.warehouse = { reed: 10, core: 4, hide: 2, qi_core: 2 };
+  deny(state, 'econStart', { id: 'r_heart_pill' });
+  state.economy.buildings.furnace = 2;
+  play(state, 'econStart', { id: 'r_sense_powder' });
+  play(state, 'econStart', { id: 'r_heart_pill' });
+  assert.deepEqual(state.economy.warehouse, { reed: 5, core: 3, hide: 1, qi_core: 1 });
+  assert.equal(state.coins, 68);
+  const jobs = [...state.economy.jobs];
+  while (jobs.some(({ readyDay }) => readyDay > state.day)) play(state, 'wait');
+  for (const { id } of jobs) play(state, 'econCollect', { id });
+  assert.equal(state.inventory.sense_powder, 2);
+  assert.equal(state.inventory.heart_pill, 3);
+});
+
 test('the late recovery formula uses a gold core for each batch after the old agreement is known', () => {
   const state = createGame(23);
   state.realm = 6;
