@@ -47,6 +47,7 @@ const ruleDescriptions = {
   pressureThreshold: '探索压力高于此值时开始额外消耗真气（点）',
   pressureQi: '压力超限的每次探索所消耗的真气（点）',
   battleDays: '战斗操作每回合用时（天）',
+  worthyFightPractice: '首次赢过某种同境或更强的野外对手，额外增加的历练进度',
   harvestEncounterDays: '采集中遭遇伏击时开打前用时（天）',
   retreatDays: '撤出战斗所需用时（天）',
   retreatDamageFactor: '脱身时先乘此值，再计算减伤和防御',
@@ -177,9 +178,10 @@ const basketOptions = [
 ];
 const choices = data.events.flatMap(({ id, name, choices }) =>
   choices.map((choice, index) => ({ event: id, eventName: name, order: index + 1, ...choice })));
-const guardedChoices = choices.filter(({ guardedBy, afterFight, ambush }) => guardedBy || afterFight || ambush).map((choice) => {
+const guardedActors = choices.flatMap((choice) =>
+  [].concat(choice.guardedBy ?? choice.ambush?.enemy ?? choice.afterFight ?? []).map((actor) => ({ choice, actor })));
+const guardedChoices = guardedActors.map(({ choice, actor }) => {
   const site = data.sites.find(({ id }) => id === choice.event);
-  const actor = choice.guardedBy ?? choice.ambush?.enemy ?? choice.afterFight;
   const pool = site.creatures[actor];
   const curve = populationCurve(pool);
   const stocks = Object.entries(site.stocks ?? {}).filter(([, stock]) => stock.choices.includes(choice.order - 1))
@@ -189,15 +191,15 @@ const guardedChoices = choices.filter(({ guardedBy, afterFight, ambush }) => gua
   let condition;
   let revisit;
   if (choice.guardedBy) {
-    condition = curve === 'none' ? '击败看守后永久开放' : '清除本地全部看守';
-    revisit = curve === 'none' ? '取胜后有余料即可直接采，库存单独回生' :
-      finite ? '有余料且看守回来时须再清场，采尽后不再补充' : '看守回来才须再清场，库存单独回生';
+    condition = '通过前要清除该行动所列的全部看守';
+    revisit = curve === 'none' ? '本种看守不会回来，完成条件后可再回来办理尚未领取的事' :
+      finite ? '本种看守回来时须再清场，库存采尽后不再补充' : '本种看守回来才须再清场，库存独立回补';
   } else if (choice.ambush) {
     condition = '可直接采，活跃对手可能打断每批采集';
     revisit = '回补后仍可直接采，有对手在场时每批可能遭遇';
   } else if (choice.perWin) {
     condition = '每次获胜解锁本班奖品';
-    revisit = '换班后再胜可领取下一班奖品';
+    revisit = '同一地每场胜利对应一次领取；领取间隔按现场选项计算';
   } else {
     condition = '获胜一次后可办理一次';
     revisit = '已获胜便可回来办理，领取后关闭选项';
@@ -508,6 +510,7 @@ const tables = [
     ['poolId', '存量标识'], ['label', '现场存量名称'],
     ['start', '初始量'], ['cap', '上限'], ['interval', '基准恢复间隔（游戏日）'], ['growth', '每次恢复'], ['curve', '种群回补规律', curveText],
     ['depletedFactor', '耗空后首次恢复用时倍率'],
+    ['fixedPopulation', '按指定班期和人数回补'],
     ['choices', '消耗此资源的选项序号', (indexes) => indexes.map((index) => index + 1).join('、')],
   ], { note: '恢复间隔或恢复量为 0 时不回补。部分野生种群的非零存量回补间隔随密度调整，系数为 0.8 + 2.4 ×（存量／上限 − 0.5）²。曲线种群和清场点看守从最后一只落败时起按基准间隔和耗空倍率计首只。只有击败当场对手才减少该地点种群。' }),
   table('guarded-sites', '守护采集、途中伏击与胜后领取', guardedChoices, [
@@ -525,9 +528,13 @@ const tables = [
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
     'need', 'consume', 'hidden', 'loot', 'enemy', ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
     ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
-    ['guardedBy', '在场会挡住选择的对手', ref], ['ambush', '有对手时每批采集伏击', ({ enemy, chance }) => `${ref(enemy)} · ${percent(chance)}`],
+    ['guardedBy', '在场会挡住选择的对手', (ids) => [].concat(ids).map(ref).join('、')],
+    ['excludesChoices', '与同一地点这些选项互斥', (indexes) => indexes.map((index) => index + 1).join('、')],
+    ['excludedReason', '互斥时告诉玩家的缘由'], ['hideWhenExcluded', '互斥时隐藏此选项'],
+    ['ambush', '有对手时每批采集伏击', ({ enemy, chance }) => `${ref(enemy)} · ${percent(chance)}`],
     ['phase', '昼夜要求', (phase) => phase === 'night' ? '入夜后' : phase], ['phaseReason', '未到时的提示'],
     ['ebbOnly', '须在退水期间做完'], ['fieldTool', '副手须持完好采集工具', ref], ['cooldown', '完成后复做间隔（游戏日）'],
+    ['cooldownText', '复做间隔的现场说明'],
     ['stay', '执行后留在原地'],
     ['desc', '选前可见内容'], ['outcome', '执行后结果'], ['injury', '执行后受伤原因'],
   ], { omit: ['food'], note: '采集类选项的用时、伤害及产量按一批编排。每点一次、完成一批，所得先放在当前具体地点。标为消耗所需物品时会扣除该列物品。受伤、战斗和实际所得只在行动后报告。' }),
@@ -546,7 +553,7 @@ const tables = [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
-    'id', 'name', 'region', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
+    'id', 'name', 'region', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['learnArts', '当面传授的术诀', (ids) => ids.map(ref).join('、')], ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),
   table('services', '村务发现条件', data.services, [
     'id', 'name', ['public', '开局已有入口'], ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],

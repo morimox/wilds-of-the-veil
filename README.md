@@ -6,7 +6,7 @@
 
 ## 开始玩
 
-用浏览器打开 [网页试玩](https://morimox.github.io/wilds-of-the-veil/?play=20)，即可从落灯村出发。
+用浏览器打开 [网页试玩](https://morimox.github.io/wilds-of-the-veil/?play=21)，即可从落灯村出发。
 
 ### 在本机运行
 
@@ -47,6 +47,8 @@ GitHub Pages 的入口是同一份单文件构建。修改 `game.html`、源码�
 [仙侠战力与生存冒险调研](docs/research.md)交代题材来源和战力设计。[规则与公式](docs/rules.md)解释结算。[中文数值总表与 CSV 下载](docs/tables/README.md)包含装备、弹药、丹药、商人委托、设施、配方、境界、敌意、地图、事件分支、沙盘和全局规则，**含后期内容与隐藏路线剧透**。
 
 [第 20 版的资源循环与试玩修整](docs/resource-loop.md)记录实际遇见的问题、原作机制和对照数据，含场景与玩法剧透。
+
+[第 21 版战斗、远行与报酬复查](docs/combat-review-21.md)记录两营与地下通道的原作调研、四条远行、实测回合与酬劳，含支线剧透。
 
 [经济验收](docs/economy-audit.md)记录原作回生算法、各摊货源、熟客条件和设施来历。[筑基版平衡考核](docs/balance.md)记录武器、丹方、材料与新局验证。[上一版地图与养成验收](docs/growth-and-world-audit.md)记录十张图的路由与现场试验，含剧透。
 

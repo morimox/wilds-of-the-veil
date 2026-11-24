@@ -61,6 +61,7 @@ export const rules = Object.freeze({
   researchInsight: 1,
   researchLimit: 2,
   practicePerDay: 1,
+  worthyFightPractice: 2,
   combatSwitchGuard: 1,
   mealHeal: records.foods.ration.hp,
   fallDays: 1,
@@ -423,9 +424,15 @@ function siteWins(state, site, enemy) {
   return state.siteVictories?.[site?.id]?.[enemy] ?? 0;
 }
 
+const choiceGuards = (choice) => [].concat(choice.guardedBy ?? []);
+
+const choiceExcluded = (state, choice, site) =>
+  Boolean(choice.excludesChoices?.some((index) => state.seenChoices.includes(`${site.id}:${index}`)));
+
 function knowsChoice(state, choice, site) {
   return (choice.afterChoice === undefined || state.seenChoices.includes(`${site?.id}:${choice.afterChoice}`)) &&
     (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
+    (!choice.hideWhenExcluded || !choiceExcluded(state, choice, site)) &&
     (!choice.hidden || hasChoiceNeeds(state, choice));
 }
 
@@ -474,7 +481,7 @@ function spendPool(state, site, kind, id, amount) {
   if (pool.interval > 0 && pool.growth > 0) {
     const wild = kind === 'creatures' && pool.curve === 'wild';
     const recovery = recoveryDays(pool, count, wild);
-    const holdsPassage = kind === 'creatures' && records.events[site.id]?.choices.some((choice) => choice.guardedBy === id);
+    const holdsPassage = kind === 'creatures' && records.events[site.id]?.choices.some((choice) => choiceGuards(choice).includes(id));
     if (count === 0 && (pool.depletedFactor > 1 || holdsPassage || wild)) nextAt = state.day + recovery;
     else if (nextAt === null) nextAt = state.day + recovery;
   }
@@ -712,7 +719,7 @@ function choiceStocks(site, choice, index) {
 }
 
 function remainingGuards(state, site, choice) {
-  return site?.creatures?.[choice.guardedBy] ? poolAt(state, site, 'creatures', choice.guardedBy).count : 0;
+  return choiceGuards(choice).reduce((count, id) => count + (site?.creatures?.[id] ? poolAt(state, site, 'creatures', id).count : 0), 0);
 }
 
 function rollHarvestAmbush(state, site, ambush) {
@@ -746,9 +753,12 @@ function gatherOptions(state, choice, site, index) {
 
 function choiceBlocker(state, choice, site, index) {
   if (completedSiteChoice(state, site, index)) return { reason: '这件事已经办过了。' };
+  if (choiceExcluded(state, choice, site)) {
+    return { reason: choice.excludedReason ?? '这趟已经答应替另一边办事。' };
+  }
   if (choice.phase === 'night' && state.day % 1 < 0.5) return { reason: choice.phaseReason ?? '等到夜里再来。' };
   const cooldown = (state.siteCooldowns?.[site.id]?.[index] ?? 0) - state.day;
-  if (cooldown > 0) return { reason: `矿队要等下一趟下井，${Math.ceil(cooldown * 8) / 8} 日后再来。` };
+  if (cooldown > 0) return { reason: `${choice.cooldownText ?? (choice.afterFight ? '下一班还没回来。' : '眼下还得等一等。')}${Math.ceil(cooldown * 8) / 8} 日后再来。` };
   if (choice.ebbOnly && ebbTimeLeft(state) < choice.days) {
     return { reason: ebbTimeLeft(state) > 0 ? '水已经开始回涨，来不及绕过去再采一遍。' : '水盖过了石脊。每隔两日会退一次。' };
   }
@@ -768,7 +778,12 @@ function choiceBlocker(state, choice, site, index) {
     return { reason: renewable ? '这里暂时已经采空了。' : '这处材料已经取尽。', depleted: true };
   }
   const guards = remainingGuards(state, site, choice);
-  if (guards > 0) return { reason: `还有 ${guards} 只挡着这条路。` };
+  if (guards > 0) {
+    const activeGuards = choiceGuards(choice).filter((id) => poolAt(state, site, 'creatures', id).count > 0);
+    const humans = activeGuards.filter((id) => records.enemies[id].tags.includes('human')).length;
+    const unit = humans === 0 ? '只' : humans === activeGuards.length ? '人' : '个对手';
+    return { reason: `还有 ${guards} ${unit}挡着这条路。` };
+  }
   if (choice.perWin && Object.keys(choice.loot ?? {}).some((id) => records.gear[id] &&
       (gearReserved(state, id) || Object.values(state.ground).some((pile) => pile[id])))) {
     return { reason: '同样的奖品已有一份。' };
@@ -876,7 +891,10 @@ function choose(state, { index, itemId, count }) {
     state.seenChoices.push(choiceKey);
     state.insight = Math.max(0, state.insight + insight);
   }
-  if (completedBatches && choice.perWin) (state.siteClaims[site.id] ??= {})[index] = siteWins(state, site, choice.afterFight);
+  if (completedBatches && choice.perWin) {
+    const claims = (state.siteClaims[site.id] ??= {});
+    claims[index] = (claims[index] ?? 0) + 1;
+  }
   if (completedBatches && choice.cooldown) ((state.siteCooldowns ??= {})[site.id] ??= {})[index] = state.day + choice.cooldown;
   const { accepted, spilled } = addItems(state, completedBatches ? lootAvailable : {}, true);
   const gatheredRegion = state.region;
@@ -974,12 +992,14 @@ function finishCombat(state, enemy) {
   const insight = first ? (enemy.insight ?? 0) : 0;
   state.insight += insight;
   recordPractice(state);
+  const worthy = first && !protectedBout && enemy.tier >= state.realm;
+  if (worthy) state.practice[state.realm] = (state.practice[state.realm] ?? 0) + rules.worthyFightPractice;
   const gathered = protectedBout ? {} : { ...enemy.loot };
   leaveOnGround(state, gathered);
   const loot = goodsText(gathered);
   const hazard = hazardVictory(state, enemy.id, site?.id);
   return {
-    message: `${protectedBout ? '试招中胜过' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${tournament}${hazard}`,
+    message: `${protectedBout ? '试招中胜过' : '击退'}${enemy.name}。${loot ? `脚边留下${loot}。` : ''}${insight ? `见识+${insight}。` : ''}${worthy ? '经过这一战，运气又熟了一分。' : ''}${tournament}${hazard}`,
     ...(loot ? { gathered, gatheredRegion: state.region, gatheredSite: site?.id } : {}),
   };
 }
@@ -1601,6 +1621,9 @@ function handin(state, id) {
   state.coins += quest.coins ?? 0;
   state.insight += quest.insight ?? 0;
   state.completedQuests.push(id);
+  for (const id of quest.learnArts ?? []) {
+    if (!state.knownArts.includes(id)) state.knownArts.push(id);
+  }
   if (id === 'lost_basket_return') state.basketDisposition = 'returned';
   const victory = id === victoryQuestId();
   if (victory) {

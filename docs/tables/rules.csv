@@ -40,6 +40,7 @@ researchQi,1,每次静修消耗的真气（点）
 researchInsight,1,每次静修获得的修为（点）
 researchLimit,2,每一境界可进行的有效静修次数
 practicePerDay,1,
+worthyFightPractice,2,首次赢过某种同境或更强的野外对手，额外增加的历练进度
 combatSwitchGuard,1,
 mealHeal,2,吃一份干粮恢复的气血
 fallDays,1,战败或气血耗尽被救回村所用的时间（天）

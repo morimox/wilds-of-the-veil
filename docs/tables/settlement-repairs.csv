@@ -38,6 +38,9 @@
 落灯村（village）,落灯村工坊,fault_coat,横渊雨衣,0,33
 落灯村（village）,落灯村工坊,coal_tassel,焦灯剑穗,0,24
 落灯村（village）,落灯村工坊,ferry_pole,渡工短篙,0,6
+落灯村（village）,落灯村工坊,caravan_bell,压雾车铃,0,6
+落灯村（village）,落灯村工坊,zhao_cargo_brace,缠绳护腕,0,10
+落灯村（village）,落灯村工坊,border_watch_charm,挡沙铜腕扣,0,12
 照原城（zhao_city）,蒲霖的后炉,cudgel,枣木杖,2,5
 照原城（zhao_city）,蒲霖的后炉,knife,割苇短刀,2,7
 照原城（zhao_city）,蒲霖的后炉,split_axe,劈柴小钺,2,6
@@ -77,6 +80,9 @@
 照原城（zhao_city）,蒲霖的后炉,fault_coat,横渊雨衣,2,35
 照原城（zhao_city）,蒲霖的后炉,coal_tassel,焦灯剑穗,2,26
 照原城（zhao_city）,蒲霖的后炉,ferry_pole,渡工短篙,2,8
+照原城（zhao_city）,蒲霖的后炉,caravan_bell,压雾车铃,2,8
+照原城（zhao_city）,蒲霖的后炉,zhao_cargo_brace,缠绳护腕,2,12
+照原城（zhao_city）,蒲霖的后炉,border_watch_charm,挡沙铜腕扣,2,14
 叩石院（sand_bell_cloister）,梁弦的外院修具台,cudgel,枣木杖,3,6
 叩石院（sand_bell_cloister）,梁弦的外院修具台,knife,割苇短刀,3,8
 叩石院（sand_bell_cloister）,梁弦的外院修具台,split_axe,劈柴小钺,3,7
@@ -116,3 +122,6 @@
 叩石院（sand_bell_cloister）,梁弦的外院修具台,fault_coat,横渊雨衣,3,36
 叩石院（sand_bell_cloister）,梁弦的外院修具台,coal_tassel,焦灯剑穗,3,27
 叩石院（sand_bell_cloister）,梁弦的外院修具台,ferry_pole,渡工短篙,3,9
+叩石院（sand_bell_cloister）,梁弦的外院修具台,caravan_bell,压雾车铃,3,9
+叩石院（sand_bell_cloister）,梁弦的外院修具台,zhao_cargo_brace,缠绳护腕,3,13
+叩石院（sand_bell_cloister）,梁弦的外院修具台,border_watch_charm,挡沙铜腕扣,3,15

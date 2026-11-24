@@ -788,7 +788,7 @@ test('the boatman and village smith trade maps that open travel for a beginning 
   feed(reloaded, 70);
   walk(reloaded, 'ridge');
   assert.equal(view(reloaded).realmIndex, 0);
-  assert.deepEqual(siteIds(reloaded), ['ore_rain', 'empty_oven', 'miner_echo', 'rope_run', 'counter_bell_door']);
+  assert.deepEqual(siteIds(reloaded), ['ore_rain', 'empty_oven', 'miner_echo', 'rope_run', 'caravan_slate', 'counter_bell_door']);
   assert.equal(act(reloaded, 'travel', { id: 'ford' }).ok, false);
   chooseAt(reloaded, 'ore_rain', 0);
   assert.equal(siteIds(reloaded).includes('stone_niche'), false);

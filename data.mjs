@@ -6,6 +6,9 @@ import { puzzleContent } from './puzzle-content.mjs';
 import { tournamentContent, tournamentData } from './tournament.mjs';
 import { ferryContent } from './ferry-content.mjs';
 import { hazardContent } from './hazards.mjs';
+import { caravanContent } from './caravan-content.mjs';
+import { employersContent } from './employers-content.mjs';
+import { borderContent } from './border-content.mjs';
 
 const realms = [
   { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
@@ -61,6 +64,8 @@ const items = [
   { id: 'mine_guide', name: '玄砂引矿签', kind: 'key', price: 0, sell: 0, desc: '药谷换来的窄木签。照着墨线，可以从药谷过石槽，也可以从沉钟岭走运矿的窄道。两条路都接到冷井的外梯。' },
   { id: 'snow_token', name: '翻雪关的栈牌', kind: 'key', price: 0, sell: 0, desc: '照着栈牌刻出的踏脚位，能从矿山背后的巡道避开雪崩沟。' },
   { id: 'sky_cord', name: '三峰引绳结', kind: 'key', price: 0, sell: 0, desc: '一根打了三个结的短绳。雪关的三条木梁各系着一段路标，绳上的结能和它们依次对上。' },
+  { id: 'snow_escort_note', name: '画有木梯的栈道图', kind: 'key', price: 0, sell: 0, desc: '守栈人用红笔圈出矮墙后的一架木梯。火棚对面的栈道被雪堵住时，可从那架梯上山。' },
+  { id: 'snow_escort_done', name: '铜栓拓印', kind: 'key', price: 0, sell: 0, desc: '薄纸上压出了上栈第三根横梁的铜栓。守栈人留下这张纸，好在棚里照着做一把新的。' },
   { id: 'pine_ledge_note', name: '松崖背阴旧址', kind: 'key', price: 0, sell: 0, desc: '木贩旧账单背面画了崖边的缺口。过松场后沿背阴石壁才认得出。' },
   { id: 'arrow_pattern', name: '包铁箭样', kind: 'key', price: 0, sell: 0, desc: '一根剖开的窄铁箭。箭头外沿的一点折角攒住了刺进甲缝的力。' },
   { id: 'kiln_manual', name: '窑匠火候牌', kind: 'key', price: 0, sell: 0, desc: '低火、闷火和开炉的时刻刻在同一块石牌上。灰线下还有落灯丹师安蒲的药印。' },
@@ -496,8 +501,32 @@ const sites = [
       hide_ice: { item: 'hide', label: '冰沿雪蜥蜕', start: 4, cap: 7, interval: 8, growth: 1, depletedFactor: 1.8, choices: [1] },
     },
     emptyText: '老石窝的蜥蜕拾净了。雪蜥咬出的几道浅窝还露在外头，低处绑着避冰口的石绳。' },
-  { id: 'snow_fire', region: 'snow_pass', name: '护栈火棚', once: [0, 2],
-    afterOnceText: { 0: '守栈人收起换下的扶绳。火盆里还有红炭，他手边搁着一只缝到一半的护绳套。', 2: '守栈人把碎布卷好，往火盆里拨了拨。脚边还放着几个磨破的护绳套。' } },
+  { id: 'snow_fire', region: 'snow_pass', name: '护栈火棚', once: [0, 2, 3, 4, 5, 6],
+    afterOnceText: {
+      0: '守栈人收起换下的扶绳。火盆里还有红炭，他手边搁着一只缝到一半的护绳套。',
+      3: '伤手的守栈人给自己缠上布带。另一人提着木槌，在棚口等上山的消息。',
+      4: '守栈人把拓纸摊在火边，照着纸上的形状挑拣铜料。棚外那条老栈道已经挂上了新绳。',
+      5: '守栈人把拓纸摊在火边，照着纸上的形状挑拣铜料。棚外那条老栈道已经挂上了新绳。' } },
+  { id: 'snow_ladder', region: 'snow_pass', name: '石墙后的木梯', reveal: { item: 'snow_escort_note' }, once: [2],
+    creatures: {
+      snow_rail_lynx: { start: 2, cap: 2, interval: 0, growth: 0 },
+      snow_rail_hawk: { start: 1, cap: 1, interval: 0, growth: 0 },
+    },
+    creatureText: {
+      snow_rail_lynx: { present: '山猞把落在梯脚的兽骨咬得咯嘣响。', absent: '梯脚的兽骨散在雪里，底下露出两级踏板。' },
+      snow_rail_hawk: { present: '一只灰翅鹰在梯沿盘旋，影子几次掠过扶手。', absent: '风把梯顶的落羽卷到峭壁外。' },
+    },
+    afterOnceText: { 2: '新系的布条沿梯身往上，指向第三根横梁。' } },
+  { id: 'snow_beam', region: 'snow_pass', name: '第三根横梁', afterChoices: ['snow_ladder:2'], once: [2],
+    creatures: {
+      snow_rail_shell: { start: 1, cap: 1, interval: 0, growth: 0 },
+      snow_rail_matron: { start: 1, cap: 1, interval: 0, growth: 0 },
+    },
+    creatureText: {
+      snow_rail_shell: { present: '冰蜥伏在靠墙的横板上，硬尾时不时扫过栈道。', absent: '靠墙的横板空出了一段落脚处。' },
+      snow_rail_matron: { present: '铜栓下伏着一只长角冰蜥。它一转身，前爪便扣进旧木。', absent: '铜栓下只剩几道深爪痕。' },
+    },
+    afterOnceText: { 2: '换过的扶绳缠在铜栓上，横梁外侧多了一道打紧的绳结。' } },
   { id: 'white_ravine', region: 'snow_pass', name: '露背的雪沟', once: [2],
     creatures: { snow_warden: { start: 1, cap: 1, interval: 18, growth: 1 } },
     creatureText: { snow_warden: { present: '雪地有一道新犁痕。远处伏着高背，呼吸声把雪粉一层层掀开。', absent: '风快把犁痕吹平了。沟里没有新脚印。' } },
@@ -785,11 +814,34 @@ const events = [
     { label: '扶石绳拾低处的雪蜥蜕', days: 1.25, insight: 3, loot: { hide: 4 }, outcome: '你提起石窝的旧蜕，阴冷处长出的韧皮冻过也能弯。' },
     { label: '爬上冰沿取挂住的整蜕', days: 1.5, hp: -7, insight: 3, loot: { hide: 6 }, outcome: '石缝里一直干着，留了几张厚实的雪蜥蜕。', injury: '你撤手时冰皮断了，硬边划过小臂。' },
   ] },
-  { id: 'snow_fire', name: '护栈火棚', text: '棚外是过山的木栈道，边上的扶绳磨破了皮套。守栈人坐在火盆旁缝新套，拽两下线，就得揉一揉手腕。', choices: [
+  { id: 'snow_fire', name: '护栈火棚', text: '棚外是过山的木栈道，边上的扶绳磨破了皮套。守栈人坐在火盆旁缝新套，拽两下线，就得揉一揉手腕。旁边的年轻人背着一捆新绳，正往雪盖住的矮墙后张望。', choices: [
     { label: '把兽革和灵草交给守栈人', desc: '「兽革缝个新套，灵草敷敷手。你若要上天衡石台，我教你怎么看岔路上的绳结。」',
-      need: { hide: 6, reed: 5 }, consume: true, days: 1, insight: 5, loot: { sky_cord: 1, ration: 4 }, outcome: '他在短绳上打了三个不同的结。「每遇一道岔路，挑绳结跟这个对得上的梁走。走过第三条，便是天衡石台。」' },
+      excludesChoices: [4], excludedReason: '守栈人已把看岔路的绳结教给你了。', need: { hide: 6, reed: 5 }, consume: true, days: 1, insight: 5, loot: { sky_cord: 1, ration: 4 }, outcome: '他在短绳上打了三个不同的结。「每遇一道岔路，挑绳结跟这个对得上的梁走。走过第三条，便是天衡石台。」' },
     { label: '添干枝借火烘衣', need: { wood: 1 }, consume: true, days: 0.5, hp: 12, qi: 6, insight: 0, loot: {}, outcome: '你拨开灰，把干枝贴到火星上。火烧起来时，湿衣的下摆慢慢暖了。' },
     { label: '问他皮套怎么缝才挡雪', desc: '守栈人摊开缝到一半的皮套，两层粗布之间夹着一片兽皮。', days: 0.5, insight: 2, loot: { pass_seam: 1 }, outcome: '他让你摸里面的缝线。「线藏进来，外头下雪也浸不透。」说完递来一片缝好的样子。' },
+    { label: '问背绳的人打算从哪上山', desc: '年轻人把新绳换到另一边肩头，朝雪下的矮墙看了两次。', days: 0.25, loot: { snow_escort_note: 1 },
+      outcome: '「老栈最上边断了绳。我能爬上去换，墙后那架梯却给两窝兽占了。若有人先帮我探过去，第三根梁上见。累了就回棚烤火，还有三包多带的粮饼。」他把木梯和横梁圈在纸上。' },
+    { label: '把铜栓拓印递给守栈人', hidden: true, need: { snow_escort_done: 1 }, consume: true, excludesChoices: [0],
+      hideWhenExcluded: true, days: 0.25, insight: 5, loot: { sky_cord: 1, ration: 4 },
+      outcome: '守栈人把拓纸铺在铜片边，又示范了三个绳结。「外头几条岔路都系着这样的结，对着走就能上天衡石台。」' },
+    { label: '把铜栓拓印递给守栈人', hidden: true, need: { snow_escort_done: 1 }, consume: true, afterChoice: 0,
+      days: 0.25, insight: 3, outcome: '守栈人按住拓纸拿炭笔描边。「铜头磨成这样，难怪新绳一天就松。我照这个重新配一个。」' },
+    { label: '付九枚灵钱，拿三包粮饼', afterChoice: 3, days: 0.125, coins: -9, loot: { ration: 3 }, stay: true,
+      desc: '火棚的人两两换班。守栈人把多带的三包粮饼从梁上摘下来，自己那一捆还吊在绳上。',
+      outcome: '守栈人收下灵钱，把三包粮饼拢到一起。整条山道上也就这棚里有火。' },
+  ] },
+  { id: 'snow_ladder', name: '石墙后的木梯', text: '绕过矮墙，木梯就搁在背阴的石槽里。梯顶立着一根短桩，可以给棚里的人系布作记号。', choices: [
+    { label: '去梯脚挡开啃骨的山猞', enemy: 'snow_rail_lynx', days: 0.25, outcome: '山猞丢下兽骨，身子压得和梯脚一样低。' },
+    { label: '沿石槽上去，迎住盘旋的灰翅鹰', enemy: 'snow_rail_hawk', days: 0.25, outcome: '灰翅鹰收拢翅尖，沿梯面直扑下来。' },
+    { label: '攀到梯顶，在木桩上系布条', guardedBy: ['snow_rail_lynx', 'snow_rail_hawk'], days: 0.25,
+      outcome: '布条在木桩上绷直。往里能看见半截没系扶绳的横梁，有一枚铜栓被风擦得发亮。' },
+  ] },
+  { id: 'snow_beam', name: '第三根横梁', text: '新绳换在伸出悬崖的这根横梁上。木板靠石壁的一侧较宽，铜栓在前面，旧绳就从那里断开。', choices: [
+    { label: '从靠墙的木板驱开冰蜥', enemy: 'snow_rail_shell', days: 0.25, outcome: '冰蜥把尾巴往身侧一卷，挪到板子正中。' },
+    { label: '贴墙走到铜栓前，迎住长角冰蜥', enemy: 'snow_rail_matron', guardedBy: 'snow_rail_shell', days: 0.25,
+      outcome: '长角从铜栓下刮过，留下几缕木屑。它抬头向你压过来。' },
+    { label: '招手让背绳的人上来换绳', guardedBy: ['snow_rail_shell', 'snow_rail_matron'], days: 0.5, coins: 30,
+      loot: { snow_escort_done: 1, salve: 2 }, outcome: '那人循布条爬上来，换好新绳，把旧铜栓的形状拓在纸上交给你。他结清工钱，又从护腕里腾出两盒防冻的松脂膏。' },
   ] },
   { id: 'white_ravine', name: '露背的雪沟', text: '南边的雪沟又长又窄。迎风口吊着旧锣，几道护绳绕过一截横铁，沿短栈道可以退回火棚。', choices: [
     { label: '在迎风处敲响谷口的旧锣', days: 1, enemy: 'snow_warden', outcome: '山沟里的白背抖落积雪。雪脊兽昂头，把厚颈露在风里。' },
@@ -880,6 +932,18 @@ const enemies = [
   { id: 'snow_warden', name: '雪脊兽', tags: ['beast', 'scaled'], tier: 3, hp: 81, atk: 15, def: 6,
     intents: [{ name: '甩雪探路', kind: 'attack', mult: 1.02 }, { name: '伏背撞沟', kind: 'heavy', mult: 1.7 }, { name: '蜷鳞藏气', kind: 'guard', mult: 1.4 }, { name: '卷冷风', kind: 'drain', mult: 0.66 }, { name: '翻颈扫石', kind: 'attack', mult: 1.1 }],
     insight: 10, loot: { beast_meat: 5, hide: 4, beast_eye: 1, foundation_core: 2 }, desc: '雪脊鳞叠得厚，压背后会沿沟猛撞。趁它还没贴近时服药或换术。' },
+  { id: 'snow_rail_lynx', name: '雪耳山猞', tags: ['beast', 'furred'], tier: 1, hp: 33, atk: 11, def: 3,
+    intents: [{ name: '矮身抄足', kind: 'attack', mult: 1 }, { name: '蹬梯扑脸', kind: 'heavy', mult: 1.55 }],
+    insight: 3, loot: { beast_meat: 2, hide: 1, qi_core: 1 }, desc: '前足碰到梯脚时，会借梯身猛扑。' },
+  { id: 'snow_rail_hawk', name: '灰翅雪鹰', tags: ['beast'], tier: 2, hp: 38, atk: 12, def: 4,
+    intents: [{ name: '掠梯啄手', kind: 'attack', mult: 1 }, { name: '折翅骤降', kind: 'heavy', mult: 1.63 }, { name: '振翼挡锋', kind: 'guard', mult: 1.32 }],
+    insight: 5, loot: { beast_meat: 2, beast_eye: 1, qi_core: 2 }, desc: '灰翅忽然收紧时，很快就会沿梯面俯冲。' },
+  { id: 'snow_rail_shell', name: '横尾冰蜥', tags: ['beast', 'scaled'], tier: 2, hp: 46, atk: 12, def: 5,
+    intents: [{ name: '盘尾护腹', kind: 'guard', mult: 1.35 }, { name: '扫板拖步', kind: 'attack', mult: 1 }, { name: '卷尾击梁', kind: 'heavy', mult: 1.58 }],
+    insight: 6, loot: { beast_meat: 2, hide: 1, qi_core: 2 }, desc: '先用尾巴护住柔软的腹部，再将长尾横扫过来。' },
+  { id: 'snow_rail_matron', name: '铜角冰蜥', tags: ['beast', 'scaled'], tier: 3, hp: 62, atk: 14, def: 5,
+    intents: [{ name: '横颈擦肩', kind: 'attack', mult: 1 }, { name: '按梁撞角', kind: 'heavy', mult: 1.68 }, { name: '退半步团身', kind: 'guard', mult: 1.38 }, { name: '贴板喷寒', kind: 'drain', mult: 0.57 }],
+    insight: 9, loot: { beast_meat: 4, hide: 2, beast_eye: 1, foundation_core: 1 }, desc: '长角会刮过横梁。它前爪压进旧木时，才要低头撞过来。' },
   { id: 'mirror_warden', name: '持衡镜灵', tags: ['spirit', 'stoneborn'], tier: 3, hp: 92, atk: 18, def: 7,
     intents: [{ name: '抬印收影', kind: 'guard', mult: 1.45 }, { name: '左影探腕', kind: 'attack', mult: 1.08 }, { name: '梁影横压', kind: 'heavy', mult: 1.65 }, { name: '抽气归镜', kind: 'drain', mult: 0.62 }, { name: '借右影回手', kind: 'attack', mult: 1.14 }],
     insight: 14, loot: { foundation_core: 2 }, desc: '它守印的时候两道影子贴在一起。影子分开以后先试探，再借梁影出重招。' },
@@ -1001,7 +1065,8 @@ const regionDetails = { ...riverContent.regionDetails, ...zhaoContent.regionDeta
 const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => content.sects ?? []);
 const mechanisms = puzzleContent.mechanisms;
 
-for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent, ferryContent, hazardContent]) {
+for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
+  ferryContent, hazardContent, caravanContent, employersContent, borderContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -1020,9 +1085,9 @@ const eventsBySite = new Map(events.map((event) => [event.id, event]));
 const sparringEnemies = new Set(enemies.filter((enemy) => enemy.sparring).map((enemy) => enemy.id));
 for (const site of sites) {
   if (!site.creatures || site.protectedArena) continue;
-  const guards = new Set(eventsBySite.get(site.id)?.choices.map((choice) => choice.guardedBy));
+  const guards = new Set(eventsBySite.get(site.id)?.choices.flatMap((choice) => choice.guardedBy ?? []));
   for (const [id, pool] of Object.entries(site.creatures)) {
-    if (!pool.interval || !pool.growth || sparringEnemies.has(id) || solitaryTerritories.has(id)) continue;
+    if (!pool.interval || !pool.growth || pool.fixedPopulation || sparringEnemies.has(id) || solitaryTerritories.has(id)) continue;
     site.creatures[id] = {
       ...pool,
       start: pool.start > 0 ? pool.start + 1 : 0,

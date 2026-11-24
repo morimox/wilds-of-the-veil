@@ -68,7 +68,10 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
     const pools = Object.entries(site.stocks ?? {});
     const creatures = site.creatures ?? {};
     for (const [index, action] of choices.entries()) {
-      for (const enemy of [action.enemy, action.guardedBy, action.afterFight, action.ambush?.enemy].filter(Boolean)) {
+      for (const other of action.excludesChoices ?? []) {
+        assert.ok(other !== index && choices[other] && site.once?.includes(other), `${site.id}:${index}:${other}`);
+      }
+      for (const enemy of [action.enemy, ...[].concat(action.guardedBy ?? []), action.afterFight, action.ambush?.enemy].filter(Boolean)) {
         assert.ok(enemies.has(enemy) && creatures[enemy], `${site.id}:${index}:${enemy}`);
         assert.ok(choices.some((choice) => choice.enemy === enemy), `${site.id}:${index}:${enemy}`);
       }
@@ -88,6 +91,10 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
         assert.ok(choices[index].loot[pool.item ?? key] > 0 && choices[index].days > 0, `${site.id}:${index}:${key}`);
       }
     }
+  }
+  const arts = new Set(data.arts.map(({ id }) => id));
+  for (const quest of data.quests) {
+    for (const art of quest.learnArts ?? []) assert.ok(arts.has(art), `${quest.id}:${art}`);
   }
   for (const { id, lead, region, ranks } of trainingData) {
     assert.ok(items.has(lead), id);
