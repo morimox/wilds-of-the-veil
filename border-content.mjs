@@ -192,4 +192,4 @@ const quests = [
   },
 ];
 
-export const borderContent = { items, gear, arts: [], sites, events, enemies, quests };
+export const borderContent = { items, gear, sites, events, enemies, quests };

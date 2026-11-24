@@ -91,8 +91,8 @@ const forgedGear = [
     item: { id: 'gold_spirit_pendant', name: '静水护心佩', kind: 'gear', price: 0, sell: 45,
       desc: '水纹从佩心往外刻，直到一圈没有接缝的暗金边。' },
     gear: { slot: 'charm', tier: 8, def: 1, hp: 4, qi: 10, durability: 61, repair: 24,
-      physicalResist: 0.04, magicResist: 0.15,
-      entry: '金丹后期可佩，能多存些真气。术法打来时，水纹一圈接一圈分开冲劲，也能挡去一点兵刃力道。' },
+      physicalResist: 0.04, magicResist: 0.15, spiritReserve: 1,
+      entry: '金丹后期可佩，能多存些真气，多蓄一点神识。打来的术法沿水纹散开，也能卸掉一点兵刃力道。' },
     recipe: { tier: 8, reveal: { item: 'fault_receipt' }, cost: 72, days: 6,
       need: { core: 10, black_iron: 8, ore: 5, gold_core: 5 },
       desc: '旧约记着先向哪边放水。护心佩照这个次序刻开水纹，让打来的气劲沿浅槽分散。' },
@@ -129,16 +129,16 @@ const forgedGear = [
   },
 ];
 
-const goldArts = [
-  { id: 'gold_ember_point', name: '伏火指', tier: 6, cost: 14, power: 17, pierce: 4, guard: 0, break: 0,
-    price: 61, weaponBased: false, damageType: 'magic', reveal: { item: 'cold_kiln_record' },
-    desc: '照冷炉册的熄火时机收住一口气，再从指尖送出。力道集中，适合打穿硬壳。' },
-  { id: 'gold_push_tide', name: '推潮掌', tier: 8, cost: 20, power: 24, pierce: 4, guard: 2, break: 0,
-    price: 86, weaponBased: false, damageType: 'magic', reveal: { item: 'fault_receipt' },
-    desc: '按湖底的分水法把气送入两掌，合掌时一并推出。出手很重，也要费不少真气。' },
-];
+const channeling = {
+  resin_staff: { spellQi: 8, spellPower: 5, spellPierce: 1, note: '把真气送入杖心，能打出一股系在松脂里的火劲。' },
+  coil_pole: { spellQi: 17, spellPower: 10, spellPierce: 2, spellInterrupt: 7, note: '催动铜纹时，杖中回响能压住敌人的蓄势。' },
+  gold_tide_staff: { spellQi: 24, spellPower: 15, spellPierce: 4, spellGuard: 3,
+    note: '引真气让杖里的水劲缠住来招，然后借势击出。' },
+  gold_confluence_staff: { spellQi: 34, spellPower: 24, spellPierce: 5, spellInterrupt: 8,
+    note: '两道槽里各走一股真气，合到杖头时一并冲出，连正在攒劲的对手也容易失手。' },
+};
 
-export function tuneCombatData({ enemies, gear, items, recipes, arts }) {
+export function tuneCombatData({ enemies, gear, items, recipes }) {
   for (const enemy of enemies) {
     Object.assign(enemy, goldEnemyResistance[enemy.id]);
     const spells = enemySpells[enemy.id];
@@ -166,9 +166,11 @@ export function tuneCombatData({ enemies, gear, items, recipes, arts }) {
     recipes.push({ id: `r_${item.id}`, result: item.id, count: 1, facility: 'forge', facilityLevel: 3, ...recipe });
   }
 
-  const doubleFlow = arts.find(({ id }) => id === 'core_spindle');
-  if (doubleFlow) {
-    Object.assign(doubleFlow, { cost: 15, power: 16, pierce: 3, guard: 3, break: 6 });
+  for (const piece of gear) {
+    const profile = channeling[piece.id];
+    if (!profile) continue;
+    const { note, ...mechanics } = profile;
+    Object.assign(piece, mechanics);
+    piece.entry += note;
   }
-  arts.push(...goldArts);
 }

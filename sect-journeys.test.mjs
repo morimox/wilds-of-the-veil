@@ -46,7 +46,7 @@ function footOfTheSlope(state) {
 
 test('an unaffiliated traveler can light and report the lower road without a fight', () => {
   const state = createGame(19);
-  state.discovered.push('pine_ridge');
+  state.discovered.push('ford', 'pine_ridge');
   play(state, 'buy', { id: 'wood' });
   walk(state, 'pine_ridge', 'lantern_court');
   play(state, 'localBuy', { id: 'ration', count: 2 });
@@ -84,7 +84,7 @@ test('an unaffiliated traveler can light and report the lower road without a fig
 
 test('the upper repair opens protected mineral access and members can take a recurring lamp shift', () => {
   const state = createGame(19);
-  state.discovered.push('pine_ridge');
+  state.discovered.push('ford', 'pine_ridge');
   Object.assign(state.inventory, { wood: 10, hide: 4, ore: 2, reed: 7 });
   state.coins = 30;
   walk(state, 'pine_ridge', 'lantern_court');
@@ -118,7 +118,7 @@ test('the upper repair opens protected mineral access and members can take a rec
 
 test('the nominal title is already on the register and ward cooldown uses elapsed time', () => {
   const state = createGame(19);
-  state.discovered.push('pine_ridge');
+  state.discovered.push('ford', 'pine_ridge');
   Object.assign(state.inventory, { wood: 10, hide: 3, reed: 8 });
   state.coins = 30;
   walk(state, 'pine_ridge', 'lantern_court');
@@ -135,27 +135,29 @@ test('the nominal title is already on the register and ward cooldown uses elapse
   assert.match(job().reason, /6.5日后再来/);
 });
 
-test('spirit guard expires after reading through an opponent’s own guard', () => {
+test('an unused reflection expires over a real opponent’s defensive turn', () => {
   const state = createGame(19);
-  state.knownItems.push('phase_chart');
-  state.region = 'zhao_city';
-  Object.assign(state.inventory, { qi_core: 2, core: 3 });
-  state.coins = 40;
-  play(state, 'trainStudy', { id: 'spirit' });
+  state.realm = 6;
+  state.hp = view(state).maxHp;
+  state.coins = 180;
+  state.region = 'measuring_hall';
+  play(state, 'spiritStudy', { id: 'turn_edge' });
+  play(state, 'rest');
   state.region = 'reed_meadows';
   visit(state, 'meadow_ruts');
   fieldChoice(state, 0);
   play(state, 'guard');
   state.combat.plan.reader = null;
   const unread = structuredClone(state);
-  play(state, 'readSpirit');
-  assert.equal(view(state).intent.kind, 'guard');
-  assert.equal(play(state, 'attack').enemyMove.kind, 'guard');
-  assert.equal(play(unread, 'attack').enemyMove.kind, 'guard');
+  play(state, 'invokeSpirit');
+  assert.equal(view(state).intent, null);
+  assert.equal(play(state, 'guard').enemyMove.kind, 'guard');
+  assert.equal(play(unread, 'guard').enemyMove.kind, 'guard');
   const followed = play(state, 'attack');
   const ordinary = play(unread, 'attack');
   assert.equal(followed.enemyMove.kind, 'heavy');
   assert.equal(followed.damageTaken, ordinary.damageTaken);
+  assert.equal(followed.reflectedDamage, 0);
 });
 
 test('the ladder passage stays open when clear even if its iron deposit is empty', () => {

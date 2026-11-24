@@ -19,15 +19,16 @@ function arriveAtZhao() {
   state.realm = 3;
   state.coins = 50;
   Object.assign(state.inventory, { ration: 9, wood: 2, hide: 1, ore: 1, heal_pill: 5, qi_powder: 4 });
-  for (const id of ['sky_sword', 'frost_robe', 'hide_shield']) {
+  for (const id of ['sky_sword', 'sky_cloak', 'hide_shield', 'tide_charm', 'breath_belt']) {
     const gear = data.gear.find((entry) => entry.id === id);
     state.inventory[id] = 1;
     state.durability[id] = gear.durability;
     play(state, 'equip', { id });
   }
+  state.inventory.resin_staff = 1;
+  state.durability.resin_staff = data.gear.find(({ id }) => id === 'resin_staff').durability;
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;
-  state.knownArts.push('cross_weir', 'tide_part');
   return state;
 }
 
@@ -57,6 +58,7 @@ function option(state, index) {
 function bout(state, index, enemy) {
   if (state.satiety < 35) play(state, 'eat', { id: 'ration' });
   const chief = enemy === 'zhao_cargo_keeper' || enemy === 'zhao_sluice_anchor';
+  if (enemy === 'zhao_cargo_keeper') play(state, 'equip', { id: 'resin_staff' });
   const { maxHp, maxQi } = view(state);
   if (state.inventory.heal_pill && state.hp < (chief ? maxHp - 15 : maxHp / 2)) play(state, 'use', { id: 'heal_pill' });
   while (state.inventory.qi_powder && state.qi <= (chief ? maxQi - 7 : 4)) play(state, 'use', { id: 'qi_powder' });
@@ -65,12 +67,13 @@ function bout(state, index, enemy) {
   const site = state.combat.siteId;
   const previous = state.siteVictories[site]?.[enemy] ?? 0;
   let turns = 0;
-  while (state.combat && turns < 18) {
-    const kind = view(state).intent?.kind;
-    if (state.hp < maxHp * 0.46 && state.inventory.heal_pill && kind !== 'heavy') play(state, 'use', { id: 'heal_pill' });
-    else if (state.qi >= 5 && (kind === 'heal' || (chief && kind !== 'guard'))) play(state, 'art', { id: 'cross_weir' });
+  while (state.combat && turns < 22) {
+    const { intent, combatWeapon } = view(state);
+    const kind = intent?.kind;
+    if (state.hp < maxHp * 0.55 && state.inventory.heal_pill && kind !== 'heavy') play(state, 'use', { id: 'heal_pill' });
     else if (kind === 'heavy') play(state, 'guard');
-    else if (state.qi >= (kind === 'guard' ? 5 : 9)) play(state, 'art', { id: 'tide_part' });
+    else if (kind === 'guard' && combatWeapon.spellQi > state.qi && state.inventory.qi_powder) play(state, 'use', { id: 'qi_powder' });
+    else if (combatWeapon.spellQi && state.qi >= combatWeapon.spellQi && kind !== 'guard') play(state, 'weaponSpell');
     else play(state, 'attack');
     turns += 1;
   }
@@ -159,7 +162,7 @@ test('cargo cover pays the deposit once and exhibits exactly eight persistent vi
   context.diagnostic(`8 wins, ${turns} battle rounds plus a deliberate retreat, 97 net coins`);
 });
 
-test('sluice guard spends the actual wood and hide, needs ore for the repair, and awards the art once', (context) => {
+test('sluice guard spends the actual wood, hide and ore before paying the repair once', (context) => {
   const state = arriveAtZhao();
   play(state, 'visit', { id: 'zhao_public_scales' });
   state.inventory.hide = 0;
@@ -193,8 +196,7 @@ test('sluice guard spends the actual wood and hide, needs ore for the repair, an
   const deepPay = { id: 'zhao_sluice_deep_pay' };
   play(state, 'handin', deepPay);
   assert.equal(state.coins, 142);
-  assert.equal(state.inventory.zhao_sluice_verse, 1);
-  assert.ok(state.knownArts.includes('zhao_water_rebound'));
+  assert.equal(state.inventory.leaf_pill, 2);
   assert.equal(state.inventory.zhao_cargo_brace, undefined);
   assert.equal(act(state, 'handin', deepPay).ok, false);
   assert.equal(Object.values(state.siteVictories).flatMap(Object.values).reduce((sum, count) => sum + count, 0), 8);

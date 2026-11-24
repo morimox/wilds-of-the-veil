@@ -89,18 +89,18 @@ const crews = {
 
 const crewRoads = {
   [greyGully]: [
-    ['marsh', 'ridge', 0.027, '倒钟前的山道有几处能藏人的矮石墙。'],
-    ['ridge', 'ford', 0.030, '旧商道只须过一道山口，两侧却都有荒屋。'],
-    ['ridge', 'screen_slope', 0.043, '晒盘后侧的石径狭窄，路旁矮石墙边常见新脚印。'],
-    ['pine_ridge', 'screen_slope', 0.029, '枯松遮住了筛盘背后的一段坡路。'],
-    ['screen_slope', 'herb_basin', 0.027, '药谷外的黄草遮到膝头，枝干上勾着一段新布。'],
-    ['screen_slope', 'kiln_valley', 0.023, '窑灰上有新脚印，几串都在坡口停过。'],
+    ['ridge', 'screen_slope', 0.16, '往晒盘坡的矿道收窄，矮石墙后常有人拦车。'],
+    ['pine_ridge', 'screen_slope', 0.14, '枯松遮着晒盘坡口，路上有人拆掉了指路的木牌。'],
+    ['screen_slope', 'herb_basin', 0.17, '去药谷的坡道经过两处废棚。挑担人近来都绕着走。'],
+    ['screen_slope', 'kiln_valley', 0.16, '窑谷一侧有新砍的路障，几串脚印都在坡口停过。'],
+    ['pine_ridge', 'ridge', 0.075, '松场南坡有几处荒矮墙，日落后往往有人蹲守。'],
+    ['kiln_valley', 'herb_basin', 0.12, '两间废窑后墙之间是条窄道，车夫说有人在那里查过粮袋。'],
+    ['ridge', 'herb_basin', 0.12, '药工旧路边有砍开的绳头。挑夫多半等人结伴才肯走。'],
   ],
   ferryHills: [
-    ['marsh', 'ford', 0.024, '旧渡的下坡贴着一道看不清底的土沟。'],
-    ['ford', 'pine_ridge', 0.022, '桥索外头还有一片旧车辙，最近被人踩乱了。'],
-    ['pine_ridge', 'kiln_valley', 0.028, '林脚这边松枝太密，从路上看不见坡底。'],
-    ['kiln_valley', 'herb_basin', 0.024, '两间废窑的后墙之间只容一人穿过。'],
+    ['pine_ridge', 'kiln_valley', 0.050, '林脚这边松枝太密，从路上看不见坡底。'],
+    ['kiln_valley', 'snow_pass', 0.055, '上雪关的石阶边有一处废木亭，常有人躲在背风一面。'],
+    ['herb_basin', 'snow_pass', 0.047, '背风山道上有拖木头的旧辙，最近又添了几道。'],
   ],
   quarryTracks: [
     ['ridge', 'black_mine', 0.028, '废矿车正挡在矿脊便道的一处拐角。'],
@@ -111,7 +111,7 @@ const crewRoads = {
     ['flood_market', 'glass_bank', 0.033, '碎琉璃滩外有一道简陋的横杆，水上看不清谁在守。'],
     ['flood_market', 'crane_granary', 0.023, '粮仓的后路绕过一排平日没人看的空高脚屋。'],
     ['crane_granary', 'glass_bank', 0.028, '枯芦把下岸的路挤成一条单行窄道。'],
-    ['ring_isles', 'glass_bank', 0.027, '白石和晒网之间有几条人走出来的岔。'],
+    ['glass_bank', 'rope_sands', 0.039, '白石和晒网之间有几条人走出来的岔，岸头人少。'],
   ],
   reedBank: [
     ['green_dyke', 'old_marker', 0.021, '堤下水浅，夹布的空篮卡在半截矮桩上。'],
@@ -119,7 +119,7 @@ const crewRoads = {
     ['frog_pond', 'scale_bog', 0.032, '苔堤狭长，沿线有几处能从泥滩绕到身后。'],
   ],
   weirReef: [
-    ['ring_isles', 'beacon_reefs', 0.023, '离岗灯还有一段下坡，低处的礁缝能避风。'],
+    ['charcoal_ridge', 'night_pit', 0.037, '伏火坑一侧没灯，低处的绳桩像是近来才打上去的。'],
     ['glass_bank', 'beacon_reefs', 0.032, '浅岸边的破船壳一直卡在两块礁中间。'],
     ['charcoal_ridge', 'burnt_weir', 0.030, '挂炭袋的树一直排到堰边。最远两只背后有窄坎。'],
     ['rope_sands', 'burnt_weir', 0.034, '沙路越过几根拴索的木桩，堰脚还有一排断柱。'],
@@ -238,28 +238,24 @@ const specialEnemies = [
 
 const fixed = [
   {
-    id: 'road_slate_peg', a: 'marsh', b: 'ridge', crew: greyGully, forceAt: 3,
+    id: 'road_slate_peg', a: 'ridge', b: 'screen_slope', crew: greyGully, forceAt: 3,
     enemy: 'road_slate_boss', chance: 0.6, fee: 5,
-    intro: '板车歪在道上，只留下车前木杆旁的一线窄路。一个灰褂人握着短刀，左臂上裹了层透红的布。他叫你丢五枚钱到车板上。',
-    nonThreatIntro: '板车歪在道上。灰褂人打量一眼你的兵器，把短刀连鞘搁在车板上。他用右手托着车前伸出的木杆，左袖的布透着血。「劳驾扶一下，别让车再倒过来。」',
-    nonThreatActions: [{ id: 'ask_cart_road', label: '帮他扶稳板车，问他从哪儿下来',
-      desc: '他一个人扶不住板车。车底夹着半张送货图。', revealSite: den,
-      outcome: '车身一正，灰褂人从底下抽出货图。「我是从晒盘坡逃下来的。筛盘后头有条灰沟，矮栅脚下扣着木盆，往里就是那伙人的寨子。」说完他把板车推到路边。' }],
-    actions: [{ id: 'bind_road_arm', label: '拿出药膏，替灰褂人裹住左臂',
-      desc: '那只手抬不稳，布一动就往下滴血，原先打的结也松了。', need: { salve: 1 },
-      loot: { [sleeve]: 1 }, revealSite: den,
-      outcome: '你给他上了药。灰褂人用右手扶着车，替你腾开窄路。「这伤是晒盘坡背后的寨里留的。走筛盘旁的灰沟，认倒扣的木盆。」他让你从车板下抽本薄册。「原先护车时拿它保命。下回看清谁先出手，再伸手。」' }],
+    intro: '一辆板车横在碎石路上。灰褂人踢紧轮下的木楔，左臂缠的布已洇红。他横过短刀，刀背敲了敲车板。「五枚。搁这儿。」',
+    nonThreatIntro: '一辆板车横在碎石路上。灰褂人抬眼看你，拇指已经顶开刀鞘，停了一停，又将刀按了回去。「借过。车轮卡了。」他试着抬车，缠布的左手使不上力。',
+    nonThreatActions: [{ id: 'ask_cart_road', label: '扶起车头，问他这车要往哪儿送',
+      desc: '车底压住了一块货牌，半边露着朱印。', revealSite: den,
+      outcome: '你扶住车。他拔出轮下的木楔，把车推到路边，拾起货牌攥在手里。「我等人来交车，人没来。你若上晒盘坡，别跟车辙走。」见你还在看那枚印，他拿鞋尖在砂里划了两道。「旧筛子后面是灰沟。过了扣木盆的矮栅，就是截货那伙人的寨子。」' }],
     afterPay: { revealSite: den,
-      outcome: '扶正板车时掉出一张旧送货图。图上的山路从晒盘坡筛盘拐进灰沟。沟尽头画着矮栅，栅脚倒扣着一只木盆。' },
+      outcome: '他扣紧车槽里的小匣，俯身抽出压轮的木楔。车挪开时，你看清车尾挂着一块送货牌，上面烙着「晒盘坡，旧筛后灰沟」。他顺着你的目光看了一眼。「见了倒扣的木盆就回头，那是里头的哨。」' },
     afterWin: {
-      intro: '短刀掉进车底。灰褂人靠住车轮，右手抓紧渗血的左袖。「我本是替寨里赶车的。上回他们叫我把押货的小孩捆进棚，我没下手，回头就挨了这一刀。拦你是想凑点看伤的钱。放我一回，我往山下走，再不上这条道。」',
+      intro: '短刀落在前轮外侧。他扶着轮辐想去捡，左臂一软，人又坐了下去。车篷也在交手时扯开，底下叠着几块有姓名的货牌。灰褂人看见你望过去，低声道：「我只管车。等他们来取钱，咱俩都走不了。」',
       actions: [
-        { id: 'spare_slate_robber', label: '拨开他脚边的短刀，放他下山',
-          desc: '他把空着的右手摊在车板上，等你让路。', revealSite: den,
-          outcome: '灰褂人扶车站起来，从车槽抽出半张送货图。「晒盘坡旧筛盘后面有条灰沟。沟尽头的矮栅脚下扣着木盆，从那儿进去。」他把短刀留在车下，按着伤口走下坡。' },
+        { id: 'spare_slate_robber', label: '踢开短刀，问清谁来收钱，再放他走',
+          desc: '他看了一眼来路，把右手从刀旁收了回来。', revealSite: den,
+          outcome: '你把刀踢到路旁。他从货牌里挑出一块刻着许字的，搁在前轮边。「许涧叫我守到天黑。数目差了一单，他就拿车棍补在我身上。」他用指甲刮开牌上干泥，露出一行小字。「晒盘坡，旧筛子后头那条灰沟。木盆倒扣的地方进去。」车还横着，他没去扶，按着左臂下了坡。' },
         { id: 'kill_slate_robber', label: '了结灰褂人',
-          desc: '他已经够不着车下的短刀，只能扶着车轮。', loot: { ration: 1 }, revealSite: den,
-          outcome: '灰褂人倒在车轮旁。车槽里压着一包干粮和半张被轮轴碾破的送货图。图上从晒盘坡一架旧筛盘画到灰沟尽头，矮栅旁标着一只倒扣的木盆。' },
+          desc: '他的手停在前轮旁，短刀还差半臂远。', loot: { ration: 1 }, revealSite: den,
+          outcome: '灰褂人倒在前轮旁。你从篷下翻出一包干粮、一张抄过数目的送货图。图上标着晒盘坡旧筛盘、灰沟和倒扣的木盆，旁边押着一个许字。两张别家的货牌还背面朝上，等着记账。' },
       ],
     },
   },
@@ -287,7 +283,7 @@ const fixed = [
 const resident = (start, interval = 0) => ({ start, cap: start, interval, growth: interval > 0 ? 1 : 0,
   fixedPopulation: true, ...(interval > 0 ? { depletedFactor: 1 } : {}) });
 const sites = [
-  { id: roadsideCart, name: '北堤歇车处', region: 'marsh' },
+  { id: roadsideCart, name: '矿道歇车处', region: 'ridge' },
   { id: den, name: '灰沟坡寨', region: 'screen_slope', afterBandit: den, once: [1, 2, 3, 4],
     creatures: { [scout]: resident(8, 28), [sentry]: resident(8, 32), [bodyguard]: resident(6, 36), [leader]: resident(1) },
     creatureText: {
@@ -322,11 +318,11 @@ const sites = [
 ];
 
 const events = [
-  { id: roadsideCart, name: '北堤歇车处',
-    text: '北堤分出一条上山的石路。赶木车的人歇在路口，扯下一截旧布，把腰间刀鞘上的铜包角缠住。',
+  { id: roadsideCart, name: '矿道歇车处',
+    text: '去晒盘坡的旧矿道在这儿分出去。木车停在弯里，车夫正用旧布缠刀鞘，生怕那块铜包角露出来。',
     choices: [
       { label: '问他为何把刀鞘缠起来', days: 0, stay: true,
-        outcome: '「过了北堤，有人专在山道上等。先看你穿的甲，再看腰里挂的刀。披亮甲的，出来讨钱的往往也更不好惹。村口和驿站有人巡，他们少往那边凑。我上山总留几枚散钱，包里也放点救急的料。上回给了两截松木，那人就挪开了绳。」' },
+        outcome: '车夫把布结塞进腰带。「往晒盘坡的路上，有人见你甲好、刀好，就去叫能压得住你的来。上回我只带这口旧刀，给两截好松木，也就过去了。」他伸手指了指山下。「往渡口还有人巡。要走山里，先想好回来走哪条。」' },
     ],
   },
   { id: den, name: '灰沟坡寨', text: '旧筛盘后的灰沟绕到半人高的外栅，栅脚倒扣着一只木盆。棚门和货架都朝着中间的空地，寨里的人来回从这儿过。',
@@ -334,9 +330,9 @@ const events = [
       { label: '翻过外栅，走进寨里的空地', desc: '站在外栅只能看见棚顶和货架，看不清是谁先走出来。', days: 0.25,
         encounter: denResidents, outcome: '你踩到栅内的平地。有人回身抄起兵器，迎上来堵住去路。' },
       { label: '从背坡拖出货柜，清点许涧留下的东西', afterFight: leader, days: 0.375, stay: true, coins: 180,
-        desc: '巡山人准备从宽板接手。柜上搁着许涧的刀，夹层里还卡着一只铁匣。',
-        loot: { ration: 4, ore: 6, core: 3, hide: 2, [kingBlade]: 1 },
-        outcome: '晒盘坡的矿户照货签领走失物。铁匣在账上只写着「寨里公用」。巡山人点过钱，把无人认领的一百八十枚灵钱、几份余货和许涧的宽背刀交给你，再将空匣和货柜从背坡抬下山。' },
+        desc: '巡山人先用绳拴住柜脚，才敢沿宽板挪它。柜上摆着许涧的宽背刀，夹层里压着一只铁匣。',
+        loot: { ration: 4, ore: 6, core: 3, hide: 2, [kingBlade]: 1, [sleeve]: 1 },
+        outcome: '巡山人取柜上的货牌，让矿户各自领回自家的东西。余下的一百八十枚灵钱、干粮、料件和许涧的宽背刀都交给你。柜脚还垫着一本发黄的护车谱，来领货的车夫认出是走山路的人互相传抄的，也递给了你。' },
       { label: '给伤号留一包干粮，叫他们下坡见巡山人', afterFight: leader, days: 0.25, stay: true,
         need: { ration: 1 }, consume: true,
         desc: '两个人扶着背坡的墙，没往前棚走。巡山人肯从外头接他们。',
@@ -382,7 +378,7 @@ const events = [
 
 const items = [
   { id: sleeve, name: '守车短袖诀', kind: 'manual', price: 0, sell: 0, keepOnFall: true, oneOfAKind: true,
-    desc: '灰褂人的护车薄册，封面抹过一层油。纸角压得很平，翻开就看见几笔将刀拢在半臂之内的画。' },
+    desc: '走山路的人互相传抄的护车薄册。封面抹了层油，翻开能看见几笔怎样在车与崖壁之间收刀的画。' },
   { id: kingBlade, name: '许涧的宽背刀', kind: 'gear', price: 0, sell: 33, keepOnFall: true, oneOfAKind: true,
     desc: '刀背厚，刀尖收得窄。前半截磨得雪亮，靠护手那段却全是长年蹭在木头上的细痕。' },
   { id: fordBell, name: '裹布铜铃', kind: 'gear', price: 0, sell: 26, keepOnFall: true, oneOfAKind: true,

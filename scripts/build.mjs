@@ -4,13 +4,13 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const file = async path => (await readFile(new URL(path, root), "utf8")).replace(/\r\n/g, "\n");
-const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, world, training, data, economy, alchemy, ferry, hazards, caravan, employers, border, hunts, dyke, ridge, kit, innerStyles, banditContentSource, banditTaleSource, encyclopediaSource, recoverySource, bandits, tactics, deductions, westQuests, eastQuests, combatBalance, engine, app] = await Promise.all([
+const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, geography, world, training, data, economy, alchemy, ferry, hazards, caravan, employers, border, hunts, dyke, ridge, kit, innerStyles, banditContentSource, banditTaleSource, encyclopediaSource, recoverySource, bandits, tactics, deductions, westQuests, eastQuests, combatBalance, spiritCombat, engine, app] = await Promise.all([
   file("game.html"), file("style.css"), file("intro.css"), file("river-content.mjs"), file("zhao-content.mjs"), file("sand-content.mjs"),
-  file("late-content.mjs"), file("puzzle-content.mjs"), file("mechanisms.mjs"), file("tournament.mjs"), file("world.mjs"), file("training.mjs"), file("data.mjs"), file("economy.mjs"),
+  file("late-content.mjs"), file("puzzle-content.mjs"), file("mechanisms.mjs"), file("tournament.mjs"), file("atlas-geography.mjs"), file("world.mjs"), file("training.mjs"), file("data.mjs"), file("economy.mjs"),
   file("alchemy.mjs"), file("ferry-content.mjs"), file("hazards.mjs"), file("caravan-content.mjs"),
   file("employers-content.mjs"), file("border-content.mjs"), file("hunt-materials.mjs"), file("dyke-armory.mjs"), file("ridge-armory.mjs"),
   file("explorer-kit.mjs"), file("inner-style-content.mjs"), file("bandit-content.mjs"), file("bandit-tale-content.mjs"), file("encyclopedia-content.mjs"), file("progression-recovery.mjs"),
-  file("bandits.mjs"), file("combat-tactics.mjs"), file("sandbox-deductions.mjs"), file("sandbox-quests-west.mjs"), file("sandbox-quests-east.mjs"), file("combat-balance.mjs"), file("engine.mjs"), file("app.mjs"),
+  file("bandits.mjs"), file("combat-tactics.mjs"), file("sandbox-deductions.mjs"), file("sandbox-quests-west.mjs"), file("sandbox-quests-east.mjs"), file("combat-balance.mjs"), file("spirit-combat.mjs"), file("engine.mjs"), file("app.mjs"),
 ]);
 const originalCss = `${style}\n${intro}`;
 const destination = process.argv[2] ? resolve(process.argv[2]) : fileURLToPath(new URL("dist/雾渡山河.html", root));
@@ -132,6 +132,10 @@ ${moduleBody(data)}
 return { default: data, ...data };
 })();
 const { data } = (() => ({ data: moduleData.default }))();
+const { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath, removedAtlasRoads } = (() => {
+${moduleBody(geography)}
+return { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath, removedAtlasRoads };
+})();
 const { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView, localGoods } = (() => {
 ${moduleBody(world)}
 return { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView, localGoods };
@@ -140,9 +144,13 @@ const { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, bandit
 ${moduleBody(bandits)}
 return { banditRules, checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, banditDefeat, recoverBanditSpoils };
 })();
-const { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead } = (() => {
+const { spiritSkills, spiritAction, spiritCapacity, spiritStudies, considerEnemySpirit, invokeSpirit, spiritBlocksStrike, spiritFrame } = (() => {
+${moduleBody(spiritCombat)}
+return { spiritSkills, spiritAction, spiritCapacity, spiritStudies, considerEnemySpirit, invokeSpirit, spiritBlocksStrike, spiritFrame };
+})();
+const { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction } = (() => {
 ${moduleBody(training)}
-return { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead };
+return { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction };
 })();
 const { initialMechanisms, mechanismView, mechanismAction } = (() => {
 ${moduleBody(mechanisms)}

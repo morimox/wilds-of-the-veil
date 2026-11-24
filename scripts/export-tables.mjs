@@ -7,7 +7,9 @@ import { banditRules, roadKey } from '../bandits.mjs';
 import { bulkSaleRules, economyData } from '../economy.mjs';
 import { alchemyData } from '../alchemy.mjs';
 import { localGoods, roadGraph, settlementOf, transportRules } from '../world.mjs';
+import { atlasLocation } from '../atlas-geography.mjs';
 import { trainingData } from '../training.mjs';
+import { spiritSkills } from '../spirit-combat.mjs';
 import { hazardData } from '../hazards.mjs';
 import { sandboxDeductions } from '../sandbox-deductions.mjs';
 
@@ -58,7 +60,7 @@ const ruleDescriptions = {
   deductionQiCost: '冥想一次所消耗的真气（点）',
   resistanceTier: '启用物抗和魔抗的最低境界编号',
   resistanceCap: '单类别抗性减伤上限',
-  magicPowerFactor: '境界基础攻击换算为独立施法力量的倍率',
+  magicPowerFactor: '境界基础攻击换算为兵器法攻的倍率',
   battleDays: '战斗操作每回合用时（天）',
   regulatedBoutCooldown: '禁药比试结束后到下次开场的最短间歇（天）',
   regulatedBoutHpFraction: '禁药比试开场所需的最低气血比例',
@@ -84,7 +86,7 @@ const ruleDescriptions = {
   batchMealTarget: '主动连吃时的饱腹目标（须容纳每份食物完整的饱腹增量）',
   satietyDrainPerDay: '每游戏日消耗的饱腹度',
   rationSatiety: '每份普通干粮恢复的饱腹度',
-  emptyAttackMultiplier: '空腹交手时对普通与兵刃术诀出伤的倍率',
+  emptyAttackMultiplier: '空腹交手时普通物攻出伤的倍率',
   unpackBasketDays: '拆开药篓所用的游戏天数',
   guardBonus: '主动格挡增加的防御（点）',
   guardQiRecovery: '对方守势时调息恢复的真气（点）',
@@ -131,7 +133,7 @@ const resources = (entries = {}) => Object.entries(entries)
   .map(([id, count]) => `${ref(id)}×${count}`).join('、');
 const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
-  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书', container: '容器', reference: '奇物',
+  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书', container: '容器', reference: '奇物', currency: '灵钱',
   attack: '普通攻势', heavy: '重招', guard: '防御', dodge: '闪避', drain: '吸取真气', heal: '恢复', focus: '蓄势', remedy: '服药',
   recoverQi: '回气', physical: '物攻', magic: '法攻',
 };
@@ -185,7 +187,6 @@ const initialItems = Object.entries(initial.inventory).map(([id, count]) => ({ i
 const initialGear = Object.entries(initial.equipment).map(([slot, id]) => ({
   slot, id, name: name(id), durability: initial.durability[id],
 }));
-const initialArts = initial.knownArts.map((id) => ({ id, name: name(id) }));
 const startState = [
   ['day', '日期（天）', initial.day],
   ['region', '地区', ref(initial.region)],
@@ -416,10 +417,13 @@ const enemyRows = gated(data.enemies.map((enemy) => {
 }));
 const foodRows = described(data.foods).map((meal) => {
   const project = meal.grade > 0 ? economyData.projects.find((row) => row.loot?.[meal.id]) : undefined;
-  return { ...meal, need: project?.need, level: project?.level, cost: project?.cost, days: project?.days, count: project?.loot[meal.id] };
+  return { ...meal, recipe: project?.reveal, tier: project?.tier ?? 0, need: project?.need, level: project?.level, cost: project?.cost, days: project?.days, count: project?.loot[meal.id] };
 });
-const regionRows = data.regions.map((region) => {
-  const { province, x, y, links, portal, array } = data.regionDetails[region.id];
+const surveyedRoads = roadGraph(data);
+const regionRows = data.regions.map(({ travel, ...region }) => {
+  const { province, portal, array } = data.regionDetails[region.id];
+  const [x, y] = atlasLocation(region.id);
+  const links = surveyedRoads.flatMap(({ from, to }) => from === region.id ? [to] : to === region.id ? [from] : []);
   return { ...region, province, x, y, links, portal: Boolean(portal), array: Boolean(array),
     town: settlementOf(data, region.id)?.type };
 });
@@ -472,7 +476,7 @@ const crewRows = Object.entries(data.roadBandits.crews).map(([id, crew]) => ({
 }));
 const banditRanges = ([min, max]) => `${min}–${max}`;
 const rollList = (pool) => pool.map(({ id, weight }) => `${ref(id)} × ${weight}`).join('、');
-const fixedBanditRows = data.roadBandits.fixed.flatMap(({ id, a, b, name, chance, intro, enemy, fee, actions, afterPay, afterWin, crew, forceAt, nonThreatActions }) => [
+const fixedBanditRows = data.roadBandits.fixed.flatMap(({ id, a, b, name, chance, intro, enemy, fee, actions = [], afterPay, afterWin, crew, forceAt, nonThreatActions }) => [
   ...actions.map(({ id: action, ...choice }) => ({ action, ...choice })),
   ...(nonThreatActions ?? []).map(({ id: action, ...choice }) => ({ action, ...choice })),
   ...(fee != null ? [{ action: 'pay', label: '交过路钱', ...afterPay }] : []),
@@ -499,12 +503,13 @@ const manualSources = data.events.flatMap(({ id, choices }) => choices.flatMap((
   Object.keys(choice.loot ?? {}).map((item) => [item, describeChoice(`${id}:${index}`)])));
 manualSources.push(...fixedBanditRows.flatMap(({ a, b, label, loot }) =>
   Object.keys(loot ?? {}).map((item) => [item, `${name(a)}至${name(b)} · ${label}`])));
+manualSources.push(['echo_guard_manual', '回声石洞验证掌法'], ['terrace_counter_manual', '竹尺庭大比三场全胜回礼']);
 const innerStyleRanks = data.innerStyles.flatMap(({ id, name, grade, tier, specialty, ranks }) =>
   ranks.map(({ base, focus, fistCharge, effect, tier: rankTier = tier, cost = 0, days = 0, need }, index) => ({
     id, name, grade, rank: index + 1, maxRank: ranks.length, tier: rankTier, cost, days, need, effect,
     specialty, source: manualSources.find(([item]) => item === id)?.[1],
     ...base, focusAtk: focus?.atk, focusPierce: focus?.pierce, focusGuard: focus?.guard,
-    fistName: fistCharge?.name, fistPower: fistCharge?.power, fistPierce: fistCharge?.pierce, fistQi: fistCharge?.qi,
+    fistName: fistCharge?.name, fistPower: fistCharge?.power, fistPierce: fistCharge?.pierce,
   })));
 
 const tables = [
@@ -577,7 +582,10 @@ const tables = [
     ['sideAtk', '副武器出手攻击修正'], ['sidePierce', '副武器出手穿甲'], ['sideGuard', '副武器出手护持'],
     ['ammo', '适用弹药', (ids) => ids.map(ref).join('、')],
     'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'], ['perception', '洞察加成'],
-    ['magicAtk', '法攻加成'], ['spellQi', '施展独立术法时每次额外耗气'], ['physicalResist', '物抗加成', percent], ['magicResist', '魔抗加成', percent],
+    ['magicAtk', '法攻属性加成'], ['spellQi', '催动法攻耗气'], ['spellPower', '催动法攻的招式威力'],
+    ['spellPierce', '催动法攻穿甲'], ['spellGuard', '催动法攻护持'], ['spellInterrupt', '催动法攻对蓄势和调息的压制'],
+    ['spiritReserve', '神识上限加成'],
+    ['physicalResist', '物抗加成', percent], ['magicResist', '魔抗加成', percent],
     'retreat', 'durability', 'repair', ['repairMaterials', '兵器从零耐久修满的材料', resources],
     ['entry', '玩家主动查读的词条'], ['effects', '特殊作用与具体数值', (entries) => entries.map(traitText).join('、')],
     ['field', '野外作用', (field) => [
@@ -593,7 +601,7 @@ const tables = [
   ], { note: '胜后另行领取的物件来自事先约定的奖品或实际可查看的位置。交手结算只给身体材料。' }),
   table('ammunition', '弹药与命中效果', described(data.ammunition ?? []), [
     'id', 'name', ['atk', '每发攻击修正'], ['pierce', '每发基础穿甲'], ['trait', '适用目标与加成', traitText],
-  ], { note: '远射和借远兵的术诀每次实际出手扣 1 发。缺弹时普通出手改为徒手，换兵刃会经过一回合。' }),
+  ], { note: '远射实际出手扣 1 发。缺弹时普通出手改为徒手。' }),
   table('inner-styles', '内功来源、每重效果与修习费用', gated(innerStyleRanks), [
     'id', 'name', ['grade', '品阶'], ['source', '获得途径'],
     ['rank', '重数'], ['maxRank', '最高重数'], 'tier', tier, ['cost', '灵钱'], 'need', 'days',
@@ -601,14 +609,16 @@ const tables = [
     ['atk', '通用攻击'], ['hp', '气血上限'], ['def', '防御'], ['qi', '真气上限'], ['perception', '洞察'],
     ['restQi', '每半日额外回气'], ['fogTolerance', '减缓积雾强度'], ['breathingQi', '双守势额外回气'],
     ['retreat', '脱身概率加成', percent], ['dodge', '被动闪避值', percent], ['evadeQi', '闪避成功回气'],
+    ['counter', '重招反击加值'], ['heavyGuard', '架重招额外减伤'], ['heavyGuardQi', '架重招恢复真气'],
     ['focusAtk', '专攻额外攻击'], ['focusPierce', '专攻穿甲'], ['focusGuard', '专攻护持'],
     ['fistName', '蓄力拳'], ['fistPower', '蓄力拳出手攻击加值'], ['fistPierce', '蓄力拳额外穿甲'],
-    ['fistQi', '蓄力拳出手耗气'], ['effect', '词条说明'],
+    ['effect', '词条说明'],
   ], { note: '一次只运转一本。基础效果与同一招实际所用兵刃的专攻同时生效。同本历重用当前重数的整行，数值不逐重累加。运转必须带在行囊里。' }),
   table('foods', '口粮与料理', foodRows, [
     'id', 'name', ['grade', '料理档次'], ['satiety', '食用恢复饱腹'], ['hp', '食用恢复气血'],
+    ['qi', '食用恢复真气'], ['sense', '食用恢复神识'], ['recipe', '所需食谱', ref], ['tier', '制作所需境界', realm],
     ['level', '备粮灶等级'], 'need', 'count', ['cost', '每批费用（灵钱）'], 'days',
-  ], { note: '生兽肉须带回备粮灶。恢复值按角色当下上限封顶。干粮也可向摊主买，备粮灶的两种干粮制法列于后院项目。' }),
+  ], { note: '三档料理各有食谱，原料可反复采集或狩猎。恢复按角色当下上限封顶，战斗中不能食用。放入便当栏的口粮优先从主界面食用。' }),
   table('pills', '丹药', gated(described(data.pills.map((pill) => ({ satiety: 0, ...pill })))), [
     'id', 'name', 'tier', tier, ['hp', '气血变化'], ['qi', '真气变化'], ['sense', '恢复神识'], ['satiety', '食用恢复饱腹'], 'toxin', 'wound', 'focus',
   ], { note: '神识只补充已修习的神识点数。战中服药占一回合，可以被蓄力命中打断。筑基丹用于突破，制作成本见筑基丹访查及制作用方。' }),
@@ -629,12 +639,13 @@ const tables = [
     ['beforeQuest', '到此委托完成为止', ref], ['beforeItem', '到实物推进至此为止', ref], 'outcome',
   ], { omit: ['loot'], note: '已经实际取过原件、当前又未带在身上时才出现。部分凭据被后续成果接替后无需再补。' }),
   table('talismans', '符箓', gated(described(data.talismans)), [
-    'id', 'name', 'tier', tier, 'damage', 'guard', 'retreat', ['qiCost', '催动耗气'],
+    'id', 'name', 'tier', tier, 'damage', 'guard', 'retreat',
   ]),
-  table('arts', '术法', gated(data.arts.map((art) => ({ ...art, damageType: art.weaponBased === false ? 'magic' : 'physical' }))), [
-    'id', 'name', 'tier', tier, ['cost', '施术耗气'], 'power', 'pierce', 'guard', 'break', ['price', '学习费用（灵钱）'], 'reveal', 'desc',
-    ['weaponBased', '借兵刃施展'], ['damageType', '伤害类别', (id) => knownKinds[id] ?? id],
-  ]),
+  table('spirit-skills', '神识技能', spiritSkills, [
+    'id', 'name', ['cost', '神识消耗'], ['duration', '持续回合'], ['cooldown', '冷却回合'],
+    ['stat', '可读对方属性'], 'region', ['teacher', '习得时请教的人'], ['defeated', '须击败的对手', ref],
+    ['proof', '对应凭证', ref], ['price', '学习费用（灵钱）'], 'desc', ['lesson', '习得剧情'],
+  ], { note: '施展回合计入持续和冷却。当回合可防御、闪避、蓄势。金丹初期神识上限 2，之后金丹上限 3，静水护心佩最多再加 1。' }),
   table('recipes', '制作用方', gated(data.recipes), [
     'id', 'result', 'count', 'tier', tier, ['cost', '制作费用（灵钱）'], 'need', 'days', 'reveal',
     ['requiresKnownMaterials', '展示需要认识材料'],
@@ -643,8 +654,8 @@ const tables = [
   ]),
   table('regions', '三州大地图点位', gated(regionRows), [
     'id', 'name', ['province', '州', ref], ['x', '横坐标'], ['y', '纵坐标'], ['links', '标定邻路', (ids) => ids.map(ref).join('、')],
-    ['town', '定居点类型'], ['portal', '有普通传送门'], ['array', '有州阵'], ['tier', '威胁参考阶'], ['realmName', '威胁参考境界'], 'travel', 'reveal', 'desc',
-  ], { omit: ['draws', 'food'], note: '图上显示已知道的点。实际可走路线、要花的时间和道具限制由引擎按所在点结算。威胁标记只用于内容参考。' }),
+    ['town', '定居点类型'], ['portal', '有普通传送门'], ['array', '有州阵'], ['tier', '威胁参考阶'], ['realmName', '威胁参考境界'], 'reveal', 'desc',
+  ], { omit: ['draws', 'food'], note: '采用山河图的共同坐标。邻路包括需要解锁的路段，里程、风险与路权见路段表。威胁标记用于内容参考。' }),
   table('world-transport', '长程道路、传送门与卷轴', transportRows, [
     ['label', '交通'], ['a', '起点', ref], ['b', '终点', ref], 'price', 'days', ['item', '道具或凭证', ref], ['quest', '另一路由', ref], ['reason', '使用条件'],
   ]),
@@ -694,15 +705,15 @@ const tables = [
     ['afterQuests', '做完任一委托后出现', (ids) => ids.map(ref).join('、')], ['minCredit', '差事最低功劳'],
     ['rankReason', '资格说明'], 'days', ['cooldown', '下一单间隔（天）']]),
   table('sect-awards', '宗门身份、职责及奖赏', sectRanks, ['region', ['sect', '宗门'], 'name', ['credit', '功劳门槛'],
-    ['disciple', '弟子身份'], ['role', '当值工作'], 'reward', ['art', '传授术诀', ref]]),
+    ['disciple', '弟子身份'], ['role', '当值工作'], 'reward']),
   table('tournament', '守尺观大比', matchRows, ['region', ['order', '场次'], 'name', 'enemy', ['lead', '认得赛帖的证物', ref],
     ['fee', '每届报名费'], 'days', ['cooldown', '下次报名间隔（天）'], ['note', '对手介绍']],
     { note: '各轮均由裁判护场。散修也可报名，符合领取条件的奖品可稍后领。' }),
-  table('tournament-prizes', '会比名次回礼', tournamentPrizes, [['wins', '胜场'], 'name', 'reward', ['art', '授予术诀', ref]]),
+  table('tournament-prizes', '会比名次回礼', tournamentPrizes, [['wins', '胜场'], 'name', 'reward']),
   table('training', '修习项目、每阶成本和战力效果', trainingRows, [
     'id', 'name', ['level', '阶次'], 'region', ['teacher', '传授人物'], ['lead', '发现所需线索', ref], 'need', ['coins', '灵钱'], 'days', ['effect', '本阶效果'],
     ['hp', '气血上限加成'], ['def', '防御加成'], ['qi', '真气上限加成'], ['restQi', '歇息额外真气'],
-    ['sealDamage', '符伤加成'], ['sealGuard', '符护加成'], ['element', '对应五行单项增量'], ['senseMax', '神识上限'], ['senseGuard', '读势减伤'],
+    ['sealDamage', '符伤加成'], ['sealGuard', '符护加成'], ['element', '对应五行单项增量'],
   ], { note: '同一修习的各阶段效果不叠加，以当前最高一阶为准。消费当前一级所列材料和时间。当地导师才可升级。' }),
   table('region-encounters', '地区内的可选地点', data.sites, [
     'region', 'id', 'name', ['protectedArena', '是否约定保护性切磋'], ['regulatedBout', '禁用药物与饮食的比试'],
@@ -775,7 +786,7 @@ const tables = [
   ], { note: '普通妖兽大多按这些习性出招。人物和部分大妖用自己承受过的伤害估计威胁。抽中洞察后能看到玩家这回合动作的类别。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
     'id', 'name', 'region', ['tier', '标注境界'], tier, ['recommendedTier', '建议交手境界', realm],
-    'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['learnArts', '当面传授的术诀', (ids) => ids.map(ref).join('、')], ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
+    'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),
   table('services', '村务发现条件', data.services, [
     'id', 'name', ['public', '开局已有入口'], ['items', '获得任一材料或线索', (items) => items.map(ref).join('、')],
@@ -791,7 +802,7 @@ const tables = [
   table('field-experiments', '现场验证与发现', experiments, [
     ['id', '沙盘疑点', ref], ['site', '验证地点', siteRef], ['desc', '现场观察'], 'need',
     ['fieldNeed', '现场须带的实物', resources], ['afterFight', '现场须清开的对手', ref],
-    ['days', '每次尝试用时（天）'], 'reward', ['learnArts', '现场学会术诀', (ids) => ids.map(ref).join('、')],
+    ['days', '每次尝试用时（天）'], 'reward',
     ['insight', '成功所得修为'], ['outcome', '验证后的观察'],
   ], {
     omit: ['controls', 'solution', 'misses'],
@@ -812,7 +823,6 @@ const tables = [
   table('starting-items', '开局行囊', initialItems, ['id', 'name', 'count'],
     { note: '已穿戴的装备也在行囊中。' }),
   table('starting-gear', '开局穿戴', initialGear, ['slot', 'id', 'name', ['durability', '初始耐久']]),
-  table('starting-arts', '开局术法', initialArts, ['id', 'name']),
 ];
 
 function csvCell(value) {

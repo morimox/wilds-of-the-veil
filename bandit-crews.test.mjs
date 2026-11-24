@@ -8,8 +8,8 @@ import { roadGraph } from './world.mjs';
 const crewId = 'grey_gully';
 const greyLeader = 'bandit_den_leader';
 const map = roadGraph(data);
-const firstRoad = map.find(({ key }) => key === 'marsh|ridge');
-const secondRoad = map.find(({ key }) => key === 'ford|ridge');
+const firstRoad = map.find(({ key }) => key === 'ridge|screen_slope');
+const secondRoad = map.find(({ key }) => key === 'herb_basin|screen_slope');
 const gear = Object.fromEntries(data.gear.map((item) => [item.id, item]));
 const banditPolicy = { data, records: { gear },
   activeGear: (state) => Object.values(state.equipment).filter((id) => state.durability[id] > 0).map((id) => gear[id]),
@@ -27,7 +27,7 @@ function seedFor(...ranges) {
   throw new Error('No seed for requested succession of draw ranges');
 }
 
-const quietSeed = seedFor(...Array.from({ length: 12 }, () => [0.1, 1]));
+const quietSeed = seedFor(...Array.from({ length: 16 }, () => [0.19, 1]));
 const chargedRiskSeed = seedFor([0, 0.0001], [0.95, 1]);
 const lowGradeEncounterSeed = seedFor([0, 0.0001], [0, 0.4]);
 const fixedEncounterSeed = seedFor([0, 0.0001], [0, 0.2]);
@@ -45,8 +45,8 @@ function play(state, action, payload = {}) {
 
 function readyTraveler() {
   const state = createGame(1129);
-  state.region = 'marsh';
-  state.discovered.push('ridge', 'ford', 'screen_slope');
+  state.region = 'ridge';
+  state.discovered.push('ridge', 'ford', 'screen_slope', 'herb_basin');
   state.coins = 100;
   state.satiety = 96;
   return state;
@@ -179,7 +179,7 @@ test('the third actual encounter shares its count across roads and a stronger tr
   const outsider = structuredClone(state);
   outsider.region = 'screen_slope';
   assert.ok(!view(outsider).sites.some(({ id }) => id === data.roadBandits.crews[crewId].den));
-  for (const [index, destination] of ['ridge', 'ford'].entries()) {
+  for (const [index, destination] of ['screen_slope', 'herb_basin'].entries()) {
     const bandit = nextThreat(state, destination);
     assert.ok(bandit.member);
     assert.equal(bandit.fixed, undefined);
@@ -197,7 +197,7 @@ test('the third actual encounter shares its count across roads and a stronger tr
   state.realm = 8;
   equip(state, 'fault_coat');
   equip(state, 'foil_sword');
-  const tip = nextThreat(state, 'ridge');
+  const tip = nextThreat(state, 'screen_slope');
   assert.equal(tip.fixed, source.id);
   assert.equal(crewState(state).encounters, 3);
   assert.equal(view(state).roadTrip.bandit.remaining, null);
@@ -208,8 +208,7 @@ test('the third actual encounter shares its count across roads and a stronger tr
   assert.equal(state.coins, beforeCoins);
   assert.deepEqual(crewState(state).defeated, []);
   assert.ok(state.resolvedBandits.includes(source.id));
-  finishRoad(state, 'ridge');
-  play(state, 'travel', { id: 'screen_slope' });
+  finishRoad(state, 'screen_slope');
   assert.ok(view(state).sites.some(({ id }) => id === data.roadBandits.crews[crewId].den));
 });
 
@@ -218,11 +217,11 @@ test('one victory barely changes a fresh large crew and its loot does not reroll
   state.realm = 8;
   state.hp = view(state).maxHp;
   state.resolvedBandits.push('road_slate_peg');
-  const otherCrewRoad = map.find(({ key }) => key === 'ford|marsh');
+  const otherCrewRoad = map.find(({ key }) => key === 'black_mine|herb_basin');
   const base = [risk(state, firstRoad), risk(state, secondRoad), risk(state, otherCrewRoad)];
   const size = crewMembers().length;
   assert.ok(size >= 40);
-  const bandit = nextThreat(state, 'ridge', lowGradeEncounterSeed);
+  const bandit = nextThreat(state, 'screen_slope', lowGradeEncounterSeed);
   const comparison = structuredClone(state);
   comparison.roadSeed = quietSeed;
   const victim = winRoadFight(state);
@@ -251,7 +250,7 @@ test('road wins temporarily empty the shared patrol and recruits arrive one at a
   const wins = [];
   let firstRecruitDay;
 
-  for (const [index, destination] of ['ridge', 'ford'].entries()) {
+  for (const [index, destination] of ['screen_slope', 'herb_basin'].entries()) {
     const remaining = live - index;
     for (const [roadIndex, road] of [firstRoad, secondRoad].entries()) {
       const expected = base[roadIndex] * remaining / members.length;
@@ -275,9 +274,9 @@ test('road wins temporarily empty the shared patrol and recruits arrive one at a
 
   state.day = firstRecruitDay - 1.25;
   state.roadSeed = chargedRiskSeed;
-  const late = play(state, 'travel', { id: 'ridge' });
+  const late = play(state, 'travel', { id: 'screen_slope' });
   assert.equal(late.roadInterrupted, undefined);
-  assert.equal(state.region, 'ridge');
+  assert.equal(state.region, 'screen_slope');
   assert.equal(state.roadBandit, null);
   assert.equal(crewState(state).encounters, 2);
 
@@ -287,15 +286,15 @@ test('road wins temporarily empty the shared patrol and recruits arrive one at a
   assert.ok(Math.abs(risk(state, secondRoad) - base[1] / members.length) < 1e-12);
   assert.deepEqual(crewState(state), snapshot);
 
-  const newcomer = nextThreat(state, 'ford', lowGradeEncounterSeed);
+  const newcomer = nextThreat(state, 'herb_basin', lowGradeEncounterSeed);
   assert.equal(crewState(state).recruits[newcomer.member], 1);
   assert.equal(crewState(state).defeated.length, members.length - 1);
   assert.equal(crewState(state).nextRecruitDay, firstRecruitDay + banditRules.recruitInterval);
   play(state, 'banditPay');
-  finishRoad(state, 'ford');
+  finishRoad(state, 'herb_basin');
 
   state.day = firstRecruitDay + banditRules.recruitInterval;
-  const twoRecruits = nextThreat(state, 'ridge', lowGradeEncounterSeed);
+  const twoRecruits = nextThreat(state, 'screen_slope', lowGradeEncounterSeed);
   assert.equal(crewState(state).defeated.length, members.length - 2);
   assert.equal(Object.values(crewState(state).recruits).reduce((sum, count) => sum + count, 0), 2);
   assert.equal(crewState(state).nextRecruitDay, firstRecruitDay + 2 * banditRules.recruitInterval);
@@ -325,7 +324,7 @@ test('a first-fight leader win opens the one-time cache and ends linked road thr
   const treasury = 1;
   const blade = 'gully_king_blade';
   const related = data.roadBandits.roads.filter(({ crew }) => crew === crewId);
-  const otherRoad = map.find(({ key }) => key === 'ford|marsh');
+  const otherRoad = map.find(({ key }) => key === 'black_mine|herb_basin');
   const linkedEdges = related.map(({ a, b }) => map.find(({ key }) => key === [a, b].sort().join('|')));
   const unaffectedRisk = risk(state, otherRoad);
   assert.ok(unaffectedRisk > 0);
@@ -371,6 +370,7 @@ test('a first-fight leader win opens the one-time cache and ends linked road thr
   assert.equal(state.coins, beforeCache + event.choices[treasury].coins);
   assert.ok(event.choices[treasury].coins >= 150);
   assert.equal(state.inventory[blade], 1);
+  assert.equal(state.inventory.road_sleeve_manual, 1);
   const total = state.coins;
   const liveCamp = () => view(state).sites.find(({ id }) => id === den).creatures;
   assert.equal(liveCamp()[greyLeader], 0);
@@ -444,7 +444,7 @@ test('a paid member can meet another traveler but cannot collect twice in the sa
   state.resolvedBandits.push('road_slate_peg');
   const [remaining, ...unavailable] = crewMembers();
   state.banditCrews[crewId] = { encounters: 0, defeated: unavailable };
-  const first = nextThreat(state, 'ridge', lowGradeEncounterSeed);
+  const first = nextThreat(state, 'screen_slope', lowGradeEncounterSeed);
   assert.equal(first.member, remaining);
   play(state, 'banditPay');
   state.roadSeed = lowGradeEncounterSeed;
@@ -453,7 +453,7 @@ test('a paid member can meet another traveler but cannot collect twice in the sa
   assert.equal(state.roadTrip, null);
   assert.equal(crewState(state).encounters, 1);
 
-  const revisited = nextThreat(state, 'ford', lowGradeEncounterSeed);
+  const revisited = nextThreat(state, 'herb_basin', lowGradeEncounterSeed);
   assert.equal(revisited.member, remaining);
   assert.equal(revisited.fee, first.fee);
   assert.equal(crewState(state).encounters, 2);
@@ -492,7 +492,7 @@ test('the wounded bandit can be spared or killed after defeating him and either 
   const state = readyTraveler();
   state.realm = 8;
   state.hp = view(state).maxHp;
-  const bandit = nextThreat(state, 'ridge', fixedEncounterSeed);
+  const bandit = nextThreat(state, 'screen_slope', fixedEncounterSeed);
   assert.equal(bandit.fixed, 'road_slate_peg');
   winRoadFight(state);
   assert.ok(state.roadBandit.aftermath);
@@ -519,7 +519,7 @@ test('the wounded bandit can be spared or killed after defeating him and either 
 
   const spared = structuredClone(state);
   const killed = structuredClone(state);
-  assert.match(play(spared, 'banditPlot', { id: 'spare_slate_robber' }).message, /「.*灰沟.*」/);
+  assert.match(play(spared, 'banditPlot', { id: 'spare_slate_robber' }).message, /许涧.*「.*灰沟.*」/);
   assert.match(play(killed, 'banditPlot', { id: 'kill_slate_robber' }).message, /送货图.*图上/);
   assert.equal(spared.inventory.ration, state.inventory.ration);
   assert.equal(killed.inventory.ration, state.inventory.ration + 1);
@@ -529,6 +529,6 @@ test('the wounded bandit can be spared or killed after defeating him and either 
     assert.ok(branch.resolvedBandits.includes(bandit.fixed));
     assert.ok(branch.banditLeads.includes(data.roadBandits.crews[crewId].den));
     assert.equal(act(branch, 'banditPlot', { id: 'kill_slate_robber' }).ok, false);
-    finishRoad(branch, 'ridge');
+    finishRoad(branch, 'screen_slope');
   }
 });

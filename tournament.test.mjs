@@ -46,7 +46,7 @@ function winCurrentBout(state) {
   assert.deepEqual(view(state).groundLoot, {});
 }
 
-test('three real arena opponents, rest between bouts, and a one-time first place teaching', () => {
+test('three real arena opponents, rest between bouts, and a one-time first place manual', () => {
   const state = atTheHall();
   assert.equal(view(state).tournament, null);
   assert.equal(act(state, 'tournamentEnroll').ok, false);
@@ -83,7 +83,7 @@ test('three real arena opponents, rest between bouts, and a one-time first place
   assert.equal(view(state).tournament.result, '三场全胜');
   assert.equal(view(state).tournament.best, 3);
   assert.match(view(state).tournament.claimName, /三场全胜.*奖品/);
-  assert.equal(state.knownArts.includes('terrace_reversing_stance'), false);
+  assert.equal(state.inventory.terrace_counter_manual, undefined);
   assert.equal(view(state).tournament.canEnroll, false);
 
   const rations = state.inventory.ration;
@@ -95,15 +95,15 @@ test('three real arena opponents, rest between bouts, and a one-time first place
   play(state, 'tournamentClaim');
   assert.equal(state.inventory.tournament_citation, 1);
   assert.equal(state.inventory.jade_pill, 2);
-  assert.ok(state.knownArts.includes('terrace_reversing_stance'));
+  assert.equal(state.inventory.terrace_counter_manual, 1);
   assert.equal(act(state, 'tournamentClaim').ok, false);
 
   const prizeLead = atTheHall();
   prizeLead.region = 'village';
   prizeLead.realm = 5;
   prizeLead.knownItems.push('tournament_citation');
-  assert.equal(view(prizeLead).discoveredArts.includes('terrace_reversing_stance'), false);
-  assert.match(act(prizeLead, 'learn', { id: 'terrace_reversing_stance' }).message, /当面教/);
+  assert.equal(prizeLead.inventory.terrace_counter_manual, undefined);
+  assert.equal(act(prizeLead, 'equipManual', { id: 'terrace_counter_manual' }).ok, false);
 });
 
 test('loss preserves score validity and possessions; one consolation with a four-day re-entry delay', () => {
@@ -178,7 +178,7 @@ test('the brick ring prohibits applying medicine and meal recovery until the fig
     const before = structuredClone(state);
     const blocked = act(state, action, { id });
     assert.equal(blocked.ok, false);
-    assert.match(blocked.message, /禁用药物和饮食/);
+    assert.match(blocked.message, id === 'ration' ? /交手中只能用药/ : /禁用药物和饮食/);
     assert.deepEqual(state, before);
   }
   const purse = state.coins;

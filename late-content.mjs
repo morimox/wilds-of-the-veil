@@ -75,14 +75,6 @@ export const lateContent = {
     { id: 'gold_salve', tier: 4, hp: 38, qi: 15, toxin: 19, wound: 1, focus: 1 },
     { id: 'return_breath_pill', tier: 6, hp: 24, qi: 32, toxin: 17, wound: 1, focus: 0 },
   ],
-  arts: [
-    { id: 'level_hand', name: '平腕掌', tier: 0, cost: 4, power: 0, guard: 10, break: 4, pierce: 0, price: 0, weaponBased: false, prizeOnly: true,
-      desc: '守尺观的防身掌法。放平手腕，出掌格开对手的手，也能打乱他的动作。' },
-    { id: 'lake_split', name: '开埂式', tier: 4, cost: 7, power: 12, pierce: 4, guard: 2, break: 0, price: 0, weaponBased: false, prizeOnly: true,
-      desc: '把真气聚到双肘，再合力打向一点，像把土堤推开一道缺口。能破厚甲。' },
-    { id: 'core_spindle', name: '双流劲', tier: 6, cost: 9, power: 14, pierce: 4, guard: 5, break: 12, price: 0, weaponBased: false, reveal: { item: 'fault_receipt' },
-      desc: '照着冷炉的两个风口，把真气分成两股。能打断对手的重招，余力还能穿透护甲。' },
-  ],
   recipes: [
     { id: 'r_gate_scroll', result: 'gate_scroll', tier: 0, count: 2, formula: 'gate_scroll_formula', cost: 5, need: { wood: 1, reed: 1, core: 1 }, days: 0.5 },
     { id: 'r_gold_powder', result: 'gold_powder', tier: 5, count: 1, facility: 'furnace', facilityLevel: 3, formula: 'gold_formula',

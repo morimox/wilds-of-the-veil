@@ -46,6 +46,7 @@ test('sect standing unlocks appropriate work independently of cultivation and op
   assert.equal(view(state).affiliation.disciple.credit, 4);
   assert.equal(job(state, 'gauge_silt').available, true);
 
+  state.inventory.ration = rules.backpackStackSize;
   const availableSlots = view(state).backpackCapacity - view(state).backpackUsed;
   state.inventory.iron_arrow = availableSlots * rules.backpackStackSize;
   assert.equal(view(state).backpackUsed, view(state).backpackCapacity);
@@ -64,8 +65,9 @@ test('sect standing unlocks appropriate work independently of cultivation and op
   assert.equal(state.inventory.heal_pill, 1);
   assert.match(denyUnchanged(state, 'sectWork', { id: 'gauge_flood_check' }), /再来/);
 
+  const rations = state.inventory.ration ?? 0;
   play(state, 'sectClaim', { id: reward.id });
-  assert.ok(state.knownArts.includes(reward.art));
+  assert.equal(state.inventory.ration, rations + reward.reward.ration);
   assert.equal(view(state).sect.disciple.name, '执事弟子');
   assert.equal(act(state, 'sectClaim', { id: reward.id }).ok, false);
 

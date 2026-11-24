@@ -1,3 +1,5 @@
+import { spiritAction, spiritCapacity, spiritStudies } from './spirit-combat.mjs';
+
 export const trainingData = [
   { id: 'seals', name: '符法', region: 'village', teacher: '莫船家', lead: 'lamp_sketch',
     desc: '灶门漏风。莫船家把符按在桌上，让你练着用一只手压稳，再用另一只手引出符里的火。',
@@ -27,13 +29,6 @@ export const trainingData = [
       { coins: 52, days: 3, need: { core: 6, black_iron: 4, foundation_core: 1 }, element: 2, effect: '遇上相应的敌人或招式时，五行加成提高到 2 点。' },
       { coins: 80, days: 4, need: { core: 9, black_iron: 7, foundation_core: 2 }, element: 3, effect: '遇上相应的敌人或招式时，五行加成提高到 3 点。' },
     ] },
-  { id: 'spirit', name: '神识', region: 'zhao_city', teacher: '教看水势的杜椿', lead: 'phase_chart',
-    desc: '水还没漫过铜板边缘，杜椿就让你闭眼听它涨上来。交手时，你也能用这个法子提前察觉对方的动作。',
-    ranks: [
-      { coins: 30, days: 2, need: { core: 3, qi_core: 2 }, senseMax: 2, senseGuard: 2, effect: '神识上限 2。花 1 点观这一招并少受 2 点伤害。对方还在等你先动时，只能护身。' },
-      { coins: 48, days: 3, need: { core: 5, beast_eye: 1, foundation_core: 1 }, senseMax: 3, senseGuard: 3, effect: '神识上限 3。花 1 点观这一招并少受 3 点伤害。对方还在等你先动时，只能护身。' },
-      { coins: 72, days: 4, need: { core: 8, beast_eye: 2, foundation_core: 2 }, senseMax: 4, senseGuard: 4, effect: '神识上限 4。花 1 点观这一招并少受 4 点伤害。对方还在等你先动时，只能护身。' },
-    ] },
 ];
 
 const tracks = new Map(trainingData.map((row) => [row.id, row]));
@@ -61,21 +56,21 @@ export function trainingPerks(state, enemy, intent) {
     sealDamage: seal.sealDamage ?? 0, sealGuard: seal.sealGuard ?? 0,
     damage: tags.includes('spirit') ? element : 0,
     pierce: stone || tags.includes('scaled') ? element : 0,
-    guard: (guardsElement ? element : 0) + (state.combat?.spiritGuard ?? 0),
+    guard: guardsElement ? element : 0,
     restQi: trainedRank(state, 'breath').restQi ?? 0,
   };
 }
 
 export function restoreTrainingSense(state, amount = Infinity) {
-  const maximum = trainedRank(state, 'spirit').senseMax ?? 0;
+  const maximum = spiritCapacity(state);
   const current = state.training?.sense ?? 0;
   const gained = Math.max(0, Math.min(amount, maximum - current));
-  if (gained > 0) state.training.sense = current + gained;
+  if (state.training) state.training.sense = Math.min(maximum, current + gained);
   return gained;
 }
 
 export function needsSenseRest(state) {
-  return (state.training?.sense ?? 0) < (trainedRank(state, 'spirit').senseMax ?? 0);
+  return (state.training?.sense ?? 0) < spiritCapacity(state);
 }
 
 function studyBlocker(state, track, rank, kit) {
@@ -83,20 +78,6 @@ function studyBlocker(state, track, rank, kit) {
   if (state.region !== track.region) return `得去${kit.records.regions[track.region].name}找${track.teacher}。`;
   if (state.combat || state.event || state.gathering) return '眼下得先处理手头的事。';
   return kit.homeRequirements(state, rank.coins, rank.need) ?? '';
-}
-
-function spiritView(state, kit) {
-  const max = trainedRank(state, 'spirit').senseMax;
-  if (!max) return null;
-  const combat = state.combat;
-  const current = state.training.sense;
-  const enemy = combat && kit.records.enemies[combat.id];
-  const readThisRound = combat && combat.spiritReadRound === combat.round;
-  const intent = enemy && readThisRound && kit.readableIntent(state);
-  return {
-    current, max, canRead: Boolean(enemy && !readThisRound && current > 0),
-    prediction: intent ? { name: intent.name, kind: intent.kind } : null,
-  };
 }
 
 export function trainingView(state, kit) {
@@ -108,11 +89,11 @@ export function trainingView(state, kit) {
     return { id, name, desc, teacher, trainer: teacher, region, level, maxLevel: ranks.length,
       effect: ranks[level - 1]?.effect ?? '', next, available: !blockedReason, blockedReason };
   });
-  return { rows, spiritSense: spiritView(state, kit) };
+  return { rows, spiritSense: spiritStudies(state, kit) };
 }
 
 export function trainingAction(state, action, { id }, kit) {
-  if (action !== 'trainStudy') return null;
+  if (action !== 'trainStudy') return spiritAction(state, action, { id }, kit);
   const track = tracks.get(id);
   if (!track || !knowsTraining(state, track)) return kit.refuse('你还没有碰到这门技艺的传承。');
   const level = trainedLevel(state, id);
@@ -125,18 +106,6 @@ export function trainingAction(state, action, { id }, kit) {
   (state.training ??= initialTraining()).levels[id] = level + 1;
   state.hp += (rank.hp ?? 0) - (before.hp ?? 0);
   state.qi += (rank.qi ?? 0) - (before.qi ?? 0);
-  if (id === 'spirit') restoreTrainingSense(state);
   kit.normalize(state);
   return kit.say(state, `${track.teacher}看你亲手操练过一遍。${track.name}练到第 ${level + 1} 阶。`);
-}
-
-export function recordTrainingRead(state, kit) {
-  const sense = spiritView(state, kit);
-  if (!sense || !state.combat) return kit.refuse('学会神识后，可以在战斗中预看对手的招式。');
-  if (!sense.canRead) return kit.refuse(sense.current ? '这回合已经用神识看过了。' : '神识已经耗尽，可以歇脚或用药养回来。');
-  state.training.sense -= 1;
-  state.combat.spiritReadRound = state.combat.round;
-  state.combat.spiritGuard = trainedRank(state, 'spirit').senseGuard;
-  const intent = kit.readableIntent(state);
-  return kit.say(state, intent ? `你看见对方这一招是「${intent.name}」。` : '对方还在等你先动。你先凝神护住周身。');
 }

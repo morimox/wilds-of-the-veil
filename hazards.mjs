@@ -75,7 +75,7 @@ function actionsAt(state, kit, incident, phase) {
   const hunger = state.satiety === 0 ? '腹中空空，先吃些东西。' : '';
   const option = (id, label) => ({
     id, label,
-    reason: hunger || (incident && phase !== 'aftermath' && id !== 'fight' && state.day + jobs[id].days > incident.ends
+    reason: (id === 'settle' ? '' : hunger) || (incident && phase !== 'aftermath' && id !== 'fight' && state.day + jobs[id].days > incident.ends
       ? '兽群已经过了这道坡，来不及在此处动手了。' : kit.homeRequirements(state, 0, jobs[id].need)),
   });
   if (!incident) return [option('report', '把苇梗给杨芹看')];
@@ -167,8 +167,8 @@ export function hazardAction(state, action, { id } = {}, kit) {
   incident[id] = true;
   if (id === 'settle') {
     const coins = payout(incident);
-    state.coins += coins;
-    return kit.say(state, `旧灯已经靠在窗下。杨芹把${coins}枚灵钱交给你。「你做的那几件活，都有人看着。」`);
+    const cash = kit.addCoins(state, coins);
+    return kit.say(state, `旧灯已经靠在窗下。${cash.spilled[kit.currency] ? '杨芹把报酬放在你脚边。' : `杨芹把${coins}枚灵钱交给你。`}「你做的那几件活，都有人看着。」`);
   }
   const replies = {
     brace: '你压住歪栏，驿童把铁扣敲进新木。两人再推，栏脚没往外滑。',

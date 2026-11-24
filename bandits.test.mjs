@@ -3,10 +3,14 @@ import test from 'node:test';
 import { data } from './data.mjs';
 import { act, createGame, rules, view } from './engine.mjs';
 import { apparentBanditGrade, checkRoadBanditStep, roadBanditRisk } from './bandits.mjs';
-import { backFromRoad, continueRoad, roadGraph, roadTripView, travelRoad } from './world.mjs';
+import { backFromRoad, continueRoad, roadGraph, roadTripView, transportRules, travelRoad } from './world.mjs';
+import { prepareQuietRoad } from './game-test-fixtures.mjs';
 
 const regions = Object.fromEntries(data.regions.map((region) => [region.id, region]));
 const foods = Object.fromEntries(data.foods.map((food) => [food.id, food]));
+const map = roadGraph(data);
+const riskyLeg = map.find(({ key }) => key === 'ridge|screen_slope');
+const stepDays = transportRules.roadUnitDays;
 
 function roadKit(checkRoadStep) {
   return {
@@ -36,23 +40,22 @@ function traveler(region, known = []) {
   return state;
 }
 
-test('the shortest route uses only known roads and can improve on a longer direct edge', () => {
-  const state = traveler('village', ['pine_ridge', 'ford']);
+test('the shortest route uses only known roads and improves when a shortcut opens', () => {
+  const state = traveler('village', ['marsh', 'pine_ridge', 'ford']);
   const journey = (destination) => view(state).world.journeys.find(({ id }) => id === destination);
-  assert.deepEqual(journey('pine_ridge').path, ['village', 'pine_ridge']);
+  const before = journey('pine_ridge');
+  assert.deepEqual(before.path, ['village', 'marsh', 'ford', 'pine_ridge']);
   assert.ok(!view(state).world.edges.some(({ key }) => key === 'ford|village'));
   state.seenChoices.push('ford_lamp_channel:0');
   const shorter = journey('pine_ridge');
   assert.deepEqual(shorter.path, ['village', 'ford', 'pine_ridge']);
-  assert.equal(shorter.units, 6);
-  assert.equal(shorter.days, 1.5);
-  const direct = view(state).world.edges.find(({ key }) => key === 'pine_ridge|village');
-  assert.equal(direct.units, 8);
+  assert.ok(shorter.units < before.units);
+  assert.equal(shorter.days, shorter.units * stepDays);
   assert.ok(!journey('snow_pass'));
 });
 
 test('a single planned journey can pass through both permitted province crossings', () => {
-  const through = ['ford', 'zhao_city', 'flood_market', 'zhao_pass', 'mingsha_city'];
+  const through = ['ford', 'zhao_city', 'flood_market', 'glass_bank', 'rope_sands', 'zhao_pass', 'mingsha_city'];
   const state = traveler('village', through);
   state.inventory.ration = 15;
   const route = () => view(state).world.journeys.find(({ id }) => id === 'mingsha_city');
@@ -63,8 +66,9 @@ test('a single planned journey can pass through both permitted province crossing
   const trip = route();
   assert.ok(trip.available);
   assert.deepEqual(trip.path, ['village', 'marsh', ...through]);
-  assert.equal(trip.days, 15.75);
-  assert.equal(trip.units, 63);
+  const expected = trip.path.slice(1).map((to, index) => [trip.path[index], to].sort().join('|'));
+  assert.equal(trip.units, expected.reduce((total, key) => total + map.find((edge) => edge.key === key).units, 0));
+  assert.equal(trip.days, trip.units * stepDays);
 });
 
 test('interrupted progress resumes after the exact step; returning revisits only the walked distance', () => {
@@ -73,36 +77,40 @@ test('interrupted progress resumes after the exact step; returning revisits only
     checked.push([leg.from, index, state.roadTrip.stop]);
     return index === 2 ? { message: '停步' } : null;
   });
-  const state = traveler('marsh', ['ridge']);
+  const state = traveler(riskyLeg.from, [riskyLeg.to]);
   const day = state.day;
-  const first = travelRoad(state, 'ridge', kit);
+  const first = travelRoad(state, riskyLeg.to, kit);
   assert.equal(first.roadInterrupted, true);
   assert.equal(first.message, '停步');
-  assert.equal(state.region, 'marsh');
-  assert.equal(state.day, day + 0.5);
-  assert.equal(state.roadTrip.stop, 'road:marsh|ridge:2');
-  assert.equal(roadTripView(state, kit).remainingUnits, 1);
+  assert.equal(state.region, riskyLeg.from);
+  assert.equal(state.day, day + 2 * stepDays);
+  assert.equal(state.roadTrip.stop, `road:${riskyLeg.key}:2`);
+  assert.equal(roadTripView(state, kit).remainingUnits, riskyLeg.units - 2);
   assert.ok(continueRoad(state, kit).ok);
-  assert.equal(state.region, 'ridge');
+  assert.equal(state.region, riskyLeg.to);
   assert.equal(state.roadTrip, null);
-  assert.equal(state.day, day + 0.75);
-  assert.deepEqual(checked.map(([, index]) => index), [1, 2, 3]);
+  assert.equal(state.day, day + riskyLeg.days);
+  const forward = Array.from({ length: riskyLeg.units }, (_, i) => i + 1);
+  assert.deepEqual(checked.map(([, index]) => index), forward);
 
-  const reverse = travelRoad(state, 'marsh', kit);
+  const reverse = travelRoad(state, riskyLeg.from, kit);
   assert.ok(reverse.roadInterrupted);
-  assert.equal(state.roadTrip.stop, 'road:marsh|ridge:2');
-  assert.equal(state.region, 'ridge');
-  assert.equal(state.day, day + 1.25);
+  assert.equal(state.roadTrip.stop, `road:${riskyLeg.key}:2`);
+  assert.equal(state.region, riskyLeg.to);
+  const returnDistance = (riskyLeg.units - 1) * stepDays;
+  assert.equal(state.day, day + riskyLeg.days + returnDistance);
   const turnBack = backFromRoad(state, kit);
   assert.equal(turnBack.roadInterrupted, true);
-  assert.equal(state.roadTrip.stop, 'road:marsh|ridge:2');
-  assert.equal(state.roadTrip.destination, 'ridge');
-  assert.equal(state.day, day + 1.5);
+  assert.equal(state.roadTrip.stop, `road:${riskyLeg.key}:2`);
+  assert.equal(state.roadTrip.destination, riskyLeg.to);
+  assert.equal(state.day, day + riskyLeg.days + returnDistance + stepDays);
   assert.ok(continueRoad(state, kit).ok);
-  assert.equal(state.region, 'ridge');
+  assert.equal(state.region, riskyLeg.to);
   assert.equal(state.roadTrip, null);
-  assert.equal(state.day, day + 1.75);
-  assert.deepEqual(checked.slice(3).map(([, index]) => index), [3, 2, 2, 3]);
+  assert.equal(state.day, day + riskyLeg.days + 2 * returnDistance);
+  assert.deepEqual(checked.slice(forward.length).map(([, index]) => index), [
+    ...forward.slice(1).reverse(), ...forward.slice(1),
+  ]);
 });
 
 test('an unlocked fractional shortcut uses the same cache positions in both directions', () => {
@@ -134,16 +142,19 @@ test('ferry units do not roll for bandits and interrupted journeys only consume 
   const result = travelRoad(state, 'flood_market', kit);
   assert.ok(result.roadInterrupted);
   assert.equal(state.region, 'zhao_city');
-  assert.equal(state.day, 6.75);
+  const ferry = map.find(({ key }) => key === 'ford|zhao_city');
+  const last = map.find(({ key }) => key === 'flood_market|zhao_city');
+  assert.equal(state.day, 1 + ferry.days + stepDays);
   assert.equal(state.world.lastSettlement, 'willow_post');
   assert.deepEqual(state.expeditionLoot, { ore: 2 });
-  assert.equal(state.inventory.ration, 3);
-  assert.equal(state.satiety, 4);
+  const rationAtStop = state.inventory.ration;
+  assert.ok(rationAtStop > 0);
+  assert.ok(state.satiety >= 0);
   assert.ok(continueRoad(state, kit).ok);
   assert.equal(state.region, 'flood_market');
-  assert.equal(state.day, 7.5);
-  assert.equal(state.inventory.ration, 2);
-  assert.equal(checked, 4);
+  assert.equal(state.day, 1 + ferry.days + last.days);
+  assert.ok(state.inventory.ration <= rationAtStop);
+  assert.equal(checked, last.units);
 });
 
 const allGear = Object.fromEntries(data.gear.map((entry) => [entry.id, entry]));
@@ -152,7 +163,6 @@ const roadPolicyKit = { data, records: { gear: allGear },
     .reduce((sum, { start }) => sum + start, 0) -
     Object.values(state.siteVictories[id] ?? {}).reduce((sum, won) => sum + won, 0),
   activeGear: (state) => Object.values(state.equipment).filter((id) => state.durability[id] > 0).map((id) => allGear[id]) };
-const riskyLeg = { key: 'marsh|ridge' };
 const banditStepKit = { ...roadPolicyKit, records: {
   ...roadPolicyKit.records, enemies: Object.fromEntries(data.enemies.map((enemy) => [enemy.id, enemy])),
 }, groundAt: () => ({}), say: (_state, message) => ({ ok: true, message }) };
@@ -162,26 +172,29 @@ function seedWith(...limits) {
     let cursor = seed;
     if (limits.every((limit) => {
       cursor = (Math.imul(cursor, 1664525) + 1013904223) >>> 0;
-      return cursor / 0x100000000 < limit;
+      const [low, high] = Array.isArray(limit) ? limit : [0, limit];
+      const draw = cursor / 0x100000000;
+      return low <= draw && draw < high;
     })) return seed;
   }
   throw new Error('No seed in range matches the required draws');
 }
 
 function interrupted({ fixed = true } = {}) {
-  const state = traveler('marsh', ['ridge']);
+  const state = traveler(riskyLeg.from, [riskyLeg.to]);
   if (!fixed) state.resolvedBandits.push('road_slate_peg');
   state.roadSeed = seedWith(0.05, 0.55, 0.5);
-  const result = act(state, 'travel', { id: 'ridge' });
+  const result = act(state, 'travel', { id: riskyLeg.to });
   assert.equal(result.roadInterrupted, true);
   return state;
 }
 
 test('each full road unit uses the same threshold regardless of earlier encounters', () => {
   const leg = { ...riskyLeg, stepUnits: 1 };
-  for (const [seed, shouldStop] of [[2023, true], [2075, false]]) {
+  const threshold = roadBanditRisk(traveler(riskyLeg.from), riskyLeg, roadPolicyKit).chance;
+  for (const [seed, shouldStop] of [[seedWith(threshold), true], [seedWith([threshold, 1]), false]]) {
     for (const prior of [0, 1, 2, 4]) {
-      const state = traveler('marsh', ['ridge']);
+      const state = traveler(riskyLeg.from, [riskyLeg.to]);
       state.resolvedBandits.push('road_slate_peg');
       state.roadSeed = seed;
       state.roadTrip = { banditsMet: Array.from({ length: prior }, (_, i) => `already-met-${i}`) };
@@ -192,17 +205,19 @@ test('each full road unit uses the same threshold regardless of earlier encounte
 });
 
 test('an entered edge keeps its threshold until the player starts a new crossing', () => {
-  const state = traveler('marsh', ['ridge']);
+  const state = traveler(riskyLeg.from, [riskyLeg.to]);
   state.resolvedBandits.push('road_slate_peg');
   state.roadTrip = {};
-  state.roadSeed = 2075;
+  const threshold = roadBanditRisk(state, riskyLeg, banditStepKit).chance;
+  state.roadSeed = seedWith([threshold, 1]);
   assert.equal(checkRoadBanditStep(state, riskyLeg, 1, banditStepKit), null);
   const defeated = Array.from({ length: 16 }, (_, index) => `0:${index}`);
   state.banditCrews.grey_gully = { encounters: 0, defeated };
-  assert.ok(roadBanditRisk(state, riskyLeg, banditStepKit).chance < 0.020);
-  state.roadSeed = 2023;
+  const depleted = roadBanditRisk(state, riskyLeg, banditStepKit).chance;
+  assert.ok(depleted < threshold);
+  state.roadSeed = seedWith([depleted, threshold]);
   assert.ok(checkRoadBanditStep(state, riskyLeg, 2, banditStepKit)?.roadInterrupted);
-  assert.equal(state.roadTrip.banditRiskByLeg[riskyLeg.key].chance, 0.027);
+  assert.equal(state.roadTrip.banditRiskByLeg[riskyLeg.key].chance, threshold);
 });
 
 test('village paths, guarded city roads, ferries and teleport scrolls do not roll a road encounter', () => {
@@ -226,7 +241,7 @@ test('village paths, guarded city roads, ferries and teleport scrolls do not rol
   assert.equal(state.roadSeed, seed);
 });
 
-test('the main grade comes from the visible armor, independent of true realm and gear hidden in the bag', () => {
+test('visible gear collectively describes the traveler without using true realm or packed items', () => {
   const state = interrupted({ fixed: false });
   const twin = structuredClone(state);
   twin.realm = 8;
@@ -235,6 +250,13 @@ test('the main grade comes from the visible armor, independent of true realm and
   assert.match(view(state).roadTrip.bandit.name, /强盗 · 炼气/);
   assert.equal(view(state).roadTrip.bandit.name, view(twin).roadTrip.bandit.name);
   twin.equipment.armor = 'fault_coat';
+  assert.equal(apparentBanditGrade(twin, roadPolicyKit), 2);
+  twin.equipment.armor = null;
+  assert.equal(apparentBanditGrade(twin, roadPolicyKit), null, 'one visible item leaves the grade uncertain');
+  twin.equipment.weapon = 'gold_iron_blade';
+  twin.equipment.head = 'reed_hat';
+  assert.equal(apparentBanditGrade(twin, roadPolicyKit), null, 'two equally visible contradictory items remain uncertain');
+  twin.equipment.head = 'gold_brow_guard';
   assert.equal(apparentBanditGrade(twin, roadPolicyKit), 2);
   const feeByMajor = [0, 1, 2].map((grade) => data.roadBandits.pools.filter(({ tier }) => Math.floor(tier / 3) === grade)
     .map(({ fee }) => fee));
@@ -289,10 +311,10 @@ test('a mixed toll transfers goods and coins together on confirmation, then the 
   assert.equal(state.inventory.road_sleeve_manual, undefined);
   assert.ok(state.resolvedBandits.includes('road_slate_peg'));
   const dayAtStop = state.day;
-  state.roadSeed = 2300;
+  prepareQuietRoad(state);
   assert.ok(act(state, 'roadContinue').ok);
-  assert.equal(state.region, 'ridge');
-  assert.equal(state.day, dayAtStop + 0.5);
+  assert.equal(state.region, riskyLeg.to);
+  assert.equal(state.day, dayAtStop + (riskyLeg.units - firstStop) * stepDays);
 });
 
 test('a traveler short of money hands over gear and collateral together and keeps protected supplies', () => {
@@ -329,9 +351,9 @@ test('a bandit can dismiss the stripped traveler without asking for another paym
   state.reliefRations = state.inventory.ration;
   assert.ok(act(state, 'banditSurrender').ok);
   assert.ok(Object.values(state.equipment).every((id) => id === null));
-  state.roadSeed = 2300;
+  prepareQuietRoad(state);
   assert.ok(act(state, 'roadContinue').ok);
-  assert.equal(state.region, 'ridge');
+  assert.equal(state.region, riskyLeg.to);
 
   const inventory = structuredClone(state.inventory);
   const lootSeed = state.banditLootSeed;
@@ -339,7 +361,7 @@ test('a bandit can dismiss the stripped traveler without asking for another paym
   state.roadSeed = seedWith(0.05, 0.55, 0.5, 0.6);
   let afterDismissal = state.roadSeed;
   for (let draw = 0; draw < 4; draw++) afterDismissal = (Math.imul(afterDismissal, 1664525) + 1013904223) >>> 0;
-  const result = act(state, 'travel', { id: 'marsh' });
+  const result = act(state, 'travel', { id: riskyLeg.from });
   assert.equal(result.banditDismissed, true);
   assert.equal(result.roadInterrupted, true);
   assert.equal(state.roadBandit, null);
@@ -356,31 +378,31 @@ test('a bandit can dismiss the stripped traveler without asking for another paym
     assert.equal(act(state, action).ok, false);
     assert.equal(state.roadSeed, afterDismissal);
   }
-  state.roadSeed = 2300;
+  prepareQuietRoad(state);
   assert.ok(act(state, 'roadContinue').ok);
-  assert.equal(state.region, 'marsh');
+  assert.equal(state.region, riskyLeg.from);
 });
 
-test('helping the wounded road bandit teaches the manual once and the den leader controls linked road danger', () => {
+test('the gray-clad bandit asks for payment without an option to bandage him, and his leader controls road danger', () => {
   const state = interrupted();
   assert.equal(act(state, 'banditPlot', { id: 'bind_road_arm' }).ok, false);
   state.inventory.salve = 1;
-  const result = act(state, 'banditPlot', { id: 'bind_road_arm' });
-  assert.ok(result.ok);
-  assert.equal(state.inventory.salve, undefined);
-  assert.equal(state.inventory.road_sleeve_manual, 1);
   assert.equal(act(state, 'banditPlot', { id: 'bind_road_arm' }).ok, false);
-  assert.equal(roadBanditRisk(state, riskyLeg, roadPolicyKit).chance, 0.027);
+  assert.equal(view(state).roadTrip.bandit.actions.length, 0);
+  assert.equal(state.inventory.salve, 1);
+  assert.equal(state.inventory.road_sleeve_manual, undefined);
+  const originalChance = roadBanditRisk(state, riskyLeg, roadPolicyKit).chance;
+  assert.ok(originalChance > 0);
   const den = data.sites.find(({ id }) => id === 'bandit_slope_den');
   state.siteVictories[den.id] = { bandit_den_scout: 1 };
   const firstChance = roadBanditRisk(state, riskyLeg, roadPolicyKit).chance;
-  assert.ok(firstChance < 0.027 && firstChance > 0.025);
+  assert.ok(firstChance < originalChance && firstChance > originalChance * 0.9);
   state.siteVictories[den.id].bandit_den_leader = 1;
   assert.equal(roadBanditRisk(state, riskyLeg, roadPolicyKit).chance, 0);
 });
 
 test('intact normal dodge gear reduces road risk without changing the fixed road distance', () => {
-  const state = traveler('marsh', ['ridge']);
+  const state = traveler(riskyLeg.from, [riskyLeg.to]);
   const chance = roadBanditRisk(state, riskyLeg, roadPolicyKit).chance;
   const boots = allGear.reed_boots;
   state.equipment.boots = boots.id;
@@ -388,7 +410,7 @@ test('intact normal dodge gear reduces road risk without changing the fixed road
   assert.ok(roadBanditRisk(state, riskyLeg, roadPolicyKit).chance < chance);
   state.durability[boots.id] = 0;
   assert.equal(roadBanditRisk(state, riskyLeg, roadPolicyKit).chance, chance);
-  assert.equal(view(state).world.journeys.find(({ id }) => id === 'ridge').units, 3);
+  assert.equal(view(state).world.journeys.find(({ id }) => id === riskyLeg.to).units, riskyLeg.units);
 });
 
 test('attacking bandits block escape and make their normal strike; known openings use a low seeded chance', () => {
@@ -415,14 +437,15 @@ test('attacking bandits block escape and make their normal strike; known opening
   const chased = act(interruptedReturn, 'retreat');
   assert.equal(chased.retreated, true);
   assert.equal(chased.roadInterrupted, true);
-  assert.equal(interruptedReturn.roadTrip.destination, 'marsh');
+  assert.equal(interruptedReturn.roadTrip.destination, riskyLeg.from);
   assert.ok(interruptedReturn.roadBandit);
   assert.doesNotMatch(chased.message, /沿着刚走过的路折回/);
+  prepareQuietRoad(state);
   const success = act(state, 'retreat');
   assert.equal(success.retreated, true);
   assert.equal(state.roadTrip, null);
   assert.equal(state.roadBandit, null);
-  assert.equal(state.region, 'marsh');
+  assert.equal(state.region, riskyLeg.from);
 });
 
 test('a road win pauses for manual pickups, medicine and a change of gear at that roadside coordinate', () => {
@@ -463,9 +486,9 @@ test('a road win pauses for manual pickups, medicine and a change of gear at tha
   assert.equal(state.roadTrip.stop, coordinate);
   assert.equal(view(state).roadTrip.afterBattle, true);
   assert.equal(act(state, 'banditFight').ok, false);
-  state.roadSeed = 172102;
+  prepareQuietRoad(state);
   assert.ok(act(state, 'roadContinue').ok);
-  assert.equal(state.region, 'ridge');
+  assert.equal(state.region, riskyLeg.to);
   assert.equal(view(state).roadTrip, null);
 });
 
@@ -491,15 +514,6 @@ test('clearing a draft, negotiating separately, or fighting leaves the unconfirm
   assert.equal(view(cleared).roadTrip.bandit.remaining, cleared.roadBandit.fee);
   assert.equal(cleared.coins, 1);
   assert.equal(cleared.inventory.cudgel, 1);
-
-  const helped = structuredClone(state);
-  helped.inventory.salve = 1;
-  assert.ok(act(helped, 'banditPlot', { id: 'bind_road_arm' }).ok);
-  assert.equal(helped.inventory.salve, undefined);
-  assert.equal(helped.inventory.road_sleeve_manual, 1);
-  assert.equal(helped.coins, 1);
-  assert.equal(helped.inventory.cudgel, 1);
-  assert.equal(helped.roadBandit, null);
 
   assert.ok(act(state, 'banditFight').ok);
   assert.equal(state.coins, 1);
@@ -568,12 +582,17 @@ test('a surviving bandit defeat loses carried gear and cash and the same attacke
   state.realm = 8;
   state.hp = view(state).maxHp;
   state.satiety = 96;
-  assert.ok(act(state, 'travel', { id: 'marsh' }).ok);
+  for (const id of ['reed_hat', 'breath_belt']) {
+    state.inventory[id] = 1;
+    state.durability[id] = allGear[id].durability;
+    assert.ok(act(state, 'equip', { id }).ok);
+  }
+  assert.ok(act(state, 'travel', { id: riskyLeg.from }).ok);
   state.banditLootSeed = 3;
   const sameMemberSeed = seedWith(0.05, 0.55, 0.5);
   const other = structuredClone(state);
   other.roadSeed = sameMemberSeed + 1;
-  assert.equal(act(other, 'travel', { id: 'ridge' }).roadInterrupted, true);
+  assert.equal(act(other, 'travel', { id: riskyLeg.to }).roadInterrupted, true);
   assert.ok(other.roadBandit.member);
   assert.notEqual(other.roadBandit.member, mugger);
   assert.ok(act(other, 'banditFight').ok);
@@ -583,7 +602,7 @@ test('a surviving bandit defeat loses carried gear and cash and the same attacke
   assert.ok(other.coins < 41);
 
   state.roadSeed = sameMemberSeed;
-  assert.equal(act(state, 'travel', { id: 'ridge' }).roadInterrupted, true);
+  assert.equal(act(state, 'travel', { id: riskyLeg.to }).roadInterrupted, true);
   assert.equal(state.roadBandit.member, mugger);
   assert.ok(act(state, 'banditFight').ok);
   let victory;

@@ -76,13 +76,13 @@ test('the three bag patterns are tied to work, an observed object, and victory',
 
   state.region = 'glass_rotunda';
   play(state, 'visit', { id: 'sand_glass_chamber' });
-  assert.match(view(state).currentEvent.text, /削下一角/);
+  assert.match(view(state).currentEvent.text, /刀鞘.*铁环/);
   assert.ok(!choices(state).includes(1));
   play(state, 'choose', { index: 0 });
   assert.equal(view(state).currentEnemy.sparring, false);
   state.combat.hp = 1;
   play(state, 'attack');
-  assert.match(view(state).currentEvent.text, /收刀入鞘/);
+  assert.match(view(state).currentEvent.text, /收了刀.*铁环/);
   play(state, 'choose', { index: 1 });
   assert.equal(state.inventory.qiankun_inner_pattern, 1);
   assert.ok(!choices(state).includes(1));

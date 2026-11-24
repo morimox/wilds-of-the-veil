@@ -220,3 +220,5 @@
 岸门下的干工房（zhao_mill_dry_workroom）,种群,磨房石鼠（zhao_mill_stone_rat）,zhao_mill_stone_rat,,1,1,8,1,固定间隔,,是,
 封乔的护堤木台（marsh_pole_lesson）,种群,护堤人封乔（river_spar_captain）,river_spar_captain,,1,1,5,1,固定间隔,,,
 闸下无灯梯（ford_below_steps）,种群,拖梯水影（ford_lower_spirit）,ford_lower_spirit,,2,4,11,1,固定间隔,,,
+药谷的旧灶（basin_cook_hut）,种群,蒲根巨蜥（herb_den_lizard）,herb_den_lizard,,1,1,0,0,不回补,,,
+背风的石灶（kiln_stone_pot）,种群,棘背岩蜥（sand_spine_lizard）,sand_spine_lizard,,1,1,0,0,不回补,,,

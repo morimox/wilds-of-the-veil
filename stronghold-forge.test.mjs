@@ -117,7 +117,10 @@ test('the armguard cushions braced hits and occupies the same hand as a shield o
   assert.equal(wearing.defense - plain.defense, 2);
   state.inventory.reed_bow = 1;
   state.durability.reed_bow = data.gear.find(({ id }) => id === 'reed_bow').durability;
-  assert.match(act(state, 'equip', { id: 'reed_bow' }).message, /先卸下副手/);
+  const archer = structuredClone(state);
+  equip(archer, 'reed_bow');
+  assert.equal(archer.equipment.offhand, null);
+  assert.equal(archer.inventory.den_armguard, 1);
   const working = structuredClone(state);
   equip(working, 'miner_pick');
   assert.equal(working.equipment.offhand, 'miner_pick');

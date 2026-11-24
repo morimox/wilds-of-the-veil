@@ -36,12 +36,17 @@ test('an empty-bellied traveler can reach a local bed and recover before taking 
   play(state, 'rest');
   while (state.inventory.ration && state.satiety < 55) play(state, 'eat', { id: 'ration' });
   play(state, 'travel', { id: 'flood_market' });
+  for (const id of ['glass_bank', 'rope_sands']) {
+    while (state.inventory.ration && state.satiety < 55) play(state, 'eat', { id: 'ration' });
+    play(state, 'travel', { id });
+  }
   play(state, 'travel', { id: 'zhao_pass' });
   state.knownItems.push('sand_writ');
   play(state, 'wait');
 
   state.satiety = 0;
   state.coins = 0;
+  state.inventory.ore = 8;
   delete state.inventory.ration;
   const emergency = roadTo(state, 'zhao_city');
   assert.ok(emergency.available && emergency.rescue);
@@ -56,10 +61,11 @@ test('an empty-bellied traveler can reach a local bed and recover before taking 
   assert.equal(state.day - day, emergency.days);
   for (let i = 0; i < 2; i++) {
     play(state, 'rest');
-    while (state.inventory.ration && state.satiety < 65) play(state, 'eat', { id: 'ration' });
+    while (state.inventory.ration && state.satiety < 92) play(state, 'eat', { id: 'ration' });
   }
-  assert.ok(state.inventory.ration > 0);
-  play(state, 'travel', { id: 'flood_market' });
+  play(state, 'localSell', { id: 'ore', count: 8 });
+  play(state, 'localBuy', { id: 'ration', count: Math.min(4, offerFor(state, 'ration').maximum) });
+  assert.ok(state.inventory.ration >= 3);
   play(state, 'travel', { id: 'zhao_pass' });
   const fare = roadTo(state, 'mingsha_city');
   assert.equal(fare.days, transportRules.crossings.find(({ b }) => b === 'mingsha_city').days);

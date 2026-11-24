@@ -107,14 +107,14 @@ test('when the granary shifts on a miss, the saved order resets without losing t
   const moves = (ids) => ids.forEach((id) => play(state, 'mechanismMove', { id }));
   const read = () => view(state).mechanism;
   play(state, 'visit', { id: 'puzzle_granary_catch' });
-  moves(['place_chock', 'soak_cloth', 'steady_catch']);
+  moves(['place_chock', 'wedge_cloth', 'steady_catch']);
   assert.equal(read().sequence.length, 3);
   const missed = play(state, 'mechanismTry');
   assert.equal(missed.injury.amount, 3);
-  assert.match(missed.message, /换了块干布/);
+  assert.match(missed.message, /把滑出的石头和木块全取出来/);
   assert.deepEqual(read().sequence, []);
   assert.deepEqual(view(state).groundLoot, {});
-  moves(['soak_cloth', 'place_chock', 'steady_catch']);
+  moves(['wedge_cloth', 'place_chock', 'steady_catch']);
   play(state, 'mechanismTry');
   assert.equal(read().complete, true);
   assert.deepEqual(view(state).groundLoot, { ration: 6, wood: 4 });

@@ -73,6 +73,9 @@ test('an opening hunter can turn a hare and gathered fuel into meals before retu
   gatherOne(state, 1, 'wood');
   play(state, 'choose', 3);
   play(state, 'visit', 'old_fire');
+  assert.equal(act(state, 'choose', { index: 4 }).ok, false);
+  play(state, 'choose', 5);
+  assert.equal(state.inventory.recipe_meat_broth, 1);
   const before = state.satiety;
   play(state, 'choose', 4);
   assert.equal(state.event, 'old_fire');

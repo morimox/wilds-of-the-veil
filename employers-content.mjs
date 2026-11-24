@@ -7,7 +7,6 @@ const items = [
   key('zhao_sluice_agreement', '修水闸用的布牌', '谷惟给的布牌，绑在手上，连环浅洲的闸工就认识你。牌背写着做下水背带用的松枝和兽革。'),
   key('zhao_sluice_receipt', '浅洲水闸的试水回条', '樊娘试过水闸，盖了拇指印。卡住闸板的碎石来自缺轮磨台，她在回条背面画了磨台的引水口。'),
   key('zhao_sluice_witness', '磨坊的通水回条', '樊娘试过水才签了条。两道闸都通了，把回条交给照原城的谷惟，她就能安排给田里放水。'),
-  key('zhao_sluice_verse', '谷惟的借水手法', '谷惟把教你的手势画下来，箭头指向来劲更弱的一边。筑基后可依这势推偏一记重招。'),
   { id: 'zhao_cargo_brace', name: '缠绳护腕', kind: 'gear', price: 0, sell: 25, keepOnFall: true, oneOfAKind: true,
     desc: '码头押货人用的厚护腕。皮环里缠着船索，用空着的那只手格挡也稳。' },
 ];
@@ -15,12 +14,6 @@ const items = [
 const gear = [
   { id: 'zhao_cargo_brace', slot: 'offhand', tier: 2, def: 1, brace: 4, durability: 36, repair: 10,
     entry: '押货用的厚护腕，须留一只手。船索缠在皮环内，架住对手蓄力后的重击时会卸去一股力。' },
-];
-
-const arts = [
-  { id: 'zhao_water_rebound', name: '借水发力', tier: 3, cost: 4, power: -1, pierce: 1, guard: 7, break: 11,
-    price: 0, weaponBased: false, prizeOnly: true, reveal: { item: 'zhao_sluice_verse' },
-    desc: '从帮闸板卸劲的手法练起。遇到重招，可顺着对手力道推偏一截，空手也能使。' },
 ];
 
 const attack = (name, mult = 1) => ({ kind: 'attack', name, mult });
@@ -160,10 +153,10 @@ const quests = [
     desc: '谷惟等浅洲闸试通的消息。把樊娘的条子给她，前闸先结。想帮樊娘清源头，从缺轮磨台的背水面去。',
     need: { zhao_sluice_receipt: 1 }, reward: { heal_pill: 1, ration: 2 }, coins: 34, insight: 3,
     outcome: '谷惟验过樊娘按的印，招呼两个等灌水的田户先去整理分水沟。她付了前闸的脚钱，顺手把歇脚的吃食和一颗丹药包了给你。' },
-  { id: 'zhao_sluice_deep_pay', region: 'zhao_city', name: '交磨坊的通水回条，请谷惟示范', reveal: { item: 'zhao_sluice_witness' },
-    desc: '引水口重新通了，樊娘把水流的准信交给你。谷惟要这张回条才能给田户排下一轮放水，也愿意教你她推闸时用的手势。',
-    need: { zhao_sluice_witness: 1 }, reward: { zhao_sluice_verse: 1, leaf_pill: 2 }, learnArts: ['zhao_water_rebound'], coins: 58, insight: 6,
-    outcome: '谷惟让来报水的田户在自己的时辰下摁印，然后结了钱。她在秤边推过两次横木，一次直推，一次往侧手送。「记着第二次手上的劲。遇上沉东西照样能推开。」' },
+  { id: 'zhao_sluice_deep_pay', region: 'zhao_city', name: '给谷惟交磨坊的通水回条', reveal: { item: 'zhao_sluice_witness' },
+    desc: '引水口重新通了，樊娘把水流的准信交给你。谷惟等这张回条给田户排下一轮放水。',
+    need: { zhao_sluice_witness: 1 }, reward: { leaf_pill: 2 }, coins: 58, insight: 6,
+    outcome: '谷惟把闸口新定的水时写在木牌上，喊田户依次来摁印。末了，她把工钱结给你，回身将牌子挂在闸房外。' },
 ];
 
-export const employersContent = { items, gear, arts, sites, events, enemies, quests };
+export const employersContent = { items, gear, sites, events, enemies, quests };

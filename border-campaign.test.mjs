@@ -22,12 +22,14 @@ function traveler(realm = 4) {
   state.knownItems.push('sand_writ');
   state.realm = realm;
   state.coins = 36;
-  state.inventory.ration = 20;
+  state.inventory.ration = 35;
   state.inventory.salve = 7;
   state.inventory.heal_pill = 4;
   state.inventory.qi_powder = 5;
-  state.knownArts.push('cliff_cut', 'bell_strike');
-  if (realm >= 4) state.knownArts.push('sky_axis');
+  if (realm >= 4) {
+    state.inventory.clear_qi_pill = 3;
+    state.inventory.jade_pill = 2;
+  }
 
   const pack = realm >= 4 ? ['coil_pole', 'gauze_armor', 'jade_pendant'] :
     realm >= 2 ? ['weir_knife', 'iron_coat', 'tide_charm', 'hide_shield'] : [];
@@ -85,34 +87,35 @@ function fight(state, index, expected, ledger = []) {
   choose(state, index);
   assert.equal(state.combat.id, expected);
   const startingHealth = state.hp;
-  const turns = { enemy: expected, attack: 0, guard: 0, art: 0, use: 0, damageTaken: 0 };
+  const turns = { enemy: expected, attack: 0, guard: 0, weaponSpell: 0, use: 0, damageTaken: 0 };
   const day = state.day;
   while (state.combat) {
-    const { intent, maxHp, maxQi } = view(state);
+    const { intent, maxHp, maxQi, combatWeapon } = view(state);
     const kind = intent?.kind;
-    const pressureArt = state.realm >= 4 ? 'sky_axis' : 'cliff_cut';
-    const heavyCost = state.realm >= 4 ? 7 : 4;
+    const spellCost = combatWeapon.spellQi || Infinity;
     let move = 'attack';
     let id;
-    if (kind !== 'heavy' && state.hp < maxHp * 0.5 && state.inventory.heal_pill) {
+    if (boss && kind !== 'heavy' && !state.combat.enemyCharged && state.hp < maxHp * 0.65 && state.inventory.jade_pill) {
+      move = 'use';
+      id = 'jade_pill';
+    } else if (boss && kind !== 'heavy' && !state.combat.enemyCharged && state.qi < spellCost && state.inventory.clear_qi_pill) {
+      move = 'use';
+      id = 'clear_qi_pill';
+    } else if (kind !== 'heavy' && state.hp < maxHp * 0.5 && state.inventory.heal_pill) {
       move = 'use';
       id = 'heal_pill';
     } else if (kind !== 'heavy' && state.hp < maxHp * 0.36 && state.inventory.salve) {
       move = 'use';
       id = 'salve';
-    } else if (kind === 'guard' && state.qi < heavyCost && state.inventory.qi_powder) {
+    } else if (kind === 'guard' && Number.isFinite(spellCost) && state.qi < spellCost && state.inventory.qi_powder) {
       move = 'use';
       id = 'qi_powder';
     } else if (kind === 'guard' && state.qi <= maxQi - rules.guardQiRecovery) {
       move = 'guard';
-    } else if ((['heal', 'heavy'].includes(kind) || (boss && kind !== 'guard')) && state.qi >= heavyCost) {
-      move = 'art';
-      id = pressureArt;
     } else if (kind === 'heavy') {
       move = 'guard';
-    } else if (kind !== 'guard' && state.qi >= heavyCost + 4) {
-      move = 'art';
-      id = 'bell_strike';
+    } else if (kind !== 'guard' && state.qi >= spellCost && (boss || kind === 'heal' || state.qi >= spellCost * 2)) {
+      move = 'weaponSpell';
     }
     const result = play(state, move, { id });
     turns[move] += 1;
@@ -177,6 +180,10 @@ test('a normal outfitted traveler clears ten opponents with distinct tactics, ma
   fight(state, 2, 'border_kiln_brazier', ledger);
   choose(state, 3);
 
+  go(state, 'sand_bell_cloister');
+  refillAtInn(state);
+  const repairBill = view(state).repairService.prices.coil_pole;
+  play(state, 'repair', { id: 'coil_pole' });
   shift(state, ['hollow_silo'], 'border_silo_den');
   choose(state, 0);
   assert.equal(available(state, 4), false);
@@ -216,16 +223,16 @@ test('a normal outfitted traveler clears ten opponents with distinct tactics, ma
   fight(state, 0, 'border_ridge_runner', ledger);
   choose(state, 1);
 
-  const totals = ['attack', 'guard', 'art', 'use', 'damageTaken'].reduce((all, key) => ({
+  const totals = ['attack', 'guard', 'weaponSpell', 'use', 'damageTaken'].reduce((all, key) => ({
     ...all, [key]: ledger.reduce((sum, entry) => sum + entry[key], 0),
   }), {});
-  const turns = totals.attack + totals.guard + totals.art + totals.use;
+  const turns = totals.attack + totals.guard + totals.weaponSpell + totals.use;
   assert.equal(new Set(ledger.map(({ enemy }) => enemy)).size, 10);
   assert.ok(turns >= 50 && turns <= 115);
-  assert.ok(totals.guard > 0 && totals.art > 0 && totals.attack > 0);
-  assert.equal(state.coins - startCoins, 206);
+  assert.ok(totals.guard > 0 && totals.weaponSpell > 0 && totals.attack > 0);
+  assert.equal(state.coins - startCoins, 206 - repairBill);
   t.diagnostic(`10 bouts, ${turns} rounds: ${JSON.stringify(totals)}`);
-  t.diagnostic(ledger.map((entry) => `${entry.enemy}:${entry.attack + entry.guard + entry.art + entry.use}`).join(', '));
+  t.diagnostic(ledger.map((entry) => `${entry.enemy}:${entry.attack + entry.guard + entry.weaponSpell + entry.use}`).join(', '));
   t.diagnostic(`From first arrival: ${state.day - startDay} game days, ${state.coins - startCoins} coins net, ${startFood + 4 - (state.inventory.ration ?? 0)} rations eaten.`);
   t.diagnostic(`Stock change: ${startHealing - (state.inventory.heal_pill ?? 0)} healing pills used, ${startQi - (state.inventory.qi_powder ?? 0)} qi powders used, ${(state.inventory.salve ?? 0) - startSalve} salves gained.`);
 });

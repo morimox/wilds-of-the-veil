@@ -2,8 +2,8 @@ import { data } from './data.mjs';
 import { createGame } from './engine.mjs';
 
 export function prepareQuietRoad(state) {
-  // The next 110 road draws are above 0.1. Keep quest and field tests on their intended routes.
-  state.roadSeed = 172102;
+  // The next 92 road draws are above the highest road risk of 0.17.
+  state.roadSeed = 15505888;
 }
 
 export function createQuietGame(seed) {

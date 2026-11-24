@@ -289,7 +289,7 @@ test('forged-heart fists use two separate turns and wear no unrelated weapon', (
   const release = play(state, 'fistCharge');
   assert.ok(release.damageDealt > ordinary.damageDealt);
   assert.equal(state.day - day, 2 * rules.battleDays);
-  assert.equal(state.qi, qi - 4);
+  assert.equal(state.qi, qi);
   assert.equal(state.durability.iron_sword, gear.iron_sword.durability);
   assert.equal(view(state).chargingWeapon, null);
 });

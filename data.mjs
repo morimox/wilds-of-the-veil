@@ -30,6 +30,7 @@ const realms = [
 ];
 
 const items = [
+  { id: 'spirit_coin', name: '灵钱', kind: 'currency', price: 0, sell: 0, desc: '通行三州的钱。多少枚都合放一格。' },
   { id: 'battle_sinew', name: '坚韧兽筋', kind: 'material', price: 0, sell: 0, desc: '取自已经长成的妖兽。晒干后可缠紧兵器的柄，也可缝制护具，受力时不容易断。' },
   { id: 'ration', name: '干粮', kind: 'food', price: 3, sell: 1, desc: '用油纸分包的粮饼，饿了就拆一包吃。' },
   { id: 'wood', name: '松木', kind: 'material', price: 3, sell: 1, desc: '干透的松枝和松片。带脂的能引火，削去树皮后可做杆、柄和屋里的架子。' },
@@ -51,9 +52,14 @@ const items = [
     desc: '小袋里两层布各自向深处叠开。布外看着薄，能装下比寻常乾坤袋更多的行李。' },
   { id: 'qiankun_deep_bag', name: '深底乾坤袋', kind: 'container', price: 0, sell: 0, keepOnFall: true,
     desc: '从袋底向上缝了两道线。把一整匣铁料送进去，袋面只轻轻往下坠一下。' },
-  { id: 'meat_broth', name: '山炉肉汤', kind: 'food', price: 0, sell: 0, desc: '装在粗陶罐里的一碗浓汤，比干粮耐饿，还能缓一缓轻伤。' },
-  { id: 'herb_stew', name: '灵草炖肉', kind: 'food', price: 0, sell: 0, desc: '用灵草慢煨到酥烂的兽肉，适合走一趟山路再吃。' },
-  { id: 'crystal_feast', name: '禾香封肉', kind: 'food', price: 0, sell: 0, desc: '用熟粟裹紧炖好的兽肉，带着走远路很耐饿，还能补些气血。' },
+  { id: 'meat_broth', name: '山炉肉汤', kind: 'food', price: 0, sell: 0, desc: '山炉煨出的兽肉浓汤。炼气修士拿它顶饿，也能缓一缓轻伤。' },
+  { id: 'herb_stew', name: '灵草炖兽脯', kind: 'food', price: 0, sell: 0, desc: '筑基妖兽的肉切成厚片和灵草慢炖，吃了能补些气血与真气。' },
+  { id: 'crystal_feast', name: '粟香封岩肉', kind: 'food', price: 0, sell: 0, desc: '用新粟裹着金丹妖兽的肉温火封熟。顶饿，补气血和真气，还能养回一点神识。' },
+  { id: 'foundation_meat', name: '灵纹兽肉', kind: 'material', price: 0, sell: 0, desc: '筑基妖兽胸腹间的好肉，能看见细白的纹。和灵草同煨才能收去腥气。' },
+  { id: 'gold_meat', name: '金纹兽肉', kind: 'material', price: 0, sell: 0, desc: '金丹妖兽身上最厚实的一块肉。下刀后还能见细细的金纹，得把热气封在锅里才能炖透。' },
+  { id: 'recipe_meat_broth', name: '山炉肉汤食谱', kind: 'key', recipeOnly: true, price: 0, sell: 0, desc: '灶旁的竹片用炭画了两升水与一把松枝。肉片要等汤滚后再下。' },
+  { id: 'recipe_herb_stew', name: '灵草炖兽脯食谱', kind: 'key', recipeOnly: true, price: 0, sell: 0, desc: '药谷旧灶上的食谱。灵纹兽肉切厚，起锅前才放草叶。' },
+  { id: 'recipe_crystal_feast', name: '粟香封岩肉食谱', kind: 'key', recipeOnly: true, price: 0, sell: 0, desc: '石灶盖背面的做法。兽肉切丁和新粟同煮，锅口用湿布封住才能留住肉汁。' },
   { id: 'ore', name: '寒铁', kind: 'material', price: 0, sell: 5, desc: '沉钟岭最常见的铁料，断面摸着冰凉。炉盖、铁具和兵刃都能用它。' },
   { id: 'core', name: '灵晶', kind: 'material', price: 14, sell: 5, desc: '有细亮纹的晶石。能从潮床或石缝里筛出细粒，硬些的可镶入兵刃。' },
   { id: 'seal', name: '镇渡印', kind: 'object', price: 0, sell: 0, keepOnFall: true, desc: '闭潮渡旧闸上的渡印，落灯村有人认得它。' },
@@ -77,7 +83,7 @@ const items = [
   { id: 'millet_grain', name: '新收的谷子', kind: 'material', price: 0, sell: 1, desc: '外壳一捻就开，里面是浅黄的粟米。' },
   { id: 'kiln_clay', name: '耐火泥', kind: 'material', price: 0, sell: 3, desc: '云炉石谷里的灰白硬泥，干透以后不容易裂。' },
   { id: 'black_iron', name: '暗金', kind: 'material', price: 0, sell: 7, desc: '细密黑砂包着的深金色矿粒。淘净后能加固器件，也是炉火里罕见的引药料。' },
-  { id: 'pine_pass', name: '松场驮道图', kind: 'key', price: 0, sell: 0, desc: '图上从落灯村北坡画出一条旧驮道，沿岭脚直通松场。断桥过后，三棵青松并排立着。' },
+  { id: 'pine_pass', name: '松场驮道图', kind: 'key', price: 0, sell: 0, desc: '图从闭潮渡桥北起笔，沿岭脚旧驮道上坡。绕过断桥能看见三棵并排的青松，再往前就是松场。' },
   { id: 'kiln_tracks', name: '窑车辙样', kind: 'key', price: 0, sell: 0, desc: '窑车走的窄道。图上两道车轮印在松树根旁一转，就出了山坳。' },
   { id: 'herb_tie', name: '篁泽的药篓绳', kind: 'key', price: 0, sell: 0, desc: '赶车人从旧药篓上解下的绑绳。绳结旁缝着一小块丝布，画着去药谷要过的竹桥。' },
   { id: 'mine_guide', name: '玄砂引矿签', kind: 'key', price: 0, sell: 0, desc: '药谷换来的窄木签。照着墨线，可以从药谷过石槽，也可以从沉钟岭走运矿的窄道。两条路都接到冷井的外梯。' },
@@ -174,7 +180,7 @@ const items = [
   { id: 'focus_pill', name: '定息丹', kind: 'pill', price: 12, sell: 5, desc: '服下能稳住气息，下一次施展术法时，出招会更有力。' },
   { id: 'tide_pill', name: '济潮丹', kind: 'pill', price: 19, sell: 8, desc: '一丸能同时补回气血和真气，药性较烈。' },
   { id: 'resin_pill', name: '温枝丸', kind: 'pill', price: 0, sell: 6, desc: '药丸入口先苦，随后才感到胸口热。适合远行后恢复气血。' },
-  { id: 'sense_powder', name: '凝神散', kind: 'pill', price: 0, sell: 4, desc: '细粉含在舌下有股凉意。练过神识的人可以借它收拢心神，留出余力观招。' },
+  { id: 'sense_powder', name: '凝神散', kind: 'pill', price: 0, sell: 4, desc: '细粉含在舌下有股凉意，能让耗去的神识渐渐恢复。' },
   { id: 'heart_pill', name: '养心丸', kind: 'pill', price: 0, sell: 6, desc: '泽医用两味药搓成的丸子。能补些气血，也能恢复神识。' },
   { id: 'leaf_pill', name: '清脉饮', kind: 'pill', price: 0, sell: 8, desc: '一小囊苦药汁，能减轻丹毒，也能补回一些真气。' },
   { id: 'jade_pill', name: '照心露', kind: 'pill', price: 0, sell: 16, desc: '用温火从晶屑中引出的药露。恢复真气和气血，服多容易积毒。' },
@@ -236,9 +242,9 @@ const ammunition = [
 
 const foods = [
   { id: 'ration', grade: 0, satiety: 32, hp: 2 },
-  { id: 'meat_broth', grade: 1, satiety: 44, hp: 3 },
-  { id: 'herb_stew', grade: 2, satiety: 56, hp: 5 },
-  { id: 'crystal_feast', grade: 3, satiety: 72, hp: 8 },
+  { id: 'meat_broth', grade: 1, satiety: 44, hp: 6 },
+  { id: 'herb_stew', grade: 2, satiety: 56, hp: 14, qi: 13 },
+  { id: 'crystal_feast', grade: 3, satiety: 72, hp: 24, qi: 28, sense: 1 },
 ];
 
 const pills = [
@@ -258,27 +264,11 @@ const pills = [
 ];
 
 const talismans = [
-  { id: 'ember_talisman', tier: 0, damage: 10, guard: 0, retreat: 0, qiCost: 3 },
+  { id: 'ember_talisman', tier: 0, damage: 10, guard: 0, retreat: 0 },
   { id: 'reed_talisman', tier: 0, damage: 0, guard: 3, retreat: 0.38 },
   { id: 'bank_talisman', tier: 0, damage: 0, guard: 2, retreat: 0.56 },
   { id: 'iron_talisman', tier: 1, damage: 0, guard: 10, retreat: 0 },
-  { id: 'tide_talisman', tier: 2, damage: 19, guard: 4, retreat: 0, qiCost: 6 },
-];
-
-const arts = [
-  { id: 'reed_cleave', name: '分苇诀', tier: 0, cost: 2, power: 3, pierce: 1, guard: 0, break: 0, price: 6, desc: '在出手时添上一股真气，劈开薄甲更容易。' },
-  { id: 'stone_brace', name: '压石诀', tier: 0, cost: 2, power: -3, pierce: 0, guard: 5, break: 0, price: 8, desc: '先压低身子护住胸腹，顺势轻击一下。' },
-  { id: 'hook_current', name: '钩水手', tier: 0, cost: 3, power: 0, pierce: 1, guard: 1, break: 7, price: 12, reveal: { item: 'oar_mark' }, desc: '用巧劲削弱对方重招，适合看准了再用。' },
-  { id: 'bell_strike', name: '敲山劲', tier: 1, cost: 4, power: 6, pierce: 3, guard: 0, break: 0, price: 19, reveal: { item: 'stone_rubbing' }, desc: '仿照岩洞回响的节奏发力，把劲集中在一处，适合打穿厚甲。' },
-  { id: 'earth_echo', name: '抱地听钟', tier: 1, cost: 3, power: -3, pierce: 0, guard: 9, break: 0, price: 0, reveal: { item: 'echo_method' }, desc: '照着洞中回声的节奏吐纳，把真气收在身前，便能多挡几分来力。' },
-  { id: 'cliff_cut', name: '截崖步', tier: 1, cost: 4, power: 1, pierce: 1, guard: 3, break: 11, price: 22, reveal: { item: 'echo_note' }, desc: '侧移半步避开正面，再出手截住对方的重招。' },
-  { id: 'tide_part', name: '破潮指', tier: 2, cost: 5, power: 10, pierce: 5, guard: 0, break: 0, price: 31, weaponBased: false, reveal: { item: 'tide_note' }, desc: '据潮牌推算闸下退水最猛的一刻，借一瞬气劲击穿坚甲。' },
-  { id: 'tide_return', name: '回澜式', tier: 2, cost: 4, power: -3, pierce: 1, guard: 13, break: 0, price: 27, reveal: { item: 'tide_note' }, desc: '退一步卸去一股劲，留力架住对手的反击。' },
-  { id: 'cross_weir', name: '截流式', tier: 2, cost: 5, power: 3, pierce: 2, guard: 4, break: 15, price: 32, reveal: { item: 'tide_note' }, desc: '赶在对方发力前截击，既能削弱重招，也能打乱调息。' },
-  { id: 'lamp_still', name: '护灯式', tier: 2, cost: 3, power: -4, pierce: 0, guard: 9, break: 4, price: 14, reveal: { item: 'lamp_sketch' }, desc: '仿着暗埠人守风口灯火的手势，省气护身。' },
-  { id: 'mist_press', name: '压雾掌', tier: 2, cost: 4, power: 5, pierce: 1, guard: 6, break: 4, price: 28, weaponBased: false, reveal: { item: 'herb_press' }, desc: '仿药槽引水的劲路，运气推掌。不借兵器出手，也能挡住些近身攻击。' },
-  { id: 'sky_axis', name: '归衡式', tier: 3, cost: 7, power: 12, pierce: 5, guard: 4, break: 10, price: 52, reveal: { item: 'meridian_etching' }, desc: '看准对手发力的方向出手，可压住重招，尚能留一股劲护身。' },
-  { id: 'jade_breath', name: '照脉诀', tier: 3, cost: 5, power: 4, pierce: 2, guard: 13, break: 8, price: 46, weaponBased: false, reveal: { item: 'meridian_etching' }, desc: '把真气引到身前挡招。手中即使没有兵器，也能施展。' },
+  { id: 'tide_talisman', tier: 2, damage: 19, guard: 4, retreat: 0 },
 ];
 
 const recipes = [
@@ -326,8 +316,8 @@ const recipes = [
   { id: 'r_hide_shield', result: 'hide_shield', count: 1, tier: 0, facility: 'forge', cost: 8, need: { wood: 4, hide: 3 }, days: 1.25, requiresShownHide: true },
   { id: 'r_miner_pick', result: 'miner_pick', count: 1, tier: 0, facility: 'forge', cost: 8, need: { ore: 4, wood: 2 }, days: 1.5, reveal: { item: 'blade_template' } },
   { id: 'r_resin_pill', result: 'resin_pill', count: 3, tier: 1, facility: 'furnace', formula: 'formula_resin', cost: 6, need: { wood: 2, reed: 3, qi_core: 2 }, days: 2 },
-  { id: 'r_sense_powder', result: 'sense_powder', count: 2, tier: 1, facility: 'furnace', formula: 'formula_sense', cost: 4, need: { reed: 2, core: 1 }, days: 1.25 },
-  { id: 'r_heart_pill', result: 'heart_pill', count: 2, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_heart', cost: 6, need: { reed: 3, hide: 1, qi_core: 1 }, days: 2 },
+  { id: 'r_sense_powder', result: 'sense_powder', count: 2, tier: 6, facility: 'furnace', formula: 'formula_sense', cost: 12, need: { reed: 3, gold_core: 1 }, days: 2 },
+  { id: 'r_heart_pill', result: 'heart_pill', count: 2, tier: 6, facility: 'furnace', facilityLevel: 2, formula: 'formula_heart', cost: 15, need: { reed: 3, beast_eye: 1, gold_core: 1 }, days: 2.5 },
   { id: 'r_leaf_pill', result: 'leaf_pill', count: 3, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_leaf', cost: 10, need: { reed: 4, kiln_clay: 1, wood: 2, qi_core: 3 }, days: 3 },
   { id: 'r_jade_pill', result: 'jade_pill', count: 3, tier: 3, facility: 'furnace', facilityLevel: 3, formula: 'formula_jade', cost: 16, need: { reed: 4, core: 2, wood: 1, foundation_core: 2, beast_eye: 1 }, days: 4 },
   { id: 'r_foundation', result: 'foundation_pill', count: 1, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_foundation', cost: 45, need: { foundation_charge: 1, reed: 6, core: 5, black_iron: 4, qi_core: 24 }, days: 4 },
@@ -375,7 +365,7 @@ const sites = [
     },
     emptyText: '水眼没有动静，干埂只剩浅兽印和拾空的碎枝。另一头仍有几块排齐的石头伸进芦苇。' },
   { id: 'old_fire', region: 'marsh', name: '背雨石渠', afterChoices: ['mud_track:3'],
-    stocks: { wood: { start: 6, cap: 6, interval: 0, growth: 0, choices: [1] } }, once: [2, 3],
+    stocks: { wood: { start: 6, cap: 6, interval: 0, growth: 0, choices: [1] } }, once: [2, 3, 5],
     stockText: { wood: { present: '渠边石板下露出几截干柴。', absent: '遮柴的石板底下已经空了。' } },
     choiceText: {
       2: { before: '炉边的灰里露着一角破瓦。', after: '拿掉瓦角的地方还留着个浅印。' },
@@ -648,13 +638,15 @@ const events = [
     { label: '捆些干柴', desc: '有人把松枝藏在渠边石板下，风吹不着。', days: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 3 }, enemy: null, outcome: '压在石渠里的松枝还干着，折一下便响。' },
     { label: '掀开渠底的破瓦', desc: '灰里露着瓦沿，边上像有划痕。', days: 0, coins: 0, hp: 0, qi: 0, insight: 1, loot: { kiln_shard: 1 }, enemy: null, outcome: '瓦上的字是反着刻的。抹掉一层灰，才辨出「敲两下，停一停」。' },
     { label: '从冷炉边取下残纸', desc: '炉沿的砖缝夹着一点纸边。', days: 0.25, insight: 1, loot: { ember_fold: 1 }, outcome: '残纸还存着三道折痕。最里一层的松灰没散开，纸边却烧穿了。' },
-    { label: '借石炉把猎物煮熟', desc: '锅还能用。烧一根干松枝，能把两份兽肉煮成两罐路上吃的浓汤。', need: { beast_meat: 2, wood: 1 },
+    { label: '借石炉把猎物煮熟', desc: '按灶边留下的做法，一根干松枝能煮好两罐肉汤。', afterChoice: 5, need: { beast_meat: 2, wood: 1 },
       consume: true, stay: true, days: 0.75, loot: { meat_broth: 2 }, outcome: '你用清水刷了锅，把兽肉煮透，连汤撇进两只空陶罐。灶火灭了，只剩干松枝的香味。' },
+    { label: '取下锅边那块蘸了油的竹片', desc: '竹片挂在炉铲旁，正面画着水和松枝。', days: 0.125, stay: true, loot: { recipe_meat_broth: 1 },
+      outcome: '背面有人写了几笔火候。肉先在沸水里滚一遍，撇净浮沫，赶路时便能喝热汤。' },
   ] },
   { id: 'reed_ferryman', name: '渡工的刨木滩', text: '渡工把一柄裂桨架在石头上。脚下还有把旧桨，桨背露出几道刻线。对岸浅石围着一丛白苇。', choices: [
-    { label: '把补桨的料递给渡工', desc: '「两份苇芯塞进裂口，再削一根松枝卡紧。我拿进山的路图跟你换。」', need: { reed: 2, wood: 1 }, consume: true, days: 0.25, coins: 0, hp: 0, qi: 0, insight: 3, loot: { ration: 1, ridge_rubbing: 1 }, enemy: null, outcome: '渡工从斗笠夹层取出沉钟岭的路图。新桨接牢后，他拿脚边那把旧桨比了比，又瞧了眼桨背上的刻线。' },
+    { label: '把补桨的料递给渡工', desc: '裂口撑出一指宽。渡工抽出两缕好苇，说再来些苇芯垫缝，一根直松枝就能削成夹条。', need: { reed: 2, wood: 1 }, consume: true, days: 0.25, coins: 0, hp: 0, qi: 0, insight: 3, loot: { ration: 1, ridge_rubbing: 1 }, enemy: null, outcome: '渡工把松枝削平，压住塞好苇芯的裂口。他试着在浅水里划了半圈，回来打开盛干粮的布包。「今儿船能开了。你若进山，这是去沉钟岭的路图，倒钟下那个岔口别走错了。」' },
     { label: '往对岸的白苇走去', desc: '渡工把刨桨的小刀放回膝头。「那边有什么一直来回，我没看清。」', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'marsh_ghost', outcome: '脚下的浅石刚露头，一道没有脚的影子就横在白苇前。水鬼抱住两臂，挡着去路。' },
-    { label: '帮他把旧桨翻过来', desc: '泥盖住了半截刻线，渡工用拇指擦了几下。', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 1, loot: { oar_mark: 1 }, enemy: null, outcome: '渡工擦去桨背的泥，给你看三根画得歪斜的船桩。「认准第三根，往断桅那头走，有道高埂。」' },
+    { label: '帮他把旧桨翻过来', desc: '泥盖住了半截刻线，渡工用拇指擦了几下。', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 1, loot: { oar_mark: 1 }, enemy: null, outcome: '旧桨背上刻了三根船桩。渡工把灰抹进槽里，线条亮了出来。他指着绕开最后一桩的细线说，那是他娘早年挑水用的船路。眼下下水太急，若要看清，先往断桅旁的高埂站。' },
     { label: '采下对岸的熟苇芯', desc: '白苇就长在水边的浅石间，叶尖已经黄了。', guardedBy: 'marsh_ghost', days: 0.5, insight: 2, loot: { reed: 3 }, outcome: '踩过空下来的石路，你伸手从齐腰的白苇中抽出熟芯。' },
   ] },
   { id: 'bank_watch', name: '矮石堤', text: '有人在堤边歇脚，腰间别着一张折图，身边的石面上搁着一把钩刃。', choices: [
@@ -679,7 +671,8 @@ const events = [
       release: { open_bank: '苇秆刚离手就被卷进外滩的主流，一直往下漂。', pole: '苇秆绕着船桩打了两个转，挂在木刺上。' },
       water: { still: '苇秆贴着石头停住，水面几乎没有动。', falling: '苇秆绕过石头，跟着退去的水漂向出水口。' },
     },
-    outcome: '涨水绕过石头，苇秆反倒贴着石脚往回漂。你顺着它踏了两步，外头的水虽急，石脚这一股却把人往里送。你站回高岸，照水势画了一张回汊图。',
+    outcome: '苇秆贴住石脚逆着漂，过石背时短短一截水面平得像凳面。你沿岸走了两步，找到可落脚的浅石。回高处对着旧桨的刻线补上这处水口，才看出一条完整的回汊。你把这张图折进口袋。',
+    afterText: '断桅仍搁在水面上。涨水时，露石脚下先现出一线向里流的水，沿着高岸能看到你照图标出的浅石。',
   } },
   { id: 'ore_rain', name: '落矿的冲沟', text: '泥水顺坡洗进冲沟，地上有一条碎石带。坡壁半腰是露出岩层的断口，沟底留着一道冲低的砂槽。沟边护篷下坐着个验矿人。', choices: [
     { label: '在沟边拾铁', days: 1, coins: 0, hp: 0, qi: 0, insight: 2, loot: { ore: 2 }, enemy: null, outcome: '洗掉浮泥，底下是寒铁。' },
@@ -723,12 +716,12 @@ const events = [
       { id: 'hand', label: '手怎么放', options: [{ id: 'back', label: '用手背贴住岩面' }, { id: 'hover', label: '手悬在岩面前' }, { id: 'palm', label: '用掌心贴住岩面' }] },
       { id: 'beat', label: '什么时候把气往下沉', options: [{ id: 'first', label: '刚听见铃响时' }, { id: 'second', label: '听见第二声回响时' }, { id: 'quiet', label: '两声都消失以后' }] },
     ],
-    solution: { hand: 'palm', beat: 'second' }, days: 0.5, insight: 2, reward: { echo_method: 1 }, learnArts: ['earth_echo'],
+    solution: { hand: 'palm', beat: 'second' }, days: 0.5, insight: 2, reward: { echo_method: 1, echo_guard_manual: 1 },
     misses: {
       hand: { back: '石面轻震，手背一麻。那股震动到腕骨前就散了。', hover: '你听见铃响，却只觉得手前有阵冷风。' },
       beat: { first: '你先沉了气。等洞里那一声传来，手掌已经松了力。', quiet: '你再把气沉下去，洞里只剩细细的摩擦声，手掌一点震动也没摸到。' },
     },
-    outcome: '第二声回响震到手掌，你的胳膊没有弹开，脚下倒站得更稳了。离开石壁再试，那股劲还能收进胳膊。你练成了抱地听钟。',
+    outcome: '这回手掌没被弹开。你腾出一只手，把木板上缺的那一笔补在草纸上。离开石壁再站一遍，脚下依旧稳。往后照这份稿子练便是。',
   } },
   { id: 'cracked_bell', name: '裂钟背面', text: '旧钟裂成了两瓣，底座几乎压进坡里。钟后墙上的小凹洞里有只铜挂钩。山背还有一条窄路能走。', choices: [
     { label: '从裂片间靠近钟座', desc: '裂口时宽时窄，破片下面透出一线灰光。', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'bell_wraith', outcome: '钟魄猛地抬起头，破片一齐响了。' },
@@ -750,7 +743,7 @@ const events = [
   { id: 'boat_shade', name: '没篷的渡舟', revisit: true, text: '老船卡在闸边，船舷正好挡着风。旧船绳挂在外侧，绳圈上结了一层白盐。船头的灯架熏黑了一半。', choices: [
     { label: '坐上船里的凳子歇脚', days: 1, fogRest: true, coins: 0, hp: 13, qi: 8, insight: 1, loot: {}, enemy: null, outcome: '船舷挡住了风。你坐到水势变缓，手脚才不再发冷。' },
     { label: '捞起船底的木柜', days: 1, coins: 15, hp: -4, qi: -2, insight: 2, loot: { core: 1 }, enemy: null, desc: '船沿下有两只木柜脚。门板被水压着，还没漂开。', outcome: '柜门里积着碎灵晶，摸到底还有几枚灵钱。', injury: '抬柜时水一顶，胳膊撞上了船底的一圈铁带。' },
-    { label: '比一比铃上的绳子和旧船绳', desc: '两根绳子的结都朝同一边收紧，绳圈也磨在同一边。', hidden: true, need: { bell_clapper: 1 }, days: 0.5, coins: 0, hp: 0, qi: 0, insight: 1, loot: { backwash_mark: 1 }, enemy: null, outcome: '把两个绳圈并排挂起来，旧船绳就松开了一截。船身摆开半尺，露出一道朝上游的槽，槽口夹着块薄铜片。' },
+    { label: '比一比铃上的绳子和旧船绳', desc: '两根绳子的结都朝同一边收紧，绳圈也磨在同一边。', hidden: true, need: { bell_clapper: 1 }, days: 0.5, coins: 0, hp: 0, qi: 0, insight: 1, loot: { backwash_mark: 1 }, enemy: null, outcome: '两处绳结都是留了个能回抽的尾头。你照铃绳那处磨痕找出湿绳下的绳尾，拽松一点让船摆开半尺。原先贴着船的石槽里夹着一片铜，长边被水冲得发亮。' },
   ], experiment: {
     id: 'trace_backwash',
     desc: '瓦能斜靠在灯架上，下面还有半截灯芯。船里有个短钩，船外的弯钩上结了白盐。灯架脚下还有两条能插进铜片的窄缝，一条积着干灰，一条留着水痕。',
@@ -766,7 +759,8 @@ const events = [
       hanger: { inner: '短钩离灯太近。铃里的铁片摆了几下，投出来的影子都被船舷挡住。' },
       plate: { wall: '铜片上只照亮半道刻纹，船外的水面还是黑的。' },
     },
-    outcome: '灯照过瓦背，铜片上的水纹和铁片的影子接在一起。顺着影子，你摸到了船外第一块能踩的石头。更多石头逆着水一直排到拐角。那儿屋檐下亮着盏旧红灯，是回灯埠。',
+    outcome: '两道缺口在铜片上照出一道窄亮，贴着外舷指到第一块浅石。你沿石向上游试走，后面每一块都压着船缆的旧勒痕。拐角下水涨不到屋脚，那儿一户人家的旧灯还亮着。你折回船上收起铜片，在能下脚的船帮旁系了一截绳。',
+    afterText: '靠外的一边船帮上系着一截绳，旁边就是水里平出的第一块浅石。逆着水沿石走过拐弯处，就到回灯埠。',
   } },
   { id: 'tide_keeper', name: '旧闸深槽', text: '两扇旧闸门悬在石槽之上，水从缝隙往外涌。岸边的高阶上有人拿旧枪头当扶杖。', choices: [
     { label: '等水低了跨进闸间', desc: '闸门下有排低石阶。水落一些，脚就能踩实。', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'tide_spirit', outcome: '两扇门之间锁链一绷，守潮灵转过了身。重锁压在闸边的方槽上，印钮在锁链下露出来。' },
@@ -1158,7 +1152,6 @@ const deductions = [
 const starting = {
   inventory: { ration: 3 },
   gear: { weapon: 'cudgel', armor: 'straw_cape', charm: null },
-  arts: [],
   coins: 20,
   satiety: 68,
 };
@@ -1188,13 +1181,39 @@ for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzz
   ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent,
   dykeArmoryContent, ridgeArmoryContent, explorerKitContent, innerStyleContent, banditContent, banditTaleContent, encyclopediaContent,
   ...sandboxQuestExtras]) {
-  for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
+  for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
   }
 }
 sites.push(...extendSites);
 events.push(...extendEvents);
+sites.push(
+  { id: 'basin_cook_hut', region: 'herb_basin', name: '药谷的旧灶', once: [1],
+    creatures: { herb_den_lizard: { start: 1, cap: 1, interval: 0, growth: 0 } } },
+  { id: 'kiln_stone_pot', region: 'cold_kiln', name: '背风的石灶', once: [1],
+    creatures: { sand_spine_lizard: { start: 1, cap: 1, interval: 0, growth: 0 } } },
+);
+events.push(
+  { id: 'basin_cook_hut', name: '药谷的旧灶',
+    text: '小路尽头有一座灶。墙上那片木板刻着灶用的火候，土台下则是被厚鳞磨亮的泥。篱边有一道空隙，能原路退回。',
+    choices: [
+      { label: '绕到墙边看看土台', desc: '爪痕深近一指，土还有湿气。', enemy: 'herb_den_lizard', days: 0.25, outcome: '土台忽然塌下一块。一头巨蜥从洞里钻出来，头正挡着通往灶墙的路。' },
+      { label: '看看刻在灶墙上的火候', afterFight: 'herb_den_lizard', days: 0.25, loot: { recipe_herb_stew: 1 },
+        outcome: '木板上的字还在。前几行写着做饭的火候，最后才提到起锅前搁一把灵草。你照原样抄了下来。' },
+    ] },
+  { id: 'kiln_stone_pot', name: '背风的石灶',
+    text: '灶台下的炭早冷了。一只宽石锅还盖着盖，锅脚旁有两道像铁犁刮出的深痕。',
+    choices: [
+      { label: '绕到上风处，靠近石锅', desc: '灶脚的石缝里，有东西把石子一点点顶出来。', enemy: 'sand_spine_lizard', days: 0.25, outcome: '一块碎石滚进灶口。棘背岩蜥收脚贴地，转眼已爬上锅台。' },
+      { label: '翻过石锅的盖子', afterFight: 'sand_spine_lizard', days: 0.25, loot: { recipe_crystal_feast: 1 },
+        outcome: '盖背刻着二人份的食谱。石匠怕风大时吹散热气，特意试过用湿布封住锅沿。' },
+    ] },
+);
+for (const enemy of enemies) {
+  if (enemy.tier < 3 || !enemy.loot?.beast_meat || !enemy.tags.includes('beast')) continue;
+  enemy.loot[enemy.tier < 6 ? 'foundation_meat' : 'gold_meat'] = enemy.tier < 6 ? 2 : 1;
+}
 innerStyleContent.extendScenes(sites, events, gear, enemies);
 addProgressionRecovery(items, events);
 addSandboxQuests({ items, sites, events, deductions });
@@ -1323,14 +1342,14 @@ for (const realm of realms) {
     realm.magicResist = [0.05, 0.07, 0.10][realm.id - 6];
   }
 }
-tuneCombatData({ enemies, gear, items, recipes, arts, pills, realms, innerStyles });
+tuneCombatData({ enemies, gear, items, recipes });
 
 const equipmentSlots = { weapon: '主武器', offhand: '副手', armor: '盔甲', head: '头部', boots: '鞋子', belt: '饰品', charm: '法器' };
 
-const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
+const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, talismans, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms,
   innerStyles, enemyInnerStyles, roadBandits, tournament: tournamentData };
 
-export { data, realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
+export { data, realms, items, gear, ammunition, foods, pills, talismans, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms };
 export default data;

@@ -104,7 +104,7 @@ test('independent bags can be exchanged without sharing contents; usable items s
   assert.equal(heldInside(state, 'ration', foldId), 0);
   assert.equal(heldInside(state, 'wood', foldId), 3);
   assert.equal(view(state).backpackCapacity, 12);
-  assert.equal(view(state).backpackUsed, 2);
+  assert.equal(view(state).backpackUsed, 3);
   assert.match(view(state).economy.warehouse.stored.find((row) => row.id === bagId).reason, /已有一只乾坤袋/);
   deny(state, 'econWithdraw', { id: bagId, count: 1 });
   deny(state, 'sell', { id: 'wood' });
@@ -254,11 +254,11 @@ test('bandit robbery strips ordinary carried gear and leaves the bag and its con
   state.inventory.knife = 1;
   state.durability.knife = 17;
   put(state, 'knife');
-  play(state, 'travel', { id: 'marsh' });
-  state.discovered.push('ridge');
+  state.region = 'ridge';
+  state.discovered.push('ridge', 'screen_slope');
   state.resolvedBandits.push('road_slate_peg');
   state.roadSeed = 1972;
-  assert.equal(play(state, 'travel', { id: 'ridge' }).roadInterrupted, true);
+  assert.equal(play(state, 'travel', { id: 'screen_slope' }).roadInterrupted, true);
   play(state, 'banditFight');
   const foe = data.enemies.find(({ id }) => id === state.combat.id);
   state.combat.plan = { round: 0, reader: null, intent: foe.intents.find(({ kind }) => kind === 'attack') };

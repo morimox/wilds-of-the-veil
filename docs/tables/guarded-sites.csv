@@ -50,7 +50,7 @@
 空音桥（dry_sound_bridge）,铜扣松动的桥栏（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,从外侧石台取走多出来的松木,可直接采，活跃对手可能打断每批采集,25%,松木（wood）×2,桥板旁的旧松木（初始4、上限7、每4日补2）,2,5,4.5,1,随种群密度变化,4.5,回补后仍可直接采，有对手在场时每批可能遭遇
 落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,取出卡在晶石底下的金属片,通过前要清除该行动所列的全部看守,,落琉洼的薄铁片（sand_glass_pass）×1,,2,3,13,1,随种群密度变化,14.95,本种看守回来才须再清场，库存独立回补
 落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,挖断晶下面的大块灵晶,通过前要清除该行动所列的全部看守,,灵晶（core）×4,断棱底下的灵晶（初始5、上限8、每8日补2）,2,3,13,1,随种群密度变化,14.95,本种看守回来才须再清场，库存独立回补
-落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,去断晶背后描出两道白影的边,获胜一次后可办理一次,,晶壁背面的合圆影线（east_glass_close_shadow）×1,,2,3,13,1,随种群密度变化,,已获胜便可回来办理，领取后关闭选项
+落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,去断晶背后描出两道白影的边,获胜一次后可办理一次,,合圆影线和手印（east_glass_close_shadow）×1,,2,3,13,1,随种群密度变化,,已获胜便可回来办理，领取后关闭选项
 横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,负砂豺（sand_vein_jackal）,钻进绳架后淘暗金,通过前要清除该行动所列的全部看守,,暗金（black_iron）×3,支架后的暗金（初始4、上限8、每6日补2）,2,3,8,1,随种群密度变化,10,本种看守回来才须再清场，库存独立回补
 砾盘浅沟（bone_dry_rill）,岸边竹棚（sand_basket_shed）,补箩老人（sand_basket_mender）,请老人讲讲方才那一步,获胜一次后可办理一次,,,,1,1,,,不回补,,已获胜便可回来办理，领取后关闭选项
 琉脊天室（glass_rotunda）,铜轮前（sand_glass_chamber）,照壁刀师邢既横（sand_sundial_master）,拉住铁环，和邢既横一起转动铜轮,获胜一次后可办理一次,,暗金（black_iron）×5、灵晶（core）×8、旧布袋的底纹（qiankun_inner_pattern）×1,,1,1,,,不回补,,已获胜便可回来办理，领取后关闭选项
@@ -91,7 +91,7 @@
 断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,木桩旁的鳞鳄（dyke_yard_croc）,把滩尾的旧梁垫起，请郁稷收回木架,通过前要清除该行动所列的全部看守,,寒铁（ore）×3,,6,6,0,0,不回补,,本种看守不会回来，完成条件后可再回来办理尚未领取的事
 断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,白脚野猪（dyke_yard_boar）,把滩尾的旧梁垫起，请郁稷收回木架,通过前要清除该行动所列的全部看守,,寒铁（ore）×3,,4,4,0,0,不回补,,本种看守不会回来，完成条件后可再回来办理尚未领取的事
 断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,沉木滩的老鳄（dyke_old_croc）,把滩尾的旧梁垫起，请郁稷收回木架,通过前要清除该行动所列的全部看守,,寒铁（ore）×3,,1,1,0,0,不回补,,本种看守不会回来，完成条件后可再回来办理尚未领取的事
-晒盘坡（screen_slope）,灰沟坡寨（bandit_slope_den）,灰沟贼王许涧（bandit_den_leader）,从背坡拖出货柜，清点许涧留下的东西,获胜一次后可办理一次,,干粮（ration）×4、寒铁（ore）×6、灵晶（core）×3、兽革（hide）×2、许涧的宽背刀（gully_king_blade）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
+晒盘坡（screen_slope）,灰沟坡寨（bandit_slope_den）,灰沟贼王许涧（bandit_den_leader）,从背坡拖出货柜，清点许涧留下的东西,获胜一次后可办理一次,,干粮（ration）×4、寒铁（ore）×6、灵晶（core）×3、兽革（hide）×2、许涧的宽背刀（gully_king_blade）×1、守车短袖诀（road_sleeve_manual）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
 晒盘坡（screen_slope）,灰沟坡寨（bandit_slope_den）,灰沟贼王许涧（bandit_den_leader）,给伤号留一包干粮，叫他们下坡见巡山人,获胜一次后可办理一次,,,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
 晒盘坡（screen_slope）,灰沟坡寨（bandit_slope_den）,巡寨刀客（bandit_den_sentry）,把棚门边的药匣拎出来,获胜一次后可办理一次,,松脂膏（salve）×2,,8,8,32,1,固定间隔,,已获胜便可回来办理，领取后关闭选项
 碎琉璃滩（glass_bank）,芦湾棚船（bandit_red_rope_den）,芦湾船主邵苹（bandit_red_rope_chief）,进后舱清点铜匣,获胜一次后可办理一次,,寒铁（ore）×4、兽革（hide）×3、裹布铜铃（bandit_ford_bell）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
@@ -99,3 +99,5 @@
 断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,从梁下抽出油布匣,获胜一次后可办理一次,,内堰旧路图（encyclopedia_weir_leaf）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
 白苇滩（marsh）,封乔的护堤木台（marsh_pole_lesson）,护堤人封乔（river_spar_captain）,接过封乔按印的木签,获胜一次后可办理一次,,封乔按印的木签（river_trial_writ）×1,,1,1,5,1,固定间隔,,已获胜便可回来办理，领取后关闭选项
 闭潮渡（ford）,闸下无灯梯（ford_below_steps）,拖梯水影（ford_lower_spirit）,翻看松动的修闸名牌,获胜一次后可办理一次,,,,2,4,11,1,固定间隔,,已获胜便可回来办理，领取后关闭选项
+篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,看看刻在灶墙上的火候,获胜一次后可办理一次,,灵草炖兽脯食谱（recipe_herb_stew）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项
+冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,翻过石锅的盖子,获胜一次后可办理一次,,粟香封岩肉食谱（recipe_crystal_feast）×1,,1,1,0,0,不回补,,已获胜便可回来办理，领取后关闭选项

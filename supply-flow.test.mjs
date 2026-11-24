@@ -54,6 +54,8 @@ test('a full bag does not block recovery or drop relief food into the field', ()
   state.hp = 4;
   state.qi = 0;
   delete state.inventory.ration;
+  state.mealPouch = null;
+  state.coins = 0;
   state.inventory.wood = rules.backpackCapacity * rules.backpackStackSize;
   assert.equal(view(state).backpackUsed, view(state).backpackCapacity);
   const summary = play(state, 'restUntilRecovered');
@@ -113,9 +115,8 @@ test('batch meals work in a scene and never bypass active gathering or a combat 
   assert.deepEqual(view(state).batchMeals, {});
   unchanged(state, 'batchEat', { id: 'ration' });
   unchanged(state, 'restUntilRecovered');
-  const day = state.day;
-  play(state, 'eat', { id: 'ration' });
-  assert.equal(state.combat.round, 1);
-  assert.equal(state.inventory.ration, 2);
-  assert.equal(state.day, day + rules.battleDays);
+  unchanged(state, 'eat', { id: 'ration' });
+  unchanged(state, 'use', { id: 'ration' });
+  assert.equal(state.combat.round, 0);
+  assert.equal(state.inventory.ration, 3);
 });

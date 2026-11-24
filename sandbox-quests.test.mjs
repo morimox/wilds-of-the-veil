@@ -223,6 +223,11 @@ for (const quest of quests) {
     for (const [item] of Object.entries(experiment.fieldNeed ?? {})) assert.equal(state.inventory[item], before[item]);
     for (const skill of experiment.learnArts ?? []) assert.ok(state.knownArts.includes(skill));
     assert.equal(view(state).deductionHistory[0].verified, true);
+    if (experiment.afterText) {
+      assert.ok(view(state).currentEvent.text.startsWith(experiment.afterText));
+      visit(state, site);
+      assert.ok(view(state).currentEvent.text.startsWith(experiment.afterText));
+    }
     const after = structuredClone(state);
     assert.equal(act(state, 'experiment', correctly).ok, false);
     assert.deepEqual(state, after);
@@ -280,7 +285,8 @@ test('the ferry and sand-road permits lead to discoveries at the reef and the sa
   walk(state, 'beacon_reefs');
   verifyOnSite(state, reef);
 
-  walk(state, 'flood_market');
+  walk(state, 'glass_bank');
+  walk(state, 'rope_sands');
   walk(state, 'zhao_pass');
   assert.equal(view(state).world.points.some((point) => point.id === 'mingsha_city'), false);
   visit(state, 'zhao_ridge_permit');

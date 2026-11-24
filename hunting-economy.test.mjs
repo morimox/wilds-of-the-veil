@@ -17,7 +17,7 @@ function deny(state, action, payload) {
   assert.deepEqual(state, before);
 }
 
-function hunt(state, site, foe, art) {
+function hunt(state, site, foe) {
   const event = data.events.find(({ id }) => id === site);
   const index = event.choices.findIndex(({ enemy }) => enemy === foe);
   assert.notEqual(index, -1);
@@ -26,7 +26,6 @@ function hunt(state, site, foe, art) {
   assert.equal(view(state).currentEnemy.id, foe);
   for (let round = 0; state.combat && round < 24; round++) {
     if (view(state).intent?.kind === 'heavy') play(state, 'guard');
-    else if (art && state.qi >= art.cost) play(state, 'art', { id: art.id });
     else play(state, 'attack');
   }
   assert.equal(state.combat, null);
@@ -70,7 +69,7 @@ test('a fresh hunt leaves anatomy outside the bag until the player picks what to
   play(state, 'travel', { id: 'village' });
   assert.deepEqual(view(state).groundLoot, {});
   assert.equal(readyHearth(state).level, 0);
-  assert.deepEqual(readyHearth(state).projects.map(({ id }) => id), ['simmer_meat_broth']);
+  assert.deepEqual(readyHearth(state).projects.map(({ id }) => id), []);
   deny(state, 'sell', { id: 'beast_meat' });
   play(state, 'sell', { id: 'hide' });
   assert.equal(state.inventory.hide, 1);
@@ -94,17 +93,15 @@ test('the renewable snow beast yields three foundation cores that sell for 21 ea
   state.satiety = 100;
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;
-  state.knownArts.push('sky_axis');
-  const art = data.arts.find(({ id }) => id === 'sky_axis');
   const openingCoins = state.coins;
-  hunt(state, 'white_ravine', 'snow_warden', art);
+  hunt(state, 'white_ravine', 'snow_warden');
   assert.equal(state.region, 'snow_pass');
   assert.equal(state.coins, openingCoins);
   assert.deepEqual(state.inventory, { ration: 14, sky_sword: 1, sky_cloak: 1, jade_pendant: 1 });
-  assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4, beast_eye: 1, foundation_core: 3 });
+  assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4, beast_eye: 1, foundation_core: 3, foundation_meat: 2 });
   play(state, 'take', { id: 'foundation_core' });
   play(state, 'take', { id: 'beast_eye' });
-  assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4 });
+  assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4, foundation_meat: 2 });
 
   play(state, 'leave');
   const population = () => view(state).sites.find(({ id }) => id === 'white_ravine').creatures.snow_warden;
@@ -126,11 +123,11 @@ test('the renewable snow beast yields three foundation cores that sell for 21 ea
   assert.equal(state.inventory.foundation_core, undefined);
 });
 
-test('stored meat cooks through the three successive dishes, and only eating applies the stated recovery', () => {
+test('three independently learned recipes use their own ingredients and recovery', () => {
   const state = createGame();
   // Supplies are pre-gathered so this test isolates furnace level, production timing and consumption.
   state.coins = 100;
-  const ingredients = { beast_meat: 7, wood: 30, reed: 12, ore: 8, kiln_clay: 6, millet_grain: 4 };
+  const ingredients = { beast_meat: 7, wood: 30, reed: 12, ore: 8, kiln_clay: 6, millet_grain: 4, foundation_meat: 2, gold_meat: 1 };
   for (const [id, amount] of Object.entries(ingredients)) {
     state.inventory[id] = amount;
     state.knownItems.push(id);
@@ -143,17 +140,21 @@ test('stored meat cooks through the three successive dishes, and only eating app
   play(state, 'econBuild', { id: 'hearth' });
 
   const dishes = [
-    { project: 'simmer_meat_broth', food: 'meat_broth', count: 1, satiety: 44, hp: 3 },
-    { project: 'cook_herb_stew', food: 'herb_stew', count: 2, satiety: 56, hp: 5 },
-    { project: 'cook_crystal_feast', food: 'crystal_feast', count: 3, satiety: 72, hp: 8 },
+    { project: 'simmer_meat_broth', food: 'meat_broth', count: 1, satiety: 44, hp: 6, qi: 0, realm: 0 },
+    { project: 'cook_herb_stew', food: 'herb_stew', count: 2, satiety: 56, hp: 14, qi: 13, realm: 3 },
+    { project: 'cook_crystal_feast', food: 'crystal_feast', count: 2, satiety: 72, hp: 24, qi: 28, realm: 6 },
   ];
   for (const [index, dish] of dishes.entries()) {
+    const recipe = economyData.projects.find(({ id }) => id === dish.project);
+    assert.equal(canSee(dish.project), false);
+    state.knownItems.push(recipe.reveal);
     if (index === 1) {
       deny(state, 'econStart', { id: dish.project });
       play(state, 'econBuild', { id: 'hearth' });
     }
+    if (dish.realm) deny(state, 'econStart', { id: dish.project });
+    state.realm = dish.realm;
     assert.ok(canSee(dish.project));
-    const recipe = economyData.projects.find(({ id }) => id === dish.project);
     const inventoryBefore = { ...state.economy.warehouse };
     const coinsBefore = state.coins;
     const dayBefore = state.day;
@@ -174,16 +175,19 @@ test('stored meat cooks through the three successive dishes, and only eating app
     assert.ok(state.satiety < 75);
 
     state.satiety = 20;
+    state.qi = 0;
     play(state, 'use', { id: dish.food });
     assert.equal(state.satiety, 20 + dish.satiety);
     assert.equal(state.hp, 12 + dish.hp);
+    assert.equal(state.qi, dish.qi);
     assert.equal(state.inventory[dish.food] ?? 0, dish.count - 1);
   }
   state.satiety = 80;
   state.hp = view(state).maxHp - 1;
+  state.qi = view(state).maxQi;
   play(state, 'use', { id: 'crystal_feast' });
   assert.equal(state.hp, view(state).maxHp);
   assert.equal(state.satiety, rules.maxSatiety);
   deny(state, 'use', { id: 'crystal_feast' });
-  assert.equal(state.inventory.crystal_feast, 1);
+  assert.equal(state.inventory.crystal_feast, undefined);
 });

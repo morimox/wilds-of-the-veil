@@ -82,14 +82,25 @@ function memberLootSeed(state, bandit) {
   );
 }
 
-export function apparentBanditGrade(state, kit) {
+function readWornGear(state, kit) {
   const gradeWeights = [0, 0, 0];
+  let visible = 0;
   for (const [slot, id] of Object.entries(state.equipment)) {
     const gear = kit.records.gear[id];
-    if (gear) gradeWeights[Math.min(2, Math.floor(gear.tier / 3))] += banditRules.wornWeights[slot] ?? 1;
+    const tier = gear && (Object.hasOwn(gear, 'apparentTier') ? gear.apparentTier : gear.tier);
+    if (!Number.isInteger(tier) || tier < 0) continue;
+    const grade = Math.min(2, Math.floor(tier / 3));
+    gradeWeights[grade] += banditRules.wornWeights[slot] ?? 1;
+    visible++;
   }
-  const median = gradeWeights.reduce((sum, amount) => sum + amount, 0) / 2;
-  return gradeWeights[0] >= median ? 0 : gradeWeights[0] + gradeWeights[1] >= median ? 1 : 2;
+  const strongest = gradeWeights.findLastIndex((weight) => weight > 0);
+  const total = gradeWeights.reduce((sum, weight) => sum + weight, 0);
+  const grade = gradeWeights.findIndex((weight) => weight >= total * 0.58);
+  return { grade: visible >= 2 && grade !== -1 ? grade : null, visible, strongest };
+}
+
+export function apparentBanditGrade(state, kit) {
+  return readWornGear(state, kit).grade;
 }
 
 export function roadBanditRisk(state, leg, kit) {
@@ -117,10 +128,15 @@ export function roadBanditRisk(state, leg, kit) {
       : routed ? '路边的贼哨少了。' : profile.riskText };
 }
 
-function pickBandit(state, grade, crewId, kit) {
+function pickBandit(state, appearance, crewId, kit) {
   const crew = kit.data.roadBandits.crews[crewId];
   const roster = unresolvedBandit(crewId, crew, state);
-  const stages = banditRules.gearGradeOdds[grade].map((weight, index) => ({
+  // When the cut of the clothes and the arms disagree, only scouts willing to
+  // probe that apparent level will step off the road. A bare traveler is no prize.
+  const odds = appearance.grade === null
+    ? [[0.8, 0.12, 0], [0.35, 0.6, 0.05], [0, 0.3, 0.7]][Math.max(0, appearance.strongest)]
+    : banditRules.gearGradeOdds[appearance.grade];
+  const stages = odds.map((weight, index) => ({
     weight, members: roster.filter(({ tier }) => Math.floor(tier / 3) === index),
   })).filter(({ weight, members }) => weight > 0 && members.length);
   const stage = chooseWeighted(state, stages, ({ weight }) => weight);
@@ -139,27 +155,31 @@ function roadStory(state, leg, crewId, grade, kit) {
 }
 
 function stopForBandit(state, leg, crewId, kit) {
-  const grade = apparentBanditGrade(state, kit);
+  const appearance = readWornGear(state, kit);
+  const { grade, visible, strongest } = appearance;
   const fixed = roadStory(state, leg, crewId, grade, kit);
-  const member = fixed ? null : pickBandit(state, grade, crewId, kit);
+  const member = fixed ? null : pickBandit(state, appearance, crewId, kit);
   if (!fixed && !member) return null;
   const pool = member && kit.data.roadBandits.pools.find(({ tier }) => tier === member.tier);
   const enemy = fixed ? fixed.enemy : pool.enemy;
   const stage = enemy ? Math.floor(kit.records.enemies[enemy].tier / 3) : grade;
-  const nonThreat = Boolean(fixed && (fixed.allowFight === false || (fixed.fee != null && stage !== grade)));
+  const nonThreat = Boolean(fixed && (fixed.allowFight === false || (fixed.fee != null && stage !== (grade ?? strongest))));
   const fee = fixed ? (nonThreat ? null : fixed.fee ?? null)
     : range({ roadSeed: memberLootSeed(state, { crew: crewId, member: member.key }) ^ 0x85a3ef1f }, pool.fee);
   const onStoryRoad = fixed && roadKey(fixed.a, fixed.b) === leg.key;
+  const uncertain = grade === null ? '他先看你手边，再抬眼打量你的行装，半晌才伸手拦住。' : '';
   const unexpected = stage < grade
     ? '他先打量你背光的一侧，伸手时并没看清护具的纹样。'
     : '路边的人本像是在等别的旅客。见你到了近处，他才挪身拦住。';
   const message = fixed
     ? ((nonThreat && fixed.nonThreatIntro) || (onStoryRoad ? fixed.intro : fixed.crewIntro ?? fixed.intro))
-    : (stage === grade ? '他横着兵器挡住路，朝你的行囊抬了抬下巴。' : unexpected);
+    : (uncertain || (stage === grade ? '他横着兵器挡住路，朝你的行囊抬了抬下巴。' : unexpected));
   (state.roadTrip.banditsMet ??= []).push(fixed?.id ?? `${crewId}/${member.key}`);
   crewRecord(state, crewId).encounters++;
-  if (!fixed && Object.values(state.equipment).every((id) => !id) && draw(state) < banditRules.ignoreUnarmedChance) {
-    return { ...kit.say(state, '强盗上下看了你一眼。「连件像样的行头都没有，走吧。」他挥挥手，让开了路。'),
+  const passChance = visible === 0 ? banditRules.ignoreUnarmedChance : grade === null && stage < strongest ? 0.7 : 0;
+  if (!fixed && passChance > 0 && draw(state) < passChance) {
+    const pass = visible === 0 ? '「瞧不出有什么油水。走罢。」' : '他又看了一眼那件行头，收了兵器。「算了，过罢。」';
+    return { ...kit.say(state, `强盗上下看了你一眼。${pass}`),
       roadInterrupted: true, banditDismissed: true };
   }
   state.roadBandit = { enemy, fixed: fixed?.id, crew: crewId, member: member?.key,
@@ -330,9 +350,9 @@ export function recoverBanditSpoils(state, siteId, kit, chiefFell = false) {
       goods[id] = (goods[id] ?? 0) + 1;
     }
   }
-  state.coins += coins;
+  const cash = kit.addCoins(state, coins);
   const recovered = [coins && `${coins}枚灵钱`, kit.goodsText(goods)].filter(Boolean).join('、');
-  return recovered ? `先前被强盗拿走的${recovered}找回来了。${Object.keys(goods).length ? '物件留在脚边。' : ''}` : '';
+  return recovered ? `先前被强盗拿走的${recovered}找回来了。${Object.keys(goods).length ? '物件留在脚边。' : ''}${cash.spilled[kit.currency] ? '灵钱也留在脚边。' : ''}` : '';
 }
 
 const roadActions = new Set(['banditFight', 'banditPlot', 'banditPass', 'banditPay', 'banditPayCoins', 'banditPayItem',
@@ -437,9 +457,10 @@ export function winRoadBandit(state, enemy, kit) {
   const goods = item ? { [item.id]: 1 } : {};
   const wear = item ? { [item.id]: Math.ceil(item.durability * range(lootRoll, rich ? [65, 87] : [34, 65]) / 100) } : {};
   kit.leaveOnGround(state, goods, wear);
-  state.coins += coins;
+  const cash = kit.addCoins(state, coins);
   const loot = kit.goodsText(goods);
-  return { ...resolveBandit(state, null, null, lead + (coins ? `从他掉下的钱袋里捡到${coins}枚灵钱。` : '') +
+  return { ...resolveBandit(state, null, null, lead + (coins ? cash.spilled[kit.currency]
+    ? `他的钱袋掉在脚边，里面有${coins}枚灵钱。` : `从他掉下的钱袋里捡到${coins}枚灵钱。` : '') +
     (loot ? `他把${loot}落在了脚边。` : coins ? '' : '他身上没落下什么。'), kit),
-    roadCoins: coins, ...(loot ? { gathered: goods, gatheredRegion: state.region } : {}) };
+    roadCoins: cash.accepted[kit.currency] ?? 0, ...(loot ? { gathered: goods, gatheredRegion: state.region } : {}) };
 }

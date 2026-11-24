@@ -113,7 +113,7 @@ test('completed food comes off the fire and a paid materials order cooks several
   state.inventory.wood = 15;
   state.inventory.reed = 6;
   state.inventory.beast_meat = 7;
-  state.knownItems.push('beast_meat');
+  state.knownItems.push('beast_meat', 'recipe_meat_broth');
   play(state, 'econBuild', { id: 'hearth' });
   const hearth = () => view(state).economy.facilities.find(({ id }) => id === 'hearth');
   const broth = () => hearth().projects.find(({ id }) => id === 'simmer_meat_broth');

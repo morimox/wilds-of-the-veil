@@ -192,7 +192,7 @@ const sites = [
     } },
   { id: 'sand_glass_chamber', region: 'glass_rotunda', name: '铜轮前', once: [1],
     creatures: { sand_sundial_master: { start: 1, cap: 1 } },
-    afterWinText: { sand_sundial_master: '邢既横收刀入鞘，把手搭在铜轮上。「你拉那只铁环，我从这边推。」' },
+    afterWinText: { sand_sundial_master: '邢既横把刀背搁上膝头。「过得了我手里这口刀，铁环也拿得住。」他收了刀，先朝轮底那只旧铁环伸手。「它一沉，劲就回来了。握不住时说一声，我接。」' },
     afterOnceText: { 1: '邢既横坐回石柱边。铜轮下的暗格开着，石缝里吹来的风也散了沙尘。' } },
 ];
 
@@ -204,8 +204,8 @@ const events = [
   { id: 'sand_cinder_kitchen', name: '炭篷边炉', text: '杨芹端着汤，等走远路的人把满是沙的鞋脱在炉边。椅子还没坐热，她就问谁在白蹄道听到了铃。锅旁晾着能包肉的宽叶。', choices: [
     { label: '问杨芹为何留意白蹄道', days: 0.25, insight: 2,
       outcome: '杨芹把汤勺往锅沿一搁。「我师傅从前给倒驿送灯。回来鞋还是干的，手上却全是湿泥。他说白蹄道有块马蹄样的白石，底下的泥一按，跟在喘气似的。」' },
-    { label: '请杨芹炖两包灵草肉', desc: '「有兽肉、灵草和一根干柴，五钱就给你用这口锅。收好汁再裹叶，带过沙地不洒汤。」',
-      need: { beast_meat: 2, reed: 1, wood: 1 }, consume: true, stay: true, coins: -5, days: 0.5, loot: { herb_stew: 2 },
+    { label: '请杨芹炖两包灵草兽脯', desc: '「你要吃这锅，得拿灵纹兽肉来。带一把灵草，五钱算灶上的柴火。」',
+      need: { foundation_meat: 2, reed: 1 }, consume: true, stay: true, coins: -5, days: 0.5, loot: { herb_stew: 2 },
       outcome: '杨芹切开炖透的肉，把锅底的灵草汁舀进去。她拿叶子裹紧两包，放在炉边晾凉。' },
   ] },
   { id: 'sand_cloister_trial', name: '试声石台', text: '管工坊的执事梁弦在棚下敲石板听回声。教剑的内门师姐袁息站在空了一格的石架边，招呼来练手的人往绳圈里走。两位巡井的人在圈外照看。', choices: [
@@ -342,9 +342,9 @@ const events = [
     { label: '请老人讲讲方才那一步', afterFight: 'sand_basket_mender', days: 0.25, insight: 7,
       outcome: '他拿竹杖指了指你刚踩过的石子。「脚下那颗会滚。下回动手之前，先知道自己站在哪儿。」' },
   ] },
-  { id: 'sand_glass_chamber', name: '铜轮前', text: '石柱旁坐着一个人。他拿脚边的石头试刀，随手削下一角。听见脚步，他站了起来，正好挡在铜轮前。你回头还能看见来时的石缝。', choices: [
-    { label: '拔出兵器，走向铜轮', desc: '那人把刀一横，刀刃上还沾着石粉。', days: 0.5, enemy: 'sand_sundial_master',
-      outcome: '那人把刀鞘往柱边一抛，提刀迎了上来。' },
+  { id: 'sand_glass_chamber', name: '铜轮前', text: '石柱下有只扭坏的铁环。一个人踩着刀鞘，用鞘尾抵住新换的铁环。见你望向铜轮，他道：「想动轮？上一个没托住，我在这儿换了两天铁。」', choices: [
+    { label: '到石柱前接一场试刀', desc: '「敢到柱前接我的刀，我才敢跟你一起动轮。来路又没封，你自己掂量。」', days: 0.5, enemy: 'sand_sundial_master',
+      outcome: '他拖过一块薄石压住铁环，把刀鞘靠在柱脚。你才看清他提刀那只手，虎口全是旧裂口。' },
     { label: '拉住铁环，和邢既横一起转动铜轮', days: 0.5, afterFight: 'sand_sundial_master', loot: { black_iron: 5, core: 8, qiankun_inner_pattern: 1 }, insight: 8,
       outcome: '铜轮底下响了一声，露出个暗格。邢既横倒空灰布袋，里头滚出灵晶和暗金。他翻过袋底，细细的针脚还在。「袋子划破了，这几针倒没散。拿去，让会缝的人照着试试。」' },
   ] },

@@ -71,19 +71,19 @@ const projects = [
     need: { millet_grain: 8, wood: 2, reed: 1 }, loot: { ration: 18 }, days: 3, cost: 2,
   },
   {
-    id: 'simmer_meat_broth', name: '炖山炉肉汤', facility: 'hearth', level: 1, reveal: 'beast_meat',
+    id: 'simmer_meat_broth', name: '炖山炉肉汤', facility: 'hearth', level: 1, reveal: 'recipe_meat_broth',
     description: '剔去生兽肉上的筋膜，炖熟后连浓汤一并封好。',
     need: { beast_meat: 1, wood: 1 }, loot: { meat_broth: 1 }, days: 0.5, cost: 0,
   },
   {
-    id: 'cook_herb_stew', name: '炖灵草肉', facility: 'hearth', level: 2, reveal: 'meat_broth',
-    description: '照肉汤的火候煨上一锅，收汁前下灵草，分作两包。',
-    need: { beast_meat: 2, reed: 1, wood: 1 }, loot: { herb_stew: 2 }, days: 1.5, cost: 0,
+    id: 'cook_herb_stew', name: '炖灵草兽脯', facility: 'hearth', level: 2, tier: 3, reveal: 'recipe_herb_stew',
+    description: '把灵纹兽肉切厚慢煨，收汁前下灵草，分作两包。',
+    need: { foundation_meat: 2, reed: 1 }, loot: { herb_stew: 2 }, days: 1.25, cost: 0,
   },
   {
-    id: 'cook_crystal_feast', name: '蒸禾香封肉', facility: 'hearth', level: 2, reveal: 'herb_stew',
-    description: '先用灵草焖透兽肉，再在肉汁里蒸熟新谷，最后用荷叶分包扎紧。',
-    need: { beast_meat: 3, reed: 2, millet_grain: 4, wood: 2 }, loot: { crystal_feast: 3 }, days: 2.5, cost: 1,
+    id: 'cook_crystal_feast', name: '做粟香封岩肉', facility: 'hearth', level: 2, tier: 6, reveal: 'recipe_crystal_feast',
+    description: '和新粟一同封锅煮透。每份金纹兽肉够分出两包。',
+    need: { gold_meat: 1, millet_grain: 2, wood: 1 }, loot: { crystal_feast: 2 }, days: 1.75, cost: 1,
   },
   {
     id: 'render_resin_salve', name: '熬松脂膏', facility: 'hearth', level: 2,
@@ -292,7 +292,7 @@ function storageUnique(id, kit) {
 
 function goodsVolume(goods, kit, stackSize = warehouseStack) {
   return Object.entries(goods).reduce((size, [id, count]) =>
-    size + (storageUnique(id, kit) ? count : Math.ceil(count / stackSize)), 0);
+    size + (id === kit.currency ? Number(count > 0) : storageUnique(id, kit) ? count : Math.ceil(count / stackSize)), 0);
 }
 
 function storedItems(state) {
@@ -532,6 +532,7 @@ function heldGear(state, loot, kit) {
 }
 
 function projectBlocker(state, project, facility, kit) {
+  if ((project.tier ?? 0) > state.realm) return `需${kit.records.realms[project.tier].name}。`;
   const level = effectiveLevel(state, facility);
   if (project.level > level) return `需${facility.name}${project.level}级。`;
   const jobs = facilityJobs(state, facility.id);

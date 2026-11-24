@@ -11,7 +11,8 @@ export const tournamentData = {
     { name: '参赛干粮', reward: { ration: 2 } },
     { name: '第一场胜利的奖品', reward: { salve: 2, iron_talisman: 1 } },
     { name: '第二场胜利的奖品', reward: { heal_pill: 2, core: 3 } },
-    { name: '三场全胜的奖品', reward: { tournament_citation: 1, jade_pill: 2 }, art: 'terrace_reversing_stance' },
+    { name: '三场全胜的奖品', reward: { tournament_citation: 1, jade_pill: 2, terrace_counter_manual: 1 },
+      delivery: '卫箬把头名帖和一册带批注的尺谱放在桌上。「第二场落脚太靠里。翻到折角那页，看看这半步该站在哪儿。」' },
   ],
 };
 
@@ -39,9 +40,6 @@ export const tournamentContent = {
       outcome: '裁判指着桌上的名单。「药和口粮都留在台下。撑不住就敲一下台边的铜片，我们叫停。两场之间至少歇半日。」' }] }],
   items: [{ id: 'tournament_citation', name: '大比头名帖', kind: 'key', price: 0, sell: 0,
     desc: '三场全胜才会拿到的名帖，上面有三位裁判的印和卫箬的签名。' }],
-  arts: [{ id: 'terrace_reversing_stance', name: '架尺反击', tier: 3, cost: 5, power: 4, pierce: 3, guard: 6, break: 12,
-    price: 0, weaponBased: false, prizeOnly: true, reveal: { item: 'tournament_citation' },
-    desc: '先侧身引开对手的力，再用短促的一击把他推回去。对手使重招时用最合适。' }],
 };
 
 const fighters = new Map(enemies.map((entry) => [entry.id, entry]));
@@ -157,6 +155,5 @@ export function tournamentAction(state, action, kit) {
   if (!kit.hasRoom(state, prize.reward)) return kit.refuse('行囊已满，留空位再领。');
   score.claimed = score.best;
   kit.addItems(state, prize.reward);
-  if (prize.art && !state.knownArts.includes(prize.art)) state.knownArts.push(prize.art);
-  return kit.say(state, prize.art ? '卫箬递来头名帖和奖品。她当面演了一遍架尺反击，教你开头怎么站、怎么出手。' : `裁判核对了名单，把${prize.name}交给你。`);
+  return kit.say(state, prize.delivery ?? `裁判核对了名单，把${prize.name}交给你。`);
 }

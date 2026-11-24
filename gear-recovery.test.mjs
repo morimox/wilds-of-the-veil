@@ -16,13 +16,19 @@ function firstHunt() {
   play(state, 'travel', { id: 'marsh' });
   play(state, 'visit', { id: 'bank_watch' });
   play(state, 'choose', { index: 0 });
-  for (const action of ['attack', 'guard', 'eat', 'attack', 'guard', 'eat', 'attack']) play(state, action);
+  state.inventory.salve = 2;
+  play(state, 'attack');
+  while (state.combat) {
+    if (state.hp <= 12 && state.inventory.salve) play(state, 'use', { id: 'salve' });
+    else play(state, 'attack');
+  }
   play(state, 'choose', { index: 2 });
   play(state, 'equip', { id: 'hook_blade' });
   play(state, 'visit', { id: 'mud_track' });
   play(state, 'choose', { index: 0 });
   for (let hit = 0; hit < 3; hit++) play(state, 'attack');
   play(state, 'take', { id: 'hide' });
+  state.hp = 7;
   return state;
 }
 
@@ -61,7 +67,10 @@ test('falling during withdrawal drops the load at the encounter rather than on t
   play(state, 'leave');
   play(state, 'visit', { id: 'mud_track' });
   play(state, 'choose', { index: 0 });
+  state.hp = 20;
   play(state, 'attack');
+  state.hp = 1;
+  state.combat.plan = { round: state.combat.round, reader: 'player', intent: { name: '猛扑', kind: 'attack', mult: 1 } };
   const result = play(state, 'retreat');
   assert.match(result.message, /落在碎石水眼/);
   assert.equal(state.region, 'village');

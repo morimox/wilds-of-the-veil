@@ -74,7 +74,7 @@ test('bringing a real herb to the apprentice introduces the alchemist and a boug
 
 test('the water diagram leads to two different repeatable spirit medicines', () => {
   const state = createGame(28);
-  state.realm = 3;
+  state.realm = 6;
   state.coins = 100;
   state.knownItems.push('clinic_note');
   deny(state, 'alchemyBuyFormula', { id: 'formula_sense' });
@@ -101,13 +101,13 @@ test('the water diagram leads to two different repeatable spirit medicines', () 
   assert.equal(state.coins, 78);
   play(state, 'alchemyTalk');
   state.economy.buildings.furnace = 1;
-  state.economy.warehouse = { reed: 10, core: 4, hide: 2, qi_core: 2 };
+  state.economy.warehouse = { reed: 10, gold_core: 2, beast_eye: 2 };
   deny(state, 'econStart', { id: 'r_heart_pill' });
   state.economy.buildings.furnace = 2;
   play(state, 'econStart', { id: 'r_sense_powder' });
   play(state, 'econStart', { id: 'r_heart_pill' });
-  assert.deepEqual(state.economy.warehouse, { reed: 5, core: 3, hide: 1, qi_core: 1 });
-  assert.equal(state.coins, 68);
+  assert.deepEqual(state.economy.warehouse, { reed: 4, beast_eye: 1 });
+  assert.equal(state.coins, 51);
   const jobs = [...state.economy.jobs];
   while (jobs.some(({ readyDay }) => readyDay > state.day)) play(state, 'wait');
   for (const { id } of jobs) play(state, 'econCollect', { id });

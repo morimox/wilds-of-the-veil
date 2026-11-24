@@ -139,10 +139,9 @@ test('an outer bank provides range while an ambush or cave removes it', () => {
   assert.ok(play(cave, 'attack').damageTaken > 0);
 });
 
-test('an art intercepts only when it actually uses the bow or crossbow', () => {
+test('the intercept uses a real ranged shot, leaving an unrelated fist attack unassisted', () => {
   const prepared = prepareBow();
   prepared.realm = 2;
-  prepared.knownArts.push('reed_cleave', 'tide_part');
   const emptyHandArt = structuredClone(prepared);
   const crossbow = structuredClone(prepared);
   crossbow.inventory.black_crossbow = 1;
@@ -151,13 +150,13 @@ test('an art intercepts only when it actually uses the bow or crossbow', () => {
   play(crossbow, 'equip', { id: 'black_crossbow' });
   for (const state of [prepared, emptyHandArt, crossbow]) hunt(state, 'mud_track', 2);
 
-  const art = play(emptyHandArt, 'art', { id: 'tide_part' });
+  const art = play(emptyHandArt, 'fistAttack');
   assert.doesNotMatch(art.message, /这一箭拦住/);
   assert.equal(emptyHandArt.inventory.reed_arrow, prepared.inventory.reed_arrow);
   assert.equal(emptyHandArt.durability.reed_bow, prepared.durability.reed_bow);
   assert.equal(view(emptyHandArt).openingShotReady, false);
 
-  assert.match(play(prepared, 'art', { id: 'reed_cleave' }).message, /拦住了/);
+  assert.match(play(prepared, 'attack').message, /拦住了/);
   assert.match(play(crossbow, 'attack').message, /拦住了/);
   assert.equal(view(crossbow).combatWeapon.isLoaded, false);
   assert.equal(crossbow.inventory.black_bolt, undefined);

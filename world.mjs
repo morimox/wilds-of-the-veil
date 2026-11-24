@@ -1,23 +1,26 @@
 import { saleQuote, saleTotal, recordSale } from './economy.mjs';
+import { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath, removedAtlasRoads } from './atlas-geography.mjs';
 
 const home = 'village';
-const legacy = new Set(['village', 'marsh', 'ridge', 'ford', 'hidden', 'pine_ridge', 'kiln_valley', 'herb_basin', 'black_mine', 'snow_pass', 'sky_terrace']);
+const roadUnitDays = 0.25;
+const withMileage = (link) => ({ ...link, days: atlasRoadDistance(atlasRoadPath(link.a, link.b), Boolean(link.openedBy)) * roadUnitDays });
 const ferryPass = { ferry: true, item: 'ferry_manifest', quest: 'last_lantern',
   reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' };
 const sandPass = { item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' };
 const crossings = [
-  { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, ...ferryPass, onPermit: true, guarded: true },
-  { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, ...sandPass, onPermit: true, guarded: true },
-  { a: 'willow_post', b: 'flood_market', label: '折水驿的货船线', days: 6.75, ...ferryPass },
-  { a: 'rope_sands', b: 'cinder_inn', label: '沿沙坡的驿路', days: 7.25, ...sandPass },
-];
+  { a: 'ford', b: 'zhao_city', label: '外港水路', ...ferryPass, onPermit: true, guarded: true },
+  { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', ...sandPass, onPermit: true, guarded: true },
+  { a: 'willow_post', b: 'flood_market', label: '折水驿的货船线', ...ferryPass },
+  { a: 'rope_sands', b: 'cinder_inn', label: '沿沙坡的驿路', ...sandPass },
+].map(withMileage);
 const regionalRoads = [
   ['reed_meadows', 'pale_shoal', '蒲湾外堤'],
-  ['gauge_tower', 'willow_post', '水尺下的旧堤'],
   ['screen_slope', 'kiln_valley', '晒盘坡北面的窑路'],
   ['kiln_valley', 'snow_pass', '窑谷上雪关的石阶'],
   ['herb_basin', 'snow_pass', '背风山道'],
   ['pine_ridge', 'ridge', '松场南坡路'],
+  ['ridge', 'kiln_valley', '窑车旧路'],
+  ['ridge', 'herb_basin', '老药工走的山腰路'],
   ['fish_ladder', 'willow_post', '沿旧渠的纤道'],
   ['green_dyke', 'measuring_hall', '守尺观外的堤路'],
   ['frog_pond', 'ring_isles', '浅塘东岸路'],
@@ -37,16 +40,16 @@ const regionalRoads = [
   ['hollow_silo', 'glass_hail_sink', '空仓外的石坡'],
 ];
 const shortcuts = [
-  { a: 'village', b: 'ford', label: '旧灯渠', days: 0.5, openedBy: 'ford_lamp_channel:0' },
-  { a: 'hanging_vein', b: 'cold_kiln', label: '石场旧车道', days: 0.875, openedBy: 'sand_hunt_colony:4' },
-];
+  { a: 'village', b: 'ford', label: '旧灯渠', openedBy: 'ford_lamp_channel:0' },
+  { a: 'hanging_vein', b: 'cold_kiln', label: '石场旧车道', openedBy: 'sand_hunt_colony:4' },
+].map(withMileage);
 const arrayPlans = {
   wuliang: { coins: 96, need: { wood: 36, ore: 20, core: 18, black_iron: 8 } },
   zhaoyuan: { coins: 115, need: { wood: 32, ore: 28, core: 24, black_iron: 18 } },
   mingsha: { coins: 140, need: { wood: 28, ore: 32, core: 32, black_iron: 25 } },
 };
 export const transportRules = Object.freeze({ gatePrice: 2, gateDays: 0.125, arrayPrice: 4, arrayDays: 0.25, scrollPrice: 2, scrollDays: 0.125,
-  roadUnitDays: 0.25, arrayPlans, crossings, shortcuts });
+  roadUnitDays, arrayPlans, crossings, shortcuts });
 
 export function initialWorld() {
   return { lastSettlement: home, gates: [], arrays: {}, avoidedRoads: [], shops: {}, recovery: {}, affiliation: null, memberships: {} };
@@ -79,36 +82,31 @@ function crossBlocker(state, edge) {
 
 const roadKey = (from, to) => [from, to].sort().join('|');
 
-function localRoadDays(from, to) {
-  const eitherHome = from.id === home || to.id === home;
-  const bothLegacy = legacy.has(from.id) && legacy.has(to.id);
-  const distances = (from.travel ?? 1) + (to.travel ?? 1);
-  if (bothLegacy && eitherHome) return (from.id === home ? to : from).travel;
-  if (bothLegacy) return Math.max(0.75, Math.round(distances) / 4);
-  return Math.max(0.5, Math.round(distances * 2) / 4);
-}
-
 export function roadGraph(data, { state } = {}) {
   const regions = new Map(data.regions.map((region) => [region.id, region]));
   const roads = new Map();
-  const add = (a, b, days, extra = {}) => {
+  const add = (a, b, extra = {}) => {
     if (!regions.has(a) || !regions.has(b) || a === b) return;
     const key = roadKey(a, b);
+    if (removedAtlasRoads.has(key)) return;
     const [from, to] = key.split('|');
-    roads.set(key, { from, to, key, days, units: days / transportRules.roadUnitDays, ...extra });
+    const path = atlasRoadPath(from, to);
+    if (!path) return;
+    const units = atlasRoadDistance(path, Boolean(extra.openedBy));
+    roads.set(key, { from, to, key, days: units * roadUnitDays, units, survey: path, ...extra });
   };
-  for (const [a, from] of regions) {
+  for (const a of regions.keys()) {
     for (const b of detail(data, a).links ?? []) {
-      if (regions.has(b) && provinceOf(data, a) === provinceOf(data, b)) add(a, b, localRoadDays(from, regions.get(b)));
+      if (regions.has(b) && provinceOf(data, a) === provinceOf(data, b)) add(a, b);
     }
   }
   for (const [a, b, label] of regionalRoads) {
-    if (regions.has(a) && regions.has(b)) add(a, b, localRoadDays(regions.get(a), regions.get(b)), { label });
+    add(a, b, { label });
   }
-  for (const cross of crossings) add(cross.a, cross.b, cross.days, { cross, label: cross.label, water: Boolean(cross.ferry) });
+  for (const cross of crossings) add(cross.a, cross.b, { cross, label: cross.label, water: Boolean(cross.ferry) });
   for (const shortcut of shortcuts) {
     if (!state || state.seenChoices.includes(shortcut.openedBy)) {
-      add(shortcut.a, shortcut.b, shortcut.days, { label: shortcut.label, openedBy: shortcut.openedBy });
+      add(shortcut.a, shortcut.b, { label: shortcut.label, openedBy: shortcut.openedBy });
     }
   }
   return [...roads.values()];
@@ -530,7 +528,7 @@ function localPurchaseBlocker(state, id, kit, count, inStock, price) {
   if (count > inStock) return inStock ? '摊上没有这么多货。' : '这批货已经卖完。';
   if (state.coins < price * count) return '手头的灵钱不够。';
   if (kit.records.gear[id] && (count !== 1 || kit.gearReserved(state, id))) return '同名装备只能留一件。';
-  if (!kit.hasRoom(state, { [id]: count })) return '行囊装不下这笔货。';
+  if (!kit.hasRoom(state, { [id]: count }, { [kit.currency]: price * count })) return '行囊装不下这笔货。';
   return '';
 }
 
@@ -540,10 +538,10 @@ function localMarket(state, kit) {
   const offers = Object.entries(localGoods(place)).filter(([id]) => kit.records.items[id] && !kit.isEvidence(kit.records.items[id])).map(([id, offer]) => {
     const { count } = shopStock(state, id, offer);
     const price = localPrice(kit.records.items[id], offer);
-    const reason = localPurchaseBlocker(state, id, kit, 1, count, price);
-    let maximum = reason ? 0 : Math.min(kit.rules.maxTradeCount, count, price > 0 ? Math.floor(state.coins / price) : count);
+    let maximum = Math.min(kit.rules.maxTradeCount, count, price > 0 ? Math.floor(state.coins / price) : count);
     if (kit.records.gear[id]) maximum = Math.min(maximum, 1);
-    while (maximum > 1 && !kit.hasRoom(state, { [id]: maximum })) maximum--;
+    while (maximum > 0 && localPurchaseBlocker(state, id, kit, maximum, count, price)) maximum--;
+    const reason = maximum ? '' : localPurchaseBlocker(state, id, kit, 1, count, price);
     return { id, count, price, maximum, reason };
   });
   const buys = kit.data.items.filter((item) => kit.owns(state, item.id) > 0).map((item) => ({ id: item.id,
@@ -574,8 +572,9 @@ function localTrade(state, id, count, kit, buying, confirmationOptions) {
     if (confirmation) return confirmation;
     const quote = saleQuote(state, id, price);
     const total = saleTotal(quote, count);
+    if (!kit.hasRoom(state, { [kit.currency]: total }, { [id]: count })) return kit.refuse('行囊满了，收不下卖得的灵钱。');
     kit.removeItem(state, id, count);
-    state.coins += total;
+    kit.addCoins(state, total);
     recordSale(state, id, count, quote);
     return kit.say(state, `卖出${record.name}×${count}，收了${total}枚灵钱。`);
   }
@@ -630,7 +629,7 @@ function sectView(state, kit) {
   });
   const ranks = sect.ranks.map((rank, index) => {
     const claimed = membership?.ranks.includes(index) ?? false;
-    const honorary = !rank.art && !Object.values(rank.reward ?? {}).some((count) => count > 0);
+    const honorary = !Object.values(rank.reward ?? {}).some((count) => count > 0);
     const reason = !joined ? '先入门，再找管事领回礼。' : credit < rank.credit ? `尚需${rank.credit - credit}份门中功劳。` :
       honorary ? '你的名字已经记在册上了。' : !claimed && !kit.hasRoom(state, rank.reward ?? {}) ? '行囊装不下这笔回礼。' : '';
     return { ...rank, id: String(index), claimed, honorary, available: !claimed && !reason, reason };
@@ -662,24 +661,21 @@ function actSect(state, action, id, kit) {
     const job = view.jobs.find((entry) => entry.id === id);
     if (!job?.available) return kit.refuse(job?.reason || '眼下办不了这桩差事。');
     kit.spendHome(state, 0, job.need);
-    kit.addItems(state, job.reward ?? {});
-    state.coins += job.coins ?? 0;
+    const { spilled } = kit.addItems(state, { ...job.reward, [kit.currency]: job.coins ?? 0 });
     member.credit += job.credit;
     if (job.days) kit.advance(state, job.days);
     member.jobs[id] = state.day + job.cooldown;
     const newDisciple = discipleStanding(local, member.credit);
     const promotion = newDisciple.name !== view.disciple.name ? `管事把你记入${newDisciple.name}的名册。` : '';
-    return kit.say(state, `${job.text ?? ''}办完「${job.name}」，得${job.credit}份功劳${job.coins ? `和${job.coins}枚灵钱` : ''}。${promotion}`);
+    return kit.say(state, `${job.text ?? ''}办完「${job.name}」，得${job.credit}份功劳${job.coins ? `和${job.coins}枚灵钱` : ''}。${spilled[kit.currency] ? '灵钱暂放在你脚边。' : ''}${promotion}`);
   }
   const rank = view.ranks.find((entry) => entry.id === String(id));
   if (!rank?.available) return kit.refuse(rank?.reason || '这笔门中回礼现在领不了。');
   member.ranks.push(Number(rank.id));
   kit.addItems(state, rank.reward ?? {});
-  if (rank.art && !state.knownArts.includes(rank.art)) state.knownArts.push(rank.art);
   const gifts = kit.goodsText(rank.reward);
-  const art = rank.art ? kit.records.arts[rank.art]?.name : '';
   const register = rank.disciple ? '' : `管事在名册上给你写了「${rank.name}」。`;
-  return kit.say(state, `${rank.text ?? ''}${register}${gifts ? `领到${gifts}。` : ''}${art ? `学会「${art}」。` : ''}`);
+  return kit.say(state, `${rank.text ?? ''}${register}${gifts ? `领到${gifts}。` : ''}`);
 }
 
 function targetSummary(region, data, reason, extra = {}) {
@@ -711,21 +707,23 @@ export function worldView(state, kit) {
     return { available: !reason, reason, avoided: isAvoidedRoad(edge, avoidedRoads), canAvoid: !avoidReason, avoidReason };
   };
   const knownEdges = edges.filter(({ from, to }) => marked(state, from) && marked(state, to)).map((edge) => {
-    const riskText = kit.roadRisk?.(state, edge)?.riskText;
-    return { ...edge, ...roadStatus(edge), ...(riskText ? { riskText } : {}) };
+    const risk = kit.roadRisk?.(state, edge);
+    return { ...edge, ...roadStatus(edge), ...(risk ? { riskText: risk.riskText, risky: risk.chance > 0 } : {}) };
   });
   const provinceNames = new Map((kit.data.provinces ?? []).map(({ id, name }) => [id, name]));
   const knownProvinces = new Set([provinceOf(kit.data, state.region), ...discovered.map(({ id }) => provinceOf(kit.data, id))]);
   const provinces = (kit.data.provinces ?? []).map((province) => ({ ...province, known: knownProvinces.has(province.id) }));
   const crossLinks = edges.filter((edge) => edge.cross && !crossBlocker(state, edge.cross)).flatMap((edge) => {
     const status = roadStatus(edge);
-    const riskText = kit.roadRisk?.(state, edge)?.riskText;
+    const risk = kit.roadRisk?.(state, edge);
     return [edge.from, edge.to].flatMap((from) => {
       const other = from === edge.from ? edge.to : edge.from;
       const province = provinceOf(kit.data, other);
       if (!marked(state, from) || !knownProvinces.has(province)) return [];
       return [{ from, province, name: provinceNames.get(province), key: edge.key, label: edge.label,
-        units: edge.units, ...(riskText ? { riskText } : {}), ...status }];
+        units: edge.units, days: edge.days, water: edge.water,
+        survey: atlasBorderRoad(atlasRoadPath(from, other), provinceOf(kit.data, from)),
+        ...(risk ? { riskText: risk.riskText, risky: risk.chance > 0 } : {}), ...status }];
     });
   });
   const roadsById = Object.fromEntries(journeys.map((road) => [road.id, road]));
@@ -742,7 +740,8 @@ export function worldView(state, kit) {
   const arrays = discovered.filter(({ id }) => Boolean(arrayPlan(kit.data, id))).map((region) => targetSummary(region, kit.data, arrayQuote(state, region.id, kit),
     { days: transportRules.arrayDays, price: transportRules.arrayPrice, active: arrayView(state, region.id, kit).active }));
   const points = discovered.map((region) => {
-    const { x, y, portal, array, description } = detail(kit.data, region.id);
+    const { portal, array, description } = detail(kit.data, region.id);
+    const [x, y] = atlasLocation(region.id);
     return { id: region.id, name: region.name, province: provinceOf(kit.data, region.id), x, y, description: description ?? region.desc,
       settlement: Boolean(settlementOf(kit.data, region.id)), portal: Boolean(portal), array: Boolean(array), attuned: state.world.gates.includes(region.id),
       current: region.id === state.region, travelable: Boolean(roadsById[region.id]?.available),
@@ -750,11 +749,12 @@ export function worldView(state, kit) {
   });
   const affiliation = kit.data.sects?.find(({ id }) => state.world.affiliation === id);
   const credit = affiliation ? pledge(state, affiliation)?.credit ?? 0 : 0;
+  const [hereX, hereY] = atlasLocation(actual.id);
   return { settlement: settlementOf(kit.data, state.region), localMarket: localMarket(state, kit), sect: sectView(state, kit),
     affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit, disciple: discipleStanding(affiliation, credit) } : null,
-    world: { province: provinceOf(kit.data, state.region), provinces, points, roads, edges: knownEdges, journeys,
+    world: { province: provinceOf(kit.data, state.region), provinces, geography: atlasGeography, points, roads, edges: knownEdges, journeys,
       crossings: closedSidePaths, crossLinks,
-      here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: here.x, y: here.y, description: here.description ?? actual.desc },
+      here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: hereX, y: hereY, description: here.description ?? actual.desc },
       scrollCount: kit.owns(state, 'gate_scroll'), gates, localGate: here.portal ? { attuned: state.world.gates.includes(state.region) } : null,
       localArray: arrayView(state, state.region, kit), arrays } };
 }

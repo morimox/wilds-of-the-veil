@@ -1,5 +1,5 @@
-﻿标识,名称,料理档次,食用恢复饱腹,食用恢复气血,备粮灶等级,所需物品,数量,每批费用（灵钱）,时间（天）
-ration,干粮,0,32,2,,,,,
-meat_broth,山炉肉汤,1,44,3,1,生兽肉（beast_meat）×1、松木（wood）×1,1,0,0.5
-herb_stew,灵草炖肉,2,56,5,2,生兽肉（beast_meat）×2、灵草（reed）×1、松木（wood）×1,2,0,1.5
-crystal_feast,禾香封肉,3,72,8,2,生兽肉（beast_meat）×3、灵草（reed）×2、新收的谷子（millet_grain）×4、松木（wood）×2,3,1,2.5
+﻿标识,名称,料理档次,食用恢复饱腹,食用恢复气血,食用恢复真气,食用恢复神识,所需食谱,制作所需境界,备粮灶等级,所需物品,数量,每批费用（灵钱）,时间（天）
+ration,干粮,0,32,2,,,,炼气初期,,,,,
+meat_broth,山炉肉汤,1,44,6,,,山炉肉汤食谱（recipe_meat_broth）,炼气初期,1,生兽肉（beast_meat）×1、松木（wood）×1,1,0,0.5
+herb_stew,灵草炖兽脯,2,56,14,13,,灵草炖兽脯食谱（recipe_herb_stew）,筑基初期,2,灵纹兽肉（foundation_meat）×2、灵草（reed）×1,2,0,1.25
+crystal_feast,粟香封岩肉,3,72,24,28,1,粟香封岩肉食谱（recipe_crystal_feast）,金丹初期,2,金纹兽肉（gold_meat）×1、新收的谷子（millet_grain）×2、松木（wood）×1,2,1,1.75

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import data from './data.mjs';
 import { act, rules, view } from './engine.mjs';
 import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
@@ -47,28 +48,32 @@ test('enemy guard gives a low-qi traveler an actual choice between pressure and 
   assert.equal(almostFull.qi, view(almostFull).maxQi);
 });
 
-test('interrupting arts can deny an actual field enemy’s restoration', () => {
+test('an interrupting weapon spell can deny a field enemy’s restoration', () => {
   const state = createGame(1);
-  // Stage the return to the clandestine quay with the previously learned river technique.
   state.region = 'hidden';
   state.discovered.push('hidden');
   state.knownItems.push('secret_pass', 'oar_mark');
-  state.knownArts.push('hook_current');
+  state.realm = 4;
+  const staff = data.gear.find(({ id }) => id === 'coil_pole');
+  state.inventory[staff.id] = 1;
+  state.durability[staff.id] = staff.durability;
+  play(state, 'equip', { id: staff.id });
+  state.hp = view(state).maxHp;
+  state.qi = view(state).maxQi;
   play(state, 'visit', { id: 'sunken_mooring' });
   play(state, 'choose', { index: 0 });
-  play(state, 'attack');
-  play(state, 'attack');
-  play(state, 'guard');
+  state.combat.plan = { round: 0, reader: 'player',
+    intent: data.enemies.find(({ id }) => id === state.combat.id).intents.find(({ kind }) => kind === 'heal') };
   assert.equal(revealCurrentMove(state).intent.kind, 'heal');
   const before = state.combat.hp;
   const ordinary = structuredClone(state);
   const strike = play(ordinary, 'attack');
-  const interrupt = play(state, 'art', { id: 'hook_current' });
+  const interrupt = play(state, 'weaponSpell');
   assert.equal(ordinary.combat.hp, before - strike.damageDealt + 6);
   assert.equal(state.combat.hp, before - interrupt.damageDealt);
   assert.equal(interrupt.enemyMove.kind, 'heal');
   assert.match(interrupt.message, /调息被打断/);
-  assert.equal(ordinary.qi - state.qi, 3);
+  assert.equal(ordinary.qi - state.qi, staff.spellQi);
 });
 
 test('a known attack blocks retreat and a guard opening offers a seeded escape', () => {

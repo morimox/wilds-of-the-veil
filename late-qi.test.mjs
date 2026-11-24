@@ -24,51 +24,48 @@ function spellDuel(weapon) {
   }
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;
-  state.knownArts.push('gold_ember_point', 'core_spindle', 'gold_push_tide', 'reed_cleave');
   const intent = foe.intents.find((move) => move.kind === 'attack');
   state.combat = { id: foe.id, hp: foe.hp, round: 0, escapeBonus: 0, plan: { round: 0, reader: null, intent } };
   return state;
 }
 
-test('late reserves grow while the strongest techniques cost more than early ones', () => {
+test('late reserves grow while the strongest weapon spells cost more than early ones', () => {
   assert.deepEqual(data.realms.map(({ qi }) => qi), [30, 38, 50, 63, 77, 92, 120, 146, 177]);
-  assert.deepEqual(view(spellDuel()).artQiCosts, {
-    gold_ember_point: 14, core_spindle: 15, gold_push_tide: 20, reed_cleave: 2, stone_brace: 2,
-  });
-  assert.deepEqual(view(createQuietGame(421)).artQiCosts, {});
+  const early = data.gear.find(({ id }) => id === 'resin_staff');
+  const middle = data.gear.find(({ id }) => id === 'coil_pole');
+  assert.deepEqual([early, middle, staff, confluence].map(({ spellQi }) => spellQi), [8, 17, 24, 34]);
+  assert.equal(view(createQuietGame(421)).combatWeapon.spellQi, 0);
 });
 
 test('a working staff raises magical damage and the quoted and paid Qi together', () => {
   const plain = spellDuel();
   const channeled = spellDuel(staff);
   const merged = spellDuel(confluence);
-  assert.equal(view(channeled).artQiCosts.gold_push_tide, 23);
-  assert.equal(view(channeled).artQiCosts.core_spindle, 18);
-  assert.equal(view(channeled).artQiCosts.reed_cleave, 2);
+  assert.equal(view(channeled).combatWeapon.spellQi, 24);
   assert.equal(view(channeled).maxQi - view(plain).maxQi, staff.qi);
   assert.equal(view(channeled).magicAttack - view(plain).magicAttack, staff.magicAtk);
-  assert.equal(view(merged).artQiCosts.gold_push_tide, 26);
+  assert.equal(view(merged).combatWeapon.spellQi, 34);
   assert.equal(view(merged).maxQi - view(plain).maxQi, confluence.qi);
   assert.equal(view(merged).magicAttack - view(plain).magicAttack, confluence.magicAtk);
   const initialPlainQi = plain.qi;
   const initialStaffQi = channeled.qi;
   const initialConfluenceQi = merged.qi;
-  const attack = { id: 'gold_push_tide' };
-  const bare = play(plain, 'art', attack);
-  const guided = play(channeled, 'art', attack);
-  const combined = play(merged, 'art', attack);
-  assert.ok(guided.damageDealt > bare.damageDealt);
+  assert.equal(act(plain, 'weaponSpell').ok, false);
+  const guided = play(channeled, 'weaponSpell');
+  const combined = play(merged, 'weaponSpell');
+  assert.ok(guided.damageDealt > 0);
   assert.ok(combined.damageDealt > guided.damageDealt);
-  assert.equal(initialPlainQi - plain.qi, 20);
-  assert.equal(initialStaffQi - channeled.qi, 23);
-  assert.equal(initialConfluenceQi - merged.qi, 26);
+  assert.equal(initialPlainQi - plain.qi, 0);
+  assert.equal(initialStaffQi - channeled.qi, 24);
+  assert.equal(initialConfluenceQi - merged.qi, 34);
+  assert.equal(channeled.durability[staff.id], staff.durability - 1);
 });
 
 test('insufficient Qi leaves the fight intact and hitting with the staff costs only wear', () => {
   const state = spellDuel(staff);
-  state.qi = view(state).artQiCosts.gold_ember_point - 1;
+  state.qi = staff.spellQi - 1;
   const before = structuredClone(state);
-  assert.equal(act(state, 'art', { id: 'gold_ember_point' }).message, '真气不足。');
+  assert.equal(act(state, 'weaponSpell').message, '真气不足。');
   assert.deepEqual(state, before);
 
   state.qi = 0;
@@ -76,7 +73,7 @@ test('insufficient Qi leaves the fight intact and hitting with the staff costs o
   assert.ok(play(state, 'attack').damageDealt > 0);
   assert.equal(state.qi, 0);
   assert.equal(state.durability[staff.id], 0);
-  assert.equal(view(state).artQiCosts.gold_ember_point, 14);
+  assert.equal(view(state).combatWeapon.spellQi, 0);
   assert.equal(view(state).magicAttack, view(spellDuel()).magicAttack);
 });
 

@@ -298,3 +298,12 @@
 生兽肉（beast_meat）,缺轮磨台（jade_mill）,岸门下的干工房（zhao_mill_dry_workroom）,磨房石鼠（zhao_mill_stone_rat）,炼气后期,2,,,2,1,1,8,1,固定间隔,得知物品 干工房的门插（zhao_mill_door_pin）,绕到工作台背后，找咬开松子的东西
 兽革（hide）,缺轮磨台（jade_mill）,岸门下的干工房（zhao_mill_dry_workroom）,磨房石鼠（zhao_mill_stone_rat）,炼气后期,0,1,60%,0.6,1,1,8,1,固定间隔,得知物品 干工房的门插（zhao_mill_door_pin）,绕到工作台背后，找咬开松子的东西
 筑基期妖丹（foundation_core）,闭潮渡（ford）,闸下无灯梯（ford_below_steps）,拖梯水影（ford_lower_spirit）,筑基中期,2,,,2,2,4,11,1,固定间隔,,沿短绳下到第二根栏杆
+筑基期妖丹（foundation_core）,篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,筑基初期,0,3,64%,1.92,1,1,0,0,不回补,,绕到墙边看看土台
+生兽肉（beast_meat）,篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,筑基初期,3,,,3,1,1,0,0,不回补,,绕到墙边看看土台
+妖目（beast_eye）,篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,筑基初期,0,1,33%,0.33,1,1,0,0,不回补,,绕到墙边看看土台
+兽革（hide）,篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,筑基初期,2,,,2,1,1,0,0,不回补,,绕到墙边看看土台
+厚甲片（hard_scale）,篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,筑基初期,2,,,2,1,1,0,0,不回补,,绕到墙边看看土台
+金丹期妖丹（gold_core）,冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,1,2,60%,2.2,1,1,0,0,不回补,,绕到上风处，靠近石锅
+生兽肉（beast_meat）,冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,3,,,3,1,1,0,0,不回补,,绕到上风处，靠近石锅
+兽革（hide）,冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,2,,,2,1,1,0,0,不回补,,绕到上风处，靠近石锅
+厚甲片（hard_scale）,冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,3,,,3,1,1,0,0,不回补,,绕到上风处，靠近石锅

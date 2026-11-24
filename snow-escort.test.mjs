@@ -17,7 +17,6 @@ function traveler() {
   state.inventory.ration = 8;
   state.inventory.wood = 6;
   state.inventory.salve = 5;
-  state.knownArts.push('hook_current');
   for (const id of ['weir_knife', 'iron_coat', 'tide_charm', 'hide_shield']) {
     state.inventory[id] = 1;
     state.durability[id] = data.gear.find((gear) => gear.id === id).durability;
@@ -39,9 +38,7 @@ function fight(state, index) {
     const { intent, maxHp } = view(state);
     if (state.hp < maxHp * 0.45 && state.inventory.salve && ['guard', 'heavy', undefined].includes(intent?.kind)) {
       play(state, 'use', { id: 'salve' });
-    } else if (intent?.kind === 'heavy' && state.qi >= 3) {
-      play(state, 'art', { id: 'hook_current' });
-    } else if (intent?.kind === 'heavy' || intent?.kind === 'guard' && state.qi < 3) {
+    } else if (intent?.kind === 'heavy') {
       play(state, 'guard');
     } else {
       play(state, 'attack');

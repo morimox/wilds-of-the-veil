@@ -57,7 +57,7 @@ test('three provinces expose only situationally known points and roads with exac
   state.knownItems.push('ferry_manifest');
   const day = state.day;
   const quote = view(state).world.roads.find(({ id }) => id === 'zhao_city');
-  assert.equal(quote.days, 5.5);
+  assert.equal(quote.days, transportRules.crossings.find(({ b }) => b === 'zhao_city').days);
   assert.equal(quote.available, true);
   play(state, 'travel', { id: 'zhao_city' });
   assert.equal(state.day - day, quote.days);
@@ -66,6 +66,8 @@ test('three provinces expose only situationally known points and roads with exac
   assert.equal(view(state).world.roads.some(({ id }) => id === 'village'), false);
 
   walk(state, 'flood_market');
+  walk(state, 'glass_bank');
+  walk(state, 'rope_sands');
   walk(state, 'zhao_pass');
   deniedWithoutChanges(state, 'travel', { id: 'mingsha_city' }, /找.*路/);
   state.knownItems.push('sand_writ');
@@ -121,12 +123,14 @@ test('a known distant destination shows its intermediate roads and cannot skip a
   assert.deepEqual(journey.via, ['白苇滩', '沉钟岭', '玄砂矿脉', '碎云雪关']);
   assert.ok(journey.days > data.regions.find(({ id }) => id === 'sky_terrace').travel);
   assert.equal(view(state).world.roads.some(({ id }) => id === 'sky_terrace'), false);
-  assert.deepEqual(journey.meals, { ration: 2 });
+  assert.ok(journey.meals.ration > 0);
+  const beforeMeals = state.inventory.ration;
   const day = state.day;
-  play(state, 'travel', { id: 'sky_terrace' });
+  const arrival = play(state, 'travel', { id: 'sky_terrace' });
   assert.equal(state.region, 'sky_terrace');
   assert.equal(state.day - day, journey.days);
-  assert.equal(state.inventory.ration, 1);
+  assert.equal(state.inventory.ration, beforeMeals - arrival.travelMeals.ration);
+  assert.equal(arrival.travelMeals.ration, journey.meals.ration);
   assert.ok(state.satiety >= 20);
   assert.deepEqual(state.eventsSeen, {});
 });
@@ -180,6 +184,8 @@ test('secondary crossings follow the same permits and draw stubs without reveali
   walk(state, 'willow_post');
   assert.ok(points().includes('flood_market'));
   walk(state, 'flood_market');
+  walk(state, 'glass_bank');
+  walk(state, 'rope_sands');
   walk(state, 'zhao_pass');
   assert.ok(points().includes('rope_sands'));
   assert.equal(stub('cinder_inn|rope_sands', 'rope_sands'), undefined);
@@ -258,7 +264,7 @@ test('the Zhaoyuan city seller gives the physical scale clue once without requir
   const before = { day: state.day, satiety: state.satiety, coins: state.coins, shops: structuredClone(state.world.shops) };
   assert.match(play(state, 'localAsk').message, /六两/);
   assert.equal(state.day, before.day + 0.125);
-  assert.equal(state.satiety, before.satiety - 0.125 * rules.satietyDrainPerDay);
+  assert.equal(state.satiety, Math.max(0, before.satiety - 0.125 * rules.satietyDrainPerDay));
   assert.equal(state.coins, before.coins);
   assert.equal(state.inventory[clue], 1);
   assert.ok(state.knownItems.includes(clue));
@@ -268,7 +274,7 @@ test('the Zhaoyuan city seller gives the physical scale clue once without requir
   assert.deepEqual(state.world.shops, before.shops);
   play(state, 'localAsk');
   assert.equal(state.day, before.day + 0.125);
-  assert.equal(state.satiety, before.satiety - 0.125 * rules.satietyDrainPerDay);
+  assert.equal(state.satiety, Math.max(0, before.satiety - 0.125 * rules.satietyDrainPerDay));
   assert.equal(state.coins, before.coins);
   assert.equal(state.inventory[clue], 1);
   assert.equal(state.knownItems.filter((item) => item === clue).length, 1);
@@ -500,6 +506,7 @@ test('protected novice sparring preserves luggage and cannot grant a win', () =>
 
 test('sect admission, contributions, cooldowns and a master reward form an optional loop', () => {
   const state = createGame();
+  state.discovered.push('ford');
   for (const id of ['pine_ridge', 'lantern_court']) {
     if (id === 'pine_ridge') state.discovered.push(id);
     walk(state, id);
@@ -513,7 +520,7 @@ test('sect admission, contributions, cooldowns and a master reward form an optio
   const cost = view(state).sect.join.coins;
   play(state, 'sectJoin');
   assert.equal(state.coins, 100 - cost);
-  const master = initialSect.ranks.find(({ art }) => art);
+  const master = initialSect.ranks.find(({ reward }) => reward?.jade_pill);
   assert.ok(master);
   deniedWithoutChanges(state, 'sectClaim', { id: master.id }, /功劳/);
 
@@ -527,7 +534,6 @@ test('sect admission, contributions, cooldowns and a master reward form an optio
     else play(state, 'wait');
   }
   play(state, 'sectClaim', { id: master.id });
-  assert.ok(state.knownArts.includes(master.art));
   for (const [id, count] of Object.entries(master.reward ?? {})) assert.ok(state.inventory[id] >= count);
   deniedWithoutChanges(state, 'sectClaim', { id: master.id });
   const credit = view(state).affiliation.credit;

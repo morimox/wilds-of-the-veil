@@ -355,9 +355,9 @@ const sects = [{ id: 'water_gauge', region: 'measuring_hall', name: '守尺观',
   ],
   ranks: [
     { credit: 4, name: '替尺行走', disciple: '内门弟子', role: '替观里试水槽，帮傅澄照看小阵，跟着学怎么读水尺。',
-      reward: { ration: 5 }, art: 'level_hand' },
+      reward: { ration: 5 } },
     { credit: 16, name: '河记执事', disciple: '执事弟子', role: '核对各户送来的水位，用观里的印回信，告诉他们照哪个水位开闸。',
-      reward: { formula_gold_salve: 1, gold_salve: 2 }, art: 'lake_split' },
+      reward: { formula_gold_salve: 1, gold_salve: 2 } },
   ],
 }];
 

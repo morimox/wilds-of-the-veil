@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
 import { act, view } from './engine.mjs';
-import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
+import { createQuietGame as createGame, prepareQuietRoad, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 function play(state, action, payload) {
   const result = act(state, action, payload);
@@ -18,6 +18,7 @@ const leave = (state) => { if (state.event) play(state, 'leave'); };
 const travel = (state, id) => {
   leave(state);
   while (state.satiety < 58 && state.inventory.ration) play(state, 'eat', { id: 'ration' });
+  prepareQuietRoad(state);
   play(state, 'travel', { id });
 };
 
@@ -41,8 +42,9 @@ function reachRidge(state) {
   travel(state, 'ridge');
 }
 
-function fight(state, index, enemy, { arts = false } = {}) {
+function fight(state, index, enemy, { wieldStaff = false } = {}) {
   const boss = enemy === 'caravan_broker';
+  if (wieldStaff && state.equipment.weapon !== 'resin_staff') play(state, 'equip', { id: 'resin_staff' });
   while (state.satiety < (boss ? 62 : 28) && state.inventory.ration) play(state, 'eat', { id: 'ration' });
   if (boss) {
     if (state.hp < view(state).maxHp - 16 && state.inventory.heal_pill) play(state, 'use', { id: 'heal_pill' });
@@ -59,12 +61,10 @@ function fight(state, index, enemy, { arts = false } = {}) {
     const observed = view(state);
     const move = observed.intent?.kind;
     if (move === 'heavy') play(state, 'guard');
-    else if (boss && move === 'heal' && state.qi >= 3) play(state, 'art', { id: 'hook_current' });
-    else if (boss && move === 'drain' && state.qi < 4 && state.inventory.qi_powder) play(state, 'use', { id: 'qi_powder' });
+    else if (boss && move === 'drain' && state.qi < observed.combatWeapon.spellQi && state.inventory.qi_powder) play(state, 'use', { id: 'qi_powder' });
     else if (boss && state.hp <= 24 && state.inventory.heal_pill) play(state, 'use', { id: 'heal_pill' });
     else if (state.hp <= 15 && state.inventory.salve) play(state, 'use', { id: 'salve' });
-    else if (boss && state.qi >= 4 && move !== 'guard') play(state, 'art', { id: 'bell_strike' });
-    else if (arts && !boss && state.qi >= 8 && move !== 'guard') play(state, 'art', { id: 'reed_cleave' });
+    else if (observed.combatWeapon.spellQi && state.qi >= observed.combatWeapon.spellQi && move !== 'guard') play(state, 'weaponSpell');
     else play(state, 'attack');
     rounds += 1;
   }
@@ -133,14 +133,15 @@ function readyExpedition() {
   reachRidge(state);
   // Stage ordinary late-Qi equipment to isolate the continuation's balance from cultivation prerequisites.
   state.realm = 2;
-  for (const [id, quantity] of Object.entries({ iron_sword: 1, iron_coat: 1, hide_shield: 1, ration: 9, salve: 5, heal_pill: 2, qi_powder: 3 })) {
+  for (const [id, quantity] of Object.entries({ iron_sword: 1, iron_coat: 1, hide_shield: 1, ration: 11, salve: 5, heal_pill: 2, qi_powder: 3 })) {
     state.inventory[id] = quantity;
     const equipment = data.gear.find((record) => record.id === id);
     if (!equipment) continue;
     state.durability[id] = equipment.durability;
     play(state, 'equip', { id });
   }
-  state.knownArts.push('reed_cleave', 'hook_current', 'bell_strike');
+  state.inventory.resin_staff = 1;
+  state.durability.resin_staff = data.gear.find(({ id }) => id === 'resin_staff').durability;
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;
   return state;
@@ -152,20 +153,20 @@ test('the full expedition clears both guard groups and collects its cargo proof 
   const purse = state.coins;
   const startingSalve = state.inventory.salve;
   let rounds = followCrash(state);
-  rounds += getSurvivor(state, { arts: true });
+  rounds += getSurvivor(state);
   leave(state);
   visit(state, 'caravan_wagon_rise');
   choose(state, 0);
   assert.equal(state.inventory.caravan_gate_key, undefined);
   assert.match(option(state, 2).lockedReason, /2/);
-  rounds += fight(state, 1, 'caravan_guard_hound', { arts: true });
+  rounds += fight(state, 1, 'caravan_guard_hound');
   assert.match(option(state, 2).lockedReason, /1/);
   assert.equal(act(state, 'choose', { index: 2 }).ok, false);
   leave(state);
   visit(state, 'caravan_wagon_rise');
   assert.equal(field(state, 'caravan_wagon_rise').creatures.caravan_guard_hound, 1);
   assert.equal(option(state, 0), undefined);
-  rounds += fight(state, 1, 'caravan_guard_hound', { arts: true });
+  rounds += fight(state, 1, 'caravan_guard_hound');
   assert.equal(view(state).groundLoot.qi_core, 4);
   play(state, 'take', { id: 'qi_core' });
   choose(state, 2);
@@ -173,17 +174,17 @@ test('the full expedition clears both guard groups and collects its cargo proof 
   visit(state, 'caravan_granary');
   assert.equal(option(state, 2), undefined);
   assert.match(option(state, 1).lockedReason, /2/);
-  rounds += fight(state, 0, 'caravan_hook_guard', { arts: true });
+  rounds += fight(state, 0, 'caravan_hook_guard');
   assert.match(option(state, 1).lockedReason, /1/);
-  rounds += fight(state, 0, 'caravan_hook_guard', { arts: true });
+  rounds += fight(state, 0, 'caravan_hook_guard');
   assert.deepEqual(view(state).groundLoot, {});
-  const bossRounds = fight(state, 1, 'caravan_broker', { arts: true });
+  const bossRounds = fight(state, 1, 'caravan_broker', { wieldStaff: true });
   rounds += bossRounds;
   assert.equal(state.inventory.caravan_lading, undefined);
   assert.equal(state.coins, purse);
   assert.equal(state.siteVictories.caravan_granary.caravan_broker, 1);
 
-  const fieldSupplies = data.items.filter(({ kind, id }) => !['gear', 'key'].includes(kind) && !state.inventory[id]);
+  const fieldSupplies = data.items.filter(({ kind, id }) => !['gear', 'key', 'currency'].includes(kind) && !state.inventory[id]);
   for (const { id } of fieldSupplies) {
     const current = view(state);
     if (current.backpackUsed === current.backpackCapacity) break;
@@ -203,7 +204,7 @@ test('the full expedition clears both guard groups and collects its cargo proof 
   assert.equal(state.coins - purse, 70);
   assert.equal(view(state).groundLoot.caravan_bell, 1);
   assert.match(view(state).currentEvent.text, /预备沿背崖往渡口运粮/);
-  const relaxed = fieldSupplies.find(({ id }) => state.inventory[id]);
+  const relaxed = fieldSupplies.find(({ id, oneOfAKind }) => id !== 'ration' && state.inventory[id] === 1 && !oneOfAKind);
   play(state, 'discard', { id: relaxed.id, count: 1 });
   play(state, 'take', { id: 'caravan_bell' });
   play(state, 'equip', { id: 'caravan_bell' });
@@ -216,6 +217,7 @@ test('the full expedition clears both guard groups and collects its cargo proof 
   visit(state, 'rope_run');
   choose(state, 0);
   leave(state);
+  if (state.satiety < 32) play(state, 'eat', { id: 'ration' });
   visit(state, 'stone_niche');
   choose(state, 0);
   travel(state, 'ford');
@@ -229,7 +231,7 @@ test('the full expedition clears both guard groups and collects its cargo proof 
 test('retreat and defeat leave the guards in place and preserve the reopened side door', () => {
   const state = readyExpedition();
   followCrash(state);
-  getSurvivor(state, { arts: true });
+  getSurvivor(state);
   leave(state);
   visit(state, 'caravan_wagon_rise');
   choose(state, 0);

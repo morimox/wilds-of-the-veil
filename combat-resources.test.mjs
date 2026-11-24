@@ -34,26 +34,21 @@ test('mist grows with elapsed field time; a deeper reserve delays exhaustion', (
   assert.ok(exposure(8) > exposure(0));
 });
 
-test('offensive symbols spend Qi as well as the paper; recovery medicine restores only Qi', () => {
+test('offensive symbols spend the paper while recovery medicine restores only Qi', () => {
   const state = createGame(13);
   state.combat = { id: 'mud_beast', hp: 25, round: 0 };
   state.inventory.ember_talisman = 1;
   state.inventory.qi_powder = 1;
-  const { qiCost } = data.talismans.find(({ id }) => id === 'ember_talisman');
-  state.qi = qiCost - 1;
-  assert.match(act(state, 'use', { id: 'ember_talisman' }).message, /真气不足/);
-  assert.equal(state.inventory.ember_talisman, 1);
+  state.qi = 0;
+  assert.ok(play(state, 'use', { id: 'ember_talisman' }).damageDealt > 0);
+  assert.equal(state.qi, 0);
+  assert.equal(state.inventory.ember_talisman, undefined);
   state.combat = null;
   const hp = state.hp;
   const powder = data.pills.find(({ id }) => id === 'qi_powder');
   play(state, 'use', { id: 'qi_powder' });
   assert.equal(state.hp, hp);
-  assert.equal(state.qi, qiCost - 1 + powder.qi);
-  state.combat = { id: 'mud_beast', hp: 25, round: 0 };
-  const before = state.qi;
-  assert.ok(play(state, 'use', { id: 'ember_talisman' }).damageDealt > 0);
-  assert.equal(state.qi, before - qiCost);
-  assert.equal(state.inventory.ember_talisman, undefined);
+  assert.equal(state.qi, powder.qi);
 });
 
 test('a spell-only enemy spends its own finite Qi and has to take a turn to recover', () => {

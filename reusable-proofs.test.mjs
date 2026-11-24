@@ -98,10 +98,12 @@ function unlockShortcutAndWalkHome(state) {
   walk(state, 'ford');
   const roadHome = () => view(state).world.journeys.find(({ id }) => id === 'village');
   assert.equal(roadHome().direct, false);
+  const before = roadHome().days;
   assert.match(chooseAt(state, shortcut, 0).outcome, /打个双结/);
   assert.equal(state.inventory[map], 1);
   assert.equal(roadHome().direct, true);
-  assert.equal(roadHome().days, 0.5);
+  assert.ok(roadHome().days < before);
+  assert.deepEqual(roadHome().path, ['ford', 'village']);
   assert.match(walk(state, 'village').message, /旧灯渠/);
 }
 

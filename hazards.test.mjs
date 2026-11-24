@@ -124,6 +124,7 @@ test('a prepared fighter can brace the enclosure and stop the chasing jackal', (
   play(state, 'take', { id: 'qi_core' }, count);
   play(state, 'leave', undefined, count);
   assert.equal(offer(state, 'fight'), undefined);
+  if (state.satiety < 25 && state.inventory.ration) play(state, 'eat', { id: 'ration' }, count);
   to(state, farm, count);
   to(state, inn, count);
   if (state.inventory.ration) play(state, 'eat', { id: 'ration' }, count);

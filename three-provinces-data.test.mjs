@@ -49,7 +49,7 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
   assert.equal(items.size, data.items.length);
   assert.equal(enemies.size, data.enemies.length);
   assert.equal(data.sites.length, data.events.length);
-  const animalParts = new Set(['beast_meat', 'hide', 'beast_eye']);
+  const animalParts = new Set(['beast_meat', 'foundation_meat', 'gold_meat', 'hide', 'beast_eye']);
   const leaderParts = { herb_den_elder: 'den_neck_plate', sand_quarry_matriarch: 'quarry_back_spine',
     dyke_old_croc: 'dyke_backstrap', ridge_armory_ram: 'ridge_ramhorn' };
   const denSupplies = { bandit_den_scout: 'ration', bandit_den_sentry: 'salve', bandit_den_bodyguard: 'ore' };
@@ -119,9 +119,8 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
       }
     }
   }
-  const arts = new Set(data.arts.map(({ id }) => id));
   for (const quest of data.quests) {
-    for (const art of quest.learnArts ?? []) assert.ok(arts.has(art), `${quest.id}:${art}`);
+    assert.ok(!quest.learnArts, `${quest.id} still teaches a removed active art`);
   }
   for (const { id, lead, region, ranks } of trainingData) {
     assert.ok(items.has(lead), id);

@@ -47,6 +47,8 @@ function choice(state, index) {
 test('the official names the water-station witness and quotes the extra fare before issuing the permit', () => {
   const state = throughTown();
   travel(state, 'flood_market');
+  travel(state, 'glass_bank');
+  travel(state, 'rope_sands');
   travel(state, 'zhao_pass');
   visit(state, 'zhao_ridge_permit');
   assert.equal(choice(state, 0).cost, 11);
@@ -285,10 +287,10 @@ test('the bog has four repeatable hunts and one species can regrow without spend
     return result.gathered;
   };
   assert.match(choice(state, 2).desc, /甲缘.*厚皮/);
-  assert.deepEqual(hunt(0, 'mud_shrike'), { beast_meat: 5, hide: 3, foundation_core: 2 });
+  assert.deepEqual(hunt(0, 'mud_shrike'), { beast_meat: 5, hide: 3, foundation_core: 2, foundation_meat: 2 });
   assert.deepEqual(hunt(2, 'zhao_moss_turtle'), { beast_meat: 3, hide: 4, qi_core: 2 });
   assert.deepEqual(hunt(3, 'glass_frog'), { beast_meat: 3, beast_eye: 1, qi_core: 2 });
-  assert.deepEqual(view(state).groundLoot, { beast_meat: 11, hide: 7, foundation_core: 2, qi_core: 4, beast_eye: 1 });
+  assert.deepEqual(view(state).groundLoot, { beast_meat: 11, hide: 7, foundation_core: 2, foundation_meat: 2, qi_core: 4, beast_eye: 1 });
   assert.equal(state.localPools.zhao_frog_shelf, undefined);
   const eel = 'zhao_rush_eel';
   hunt(4, eel);

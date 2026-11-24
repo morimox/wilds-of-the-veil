@@ -314,7 +314,7 @@ const sects = [
       { id: 'lantern_patrol', credit: 8, name: '巡灯人', disciple: '内门弟子', role: '能把近处的灯路走熟，回来指出哪盏灯灭了、哪处绳子磨破了。',
         reward: { iron_talisman: 2, ration: 6 }, text: '两段驮道终于都有稳灯。裴见把旧符和一袋耐放的粮给你。' },
       { id: 'lantern_keeper', credit: 18, name: '掌灯人', disciple: '执事弟子', role: '核对各段灯位和巡夜名册，给回来交班的人分配备用灯。',
-        reward: { jade_pill: 1, core: 4 }, art: 'stone_brace', text: '裴见把守灯人站稳脚跟的法子教给你，也留了上一趟多带回的方晶和一丸稳气丹。' },
+        reward: { jade_pill: 1, core: 4 }, text: '裴见扯下腰间的布囊。「上趟多带回来的方晶。你下回替人守灯，身上也备一丸药。」' },
     ],
     sparSite: 'marsh_pole_lesson',
   },

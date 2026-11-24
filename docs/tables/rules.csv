@@ -39,7 +39,7 @@ combatChargeFactor,0.35,蓄势增伤按人物攻击计算的比例
 enemyChargeFactor,0.25,敌方蓄势增伤按基础攻击计算的比例
 resistanceTier,6,启用物抗和魔抗的最低境界编号
 resistanceCap,0.6,单类别抗性减伤上限
-magicPowerFactor,1.32,境界基础攻击换算为独立施法力量的倍率
+magicPowerFactor,1.32,境界基础攻击换算为兵器法攻的倍率
 chargeBreakDamage,4,蓄势被气血伤害打散的单回合伤害下限
 harvestEncounterDays,0.125,采集中遭遇伏击时开打前用时（天）
 ebbCycleDays,2,闭潮渡退水循环（游戏日）
@@ -56,7 +56,7 @@ maxSatiety,100,饱腹度上限
 batchMealTarget,80,主动连吃时的饱腹目标（须容纳每份食物完整的饱腹增量）
 satietyDrainPerDay,16,每游戏日消耗的饱腹度
 rationSatiety,32,每份普通干粮恢复的饱腹度
-emptyAttackMultiplier,0.75,空腹交手时对普通与兵刃术诀出伤的倍率
+emptyAttackMultiplier,0.75,空腹交手时普通物攻出伤的倍率
 unpackBasketDays,0.25,拆开药篓所用的游戏天数
 guardBonus,3,主动格挡增加的防御（点）
 heavyGuardBonus,4,主动格挡遇到重招时再增加的防御（点）

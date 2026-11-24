@@ -23,7 +23,6 @@ function expedition(id, seed = 500) {
   state.discovered.push(site.region);
   state.inventory.ration = 20;
   state.inventory.salve = 15;
-  state.knownArts.push('bell_strike');
   state.seenChoices.push(...(site.afterChoices ?? []).slice(0, 1));
   for (const [slot, id] of Object.entries({ weapon: 'sky_sword', armor: 'sky_cloak', charm: 'jade_pendant' })) {
     state.inventory[id] = 1;
@@ -54,7 +53,6 @@ function defeat(state, index, enemy) {
   for (let turn = 0; state.combat && turn < 40; turn += 1) {
     if (view(state).intent?.kind === 'heavy') play(state, 'guard');
     else if (state.hp < 20) play(state, 'use', { id: 'salve' });
-    else if (state.qi >= 4) play(state, 'art', { id: 'bell_strike' });
     else play(state, 'attack');
   }
   assert.equal(view(state).currentEvent?.id, site, state.log.slice(-5).join('\n'));

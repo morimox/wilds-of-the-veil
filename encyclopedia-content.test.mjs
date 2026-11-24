@@ -66,7 +66,6 @@ test('the desk encounter can be asked about, left, or accepted at the lowest rea
 test('the two leads require an actual fight and repair, then a free physical slot to claim the single book', () => {
   const state = beginAtTheHall(4);
   Object.assign(state.inventory, { ration: 28, wood: 4, hide: 3, battle_sinew: 1, salve: 2 });
-  state.knownArts.push('reed_cleave');
   state.knownItems.push('sand_writ');
   for (const id of ['iron_sword', 'iron_coat', 'hide_shield']) {
     state.inventory[id] = 1;
@@ -83,10 +82,9 @@ test('the two leads require an actual fight and repair, then a free physical slo
   play(state, 'choose', { index: 0 });
   assert.equal(view(state).currentEnemy.id, snake);
   for (let round = 0; round < 15 && state.combat; round++) {
-    const { intent, hp, qi } = view(state);
+    const { intent, hp } = view(state);
     if (intent?.kind === 'heavy') play(state, 'guard');
     else if (hp <= 19 && state.inventory.salve) play(state, 'use', { id: 'salve' });
-    else if (qi >= 2) play(state, 'art', { id: 'reed_cleave' });
     else play(state, 'attack');
   }
   assert.ok(state.defeated.includes(snake));

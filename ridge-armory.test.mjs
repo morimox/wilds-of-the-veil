@@ -24,8 +24,7 @@ function travel(state, id) {
 function win(state) {
   for (let rounds = 0; state.combat && rounds < 16; rounds += 1) {
     if (state.hp < 36 && state.inventory.heal_pill) play(state, 'use', { id: 'heal_pill' });
-    else if (view(state).intent?.kind === 'heavy' && state.qi >= 5) play(state, 'art', { id: 'cross_weir' });
-    else if (state.qi >= 7) play(state, 'art', { id: 'sky_axis' });
+    else if (view(state).intent?.kind === 'heavy') play(state, 'guard');
     else play(state, 'attack');
   }
   assert.equal(state.combat, null);
@@ -42,7 +41,6 @@ test('the two wind paths share thirty animals and the real horn leads to a reusa
   state.inventory.ration = 12;
   state.inventory.heal_pill = 2;
   state.economy.buildings.forge = 3;
-  state.knownArts.push('sky_axis', 'cross_weir');
   for (const id of ['foil_sword', 'fault_coat', 'coal_tassel']) {
     state.inventory[id] = 1;
     state.durability[id] = data.gear.find((gear) => gear.id === id).durability;

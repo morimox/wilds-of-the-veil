@@ -121,12 +121,11 @@ test('opponents with the same observations answer the same action even when the 
   const first = strong.combat.observedHits[0].damage;
   strong.inventory.cudgel = 1;
   strong.durability.cudgel = gear.cudgel.durability;
-  strong.knownArts.push('gold_ember_point');
   const locked = structuredClone(strong);
   assert.match(act(strong, 'combatEquip', { id: 'cudgel' }).message, /交手中不能换装备/);
   assert.deepEqual(strong, locked);
   assert.equal(strong.combat.observedHits.length, 1);
-  const next = play(strong, 'art', { id: 'gold_ember_point' });
+  const next = play(strong, 'fistAttack');
   assert.equal(strong.combat.observedHits[1].damage, next.damageDealt - next.reflectedDamage);
   assert.notEqual(first, strong.combat.observedHits[1].damage);
 });
@@ -324,8 +323,10 @@ test('a bandit who reads medicine releases a prepared strike, but a dodge lets t
   assert.equal(unread.combat.enemyCharged, true);
 
   const supplies = meal.inventory.ration;
-  assert.doesNotMatch(play(meal, 'eat', { id: 'ration' }).message, /打断/);
-  assert.equal(meal.inventory.ration, supplies - 1);
+  const mealRound = meal.combat.round;
+  assert.match(act(meal, 'eat', { id: 'ration' }).message, /交手中只能用药/);
+  assert.equal(meal.inventory.ration, supplies);
+  assert.equal(meal.combat.round, mealRound);
 });
 
 test('an empty medicine supply cannot restore health even if a dose was already planned', () => {
@@ -474,11 +475,10 @@ test('guarding abandons preparation and a strong hit scatters it before the next
   assert.equal(struck.durability.scale_chisel, gear.scale_chisel.durability);
 });
 
-test('a weapon technique needs its own charged weapon and a bare-handed technique abandons the charge', () => {
+test('preparation is tied to one weapon, and cancelling makes bare-handed strikes possible', () => {
   const state = staged('ford_shale_crab', { realm: 4, items: ['anvil_hammer', 'scale_chisel'] });
-  state.knownArts.push('reed_cleave', 'tide_part');
   const start = structuredClone(state);
-  assert.equal(act(state, 'art', { id: 'reed_cleave' }).ok, false);
+  assert.equal(act(state, 'weaponSpell').ok, false);
   assert.equal(state.day, start.day);
   assert.equal(state.qi, start.qi);
   assert.deepEqual(state.durability, start.durability);
@@ -486,15 +486,17 @@ test('a weapon technique needs its own charged weapon and a bare-handed techniqu
   const offhand = structuredClone(state);
   play(offhand, 'offhandAttack');
   const pending = structuredClone(offhand);
-  assert.equal(act(offhand, 'art', { id: 'reed_cleave' }).ok, false);
+  assert.equal(act(offhand, 'attack').ok, false);
+  assert.equal(act(offhand, 'fistAttack').ok, false);
   assert.deepEqual(offhand, pending);
-  assert.ok(play(offhand, 'art', { id: 'tide_part' }).damageDealt > 0);
+  play(offhand, 'cancelCharge');
+  assert.ok(play(offhand, 'fistAttack').damageDealt > 0);
   assert.equal(view(offhand).chargingWeapon, null);
   assert.equal(offhand.durability.scale_chisel, gear.scale_chisel.durability);
   assert.equal(offhand.durability.anvil_hammer, gear.anvil_hammer.durability);
 
   play(state, 'attack');
-  assert.ok(play(state, 'art', { id: 'reed_cleave' }).damageDealt > 0);
+  assert.ok(play(state, 'attack').damageDealt > 0);
   assert.equal(state.day - start.day, 2 * rules.battleDays);
   assert.equal(view(state).chargingWeapon, null);
   assert.equal(state.durability.anvil_hammer, gear.anvil_hammer.durability - 1);

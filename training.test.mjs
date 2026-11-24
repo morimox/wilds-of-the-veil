@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { act, rules, view } from './engine.mjs';
-import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
+import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 import { data } from './data.mjs';
 import { trainingData } from './training.mjs';
 
@@ -33,16 +33,11 @@ test('a focused medicine restores spent spirit without healing or adding true qi
   const state = createGame(7);
   state.realm = 2;
   state.inventory.sense_powder = 2;
-  assert.match(view(state).medicineUseReasons.sense_powder, /先学会神识/);
+  assert.match(view(state).medicineUseReasons.sense_powder, /金丹/);
   assert.equal(act(state, 'use', { id: 'sense_powder' }).ok, false);
   assert.equal(state.inventory.sense_powder, 2);
-  teachable(state, 'spirit');
-  play(state, 'trainStudy', { id: 'spirit' });
+  state.realm = 6;
   const enemy = combat(state, 'mud_beast');
-  for (let i = 0; i < 2; i++) {
-    play(state, 'readSpirit');
-    play(state, 'guard');
-  }
   assert.equal(view(state).spiritSense.current, 0);
   const round = state.combat.round;
   const guard = enemy.intents.find(({ kind }) => kind === 'guard');
@@ -55,7 +50,6 @@ test('a focused medicine restores spent spirit without healing or adding true qi
   assert.equal(state.combat.round, round + 1);
   assert.equal(state.day - day, rules.battleDays);
   assert.equal(view(state).spiritSense.current, 2);
-  assert.equal(view(state).spiritSense.canRead, true);
   assert.equal(state.hp, hp);
   assert.equal(state.qi, qi);
   assert.equal(state.inventory.sense_powder, 1);
@@ -66,10 +60,8 @@ test('a focused medicine restores spent spirit without healing or adding true qi
 
 test('a mixed medicine restores both resources in one round and can restore only the missing one', () => {
   const state = createGame(11);
-  state.realm = 2;
+  state.realm = 6;
   state.inventory.heart_pill = 2;
-  teachable(state, 'spirit');
-  play(state, 'trainStudy', { id: 'spirit' });
   state.training.sense = 0;
   const maxHp = view(state).maxHp;
   state.hp = maxHp - 18;
@@ -80,7 +72,9 @@ test('a mixed medicine restores both resources in one round and can restore only
   const fullHealth = structuredClone(state);
   fullHealth.hp = maxHp;
   const untrained = structuredClone(state);
-  untrained.training.levels.spirit = 0;
+  untrained.realm = 2;
+  const lowerHp = view(untrained).maxHp;
+  untrained.hp = lowerHp - 18;
 
   const day = state.day;
   const dose = play(state, 'use', { id: 'heart_pill' });
@@ -99,15 +93,13 @@ test('a mixed medicine restores both resources in one round and can restore only
   assert.equal(fullHealth.hp, maxHp);
   assert.equal(fullHealth.training.sense, 1);
   play(untrained, 'use', { id: 'heart_pill' });
-  assert.equal(untrained.hp, maxHp - 4);
+  assert.equal(untrained.hp, lowerHp - 4);
   assert.equal(view(untrained).spiritSense, null);
 });
 
 test('a charged hit stops the spirit and health effects of a mixed medicine before its dose is spent', () => {
   const state = createGame(15);
-  state.realm = 2;
-  teachable(state, 'spirit');
-  play(state, 'trainStudy', { id: 'spirit' });
+  state.realm = 6;
   state.inventory.heart_pill = 1;
   state.training.sense = 1;
   const enemy = combat(state, 'bandit_den_leader');
@@ -196,33 +188,9 @@ test('body, seals and elements act on separate combat rules', () => {
   assert.equal(hit.damageTaken - countered.damageTaken, 3);
 });
 
-test('one spirit reading per round, one guarded reply, and rest at a visited new town refills it', () => {
+test('a visited town refills spirit as well as health and true qi', () => {
   const state = createGame(13);
-  teachable(state, 'spirit');
-  play(state, 'trainStudy', { id: 'spirit' });
-  assert.deepEqual(view(state).spiritSense, { current: 2, max: 2, canRead: false, prediction: null });
-  const enemy = combat(state, 'mud_beast');
-  const baseline = structuredClone(state);
-  assert.equal(view(state).intent, null);
-  const day = state.day;
-  play(state, 'readSpirit');
-  assert.equal(state.day, day);
-  assert.equal(view(state).spiritSense.current, 1);
-  assert.equal(view(state).spiritSense.prediction.name, enemy.intents[0].name);
-  assert.equal(act(state, 'readSpirit').ok, false);
-  assert.equal(act(state, 'trainStudy', { id: 'spirit' }).ok, false);
-  const expected = play(baseline, 'attack');
-  const guarded = play(state, 'attack');
-  assert.equal(expected.damageTaken - guarded.damageTaken, 2);
-  assert.equal(guarded.enemyMove.name, enemy.intents[0].name);
-  assert.equal(state.combat.spiritGuard, undefined);
-  assert.equal(view(state).spiritSense.prediction, null);
-  state.combat.plan.reader = 'enemy';
-  play(state, 'readSpirit');
-  assert.equal(view(state).spiritSense.prediction, null);
-  assert.equal(view(state).intent, null);
-  stageRetreatOpening(state);
-  assert.equal(play(state, 'retreat').retreated, true);
+  state.realm = 6;
   assert.equal(view(state).spiritSense.current, 0);
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;
