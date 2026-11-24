@@ -169,6 +169,10 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .item-tools { display: flex; grid-column: 1 / -1; flex-wrap: wrap; gap: 5px; margin: 4px 0; }
 .item-tools .button { padding: 3px 8px; min-height: 30px; font-size: 13px; }
 .manual-upgrade-note { flex-basis: 100%; overflow-wrap: anywhere; }
+.container-kit { padding-left: 8px; border-left: 2px solid #526b59; }
+.container-kit > .kit-section { margin-top: 4px; }
+.container-kit > .kit-section + .kit-section { padding-top: 4px; }
+.bag-blocker { flex-basis: 100%; }
 @media (hover: hover) {
   .item-trigger:hover + .item-tip { position: absolute; z-index: 3; display: block; inset: calc(100% - 1px) 0 auto; }
   .entry-anchor > .item-trigger:hover + .item-tip { right: auto; width: min(236px, 73vw); }
@@ -341,9 +345,11 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .player-thought { overflow-wrap: anywhere; white-space: pre-wrap; }
 dialog { width: min(414px, calc(100% - 26px)); color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
 dialog::backdrop { background: #08100bd1; }
-dialog ol { padding-left: 22px; color: var(--muted); }
 .dialog-head { display: flex; align-items: center; justify-content: space-between; }
 .sect-affiliation { margin-top: 6px; }
+.guide-topic { margin: 5px 0 8px; }
+.guide-topic > summary { color: var(--jade); cursor: pointer; }
+.guide-topic > p { margin-top: 4px; }
 .dialog-head button, .text-danger { color: var(--red); background: transparent; border: 1px solid #654e44; border-radius: 5px; padding: 4px 8px; cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 610px) {
@@ -491,7 +497,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=31" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=32" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -528,11 +534,21 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <dialog id="help" aria-labelledby="guide-title">
     <div class="dialog-head"><h2 id="guide-title">行旅菜单</h2><button type="button" data-close aria-label="关闭菜单">×</button></div>
     <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习进度</button></div>
-    <ol>
-      <li>时间久了会饿。可以吃行囊里的干粮，空着肚子也能慢慢走回歇脚点。</li>
-      <li>点开状态名可以查看它的用途。拿到路图后可以试着走新路。</li>
-      <li>把鼠标放在物品上可以看用途，点一下可以使用或整理。</li>
-    </ol>
+    <details class="guide-topic"><summary>赶路与补给</summary>
+      <p class="fine">在山河图上查已知去路和里程。快空腹时先吃些口粮，负伤可以到歇脚处休息。</p>
+    </details>
+    <details class="guide-topic"><summary>交手与脱身</summary>
+      <p class="fine">看清对方来招时，可以据此出手或防御。要撤退，尽量等对方收招的空当。</p>
+    </details>
+    <details class="guide-topic"><summary>采集与拾取</summary>
+      <p class="fine">采集需要等进度走完。脚边的东西按种类分开拾取，装不下的还会留在原地。</p>
+    </details>
+    <details class="guide-topic"><summary>行囊与仓库</summary>
+      <p class="fine">把鼠标放在物品上可以看用途，点一下可以使用或整理。备用的物品可以存进落灯村后院的仓库。</p>
+    </details>
+    <details class="guide-topic" data-guide-deduction hidden><summary>线索与沙盘</summary>
+      <p class="fine">可以在沙盘上摊开随身的证物，写下猜想，再回现场试一试。</p>
+    </details>
     <button type="button" class="text-danger" data-reset>开始新行程</button>
   </dialog>
   <noscript>开启 JavaScript 后即可进入雾渡山河。</noscript>
@@ -4126,6 +4142,12 @@ const items = [
     desc: '两片样布缝在一处，两个袋口上下错开。落灯村的皮匠能照着缝出双层乾坤袋。' },
   { id: 'qiankun_inner_pattern', name: '旧布袋的底纹', kind: 'key', price: 0, sell: 0,
     desc: '铜轮下找到的旧布样。顺着底边的针脚捋一圈，能摸到埋在折缝里的线头。可拿给落灯村的皮匠看。' },
+  { id: 'qiankun_bag', name: '乾坤袋', kind: 'container', price: 0, sell: 0, keepOnFall: true,
+    desc: '一只系在行囊里的小布袋。解开细绳，能从另一边深处挪出装进去的东西。' },
+  { id: 'qiankun_fold_bag', name: '双层乾坤袋', kind: 'container', price: 0, sell: 0, keepOnFall: true,
+    desc: '小袋里两层布各自向深处叠开。布外看着薄，能装下比寻常乾坤袋更多的行李。' },
+  { id: 'qiankun_deep_bag', name: '深底乾坤袋', kind: 'container', price: 0, sell: 0, keepOnFall: true,
+    desc: '从袋底向上缝了两道线。把一整匣铁料送进去，袋面只轻轻往下坠一下。' },
   { id: 'meat_broth', name: '山炉肉汤', kind: 'food', price: 0, sell: 0, desc: '装在粗陶罐里的一碗浓汤，比干粮耐饿，还能缓一缓轻伤。' },
   { id: 'herb_stew', name: '灵草炖肉', kind: 'food', price: 0, sell: 0, desc: '用灵草慢煨到酥烂的兽肉，适合走一趟山路再吃。' },
   { id: 'crystal_feast', name: '禾香封肉', kind: 'food', price: 0, sell: 0, desc: '炖好的兽肉裹上熟粟封好。够顶远路的饥饿，也能补回一些气血。' },
@@ -6013,6 +6035,7 @@ const banditRules = Object.freeze({
   fatalDefeatCap: 0.32,
   fatalChiefDefeat: 0.30,
   ignoreUnarmedChance: 0.65,
+  repeatEncounterFactors: Object.freeze([1, 0.10, 0.02]),
 });
 
 const roadKey = (a, b) => [a, b].sort().join('|');
@@ -6167,7 +6190,9 @@ function stopForBandit(state, leg, crewId, kit) {
 
 function checkRoadBanditStep(state, leg, index, kit) {
   const profile = roadBanditRisk(state, leg, kit);
-  if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1)) {
+  const prior = state.roadTrip.banditsMet?.length ?? 0;
+  const factor = banditRules.repeatEncounterFactors[Math.min(prior, banditRules.repeatEncounterFactors.length - 1)];
+  if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1) * factor) {
     const roster = recruitsByNow(state, profile.crew, kit);
     if (roster) state.banditCrews[profile.crew] = roster;
     const pause = stopForBandit(state, leg, profile.crew, kit);
@@ -6879,15 +6904,17 @@ const backpackExpansions = [
   { capacity: 16, name: '加缝侧袋的行囊', lead: 'hide', source: '出门带回兽革', need: { hide: 6, wood: 4 }, cost: 12, days: 0.5,
     label: '请皮匠加缝侧袋', desc: '皮匠把兽革对折了一下。「这皮够结实。拿几截松木给袋底撑住，就能再缝一对侧袋。」',
     outcome: '皮匠把两只侧袋缝进旧行囊，削了松木给袋底加了两道撑条。' },
-  { capacity: 28, name: '乾坤袋', lead: 'qiankun_pattern', source: '杨木水栈的余节', need: { hide: 10, black_iron: 3, core: 4 }, cost: 28, days: 1,
+];
+const containerPlans = [
+  { id: 'qiankun_bag', capacity: 16, name: '乾坤袋', lead: 'qiankun_pattern', source: '杨木水栈的余节', need: { hide: 10, black_iron: 3, core: 4 }, cost: 28, days: 1,
     label: '照袋样缝一只乾坤袋', desc: '皮匠顺着样布摸到袋角。「原来这道缝要往里折，才量得出多出来的那一层。」',
-    outcome: '皮匠把你的物件倒进缝好的小袋。松木一截截滑了进去，袋底看着还是原来的大小。' },
-  { capacity: 44, name: '双层乾坤袋', lead: 'qiankun_fold_pattern', source: '鸣沙叩石院', need: { hide: 12, black_iron: 5, core: 8, foundation_core: 2 }, cost: 46, days: 2,
+    outcome: '皮匠把缝好的小袋递给你，抻开空空的袋口让你看了一眼。' },
+  { id: 'qiankun_fold_bag', capacity: 28, name: '双层乾坤袋', lead: 'qiankun_fold_pattern', source: '鸣沙叩石院', need: { hide: 12, black_iron: 5, core: 8, foundation_core: 2 }, cost: 46, days: 2,
     label: '照叠缝样缝一只双层乾坤袋', desc: '皮匠把两道缝一上一下叠在桌面。「得先让两层的袋口错开，伸手才摸得准。」',
-    outcome: '皮匠把袋口翻给你看。手沿左边摸进去是干粮，沿右边摸进去是那几件铁器。' },
-  { capacity: 64, name: '深底乾坤袋', lead: 'qiankun_inner_pattern', source: '琉脊天室', need: { hide: 16, black_iron: 8, core: 12, gold_core: 2 }, cost: 72, days: 3,
+    outcome: '皮匠把空袋翻给你看。手贴袋口往里伸是一层，顺着内侧的折缝还能摸到另一层。' },
+  { id: 'qiankun_deep_bag', capacity: 44, name: '深底乾坤袋', lead: 'qiankun_inner_pattern', source: '琉脊天室', need: { hide: 16, black_iron: 8, core: 12, gold_core: 2 }, cost: 72, days: 3,
     label: '照旧袋底纹缝一只深底乾坤袋', desc: '皮匠把袋底铺开，沿旧线一寸寸量过去。「先把底线走完，再回来收口。」',
-    outcome: '皮匠把一整捆备用兽革推进袋口，松手后连背带都没往下一沉。' },
+    outcome: '皮匠取走撑袋用的木片，把深底袋交给你。袋身看起来只够放下一本薄书，手伸进去却摸不到底。' },
 ];
 const setupDays = 0.25;
 const collectDays = 0.25;
@@ -6900,7 +6927,7 @@ const bulkSaleRules = Object.freeze({
 });
 
 const economyData = {
-  facilities, projects, merchantOrders, warehouseStack, warehouseCap, backpackExpansions,
+  facilities, projects, merchantOrders, warehouseStack, warehouseCap, backpackExpansions, containerPlans,
   setupDays, collectDays, consumableBatchLimit, facilityOrderMultiplier,
   jobSlots: '同时制作数等于设施等级，含待领取的在册总数最多为等级的两倍',
 };
@@ -6909,6 +6936,7 @@ function initialEconomyState() {
   return {
     warehouse: {},
     warehouseWear: {},
+    containers: {},
     buildings: Object.fromEntries(facilities.map(({ id, start }) => [id, start])),
     jobs: [],
     nextJob: 1,
@@ -6952,7 +6980,9 @@ function recordSale(state, id, count, quote) {
 }
 
 function backpackCapacity(state, initialCapacity) {
-  return state.economy?.backpackSize ?? initialCapacity;
+  const sewnSize = state.economy?.backpackSize;
+  return backpackExpansions.some(({ capacity }) => capacity === sewnSize)
+    ? Math.max(initialCapacity, sewnSize) : initialCapacity;
 }
 
 function backpackName(state, initialCapacity) {
@@ -6975,9 +7005,13 @@ function knowsFacility(state, facility, kit) {
     state.knownItems.includes(id) || kit.homeSupplies(state, id) > 0);
 }
 
-function goodsVolume(goods, kit) {
+function storageUnique(id, kit) {
+  return Boolean(kit.records.gear[id] || kit.records.items[id]?.kind === 'container');
+}
+
+function goodsVolume(goods, kit, stackSize = warehouseStack) {
   return Object.entries(goods).reduce((size, [id, count]) =>
-    size + (kit.records.gear[id] ? count : Math.ceil(count / warehouseStack)), 0);
+    size + (storageUnique(id, kit) ? count : Math.ceil(count / stackSize)), 0);
 }
 
 function storedItems(state) {
@@ -6986,7 +7020,7 @@ function storedItems(state) {
 
 function depositable(state, id, kit) {
   const item = kit.records.items[id];
-  if (!item || item.kind === 'key' || (item.keepOnFall && item.kind !== 'manual') ||
+  if (!item || kit.isEvidence(item) || (item.keepOnFall && !['manual', 'gear', 'container'].includes(item.kind)) ||
       Object.values(state.equipment).includes(id)) return 0;
   return Math.max(0, kit.owns(state, id) - (id === 'ration' ? (state.reliefRations ?? 0) : 0));
 }
@@ -6998,8 +7032,8 @@ function spaceInWarehouse(state) {
 function warehouseSpaceReason(state, goods, kit, stored = storedItems(state)) {
   const combined = { ...stored };
   for (const [id, count] of Object.entries(goods)) {
-    if (stored[id] && kit.records.gear[id]) return '仓库已有同名装备。';
     combined[id] = (combined[id] ?? 0) + count;
+    if (combined[id] > 1 && storageUnique(id, kit)) return '仓库已有同样的物件。';
   }
   return goodsVolume(combined, kit) > spaceInWarehouse(state) ? '仓架放不下了。' : '';
 }
@@ -7012,7 +7046,7 @@ function depositReason(state, id, count, kit, stored) {
 
 function withdrawalReason(state, id, count, kit) {
   if ((storedItems(state)[id] ?? 0) < count) return '仓库里没有这么多。';
-  if (kit.records.gear[id] && kit.owns(state, id)) return '行囊已有同名装备。';
+  if (storageUnique(id, kit) && kit.owns(state, id)) return '行囊已有同样的物件。';
   if (!kit.hasRoom(state, { [id]: count })) return '行囊装不下。';
   return '';
 }
@@ -7026,6 +7060,22 @@ function transferable(count, rejects) {
     else low = middle;
   }
   return low;
+}
+
+function storageRow(id, count, check, kit) {
+  return { id, name: kit.nameOf(id), count, maximum: transferable(count, check), reason: count ? check(1) : '' };
+}
+
+function containerContents(state, bagId) {
+  return state.economy?.containers?.[bagId]?.items ?? {};
+}
+
+function containerHasItem(state, id) {
+  return Object.values(state.economy?.containers ?? {}).some(({ items }) => (items?.[id] ?? 0) > 0);
+}
+
+function carriedContainerPlans(state, kit) {
+  return containerPlans.filter(({ id }) => kit.owns(state, id) > 0);
 }
 
 function storeInWarehouse(state, goods, kit, wear = {}) {
@@ -7061,7 +7111,7 @@ function storeMaterials(state, kit) {
 }
 
 function transfer(state, id, count, deposit, kit) {
-  if (!kit.records.items[id] || !Number.isSafeInteger(count) || count < 1) return kit.refuse('请选择实际物件和件数。');
+  if (!Object.hasOwn(kit.records.items, id) || !Number.isSafeInteger(count) || count < 1) return kit.refuse('请选择实际物件和件数。');
   const why = deposit ? depositReason(state, id, count, kit) : withdrawalReason(state, id, count, kit);
   if (why) return kit.refuse(why);
   const economy = normalizeEconomy(state);
@@ -7078,6 +7128,74 @@ function transfer(state, id, count, deposit, kit) {
     }
   }
   return kit.say(state, `${deposit ? '存入' : '取出'}${kit.nameOf(id)}×${count}。`);
+}
+
+function containerTransferReason(state, plan, id, count, deposit, kit) {
+  const contents = containerContents(state, plan.id);
+  if (!deposit) {
+    if ((contents[id] ?? 0) < count) return '这只乾坤袋里没有这么多。';
+    if (storageUnique(id, kit) && kit.owns(state, id)) return '行囊已有同样的物件。';
+    return kit.hasRoom(state, { [id]: count }) ? '' : '先在行囊里腾出位置。';
+  }
+  const item = kit.records.items[id];
+  if (item.kind === 'container') return '乾坤袋不能装进另一只乾坤袋。';
+  if (kit.isEvidence(item)) return '线索和信物要留在身上。';
+  if (Object.values(state.equipment).includes(id)) return '先把穿戴的装备收下。';
+  if (state.activeManual === id) return '先停下这门内功，再把书收入袋里。';
+  if (depositable(state, id, kit) < count) return '手头没有这么多能放进袋里的东西。';
+  const combined = { ...contents, [id]: (contents[id] ?? 0) + count };
+  if (storageUnique(id, kit) && combined[id] > 1) return '袋里已经有同样的装备。';
+  return goodsVolume(combined, kit, kit.rules.backpackStackSize) > plan.capacity ? '这只乾坤袋装不下了。' : '';
+}
+
+function transferContainer(state, bagId, id, requested, deposit, kit) {
+  const plan = carriedContainerPlans(state, kit).find((option) => option.id === bagId);
+  if (!plan) return kit.refuse('先把这只乾坤袋带在身上。');
+  if (!Object.hasOwn(kit.records.items, id) || (requested !== 'all' && (!Number.isSafeInteger(requested) || requested < 1))) {
+    return kit.refuse('请选择实际物件和件数。');
+  }
+  const check = (count) => containerTransferReason(state, plan, id, count, deposit, kit);
+  const available = deposit ? kit.owns(state, id) : containerContents(state, bagId)[id] ?? 0;
+  const count = requested === 'all' ? transferable(available, check) : requested;
+  const reason = check(count || 1);
+  if (reason || !count) return kit.refuse(reason || '没有能存取的物件。');
+  const economy = normalizeEconomy(state);
+  const containers = economy.containers ??= {};
+  const bag = containers[bagId] ??= { items: {}, wear: {} };
+  const gear = kit.records.gear[id];
+  if (deposit) {
+    bag.items[id] = (bag.items[id] ?? 0) + count;
+    if (gear) bag.wear[id] = state.durability[id] ?? gear.durability;
+    kit.removeItem(state, id, count, false);
+  } else {
+    bag.items[id] -= count;
+    if (!bag.items[id]) delete bag.items[id];
+    kit.addItems(state, { [id]: count });
+    if (gear) {
+      state.durability[id] = bag.wear[id] ?? gear.durability;
+      delete bag.wear[id];
+    }
+  }
+  const goods = kit.goodsText({ [id]: count });
+  return kit.say(state, deposit ? `把${goods}放进${plan.name}。` : `从${plan.name}取出${goods}。`);
+}
+
+function carriedContainersView(state, kit) {
+  const plans = carriedContainerPlans(state, kit);
+  if (!plans.length) return [];
+  const canStore = Object.keys(state.inventory).filter((id) =>
+    kit.records.items[id]?.kind !== 'container' && state.activeManual !== id && depositable(state, id, kit));
+  return plans.map((plan) => {
+    const { id, name, capacity } = plan;
+    const contents = containerContents(state, id);
+    const row = (item, count, deposit) => ({
+      ...storageRow(item, count, (amount) => containerTransferReason(state, plan, item, amount, deposit, kit), kit),
+      wear: deposit ? state.durability[item] : state.economy.containers[id].wear[item],
+    });
+    return { id, name, capacity, used: goodsVolume(contents, kit, kit.rules.backpackStackSize),
+      stored: Object.entries(contents).map(([item, count]) => row(item, count, false)),
+      carried: canStore.map((item) => row(item, depositable(state, item, kit), true)) };
+  });
 }
 
 function allProjects(state, kit) {
@@ -7120,7 +7238,7 @@ function waitForProduction(state, facility, kit) {
 }
 
 function heldGear(state, loot, kit) {
-  return Object.keys(loot).some((id) => kit.records.gear[id] && kit.homeSupplies(state, id));
+  return Object.keys(loot).some((id) => kit.records.gear[id] && (kit.homeSupplies(state, id) || containerHasItem(state, id)));
 }
 
 function projectBlocker(state, project, facility, kit) {
@@ -7202,8 +7320,34 @@ function expandBackpack(state, capacity, kit) {
   return kit.say(state, `${step.outcome}行囊扩到${step.capacity}格。`);
 }
 
+function knowsContainerPlan(state, plan, kit) {
+  return state.knownItems.includes(plan.lead) || kit.homeSupplies(state, plan.lead) > 0;
+}
+
+function containerPlanReason(state, plan, kit) {
+  if (state.economy?.containers?.[plan.id] || kit.homeSupplies(state, plan.id) > 0 ||
+      Object.values(state.ground ?? {}).some((pile) => (pile[plan.id] ?? 0) > 0)) {
+    return '这张样布已经用来缝过这只袋子。';
+  }
+  return kit.homeRequirements(state, plan.cost, plan.need) ||
+    (kit.hasRoom(state, { [plan.id]: 1 }, kit.homeBagSpend(state, plan.need)) ? '' : '先在行囊里腾出一格来收袋子。');
+}
+
+function craftContainer(state, id, kit) {
+  const plan = containerPlans.find((entry) => entry.id === id && knowsContainerPlan(state, entry, kit));
+  if (!plan) return kit.refuse('皮匠还没见到能照着缝的袋样。');
+  const reason = containerPlanReason(state, plan, kit);
+  if (reason) return kit.refuse(reason);
+  kit.spendHome(state, plan.cost, plan.need);
+  kit.advance(state, plan.days);
+  kit.addItems(state, { [id]: 1 });
+  (normalizeEconomy(state).containers ??= {})[id] = { items: {}, wear: {} };
+  return kit.say(state, `${plan.outcome}得到${plan.name}。`);
+}
+
 function economyView(state, kit) {
-  if (!kit.atHome(state)) return { facilities: [], warehouse: { used: 0, capacity: 0, stored: [], carried: [] } };
+  const containers = carriedContainersView(state, kit);
+  if (!kit.atHome(state)) return { facilities: [], warehouse: { used: 0, capacity: 0, stored: [], carried: [] }, containers, containerPlans: [] };
   const localFacilities = facilities.filter((facility) => knowsFacility(state, facility, kit)).map((facility) => {
     const { id, name, desc } = facility;
     const level = effectiveLevel(state, facility);
@@ -7219,7 +7363,9 @@ function economyView(state, kit) {
   }
   const stored = storedItems(state);
   const row = (id, count, check) => ({
-    id, name: kit.nameOf(id), count, maximum: transferable(count, check), reason: count ? check(1) : '',
+    ...storageRow(id, count, check, kit),
+    ...(kit.records.items[id]?.kind === 'container'
+      ? { contained: goodsVolume(containerContents(state, id), kit, kit.rules.backpackStackSize) } : {}),
   });
   const warehouse = {
     used: goodsVolume(stored, kit), capacity: spaceInWarehouse(state),
@@ -7230,7 +7376,9 @@ function economyView(state, kit) {
       return row(id, count, (quantity) => depositReason(state, id, quantity, kit));
     }).filter(({ count }) => count > 0),
   };
-  return { facilities: localFacilities, warehouse, backpack: backpackView(state, kit) };
+  const bagPlans = containerPlans.filter((plan) => knowsContainerPlan(state, plan, kit))
+    .map((plan) => ({ ...plan, reason: containerPlanReason(state, plan, kit) }));
+  return { facilities: localFacilities, warehouse, backpack: backpackView(state, kit), containers, containerPlans: bagPlans };
 }
 
 function buildFacility(state, id, kit) {
@@ -7371,7 +7519,11 @@ function fulfillOrder(state, id, kit) {
   return kit.say(state, order.outcome);
 }
 
-function economyAction(state, action, { id, count = 1 }, kit) {
+function economyAction(state, action, { bagId, id, count = 1 }, kit) {
+  if (action === 'econBagDeposit' || action === 'econBagWithdraw') {
+    if (state.combat || state.gathering || state.roadBandit) return kit.refuse('先把眼前的事处理完，再解开乾坤袋。');
+    return transferContainer(state, bagId, id, count, action === 'econBagDeposit', kit);
+  }
   const actions = {
     econDeposit: () => transfer(state, id, count, true, kit),
     econWithdraw: () => transfer(state, id, count, false, kit),
@@ -7382,6 +7534,7 @@ function economyAction(state, action, { id, count = 1 }, kit) {
     econStoreJob: () => collectProject(state, id, kit, true),
     econWait: () => waitForProduction(state, id, kit),
     econExpandPack: () => expandBackpack(state, id, kit),
+    econCraftBag: () => craftContainer(state, id, kit),
     merchantTalk: () => merchantTalk(state, id, kit),
     merchantOrder: () => fulfillOrder(state, id, kit),
   };
@@ -7390,9 +7543,9 @@ function economyAction(state, action, { id, count = 1 }, kit) {
   return actions[action]();
 }
 
-return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale };
+return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem };
 })();
-const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale } = economyModule;
+const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem } = economyModule;
 const { alchemyData, initialAlchemyState, alchemyView, alchemyAction } = (() => {
 const town = {
   name: '丹师安蒲',
@@ -7897,6 +8050,7 @@ function groundPlace(state) {
 
 const roadsideActions = new Set(['eat', 'batchEat', 'use', 'equip', 'unequip', 'equipManual',
   'unequipManual', 'selectAmmo', 'take', 'discard']);
+const containerTransfers = new Set(['econBagDeposit', 'econBagWithdraw']);
 
 function groundAt(state, place = groundPlace(state)) {
   return state.ground?.[place] ?? {};
@@ -9678,7 +9832,7 @@ function hasRoom(state, loot, spent) {
 }
 
 function gearReserved(state, id) {
-  return owns(state, id) || state.economy.warehouse[id] || state.economy.jobs.some(({ loot }) => loot[id]);
+  return owns(state, id) || state.economy.warehouse[id] || containerHasItem(state, id) || state.economy.jobs.some(({ loot }) => loot[id]);
 }
 
 function breakthroughBlockers(state, next) {
@@ -10034,6 +10188,7 @@ function takeTurn(state, action, payload) {
     if (state.roadBandit) return banditAction(state, action, payload, economyKit) ?? refuse('先处理眼前拦路的人。');
     if (action === 'roadContinue') return continueRoad(state, economyKit);
     if (action === 'roadBack') return backFromRoad(state, economyKit);
+    if (containerTransfers.has(action)) return economyAction(state, action, payload, economyKit);
     if (roadsideActions.has(action)) return generalActions[action](state, payload);
     return refuse('先走完这段路，或折回先前的路口。');
   }
@@ -10043,6 +10198,7 @@ function takeTurn(state, action, payload) {
   if (state.event) {
     const mechanism = mechanismAction(state, action, payload, economyKit);
     if (mechanism) return mechanism;
+    if (containerTransfers.has(action)) return economyAction(state, action, payload, economyKit);
     if (action === 'eat') return eat(state, false, payload.id || supply);
     if (action === 'batchEat') return eat(state, false, payload.id || supply, true);
     if (action === 'use') return use(state, payload.id, false);
@@ -10100,7 +10256,7 @@ const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [reci
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
 const slotNames = data.equipmentSlots;
 const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", dodge: "闪避", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
-const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药", manual: "内功" };
+const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药", manual: "内功", container: "收纳" };
 const weaponNames = { fist: "拳与指虎", sword: "剑", blade: "刀斧", spear: "枪戟", staff: "棍杖", hammer: "锤", bow: "弓", crossbow: "弩" };
 const manualRankName = new Intl.NumberFormat("zh-CN-u-nu-hanidec");
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
@@ -10108,10 +10264,18 @@ const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterl
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
 const guide = document.querySelector("#help");
+const guideDeduction = guide.querySelector("[data-guide-deduction]");
 const guideAffiliation = document.createElement("p");
 guideAffiliation.className = "fine sect-affiliation";
 guideAffiliation.hidden = true;
 guide.querySelector(".dialog-head").after(guideAffiliation);
+const guideBags = document.createElement("details");
+guideBags.className = "guide-topic guide-bags";
+guideBags.hidden = true;
+guideBags.innerHTML = `<summary>整理乾坤袋</summary>
+  <p class="fine">点行囊里的乾坤袋打开。右键点行囊物品会尽量装入袋中，右键点袋里的物品会尽量取回。按住 Shift 再右键只移一件。</p>
+  <p class="fine">触屏或用键盘时，点开物品，再选「装入」或「取回」。要用袋里的东西，先取回行囊。</p>`;
+guide.querySelector("[data-reset]").before(guideBags);
 const kit = document.querySelector("#kit");
 const notices = document.querySelector("#notices");
 const opening = document.querySelector("#opening");
@@ -10120,6 +10284,7 @@ const instantRoutes = ["gateJump", "gateScroll", "arrayJump"];
 const roadTravelActions = ["travel", "roadContinue", "roadBack"];
 const banditPaymentActions = ["banditPay", "banditSettle", "banditSurrender"];
 const banditOfferActions = ["banditPayCoins", "banditPayItem", "banditClearOffer"];
+const bagTransferActions = ["econBagDeposit", "econBagWithdraw"];
 let state = freshGame();
 let screen = "journey";
 let marketMode = "buy";
@@ -10128,6 +10293,7 @@ let openingTimer;
 let restartNotice = false;
 let transferTimer;
 let selectedItem = null;
+let openBagId = null;
 let combatObservation = null;
 const kitSectionOpen = new Map();
 let activeDeduction = null;
@@ -10688,15 +10854,55 @@ function gearDescription(item, gear, remaining) {
   return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
 }
 
-function itemSlot(item, location, description, actions = "", label = "", count = 0) {
+function itemSlot(item, location, description, actions = "", label = "", count = 0, controls = {}) {
   const key = `${location}-${item.id}`;
-  const open = selectedItem === key;
+  const open = controls.openBag ? openBagId === item.id : selectedItem === key;
+  const openAction = controls.openBag ? ` data-open-bag="${escape(item.id)}"${open ? ` aria-controls="kit-bag-${escape(item.id)}"` : ""}` : "";
+  const shortcut = controls.shortcut
+    ? ` data-bag-action="${controls.shortcut.action}" data-bag-id="${escape(controls.shortcut.bagId)}" data-bag-item="${escape(item.id)}"` : "";
   return `<div class="item-row" data-item-row="${escape(key)}">
     ${label ? `<span class="slot-label">${escape(label)}</span>` : ""}
-    <button type="button" class="item-trigger" data-item="${escape(key)}" aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
+    <button type="button" class="item-trigger" data-item="${escape(key)}"${openAction}${shortcut} aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
     <span class="item-tip" id="tip-${escape(key)}" role="tooltip">${escape(publicText(description))}</span>
     ${actions ? `<div class="item-tools"${open ? "" : " hidden"}>${actions}</div>` : ""}
   </div>`;
+}
+
+function bagTransferButton(label, action, bagId, itemId, count, disabled = false) {
+  return `<button type="button" class="button quiet" data-action="${action}" data-bag-id="${escape(bagId)}"
+    data-value="${escape(itemId)}" data-count="${count}"${disabled ? " disabled" : ""}>${escape(label)}</button>`;
+}
+
+function bagTransferControls(action, bagId, row) {
+  if (!row) return {};
+  const verb = action === "econBagDeposit" ? "装入" : "取回";
+  const maximum = row.maximum ?? 0;
+  const first = bagTransferButton(maximum > 1 ? `${verb} 1 件` : verb, action, bagId, row.id, 1, maximum <= 0);
+  const more = maximum > 1 ? bagTransferButton(maximum === row.count ? `${verb}全部` : `${verb} ${maximum} 件`, action, bagId, row.id, "all") : "";
+  const reason = row.blockedReason || row.reason;
+  return { actions: first + more + (maximum <= 0 && reason ? `<p class="fine bag-blocker">${escape(reason)}</p>` : ""),
+    shortcut: { action, bagId } };
+}
+
+function bagContents(bag, canMove) {
+  if (!bag) return "";
+  const rows = { "材料": [], "补给": [], "装备和功谱": [], "其他物件": [] };
+  for (const row of bag.stored) {
+    const item = itemRows[row.id];
+    const gear = data.gear.find(entry => entry.id === row.id);
+    const pill = data.pills.find(entry => entry.id === row.id);
+    const seal = data.talismans.find(entry => entry.id === row.id);
+    const description = gear ? gearDescription(item, gear, row.wear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
+    const category = item.kind === "material" ? "材料" : ["food", "pill", "ammo", "talisman"].includes(item.kind) ? "补给"
+      : ["gear", "manual"].includes(item.kind) ? "装备和功谱" : "其他物件";
+    const controls = canMove ? bagTransferControls("econBagWithdraw", bag.id, row) : {};
+    rows[category].push(itemSlot(item, `bag-${bag.id}`, description, controls.actions, "", row.count, controls));
+  }
+  const storage = Object.entries(rows).map(([category, entries]) => kitDetails(`bag-${bag.id}-${category}`, category, entries, entries.length <= 6)).join("");
+  return `<section class="kit-section container-kit" id="kit-bag-${escape(bag.id)}"><div class="kit-head">
+      <h2>${escape(bag.name)}</h2><span class="fine">${bag.used}/${bag.capacity} 格</span></div>
+    <progress class="pack-meter" max="${bag.capacity}" value="${bag.used}" aria-label="${escape(bag.name)}已用${bag.used}格，共${bag.capacity}格"></progress>
+    ${storage || '<p class="fine">空</p>'}</section>`;
 }
 
 function manualDescription(book, active = false) {
@@ -10726,6 +10932,9 @@ function manualActions(book, active, canManage, canTrain) {
 function pack(s) {
   const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event" || onOpenRoad(s);
   const canManageManual = canEquip && !s.gathering;
+  const containers = s.economy?.containers ?? [];
+  const openBag = containers.find(row => row.id === openBagId);
+  const bagSources = new Map((openBag?.carried ?? []).map(row => [row.id, row]));
   const canUse = canEquip || s.mode === "combat";
   const canEat = canUse;
   const repair = s.mode === "village" ? s.repairService : null;
@@ -10751,6 +10960,8 @@ function pack(s) {
     const pill = data.pills.find(g => g.id === row.id);
     const seal = data.talismans.find(g => g.id === row.id);
     const book = manuals.get(row.id);
+    const controls = row.kind === "container" ? { openBag: true } : canManageManual && openBag
+      ? bagTransferControls("econBagDeposit", openBag.id, bagSources.get(row.id)) : {};
     let actions = "";
     if (gear) {
       const remaining = s.durability[row.id] ?? gear.durability;
@@ -10779,9 +10990,10 @@ function pack(s) {
       actions += linkButton("拆篓取药", "unpackBasket", "", "danger");
     }
     if (row.id === "gate_scroll" && canEquip && !s.gathering && !onOpenRoad(s)) actions += tabButton("展开卷轴", "atlas");
+    actions += controls.actions ?? "";
     if (canEquip && !row.breakthrough) actions += linkButton("放下", "discard", row.id, "quiet");
     const description = book ? manualDescription(book) : gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
-    return itemSlot(row, "held", description, actions, "", s.inventory[row.id]);
+    return itemSlot(row, "held", description, actions, "", s.inventory[row.id], controls);
   });
   const keys = carried.filter(row => row.kind === "key" && !row.breakthrough);
   const keySlot = row => itemSlot(row, "clue", row.desc, "", "", s.inventory[row.id]);
@@ -10809,6 +11021,7 @@ function pack(s) {
       ${meter}
       ${inventory.join("") || '<p class="fine">空</p>'}
     </section>
+    ${bagContents(openBag, canManageManual)}
     ${kitDetails("clues", "线索", clues, clues.length <= 5)}
     ${kitDetails("formulae", "丹方", formulae)}
     ${ground.length ? `<section class="kit-section"><h2>脚边</h2>${ground.join("")}</section>` : ""}`;
@@ -10932,26 +11145,32 @@ function productionScreen(facility) {
 }
 
 function yard(s) {
-  const { facilities, warehouse, backpack } = s.economy;
-  const options = backpack ? [...facilities, { id: "backpack", name: "皮匠", desc: backpack.desc }] : facilities;
+  const { facilities, warehouse, backpack, containerPlans = [] } = s.economy;
+  const options = backpack || containerPlans.length
+    ? [...facilities, { id: "backpack", name: "皮匠", desc: backpack?.desc ?? "皮匠用针挑开旧皮上的一排接缝。" }]
+    : facilities;
   const current = options.find(facility => facility.id === activeFacility) ?? options[0];
   if (!current) return panel("后院", "");
   const entrances = options.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
     data-facility="${escape(facility.id)}" aria-pressed="${facility.id === current.id}">${escape(facility.name)}</button>`).join("");
-  const inside = current.id === "backpack" ? backpackScreen(backpack) : (
+  const inside = current.id === "backpack" ? backpackScreen(s, backpack, containerPlans) : (
     (current.id === "warehouse" ? warehouseScreen(warehouse) : "") + productionScreen(current));
   return panel("后院", `<div class="actions facility-tabs">${entrances}</div>
     <p class="intro facility-intro">${escape(current.desc)}</p>${inside}`, current.level > 0 ? tag(`${current.name} · ${current.level} 级`) : "");
 }
 
-function backpackScreen(backpack) {
-  const upgrades = backpack.upgrades.map((row) => card(row.name, row.desc, tag(`${row.capacity} 格`),
+function backpackScreen(s, backpack, containerPlans) {
+  const upgrades = (backpack?.upgrades ?? []).map((row) => card(row.name, row.desc, tag(`${row.capacity} 格`),
     `<span class="fine">${row.cost} 枚灵钱 · ${row.days} 日</span>` +
       linkButton(row.label, "econExpandPack", row.capacity, "", Boolean(row.reason)) +
       (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : ""),
     "", row.need)).join("");
-  return `<p class="fine">随身用的是${escape(backpack.name)}，共 ${backpack.capacity} 格。</p>
-    ${upgrades ? `<div class="card-grid">${upgrades}</div>` : ""}`;
+  const bags = containerPlans.map(row => card(row.name, row.desc, tag(`${row.capacity} 格`),
+    `<span class="fine">${row.cost} 枚灵钱 · ${row.days} 日</span>` +
+      linkButton(row.label || "缝制", "econCraftBag", row.id, "", Boolean(row.reason)) +
+      (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : ""), "", row.need)).join("");
+  return `<p class="fine">随身用的是${escape(s.backpackName)}，共 ${s.backpackCapacity} 格。</p>
+    ${upgrades || bags ? `<div class="card-grid">${upgrades}${bags}</div>` : ""}`;
 }
 
 function salePriceTag(entry) {
@@ -11182,7 +11401,7 @@ function deductionBoard(s) {
       </form>`), current.completed ? tag("已在现场验过") : current.thought ? tag("待查证", "warn") : "");
 }
 
-const focusKeys = ["data-action", "data-value", "data-count", "data-tab", "data-facility",
+const focusKeys = ["data-action", "data-value", "data-count", "data-bag-id", "data-tab", "data-facility",
   "data-market-mode", "data-case", "data-item", "data-atlas-province", "data-atlas-point"];
 
 function keyboardFocus() {
@@ -11192,7 +11411,7 @@ function keyboardFocus() {
   if (!area) return null;
   const keys = focusKeys.filter(key => control.hasAttribute(key))
     .map(key => `[${key}="${CSS.escape(control.getAttribute(key))}"]`).join("");
-  return { area, keys, action: control.dataset.action };
+  return { area, keys, action: control.dataset.action, bagId: control.dataset.bagId };
 }
 
 function restoreKeyboardFocus(focus) {
@@ -11201,7 +11420,9 @@ function restoreKeyboardFocus(focus) {
   const inspected = focus.area === kit && selectedItem ? kit.querySelector(`[data-item="${CSS.escape(selectedItem)}"]`) : null;
   const offerFollowUp = focus.area === main && banditOfferActions.includes(focus.action)
     ? main.querySelector('[data-action="banditSettle"]:enabled') ?? main.querySelector('[data-road-offers] summary') : null;
-  const chosen = candidates.find(control => control.getClientRects().length) ?? inspected ?? offerFollowUp ??
+  const bagFollowUp = focus.area === kit && bagTransferActions.includes(focus.action)
+    ? kit.querySelector(`[data-open-bag="${CSS.escape(focus.bagId)}"]`) : null;
+  const chosen = candidates.find(control => control.getClientRects().length) ?? inspected ?? offerFollowUp ?? bagFollowUp ??
     [...main.querySelectorAll("button:enabled")].find(control => control.getClientRects().length);
   if (chosen) {
     chosen.focus({ preventScroll: true });
@@ -11217,6 +11438,8 @@ function restoreKeyboardFocus(focus) {
 function render() {
   const focus = keyboardFocus();
   const s = view(state);
+  const carriedBags = s.economy?.containers ?? [];
+  if (openBagId && !carriedBags.some(row => row.id === openBagId)) openBagId = null;
   if (s.mode !== "combat") combatObservation = null;
   const dead = s.mode === "death";
   const inEvent = s.mode === "event";
@@ -11253,6 +11476,8 @@ function render() {
   guide.querySelector('[data-tab="training"]').hidden = !available.training || inEncounter || inEvent;
   guideAffiliation.hidden = !s.affiliation;
   guideAffiliation.textContent = s.affiliation ? `${s.affiliation.name} · ${s.affiliation.disciple.name}` : "";
+  guideBags.hidden = !carriedBags.length;
+  guideDeduction.hidden = !available.deduction;
   main.innerHTML = (dead ? "" : roadPosition(s.roadTrip)) + content[tab](s);
   restoreKeyboardFocus(focus);
   return s;
@@ -11261,7 +11486,7 @@ function render() {
 function selectItem(key) {
   selectedItem = selectedItem === key ? null : key;
   for (const trigger of kit.querySelectorAll("[data-item]")) {
-    const open = trigger.dataset.item === selectedItem;
+    const open = trigger.dataset.openBag ? trigger.dataset.openBag === openBagId : trigger.dataset.item === selectedItem;
     trigger.setAttribute("aria-expanded", String(open));
     const tools = trigger.parentElement.querySelector(".item-tools");
     if (tools) tools.hidden = !open;
@@ -11282,7 +11507,7 @@ function showNotice(lines, warning) {
   setTimeout(() => toast.remove(), 4400);
 }
 
-function feedback(before, after, result, action, presentation) {
+function feedback(before, after, result, action, presentation, payload) {
   if (result.ok && banditOfferActions.includes(action)) return [];
   const ate = action === "eat" || action === "batchEat";
   const rested = action === "rest" || action === "restUntilRecovered";
@@ -11299,6 +11524,12 @@ function feedback(before, after, result, action, presentation) {
     const quantity = item => ((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0)) * (depositing ? -1 : 1);
     const moved = data.items.find(item => quantity(item) > 0);
     if (moved) return [`${depositing ? "存入" : "取出"}${moved.name} ×${quantity(moved)}。`];
+  }
+  if (result.ok && bagTransferActions.includes(action)) {
+    const item = itemRows[payload.id];
+    const bag = itemRows[payload.bagId];
+    const count = Math.abs((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0));
+    return count ? [action === "econBagDeposit" ? `把${item.name} ×${count}装入${bag.name}。` : `从${bag.name}取回${item.name} ×${count}。`] : [];
   }
   const lines = [];
   if (result.ok && banditPaymentActions.includes(action)) {
@@ -11420,7 +11651,7 @@ function performAction(action, payload) {
     runGatherProgress(state.gathering);
     return;
   }
-  const lines = feedback(before, state, result, action, presentation);
+  const lines = feedback(before, state, result, action, presentation, payload);
   const newThreat = before.roadBandit !== state.roadBandit && presentation.roadTrip?.bandit?.fightAllowed;
   showNotice(lines, Boolean(result.injury || result.damageTaken || result.banditLoss || presentation.mode === "death" || newThreat || !result.ok));
   if (transferred) showTransfer();
@@ -11482,6 +11713,13 @@ document.addEventListener("submit", event => {
   }
 });
 
+kit.addEventListener("contextmenu", event => {
+  const trigger = event.target.closest("button[data-bag-action]");
+  if (!trigger || event.button !== 2) return;
+  event.preventDefault();
+  performAction(trigger.dataset.bagAction, { bagId: trigger.dataset.bagId, id: trigger.dataset.bagItem, count: event.shiftKey ? 1 : "all" });
+});
+
 document.addEventListener("click", event => {
   const observation = event.target.closest(".field-note > summary");
   if (observation && state.combat) combatObservation = observation.parentElement.open ? null : state.combat;
@@ -11497,6 +11735,12 @@ document.addEventListener("click", event => {
   }
   if (button.hasAttribute("data-skip-transfer")) {
     dismissTransfer();
+    return;
+  }
+  if (button.dataset.openBag) {
+    openBagId = openBagId === button.dataset.openBag ? null : button.dataset.openBag;
+    selectedItem = null;
+    render();
     return;
   }
   if (button.dataset.item) {
@@ -11526,6 +11770,8 @@ document.addEventListener("click", event => {
     atlasPoint = null;
     atlasIndexOpen = false;
     selectedItem = null;
+    openBagId = null;
+    for (const topic of guide.querySelectorAll("details")) topic.open = false;
     activeDeduction = null;
     deductionDrafts.clear();
     experimentDrafts.clear();
@@ -11578,6 +11824,11 @@ document.addEventListener("click", event => {
   const action = button.dataset.action;
   if (!action) return;
   const value = button.dataset.value;
+  if (bagTransferActions.includes(action)) {
+    const count = button.dataset.count === "all" ? "all" : Number(button.dataset.count);
+    performAction(action, { bagId: button.dataset.bagId, id: value, count });
+    return;
+  }
   const payload = ["choose", "beginGather"].includes(action) ? { index: Number(value) } :
     action === "unequip" ? { slot: value } : action === "take" ? { id: value } : { id: value, count: Number(button.dataset.count ?? 1) };
   performAction(action, payload);

@@ -160,6 +160,10 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .item-tools { display: flex; grid-column: 1 / -1; flex-wrap: wrap; gap: 5px; margin: 4px 0; }
 .item-tools .button { padding: 3px 8px; min-height: 30px; font-size: 13px; }
 .manual-upgrade-note { flex-basis: 100%; overflow-wrap: anywhere; }
+.container-kit { padding-left: 8px; border-left: 2px solid #526b59; }
+.container-kit > .kit-section { margin-top: 4px; }
+.container-kit > .kit-section + .kit-section { padding-top: 4px; }
+.bag-blocker { flex-basis: 100%; }
 @media (hover: hover) {
   .item-trigger:hover + .item-tip { position: absolute; z-index: 3; display: block; inset: calc(100% - 1px) 0 auto; }
   .entry-anchor > .item-trigger:hover + .item-tip { right: auto; width: min(236px, 73vw); }
@@ -332,9 +336,11 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .player-thought { overflow-wrap: anywhere; white-space: pre-wrap; }
 dialog { width: min(414px, calc(100% - 26px)); color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
 dialog::backdrop { background: #08100bd1; }
-dialog ol { padding-left: 22px; color: var(--muted); }
 .dialog-head { display: flex; align-items: center; justify-content: space-between; }
 .sect-affiliation { margin-top: 6px; }
+.guide-topic { margin: 5px 0 8px; }
+.guide-topic > summary { color: var(--jade); cursor: pointer; }
+.guide-topic > p { margin-top: 4px; }
 .dialog-head button, .text-danger { color: var(--red); background: transparent; border: 1px solid #654e44; border-radius: 5px; padding: 4px 8px; cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 610px) {

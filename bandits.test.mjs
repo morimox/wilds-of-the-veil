@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
 import { act, createGame, rules, view } from './engine.mjs';
-import { apparentBanditGrade, roadBanditRisk } from './bandits.mjs';
+import { apparentBanditGrade, checkRoadBanditStep, roadBanditRisk } from './bandits.mjs';
 import { backFromRoad, continueRoad, roadGraph, roadTripView, travelRoad } from './world.mjs';
 
 const regions = Object.fromEntries(data.regions.map((region) => [region.id, region]));
@@ -168,6 +168,28 @@ function interrupted({ fixed = true } = {}) {
   assert.equal(result.roadInterrupted, true);
   return state;
 }
+
+test('a walk keeps its first-encounter risk and sharply reduces each further encounter', () => {
+  const kit = { ...roadPolicyKit, records: {
+    ...roadPolicyKit.records, enemies: Object.fromEntries(data.enemies.map((enemy) => [enemy.id, enemy])),
+  }, groundAt: () => ({}), say: (_state, message) => ({ ok: true, message }) };
+  const leg = { ...riskyLeg, stepUnits: 1 };
+  const rolls = [
+    { seed: 2023, hit: [true, false, false] }, // First draw: 2.01%
+    { seed: 1977, hit: [true, true, false] },  // First draw: 0.23%
+    { seed: 1972, hit: [true, true, true] },   // First draw: 0.032%
+  ];
+  for (const { seed, hit } of rolls) {
+    for (const [prior, shouldStop] of hit.entries()) {
+      const state = traveler('marsh', ['ridge']);
+      state.resolvedBandits.push('road_slate_peg');
+      state.roadSeed = seed;
+      state.roadTrip = { banditsMet: Array.from({ length: prior }, (_, i) => `already-met-${i}`) };
+      assert.equal(Boolean(checkRoadBanditStep(state, leg, 1, kit)?.roadInterrupted), shouldStop);
+      assert.equal(state.roadTrip.banditsMet.length, prior + Number(shouldStop));
+    }
+  }
+});
 
 test('village paths, guarded city roads, ferries and teleport scrolls do not roll a road encounter', () => {
   const state = traveler('village');

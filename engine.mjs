@@ -1,5 +1,5 @@
 import * as moduleData from './data.mjs';
-import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale } from './economy.mjs';
+import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem } from './economy.mjs';
 import { hazardView, hazardAction, hazardVictory } from './hazards.mjs';
 import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
 import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView } from './world.mjs';
@@ -236,6 +236,7 @@ function groundPlace(state) {
 
 const roadsideActions = new Set(['eat', 'batchEat', 'use', 'equip', 'unequip', 'equipManual',
   'unequipManual', 'selectAmmo', 'take', 'discard']);
+const containerTransfers = new Set(['econBagDeposit', 'econBagWithdraw']);
 
 function groundAt(state, place = groundPlace(state)) {
   return state.ground?.[place] ?? {};
@@ -2017,7 +2018,7 @@ function hasRoom(state, loot, spent) {
 }
 
 function gearReserved(state, id) {
-  return owns(state, id) || state.economy.warehouse[id] || state.economy.jobs.some(({ loot }) => loot[id]);
+  return owns(state, id) || state.economy.warehouse[id] || containerHasItem(state, id) || state.economy.jobs.some(({ loot }) => loot[id]);
 }
 
 function breakthroughBlockers(state, next) {
@@ -2373,6 +2374,7 @@ function takeTurn(state, action, payload) {
     if (state.roadBandit) return banditAction(state, action, payload, economyKit) ?? refuse('先处理眼前拦路的人。');
     if (action === 'roadContinue') return continueRoad(state, economyKit);
     if (action === 'roadBack') return backFromRoad(state, economyKit);
+    if (containerTransfers.has(action)) return economyAction(state, action, payload, economyKit);
     if (roadsideActions.has(action)) return generalActions[action](state, payload);
     return refuse('先走完这段路，或折回先前的路口。');
   }
@@ -2382,6 +2384,7 @@ function takeTurn(state, action, payload) {
   if (state.event) {
     const mechanism = mechanismAction(state, action, payload, economyKit);
     if (mechanism) return mechanism;
+    if (containerTransfers.has(action)) return economyAction(state, action, payload, economyKit);
     if (action === 'eat') return eat(state, false, payload.id || supply);
     if (action === 'batchEat') return eat(state, false, payload.id || supply, true);
     if (action === 'use') return use(state, payload.id, false);

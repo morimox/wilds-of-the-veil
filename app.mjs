@@ -9,7 +9,7 @@ const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [reci
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
 const slotNames = data.equipmentSlots;
 const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", dodge: "闪避", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
-const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药", manual: "内功" };
+const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药", manual: "内功", container: "收纳" };
 const weaponNames = { fist: "拳与指虎", sword: "剑", blade: "刀斧", spear: "枪戟", staff: "棍杖", hammer: "锤", bow: "弓", crossbow: "弩" };
 const manualRankName = new Intl.NumberFormat("zh-CN-u-nu-hanidec");
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
@@ -17,10 +17,18 @@ const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterl
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
 const guide = document.querySelector("#help");
+const guideDeduction = guide.querySelector("[data-guide-deduction]");
 const guideAffiliation = document.createElement("p");
 guideAffiliation.className = "fine sect-affiliation";
 guideAffiliation.hidden = true;
 guide.querySelector(".dialog-head").after(guideAffiliation);
+const guideBags = document.createElement("details");
+guideBags.className = "guide-topic guide-bags";
+guideBags.hidden = true;
+guideBags.innerHTML = `<summary>整理乾坤袋</summary>
+  <p class="fine">点行囊里的乾坤袋打开。右键点行囊物品会尽量装入袋中，右键点袋里的物品会尽量取回。按住 Shift 再右键只移一件。</p>
+  <p class="fine">触屏或用键盘时，点开物品，再选「装入」或「取回」。要用袋里的东西，先取回行囊。</p>`;
+guide.querySelector("[data-reset]").before(guideBags);
 const kit = document.querySelector("#kit");
 const notices = document.querySelector("#notices");
 const opening = document.querySelector("#opening");
@@ -29,6 +37,7 @@ const instantRoutes = ["gateJump", "gateScroll", "arrayJump"];
 const roadTravelActions = ["travel", "roadContinue", "roadBack"];
 const banditPaymentActions = ["banditPay", "banditSettle", "banditSurrender"];
 const banditOfferActions = ["banditPayCoins", "banditPayItem", "banditClearOffer"];
+const bagTransferActions = ["econBagDeposit", "econBagWithdraw"];
 let state = freshGame();
 let screen = "journey";
 let marketMode = "buy";
@@ -37,6 +46,7 @@ let openingTimer;
 let restartNotice = false;
 let transferTimer;
 let selectedItem = null;
+let openBagId = null;
 let combatObservation = null;
 const kitSectionOpen = new Map();
 let activeDeduction = null;
@@ -597,15 +607,55 @@ function gearDescription(item, gear, remaining) {
   return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
 }
 
-function itemSlot(item, location, description, actions = "", label = "", count = 0) {
+function itemSlot(item, location, description, actions = "", label = "", count = 0, controls = {}) {
   const key = `${location}-${item.id}`;
-  const open = selectedItem === key;
+  const open = controls.openBag ? openBagId === item.id : selectedItem === key;
+  const openAction = controls.openBag ? ` data-open-bag="${escape(item.id)}"${open ? ` aria-controls="kit-bag-${escape(item.id)}"` : ""}` : "";
+  const shortcut = controls.shortcut
+    ? ` data-bag-action="${controls.shortcut.action}" data-bag-id="${escape(controls.shortcut.bagId)}" data-bag-item="${escape(item.id)}"` : "";
   return `<div class="item-row" data-item-row="${escape(key)}">
     ${label ? `<span class="slot-label">${escape(label)}</span>` : ""}
-    <button type="button" class="item-trigger" data-item="${escape(key)}" aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
+    <button type="button" class="item-trigger" data-item="${escape(key)}"${openAction}${shortcut} aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
     <span class="item-tip" id="tip-${escape(key)}" role="tooltip">${escape(publicText(description))}</span>
     ${actions ? `<div class="item-tools"${open ? "" : " hidden"}>${actions}</div>` : ""}
   </div>`;
+}
+
+function bagTransferButton(label, action, bagId, itemId, count, disabled = false) {
+  return `<button type="button" class="button quiet" data-action="${action}" data-bag-id="${escape(bagId)}"
+    data-value="${escape(itemId)}" data-count="${count}"${disabled ? " disabled" : ""}>${escape(label)}</button>`;
+}
+
+function bagTransferControls(action, bagId, row) {
+  if (!row) return {};
+  const verb = action === "econBagDeposit" ? "装入" : "取回";
+  const maximum = row.maximum ?? 0;
+  const first = bagTransferButton(maximum > 1 ? `${verb} 1 件` : verb, action, bagId, row.id, 1, maximum <= 0);
+  const more = maximum > 1 ? bagTransferButton(maximum === row.count ? `${verb}全部` : `${verb} ${maximum} 件`, action, bagId, row.id, "all") : "";
+  const reason = row.blockedReason || row.reason;
+  return { actions: first + more + (maximum <= 0 && reason ? `<p class="fine bag-blocker">${escape(reason)}</p>` : ""),
+    shortcut: { action, bagId } };
+}
+
+function bagContents(bag, canMove) {
+  if (!bag) return "";
+  const rows = { "材料": [], "补给": [], "装备和功谱": [], "其他物件": [] };
+  for (const row of bag.stored) {
+    const item = itemRows[row.id];
+    const gear = data.gear.find(entry => entry.id === row.id);
+    const pill = data.pills.find(entry => entry.id === row.id);
+    const seal = data.talismans.find(entry => entry.id === row.id);
+    const description = gear ? gearDescription(item, gear, row.wear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
+    const category = item.kind === "material" ? "材料" : ["food", "pill", "ammo", "talisman"].includes(item.kind) ? "补给"
+      : ["gear", "manual"].includes(item.kind) ? "装备和功谱" : "其他物件";
+    const controls = canMove ? bagTransferControls("econBagWithdraw", bag.id, row) : {};
+    rows[category].push(itemSlot(item, `bag-${bag.id}`, description, controls.actions, "", row.count, controls));
+  }
+  const storage = Object.entries(rows).map(([category, entries]) => kitDetails(`bag-${bag.id}-${category}`, category, entries, entries.length <= 6)).join("");
+  return `<section class="kit-section container-kit" id="kit-bag-${escape(bag.id)}"><div class="kit-head">
+      <h2>${escape(bag.name)}</h2><span class="fine">${bag.used}/${bag.capacity} 格</span></div>
+    <progress class="pack-meter" max="${bag.capacity}" value="${bag.used}" aria-label="${escape(bag.name)}已用${bag.used}格，共${bag.capacity}格"></progress>
+    ${storage || '<p class="fine">空</p>'}</section>`;
 }
 
 function manualDescription(book, active = false) {
@@ -635,6 +685,9 @@ function manualActions(book, active, canManage, canTrain) {
 function pack(s) {
   const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event" || onOpenRoad(s);
   const canManageManual = canEquip && !s.gathering;
+  const containers = s.economy?.containers ?? [];
+  const openBag = containers.find(row => row.id === openBagId);
+  const bagSources = new Map((openBag?.carried ?? []).map(row => [row.id, row]));
   const canUse = canEquip || s.mode === "combat";
   const canEat = canUse;
   const repair = s.mode === "village" ? s.repairService : null;
@@ -660,6 +713,8 @@ function pack(s) {
     const pill = data.pills.find(g => g.id === row.id);
     const seal = data.talismans.find(g => g.id === row.id);
     const book = manuals.get(row.id);
+    const controls = row.kind === "container" ? { openBag: true } : canManageManual && openBag
+      ? bagTransferControls("econBagDeposit", openBag.id, bagSources.get(row.id)) : {};
     let actions = "";
     if (gear) {
       const remaining = s.durability[row.id] ?? gear.durability;
@@ -688,9 +743,10 @@ function pack(s) {
       actions += linkButton("拆篓取药", "unpackBasket", "", "danger");
     }
     if (row.id === "gate_scroll" && canEquip && !s.gathering && !onOpenRoad(s)) actions += tabButton("展开卷轴", "atlas");
+    actions += controls.actions ?? "";
     if (canEquip && !row.breakthrough) actions += linkButton("放下", "discard", row.id, "quiet");
     const description = book ? manualDescription(book) : gear ? gearDescription(row, gear, s.durability[row.id] ?? gear.durability) : pill ? pillSummary(pill) : seal ? talismanSummary(seal) : row.desc;
-    return itemSlot(row, "held", description, actions, "", s.inventory[row.id]);
+    return itemSlot(row, "held", description, actions, "", s.inventory[row.id], controls);
   });
   const keys = carried.filter(row => row.kind === "key" && !row.breakthrough);
   const keySlot = row => itemSlot(row, "clue", row.desc, "", "", s.inventory[row.id]);
@@ -718,6 +774,7 @@ function pack(s) {
       ${meter}
       ${inventory.join("") || '<p class="fine">空</p>'}
     </section>
+    ${bagContents(openBag, canManageManual)}
     ${kitDetails("clues", "线索", clues, clues.length <= 5)}
     ${kitDetails("formulae", "丹方", formulae)}
     ${ground.length ? `<section class="kit-section"><h2>脚边</h2>${ground.join("")}</section>` : ""}`;
@@ -841,26 +898,32 @@ function productionScreen(facility) {
 }
 
 function yard(s) {
-  const { facilities, warehouse, backpack } = s.economy;
-  const options = backpack ? [...facilities, { id: "backpack", name: "皮匠", desc: backpack.desc }] : facilities;
+  const { facilities, warehouse, backpack, containerPlans = [] } = s.economy;
+  const options = backpack || containerPlans.length
+    ? [...facilities, { id: "backpack", name: "皮匠", desc: backpack?.desc ?? "皮匠用针挑开旧皮上的一排接缝。" }]
+    : facilities;
   const current = options.find(facility => facility.id === activeFacility) ?? options[0];
   if (!current) return panel("后院", "");
   const entrances = options.map(facility => `<button type="button" class="button${facility.id === current.id ? " primary" : " quiet"}"
     data-facility="${escape(facility.id)}" aria-pressed="${facility.id === current.id}">${escape(facility.name)}</button>`).join("");
-  const inside = current.id === "backpack" ? backpackScreen(backpack) : (
+  const inside = current.id === "backpack" ? backpackScreen(s, backpack, containerPlans) : (
     (current.id === "warehouse" ? warehouseScreen(warehouse) : "") + productionScreen(current));
   return panel("后院", `<div class="actions facility-tabs">${entrances}</div>
     <p class="intro facility-intro">${escape(current.desc)}</p>${inside}`, current.level > 0 ? tag(`${current.name} · ${current.level} 级`) : "");
 }
 
-function backpackScreen(backpack) {
-  const upgrades = backpack.upgrades.map((row) => card(row.name, row.desc, tag(`${row.capacity} 格`),
+function backpackScreen(s, backpack, containerPlans) {
+  const upgrades = (backpack?.upgrades ?? []).map((row) => card(row.name, row.desc, tag(`${row.capacity} 格`),
     `<span class="fine">${row.cost} 枚灵钱 · ${row.days} 日</span>` +
       linkButton(row.label, "econExpandPack", row.capacity, "", Boolean(row.reason)) +
       (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : ""),
     "", row.need)).join("");
-  return `<p class="fine">随身用的是${escape(backpack.name)}，共 ${backpack.capacity} 格。</p>
-    ${upgrades ? `<div class="card-grid">${upgrades}</div>` : ""}`;
+  const bags = containerPlans.map(row => card(row.name, row.desc, tag(`${row.capacity} 格`),
+    `<span class="fine">${row.cost} 枚灵钱 · ${row.days} 日</span>` +
+      linkButton(row.label || "缝制", "econCraftBag", row.id, "", Boolean(row.reason)) +
+      (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : ""), "", row.need)).join("");
+  return `<p class="fine">随身用的是${escape(s.backpackName)}，共 ${s.backpackCapacity} 格。</p>
+    ${upgrades || bags ? `<div class="card-grid">${upgrades}${bags}</div>` : ""}`;
 }
 
 function salePriceTag(entry) {
@@ -1091,7 +1154,7 @@ function deductionBoard(s) {
       </form>`), current.completed ? tag("已在现场验过") : current.thought ? tag("待查证", "warn") : "");
 }
 
-const focusKeys = ["data-action", "data-value", "data-count", "data-tab", "data-facility",
+const focusKeys = ["data-action", "data-value", "data-count", "data-bag-id", "data-tab", "data-facility",
   "data-market-mode", "data-case", "data-item", "data-atlas-province", "data-atlas-point"];
 
 function keyboardFocus() {
@@ -1101,7 +1164,7 @@ function keyboardFocus() {
   if (!area) return null;
   const keys = focusKeys.filter(key => control.hasAttribute(key))
     .map(key => `[${key}="${CSS.escape(control.getAttribute(key))}"]`).join("");
-  return { area, keys, action: control.dataset.action };
+  return { area, keys, action: control.dataset.action, bagId: control.dataset.bagId };
 }
 
 function restoreKeyboardFocus(focus) {
@@ -1110,7 +1173,9 @@ function restoreKeyboardFocus(focus) {
   const inspected = focus.area === kit && selectedItem ? kit.querySelector(`[data-item="${CSS.escape(selectedItem)}"]`) : null;
   const offerFollowUp = focus.area === main && banditOfferActions.includes(focus.action)
     ? main.querySelector('[data-action="banditSettle"]:enabled') ?? main.querySelector('[data-road-offers] summary') : null;
-  const chosen = candidates.find(control => control.getClientRects().length) ?? inspected ?? offerFollowUp ??
+  const bagFollowUp = focus.area === kit && bagTransferActions.includes(focus.action)
+    ? kit.querySelector(`[data-open-bag="${CSS.escape(focus.bagId)}"]`) : null;
+  const chosen = candidates.find(control => control.getClientRects().length) ?? inspected ?? offerFollowUp ?? bagFollowUp ??
     [...main.querySelectorAll("button:enabled")].find(control => control.getClientRects().length);
   if (chosen) {
     chosen.focus({ preventScroll: true });
@@ -1126,6 +1191,8 @@ function restoreKeyboardFocus(focus) {
 function render() {
   const focus = keyboardFocus();
   const s = view(state);
+  const carriedBags = s.economy?.containers ?? [];
+  if (openBagId && !carriedBags.some(row => row.id === openBagId)) openBagId = null;
   if (s.mode !== "combat") combatObservation = null;
   const dead = s.mode === "death";
   const inEvent = s.mode === "event";
@@ -1162,6 +1229,8 @@ function render() {
   guide.querySelector('[data-tab="training"]').hidden = !available.training || inEncounter || inEvent;
   guideAffiliation.hidden = !s.affiliation;
   guideAffiliation.textContent = s.affiliation ? `${s.affiliation.name} · ${s.affiliation.disciple.name}` : "";
+  guideBags.hidden = !carriedBags.length;
+  guideDeduction.hidden = !available.deduction;
   main.innerHTML = (dead ? "" : roadPosition(s.roadTrip)) + content[tab](s);
   restoreKeyboardFocus(focus);
   return s;
@@ -1170,7 +1239,7 @@ function render() {
 function selectItem(key) {
   selectedItem = selectedItem === key ? null : key;
   for (const trigger of kit.querySelectorAll("[data-item]")) {
-    const open = trigger.dataset.item === selectedItem;
+    const open = trigger.dataset.openBag ? trigger.dataset.openBag === openBagId : trigger.dataset.item === selectedItem;
     trigger.setAttribute("aria-expanded", String(open));
     const tools = trigger.parentElement.querySelector(".item-tools");
     if (tools) tools.hidden = !open;
@@ -1191,7 +1260,7 @@ function showNotice(lines, warning) {
   setTimeout(() => toast.remove(), 4400);
 }
 
-function feedback(before, after, result, action, presentation) {
+function feedback(before, after, result, action, presentation, payload) {
   if (result.ok && banditOfferActions.includes(action)) return [];
   const ate = action === "eat" || action === "batchEat";
   const rested = action === "rest" || action === "restUntilRecovered";
@@ -1208,6 +1277,12 @@ function feedback(before, after, result, action, presentation) {
     const quantity = item => ((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0)) * (depositing ? -1 : 1);
     const moved = data.items.find(item => quantity(item) > 0);
     if (moved) return [`${depositing ? "存入" : "取出"}${moved.name} ×${quantity(moved)}。`];
+  }
+  if (result.ok && bagTransferActions.includes(action)) {
+    const item = itemRows[payload.id];
+    const bag = itemRows[payload.bagId];
+    const count = Math.abs((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0));
+    return count ? [action === "econBagDeposit" ? `把${item.name} ×${count}装入${bag.name}。` : `从${bag.name}取回${item.name} ×${count}。`] : [];
   }
   const lines = [];
   if (result.ok && banditPaymentActions.includes(action)) {
@@ -1329,7 +1404,7 @@ function performAction(action, payload) {
     runGatherProgress(state.gathering);
     return;
   }
-  const lines = feedback(before, state, result, action, presentation);
+  const lines = feedback(before, state, result, action, presentation, payload);
   const newThreat = before.roadBandit !== state.roadBandit && presentation.roadTrip?.bandit?.fightAllowed;
   showNotice(lines, Boolean(result.injury || result.damageTaken || result.banditLoss || presentation.mode === "death" || newThreat || !result.ok));
   if (transferred) showTransfer();
@@ -1391,6 +1466,13 @@ document.addEventListener("submit", event => {
   }
 });
 
+kit.addEventListener("contextmenu", event => {
+  const trigger = event.target.closest("button[data-bag-action]");
+  if (!trigger || event.button !== 2) return;
+  event.preventDefault();
+  performAction(trigger.dataset.bagAction, { bagId: trigger.dataset.bagId, id: trigger.dataset.bagItem, count: event.shiftKey ? 1 : "all" });
+});
+
 document.addEventListener("click", event => {
   const observation = event.target.closest(".field-note > summary");
   if (observation && state.combat) combatObservation = observation.parentElement.open ? null : state.combat;
@@ -1406,6 +1488,12 @@ document.addEventListener("click", event => {
   }
   if (button.hasAttribute("data-skip-transfer")) {
     dismissTransfer();
+    return;
+  }
+  if (button.dataset.openBag) {
+    openBagId = openBagId === button.dataset.openBag ? null : button.dataset.openBag;
+    selectedItem = null;
+    render();
     return;
   }
   if (button.dataset.item) {
@@ -1435,6 +1523,8 @@ document.addEventListener("click", event => {
     atlasPoint = null;
     atlasIndexOpen = false;
     selectedItem = null;
+    openBagId = null;
+    for (const topic of guide.querySelectorAll("details")) topic.open = false;
     activeDeduction = null;
     deductionDrafts.clear();
     experimentDrafts.clear();
@@ -1487,6 +1577,11 @@ document.addEventListener("click", event => {
   const action = button.dataset.action;
   if (!action) return;
   const value = button.dataset.value;
+  if (bagTransferActions.includes(action)) {
+    const count = button.dataset.count === "all" ? "all" : Number(button.dataset.count);
+    performAction(action, { bagId: button.dataset.bagId, id: value, count });
+    return;
+  }
   const payload = ["choose", "beginGather"].includes(action) ? { index: Number(value) } :
     action === "unequip" ? { slot: value } : action === "take" ? { id: value } : { id: value, count: Number(button.dataset.count ?? 1) };
   performAction(action, payload);

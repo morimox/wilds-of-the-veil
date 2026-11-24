@@ -13,7 +13,7 @@
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=31" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=32" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -50,11 +50,21 @@
   <dialog id="help" aria-labelledby="guide-title">
     <div class="dialog-head"><h2 id="guide-title">行旅菜单</h2><button type="button" data-close aria-label="关闭菜单">×</button></div>
     <div class="actions"><button type="button" class="button" data-tab="training" hidden>查看修习进度</button></div>
-    <ol>
-      <li>时间久了会饿。可以吃行囊里的干粮，空着肚子也能慢慢走回歇脚点。</li>
-      <li>点开状态名可以查看它的用途。拿到路图后可以试着走新路。</li>
-      <li>把鼠标放在物品上可以看用途，点一下可以使用或整理。</li>
-    </ol>
+    <details class="guide-topic"><summary>赶路与补给</summary>
+      <p class="fine">在山河图上查已知去路和里程。快空腹时先吃些口粮，负伤可以到歇脚处休息。</p>
+    </details>
+    <details class="guide-topic"><summary>交手与脱身</summary>
+      <p class="fine">看清对方来招时，可以据此出手或防御。要撤退，尽量等对方收招的空当。</p>
+    </details>
+    <details class="guide-topic"><summary>采集与拾取</summary>
+      <p class="fine">采集需要等进度走完。脚边的东西按种类分开拾取，装不下的还会留在原地。</p>
+    </details>
+    <details class="guide-topic"><summary>行囊与仓库</summary>
+      <p class="fine">把鼠标放在物品上可以看用途，点一下可以使用或整理。备用的物品可以存进落灯村后院的仓库。</p>
+    </details>
+    <details class="guide-topic" data-guide-deduction hidden><summary>线索与沙盘</summary>
+      <p class="fine">可以在沙盘上摊开随身的证物，写下猜想，再回现场试一试。</p>
+    </details>
     <button type="button" class="text-danger" data-reset>开始新行程</button>
   </dialog>
   <noscript>开启 JavaScript 后即可进入雾渡山河。</noscript>

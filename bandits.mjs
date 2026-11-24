@@ -13,6 +13,7 @@ export const banditRules = Object.freeze({
   fatalDefeatCap: 0.32,
   fatalChiefDefeat: 0.30,
   ignoreUnarmedChance: 0.65,
+  repeatEncounterFactors: Object.freeze([1, 0.10, 0.02]),
 });
 
 export const roadKey = (a, b) => [a, b].sort().join('|');
@@ -167,7 +168,9 @@ function stopForBandit(state, leg, crewId, kit) {
 
 export function checkRoadBanditStep(state, leg, index, kit) {
   const profile = roadBanditRisk(state, leg, kit);
-  if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1)) {
+  const prior = state.roadTrip.banditsMet?.length ?? 0;
+  const factor = banditRules.repeatEncounterFactors[Math.min(prior, banditRules.repeatEncounterFactors.length - 1)];
+  if (profile?.chance > 0 && draw(state) < profile.chance * Math.min(1, leg.stepUnits ?? 1) * factor) {
     const roster = recruitsByNow(state, profile.crew, kit);
     if (roster) state.banditCrews[profile.crew] = roster;
     const pause = stopForBandit(state, leg, profile.crew, kit);

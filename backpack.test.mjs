@@ -15,7 +15,7 @@ function deny(state, action, payload) {
   assert.deepEqual(state, before);
 }
 
-test('the leatherworker reveals side pockets and then the patterned bag, charging each job once', () => {
+test('the leatherworker sews side pockets and makes a separate patterned bag, charging each job once', () => {
   const state = createGame(214);
   assert.equal(view(state).backpackCapacity, 12);
   assert.equal(view(state).economy.backpack, null);
@@ -43,21 +43,26 @@ test('the leatherworker reveals side pockets and then the patterned bag, chargin
   assert.equal(view(state).backpackCapacity, 16);
   assert.equal(view(state).economy.backpack.upgrade, null);
   deny(state, 'econExpandPack', { id: 28 });
+  deny(state, 'econCraftBag', { id: 'qiankun_bag' });
 
   state.ground.village = { black_iron: 3, core: 4, qiankun_pattern: 1 };
   play(state, 'take', { id: 'black_iron' });
   assert.equal(view(state).economy.backpack.upgrade, null);
   play(state, 'take', { id: 'core' });
   play(state, 'take', { id: 'qiankun_pattern' });
-  offer = view(state).economy.backpack.upgrade;
-  assert.equal(offer.capacity, 28);
-  assert.match(offer.reason, /28枚灵钱/);
-  deny(state, 'econExpandPack', { id: 28 });
+  const bag = view(state).economy.containerPlans.find(({ id }) => id === 'qiankun_bag');
+  assert.equal(bag.capacity, 16);
+  assert.match(bag.reason, /28枚灵钱/);
+  deny(state, 'econCraftBag', { id: 'qiankun_bag' });
   state.coins = 30;
   deny(state, 'econExpandPack', { id: 16 });
-  play(state, 'econExpandPack', { id: '28' });
-  assert.equal(view(state).backpackCapacity, 28);
-  assert.equal(view(state).backpackName, '乾坤袋');
+  play(state, 'econCraftBag', { id: 'qiankun_bag' });
+  assert.equal(view(state).backpackCapacity, 16);
+  assert.equal(view(state).backpackName, '加缝侧袋的行囊');
+  assert.equal(state.inventory.qiankun_bag, 1);
+  const owned = view(state).economy.containers.find(({ id }) => id === 'qiankun_bag');
+  assert.equal(owned.capacity, 16);
+  assert.equal(owned.used, 0);
   assert.equal(view(state).economy.backpack.upgrade, null);
   assert.equal(state.day, day + 1.5);
   assert.equal(state.coins, 2);
@@ -66,31 +71,32 @@ test('the leatherworker reveals side pockets and then the patterned bag, chargin
   assert.equal(state.inventory.core, undefined);
   assert.equal(state.inventory.qiankun_pattern, 1);
   assert.equal(state.realm, 0);
-  deny(state, 'econExpandPack', { id: 28 });
+  deny(state, 'econCraftBag', { id: 'qiankun_bag' });
 });
 
-test('known patterns support going directly to a larger bag and only show improvements', () => {
+test('separately known patterns can be crafted in any order and every bag takes its own pack slot', () => {
   const state = createGame(216);
   assert.equal(view(state).backpackCapacity, 12);
   state.ground.village = { qiankun_pattern: 1, qiankun_fold_pattern: 1, qiankun_inner_pattern: 1 };
   for (const id of Object.keys(state.ground.village)) play(state, 'take', { id });
   assert.equal(view(state).backpackUsed, 1);
-  const offers = () => view(state).economy.backpack.upgrades.map(({ capacity }) => capacity);
-  assert.deepEqual(offers(), [28, 44, 64]);
-  state.economy.warehouse = { hide: 28, black_iron: 13, core: 20, foundation_core: 2, gold_core: 2 };
-  state.coins = 120;
-  play(state, 'econExpandPack', { id: 44 });
-  assert.equal(view(state).backpackCapacity, 44);
-  assert.equal(view(state).backpackName, '双层乾坤袋');
-  assert.deepEqual(offers(), [64]);
-  deny(state, 'econExpandPack', { id: 28 });
-  play(state, 'econExpandPack', { id: 64 });
-  assert.equal(view(state).backpackCapacity, 64);
-  assert.equal(view(state).backpackName, '深底乾坤袋');
-  assert.deepEqual(offers(), []);
+  const offers = view(state).economy.containerPlans;
+  assert.deepEqual(offers.map(({ capacity }) => capacity), [16, 28, 44]);
+  state.economy.warehouse = { hide: 38, black_iron: 16, core: 24, foundation_core: 2, gold_core: 2 };
+  state.coins = 160;
+  const bagIds = ['qiankun_fold_bag', 'qiankun_bag', 'qiankun_deep_bag'];
+  for (const [index, id] of bagIds.entries()) {
+    play(state, 'econCraftBag', { id });
+    assert.equal(state.inventory[id], 1);
+    assert.equal(view(state).backpackCapacity, 12);
+    assert.equal(view(state).backpackUsed, index + 2);
+    deny(state, 'econCraftBag', { id });
+  }
+  assert.equal(view(state).backpackName, '行囊');
+  assert.deepEqual(view(state).economy.containers.map(({ capacity }) => capacity).sort((a, b) => a - b), [16, 28, 44]);
   assert.deepEqual(state.economy.warehouse, {});
-  assert.equal(state.coins, 2);
-  assert.equal(state.day, 6);
+  assert.equal(state.coins, 14);
+  assert.equal(state.day, 7);
 });
 
 test('expanding a full backpack takes effect on pickups, unequipping and buying', () => {

@@ -117,7 +117,7 @@ const resources = (entries = {}) => Object.entries(entries)
   .map(([id, count]) => `${ref(id)}×${count}`).join('、');
 const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
-  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书',
+  gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书', container: '容器',
   attack: '普通攻势', heavy: '重招', guard: '防御', dodge: '闪避', drain: '吸取真气', heal: '恢复', focus: '蓄势', remedy: '服药',
 };
 const slotNames = data.equipmentSlots;
@@ -360,6 +360,7 @@ const huntCosts = [
   ...data.recipes.map(({ result, need, count }) => ({ type: '配方', name: name(result), need, output: count ?? 1 })),
   ...trainingData.flatMap(({ name, ranks }) => ranks.map(({ need }, index) => ({ type: '修习', name: `${name} 第${index + 1}阶`, need }))),
   ...economyData.backpackExpansions.map(({ name, need }) => ({ type: '行囊', name, need })),
+  ...economyData.containerPlans.map(({ name, need }) => ({ type: '乾坤袋', name, need, output: 1 })),
   ...economyData.projects.map(({ name, need, loot }) => ({ type: '后院生产', name, need, output: resources(loot) })),
 ].flatMap(({ type, name, need, output }) => huntedItems.filter((id) => need?.[id])
   .map((id) => ({ id, type, name, count: need[id], output })));
@@ -382,6 +383,7 @@ ruleRows.push(
   { id: 'banditFatalDefeatCap', value: banditRules.fatalDefeatCap, desc: '普通强盗战败后死亡概率上限' },
   { id: 'banditFatalChiefDefeat', value: banditRules.fatalChiefDefeat, desc: '战败于灰沟贼王时的死亡概率' },
   { id: 'banditIgnoreUnarmedChance', value: banditRules.ignoreUnarmedChance, desc: '普通拦路人直接放过无穿戴旅客的概率' },
+  { id: 'banditRepeatFactors', value: banditRules.repeatEncounterFactors.join(' / '), desc: '当趟已遇零人、一人、两人以上后，下一格路的遭遇倍率' },
   { id: 'setupDays', value: economyData.setupDays, desc: '每次开启生产的操作耗时（日）' },
   { id: 'collectDays', value: economyData.collectDays, desc: '每次领取成品的操作耗时（日）' },
   { id: 'consumableBatchLimit', value: economyData.consumableBatchLimit, desc: '常用消耗品每单合批数上限；材料、灵钱和工期照批数累加' },
@@ -525,13 +527,17 @@ const tables = [
     ['stack', '仓库每格堆叠上限'], ['reveal', '看见设施需实际取得的物件', ref], ['alternateReveal', '另一件可引出设施的物件', ref],
     'need', ['cost', '搭建扩建费用（灵钱）'], 'days', 'desc',
   ], { note: '起始仓库已经可用。等级 0 的生产设施需要先搭建。生产工位数与等级相等，完工单移出工位。开工及待领总单数最多为设施等级的两倍，仓库单列实际格数。' }),
-  table('backpack-expansions', '行囊和乾坤袋', [
+  table('backpack-expansions', '行囊和侧袋', [
     { name: '行囊', capacity: rules.backpackCapacity, source: '初来落灯村' },
     ...economyData.backpackExpansions,
   ], [
     'name', ['capacity', '容量（格）'], ['source', '来历'], ['lead', '实际发现的材料或袋样', ref],
     'need', ['cost', '制作费用（灵钱）'], 'days',
-  ], { note: '每档同种物品每格可放 20 件。落灯村皮匠照袋样制作，新袋容量较大时自动使用，所携物件直接随身。' }),
+  ], { note: '每种可堆放的物品每格最多放 20 件。侧袋缝在原行囊上。' }),
+  table('space-bags', '独立乾坤袋和制作费用', economyData.containerPlans, [
+    'id', 'name', ['capacity', '袋内格数'], ['source', '来历'], ['lead', '袋样', ref], 'need',
+    ['cost', '制作费用（灵钱）'], 'days',
+  ], { note: '每只成品占用行囊一格，袋内同种物品每格最多堆 20 件。装备按件占格。各袋分别存取，袋内物品取出后参与制作、交易、作战和交付。' }),
   table('yard-projects', '后院种植与备粮', economyData.projects, [
     'id', 'name', ['facility', '使用设施', facilityRef], ['level', '所需设施等级'],
     'need', 'loot', ['cost', '费用（灵钱）'], ['days', '等待成熟天数'],

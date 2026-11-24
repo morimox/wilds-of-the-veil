@@ -80,6 +80,7 @@ banditFatalDefeatPerTier,0.02,强盗每高一小境的死亡概率加值
 banditFatalDefeatCap,0.32,普通强盗战败后死亡概率上限
 banditFatalChiefDefeat,0.3,战败于灰沟贼王时的死亡概率
 banditIgnoreUnarmedChance,0.65,普通拦路人直接放过无穿戴旅客的概率
+banditRepeatFactors,1 / 0.1 / 0.02,当趟已遇零人、一人、两人以上后，下一格路的遭遇倍率
 setupDays,0.25,每次开启生产的操作耗时（日）
 collectDays,0.25,每次领取成品的操作耗时（日）
 consumableBatchLimit,4,常用消耗品每单合批数上限；材料、灵钱和工期照批数累加
