@@ -145,13 +145,16 @@ test('spirit guard expires after reading through an opponent’s own guard', () 
   visit(state, 'meadow_ruts');
   fieldChoice(state, 0);
   play(state, 'guard');
-  assert.equal(view(state).intent.kind, 'guard');
+  state.combat.plan.reader = null;
   const unread = structuredClone(state);
   play(state, 'readSpirit');
-  play(state, 'attack');
-  play(unread, 'attack');
-  assert.equal(view(state).intent.kind, 'heavy');
-  assert.equal(play(state, 'attack').damageTaken, play(unread, 'attack').damageTaken);
+  assert.equal(view(state).intent.kind, 'guard');
+  assert.equal(play(state, 'attack').enemyMove.kind, 'guard');
+  assert.equal(play(unread, 'attack').enemyMove.kind, 'guard');
+  const followed = play(state, 'attack');
+  const ordinary = play(unread, 'attack');
+  assert.equal(followed.enemyMove.kind, 'heavy');
+  assert.equal(followed.damageTaken, ordinary.damageTaken);
 });
 
 test('the ladder passage stays open when clear even if its iron deposit is empty', () => {

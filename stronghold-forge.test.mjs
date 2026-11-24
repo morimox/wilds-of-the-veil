@@ -140,6 +140,10 @@ test('the spear trades a point of ordinary damage for penetration against scaled
     equip(state, 'quarry_spear');
     equip(state, 'den_armguard');
     state.combat = combat;
-    assert.equal(play(state, 'attack').damageDealt - play(sword, 'attack').damageDealt, difference);
+    const strike = (fighter) => {
+      const result = play(fighter, 'attack');
+      return result.damageDealt - (result.reflectedDamage ?? 0);
+    };
+    assert.equal(strike(state) - strike(sword), difference);
   }
 });

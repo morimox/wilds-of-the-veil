@@ -44,8 +44,8 @@ function fight(state, index, enemy, { arts = false } = {}) {
   const boss = enemy === 'caravan_broker';
   while (state.satiety < (boss ? 62 : 28) && state.inventory.ration) play(state, 'eat', { id: 'ration' });
   if (boss) {
-    if (state.hp < 36) play(state, 'use', { id: 'heal_pill' });
-    if (state.qi < 12) play(state, 'use', { id: 'qi_powder' });
+    if (state.hp < view(state).maxHp - 16 && state.inventory.heal_pill) play(state, 'use', { id: 'heal_pill' });
+    while (state.qi < view(state).maxQi - 6 && state.inventory.qi_powder) play(state, 'use', { id: 'qi_powder' });
   }
   const from = state.event;
   const coins = state.coins;
@@ -56,14 +56,14 @@ function fight(state, index, enemy, { arts = false } = {}) {
   let rounds = 0;
   while (state.combat && rounds < 22) {
     const observed = view(state);
-    const move = observed.intent.kind;
+    const move = observed.intent?.kind;
     if (move === 'heavy') play(state, 'guard');
     else if (boss && move === 'heal' && state.qi >= 3) play(state, 'art', { id: 'hook_current' });
     else if (boss && move === 'drain' && state.qi < 4 && state.inventory.qi_powder) play(state, 'use', { id: 'qi_powder' });
     else if (boss && state.hp <= 24 && state.inventory.heal_pill) play(state, 'use', { id: 'heal_pill' });
     else if (state.hp <= 15 && state.inventory.salve) play(state, 'use', { id: 'salve' });
-    else if (boss && state.qi >= 5 && move === 'attack') play(state, 'art', { id: 'bell_strike' });
-    else if (arts && !boss && state.qi >= 8 && move === 'attack') play(state, 'art', { id: 'reed_cleave' });
+    else if (boss && state.qi >= 4 && move !== 'guard') play(state, 'art', { id: 'bell_strike' });
+    else if (arts && !boss && state.qi >= 8 && move !== 'guard') play(state, 'art', { id: 'reed_cleave' });
     else play(state, 'attack');
     rounds += 1;
   }

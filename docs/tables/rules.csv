@@ -11,6 +11,14 @@ firstRegionInsight,1,首次探索一个地区获得的修为（点）
 pressureThreshold,3,探索压力高于此值时开始额外消耗真气（点）
 pressureQi,1,压力超限的每次探索所消耗的真气（点）
 battleDays,0.125,战斗操作每回合用时（天）
+perceptionScale,12,洞察概率曲线分母的固定项。洞察差除以固定项与洞察差之和
+perceptionCap,0.7,洞察优势转化为看破的概率上限
+observedHitLimit,3,敌人参考最近几次实际承受的主动出招伤害
+combatDodgeCap,0.3,完好装备对普通近击的闪避叠加上限
+combatChargeFloor,4,蓄势下一次亲手出招的最小原始增伤
+combatChargeFactor,0.35,蓄势增伤按人物攻击计算的比例
+enemyChargeFactor,0.25,敌方蓄势增伤按基础攻击计算的比例
+chargeBreakDamage,4,蓄势被气血伤害打散的单回合伤害下限
 harvestEncounterDays,0.125,采集中遭遇伏击时开打前用时（天）
 ebbCycleDays,2,闭潮渡退水循环（游戏日）
 ebbWindowDays,0.625,每次退水维持时间（游戏日）

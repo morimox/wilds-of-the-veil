@@ -30,9 +30,9 @@ export const trainingData = [
   { id: 'spirit', name: '神识', region: 'zhao_city', teacher: '水师杜椿', lead: 'phase_chart',
     desc: '水还没漫过铜板边缘，杜椿就让你闭眼听它涨上来。交手时，你也能用这个法子提前察觉对方的动作。',
     ranks: [
-      { coins: 30, days: 2, need: { core: 3, qi_core: 2 }, senseMax: 2, senseGuard: 2, effect: '神识上限 2。花 1 点预看再下一招，本回合少受 2 点伤害。' },
-      { coins: 48, days: 3, need: { core: 5, beast_eye: 1, foundation_core: 1 }, senseMax: 3, senseGuard: 3, effect: '神识上限 3。花 1 点预看再下一招，本回合少受 3 点伤害。' },
-      { coins: 72, days: 4, need: { core: 8, beast_eye: 2, foundation_core: 2 }, senseMax: 4, senseGuard: 4, effect: '神识上限 4。花 1 点预看再下一招，本回合少受 4 点伤害。' },
+      { coins: 30, days: 2, need: { core: 3, qi_core: 2 }, senseMax: 2, senseGuard: 2, effect: '神识上限 2。花 1 点观这一招并少受 2 点伤害。对方还在等你先动时，只能护身。' },
+      { coins: 48, days: 3, need: { core: 5, beast_eye: 1, foundation_core: 1 }, senseMax: 3, senseGuard: 3, effect: '神识上限 3。花 1 点观这一招并少受 3 点伤害。对方还在等你先动时，只能护身。' },
+      { coins: 72, days: 4, need: { core: 8, beast_eye: 2, foundation_core: 2 }, senseMax: 4, senseGuard: 4, effect: '神识上限 4。花 1 点观这一招并少受 4 点伤害。对方还在等你先动时，只能护身。' },
     ] },
 ];
 
@@ -91,10 +91,10 @@ function spiritView(state, kit) {
   const current = state.training.sense;
   const enemy = combat && kit.records.enemies[combat.id];
   const readThisRound = combat && combat.spiritReadRound === combat.round;
-  const next = enemy && readThisRound && enemy.intents[(combat.round + 1) % enemy.intents.length];
+  const intent = enemy && readThisRound && kit.readableIntent(state);
   return {
     current, max, canRead: Boolean(enemy && !readThisRound && current > 0),
-    prediction: next ? { name: next.name, kind: next.kind } : null,
+    prediction: intent ? { name: intent.name, kind: intent.kind } : null,
   };
 }
 
@@ -136,5 +136,6 @@ export function recordTrainingRead(state, kit) {
   state.training.sense -= 1;
   state.combat.spiritReadRound = state.combat.round;
   state.combat.spiritGuard = trainedRank(state, 'spirit').senseGuard;
-  return kit.say(state, `你看见对方再下一招是「${spiritView(state, kit).prediction.name}」。`);
+  const intent = kit.readableIntent(state);
+  return kit.say(state, intent ? `你看见对方这一招是「${intent.name}」。` : '对方还在等你先动。你先凝神护住周身。');
 }

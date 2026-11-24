@@ -75,31 +75,41 @@ function shift(state, trail, id) {
 
 function fight(state, index, expected, ledger = []) {
   eatBeforeMoving(state);
+  const boss = expected === 'border_silo_leader';
+  if (boss) {
+    const { maxHp, maxQi } = view(state);
+    if (state.hp <= maxHp - 16 && state.inventory.heal_pill) play(state, 'use', { id: 'heal_pill' });
+    while (state.qi <= maxQi - 7 && state.inventory.qi_powder) play(state, 'use', { id: 'qi_powder' });
+  }
   choose(state, index);
   assert.equal(state.combat.id, expected);
   const startingHealth = state.hp;
   const turns = { enemy: expected, attack: 0, guard: 0, art: 0, use: 0, damageTaken: 0 };
   const day = state.day;
   while (state.combat) {
-    const { intent, maxHp } = view(state);
+    const { intent, maxHp, maxQi } = view(state);
+    const kind = intent?.kind;
     const pressureArt = state.realm >= 4 ? 'sky_axis' : 'cliff_cut';
     const heavyCost = state.realm >= 4 ? 7 : 4;
     let move = 'attack';
     let id;
-    if (intent.kind === 'guard' && state.hp < maxHp * 0.55 && state.inventory.heal_pill) {
+    if (kind !== 'heavy' && state.hp < maxHp * 0.5 && state.inventory.heal_pill) {
       move = 'use';
       id = 'heal_pill';
-    } else if (intent.kind === 'guard' && state.qi < heavyCost && state.inventory.qi_powder) {
+    } else if (kind !== 'heavy' && state.hp < maxHp * 0.36 && state.inventory.salve) {
+      move = 'use';
+      id = 'salve';
+    } else if (kind === 'guard' && state.qi < heavyCost && state.inventory.qi_powder) {
       move = 'use';
       id = 'qi_powder';
-    } else if (intent.kind === 'guard' && state.qi <= view(state).maxQi - rules.guardQiRecovery) {
+    } else if (kind === 'guard' && state.qi <= maxQi - rules.guardQiRecovery) {
       move = 'guard';
-    } else if (['heal', 'heavy'].includes(intent.kind) && state.qi >= heavyCost) {
+    } else if ((['heal', 'heavy'].includes(kind) || (boss && kind !== 'guard')) && state.qi >= heavyCost) {
       move = 'art';
       id = pressureArt;
-    } else if (intent.kind === 'heavy') {
+    } else if (kind === 'heavy') {
       move = 'guard';
-    } else if (intent.kind === 'attack' && state.qi >= heavyCost + 4) {
+    } else if (kind !== 'guard' && state.qi >= heavyCost + 4) {
       move = 'art';
       id = 'bell_strike';
     }
@@ -108,7 +118,7 @@ function fight(state, index, expected, ledger = []) {
     turns.damageTaken += result.damageTaken ?? 0;
     assert.ok(state.day - day < 7, `stalled on ${expected}`);
   }
-  assert.ok(state.defeated.includes(expected), `lost to ${expected}, began at ${startingHealth} health`);
+  assert.ok(state.defeated.includes(expected), `lost to ${expected}, began at ${startingHealth} health\n${state.log.slice(-12).join('\n')}`);
   assert.ok(state.event, `winner was not returned to ${expected}'s scene`);
   assert.deepEqual(view(state).groundLoot, {}, 'human opponents gave no body drops');
   ledger.push(turns);
@@ -261,8 +271,8 @@ test('a weak arrival can turn back, or fall and return without opening stages or
   const coins = state.coins;
   choose(state, 0);
   assert.equal(view(state).currentEnemy.sparring, false);
-  assert.ok(view(state).retreatRisk.damage < state.hp);
-  play(state, 'retreat');
+  const beforeRetreat = state.hp;
+  assert.ok(play(state, 'retreat').damageTaken < beforeRetreat);
   assert.equal(state.region, 'chalk_hoof_trail');
   visit(state, 'border_hoof_patrol');
   assert.equal(available(state, 0), true);

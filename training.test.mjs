@@ -23,7 +23,8 @@ function teachable(state, id) {
 
 function combat(state, id, round = 0) {
   const enemy = data.enemies.find((entry) => entry.id === id);
-  state.combat = { id, hp: enemy.hp, round, escapeBonus: 0 };
+  state.combat = { id, hp: enemy.hp, round, escapeBonus: 0,
+    plan: { round, intent: enemy.intents[round % enemy.intents.length], reader: null } };
   return enemy;
 }
 
@@ -102,17 +103,24 @@ test('one spirit reading per round, one guarded reply, and rest at a visited new
   assert.deepEqual(view(state).spiritSense, { current: 2, max: 2, canRead: false, prediction: null });
   const enemy = combat(state, 'mud_beast');
   const baseline = structuredClone(state);
+  assert.equal(view(state).intent, null);
   const day = state.day;
   play(state, 'readSpirit');
   assert.equal(state.day, day);
   assert.equal(view(state).spiritSense.current, 1);
-  assert.equal(view(state).spiritSense.prediction.name, enemy.intents[1].name);
+  assert.equal(view(state).spiritSense.prediction.name, enemy.intents[0].name);
   assert.equal(act(state, 'readSpirit').ok, false);
   assert.equal(act(state, 'trainStudy', { id: 'spirit' }).ok, false);
-  assert.equal(play(baseline, 'attack').damageTaken - play(state, 'attack').damageTaken, 2);
+  const expected = play(baseline, 'attack');
+  const guarded = play(state, 'attack');
+  assert.equal(expected.damageTaken - guarded.damageTaken, 2);
+  assert.equal(guarded.enemyMove.name, enemy.intents[0].name);
   assert.equal(state.combat.spiritGuard, undefined);
   assert.equal(view(state).spiritSense.prediction, null);
+  state.combat.plan.reader = 'enemy';
   play(state, 'readSpirit');
+  assert.equal(view(state).spiritSense.prediction, null);
+  assert.equal(view(state).intent, null);
   play(state, 'retreat');
   assert.equal(view(state).spiritSense.current, 0);
   state.hp = view(state).maxHp;

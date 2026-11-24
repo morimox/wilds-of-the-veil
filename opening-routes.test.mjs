@@ -65,7 +65,7 @@ test('an opening hunter can turn a hare and gathered fuel into meals before retu
   play(state, 'visit', 'mud_track');
   play(state, 'choose', 5);
   for (let turns = 0; state.combat && turns < 8; turns += 1) {
-    play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+    play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
   }
   assert.equal(state.combat, null);
   play(state, 'take', 'beast_meat');

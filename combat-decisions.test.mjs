@@ -17,11 +17,16 @@ function startHunt() {
   return state;
 }
 
+function revealCurrentMove(state) {
+  state.combat.plan.reader = 'player';
+  return view(state);
+}
+
 test('enemy guard gives a low-qi traveler an actual choice between pressure and breathing', () => {
   const breathing = startHunt();
   play(breathing, 'guard');
   breathing.qi = 2;
-  assert.equal(view(breathing).intent.kind, 'guard');
+  assert.equal(revealCurrentMove(breathing).intent.kind, 'guard');
   assert.equal(view(breathing).breathingQi, rules.guardQiRecovery);
   const attacking = structuredClone(breathing);
   const almostFull = structuredClone(breathing);
@@ -53,20 +58,21 @@ test('interrupting arts can deny an actual field enemy’s restoration', () => {
   play(state, 'attack');
   play(state, 'attack');
   play(state, 'guard');
-  assert.equal(view(state).intent.kind, 'heal');
+  assert.equal(revealCurrentMove(state).intent.kind, 'heal');
   const before = state.combat.hp;
   const ordinary = structuredClone(state);
   const strike = play(ordinary, 'attack');
   const interrupt = play(state, 'art', { id: 'hook_current' });
   assert.equal(ordinary.combat.hp, before - strike.damageDealt + 6);
   assert.equal(state.combat.hp, before - interrupt.damageDealt);
+  assert.equal(interrupt.enemyMove.kind, 'heal');
   assert.match(interrupt.message, /调息被打断/);
   assert.equal(ordinary.qi - state.qi, 3);
 });
 
 test('retreat forecast distinguishes lethal pursuit from the safe enemy guard window', () => {
   const state = startHunt();
-  assert.equal(view(state).intent.kind, 'heavy');
+  assert.equal(revealCurrentMove(state).intent.kind, 'heavy');
   assert.equal(view(state).retreatRisk.damage, 3);
   state.hp = 3;
   const safeOpening = structuredClone(state);
@@ -78,7 +84,7 @@ test('retreat forecast distinguishes lethal pursuit from the safe enemy guard wi
   // A healthier traveler can brace once and wait for a safe opening.
   safeOpening.hp = 18;
   play(safeOpening, 'guard');
-  assert.equal(view(safeOpening).intent.kind, 'guard');
+  assert.equal(revealCurrentMove(safeOpening).intent.kind, 'guard');
   assert.equal(view(safeOpening).retreatRisk.damage, 0);
   assert.equal(view(safeOpening).retreatRisk.wouldFall, false);
   assert.equal(play(safeOpening, 'retreat').damageTaken, 0);

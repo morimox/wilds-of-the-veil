@@ -218,6 +218,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .warning-toast { border-left-color: var(--red); background: #322119fa; color: #f5d9ca; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 .intent { margin: 8px 0; }
+.intent.unread { color: var(--muted); }
 .training-note { margin-bottom: 8px; }
 .learned-arts { margin-top: 9px; }
 .meter { max-width: 210px; color: var(--muted); font-size: 13px; }

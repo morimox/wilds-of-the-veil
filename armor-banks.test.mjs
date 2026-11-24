@@ -60,7 +60,7 @@ function defeat(state, index, enemy) {
   assert.equal(view(state).currentEnemy.id, enemy);
   let result;
   for (let turn = 0; turn < 28 && state.combat; turn += 1) {
-    const intent = view(state).intent.kind;
+    const intent = view(state).intent?.kind;
     result = play(state, intent === 'heavy' ? 'guard' : 'attack');
   }
   assert.equal(state.combat, null);

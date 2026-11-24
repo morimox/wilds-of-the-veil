@@ -39,7 +39,7 @@ function outfitForThreeBouts(state) {
 }
 
 function winCurrentBout(state) {
-  for (let i = 0; state.combat && i < 16; i++) play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+  for (let i = 0; state.combat && i < 16; i++) play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
   assert.equal(state.combat, null);
   assert.equal(state.event, null);
   assert.equal(state.region, 'measuring_hall');

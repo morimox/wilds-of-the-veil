@@ -32,7 +32,7 @@ function hunt(state, index, expected) {
   if (state.satiety < 45) play(state, 'eat', { id: 'ration' });
   play(state, 'choose', { index });
   assert.equal(view(state).currentEnemy.id, expected);
-  for (let turn = 0; state.combat && turn < 8; turn++) play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+  for (let turn = 0; state.combat && turn < 8; turn++) play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
   assert.equal(state.combat, null);
   assert.ok(state.defeated.includes(expected));
 }

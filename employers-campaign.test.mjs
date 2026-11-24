@@ -17,7 +17,7 @@ function arriveAtZhao() {
   state.world.lastSettlement = 'zhao_city';
   state.realm = 3;
   state.coins = 50;
-  Object.assign(state.inventory, { ration: 6, wood: 2, hide: 1, ore: 1, heal_pill: 5 });
+  Object.assign(state.inventory, { ration: 9, wood: 2, hide: 1, ore: 1, heal_pill: 5, qi_powder: 4 });
   for (const id of ['sky_sword', 'frost_robe', 'hide_shield']) {
     const gear = data.gear.find((entry) => entry.id === id);
     state.inventory[id] = 1;
@@ -55,23 +55,26 @@ function option(state, index) {
 
 function bout(state, index, enemy) {
   if (state.satiety < 35) play(state, 'eat', { id: 'ration' });
-  if (state.hp < view(state).maxHp / 2 && state.inventory.heal_pill) play(state, 'use', { id: 'heal_pill' });
+  const chief = enemy === 'zhao_cargo_keeper' || enemy === 'zhao_sluice_anchor';
+  const { maxHp, maxQi } = view(state);
+  if (state.inventory.heal_pill && state.hp < (chief ? maxHp - 15 : maxHp / 2)) play(state, 'use', { id: 'heal_pill' });
+  while (state.inventory.qi_powder && state.qi <= (chief ? maxQi - 7 : 4)) play(state, 'use', { id: 'qi_powder' });
   choose(state, index);
   assert.equal(view(state).currentEnemy.id, enemy);
   const site = state.combat.siteId;
   const previous = state.siteVictories[site]?.[enemy] ?? 0;
   let turns = 0;
   while (state.combat && turns < 18) {
-    const { kind } = view(state).intent;
-    if (state.hp < 16 && state.inventory.heal_pill && kind !== 'heavy') play(state, 'use', { id: 'heal_pill' });
+    const kind = view(state).intent?.kind;
+    if (state.hp < maxHp * 0.46 && state.inventory.heal_pill && kind !== 'heavy') play(state, 'use', { id: 'heal_pill' });
+    else if (state.qi >= 5 && (kind === 'heal' || (chief && kind !== 'guard'))) play(state, 'art', { id: 'cross_weir' });
     else if (kind === 'heavy') play(state, 'guard');
-    else if (kind === 'heal' && state.qi >= 5) play(state, 'art', { id: 'cross_weir' });
-    else if (kind === 'guard' && state.qi >= 5 && enemy !== 'zhao_cargo_shield') play(state, 'art', { id: 'tide_part' });
+    else if (state.qi >= (kind === 'guard' ? 5 : 9)) play(state, 'art', { id: 'tide_part' });
     else play(state, 'attack');
     turns += 1;
   }
   assert.equal(state.combat, null, `${enemy} ran past ${turns} turns`);
-  assert.equal(state.event, site, `victory returns to ${site}`);
+  assert.equal(state.event, site, `victory returns to ${site}\n${state.log.slice(-12).join('\n')}`);
   assert.equal(state.siteVictories[site][enemy], previous + 1);
   return turns;
 }

@@ -24,3 +24,22 @@
 梁后的露天石场（sand_hunt_colony）,扶倒柱的低棱，绕上北墙石台,灰钳岩蝎（sand_quarry_rockscorpion）,梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕,0.5,81,24,1,29.62963%,24,0,,
 梁后的露天石场（sand_hunt_colony）,扶倒柱的低棱，绕上北墙石台,赤脊护巢蜥（sand_quarry_guard）,梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕,0.5,81,8,1,9.876543%,8,0,,
 梁后的露天石场（sand_hunt_colony）,扶倒柱的低棱，绕上北墙石台,白额老蜥（sand_quarry_matriarch）,梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕,0.5,81,1,1,1.234568%,1,0,,
+沉木滩（dyke_sunken_yard）,踏短木到滩口寻猎物,泥肩拦獭（dyke_yard_otter）,,0.25,21,10,1,47.619048%,10,0,,
+沉木滩（dyke_sunken_yard）,踏短木到滩口寻猎物,贴桩鳞鳄（dyke_yard_croc）,,0.25,21,6,1,28.571429%,6,0,,
+沉木滩（dyke_sunken_yard）,踏短木到滩口寻猎物,白脚沼豕（dyke_yard_boar）,,0.25,21,4,1,19.047619%,4,0,,
+沉木滩（dyke_sunken_yard）,踏短木到滩口寻猎物,托梁老鳄（dyke_old_croc）,,0.25,21,1,1,4.761905%,1,0,,
+沉木滩（dyke_sunken_yard）,绕断桩外缘，在干地等水里有动静,泥肩拦獭（dyke_yard_otter）,,0.5,21,10,1,47.619048%,10,0,,
+沉木滩（dyke_sunken_yard）,绕断桩外缘，在干地等水里有动静,贴桩鳞鳄（dyke_yard_croc）,,0.5,21,6,1,28.571429%,6,0,,
+沉木滩（dyke_sunken_yard）,绕断桩外缘，在干地等水里有动静,白脚沼豕（dyke_yard_boar）,,0.5,21,4,1,19.047619%,4,0,,
+沉木滩（dyke_sunken_yard）,绕断桩外缘，在干地等水里有动静,托梁老鳄（dyke_old_croc）,,0.5,21,1,1,4.761905%,1,0,,
+尾水石槽（dyke_tailwaters）,在两股水碰头的浅滩找猎物,泥肩拦獭（dyke_yard_otter）,,0.25,7,3,1,42.857143%,5,8,wild,是
+尾水石槽（dyke_tailwaters）,在两股水碰头的浅滩找猎物,贴桩鳞鳄（dyke_yard_croc）,,0.25,7,3,1,42.857143%,5,10,wild,是
+尾水石槽（dyke_tailwaters）,在两股水碰头的浅滩找猎物,白脚沼豕（dyke_yard_boar）,,0.25,7,1,1,14.285714%,3,13,wild,是
+风板下的旧弦库（ridge_armory_refuge）,贴矮墙进库,啮绳岩羊（ridge_armory_goat）,,0.25,30,16,1,53.333333%,16,0,,
+风板下的旧弦库（ridge_armory_refuge）,贴矮墙进库,砂棱地蜥（ridge_armory_lizard）,,0.25,30,8,1,26.666667%,8,0,,
+风板下的旧弦库（ridge_armory_refuge）,贴矮墙进库,盘崖赤猞（ridge_armory_lynx）,,0.25,30,5,1,16.666667%,5,0,,
+风板下的旧弦库（ridge_armory_refuge）,贴矮墙进库,断风角羚（ridge_armory_ram）,,0.25,30,1,1,3.333333%,1,0,,
+风板下的旧弦库（ridge_armory_refuge）,沿外石梁绕去库门对面,啮绳岩羊（ridge_armory_goat）,,0.5,30,16,1,53.333333%,16,0,,
+风板下的旧弦库（ridge_armory_refuge）,沿外石梁绕去库门对面,砂棱地蜥（ridge_armory_lizard）,,0.5,30,8,1,26.666667%,8,0,,
+风板下的旧弦库（ridge_armory_refuge）,沿外石梁绕去库门对面,盘崖赤猞（ridge_armory_lynx）,,0.5,30,5,1,16.666667%,5,0,,
+风板下的旧弦库（ridge_armory_refuge）,沿外石梁绕去库门对面,断风角羚（ridge_armory_ram）,,0.5,30,1,1,3.333333%,1,0,,

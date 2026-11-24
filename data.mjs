@@ -10,16 +10,20 @@ import { caravanContent } from './caravan-content.mjs';
 import { employersContent } from './employers-content.mjs';
 import { borderContent } from './border-content.mjs';
 import { huntMaterialContent } from './hunt-materials.mjs';
+import { dykeArmoryContent } from './dyke-armory.mjs';
+import { ridgeArmoryContent } from './ridge-armory.mjs';
+import { explorerKitContent } from './explorer-kit.mjs';
 
 const realms = [
-  { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
-  { id: 1, name: '炼气中期', hp: 35, qi: 15, atk: 9, def: 3, insight: 14, practice: 5, cost: 18, need: { reed: 6, hide: 2, qi_core: 5 }, pressure: 0.97, days: 1.5 },
-  { id: 2, name: '炼气后期', hp: 42, qi: 20, atk: 10, def: 4, insight: 36, practice: 9, cost: 36, need: { ore: 5, core: 3, reed: 6, qi_core: 12 }, pressure: 0.94, days: 2.5 },
-  { id: 3, name: '筑基初期', hp: 50, qi: 26, atk: 11, def: 5, insight: 70, practice: 14, cost: 18,
+  { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, perception: 10, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
+  { id: 1, name: '炼气中期', hp: 35, qi: 15, atk: 9, def: 3, perception: 12, insight: 14, practice: 5, cost: 18, need: { reed: 6, hide: 2, qi_core: 5 }, pressure: 0.97, days: 1.5 },
+  { id: 2, name: '炼气后期', hp: 42, qi: 20, atk: 10, def: 4, perception: 14, insight: 36, practice: 9, cost: 36, need: { ore: 5, core: 3, reed: 6, qi_core: 12 }, pressure: 0.94, days: 2.5 },
+  { id: 3, name: '筑基初期', hp: 50, qi: 26, atk: 11, def: 5, perception: 16, insight: 70, practice: 14, cost: 18,
     need: { foundation_pill: 1 }, pressure: 0.90, days: 4 },
 ];
 
 const items = [
+  { id: 'battle_sinew', name: '坚韧兽筋', kind: 'material', price: 0, sell: 0, desc: '从筋骨已经长足的妖兽身上取下。晒干后缠住柄、缝住护具，吃足力也不容易迸开。' },
   { id: 'ration', name: '干粮', kind: 'food', price: 3, sell: 1, desc: '用油纸分包的粮饼，饿了就拆一包吃。' },
   { id: 'wood', name: '松木', kind: 'material', price: 3, sell: 1, desc: '干透的松枝和松片。带脂的能引火，削去树皮后可做杆、柄和屋里的架子。' },
   { id: 'reed', name: '灵草', kind: 'material', price: 6, sell: 2, desc: '滩边采的白苇芯或内山长的银脉叶，拣紧实的留下。煎药、炼丹和育苗都用得上。' },
@@ -164,35 +168,41 @@ const items = [
 ];
 
 const gear = [
-  { id: 'cudgel', slot: 'weapon', weaponClass: 'staff', tier: 0, atk: 1, def: 0, hp: 0, qi: 0, retreat: 0, durability: 26, repair: 3, entry: '寻常行杖。出手稳当，力道偏轻，适合刚出门的散修。' },
-  { id: 'knife', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 3, def: 0, hp: 0, qi: 0, retreat: 0, durability: 30, repair: 5, entry: '利落的凡制短刃。薄刃能从鳞缝里切进去，打披鳞的敌人时容易破防。', trait: { kind: 'pierce', enemyTag: 'scaled', bonus: 2 } },
-  { id: 'split_axe', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 4, entry: '下手有分量的厚刃，在常年劈柴的木户手里也经用。' },
-  { id: 'short_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0, durability: 27, repair: 7, entry: '村口巡守平日练的短矛。柄尾能架住近处来招，矛尖却薄，得时常修。' },
-  { id: 'hook_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 31, repair: 6, entry: '拦滩客的备刀。分量略沉，寻常人也能劈得稳。' },
-  { id: 'trail_cutter', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0, durability: 33, repair: 5, entry: '索棚比手的奖刀。护手宽，敢把刃从对手手边送过去。' },
-  { id: 'star_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 37, repair: 11, entry: '照护矿人的旧式锻成，刀背厚，劈硬物时刃口容易吃住石缝。养气浅些也能握得稳。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
+  { id: 'cudgel', slot: 'weapon', weaponClass: 'staff', tier: 0, atk: 1, def: 0, perception: 1, hp: 0, qi: 0, retreat: 0, durability: 26, repair: 3, entry: '寻常行杖。出手稳当，力道偏轻，适合刚出门的散修。' },
+  { id: 'knife', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 3, def: 0, perception: 3, hp: 0, qi: 0, retreat: 0, durability: 30, repair: 5, entry: '利落的凡制短刃。薄刃能从鳞缝里切进去，打披鳞的敌人时容易破防。', trait: { kind: 'pierce', enemyTag: 'scaled', bonus: 2 } },
+  { id: 'split_axe', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 0, perception: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 4, entry: '下手有分量的厚刃，在常年劈柴的木户手里也经用。' },
+  { id: 'short_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 4, def: 1, perception: 3, hp: 0, qi: 0, retreat: 0, durability: 27, repair: 7, entry: '村口巡守平日练的短矛。柄尾能架住近处来招，矛尖却薄，得时常修。' },
+  { id: 'hook_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 5, def: 0, perception: 1, hp: 0, qi: 0, retreat: 0, durability: 31, repair: 6, entry: '拦滩客的备刀。分量略沉，寻常人也能劈得稳。' },
+  { id: 'trail_cutter', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 1, perception: 4, hp: 0, qi: 0, retreat: 0, durability: 33, repair: 5, entry: '索棚比手的奖刀。宽护手能贴住对手的兵器，他一撤腕，你就容易察觉。' },
+  { id: 'star_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 6, def: 0, perception: 1, hp: 0, qi: 0, retreat: 0, durability: 37, repair: 11, entry: '照护矿人的旧式锻成，刀背厚，劈硬物时刃口容易吃住石缝。养气浅些也能握得稳。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
   { id: 'hide_shield', slot: 'offhand', tier: 0, atk: 0, def: 0, brace: 3, durability: 28, repair: 5, entry: '空出一只手便能用。防住蓄力后砸来的重招时，盾面能卸开一股力。' },
   { id: 'miner_pick', slot: 'offhand', tier: 0, durability: 18, repair: 4, entry: '拿在副手。沉钟岭冲沟可以站稳后撬坡矿，玄砂偏井里也可少花些工夫。镐头要磨，腾不出手持盾。' },
-  { id: 'coil_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 45, repair: 10, entry: '练得不深也能贯穿整段枪势的重兵。枪杆经用，锻造却要吃掉一匣硬料。' },
-  { id: 'reed_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 3, def: 0, hp: 0, qi: 0, retreat: 0, durability: 28, repair: 4, entry: '寻常猎弓，弓力温和。可用削苇箭或包铁箭，射入厚毛不易滑脱。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 2 } },
-  { id: 'iron_sword', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '不挑修为的实用剑。厚脊让劈刺都稳，常年巡矿也不用总补剑身。' },
-  { id: 'tide_spear', slot: 'weapon', weaponClass: 'spear', tier: 1, atk: 5, def: 0, hp: 0, qi: 1, retreat: 0, durability: 45, repair: 10, entry: '炼气中期能端稳的长枪。顺着对手蓄势的空当刺过去，常能穿薄些的护甲。', trait: { kind: 'pierce', intent: 'heavy', bonus: 2 } },
+  { id: 'coil_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 6, def: 0, perception: 2, hp: 0, qi: 0, retreat: 0, durability: 45, repair: 10, entry: '练得不深也能贯穿整段枪势的重兵。枪杆经用，锻造却要吃掉一匣硬料。' },
+  { id: 'reed_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 3, def: 0, perception: 4, hp: 0, qi: 0, retreat: 0, durability: 28, repair: 4, entry: '寻常猎弓，弓力温和。可用削苇箭或包铁箭，射入厚毛不易滑脱。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 2 } },
+  { id: 'iron_sword', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 5, def: 0, perception: 3, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '不挑修为的实用剑。厚脊让劈刺都稳，常年巡矿也不用总补剑身。' },
+  { id: 'tide_spear', slot: 'weapon', weaponClass: 'spear', tier: 1, atk: 5, def: 0, perception: 5, hp: 0, qi: 1, retreat: 0, durability: 45, repair: 10, entry: '炼气中期能端稳的长枪。枪身压得稳，对手沉肩蓄力时容易看清。顺着这一空当刺过去，常能穿薄些的护甲。', trait: { kind: 'pierce', intent: 'heavy', bonus: 2 } },
   { id: 'straw_cape', slot: 'armor', tier: 0, atk: 0, def: 1, hp: 3, qi: 0, retreat: 0, durability: 24, repair: 3, entry: '渔人常穿的轻护具。能缓掉些寻常抓咬，遇到沉重来招仍须躲闪。' },
   { id: 'hide_coat', slot: 'armor', tier: 0, atk: 0, def: 2, hp: 5, qi: 0, retreat: 0, durability: 29, repair: 5, entry: '结实的凡制软甲。泥蜕织面咬不住，能额外卸掉野兽来招的力道。', trait: { kind: 'guard', enemyTag: 'beast', bonus: 2 } },
   { id: 'iron_coat', slot: 'armor', tier: 1, atk: 0, def: 3, hp: 7, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '炼气中期用的重护具。叠铁护心能分散重击，接蓄势之后的重招更稳。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
-  { id: 'tide_coat', slot: 'armor', tier: 2, atk: 0, def: 5, hp: 9, qi: -1, retreat: 0, durability: 46, repair: 12, entry: '炼气后期用的厚甲。甲下气息走得窄，穿着时体内少容些真气。' },
+  { id: 'tide_coat', slot: 'armor', tier: 2, atk: 0, def: 5, hp: 9, qi: -1, retreat: 0, durability: 46, repair: 12,
+    entry: '炼气后期用的厚甲。甲下气息走得窄，穿着时体内少容些真气。挨了贴身的重招而受伤，甲片会反震伤敌。',
+    trait: { kind: 'reflect', intent: 'heavy', bonus: 2 } },
   { id: 'reed_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 0, qi: 2, retreat: 0.05, durability: 25, repair: 3, entry: '小巧的凡制护符。苇声能帮助稳住真气，脱身时也能少挨些追击。' },
-  { id: 'path_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 2, qi: 0, retreat: 0.17, durability: 28, repair: 5, entry: '旧渡工用的护身钱。擅长在混乱中辨来路，撤出战斗时能少受追击。' },
+  { id: 'path_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 2, qi: 0, retreat: 0.17, durability: 28, repair: 5,
+    entry: '旧渡工用的护身钱。撤走时能少挨追击，对方寻常的贴身一击袭来，也有时能闪开。',
+    trait: { kind: 'dodge', bonus: 0.1, intent: 'attack' } },
   { id: 'bell_charm', slot: 'charm', tier: 1, atk: 0, def: 1, hp: 0, qi: 4, retreat: 0.05, durability: 38, repair: 8, entry: '炼气中期可佩的无声小铃。能多存些真气，受击和撤退时也有一点保护。' },
   { id: 'tide_charm', slot: 'charm', tier: 2, atk: 0, def: 1, hp: 4, qi: 3, retreat: 0.20, durability: 46, repair: 12, entry: '炼气后期可佩的玉坠。能护身、储存真气，撤退时还能挡掉身后的部分追击。' },
   { id: 'jetty_charm', slot: 'charm', tier: 2, atk: 0, def: 0, hp: 0, qi: 5, retreat: 0.30, durability: 38, repair: 9, entry: '炼气后期可佩的旧渡口灯坠。能多存些真气，撤离险处时尤其能挡住追击。' },
-  { id: 'pine_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 7, entry: '耐雨长弓。拉得稳又耐使，削苇箭和包铁箭都合弦。' },
-  { id: 'resin_staff', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 2, hp: 0, qi: 2, retreat: 0, durability: 40, repair: 7, entry: '炉户用的厚杖。能架住来势，杖芯温热，持久行气时也趁手。' },
-  { id: 'black_crossbow', slot: 'weapon', weaponClass: 'crossbow', ammo: ['black_bolt'], tier: 2, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 36, repair: 12, entry: '炼气后期才能拉开的弩。只能用暗金短矢，对付长着石甲的敌人尤其容易射穿。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
-  { id: 'snow_halberd', slot: 'weapon', weaponClass: 'spear', tier: 2, atk: 6, def: 1, hp: 0, qi: 0, retreat: 0.06, durability: 42, repair: 12, entry: '炼气后期常使的长戟。重招来时能挑住外缘，再反钩卸去一股冲力。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
-  { id: 'sky_sword', slot: 'weapon', weaponClass: 'sword', tier: 3, atk: 6, def: 1, hp: 0, qi: 2, retreat: 0.04, durability: 48, repair: 15, entry: '筑基修士温养的衡剑。敌手收势防守时，剑会顺着中线钻进护身的缝。', trait: { kind: 'pierce', intent: 'guard', bonus: 3 } },
-  { id: 'sky_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['iron_arrow', 'cloud_arrow'], tier: 3, atk: 7, def: 0, hp: 0, qi: 1, retreat: 0, durability: 44, repair: 15, entry: '筑基修士才能拉满的弓，按重箭的分量做成。只能用包铁箭或凝光箭。' },
-  { id: 'frost_robe', slot: 'armor', tier: 2, atk: 0, def: 4, hp: 7, qi: 2, retreat: 0.10, durability: 43, repair: 13, entry: '炼气后期可穿的轻袍，能挡住对手抽走真气的招式，也便于脱身。', trait: { kind: 'guard', intent: 'drain', bonus: 5 } },
+  { id: 'pine_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 5, def: 0, perception: 5, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 7, entry: '耐雨长弓。拉得稳，瞄住猎物时有余裕看它哪只脚先动。削苇箭和包铁箭都合弦。' },
+  { id: 'resin_staff', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 2, perception: 3, hp: 0, qi: 2, retreat: 0, durability: 40, repair: 7, entry: '炉户用的厚杖。能架住来势，杖芯温热，持久行气时也趁手。' },
+  { id: 'black_crossbow', slot: 'weapon', weaponClass: 'crossbow', ammo: ['black_bolt'], tier: 2, atk: 6, def: 0, perception: 2, hp: 0, qi: 0, retreat: 0, durability: 36, repair: 12, entry: '炼气后期才能拉开的弩。只能用暗金短矢，对付长着石甲的敌人尤其容易射穿。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
+  { id: 'snow_halberd', slot: 'weapon', weaponClass: 'spear', tier: 2, atk: 6, def: 1, perception: 4, hp: 0, qi: 0, retreat: 0.06, durability: 42, repair: 12, entry: '炼气后期常使的长戟。重招来时能挑住外缘，再反钩卸去一股冲力。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
+  { id: 'sky_sword', slot: 'weapon', weaponClass: 'sword', tier: 3, atk: 6, def: 1, perception: 8, hp: 0, qi: 2, retreat: 0.04, durability: 48, repair: 15, entry: '筑基修士温养的衡剑。敌手腕上刚一吃劲，剑尖就有回响。敌手收势防守时，剑会顺着中线钻进护身的缝。', trait: { kind: 'pierce', intent: 'guard', bonus: 3 } },
+  { id: 'sky_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['iron_arrow', 'cloud_arrow'], tier: 3, atk: 7, def: 0, perception: 6, hp: 0, qi: 1, retreat: 0, durability: 44, repair: 15, entry: '筑基修士才能拉满的弓，按重箭的分量做成。只能用包铁箭或凝光箭。' },
+  { id: 'frost_robe', slot: 'armor', tier: 2, atk: 0, def: 4, hp: 7, qi: 2, retreat: 0.10, durability: 43, repair: 13,
+    entry: '炼气后期穿的轻袍，能抵挡抽走真气的招式，也便于脱身。普通贴身招打来时，有时能及时转身闪开。',
+    trait: { kind: 'guard', intent: 'drain', bonus: 5 }, traits: [{ kind: 'dodge', bonus: 0.16, intent: 'attack' }] },
   { id: 'sky_cloak', slot: 'armor', tier: 3, atk: 0, def: 6, hp: 11, qi: 0, retreat: 0.04, durability: 54, repair: 16, entry: '筑基修士可穿的厚甲。皮条和厚晶片分担冲力，最能挡住蓄力后的重击。', trait: { kind: 'guard', intent: 'heavy', bonus: 3 } },
   { id: 'jade_pendant', slot: 'charm', tier: 3, atk: 0, def: 1, hp: 3, qi: 7, retreat: 0.14, durability: 51, repair: 16, entry: '筑基修士养气所用。手腕的浮光略闪，散掉的气便向内收。' },
 ];
@@ -1139,7 +1149,8 @@ const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => cont
 const mechanisms = puzzleContent.mechanisms;
 
 for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
-  ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent]) {
+  ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent,
+  dykeArmoryContent, ridgeArmoryContent, explorerKitContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -1155,6 +1166,48 @@ for (const item of gear) {
   if (item.slot === 'weapon') item.hands = twoHandedClasses.has(item.weaponClass) && !oneHandedWeapons.has(item.id) ? 2 : 1;
 }
 const eventsBySite = new Map(events.map((event) => [event.id, event]));
+const enemyCombatProfiles = {
+  reed_hare: { perception: 4 },
+  ford_silver_dace: { perception: 3 },
+  bank_runner: { perception: 12, strategy: 'predator' },
+  caravan_lookout: { perception: 11 },
+  vine_king: { perception: 17, strategy: 'predator' },
+  tide_spirit: { strategy: 'bulwark' },
+  foundation_duelist: { perception: 18 },
+  foundation_warden: { perception: 17, strategy: 'bulwark' },
+  mirror_warden: { perception: 25, strategy: 'schemer' },
+  herb_den_elder: { perception: 21, strategy: 'bulwark' },
+  river_spar_captain: { perception: 27, strategy: 'bulwark' },
+  undertow_moundback: { perception: 22, strategy: 'predator' },
+  zhao_spar: { perception: 27 },
+  fault_warden: { perception: 32, strategy: 'schemer' },
+  ember_yak: { strategy: 'predator' },
+  sand_well_basilisk: { perception: 22, strategy: 'predator' },
+  sand_glass_lynx: { perception: 27, strategy: 'predator' },
+  sand_riven_scorpion: { perception: 21, strategy: 'bulwark' },
+  sand_quarry_matriarch: { perception: 29, strategy: 'schemer' },
+  sand_basket_mender: { perception: 33, strategy: 'duelist' },
+  sand_sundial_master: { perception: 35, strategy: 'schemer', medicine: { id: 'jade_pill', count: 1 } },
+  caravan_broker: { strategy: 'schemer' },
+  zhao_cargo_shield: { strategy: 'bulwark' },
+  zhao_cargo_keeper: { strategy: 'schemer' },
+  border_axle_poleman: { perception: 14, strategy: 'predator' },
+  border_wind_ambusher: { strategy: 'schemer' },
+  border_kiln_shield: { strategy: 'bulwark' },
+  border_silo_leader: { perception: 27, strategy: 'schemer' },
+};
+for (const enemy of enemies) {
+  const human = enemy.tags.includes('human');
+  const baseline = human ? 14 : enemy.tags.includes('beast') ? 6 : 9;
+  const profile = enemyCombatProfiles[enemy.id] ?? {};
+  const tier = enemy.tier ?? 0;
+  enemy.perception = profile.perception ?? enemy.perception ?? baseline + 2 * tier;
+  enemy.strategy = profile.strategy ?? enemy.strategy ?? (human ? 'duelist' : 'instinct');
+  if (human) {
+    const medicineId = tier < 2 ? 'salve' : tier < 5 ? 'heal_pill' : 'tide_pill';
+    enemy.medicine = profile.medicine ?? { id: medicineId, count: 1 };
+  }
+}
 const sparringEnemies = new Set(enemies.filter((enemy) => enemy.sparring).map((enemy) => enemy.id));
 for (const site of sites) {
   if (!site.creatures || site.protectedArena) continue;
@@ -1169,7 +1222,9 @@ for (const site of sites) {
   }
 }
 
-const data = { realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
+const equipmentSlots = { weapon: '主武器', offhand: '副手', armor: '盔甲', head: '头部', boots: '鞋子', belt: '饰品', charm: '法器' };
+
+const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms, tournament: tournamentData };
 
 export { data, realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,

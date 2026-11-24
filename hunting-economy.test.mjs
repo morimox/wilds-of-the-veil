@@ -24,7 +24,7 @@ function hunt(state, site, foe, art) {
   play(state, 'choose', { index });
   assert.equal(view(state).currentEnemy.id, foe);
   for (let round = 0; state.combat && round < 24; round++) {
-    if (view(state).intent.kind === 'heavy') play(state, 'guard');
+    if (view(state).intent?.kind === 'heavy') play(state, 'guard');
     else if (art && state.qi >= art.cost) play(state, 'art', { id: art.id });
     else play(state, 'attack');
   }

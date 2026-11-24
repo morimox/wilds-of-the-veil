@@ -141,6 +141,7 @@
 生兽肉（beast_meat）,落琉洼（glass_hail_sink）,断琉棱（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,5,,,5,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
 妖目（beast_eye）,落琉洼（glass_hail_sink）,断琉棱（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,1,,,1,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
 兽革（hide）,落琉洼（glass_hail_sink）,断琉棱（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,4,,,4,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
+坚韧兽筋（battle_sinew）,落琉洼（glass_hail_sink）,断琉棱（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,2,,,2,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
 筑基期妖丹（foundation_core）,横生脉（hanging_vein）,贴壁支木（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,2,,,2,2,3,8,1,随种群密度变化,,靠近绳架，看看暗处那双金眼
 生兽肉（beast_meat）,横生脉（hanging_vein）,贴壁支木（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,3,,,3,2,3,8,1,随种群密度变化,,靠近绳架，看看暗处那双金眼
 兽革（hide）,横生脉（hanging_vein）,贴壁支木（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,3,,,3,2,3,8,1,随种群密度变化,,靠近绳架，看看暗处那双金眼
@@ -177,6 +178,7 @@
 筑基期妖丹（foundation_core）,碎云雪关（snow_pass）,雪线下的暖涧（snow_hunt_scree）,覆雪石羚（snow_rime_antelope）,筑基初期,3,,,3,2,3,7.5,1,随种群密度变化,,踩露出的山石上坡，接近石羚
 生兽肉（beast_meat）,碎云雪关（snow_pass）,雪线下的暖涧（snow_hunt_scree）,覆雪石羚（snow_rime_antelope）,筑基初期,5,,,5,2,3,7.5,1,随种群密度变化,,踩露出的山石上坡，接近石羚
 兽革（hide）,碎云雪关（snow_pass）,雪线下的暖涧（snow_hunt_scree）,覆雪石羚（snow_rime_antelope）,筑基初期,3,,,3,2,3,7.5,1,随种群密度变化,,踩露出的山石上坡，接近石羚
+坚韧兽筋（battle_sinew）,碎云雪关（snow_pass）,雪线下的暖涧（snow_hunt_scree）,覆雪石羚（snow_rime_antelope）,筑基初期,1,1,45%,1.45,2,3,7.5,1,随种群密度变化,,踩露出的山石上坡，接近石羚
 金丹期妖丹（gold_core）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊浮水蜥（sky_spillway_lizard）,金丹初期,3,,,3,2,3,10,1,随种群密度变化,得知物品 留水底印（fault_receipt）,扶矮沿接近水槽里露脊鳍的东西
 生兽肉（beast_meat）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊浮水蜥（sky_spillway_lizard）,金丹初期,5,,,5,2,3,10,1,随种群密度变化,得知物品 留水底印（fault_receipt）,扶矮沿接近水槽里露脊鳍的东西
 妖目（beast_eye）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊浮水蜥（sky_spillway_lizard）,金丹初期,0,1,60%,0.6,2,3,10,1,随种群密度变化,得知物品 留水底印（fault_receipt）,扶矮沿接近水槽里露脊鳍的东西
@@ -189,6 +191,7 @@
 筑基期妖丹（foundation_core）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,覆雪石羚（snow_rime_antelope）,筑基初期,3,,,3,2,3,10,1,随种群密度变化,,沿滩找活物留下的踪迹
 生兽肉（beast_meat）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,覆雪石羚（snow_rime_antelope）,筑基初期,5,,,5,2,3,10,1,随种群密度变化,,沿滩找活物留下的踪迹
 兽革（hide）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,覆雪石羚（snow_rime_antelope）,筑基初期,3,,,3,2,3,10,1,随种群密度变化,,沿滩找活物留下的踪迹
+坚韧兽筋（battle_sinew）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,覆雪石羚（snow_rime_antelope）,筑基初期,1,1,45%,1.45,2,3,10,1,随种群密度变化,,沿滩找活物留下的踪迹
 筑基期妖丹（foundation_core）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,扁背雪蜥（snow_flat_scale）,筑基初期,0,2,72%,1.44,8,12,9,1,随种群密度变化,,沿滩找活物留下的踪迹、沿细尾印翻开水边的扁石
 生兽肉（beast_meat）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,扁背雪蜥（snow_flat_scale）,筑基初期,2,,,2,8,12,9,1,随种群密度变化,,沿滩找活物留下的踪迹、沿细尾印翻开水边的扁石
 兽革（hide）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,扁背雪蜥（snow_flat_scale）,筑基初期,1,,,1,8,12,9,1,随种群密度变化,,沿滩找活物留下的踪迹、沿细尾印翻开水边的扁石
@@ -204,6 +207,7 @@
 生兽肉（beast_meat）,落琉洼（glass_hail_sink）,琉石堆后的背风槽（sand_armor_bank）,三痕琉狮（sand_glass_lynx）,金丹初期,5,,,5,3,4,13,1,随种群密度变化,,顺背风的石脊找猎物
 妖目（beast_eye）,落琉洼（glass_hail_sink）,琉石堆后的背风槽（sand_armor_bank）,三痕琉狮（sand_glass_lynx）,金丹初期,1,,,1,3,4,13,1,随种群密度变化,,顺背风的石脊找猎物
 兽革（hide）,落琉洼（glass_hail_sink）,琉石堆后的背风槽（sand_armor_bank）,三痕琉狮（sand_glass_lynx）,金丹初期,4,,,4,3,4,13,1,随种群密度变化,,顺背风的石脊找猎物
+坚韧兽筋（battle_sinew）,落琉洼（glass_hail_sink）,琉石堆后的背风槽（sand_armor_bank）,三痕琉狮（sand_glass_lynx）,金丹初期,2,,,2,3,4,13,1,随种群密度变化,,顺背风的石脊找猎物
 金丹期妖丹（gold_core）,落琉洼（glass_hail_sink）,琉石堆后的背风槽（sand_armor_bank）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,0,3,62%,1.86,4,6,13,1,随种群密度变化,,顺背风的石脊找猎物
 生兽肉（beast_meat）,落琉洼（glass_hail_sink）,琉石堆后的背风槽（sand_armor_bank）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,4,,,4,4,6,13,1,随种群密度变化,,顺背风的石脊找猎物
 妖目（beast_eye）,落琉洼（glass_hail_sink）,琉石堆后的背风槽（sand_armor_bank）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,0,1,35%,0.35,4,6,13,1,随种群密度变化,,顺背风的石脊找猎物
@@ -238,4 +242,52 @@
 兽革（hide）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,4,,,4,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台
 厚甲片（hard_scale）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,4,,,4,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台
 白蜥背棘（quarry_back_spine）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,1,,,1,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,泥肩拦獭（dyke_yard_otter）,筑基初期,0,1,64%,0.64,10,10,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,泥肩拦獭（dyke_yard_otter）,筑基初期,2,,,2,10,10,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+兽革（hide）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,泥肩拦獭（dyke_yard_otter）,筑基初期,1,,,1,10,10,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,泥肩拦獭（dyke_yard_otter）,筑基初期,1,,,1,10,10,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,贴桩鳞鳄（dyke_yard_croc）,筑基初期,1,1,58%,1.58,6,6,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,贴桩鳞鳄（dyke_yard_croc）,筑基初期,3,,,3,6,6,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+厚甲片（hard_scale）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,贴桩鳞鳄（dyke_yard_croc）,筑基初期,1,,,1,6,6,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,贴桩鳞鳄（dyke_yard_croc）,筑基初期,1,,,1,6,6,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,白脚沼豕（dyke_yard_boar）,筑基中期,1,2,62%,2.24,4,4,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,白脚沼豕（dyke_yard_boar）,筑基中期,5,,,5,4,4,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+兽革（hide）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,白脚沼豕（dyke_yard_boar）,筑基中期,2,,,2,4,4,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,白脚沼豕（dyke_yard_boar）,筑基中期,2,,,2,4,4,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,托梁老鳄（dyke_old_croc）,筑基后期,3,2,60%,4.2,1,1,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,托梁老鳄（dyke_old_croc）,筑基后期,5,,,5,1,1,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+兽革（hide）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,托梁老鳄（dyke_old_croc）,筑基后期,3,,,3,1,1,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+厚甲片（hard_scale）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,托梁老鳄（dyke_old_croc）,筑基后期,3,,,3,1,1,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,托梁老鳄（dyke_old_croc）,筑基后期,4,,,4,1,1,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+老鳄脊腱（dyke_backstrap）,断齿内堰（burnt_weir）,沉木滩（dyke_sunken_yard）,托梁老鳄（dyke_old_croc）,筑基后期,1,,,1,1,1,0,0,不回补,短水尺旁的木架（dyke_spillway_shed） · 帮郁稷把短水尺夹回横杆上,踏短木到滩口寻猎物、绕断桩外缘，在干地等水里有动静
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,泥肩拦獭（dyke_yard_otter）,筑基初期,0,1,64%,0.64,3,5,8,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,泥肩拦獭（dyke_yard_otter）,筑基初期,2,,,2,3,5,8,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物
+兽革（hide）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,泥肩拦獭（dyke_yard_otter）,筑基初期,1,,,1,3,5,8,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,泥肩拦獭（dyke_yard_otter）,筑基初期,1,,,1,3,5,8,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,贴桩鳞鳄（dyke_yard_croc）,筑基初期,1,1,58%,1.58,3,5,10,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物、从腹鳞擦痕旁贴到桩脚
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,贴桩鳞鳄（dyke_yard_croc）,筑基初期,3,,,3,3,5,10,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物、从腹鳞擦痕旁贴到桩脚
+厚甲片（hard_scale）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,贴桩鳞鳄（dyke_yard_croc）,筑基初期,1,,,1,3,5,10,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物、从腹鳞擦痕旁贴到桩脚
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,贴桩鳞鳄（dyke_yard_croc）,筑基初期,1,,,1,3,5,10,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物、从腹鳞擦痕旁贴到桩脚
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,白脚沼豕（dyke_yard_boar）,筑基中期,1,2,62%,2.24,1,3,13,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物、翻过槽岸，沿刚拱开的土找过去
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,白脚沼豕（dyke_yard_boar）,筑基中期,5,,,5,1,3,13,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物、翻过槽岸，沿刚拱开的土找过去
+兽革（hide）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,白脚沼豕（dyke_yard_boar）,筑基中期,2,,,2,1,3,13,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物、翻过槽岸，沿刚拱开的土找过去
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,尾水石槽（dyke_tailwaters）,白脚沼豕（dyke_yard_boar）,筑基中期,2,,,2,1,3,13,1,随种群密度变化,短水尺旁的木架（dyke_spillway_shed） · 循水声看短尺底下的尾水往哪走,在两股水碰头的浅滩找猎物、翻过槽岸，沿刚拱开的土找过去
+筑基期妖丹（foundation_core）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,啮绳岩羊（ridge_armory_goat）,筑基中期,0,1,58%,0.58,16,16,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+生兽肉（beast_meat）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,啮绳岩羊（ridge_armory_goat）,筑基中期,3,,,3,16,16,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+兽革（hide）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,啮绳岩羊（ridge_armory_goat）,筑基中期,1,,,1,16,16,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+坚韧兽筋（battle_sinew）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,啮绳岩羊（ridge_armory_goat）,筑基中期,1,,,1,16,16,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+筑基期妖丹（foundation_core）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,砂棱地蜥（ridge_armory_lizard）,筑基后期,0,2,65%,1.3,8,8,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+生兽肉（beast_meat）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,砂棱地蜥（ridge_armory_lizard）,筑基后期,2,,,2,8,8,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+厚甲片（hard_scale）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,砂棱地蜥（ridge_armory_lizard）,筑基后期,2,,,2,8,8,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+坚韧兽筋（battle_sinew）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,砂棱地蜥（ridge_armory_lizard）,筑基后期,1,,,1,8,8,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+金丹期妖丹（gold_core）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,盘崖赤猞（ridge_armory_lynx）,金丹初期,1,2,55%,2.1,5,5,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+生兽肉（beast_meat）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,盘崖赤猞（ridge_armory_lynx）,金丹初期,3,,,3,5,5,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+妖目（beast_eye）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,盘崖赤猞（ridge_armory_lynx）,金丹初期,0,1,40%,0.4,5,5,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+兽革（hide）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,盘崖赤猞（ridge_armory_lynx）,金丹初期,2,,,2,5,5,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+坚韧兽筋（battle_sinew）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,盘崖赤猞（ridge_armory_lynx）,金丹初期,2,,,2,5,5,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+金丹期妖丹（gold_core）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,断风角羚（ridge_armory_ram）,金丹中期,3,3,59%,4.77,1,1,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+生兽肉（beast_meat）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,断风角羚（ridge_armory_ram）,金丹中期,5,,,5,1,1,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+兽革（hide）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,断风角羚（ridge_armory_ram）,金丹中期,3,,,3,1,1,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+坚韧兽筋（battle_sinew）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,断风角羚（ridge_armory_ram）,金丹中期,3,,,3,1,1,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
+断风角羚的弯角（ridge_ramhorn）,架风板（wind_slate）,风板下的旧弦库（ridge_armory_refuge）,断风角羚（ridge_armory_ram）,金丹中期,1,,,1,1,1,0,0,不回补,梁弦的旧弦架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外石梁绕去库门对面
 筑基期妖丹（foundation_core）,闭潮渡（ford）,闸下无灯梯（ford_below_steps）,悬梯堰影（ford_lower_spirit）,筑基中期,2,,,2,2,4,11,1,固定间隔,,沿短绳下到第二根栏杆

@@ -55,7 +55,7 @@ const residents = (state, ground) => Object.values(view(state).sites.find(({ id 
 
 function finishFight(state) {
   for (let i = 0; state.combat && i < 20; i++) {
-    const intent = view(state).intent.kind;
+    const intent = view(state).intent?.kind;
     if (state.qi >= 7 && intent !== 'guard') play(state, 'art', { id: 'sky_axis' });
     else play(state, 'attack');
   }

@@ -8,7 +8,7 @@ export const ferryContent = {
       desc: '截短的竹篙，篙头磨得很钝。渡工立在窄船上也能横着用。' },
   ],
   gear: [
-    { id: 'ferry_pole', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0.1,
+    { id: 'ferry_pole', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 1, perception: 4, hp: 0, qi: 0, retreat: 0.1,
       durability: 36, repair: 6, entry: '炼气中期使得稳的短篙。握得靠后能横架，想离开交手时也好借力退一步。' },
   ],
   sites: [

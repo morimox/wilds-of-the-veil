@@ -227,6 +227,7 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .warning-toast { border-left-color: var(--red); background: #322119fa; color: #f5d9ca; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 .intent { margin: 8px 0; }
+.intent.unread { color: var(--muted); }
 .training-note { margin-bottom: 8px; }
 .learned-arts { margin-top: 9px; }
 .meter { max-width: 210px; color: var(--muted); font-size: 13px; }
@@ -470,7 +471,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=25" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=26" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -1600,7 +1601,7 @@ const enemies = [
   { id: 'sand_glass_lynx', name: '三痕琉狮', tags: ['beast', 'furred'], tier: 6, hp: 110, atk: 22, def: 8, insight: 11,
     intents: [{ name: '碎晶擦肩', kind: 'attack', mult: 1 }, { name: '卷鬃护目', kind: 'guard', mult: 1.4 },
       { name: '撞倒一大块晶石', kind: 'heavy', mult: 1.68 }, { name: '扬起呛人的晶尘', kind: 'drain', mult: 0.7 }, { name: '抖回脱落的晶片', kind: 'heal', mult: 0.45 }],
-    loot: { beast_meat: 5, hide: 4, beast_eye: 1, gold_core: 2 }, desc: '肩背和鬃毛间嵌满晶片。每次把眼睛藏进鬃毛，它都会用肩膀撞向附近的晶石。' },
+    loot: { beast_meat: 5, hide: 4, beast_eye: 1, gold_core: 2, battle_sinew: 2 }, desc: '肩背和鬃毛间嵌满晶片。每次把眼睛藏进鬃毛，它都会用肩膀撞向附近的晶石。' },
   { id: 'sand_inverted_keeper', name: '倒驿锁影', tags: ['spirit'], tier: 7, hp: 122, atk: 24, def: 9, insight: 12,
     intents: [{ name: '牵锁扫地', kind: 'attack', mult: 1 }, { name: '急收印锁', kind: 'drain', mult: 0.66 },
       { name: '柱背压锁', kind: 'heavy', mult: 1.64 }, { name: '绕梁抱臂', kind: 'guard', mult: 1.45 }],
@@ -1656,15 +1657,15 @@ const item = (id, name, kind, desc, extra = {}) => ({ id, name, kind, desc, pric
 
 const lateContent = {
   realms: [
-    { id: 4, name: '筑基中期', hp: 58, qi: 31, atk: 13, def: 6, insight: 100, practice: 18, cost: 64,
+    { id: 4, name: '筑基中期', hp: 58, qi: 31, atk: 13, def: 6, perception: 18, insight: 100, practice: 18, cost: 64,
       need: { ore: 9, core: 7, reed: 8, qi_core: 8, foundation_core: 10 }, pressure: 0.95, days: 4.5 },
-    { id: 5, name: '筑基后期', hp: 68, qi: 37, atk: 15, def: 8, insight: 140, practice: 22, cost: 100,
+    { id: 5, name: '筑基后期', hp: 68, qi: 37, atk: 15, def: 8, perception: 20, insight: 140, practice: 22, cost: 100,
       need: { ore: 12, core: 12, black_iron: 10, foundation_core: 20 }, pressure: 0.94, days: 5 },
-    { id: 6, name: '金丹初期', hp: 80, qi: 44, atk: 18, def: 10, insight: 180, practice: 26, cost: 126,
+    { id: 6, name: '金丹初期', hp: 80, qi: 44, atk: 18, def: 10, perception: 22, insight: 180, practice: 26, cost: 126,
       need: { gold_powder: 1 }, pressure: 0.89, days: 6.5 },
-    { id: 7, name: '金丹中期', hp: 92, qi: 51, atk: 21, def: 12, insight: 225, practice: 30, cost: 152,
+    { id: 7, name: '金丹中期', hp: 92, qi: 51, atk: 21, def: 12, perception: 24, insight: 225, practice: 30, cost: 152,
       need: { gold_core: 18, core: 17, reed: 16, black_iron: 12 }, pressure: 0.94, days: 7 },
-    { id: 8, name: '金丹后期', hp: 106, qi: 60, atk: 24, def: 14, insight: 275, practice: 35, cost: 185,
+    { id: 8, name: '金丹后期', hp: 106, qi: 60, atk: 24, def: 14, perception: 26, insight: 275, practice: 35, cost: 185,
       need: { gold_core: 30, core: 22, ore: 17, black_iron: 18 }, pressure: 0.94, days: 8,
       requireDefeated: ['fault_warden'] },
   ],
@@ -1701,15 +1702,15 @@ const lateContent = {
     item('clear_needle', '照水重矢', 'ammo', '箭杆用沉木做成，沾湿了也射得稳。箭尖尤其擅长穿透石甲。'),
   ],
   gear: [
-    { id: 'weir_knife', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 7, def: 1, durability: 53, repair: 15,
+    { id: 'weir_knife', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 7, def: 1, perception: 2, durability: 53, repair: 15,
       entry: '走水路的散修常带的宽背刀，入门便能用。用来挡对手蓄力后的重击，能卸掉一部分力道。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
-    { id: 'coil_pole', slot: 'weapon', weaponClass: 'staff', tier: 4, atk: 8, def: 2, qi: 4, durability: 62, repair: 22,
+    { id: 'coil_pole', slot: 'weapon', weaponClass: 'staff', tier: 4, atk: 8, def: 2, perception: 6, qi: 4, durability: 62, repair: 22,
       entry: '筑基中期可用的长杖。杖里的铁片能挡招、存真气。握着它走进雾里，能多探几处才开始消耗真气。',
       field: { fogTolerance: 2 } },
-    { id: 'foil_sword', slot: 'weapon', weaponClass: 'sword', tier: 5, atk: 10, def: 1, qi: 3, durability: 66, repair: 25,
+    { id: 'foil_sword', slot: 'weapon', weaponClass: 'sword', tier: 5, atk: 10, def: 1, perception: 5, qi: 3, durability: 66, repair: 25,
       entry: '筑基后期能用稳的细剑。对手摆出防守姿势时，剑尖反而更容易刺进护甲的缝里。', trait: { kind: 'pierce', intent: 'guard', bonus: 4 } },
-    { id: 'lake_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['cloud_arrow', 'clear_needle'], tier: 5, atk: 9, durability: 59, repair: 23,
-      entry: '筑基后期猎手用的湖弓，可以射凝光箭和照水重矢。对披毛的野兽伤害更高。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 3 } },
+    { id: 'lake_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['cloud_arrow', 'clear_needle'], tier: 5, atk: 9, perception: 8, durability: 59, repair: 23,
+      entry: '筑基后期猎手用的湖弓，稳住弓弦便能从对手的脚步看出动向。可用凝光箭和照水重矢，射披毛的野兽伤害更高。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 3 } },
     { id: 'gauze_armor', slot: 'armor', tier: 4, def: 8, hp: 12, qi: 4, durability: 70, repair: 25,
       entry: '筑基中期的护堤人常穿。甲片随呼吸开合，能存住更多真气。护臂和裙甲也能减轻摸水采药、撬石时的撞擦。',
       field: { gatherPadding: 3 } },
@@ -1719,8 +1720,9 @@ const lateContent = {
     { id: 'coal_tassel', slot: 'charm', tier: 5, def: 2, hp: 4, qi: 9, retreat: 0.14, durability: 66, repair: 24,
       entry: '筑基后期可佩戴的旧剑穗。攥住它能稳住呼吸，也更容易抽身退开。' },
     { id: 'den_armguard', slot: 'offhand', tier: 4, def: 2, hp: 5, qi: 4, brace: 4, durability: 56, repair: 18,
-      entry: '筑基中期可用的分片护臂，占一只手。平时护住手腕，架住蓄力重招时还能多卸一股劲。' },
-    { id: 'quarry_spear', slot: 'weapon', weaponClass: 'spear', tier: 5, atk: 9, qi: 2, durability: 64, repair: 24,
+      entry: '筑基中期可用的分片护臂，占一只手。架重招时能多卸一股劲。挨了寻常的近身一击而受伤，腕边的硬棱会反伤对手。',
+      trait: { kind: 'reflect', intent: 'attack', bonus: 3 } },
+    { id: 'quarry_spear', slot: 'weapon', weaponClass: 'spear', tier: 5, atk: 9, perception: 3, qi: 2, durability: 64, repair: 24,
       entry: '筑基后期可单手使的长枪。面对披硬鳞的妖兽，可以从鳞片的接缝扎进去。', trait: { kind: 'pierce', enemyTag: 'scaled', bonus: 4 } },
   ],
   ammunition: [{ id: 'clear_needle', atk: 2, pierce: 2, trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } }],
@@ -2145,7 +2147,7 @@ const ferryContent = {
       desc: '截短的竹篙，篙头磨得很钝。渡工立在窄船上也能横着用。' },
   ],
   gear: [
-    { id: 'ferry_pole', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0.1,
+    { id: 'ferry_pole', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 1, perception: 4, hp: 0, qi: 0, retreat: 0.1,
       durability: 36, repair: 6, entry: '炼气中期使得稳的短篙。握得靠后能横架，想离开交手时也好借力退一步。' },
   ],
   sites: [
@@ -2546,7 +2548,8 @@ const enemies = [
   { id: 'zhao_cargo_roper', name: '断索人', tier: 2, hp: 44, atk: 11, def: 4, tags: ['human'], insight: 3,
     intents: [attack('用绳梢抽向手腕'), heavy('甩出缠石的绳头'), guard('把麻绳在身前绕成一圈')], loot: {} },
   { id: 'zhao_cargo_archer', name: '滩上弩手', tier: 2, hp: 43, atk: 12, def: 3, tags: ['human'], insight: 3,
-    intents: [guard('矮身躲在货箱后'), heavy('从箱顶放出短箭', 1.34), attack('搭箭向脚边射来')], loot: {} },
+    intents: [guard('矮身躲在货箱后'), { ...heavy('从箱顶放出短箭', 1.34), ranged: true },
+      { ...attack('搭箭向脚边射来'), ranged: true }], loot: {} },
   { id: 'zhao_cargo_shield', name: '礁脚持盾人', tier: 3, hp: 62, atk: 14, def: 6, tags: ['human'], insight: 4,
     intents: [guard('弯腰顶住木盾', 1.36), attack('从盾下出刀'), heavy('用盾沿撞向肩头'), attack('收刀反抹')], loot: {} },
   { id: 'zhao_cargo_hook', name: '礁边提钩人', tier: 3, hp: 58, atk: 16, def: 5, tags: ['human'], insight: 4,
@@ -2727,7 +2730,7 @@ const patrols = [
 
 function localEnemy(id, name, tier, hp, atk, def, insight, desc, intents) {
   return { id, name, tags: ['human'], tier, hp, atk, def, insight, desc,
-    intents: intents.map(([name, kind, mult = 1]) => ({ name, kind, mult })),
+    intents: intents.map(([name, kind, mult = 1, ranged]) => ({ name, kind, mult, ...(ranged ? { ranged: true } : {}) })),
   };
 }
 
@@ -2739,7 +2742,8 @@ const enemies = [
   localEnemy('border_ledger_cutter', '门洞劫盐人', 3, 82, 16, 6, 7, '刀上的盐渍一靠近，身上的真气就往外走。他贴在门沿时，可先架住刀。',
     [['贴门探刀', 'attack'], ['反手蹭过护腕', 'drain', 0.9], ['缩回门后', 'guard', 1.48], ['踏过盐袋砍来', 'heavy', 1.6]]),
   localEnemy('border_wind_ambusher', '风板下的弩手', 3, 76, 16, 6, 7, '他先放短箭再拽弦。上箭时须把弩头压低，肩颈会露出来。',
-    [['隔着石板抬弩', 'heavy', 1.53], ['抽匕顶来', 'attack'], ['侧身上箭', 'guard', 1.36], ['踏石放箭', 'heavy', 1.65], ['拨开近身的兵刃', 'attack']]),
+    [['隔着石板抬弩', 'heavy', 1.53, true], ['抽匕顶来', 'attack'], ['侧身上箭', 'guard', 1.36],
+      ['踏石放箭', 'heavy', 1.65, true], ['拨开近身的兵刃', 'attack']]),
   localEnemy('border_rope_warden', '守绳的斧手', 3, 86, 17, 7, 8, '脚边的绳子通向坡下。他把斧柄夹在肘下时，会趁机调息再举斧。',
     [['斧背压臂', 'attack'], ['蹲下守桩', 'guard', 1.43], ['抱柄调息', 'heal', 0.63], ['拔斧砸肩', 'heavy', 1.68], ['提柄封路', 'attack']]),
   localEnemy('border_kiln_shield', '卸货窑的铁盾手', 4, 94, 17, 9, 9, '窑门只容一人宽，他能用盾盖住大半。盾沿撞过来以后，肩会露在门外。',
@@ -3007,7 +3011,8 @@ const enemies = [
   { id: 'snow_rime_antelope', name: '覆雪石羚', tier: 3, hp: 77, atk: 14, def: 6, tags: ['beast', 'furred'], insight: 8,
     intents: [attack('侧肩撞开薄冰'), guard('收膝护颈', 1.42), heavy('蹬岩下撞', 1.67), attack('踏碎雪壳', 1.1)],
     desc: '蹄缘像磨钝的铁。它缩起前膝时能用角护颈，接着会从坡上踏碎一层雪。',
-    loot: { foundation_core: 3, beast_meat: 5, hide: 3 } },
+    loot: { foundation_core: 3, beast_meat: 5, hide: 3, battle_sinew: 1 },
+    chanceLoot: { battle_sinew: { count: 1, chance: 0.45 } } },
   { id: 'snow_flat_scale', name: '扁背雪蜥', tier: 3, hp: 63, atk: 13, def: 5, tags: ['beast', 'scaled'], insight: 6,
     intents: [attack('蹬石扫尾'), guard('贴水收腹', 1.38), heavy('弹起掀鳞', 1.54)],
     desc: '背鳞压在一起时几乎和扁石一样平。它从水边腾起时，白腹会先翻出来。',
@@ -3061,6 +3066,272 @@ const huntMaterialContent = { sites, events, enemies };
 
 return huntMaterialContent;
 })();
+const dykeArmoryContent = (() => {
+const region = 'burnt_weir';
+const floodYard = ['dyke_yard_otter', 'dyke_yard_croc', 'dyke_yard_boar', 'dyke_old_croc'];
+const tailwaters = ['dyke_yard_otter', 'dyke_yard_croc', 'dyke_yard_boar'];
+const resident = (count) => ({ start: count, cap: count, interval: 0, growth: 0 });
+const wild = (start, cap, interval) => ({ start, cap, interval, growth: 1, curve: 'wild', fixedPopulation: true });
+const attack = (name, mult = 1) => ({ kind: 'attack', name, mult });
+const heavy = (name, mult = 1.55) => ({ kind: 'heavy', name, mult });
+const guard = (name, mult = 1.4) => ({ kind: 'guard', name, mult });
+
+const items = [
+  { id: 'dyke_backstrap', name: '老鳄脊腱', kind: 'key', price: 0, sell: 0,
+    desc: '从托梁老鳄脊骨旁取下。两边粗细不等，一合一松，仿佛还在牵着背鳞转身。' },
+  { id: 'dyke_jacket_pattern', name: '短褂收肩样', kind: 'key', price: 0, sell: 0,
+    desc: '针匠蒋榛依老鳄脊腱画的纸样。两边的皮条错着下针，急转身体时肩口仍能松开。' },
+  { id: 'dyke_slip_jacket', name: '转水短褂', kind: 'gear', price: 0, sell: 0,
+    desc: '衣肩叠得薄，皮条藏在腋下。急着摆身时衣摆跟得上，接重手还得自己架住。' },
+];
+
+const gear = [
+  { id: 'dyke_slip_jacket', slot: 'armor', tier: 4, def: 5, hp: 8, qi: 3, retreat: 0.06, durability: 58, repair: 18,
+    trait: { kind: 'dodge', intent: 'attack', bonus: 0.13 },
+    entry: '筑基中期可穿的轻褂。肩腋跟得上摆身，遇到贴身的普通来招偶尔能干净躲开。' },
+];
+
+const recipes = [
+  { id: 'r_dyke_slip_jacket', result: 'dyke_slip_jacket', tier: 4, count: 1, facility: 'forge', facilityLevel: 2,
+    reveal: { item: 'dyke_jacket_pattern', need: { dyke_backstrap: 1 } },
+    cost: 52, need: { battle_sinew: 12, hide: 6, core: 3, foundation_core: 4 }, days: 5,
+    desc: '用老鳄脊腱比出肩口转动的余量，再把干过水的兽筋穿进皮条里。纸样和脊腱留着。' },
+];
+
+const sites = [
+  { id: 'dyke_spillway_shed', region, name: '短水尺旁的木架', once: [0, 1],
+    afterOnceText: {
+      0: '木尺夹回横杆上，后面的沉木滩从浅步道就能望见。',
+      1: '短水尺的下缘还是湿的。尾水那边几块露头的石块连成一条岸路。',
+    } },
+  { id: 'dyke_sunken_yard', region, name: '沉木滩', afterChoices: ['dyke_spillway_shed:0'], once: [2],
+    creatures: { dyke_yard_otter: resident(10), dyke_yard_croc: resident(6), dyke_yard_boar: resident(4), dyke_old_croc: resident(1) },
+    creatureText: {
+      dyke_yard_otter: { present: '水獭在几块泡烂的木头旁打转。', absent: '泡木旁只剩水上的一圈浮屑。' },
+      dyke_yard_croc: { present: '几截灰脊沿桩边慢慢往深处退。', absent: '桩边再看不见贴水的鳞光。' },
+      dyke_yard_boar: { present: '高些的泥岸被拱得一块硬、一块软。', absent: '泥已经沉实，岸上没有再翻出来的新土。' },
+      dyke_old_croc: { present: '倒梁挨着水面的那头时不时被往上推一下。', absent: '放梁的凹处空下来，水还留着被鳄尾打散的泥。' },
+    },
+    afterOnceText: { 2: '护住木架的横梁提回了岸边，再抬水尺时不用挨着深水走。' } },
+  { id: 'dyke_tailwaters', region, name: '尾水石槽', afterChoices: ['dyke_spillway_shed:1'],
+    creatures: { dyke_yard_otter: wild(3, 5, 8), dyke_yard_croc: wild(3, 5, 10), dyke_yard_boar: wild(1, 3, 13) },
+    creatureText: {
+      dyke_yard_otter: { present: '浅石旁翻了几块刚咬过的蚌壳。', absent: '蚌壳边的水清了。' },
+      dyke_yard_croc: { present: '齐水的桩脚有带弧的腹鳞擦痕。', absent: '桩脚的鳞印泡淡了，水纹里没有拖尾的痕。' },
+      dyke_yard_boar: { present: '靠上的干草底下松了一团新土。', absent: '干草已经倒伏，再听不到拱土。' },
+    } },
+];
+
+const events = [
+  { id: 'dyke_spillway_shed', name: '短水尺旁的木架',
+    text: '这根短水尺只在退水时用。量水人郁稷扶着架脚，等两根细绳都不绷了才把尺抽出来。墙后翻倒半截横木，从石缝能看见水在往下走。',
+    choices: [
+      { label: '帮郁稷把短水尺夹回横杆上', days: 0.25, insight: 2, stay: true,
+        outcome: '郁稷往石缝后指了指。「沉木滩从这里能下去。老鳄一翻身，连压水的梁也会动。有个蒋针匠从前就盯着它的背，真要拿到脊腱，回城去找她。」' },
+      { label: '循水声看短尺底下的尾水往哪走', days: 0.25, insight: 1, stay: true,
+        outcome: '短尺底下的水贴着石槽向东去。你用枯枝拨开浮草，看清露出水面的几块石头可以踏。' },
+    ] },
+  { id: 'dyke_sunken_yard', name: '沉木滩',
+    text: '堰墙后搁着一长排沉木，一半搭岸，一半探到水上。量水时要用的旧梁倒在另一头。踩过近处的短木能到滩口，沿断桩外缘绕过去则能从干地看到水面。',
+    choices: [
+      { label: '踏短木到滩口寻猎物', desc: '近一截。隔着木排要走到边上，才能看清动静从哪来。', days: 0.25, encounter: floodYard,
+        outcome: '木排往下一沉，水拍过靴边。湿亮的背影从梁下抢了出来。' },
+      { label: '绕断桩外缘，在干地等水里有动静', desc: '路长些。隔一片浅水，哪边有东西冲过来都能看见。', days: 0.5,
+        encounter: floodYard, openingRange: true, outcome: '水线另一侧溅起一串泥点。那东西正越过两块泡木，离你还有一段。' },
+      { label: '把滩尾的旧梁垫起，请郁稷收回木架', desc: '旧梁仍压在水里。留两根松木垫住，郁稷才够得着梁下的绳。', days: 0.5,
+        guardedBy: floodYard, need: { wood: 2 }, consume: true, loot: { ore: 3 }, stay: true,
+        outcome: '郁稷抽回梁下的绳，把旧梁往岸这头拖。几截拆下的寒铁钉留给了你，他抱着木架从浅水走回去。' },
+    ] },
+  { id: 'dyke_tailwaters', name: '尾水石槽',
+    text: '尾水穿过几堆夹泥的石块，水到半尺高就漫进河里。近岸露着压蚌的小台，槽中间的几根桩没叫水冲走。',
+    choices: [
+      { label: '在两股水碰头的浅滩找猎物', days: 0.25, encounter: tailwaters,
+        outcome: '水从两侧涌到脚前。河岸上的影子往你这边动了。' },
+      { label: '从腹鳞擦痕旁贴到桩脚', desc: '桩脚的水向上翻，能站稳的一边在外侧。', days: 0.375,
+        enemy: 'dyke_yard_croc', outcome: '撞着桩身的是一截鳞背。鳄头顶过木桩，直朝你扭来。' },
+      { label: '翻过槽岸，沿刚拱开的土找过去', desc: '拱过的地方踩上去还有些软，尽头有一线干草。', days: 0.5,
+        enemy: 'dyke_yard_boar', outcome: '草尖猛地一晃，一头白脚猪从草下抬头，獠牙上带着泥。' },
+    ] },
+];
+
+const enemies = [
+  { id: 'dyke_yard_otter', name: '泥肩拦獭', tier: 3, hp: 62, atk: 13, def: 4, tags: ['beast', 'furred'], insight: 5,
+    intents: [attack('掠过湿木咬来'), heavy('推开浮木扑向肩头', 1.54), attack('用尾巴扫腕', 1.05)],
+    desc: '肩头那圈毛常粘着泥。出水后它喜欢贴着湿木走，能把两根浮木推成一条斜线。',
+    loot: { beast_meat: 2, hide: 1, battle_sinew: 1 }, chanceLoot: { foundation_core: { count: 1, chance: 0.64 } } },
+  { id: 'dyke_yard_croc', name: '贴桩鳞鳄', tier: 3, hp: 76, atk: 15, def: 7, tags: ['beast', 'scaled'], insight: 7,
+    intents: [guard('把背鳞顶紧木桩'), attack('回头去咬落脚处'), heavy('脱桩挥尾', 1.58)],
+    desc: '背鳞磨得和木桩一般灰。尾巴离了桩，就有足够地方扫过近岸。',
+    loot: { beast_meat: 3, hard_scale: 1, battle_sinew: 1, foundation_core: 1 },
+    chanceLoot: { foundation_core: { count: 1, chance: 0.58 } } },
+  { id: 'dyke_yard_boar', name: '白脚沼豕', tier: 4, hp: 93, atk: 17, def: 7, tags: ['beast', 'furred'], insight: 9,
+    intents: [attack('侧着肩把人往水边挤'), heavy('后蹄刨地挑牙', 1.62), guard('在干草前收紧肩背'), attack('沿槽岸顶来', 1.1)],
+    desc: '前蹄一圈白毛都湿透了，向直处顶不动就拐到岸边来挤。它停下刨后蹄时，左边那支牙往往先抬。',
+    loot: { beast_meat: 5, hide: 2, battle_sinew: 2, foundation_core: 1 },
+    chanceLoot: { foundation_core: { count: 2, chance: 0.62 } } },
+  { id: 'dyke_old_croc', name: '托梁老鳄', tier: 5, hp: 117, atk: 20, def: 9, tags: ['beast', 'scaled'], insight: 13,
+    perception: 23, strategy: 'bulwark',
+    intents: [attack('推起横梁抢到岸边'), guard('斜过鳞脊护住颈下', 1.48), heavy('借浮梁卷尾砸下', 1.65),
+      { kind: 'heal', name: '沉入静水缓气', mult: 0.39 }, attack('贴着桩根摆身', 1.1)],
+    desc: '粗梁压过它的后背，却看不出曾受过伤。翻身时背鳞从颈后依次错开，贴水过去轻得没有声。',
+    loot: { beast_meat: 5, hide: 3, hard_scale: 3, battle_sinew: 4, foundation_core: 3, dyke_backstrap: 1 },
+    chanceLoot: { foundation_core: { count: 2, chance: 0.6 } } },
+];
+
+const quests = [
+  { id: 'dyke_tailor_handoff', region: 'zhao_city', name: '给蒋榛试裁湿兽筋', tier: 3,
+    reveal: { item: 'dyke_backstrap', need: { dyke_backstrap: 1 } }, need: { battle_sinew: 5 },
+    desc: '针匠蒋榛在水尺档旁晾袖口。她用指腹比了比老鳄脊腱上那道细弧，想拿几根寻常湿兽筋先试一张纸样。',
+    reward: { dyke_jacket_pattern: 1 }, coins: 0, insight: 5,
+    outcome: '蒋榛用湿筋在两片废皮上试着收肩。她拆下第三次错扣的皮条，将合适的下针位置画进纸样，又把老鳄脊腱还给你。',
+  },
+];
+
+const dykeArmoryContent = { items, gear, recipes, sites, events, enemies, quests };
+
+return dykeArmoryContent;
+})();
+const ridgeArmoryContent = (() => {
+const bench = 'ridge_armory_bench';
+const refuge = 'ridge_armory_refuge';
+const leader = 'ridge_armory_ram';
+const horn = 'ridge_ramhorn';
+const pattern = 'ridge_bracer_pattern';
+const bracer = 'ridge_bracer';
+const animals = ['ridge_armory_goat', 'ridge_armory_lizard', 'ridge_armory_lynx', leader];
+
+const fixed = (count) => ({ start: count, cap: count, interval: 0, growth: 0 });
+const strike = (name, kind, mult = 1) => ({ name, kind, mult });
+const item = (id, name, kind, desc) => ({ id, name, kind, price: 0, sell: 0, desc });
+
+const ridgeArmoryContent = {
+  items: [
+    item(horn, '断风角羚的弯角', 'key', '角根嵌着一截折断的弦钩。双手掰一掰，薄的一侧松手便会弹回原处。梁弦在找这样的弧度。'),
+    item(pattern, '回力护腕图', 'key', '梁弦把护腕的两根横筋画在角弧里，又补了一笔掌侧的松扣。图旁压着一句：让入臂的劲循原路退回去。'),
+    item(bracer, '回力护腕', 'gear', '暗金片底下绷着几根短筋，贴身重击落在护腕上时，有一股力会沿弯角弹回来。'),
+  ],
+  gear: [
+    { id: bracer, slot: 'offhand', tier: 6, def: 1, qi: 3, brace: 4, durability: 63, repair: 22,
+      trait: { kind: 'reflect', intent: 'heavy', bonus: 4 },
+      entry: '金丹初期可用，占一只手。能卸开些近身重击。挡不尽而仍受伤时，短筋回弹，也会打疼对手。' },
+  ],
+  recipes: [
+    { id: 'r_ridge_bracer', result: bracer, count: 1, tier: 6, facility: 'forge', facilityLevel: 3,
+      reveal: { item: pattern, need: { [horn]: 1 } }, cost: 62, days: 6,
+      need: { battle_sinew: 12, black_iron: 9, hard_scale: 6, gold_core: 4 },
+      desc: '照手里的弯角把暗金压好，再用坚韧兽筋绷紧，护腕内侧垫厚甲片。原角留着比形。' },
+  ],
+  sites: [
+    { id: bench, region: 'sand_bell_cloister', name: '梁弦的旧弦架', once: [0],
+      afterOnceText: { 0: '学徒已把断绳换下，梁弦正用木尺量仍完好的弦。院墙外能看见架风板顶上露出来的石梁。' } },
+    { id: refuge, region: 'wind_slate', name: '风板下的旧弦库', afterChoices: [`${bench}:0`],
+      creatures: {
+        ridge_armory_goat: fixed(16), ridge_armory_lizard: fixed(8), ridge_armory_lynx: fixed(5), [leader]: fixed(1),
+      },
+      creatureText: {
+        ridge_armory_goat: { present: '库墙拐角的绳头还在颤，矮门洞里露出几对岩羊蹄子。', absent: '羊蹄印已经蒙了砂。' },
+        ridge_armory_lizard: { present: '两块旧簧片碰了一下，一条淡黄尾巴从底下掠过。', absent: '压簧片的旧石下只剩脱落的鳞屑。' },
+        ridge_armory_lynx: { present: '外墙角勾着赤毛，石梁上的软沙被踩出了几处深印。', absent: '落砂盖住了石梁上的爪印。' },
+        [leader]: { present: '往北看，立着的风板让一根大角蹭得歪了一寸。', absent: '北面的风板靠在墙上，再也没有大角来顶。' },
+      } },
+  ],
+  events: [
+    { id: bench, name: '梁弦的旧弦架',
+      text: '学徒踩着凳子拉一副旧石簧，绳子才绷住，就有一股劲把手掀了开去。梁弦拿木尺敲了敲缺掉的弦钩。',
+      choices: [
+        { label: '问梁弦缺的是哪一截', days: 0.125, stay: true,
+          outcome: '「旧件全在架风板底下。沿板边找断绳，进石门，碰上妖物就从矮墙退。」他指指折钩上的一缕毛。「一只大角羚顶歪了梁。我想看看它角根的弧度，断了的钩就是顺这个道理做的。」' },
+      ] },
+    { id: refuge, name: '风板下的旧弦库',
+      text: '断绳从风板底下伸进石门。贴矮墙能直接进库，一边仍有出去的坡道。沿外石梁绕过去，能站在库门对面，隔空看见里面的出脚处。',
+      choices: [
+        { label: '贴矮墙进库', desc: '这里近，转身就是回去的缓坡。', days: 0.25, encounter: animals,
+          outcome: '刚过矮墙，有什么从宽石边翻了过来。' },
+        { label: '沿外石梁绕去库门对面', desc: '得多走一段。这里隔着开阔的砂地，能先看见出库的东西。', days: 0.5,
+          encounter: animals, openingRange: true, outcome: '你站上斜梁，库门里的影子踏出石门，踩进两边之间的砂地。' },
+      ] },
+  ],
+  enemies: [
+    { id: 'ridge_armory_goat', name: '啮绳岩羊', tier: 4, hp: 69, atk: 16, def: 5, tags: ['beast', 'furred'], insight: 6,
+      intents: [strike('侧头顶开绳架', 'attack'), strike('屈腿护住颈侧', 'guard', 1.32), strike('踩梁蹬出', 'heavy', 1.53)],
+      desc: '颈毛里还缠着几根旧麻丝，蹄子却在木架上踩得稳。',
+      loot: { beast_meat: 3, hide: 1, battle_sinew: 1 }, chanceLoot: { foundation_core: { count: 1, chance: 0.58 } } },
+    { id: 'ridge_armory_lizard', name: '砂棱地蜥', tier: 5, hp: 91, atk: 18, def: 8, tags: ['beast', 'scaled'], insight: 8,
+      intents: [strike('扣腹贴地', 'guard', 1.46), strike('扫尾带起细砂', 'attack'), strike('甩背击梁', 'heavy', 1.58), strike('贴砂引气', 'drain', 0.72)],
+      desc: '背鳞沿砂棱排成一列。贴地伏着时几乎看不到，甩尾时却会把整片鳞都立起来。',
+      loot: { hard_scale: 2, battle_sinew: 1, beast_meat: 2 }, chanceLoot: { foundation_core: { count: 2, chance: 0.65 } } },
+    { id: 'ridge_armory_lynx', name: '盘崖赤猞', tier: 6, hp: 113, atk: 22, def: 7, tags: ['beast', 'furred'], insight: 10,
+      intents: [strike('顺梁横掠', 'attack'), strike('埋耳借风', 'drain', 0.82), strike('蹬墙探爪', 'heavy', 1.58), strike('翻身扫腿', 'attack', 1.07)],
+      desc: '背上的毛被风梳成两股。两只耳朵一齐伏下时，它就要借墙腾起。',
+      loot: { gold_core: 1, beast_meat: 3, hide: 2, battle_sinew: 2 },
+      chanceLoot: { gold_core: { count: 2, chance: 0.55 }, beast_eye: { count: 1, chance: 0.4 } } },
+    { id: leader, name: '断风角羚', tier: 7, hp: 148, atk: 26, def: 10, perception: 30, strategy: 'predator',
+      tags: ['beast', 'furred'], insight: 14,
+      intents: [strike('昂角横扫', 'attack'), strike('踏塌绳架猛顶', 'heavy', 1.6), strike('两角拢住肩颈', 'guard', 1.5),
+        strike('踏石返撞', 'attack', 1.1), strike('扬头牵走风气', 'drain', 0.84)],
+      desc: '一根角顶进石梁下的活扣，另一根顺势削过矮墙。弦钩在角根嵌得很深。',
+      loot: { [horn]: 1, battle_sinew: 3, gold_core: 3, beast_meat: 5, hide: 3 },
+      chanceLoot: { gold_core: { count: 3, chance: 0.59 } } },
+  ],
+  quests: [
+    { id: 'ridge_bracer_commission', region: 'sand_bell_cloister', name: '让梁弦照着弯角试弦',
+      reveal: { item: horn, need: { [horn]: 1 } }, need: { battle_sinew: 4, hide: 2 }, reward: { [pattern]: 1 },
+      desc: '梁弦拿弯角对着缺钩比了比。「角只借来看。还得给学徒换两层包手皮、四根短筋，才能放手试这股弹劲。」',
+      outcome: '梁弦绷上新筋，把弯角还给你。学徒再拉旧架时手没有被掀起来，他便把护腕的做法画给你。' },
+  ],
+};
+
+return ridgeArmoryContent;
+})();
+const explorerKitContent = (() => {
+const explorerKitContent = {
+  items: [
+    { id: 'reed_hat', name: '叠芦帽', kind: 'gear', price: 0, sell: 3,
+      desc: '芦片一层压着一层，帽檐垫了一圈软皮。雾珠挂在檐外，不往眼前流。' },
+    { id: 'reed_boots', name: '踏苇鞋', kind: 'gear', price: 0, sell: 4,
+      desc: '细芦编成底，足弓和脚踝各系一道皮条。鞋底浸湿了也不打滑。' },
+    { id: 'breath_belt', name: '行气束带', kind: 'gear', price: 0, sell: 12,
+      desc: '韧皮带内侧嵌着小片灵晶，两孔用兽筋穿紧，收腰时带身仍能微微伸开。' },
+    { id: 'side_hook', name: '系绳短钩', kind: 'gear', price: 0, sell: 6,
+      desc: '船工用来挑索的小钩，内缘磨成窄刃，木柄用细皮包紧。' },
+    { id: 'anvil_hammer', name: '短柄砧锤', kind: 'gear', price: 0, sell: 12,
+      desc: '厚实的铁锤。敲面的方棱收得硬，柄却只够一手握实。' },
+    { id: 'scale_chisel', name: '翻鳞凿', kind: 'gear', price: 0, sell: 16,
+      desc: '凿身窄短，暗金边磨得很薄。皮握和凿颈之间压着一小环厚甲。' },
+  ],
+  gear: [
+    { id: 'reed_hat', slot: 'head', tier: 0, perception: 2, durability: 25, repair: 4,
+      field: { fogTolerance: 1 }, entry: '帽檐拦开扑到眼前的雾，容易看清对手的来招。在雾里多待一阵才会耗真气。' },
+    { id: 'reed_boots', slot: 'boots', tier: 0, retreat: 0.06, durability: 28, repair: 5,
+      trait: { kind: 'dodge', bonus: 0.08, intent: 'attack' },
+      entry: '鞋底踩得住，寻常的贴身一击有时能侧步闪开。转身脱离交手时也能少挨追击。' },
+    { id: 'breath_belt', slot: 'belt', tier: 2, qi: 4, hp: 3, def: 1, durability: 44, repair: 10,
+      entry: '勒在腰腹，带下的灵晶能养一口长气。气息稳了，腰腹挨招也有些支撑。' },
+    { id: 'side_hook', slot: 'offhand', weaponClass: 'blade', tier: 0, sideAtk: 4, sidePierce: 1, sideGuard: 2, durability: 30, repair: 5,
+      entry: '副手握住短钩，交手时可以单独出钩，主兵不用换下。钩尖能探进护甲的接缝，回钩时也能顺手护住手腕。' },
+    { id: 'anvil_hammer', slot: 'weapon', weaponClass: 'hammer', tier: 2, atk: 7, chargeRequired: true, chargePierce: 2, durability: 46, repair: 12,
+      entry: '单手使的重锤。得先沉肩蓄势才能出锤。铁角砸得实，有机会砸开坚硬的护甲。' },
+    { id: 'scale_chisel', slot: 'offhand', weaponClass: 'blade', tier: 4, sideAtk: 7, sidePierce: 3, chargeRequired: true, durability: 42, repair: 10,
+      entry: '副手持凿。要先扎稳蓄势，再把窄刃送进甲缝，主兵仍留在另一只手上。' },
+  ],
+  recipes: [
+    { id: 'r_reed_hat', result: 'reed_hat', tier: 0, reveal: { item: 'reed' },
+      cost: 4, days: 0.5, need: { reed: 3, wood: 1, hide: 1 } },
+    { id: 'r_reed_boots', result: 'reed_boots', tier: 0, reveal: { item: 'hide' },
+      cost: 6, days: 0.75, need: { hide: 2, reed: 2, wood: 1 } },
+    { id: 'r_breath_belt', result: 'breath_belt', tier: 2, reveal: { item: 'battle_sinew' }, facility: 'forge', facilityLevel: 2,
+      cost: 16, days: 2.5, need: { hide: 2, core: 2, battle_sinew: 1, ore: 1 } },
+    { id: 'r_side_hook', result: 'side_hook', tier: 0, reveal: { item: 'oar_mark' },
+      cost: 8, days: 1, need: { ore: 2, wood: 2, hide: 1 } },
+    { id: 'r_anvil_hammer', result: 'anvil_hammer', tier: 2, reveal: { item: 'ore' }, facility: 'forge', facilityLevel: 2,
+      cost: 18, days: 2, need: { ore: 6, wood: 2, hide: 2 } },
+    { id: 'r_scale_chisel', result: 'scale_chisel', tier: 4, reveal: { item: 'hard_scale' }, facility: 'forge', facilityLevel: 2,
+      cost: 23, days: 2.75, need: { hard_scale: 4, black_iron: 3, hide: 2, battle_sinew: 1 } },
+  ],
+};
+
+return explorerKitContent;
+})();
 const moduleData = (() => {
 
 
@@ -3075,15 +3346,19 @@ const moduleData = (() => {
 
 
 
+
+
+
 const realms = [
-  { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
-  { id: 1, name: '炼气中期', hp: 35, qi: 15, atk: 9, def: 3, insight: 14, practice: 5, cost: 18, need: { reed: 6, hide: 2, qi_core: 5 }, pressure: 0.97, days: 1.5 },
-  { id: 2, name: '炼气后期', hp: 42, qi: 20, atk: 10, def: 4, insight: 36, practice: 9, cost: 36, need: { ore: 5, core: 3, reed: 6, qi_core: 12 }, pressure: 0.94, days: 2.5 },
-  { id: 3, name: '筑基初期', hp: 50, qi: 26, atk: 11, def: 5, insight: 70, practice: 14, cost: 18,
+  { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, perception: 10, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
+  { id: 1, name: '炼气中期', hp: 35, qi: 15, atk: 9, def: 3, perception: 12, insight: 14, practice: 5, cost: 18, need: { reed: 6, hide: 2, qi_core: 5 }, pressure: 0.97, days: 1.5 },
+  { id: 2, name: '炼气后期', hp: 42, qi: 20, atk: 10, def: 4, perception: 14, insight: 36, practice: 9, cost: 36, need: { ore: 5, core: 3, reed: 6, qi_core: 12 }, pressure: 0.94, days: 2.5 },
+  { id: 3, name: '筑基初期', hp: 50, qi: 26, atk: 11, def: 5, perception: 16, insight: 70, practice: 14, cost: 18,
     need: { foundation_pill: 1 }, pressure: 0.90, days: 4 },
 ];
 
 const items = [
+  { id: 'battle_sinew', name: '坚韧兽筋', kind: 'material', price: 0, sell: 0, desc: '从筋骨已经长足的妖兽身上取下。晒干后缠住柄、缝住护具，吃足力也不容易迸开。' },
   { id: 'ration', name: '干粮', kind: 'food', price: 3, sell: 1, desc: '用油纸分包的粮饼，饿了就拆一包吃。' },
   { id: 'wood', name: '松木', kind: 'material', price: 3, sell: 1, desc: '干透的松枝和松片。带脂的能引火，削去树皮后可做杆、柄和屋里的架子。' },
   { id: 'reed', name: '灵草', kind: 'material', price: 6, sell: 2, desc: '滩边采的白苇芯或内山长的银脉叶，拣紧实的留下。煎药、炼丹和育苗都用得上。' },
@@ -3228,35 +3503,41 @@ const items = [
 ];
 
 const gear = [
-  { id: 'cudgel', slot: 'weapon', weaponClass: 'staff', tier: 0, atk: 1, def: 0, hp: 0, qi: 0, retreat: 0, durability: 26, repair: 3, entry: '寻常行杖。出手稳当，力道偏轻，适合刚出门的散修。' },
-  { id: 'knife', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 3, def: 0, hp: 0, qi: 0, retreat: 0, durability: 30, repair: 5, entry: '利落的凡制短刃。薄刃能从鳞缝里切进去，打披鳞的敌人时容易破防。', trait: { kind: 'pierce', enemyTag: 'scaled', bonus: 2 } },
-  { id: 'split_axe', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 4, entry: '下手有分量的厚刃，在常年劈柴的木户手里也经用。' },
-  { id: 'short_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0, durability: 27, repair: 7, entry: '村口巡守平日练的短矛。柄尾能架住近处来招，矛尖却薄，得时常修。' },
-  { id: 'hook_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 31, repair: 6, entry: '拦滩客的备刀。分量略沉，寻常人也能劈得稳。' },
-  { id: 'trail_cutter', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 1, hp: 0, qi: 0, retreat: 0, durability: 33, repair: 5, entry: '索棚比手的奖刀。护手宽，敢把刃从对手手边送过去。' },
-  { id: 'star_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 37, repair: 11, entry: '照护矿人的旧式锻成，刀背厚，劈硬物时刃口容易吃住石缝。养气浅些也能握得稳。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
+  { id: 'cudgel', slot: 'weapon', weaponClass: 'staff', tier: 0, atk: 1, def: 0, perception: 1, hp: 0, qi: 0, retreat: 0, durability: 26, repair: 3, entry: '寻常行杖。出手稳当，力道偏轻，适合刚出门的散修。' },
+  { id: 'knife', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 3, def: 0, perception: 3, hp: 0, qi: 0, retreat: 0, durability: 30, repair: 5, entry: '利落的凡制短刃。薄刃能从鳞缝里切进去，打披鳞的敌人时容易破防。', trait: { kind: 'pierce', enemyTag: 'scaled', bonus: 2 } },
+  { id: 'split_axe', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 0, perception: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 4, entry: '下手有分量的厚刃，在常年劈柴的木户手里也经用。' },
+  { id: 'short_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 4, def: 1, perception: 3, hp: 0, qi: 0, retreat: 0, durability: 27, repair: 7, entry: '村口巡守平日练的短矛。柄尾能架住近处来招，矛尖却薄，得时常修。' },
+  { id: 'hook_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 5, def: 0, perception: 1, hp: 0, qi: 0, retreat: 0, durability: 31, repair: 6, entry: '拦滩客的备刀。分量略沉，寻常人也能劈得稳。' },
+  { id: 'trail_cutter', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 4, def: 1, perception: 4, hp: 0, qi: 0, retreat: 0, durability: 33, repair: 5, entry: '索棚比手的奖刀。宽护手能贴住对手的兵器，他一撤腕，你就容易察觉。' },
+  { id: 'star_blade', slot: 'weapon', weaponClass: 'blade', tier: 0, atk: 6, def: 0, perception: 1, hp: 0, qi: 0, retreat: 0, durability: 37, repair: 11, entry: '照护矿人的旧式锻成，刀背厚，劈硬物时刃口容易吃住石缝。养气浅些也能握得稳。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
   { id: 'hide_shield', slot: 'offhand', tier: 0, atk: 0, def: 0, brace: 3, durability: 28, repair: 5, entry: '空出一只手便能用。防住蓄力后砸来的重招时，盾面能卸开一股力。' },
   { id: 'miner_pick', slot: 'offhand', tier: 0, durability: 18, repair: 4, entry: '拿在副手。沉钟岭冲沟可以站稳后撬坡矿，玄砂偏井里也可少花些工夫。镐头要磨，腾不出手持盾。' },
-  { id: 'coil_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 45, repair: 10, entry: '练得不深也能贯穿整段枪势的重兵。枪杆经用，锻造却要吃掉一匣硬料。' },
-  { id: 'reed_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 3, def: 0, hp: 0, qi: 0, retreat: 0, durability: 28, repair: 4, entry: '寻常猎弓，弓力温和。可用削苇箭或包铁箭，射入厚毛不易滑脱。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 2 } },
-  { id: 'iron_sword', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '不挑修为的实用剑。厚脊让劈刺都稳，常年巡矿也不用总补剑身。' },
-  { id: 'tide_spear', slot: 'weapon', weaponClass: 'spear', tier: 1, atk: 5, def: 0, hp: 0, qi: 1, retreat: 0, durability: 45, repair: 10, entry: '炼气中期能端稳的长枪。顺着对手蓄势的空当刺过去，常能穿薄些的护甲。', trait: { kind: 'pierce', intent: 'heavy', bonus: 2 } },
+  { id: 'coil_spear', slot: 'weapon', weaponClass: 'spear', tier: 0, atk: 6, def: 0, perception: 2, hp: 0, qi: 0, retreat: 0, durability: 45, repair: 10, entry: '练得不深也能贯穿整段枪势的重兵。枪杆经用，锻造却要吃掉一匣硬料。' },
+  { id: 'reed_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 3, def: 0, perception: 4, hp: 0, qi: 0, retreat: 0, durability: 28, repair: 4, entry: '寻常猎弓，弓力温和。可用削苇箭或包铁箭，射入厚毛不易滑脱。', trait: { kind: 'damage', enemyTag: 'furred', bonus: 2 } },
+  { id: 'iron_sword', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 5, def: 0, perception: 3, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '不挑修为的实用剑。厚脊让劈刺都稳，常年巡矿也不用总补剑身。' },
+  { id: 'tide_spear', slot: 'weapon', weaponClass: 'spear', tier: 1, atk: 5, def: 0, perception: 5, hp: 0, qi: 1, retreat: 0, durability: 45, repair: 10, entry: '炼气中期能端稳的长枪。枪身压得稳，对手沉肩蓄力时容易看清。顺着这一空当刺过去，常能穿薄些的护甲。', trait: { kind: 'pierce', intent: 'heavy', bonus: 2 } },
   { id: 'straw_cape', slot: 'armor', tier: 0, atk: 0, def: 1, hp: 3, qi: 0, retreat: 0, durability: 24, repair: 3, entry: '渔人常穿的轻护具。能缓掉些寻常抓咬，遇到沉重来招仍须躲闪。' },
   { id: 'hide_coat', slot: 'armor', tier: 0, atk: 0, def: 2, hp: 5, qi: 0, retreat: 0, durability: 29, repair: 5, entry: '结实的凡制软甲。泥蜕织面咬不住，能额外卸掉野兽来招的力道。', trait: { kind: 'guard', enemyTag: 'beast', bonus: 2 } },
   { id: 'iron_coat', slot: 'armor', tier: 1, atk: 0, def: 3, hp: 7, qi: 0, retreat: 0, durability: 38, repair: 8, entry: '炼气中期用的重护具。叠铁护心能分散重击，接蓄势之后的重招更稳。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
-  { id: 'tide_coat', slot: 'armor', tier: 2, atk: 0, def: 5, hp: 9, qi: -1, retreat: 0, durability: 46, repair: 12, entry: '炼气后期用的厚甲。甲下气息走得窄，穿着时体内少容些真气。' },
+  { id: 'tide_coat', slot: 'armor', tier: 2, atk: 0, def: 5, hp: 9, qi: -1, retreat: 0, durability: 46, repair: 12,
+    entry: '炼气后期用的厚甲。甲下气息走得窄，穿着时体内少容些真气。挨了贴身的重招而受伤，甲片会反震伤敌。',
+    trait: { kind: 'reflect', intent: 'heavy', bonus: 2 } },
   { id: 'reed_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 0, qi: 2, retreat: 0.05, durability: 25, repair: 3, entry: '小巧的凡制护符。苇声能帮助稳住真气，脱身时也能少挨些追击。' },
-  { id: 'path_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 2, qi: 0, retreat: 0.17, durability: 28, repair: 5, entry: '旧渡工用的护身钱。擅长在混乱中辨来路，撤出战斗时能少受追击。' },
+  { id: 'path_charm', slot: 'charm', tier: 0, atk: 0, def: 0, hp: 2, qi: 0, retreat: 0.17, durability: 28, repair: 5,
+    entry: '旧渡工用的护身钱。撤走时能少挨追击，对方寻常的贴身一击袭来，也有时能闪开。',
+    trait: { kind: 'dodge', bonus: 0.1, intent: 'attack' } },
   { id: 'bell_charm', slot: 'charm', tier: 1, atk: 0, def: 1, hp: 0, qi: 4, retreat: 0.05, durability: 38, repair: 8, entry: '炼气中期可佩的无声小铃。能多存些真气，受击和撤退时也有一点保护。' },
   { id: 'tide_charm', slot: 'charm', tier: 2, atk: 0, def: 1, hp: 4, qi: 3, retreat: 0.20, durability: 46, repair: 12, entry: '炼气后期可佩的玉坠。能护身、储存真气，撤退时还能挡掉身后的部分追击。' },
   { id: 'jetty_charm', slot: 'charm', tier: 2, atk: 0, def: 0, hp: 0, qi: 5, retreat: 0.30, durability: 38, repair: 9, entry: '炼气后期可佩的旧渡口灯坠。能多存些真气，撤离险处时尤其能挡住追击。' },
-  { id: 'pine_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 5, def: 0, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 7, entry: '耐雨长弓。拉得稳又耐使，削苇箭和包铁箭都合弦。' },
-  { id: 'resin_staff', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 2, hp: 0, qi: 2, retreat: 0, durability: 40, repair: 7, entry: '炉户用的厚杖。能架住来势，杖芯温热，持久行气时也趁手。' },
-  { id: 'black_crossbow', slot: 'weapon', weaponClass: 'crossbow', ammo: ['black_bolt'], tier: 2, atk: 6, def: 0, hp: 0, qi: 0, retreat: 0, durability: 36, repair: 12, entry: '炼气后期才能拉开的弩。只能用暗金短矢，对付长着石甲的敌人尤其容易射穿。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
-  { id: 'snow_halberd', slot: 'weapon', weaponClass: 'spear', tier: 2, atk: 6, def: 1, hp: 0, qi: 0, retreat: 0.06, durability: 42, repair: 12, entry: '炼气后期常使的长戟。重招来时能挑住外缘，再反钩卸去一股冲力。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
-  { id: 'sky_sword', slot: 'weapon', weaponClass: 'sword', tier: 3, atk: 6, def: 1, hp: 0, qi: 2, retreat: 0.04, durability: 48, repair: 15, entry: '筑基修士温养的衡剑。敌手收势防守时，剑会顺着中线钻进护身的缝。', trait: { kind: 'pierce', intent: 'guard', bonus: 3 } },
-  { id: 'sky_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['iron_arrow', 'cloud_arrow'], tier: 3, atk: 7, def: 0, hp: 0, qi: 1, retreat: 0, durability: 44, repair: 15, entry: '筑基修士才能拉满的弓，按重箭的分量做成。只能用包铁箭或凝光箭。' },
-  { id: 'frost_robe', slot: 'armor', tier: 2, atk: 0, def: 4, hp: 7, qi: 2, retreat: 0.10, durability: 43, repair: 13, entry: '炼气后期可穿的轻袍，能挡住对手抽走真气的招式，也便于脱身。', trait: { kind: 'guard', intent: 'drain', bonus: 5 } },
+  { id: 'pine_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['reed_arrow', 'iron_arrow'], tier: 0, atk: 5, def: 0, perception: 5, hp: 0, qi: 0, retreat: 0, durability: 38, repair: 7, entry: '耐雨长弓。拉得稳，瞄住猎物时有余裕看它哪只脚先动。削苇箭和包铁箭都合弦。' },
+  { id: 'resin_staff', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 2, perception: 3, hp: 0, qi: 2, retreat: 0, durability: 40, repair: 7, entry: '炉户用的厚杖。能架住来势，杖芯温热，持久行气时也趁手。' },
+  { id: 'black_crossbow', slot: 'weapon', weaponClass: 'crossbow', ammo: ['black_bolt'], tier: 2, atk: 6, def: 0, perception: 2, hp: 0, qi: 0, retreat: 0, durability: 36, repair: 12, entry: '炼气后期才能拉开的弩。只能用暗金短矢，对付长着石甲的敌人尤其容易射穿。', trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } },
+  { id: 'snow_halberd', slot: 'weapon', weaponClass: 'spear', tier: 2, atk: 6, def: 1, perception: 4, hp: 0, qi: 0, retreat: 0.06, durability: 42, repair: 12, entry: '炼气后期常使的长戟。重招来时能挑住外缘，再反钩卸去一股冲力。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
+  { id: 'sky_sword', slot: 'weapon', weaponClass: 'sword', tier: 3, atk: 6, def: 1, perception: 8, hp: 0, qi: 2, retreat: 0.04, durability: 48, repair: 15, entry: '筑基修士温养的衡剑。敌手腕上刚一吃劲，剑尖就有回响。敌手收势防守时，剑会顺着中线钻进护身的缝。', trait: { kind: 'pierce', intent: 'guard', bonus: 3 } },
+  { id: 'sky_bow', slot: 'weapon', weaponClass: 'bow', ammo: ['iron_arrow', 'cloud_arrow'], tier: 3, atk: 7, def: 0, perception: 6, hp: 0, qi: 1, retreat: 0, durability: 44, repair: 15, entry: '筑基修士才能拉满的弓，按重箭的分量做成。只能用包铁箭或凝光箭。' },
+  { id: 'frost_robe', slot: 'armor', tier: 2, atk: 0, def: 4, hp: 7, qi: 2, retreat: 0.10, durability: 43, repair: 13,
+    entry: '炼气后期穿的轻袍，能抵挡抽走真气的招式，也便于脱身。普通贴身招打来时，有时能及时转身闪开。',
+    trait: { kind: 'guard', intent: 'drain', bonus: 5 }, traits: [{ kind: 'dodge', bonus: 0.16, intent: 'attack' }] },
   { id: 'sky_cloak', slot: 'armor', tier: 3, atk: 0, def: 6, hp: 11, qi: 0, retreat: 0.04, durability: 54, repair: 16, entry: '筑基修士可穿的厚甲。皮条和厚晶片分担冲力，最能挡住蓄力后的重击。', trait: { kind: 'guard', intent: 'heavy', bonus: 3 } },
   { id: 'jade_pendant', slot: 'charm', tier: 3, atk: 0, def: 1, hp: 3, qi: 7, retreat: 0.14, durability: 51, repair: 16, entry: '筑基修士养气所用。手腕的浮光略闪，散掉的气便向内收。' },
 ];
@@ -4203,7 +4484,8 @@ const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => cont
 const mechanisms = puzzleContent.mechanisms;
 
 for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
-  ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent]) {
+  ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent,
+  dykeArmoryContent, ridgeArmoryContent, explorerKitContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -4219,6 +4501,48 @@ for (const item of gear) {
   if (item.slot === 'weapon') item.hands = twoHandedClasses.has(item.weaponClass) && !oneHandedWeapons.has(item.id) ? 2 : 1;
 }
 const eventsBySite = new Map(events.map((event) => [event.id, event]));
+const enemyCombatProfiles = {
+  reed_hare: { perception: 4 },
+  ford_silver_dace: { perception: 3 },
+  bank_runner: { perception: 12, strategy: 'predator' },
+  caravan_lookout: { perception: 11 },
+  vine_king: { perception: 17, strategy: 'predator' },
+  tide_spirit: { strategy: 'bulwark' },
+  foundation_duelist: { perception: 18 },
+  foundation_warden: { perception: 17, strategy: 'bulwark' },
+  mirror_warden: { perception: 25, strategy: 'schemer' },
+  herb_den_elder: { perception: 21, strategy: 'bulwark' },
+  river_spar_captain: { perception: 27, strategy: 'bulwark' },
+  undertow_moundback: { perception: 22, strategy: 'predator' },
+  zhao_spar: { perception: 27 },
+  fault_warden: { perception: 32, strategy: 'schemer' },
+  ember_yak: { strategy: 'predator' },
+  sand_well_basilisk: { perception: 22, strategy: 'predator' },
+  sand_glass_lynx: { perception: 27, strategy: 'predator' },
+  sand_riven_scorpion: { perception: 21, strategy: 'bulwark' },
+  sand_quarry_matriarch: { perception: 29, strategy: 'schemer' },
+  sand_basket_mender: { perception: 33, strategy: 'duelist' },
+  sand_sundial_master: { perception: 35, strategy: 'schemer', medicine: { id: 'jade_pill', count: 1 } },
+  caravan_broker: { strategy: 'schemer' },
+  zhao_cargo_shield: { strategy: 'bulwark' },
+  zhao_cargo_keeper: { strategy: 'schemer' },
+  border_axle_poleman: { perception: 14, strategy: 'predator' },
+  border_wind_ambusher: { strategy: 'schemer' },
+  border_kiln_shield: { strategy: 'bulwark' },
+  border_silo_leader: { perception: 27, strategy: 'schemer' },
+};
+for (const enemy of enemies) {
+  const human = enemy.tags.includes('human');
+  const baseline = human ? 14 : enemy.tags.includes('beast') ? 6 : 9;
+  const profile = enemyCombatProfiles[enemy.id] ?? {};
+  const tier = enemy.tier ?? 0;
+  enemy.perception = profile.perception ?? enemy.perception ?? baseline + 2 * tier;
+  enemy.strategy = profile.strategy ?? enemy.strategy ?? (human ? 'duelist' : 'instinct');
+  if (human) {
+    const medicineId = tier < 2 ? 'salve' : tier < 5 ? 'heal_pill' : 'tide_pill';
+    enemy.medicine = profile.medicine ?? { id: medicineId, count: 1 };
+  }
+}
 const sparringEnemies = new Set(enemies.filter((enemy) => enemy.sparring).map((enemy) => enemy.id));
 for (const site of sites) {
   if (!site.creatures || site.protectedArena) continue;
@@ -4233,7 +4557,9 @@ for (const site of sites) {
   }
 }
 
-const data = { realms, items, gear, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
+const equipmentSlots = { weapon: '主武器', offhand: '副手', armor: '盔甲', head: '头部', boots: '鞋子', belt: '饰品', charm: '法器' };
+
+const data = { realms, items, gear, equipmentSlots, ammunition, foods, pills, talismans, arts, recipes, regions, sites, events, enemies, quests,
   services, market, deductions, rules: {}, starting, basket, victoryQuest, finalQuest, provinces, regionDetails, sects, mechanisms, tournament: tournamentData };
 
 
@@ -4786,9 +5112,9 @@ const trainingData = [
   { id: 'spirit', name: '神识', region: 'zhao_city', teacher: '水师杜椿', lead: 'phase_chart',
     desc: '水还没漫过铜板边缘，杜椿就让你闭眼听它涨上来。交手时，你也能用这个法子提前察觉对方的动作。',
     ranks: [
-      { coins: 30, days: 2, need: { core: 3, qi_core: 2 }, senseMax: 2, senseGuard: 2, effect: '神识上限 2。花 1 点预看再下一招，本回合少受 2 点伤害。' },
-      { coins: 48, days: 3, need: { core: 5, beast_eye: 1, foundation_core: 1 }, senseMax: 3, senseGuard: 3, effect: '神识上限 3。花 1 点预看再下一招，本回合少受 3 点伤害。' },
-      { coins: 72, days: 4, need: { core: 8, beast_eye: 2, foundation_core: 2 }, senseMax: 4, senseGuard: 4, effect: '神识上限 4。花 1 点预看再下一招，本回合少受 4 点伤害。' },
+      { coins: 30, days: 2, need: { core: 3, qi_core: 2 }, senseMax: 2, senseGuard: 2, effect: '神识上限 2。花 1 点观这一招并少受 2 点伤害。对方还在等你先动时，只能护身。' },
+      { coins: 48, days: 3, need: { core: 5, beast_eye: 1, foundation_core: 1 }, senseMax: 3, senseGuard: 3, effect: '神识上限 3。花 1 点观这一招并少受 3 点伤害。对方还在等你先动时，只能护身。' },
+      { coins: 72, days: 4, need: { core: 8, beast_eye: 2, foundation_core: 2 }, senseMax: 4, senseGuard: 4, effect: '神识上限 4。花 1 点观这一招并少受 4 点伤害。对方还在等你先动时，只能护身。' },
     ] },
 ];
 
@@ -4847,10 +5173,10 @@ function spiritView(state, kit) {
   const current = state.training.sense;
   const enemy = combat && kit.records.enemies[combat.id];
   const readThisRound = combat && combat.spiritReadRound === combat.round;
-  const next = enemy && readThisRound && enemy.intents[(combat.round + 1) % enemy.intents.length];
+  const intent = enemy && readThisRound && kit.readableIntent(state);
   return {
     current, max, canRead: Boolean(enemy && !readThisRound && current > 0),
-    prediction: next ? { name: next.name, kind: next.kind } : null,
+    prediction: intent ? { name: intent.name, kind: intent.kind } : null,
   };
 }
 
@@ -4892,7 +5218,8 @@ function recordTrainingRead(state, kit) {
   state.training.sense -= 1;
   state.combat.spiritReadRound = state.combat.round;
   state.combat.spiritGuard = trainedRank(state, 'spirit').senseGuard;
-  return kit.say(state, `你看见对方再下一招是「${spiritView(state, kit).prediction.name}」。`);
+  const intent = kit.readableIntent(state);
+  return kit.say(state, intent ? `你看见对方这一招是「${intent.name}」。` : '对方还在等你先动。你先凝神护住周身。');
 }
 
 return { initialTraining, trainingStats, trainingPerks, restoreTrainingSense, needsSenseRest, trainingView, trainingAction, recordTrainingRead };
@@ -5864,7 +6191,109 @@ function alchemyAction(state, action, { id }, kit) {
 
 return { alchemyData, initialAlchemyState, alchemyView, alchemyAction };
 })();
+const { chooseEnemyIntent } = (() => {
+const strategies = {
+  predator: { guardAt: 0.86, healAt: 0.22 },
+  bulwark: { guardAt: 0.42, healAt: 0.48 },
+  duelist: { guardAt: 0.62, healAt: 0.3 },
+  schemer: { guardAt: 0.68, healAt: 0.43 },
+};
+
+const focus = { kind: 'focus', name: '蓄势待发' };
+const isAttack = (kind) => kind === 'attack' || kind === 'heavy' || kind === 'drain';
+
+function recentEstimate(values) {
+  const weights = values.length * (values.length + 1) / 2;
+  const weighted = values.reduce((sum, value, index) => sum + value * (index + 1), 0);
+  return Math.max(values.at(-1), Math.ceil(weighted / weights));
+}
+
+function incomingEstimate(enemy, guard, observedHits) {
+  if (!observedHits.length) return null;
+  const cushion = guard ? Math.max(2, Math.ceil(enemy.def * (guard.mult ?? 1)) - enemy.def) : 0;
+  const adjustment = Math.ceil(cushion / 2);
+  return {
+    open: recentEstimate(observedHits.map(({ damage, guarded }) => damage + (guarded ? adjustment : 0))),
+    braced: recentEstimate(observedHits.map(({ damage, guarded }) => Math.max(1, damage - (guarded ? 0 : adjustment)))),
+  };
+}
+
+function worthwhileHeal(enemy, heal, hp, threat, threshold) {
+  if (!heal || hp > enemy.hp * threshold || threat >= hp) return false;
+  const missing = enemy.hp - hp;
+  const restored = Math.min(missing, Math.ceil(enemy.atk * (heal.mult ?? 1)));
+  return restored > Math.max(2, threat);
+}
+
+function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, read, observedHits = [], medicine }) {
+  const start = round % enemy.intents.length;
+  const order = [...enemy.intents.slice(start), ...enemy.intents.slice(0, start)];
+  const recentlyRecovered = previousKind === 'heal' || previousKind === 'remedy';
+  const available = order.filter(({ kind }) => !(kind === 'guard' && previousKind === 'guard') && !(kind === 'heal' && recentlyRecovered));
+  const planned = available[0];
+  const attack = available.find(({ kind }) => kind === 'attack') ?? available.find(({ kind }) => isAttack(kind));
+  const heavy = previousKind === 'heavy' ? null : available.find(({ kind }) => kind === 'heavy');
+  const strategy = Object.hasOwn(strategies, enemy.strategy) ? strategies[enemy.strategy] : null;
+
+  if (!strategy) {
+    if (!read) return planned;
+    if (read.kind === 'focus' || read.kind === 'recover') return attack;
+    if (planned.kind === 'guard' && read.kind !== 'strike') return attack;
+    return planned;
+  }
+
+  // The enemy can estimate danger only from hits that have already landed.
+  const guard = available.find(({ kind }) => kind === 'guard');
+  const heal = available.find(({ kind }) => kind === 'heal');
+  const threat = incomingEstimate(enemy, guard ?? order.find(({ kind }) => kind === 'guard'), observedHits);
+  const open = threat?.open ?? 0;
+
+  const safeWindow = read?.kind === 'brace' || read?.kind === 'focus' || read?.kind === 'recover' || read?.kind === 'switch';
+  const recentlyPassive = previousKind === 'guard' || recentlyRecovered || previousKind === 'focus';
+  if (medicine?.hp > 0 && !recentlyRecovered && read?.kind !== 'retreat' &&
+      (safeWindow || (threat && !recentlyPassive && open < hp))) {
+    const restored = Math.min(enemy.hp - hp, medicine.hp);
+    const threshold = strategy.healAt + (read?.kind === 'focus' ? 0 : safeWindow ? 0.18 : 0.08);
+    const hazard = safeWindow ? 0 : open;
+    if (hp <= enemy.hp * threshold && restored >= Math.max(4, Math.ceil(medicine.hp * 0.55)) && restored > hazard &&
+        (!worthwhileHeal(enemy, heal, hp, hazard, strategy.healAt) || restored > Math.ceil(enemy.atk * (heal.mult ?? 1)))) {
+      return { kind: 'remedy', name: medicine.action ?? `服下${medicine.name}` };
+    }
+  }
+
+  if (!read) {
+    if (threat && worthwhileHeal(enemy, heal, hp, open, strategy.healAt) && isAttack(previousKind)) return heal;
+    if (planned.kind === 'heal' && (enemy.hp - hp < 3 || open >= hp)) return attack;
+    return planned;
+  }
+
+  if (read.kind === 'focus') return heavy ?? attack;
+  if (read.kind === 'brace') {
+    if (worthwhileHeal(enemy, heal, hp, 0, strategy.healAt)) return heal;
+    if (!charged && hp > enemy.hp * 0.25 && enemy.strategy !== 'predator') return focus;
+    return attack;
+  }
+  if (read.kind === 'recover' && worthwhileHeal(enemy, heal, hp, 0, strategy.healAt)) return heal;
+  if (read.kind !== 'strike') {
+    const drain = enemy.strategy === 'schemer' && read.kind === 'recover' && available.find(({ kind }) => kind === 'drain');
+    return drain || (enemy.strategy === 'bulwark' ? attack : heavy ?? attack);
+  }
+
+  if (!recentlyPassive && threat) {
+    if (guard && threat.braced < hp && open - threat.braced >= 2 && open >= Math.max(3, hp * strategy.guardAt)) return guard;
+    if (worthwhileHeal(enemy, heal, hp, open, strategy.healAt)) return heal;
+  } else if (!recentlyPassive && planned.kind === 'guard') {
+    return planned;
+  }
+  if (charged && heavy) return heavy;
+  if (isAttack(planned.kind) && (planned.kind !== 'heavy' || heavy)) return planned;
+  return attack;
+}
+
+return { chooseEnemyIntent };
+})();
 const { act, createGame, handConflict, rules, view } = (() => {
+
 
 
 
@@ -5883,7 +6312,7 @@ const records = Object.fromEntries(
 const experiments = Object.fromEntries(data.events.filter(({ experiment }) => experiment).map(({ experiment }) => [experiment.id, experiment]));
 const supply = 'ration';
 const hub = 'village';
-const slots = ['weapon', 'offhand', 'armor', 'charm'];
+const slots = Object.keys(data.equipmentSlots);
 const hypothesisLimit = 180;
 
 const rules = Object.freeze({
@@ -5899,6 +6328,14 @@ const rules = Object.freeze({
   pressureThreshold: 3,
   pressureQi: 1,
   battleDays: 0.125,
+  perceptionScale: 12,
+  perceptionCap: 0.7,
+  observedHitLimit: 3,
+  combatDodgeCap: 0.30,
+  combatChargeFloor: 4,
+  combatChargeFactor: 0.35,
+  enemyChargeFactor: 0.25,
+  chargeBreakDamage: 4,
   harvestEncounterDays: 0.125,
   ebbCycleDays: 2,
   ebbWindowDays: 0.625,
@@ -5965,7 +6402,11 @@ function activeGear(state) {
 }
 
 function fogProtection(state) {
-  return activeGear(state).find(({ field }) => field?.fogTolerance > 0);
+  let protection;
+  for (const gear of activeGear(state)) {
+    if ((gear.field?.fogTolerance ?? 0) > (protection?.field.fogTolerance ?? 0)) protection = gear;
+  }
+  return protection;
 }
 
 function roadProtection(state, province) {
@@ -5982,6 +6423,7 @@ function stats(state) {
     maxQi: Math.max(1, realm.qi + sum('qi') + trained.qi),
     attack: realm.atk + sum('atk'),
     defense: realm.def + sum('def') + trained.def,
+    perception: (realm.perception ?? 0) + sum('perception'),
     retreat: sum('retreat'),
   };
 }
@@ -6245,6 +6687,8 @@ function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     huntTracks: {},
     siteWitnesses: {},
     encounterSeed: seed >>> 0,
+    combatSeed: (seed ^ 0x9e3779b9) >>> 0,
+    evadeSeed: (seed ^ 0x85ebca6b) >>> 0,
     basketInspected: false,
     basketDisposition: null,
     showedHideToSmith: false,
@@ -6282,9 +6726,43 @@ function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
 }
 
 function currentIntent(state) {
+  return state.combat?.plan?.intent ?? null;
+}
+
+function readableIntent(state) {
+  return state.combat?.plan?.reader === 'enemy' ? null : currentIntent(state);
+}
+
+function enemyMedicine(state) {
+  const carried = enemyOf(state)?.medicine;
+  if (!carried || (state.combat.medicineLeft ?? carried.count) <= 0) return null;
+  const { id, count } = carried;
+  const name = nameOf(id);
+  const action = id === 'salve' ? `敷上${name}` : id === 'jade_pill' ? `喝下${name}` : `服下${name}`;
+  return { id, name, action, hp: records.pills[id].hp, left: state.combat.medicineLeft ?? count };
+}
+
+function enemyContext(state) {
+  const { round, hp, lastEnemyIntent, enemyCharged, observedHits } = state.combat;
+  return {
+    round, hp, previousKind: lastEnemyIntent?.kind, charged: Boolean(enemyCharged),
+    observedHits: observedHits ?? [], medicine: enemyMedicine(state),
+  };
+}
+
+function prepareCombatRound(state) {
+  const combat = state.combat;
+  if (!combat || combat.plan?.round === combat.round) return;
   const enemy = enemyOf(state);
-  if (!enemy) return null;
-  return enemy.intents[state.combat.round % enemy.intents.length];
+  const context = enemyContext(state);
+  const gap = stats(state).perception - (enemy.perception ?? 0);
+  const magnitude = Math.abs(gap);
+  const chance = Math.min(rules.perceptionCap, magnitude / (rules.perceptionScale + magnitude));
+  const seed = state.combatSeed ?? ((state.encounterSeed ^ 0x9e3779b9) >>> 0);
+  state.combatSeed = (Math.imul(1664525, seed) + 1013904223) >>> 0;
+  const reads = state.combatSeed / 0x100000000 < chance;
+  combat.plan = { round: combat.round, reader: reads ? (gap > 0 ? 'player' : 'enemy') : null,
+    intent: chooseEnemyIntent(enemy, context) };
 }
 
 function canInterceptOpening(state, intent) {
@@ -6424,7 +6902,9 @@ function revisitableEvents(state) {
 
 function view(state) {
   const enemy = enemyOf(state);
-  const intent = currentIntent(state);
+  const combatRead = state.combat?.plan?.reader ?? null;
+  const observed = combatRead === 'player' || (state.combat && state.combat.spiritReadRound === state.combat.round);
+  const intent = observed ? readableIntent(state) : null;
   const inSettlement = isSettlement(state);
   const mode = state.victoryPending ? 'victory' : state.combat ? 'combat' : state.event ? 'event' : inSettlement ? 'village' : 'field';
   const questLocation = inSettlement ? state.region : hub;
@@ -6439,6 +6919,7 @@ function view(state) {
   const nextRealm = services.includes('cultivate') ? records.realms[state.realm + 1] ?? null : null;
   const groundLoot = { ...groundAt(state) };
   const combatWeapon = weaponView(state);
+  const side = sideWeapon(state);
   const studies = trainingView(state, economyKit);
   const visibleChoices = (currentEvent?.choices ?? []).map((choice, index) => {
     const blocker = choiceBlocker(state, choice, currentSite, index);
@@ -6451,8 +6932,9 @@ function view(state) {
       ...(gather.length ? { gather } : {}) };
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
     knowsChoice(state, currentEvent.choices[index], currentSite));
+  const { combatSeed, evadeSeed, combat, ...visibleState } = state;
   return {
-    ...state,
+    ...visibleState,
     ...stats(state),
     ...worldView(state, economyKit),
     localHazard: hazardView(state, economyKit),
@@ -6499,12 +6981,20 @@ function view(state) {
       })),
     } : null,
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
-    currentEnemy: enemy ? { ...enemy, sparring: inProtectedBout(state), maxHp: enemy.hp, hp: state.combat.hp } : null,
+    combat: combat ? { id: combat.id, siteId: combat.siteId, round: combat.round } : null,
+    currentEnemy: enemy ? { id: enemy.id, name: enemy.name, tier: enemy.tier, desc: enemy.desc,
+      sparring: inProtectedBout(state), maxHp: enemy.hp, hp: combat.hp } : null,
     combatWeapon,
+    combatOffhand: side ? { id: side.id, name: nameOf(side.id), chargeRequired: Boolean(side.chargeRequired) } : null,
     openingShotReady: canInterceptOpening(state, intent) && Boolean(combatWeapon.selectedAmmo),
+    openingShotPossible: Boolean(combat?.openingRange && combat.round === 0 && combatWeapon.selectedAmmo),
+    combatRead,
+    combatCharge: Boolean(combat?.playerCharged),
+    enemyCharged: Boolean(combat?.enemyCharged),
+    lastEnemyIntent: combat?.lastEnemyIntent ?? null,
     intent,
-    intentDamage: enemy && intent ? estimatedHit(enemy, intent) : 0,
-    retreatRisk: enemy && !inProtectedBout(state) ? retreatRisk(state, enemy, intent) : null,
+    intentDamage: intent ? estimatedHit(state, enemy, intent) : null,
+    retreatRisk: intent && !inProtectedBout(state) ? retreatRisk(state, enemy, intent) : null,
     breathingQi: intent?.kind === 'guard' ? breathingQi(state) : 0,
     discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
       (!art.prizeOnly && (!inSettlement || atHome(state)) && services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
@@ -6625,7 +7115,8 @@ function saveHuntTrack(state) {
   const fight = state.combat;
   if (fight?.huntChoice === undefined) return;
   const tracks = ((state.huntTracks ??= {})[fight.siteId] ??= {});
-  tracks[fight.huntChoice] = { enemy: fight.id, hp: fight.hp, day: state.day };
+  tracks[fight.huntChoice] = { enemy: fight.id, hp: fight.hp, day: state.day,
+    observedHits: fight.observedHits ?? [], medicineLeft: fight.medicineLeft };
 }
 
 function selectEncounter(state, site, choice) {
@@ -6833,6 +7324,8 @@ function choose(state, { index, itemId, count }) {
       if (track) {
         const healed = Math.floor((state.day - track.day) * rules.mixedTrackHealingPerDay);
         state.combat.hp = Math.min(state.combat.hp, track.hp + healed);
+        state.combat.observedHits = [...(track.observedHits ?? [])];
+        state.combat.medicineLeft = track.medicineLeft;
       }
     }
   } else if (!continuesHere && !stocks.length && !Object.keys(spilled).length) {
@@ -6944,9 +7437,14 @@ function finishCombat(state, enemy) {
   };
 }
 
-function estimatedHit(enemy, intent) {
-  if (intent.kind === 'guard' || intent.kind === 'heal') return 0;
-  return Math.ceil(enemy.atk * (intent.mult ?? 1));
+function attackingIntent(intent) {
+  return ['attack', 'heavy', 'drain'].includes(intent.kind);
+}
+
+function estimatedHit(state, enemy, intent) {
+  if (!attackingIntent(intent)) return 0;
+  const extra = state.combat.enemyCharged ? Math.ceil(enemy.atk * rules.enemyChargeFactor) : 0;
+  return Math.ceil(enemy.atk * (intent.mult ?? 1)) + extra;
 }
 
 function breathingQi(state) {
@@ -6957,7 +7455,7 @@ function retreatRisk(state, enemy, intent, bonus = 0, guard = 0) {
   const { defense, retreat: retreatBonus } = stats(state);
   const training = trainingPerks(state, enemy, intent);
   const reduction = clamp(retreatBonus + (state.combat.escapeBonus ?? 0) + bonus, 0, 1);
-  const damage = Math.max(0, Math.ceil(estimatedHit(enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
+  const damage = Math.max(0, Math.ceil(estimatedHit(state, enemy, intent) * rules.retreatDamageFactor * (1 - reduction))
     - defense - guard - training.guard);
   return { damage, wouldFall: damage > 0 && damage >= state.hp, retreatBonus };
 }
@@ -6986,6 +7484,7 @@ function weaponView(state) {
     id: weapon?.id ?? null,
     name: weapon ? nameOf(weapon.id) : '徒手',
     weaponClass: weapon?.weaponClass ?? (weapon ? 'melee' : 'unarmed'),
+    chargeRequired: Boolean(weapon?.chargeRequired),
     needsAmmo: compatible.length > 0,
     isLoaded: !compatible.length || Boolean(ammo),
     selectedAmmo: ammo?.id ?? null,
@@ -7001,8 +7500,13 @@ function selectAmmo(state, id) {
   return say(state, `取用${nameOf(id)}。`);
 }
 
+function sideWeapon(state) {
+  const gear = records.gear[state.equipment.offhand];
+  return gear?.sideAtk && state.durability[gear.id] > 0 ? gear : null;
+}
+
 function combatTraits(traits, enemy, intent) {
-  const effects = { damage: 0, pierce: 0, guard: 0 };
+  const effects = { damage: 0, pierce: 0, guard: 0, reflect: 0, dodge: 0 };
   for (const trait of traits) {
     if (!trait || (trait.enemyTag && !enemy.tags?.includes(trait.enemyTag)) ||
         (trait.intent && trait.intent !== intent.kind) || !Object.hasOwn(effects, trait.kind)) continue;
@@ -7011,13 +7515,16 @@ function combatTraits(traits, enemy, intent) {
   return effects;
 }
 
-function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, counter = 0, brace = false,
-  wearWeapon = false, hungerAffected = wearWeapon, ammo = null, message }) {
-  const enemy = enemyOf(state);
-  const intent = currentIntent(state);
-  const { defense } = stats(state);
+function combatEffects(state, enemy, intent, move) {
+  const { damage = 0, pierce = 0, brace = false, wearWeapon = false, hungerAffected = wearWeapon, ammo } = move;
+  const { defense, attack: force } = stats(state);
+  const heavyBrace = brace && intent.kind === 'heavy';
+  const counter = heavyBrace ? rules.guardCounter : 0;
+  const guard = (move.guard ?? 0) + (brace ? rules.guardBonus + (heavyBrace ? rules.heavyGuardBonus : 0) : 0);
+  const interrupt = ['heavy', 'heal', 'focus'].includes(intent.kind) ? move.interrupt ?? 0 : 0;
+  const charge = move.chargeable && damage > 0 && state.combat.playerCharged
+    ? Math.max(rules.combatChargeFloor, Math.ceil((move.chargeBase ?? force) * rules.combatChargeFactor)) : 0;
   const training = trainingPerks(state, enemy, intent);
-  delete state.combat.spiritGuard;
   const traits = combatTraits([
     ...activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), ammo?.trait, ...(ammo?.traits ?? []),
   ], enemy, intent);
@@ -7027,54 +7534,128 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
     ? Math.max(enemy.def + rules.enemyGuardBonus, Math.ceil(enemy.def * (intent.mult ?? 1)))
     : enemy.def;
   const hunger = hungerAffected && state.satiety === 0 ? rules.emptyAttackMultiplier : 1;
-  const effectiveDamage = Math.floor((damage + weaponDamageBonus + training.damage + (ammo?.atk ?? 0)) * hunger * crossRealmFactor(state, enemy));
+  const effectiveDamage = Math.floor((damage + charge + weaponDamageBonus + training.damage + (ammo?.atk ?? 0)) * hunger * crossRealmFactor(state, enemy));
   const dealt = damage > 0
     ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - weaponPierceBonus - training.pierce - (ammo?.pierce ?? 0))) : 0;
-  const damageDealt = Math.min(state.combat.hp, dealt + counter);
+  const hit = Boolean(ammo && dealt > 0 && canInterceptOpening(state, intent));
+  const incoming = hit || !attackingIntent(intent) ? 0
+    : Math.max(0, estimatedHit(state, enemy, intent) - defense - guard - traits.guard - training.guard - interrupt);
+  const shield = heavyBrace && incoming > 0 ? activeGear(state).find(({ slot, brace }) => slot === 'offhand' && brace) : null;
+  const received = Math.max(0, incoming - (shield?.brace ?? 0));
+  const qiToPlayer = intent.kind === 'drain' ? Math.min(state.qi, received) : 0;
+  const damageToPlayer = received - qiToPlayer;
+  const healing = intent.kind === 'heal' ? Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt) : 0;
+  const reflect = damageToPlayer > 0 && damageToPlayer < state.hp && !intent.ranged &&
+    (intent.kind === 'attack' || intent.kind === 'heavy') ? traits.reflect : 0;
+  const dodge = damageToPlayer > 0 && intent.kind === 'attack' && !intent.ranged ? Math.min(rules.combatDodgeCap, traits.dodge) : 0;
+  return { dealt, counter, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer };
+}
+
+function evaded(state, chance) {
+  if (!chance) return false;
+  const seed = state.evadeSeed ?? ((state.combatSeed ^ 0x85ebca6b) >>> 0);
+  state.evadeSeed = (Math.imul(1664525, seed) + 1013904223) >>> 0;
+  return state.evadeSeed / 0x100000000 < chance;
+}
+
+function respondToMove(state, enemy, kind) {
+  const intent = currentIntent(state);
+  return state.combat.plan.reader === 'enemy'
+    ? chooseEnemyIntent(enemy, { ...enemyContext(state), read: { kind } }) : intent;
+}
+
+function combatVictory(state, enemy, summary, results) {
+  const { message, ...outcome } = finishCombat(state, enemy);
+  normalize(state);
+  return { ...say(state, summary + message), ...outcome, ...results };
+}
+
+function combatTurn(state, move) {
+  const enemy = enemyOf(state);
+  const { kind = 'recover', brace, wearWeapon, ammo, message } = move;
+  const intent = respondToMove(state, enemy, kind);
+  const result = combatEffects(state, enemy, intent, move);
+  const { dealt, counter, hit, charge, interrupt, shield, reflect, dodge, healing, qiToPlayer, damageToPlayer } = result;
   const healthBefore = state.hp;
-  state.combat.hp -= dealt + counter;
-  advance(state, rules.battleDays);
-  const weaponDamage = wearWeapon ? wear(state, 'weapon') : '';
-  if (ammo) removeItem(state, ammo.id, 1);
-  let summary = `${message}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${dealt + counter ? `造成${dealt + counter}点伤害。` : ''}${weaponDamage}`;
-  if (state.combat.hp <= 0) {
-    const { message: outcome, ...results } = finishCombat(state, enemy);
-    normalize(state);
-    return { ...say(state, summary + outcome), damageDealt, damageTaken: 0, ...results };
+  const enemyMove = { name: intent.name, kind: intent.kind };
+  const read = state.combat.plan.reader === 'enemy' ? `${enemy.name}看破了你的起手。` : '';
+  delete state.combat.spiritGuard;
+  let damageDealt = Math.min(state.combat.hp, dealt + counter);
+  let reflectedDamage = 0;
+  if (dealt > 0) {
+    const landed = { damage: Math.min(state.combat.hp, dealt), guarded: intent.kind === 'guard' };
+    const observed = (state.combat.observedHits ??= []);
+    observed.push(landed);
+    if (observed.length > rules.observedHitLimit) observed.shift();
   }
-  if (ammo && dealt > 0 && canInterceptOpening(state, intent)) {
+  state.combat.hp -= dealt + counter;
+  if (charge) state.combat.playerCharged = false;
+  if (kind === 'focus') state.combat.playerCharged = true;
+  const recovered = brace && intent.kind === 'guard' ? breathingQi(state) : 0;
+  state.qi += recovered;
+  advance(state, rules.battleDays);
+  const weaponDamage = wearWeapon ? wear(state, 'weapon') : move.wearSlot ? wear(state, move.wearSlot) : '';
+  if (ammo) removeItem(state, ammo.id, 1);
+  const playerMove = brace ? counter ? '你挡住重招，趁对手还没收招打了回去。'
+    : recovered ? `你趁对手守势回了${recovered}点真气。` : '你收回手，挡在身前。' : message;
+  let summary = `${read}${playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
+  if (state.combat.hp <= 0) {
+    if (counter) summary += `「${intent.name}」被你截住了。`;
+    return combatVictory(state, enemy, summary, { damageDealt, damageTaken: 0, ...(counter ? { enemyMove } : {}) });
+  }
+  summary += intent.kind === 'remedy' ? `${enemy.name}${intent.name}。` : `${enemy.name}使出「${intent.name}」。`;
+  if (attackingIntent(intent)) state.combat.enemyCharged = false;
+  const dodged = evaded(state, dodge);
+  if (hit) {
     summary += `这一箭拦住了${enemy.name}的冲势。`;
+  } else if (dodged) {
+    summary += '你错开半步，这一招落了空。' + wear(state, 'boots');
   } else if (intent.kind === 'heal') {
     const before = state.combat.hp;
-    state.combat.hp = Math.min(enemy.hp, before + Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt));
+    state.combat.hp = Math.min(enemy.hp, before + healing);
     const restored = state.combat.hp - before;
     summary += interrupt && !restored ? `${enemy.name}调息被打断。`
       : `${enemy.name}${interrupt ? '调息受阻，只' : ''}恢复了${restored}点生命。`;
+  } else if (intent.kind === 'remedy') {
+    const dose = enemyMedicine(state);
+    state.combat.medicineLeft = dose.left - 1;
+    const restored = Math.min(enemy.hp - state.combat.hp, dose.hp);
+    state.combat.hp += restored;
+    summary += `气血回了${restored}点。`;
   } else if (intent.kind === 'guard') {
     summary += `${enemy.name}稳住了架势。`;
+  } else if (intent.kind === 'focus') {
+    state.combat.enemyCharged = dealt < rules.chargeBreakDamage && !interrupt;
+    summary += state.combat.enemyCharged ? '它的下一记出招会更重。' : '蓄势被你打断了。';
   } else {
-    const incoming = Math.max(0, estimatedHit(enemy, intent) - defense - guard - traits.guard - training.guard - interrupt);
-    const shield = brace && intent.kind === 'heavy' && incoming > 0
-      ? activeGear(state).find(({ slot }) => slot === 'offhand') : null;
-    const received = Math.max(0, incoming - (shield?.brace ?? 0));
-    if (shield?.brace) summary += nameOf(shield.id) + '卸掉了一股冲力。' + wear(state, 'offhand');
+    if (shield) summary += nameOf(shield.id) + '卸掉了一股冲力。' + wear(state, 'offhand');
+    state.qi -= qiToPlayer;
+    state.hp -= damageToPlayer;
+    const armorDamage = damageToPlayer ? wear(state, 'armor') : '';
     if (intent.kind === 'drain') {
-      const lostQi = Math.min(state.qi, received);
-      state.qi -= lostQi;
-      state.hp -= received - lostQi;
-      const armorDamage = received > lostQi ? wear(state, 'armor') : '';
-      summary += `${enemy.name}抽走你${lostQi}点真气${received > lostQi ? `，另造成${received - lostQi}点伤害` : ''}。${armorDamage}`;
+      summary += `${enemy.name}抽走你${qiToPlayer}点真气${damageToPlayer ? `，另造成${damageToPlayer}点伤害` : ''}。${armorDamage}`;
     } else {
-      state.hp -= received;
-      const armorDamage = received ? wear(state, 'armor') : '';
-      summary += received ? `${enemy.name}反击，你受了${received}点伤。${armorDamage}` : '你挡下了这一招。';
+      summary += damageToPlayer ? `你受了${damageToPlayer}点伤。${armorDamage}` : '你挡下了这一招。';
+    }
+    if (state.combat.playerCharged && damageToPlayer >= rules.chargeBreakDamage) {
+      state.combat.playerCharged = false;
+      summary += '你蓄着的劲被打散了。';
+    }
+    if (reflect > 0) {
+      reflectedDamage = Math.min(state.combat.hp, reflect);
+      state.combat.hp -= reflectedDamage;
+      damageDealt += reflectedDamage;
+      summary += `护具把来劲弹了回去，造成${reflectedDamage}点反伤。`;
     }
   }
+  if (state.combat.hp <= 0) return combatVictory(state, enemy, summary, { damageDealt, damageTaken: healthBefore - state.hp, enemyMove, reflectedDamage });
+  state.combat.lastEnemyIntent = enemyMove;
   state.combat.round += 1;
   normalize(state);
   const damageTaken = Math.max(0, healthBefore - state.hp);
   say(state, summary);
-  return { ...(state.hp === 0 ? fall(state) : { ok: true, message: summary }), damageDealt, damageTaken };
+  const fell = state.hp === 0 ? fall(state) : null;
+  return { ...fell, ok: true, message: summary + (fell?.message ?? ''), damageDealt, damageTaken, enemyMove, reflectedDamage, dodged };
 }
 
 function retreat(state, bonus = 0, lead = '', guard = 0) {
@@ -7086,7 +7667,7 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
     state.focus = 0;
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
   }
-  const intent = currentIntent(state);
+  const intent = respondToMove(state, enemy, 'retreat');
   const { damage: received, retreatBonus } = retreatRisk(state, enemy, intent, bonus, guard);
   advance(state, rules.retreatDays);
   const charmDamage = retreatBonus > 0 ? wear(state, 'charm') : '';
@@ -7097,9 +7678,13 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   const damageTaken = Math.max(0, healthBefore - state.hp);
   const outerEdge = state.combat.huntChoice !== undefined ? state.combat.siteId : null;
   const position = outerEdge ? '退回了这处猎场的外沿' : `仍在${regionOf(state).name}`;
-  const summary = `${lead}你退出了与${enemy.name}的交手，${position}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
+  const reaction = attackingIntent(intent) ? `${enemy.name}以「${intent.name}」追来。` : '';
+  const summary = `${lead}${reaction}你退出了与${enemy.name}的交手，${position}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
   say(state, summary);
-  if (state.hp === 0) return { ...fall(state), damageDealt: 0, damageTaken };
+  if (state.hp === 0) {
+    const fell = fall(state);
+    return { ...fell, message: summary + fell.message, damageDealt: 0, damageTaken };
+  }
   if (outerEdge) {
     saveHuntTrack(state);
     state.event = outerEdge;
@@ -7117,15 +7702,16 @@ function cast(state, id) {
   const { weapon, compatible, ammo } = weaponLoadout(state);
   const weaponBased = art.weaponBased !== false;
   if (weaponBased && compatible.length && !ammo) return refuse('这门术要借兵器出手，先备上弹药。');
+  if (weaponBased && weapon?.chargeRequired && !state.combat.playerCharged) return refuse('这件兵器得先蓄势。');
   state.qi -= cost;
   const focus = state.focus >= 1 ? 1 : 0;
   state.focus -= focus;
-  const { kind } = currentIntent(state);
   return combatTurn(state, {
+    kind: 'strike', chargeable: true,
     damage: stats(state).attack - (weaponBased ? 0 : weapon?.atk ?? 0) + (art.power ?? 0) + focus * rules.focusDamage,
-    pierce: art.pierce,
+    pierce: (art.pierce ?? 0) + (weaponBased && state.combat.playerCharged ? weapon?.chargePierce ?? 0 : 0),
     guard: art.guard,
-    interrupt: kind === 'heavy' || kind === 'heal' ? art.break : 0,
+    interrupt: art.break,
     wearWeapon: weaponBased && Boolean(weapon),
     hungerAffected: weaponBased,
     ammo: weaponBased ? ammo : null,
@@ -7136,12 +7722,28 @@ function cast(state, id) {
 function attack(state) {
   const { weapon, compatible, ammo } = weaponLoadout(state);
   const unarmed = !weapon || (compatible.length > 0 && !ammo);
+  if (!unarmed && weapon.chargeRequired && !state.combat.playerCharged) return refuse('这件兵器得先蓄势。');
   return combatTurn(state, {
+    kind: 'strike', chargeable: true,
     damage: stats(state).attack - (unarmed ? weapon?.atk ?? 0 : 0),
+    pierce: !unarmed && state.combat.playerCharged ? weapon.chargePierce : 0,
     wearWeapon: !unarmed,
     hungerAffected: true,
     ammo,
     message: unarmed ? '你空手出招。' : '你抢先出手。',
+  });
+}
+
+function offhandAttack(state) {
+  const side = sideWeapon(state);
+  if (!side) return refuse('手边没有可出招的副兵器。');
+  if (side.chargeRequired && !state.combat.playerCharged) return refuse('这件副兵器得先蓄势。');
+  const { weapon } = weaponLoadout(state);
+  const damage = stats(state).attack - (weapon?.atk ?? 0) + side.sideAtk;
+  return combatTurn(state, {
+    kind: 'strike', chargeable: true, hungerAffected: true, wearSlot: 'offhand',
+    damage, chargeBase: damage, pierce: side.sidePierce, guard: side.sideGuard,
+    message: `你用${nameOf(side.id)}出手。`,
   });
 }
 
@@ -7230,6 +7832,7 @@ function use(state, id, inCombat) {
   if (talisman.retreat > 0 && !talisman.damage) return retreat(state, talisman.retreat, message, guard);
   state.combat.escapeBonus += talisman.retreat ?? 0;
   return combatTurn(state, {
+    kind: talisman.damage > 0 ? 'strike' : 'brace',
     damage: talisman.damage > 0 ? talisman.damage + training.sealDamage : 0,
     pierce: Infinity,
     guard,
@@ -7256,7 +7859,7 @@ function equip(state, id, inCombat = false) {
   state.equipment[gear.slot] = id;
   normalize(state);
   const message = `换上${nameOf(id)}。`;
-  return inCombat ? combatTurn(state, { guard: rules.combatSwitchGuard, message }) : say(state, message);
+  return inCombat ? combatTurn(state, { kind: 'switch', guard: rules.combatSwitchGuard, message }) : say(state, message);
 }
 
 function unequip(state, slot) {
@@ -7664,7 +8267,7 @@ function tryExperiment(state, { id, settings }) {
 }
 
 const economyKit = {
-  data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem, startCombat,
+  data, records, rules, owns, atHome, resourceEntries, say, refuse, advance, addItems, removeItem, startCombat, readableIntent,
   missingItems, payItems, hasRoom, backpackSlots, leaveOnGround, groundAt, nameOf, goodsText, normalize,
   isEvidence, knowsRecipe, homeSupplies, homeRequirements, spendHome, homeBagSpend, homeBagAvailable, gearReserved, mechanismFailure, roadProtection,
   eatOnRoad: (state, id) => eat(state, false, id),
@@ -7718,23 +8321,14 @@ const generalActions = {
 
 const combatActions = {
   attack,
+  offhandAttack,
   tournamentWithdraw: (state) => tournamentAction(state, 'tournamentWithdraw', economyKit),
   readSpirit: (state) => recordTrainingRead(state, economyKit),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   combatEquip: (state, { id }) => equip(state, id, true),
-  guard: (state) => {
-    const { kind } = currentIntent(state);
-    const heavy = kind === 'heavy';
-    const recovered = kind === 'guard' ? breathingQi(state) : 0;
-    state.qi += recovered;
-    return combatTurn(state, {
-      guard: rules.guardBonus + (heavy ? rules.heavyGuardBonus : 0),
-      counter: heavy ? rules.guardCounter : 0,
-      brace: true,
-      message: heavy ? '你挡住重招，趁对手还没收招打了回去。'
-        : recovered ? '你趁对手守势收招调息。' : '你收回手，挡在身前。',
-    });
-  },
+  guard: (state) => combatTurn(state, { kind: 'brace', brace: true }),
+  focus: (state) => state.combat.playerCharged ? refuse('你已经蓄好劲了。')
+    : combatTurn(state, { kind: 'focus', message: '你沉肩蓄力。' }),
   art: (state, { id }) => cast(state, id),
   use: (state, { id }) => use(state, id, true),
   eat: (state, { id }) => eat(state, true, id || supply),
@@ -7796,8 +8390,12 @@ function takeTurn(state, action, payload) {
 }
 
 function act(state, action, payload = {}) {
+  prepareCombatRound(state);
   const result = takeTurn(state, action, payload);
-  if (result.ok) refreshDiscovery(state);
+  if (result.ok) {
+    prepareCombatRound(state);
+    refreshDiscovery(state);
+  }
   return result;
 }
 
@@ -7811,8 +8409,8 @@ const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
 const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [recipe.formula] : []));
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
-const slotNames = { weapon: "兵刃", offhand: "副手", armor: "身甲", charm: "法器" };
-const intentNames = { attack: "进攻", heavy: "准备重击", guard: "防御", heal: "疗伤", drain: "吸取真气" };
+const slotNames = data.equipmentSlots;
+const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
 const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药" };
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
 const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterline"];
@@ -7988,7 +8586,7 @@ function stats(s) {
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
     ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施展术诀、在雾中久留都会消耗真气。在据点歇息能恢复。") : ""}
-    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，可以预看再下一招，并减轻本回合受到的伤害。歇息能恢复神识。</p></details>` : ""}
+    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息能恢复神识。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
@@ -8209,6 +8807,7 @@ function combatScreen(s) {
   const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
   const weapon = s.combatWeapon;
+  const side = s.combatOffhand;
   const ammoBar = weapon?.needsAmmo ? `<div class="combat-ammo">
     <p class="fine">${escape(weapon.name)} · ${weapon.isLoaded ? "已备弹药" : "弹药已尽，可徒手出手"}</p>
     <div class="actions">${(weapon.ammo ?? []).map(ammo => linkButton(
@@ -8216,28 +8815,49 @@ function combatScreen(s) {
     )).join("")}</div>
   </div>` : "";
   const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
-  const attackLabel = s.openingShotReady ? "抢先放箭" : weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手";
-  const guardLabel = intent.kind === "heavy" ? "挡住重招" : s.breathingQi ? "收势调息" : "防御";
-  const retreatLabel = enemy.sparring ? "认输" : s.retreatRisk?.wouldFall ? "撤退会倒下"
-    : s.retreatRisk?.damage ? `撤退 · 追伤 ${s.retreatRisk.damage}` : "撤退 · 无追伤";
+  const openingShot = intent && s.openingShotReady;
+  const chargeMain = weapon?.chargeRequired && !s.combatCharge;
+  const chargeSide = side?.chargeRequired && !s.combatCharge;
+  const attackLabel = chargeMain ? "主武器 · 先蓄势" : weapon?.chargeRequired ? `用${weapon.name}出手`
+    : openingShot ? "抢先放箭" : weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : side ? "主武器出手" : "出手";
+  const guardLabel = intent?.kind === "heavy" ? "挡住重招" : intent?.kind === "guard" && s.breathingQi ? "收势调息" : "防御";
+  const flight = intent && s.retreatRisk;
+  const retreatLabel = enemy.sparring ? "认输" : flight?.wouldFall ? "撤退会倒下"
+    : flight?.damage ? `撤退 · 追伤 ${flight.damage}` : flight ? "撤退 · 无追伤" : "撤退";
+  const intentLine = intent
+    ? `<div class="intent"><b>看破来招 · ${escape(intent.name)}</b>　${escape(intentNames[intent.kind])}</div>`
+    : `<p class="intent unread">${s.combatRead === "enemy" ? "对方盯着你的起手，没先露招。" : "一时看不清对方的来招。"}</p>`;
+  const openingNote = openingShot ? "对方还隔着一段路。这一回合放箭，能拦住它的头一扑。"
+    : !intent && s.openingShotPossible ? "还隔着一段路。对方若冲来，首箭能拦一下。" : "";
+  const chargeNote = [
+    s.combatCharge && "你已经蓄势，下一击更重。",
+    s.enemyCharged && "对方已经攒足了劲。",
+  ].filter(Boolean).join("");
+  const spiritLabel = intent || s.combatRead === "enemy" ? "凝神护身" : "凝神看招";
   const observation = enemy.desc ? `<details class="field-note"${combatObservation === state.combat ? " open" : ""}><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
   const techniques = arts.map(row => {
     const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" :
-      weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽" : "";
-    const action = intent.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
+      weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽"
+        : chargeMain && row.weaponBased !== false ? "兵器须先蓄势" : "";
+    const action = intent?.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
     return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), row.desc);
   });
   return panel(enemy.name, `
-    <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
-    ${s.openingShotReady ? '<p class="fine">对方还隔着一段路。这一回合放箭，能拦住它的头一扑。</p>' : ""}
+    ${intentLine}
+    ${openingNote ? `<p class="fine">${openingNote}</p>` : ""}
+    ${chargeNote ? `<p class="fine">${chargeNote}</p>` : ""}
     ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
-    <div class="actions">${linkButton(attackLabel, "attack", "", "primary")}${linkButton(guardLabel, "guard")}${linkButton(retreatLabel, "retreat", "", !enemy.sparring && s.retreatRisk?.damage ? "danger" : "quiet")}
+    <div class="actions">${linkButton(attackLabel, "attack", "", "primary", Boolean(chargeMain))}
+      ${side ? linkButton(chargeSide ? "副武器 · 先蓄势" : `用${side.name}出手`, "offhandAttack", "", "", Boolean(chargeSide)) : ""}
+      ${linkButton(guardLabel, "guard")}
+      ${linkButton(s.combatCharge ? "已蓄势" : "蓄势", "focus", "", "quiet", s.combatCharge)}
+      ${linkButton(retreatLabel, "retreat", "", !enemy.sparring && flight?.damage ? "danger" : "quiet")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
-      ${s.spiritSense ? linkButton("预看再下一招", "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
+      ${s.spiritSense ? linkButton(spiritLabel, "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
     </div>
-    ${s.spiritSense?.prediction ? `<p class="intent">再下一招 · ${escape(s.spiritSense.prediction.name)}　${escape(intentNames[s.spiritSense.prediction.kind] ?? "")}</p>` : ""}
+    ${s.lastEnemyIntent ? `<p class="fine">上回合 · ${escape(s.lastEnemyIntent.name)}</p>` : ""}
     ${observation}
     ${techniques.length ? `<div class="card-grid learned-arts">${techniques.join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
@@ -8250,7 +8870,15 @@ function gearCondition(remaining, total) {
 function gearDescription(item, gear, remaining) {
   const entry = gear.entry || `${tierName(gear.tier)}散修可用。${item.desc}`;
   const ranged = gear.ammo?.length ? "遇上从远处冲来的对手，可放箭拦住它的头一扑。" : "";
-  const description = entry + ranged + (gear.hands === 2 ? "须双手使用，不能同时持盾。" : "");
+  const perception = gear.perception >= 5 ? "完好时，持用它能明显帮你察觉来招。"
+    : gear.perception >= 3 ? "完好时，持用它更容易察觉来招。"
+    : gear.perception > 0 ? "完好时，持用它略能帮你察觉来招。"
+    : gear.perception < 0 ? "持用时，较难察觉对手的来招。" : "";
+  const reflection = [gear.trait, ...(gear.traits ?? [])].find(trait => trait?.kind === "reflect");
+  const reflect = reflection && !/反伤|反震/.test(entry)
+    ? `挨下近身${reflection.intent === "heavy" ? "重招" : "普攻"}而受伤时，能把部分力道震回去。` : "";
+  const charge = gear.chargeRequired && !/蓄势|蓄力/.test(entry) ? "得先蓄势才能用它出招。" : "";
+  const description = entry + perception + reflect + ranged + charge + (gear.hands === 2 ? "须双手使用，副手要空出来。" : "");
   return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
 }
 
@@ -8829,8 +9457,9 @@ function feedback(before, after, result, action) {
     lines.push(`${cause}，气血减少 ${result.injury.amount} 点。`);
   }
   if (result.damageDealt || result.damageTaken) {
+    const reflected = result.reflectedDamage ? `，其中反伤 ${result.reflectedDamage} 点` : "";
     lines.push([
-      result.damageDealt && `造成 ${result.damageDealt} 点伤害。`,
+      result.damageDealt && `造成 ${result.damageDealt} 点伤害${reflected}。`,
       result.damageTaken && `受到 ${result.damageTaken} 点伤害。`,
     ].filter(Boolean).join(""));
   }
@@ -8842,7 +9471,8 @@ function feedback(before, after, result, action) {
   let narrative = result.message ?? "";
   if (ate) narrative = narrative.replace(/(?:饱腹|气血)\+\d+(?:\.\d+)?[，。]?/g, "");
   if (result.damageDealt || result.damageTaken) {
-    narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "").replace(/反击，[。]?/g, "反击。");
+    narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "")
+      .replace(/，造成\d+点反伤。/g, "。").replace(/反击，[。]?/g, "反击。");
   }
   if (acquired.length) narrative = narrative.replace(/获得[^。]+。/g, "");
   if (picking && acquired.length) narrative = "";

@@ -37,11 +37,11 @@ function fight(state, index) {
   let rounds = 0;
   while (state.combat && rounds < 18) {
     const { intent, maxHp } = view(state);
-    if (state.hp < maxHp * 0.45 && state.inventory.salve && ['guard', 'heavy'].includes(intent.kind)) {
+    if (state.hp < maxHp * 0.45 && state.inventory.salve && ['guard', 'heavy', undefined].includes(intent?.kind)) {
       play(state, 'use', { id: 'salve' });
-    } else if (intent.kind === 'heavy' && state.qi >= 3) {
+    } else if (intent?.kind === 'heavy' && state.qi >= 3) {
       play(state, 'art', { id: 'hook_current' });
-    } else if (intent.kind === 'heavy' || intent.kind === 'guard' && state.qi < 3) {
+    } else if (intent?.kind === 'heavy' || intent?.kind === 'guard' && state.qi < 3) {
       play(state, 'guard');
     } else {
       play(state, 'attack');

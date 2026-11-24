@@ -90,9 +90,15 @@ test('a raised rain flag stays up and the hide coat protects against a real mart
   play(state, 'equip', { id: coat.id });
   visit(state, 'zhao_dyke_bend');
   choose(state, 1);
-  const enemy = view(state).currentEnemy;
+  const enemy = data.enemies.find(({ id }) => id === view(state).currentEnemy.id);
   assert.ok(enemy.tags.includes('beast'));
-  assert.equal(play(state, 'attack').damageTaken, 1);
+  assert.equal(enemy.id, 'dyke_marten');
+  const biteIntent = enemy.intents.find(({ kind }) => kind === 'attack');
+  state.combat.plan.intent = biteIntent;
+  state.combat.plan.reader = 'player';
+  const bite = play(state, 'attack');
+  assert.equal(bite.enemyMove.name, biteIntent.name);
+  assert.equal(bite.damageTaken, 1);
   assert.ok(data.enemies.filter(item => item.loot?.beast_meat).every(item => item.tags.includes('beast')));
 });
 
@@ -195,7 +201,7 @@ test('the river bounty verifies real evidence, leaves a way to help without figh
   visit(state, 'zhao_pond_shutter');
   choose(state, 1);
   for (let turns = 0; state.combat && turns < 15; turns += 1) {
-    play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+    play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
   }
   assert.ok(state.siteVictories.zhao_pond_shutter.zhao_gate_otter);
   assert.ok(view(state).groundLoot.beast_meat > 0);
@@ -240,7 +246,7 @@ test('dyke and bog hunts keep mixed species and the original shore activity inde
     choose(state, stop.hunt);
     assert.equal(state.combat.id, stop.local);
     for (let turns = 0; state.combat && turns < 15; turns += 1) {
-      play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+      play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
     }
     assert.ok(state.siteVictories[stop.id][stop.local]);
     assert.equal(state.localPools[stop.id].creatures[stop.other], undefined);
@@ -272,7 +278,7 @@ test('the bog has four repeatable hunts and one species can regrow without spend
     assert.equal(state.combat.id, id);
     let result;
     for (let turns = 0; state.combat && turns < 12; turns += 1) {
-      result = play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+      result = play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
     }
     assert.equal(state.event, site);
     return result.gathered;

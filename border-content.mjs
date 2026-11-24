@@ -41,7 +41,7 @@ const patrols = [
 
 function localEnemy(id, name, tier, hp, atk, def, insight, desc, intents) {
   return { id, name, tags: ['human'], tier, hp, atk, def, insight, desc,
-    intents: intents.map(([name, kind, mult = 1]) => ({ name, kind, mult })),
+    intents: intents.map(([name, kind, mult = 1, ranged]) => ({ name, kind, mult, ...(ranged ? { ranged: true } : {}) })),
   };
 }
 
@@ -53,7 +53,8 @@ const enemies = [
   localEnemy('border_ledger_cutter', '门洞劫盐人', 3, 82, 16, 6, 7, '刀上的盐渍一靠近，身上的真气就往外走。他贴在门沿时，可先架住刀。',
     [['贴门探刀', 'attack'], ['反手蹭过护腕', 'drain', 0.9], ['缩回门后', 'guard', 1.48], ['踏过盐袋砍来', 'heavy', 1.6]]),
   localEnemy('border_wind_ambusher', '风板下的弩手', 3, 76, 16, 6, 7, '他先放短箭再拽弦。上箭时须把弩头压低，肩颈会露出来。',
-    [['隔着石板抬弩', 'heavy', 1.53], ['抽匕顶来', 'attack'], ['侧身上箭', 'guard', 1.36], ['踏石放箭', 'heavy', 1.65], ['拨开近身的兵刃', 'attack']]),
+    [['隔着石板抬弩', 'heavy', 1.53, true], ['抽匕顶来', 'attack'], ['侧身上箭', 'guard', 1.36],
+      ['踏石放箭', 'heavy', 1.65, true], ['拨开近身的兵刃', 'attack']]),
   localEnemy('border_rope_warden', '守绳的斧手', 3, 86, 17, 7, 8, '脚边的绳子通向坡下。他把斧柄夹在肘下时，会趁机调息再举斧。',
     [['斧背压臂', 'attack'], ['蹲下守桩', 'guard', 1.43], ['抱柄调息', 'heal', 0.63], ['拔斧砸肩', 'heavy', 1.68], ['提柄封路', 'attack']]),
   localEnemy('border_kiln_shield', '卸货窑的铁盾手', 4, 94, 17, 9, 9, '窑门只容一人宽，他能用盾盖住大半。盾沿撞过来以后，肩会露在门外。',

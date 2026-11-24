@@ -41,6 +41,7 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   const randomAfterFirst = full.encounterSeed;
   play(full, 'attack');
   const previousFoeHealth = full.combat.hp;
+  const observed = structuredClone(full.combat.observedHits);
   play(full, 'retreat');
   assert.deepEqual(countAt(full), [48, 8, 1, 24]);
   assert.ok(!full.siteVictories[quarry]);
@@ -51,6 +52,7 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   assert.equal(full.combat.id, actors[0]);
   assert.equal(full.encounterSeed, randomAfterFirst);
   assert.equal(full.combat.hp, previousFoeHealth + 1);
+  assert.deepEqual(full.combat.observedHits, observed);
   play(full, 'retreat');
   play(full, 'leave');
   play(full, 'eat', { id: 'ration' });

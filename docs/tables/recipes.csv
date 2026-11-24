@@ -57,3 +57,11 @@ r_quarry_spear,裂鳞枪（quarry_spear）,,5,筑基后期,68,暗金（black_iro
 r_clear_needle,照水重矢（clear_needle）,9,3,筑基初期,5,松木（wood）×2、寒铁（ore）×2、筑基期妖丹（foundation_core）×1,1,得知物品 伏潮漏图（phase_chart）,,,锻炉（forge）,2,
 r_gold_salve,缓脉丹（gold_salve）,4,4,筑基中期,20,灵草（reed）×6、兽革（hide）×2、灵晶（core）×3、筑基期妖丹（foundation_core）×2,3,,,缓脉丹方（formula_gold_salve）,炼丹炉（furnace）,3,
 r_return_breath,归元丹（return_breath_pill）,3,6,金丹初期,14,灵草（reed）×5、灵晶（core）×2、金丹期妖丹（gold_core）×1,3,,,归元丹方（formula_return_breath）,炼丹炉（furnace）,3,
+r_dyke_slip_jacket,转水短褂（dyke_slip_jacket）,1,4,筑基中期,52,坚韧兽筋（battle_sinew）×12、兽革（hide）×6、灵晶（core）×3、筑基期妖丹（foundation_core）×4,5,得知物品 短褂收肩样（dyke_jacket_pattern）；须持有 老鳄脊腱（dyke_backstrap）×1,,,锻炉（forge）,2,用老鳄脊腱比出肩口转动的余量，再把干过水的兽筋穿进皮条里。纸样和脊腱留着。
+r_ridge_bracer,回力护腕（ridge_bracer）,1,6,金丹初期,62,坚韧兽筋（battle_sinew）×12、暗金（black_iron）×9、厚甲片（hard_scale）×6、金丹期妖丹（gold_core）×4,6,得知物品 回力护腕图（ridge_bracer_pattern）；须持有 断风角羚的弯角（ridge_ramhorn）×1,,,锻炉（forge）,3,照手里的弯角把暗金压好，再用坚韧兽筋绷紧，护腕内侧垫厚甲片。原角留着比形。
+r_reed_hat,叠芦帽（reed_hat）,,0,炼气初期,4,灵草（reed）×3、松木（wood）×1、兽革（hide）×1,0.5,得知物品 灵草（reed）,,,,,
+r_reed_boots,踏苇鞋（reed_boots）,,0,炼气初期,6,兽革（hide）×2、灵草（reed）×2、松木（wood）×1,0.75,得知物品 兽革（hide）,,,,,
+r_breath_belt,行气束带（breath_belt）,,2,炼气后期,16,兽革（hide）×2、灵晶（core）×2、坚韧兽筋（battle_sinew）×1、寒铁（ore）×1,2.5,得知物品 坚韧兽筋（battle_sinew）,,,锻炉（forge）,2,
+r_side_hook,系绳短钩（side_hook）,,0,炼气初期,8,寒铁（ore）×2、松木（wood）×2、兽革（hide）×1,1,得知物品 旧桨上的靠岸图（oar_mark）,,,,,
+r_anvil_hammer,短柄砧锤（anvil_hammer）,,2,炼气后期,18,寒铁（ore）×6、松木（wood）×2、兽革（hide）×2,2,得知物品 寒铁（ore）,,,锻炉（forge）,2,
+r_scale_chisel,翻鳞凿（scale_chisel）,,4,筑基中期,23,厚甲片（hard_scale）×4、暗金（black_iron）×3、兽革（hide）×2、坚韧兽筋（battle_sinew）×1,2.75,得知物品 厚甲片（hard_scale）,,,锻炉（forge）,2,

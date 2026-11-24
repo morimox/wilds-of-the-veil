@@ -6,8 +6,8 @@ const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
 const formulaIds = new Set(data.recipes.flatMap(recipe => recipe.formula ? [recipe.formula] : []));
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
-const slotNames = { weapon: "兵刃", offhand: "副手", armor: "身甲", charm: "法器" };
-const intentNames = { attack: "进攻", heavy: "准备重击", guard: "防御", heal: "疗伤", drain: "吸取真气" };
+const slotNames = data.equipmentSlots;
+const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
 const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药" };
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
 const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterline"];
@@ -183,7 +183,7 @@ function stats(s) {
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
     ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施展术诀、在雾中久留都会消耗真气。在据点歇息能恢复。") : ""}
-    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，可以预看再下一招，并减轻本回合受到的伤害。歇息能恢复神识。</p></details>` : ""}
+    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息能恢复神识。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
@@ -404,6 +404,7 @@ function combatScreen(s) {
   const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
   const weapon = s.combatWeapon;
+  const side = s.combatOffhand;
   const ammoBar = weapon?.needsAmmo ? `<div class="combat-ammo">
     <p class="fine">${escape(weapon.name)} · ${weapon.isLoaded ? "已备弹药" : "弹药已尽，可徒手出手"}</p>
     <div class="actions">${(weapon.ammo ?? []).map(ammo => linkButton(
@@ -411,28 +412,49 @@ function combatScreen(s) {
     )).join("")}</div>
   </div>` : "";
   const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
-  const attackLabel = s.openingShotReady ? "抢先放箭" : weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手";
-  const guardLabel = intent.kind === "heavy" ? "挡住重招" : s.breathingQi ? "收势调息" : "防御";
-  const retreatLabel = enemy.sparring ? "认输" : s.retreatRisk?.wouldFall ? "撤退会倒下"
-    : s.retreatRisk?.damage ? `撤退 · 追伤 ${s.retreatRisk.damage}` : "撤退 · 无追伤";
+  const openingShot = intent && s.openingShotReady;
+  const chargeMain = weapon?.chargeRequired && !s.combatCharge;
+  const chargeSide = side?.chargeRequired && !s.combatCharge;
+  const attackLabel = chargeMain ? "主武器 · 先蓄势" : weapon?.chargeRequired ? `用${weapon.name}出手`
+    : openingShot ? "抢先放箭" : weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : side ? "主武器出手" : "出手";
+  const guardLabel = intent?.kind === "heavy" ? "挡住重招" : intent?.kind === "guard" && s.breathingQi ? "收势调息" : "防御";
+  const flight = intent && s.retreatRisk;
+  const retreatLabel = enemy.sparring ? "认输" : flight?.wouldFall ? "撤退会倒下"
+    : flight?.damage ? `撤退 · 追伤 ${flight.damage}` : flight ? "撤退 · 无追伤" : "撤退";
+  const intentLine = intent
+    ? `<div class="intent"><b>看破来招 · ${escape(intent.name)}</b>　${escape(intentNames[intent.kind])}</div>`
+    : `<p class="intent unread">${s.combatRead === "enemy" ? "对方盯着你的起手，没先露招。" : "一时看不清对方的来招。"}</p>`;
+  const openingNote = openingShot ? "对方还隔着一段路。这一回合放箭，能拦住它的头一扑。"
+    : !intent && s.openingShotPossible ? "还隔着一段路。对方若冲来，首箭能拦一下。" : "";
+  const chargeNote = [
+    s.combatCharge && "你已经蓄势，下一击更重。",
+    s.enemyCharged && "对方已经攒足了劲。",
+  ].filter(Boolean).join("");
+  const spiritLabel = intent || s.combatRead === "enemy" ? "凝神护身" : "凝神看招";
   const observation = enemy.desc ? `<details class="field-note"${combatObservation === state.combat ? " open" : ""}><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
   const techniques = arts.map(row => {
     const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" :
-      weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽" : "";
-    const action = intent.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
+      weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽"
+        : chargeMain && row.weaponBased !== false ? "兵器须先蓄势" : "";
+    const action = intent?.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
     return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), row.desc);
   });
   return panel(enemy.name, `
-    <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
-    ${s.openingShotReady ? '<p class="fine">对方还隔着一段路。这一回合放箭，能拦住它的头一扑。</p>' : ""}
+    ${intentLine}
+    ${openingNote ? `<p class="fine">${openingNote}</p>` : ""}
+    ${chargeNote ? `<p class="fine">${chargeNote}</p>` : ""}
     ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
-    <div class="actions">${linkButton(attackLabel, "attack", "", "primary")}${linkButton(guardLabel, "guard")}${linkButton(retreatLabel, "retreat", "", !enemy.sparring && s.retreatRisk?.damage ? "danger" : "quiet")}
+    <div class="actions">${linkButton(attackLabel, "attack", "", "primary", Boolean(chargeMain))}
+      ${side ? linkButton(chargeSide ? "副武器 · 先蓄势" : `用${side.name}出手`, "offhandAttack", "", "", Boolean(chargeSide)) : ""}
+      ${linkButton(guardLabel, "guard")}
+      ${linkButton(s.combatCharge ? "已蓄势" : "蓄势", "focus", "", "quiet", s.combatCharge)}
+      ${linkButton(retreatLabel, "retreat", "", !enemy.sparring && flight?.damage ? "danger" : "quiet")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
-      ${s.spiritSense ? linkButton("预看再下一招", "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
+      ${s.spiritSense ? linkButton(spiritLabel, "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
     </div>
-    ${s.spiritSense?.prediction ? `<p class="intent">再下一招 · ${escape(s.spiritSense.prediction.name)}　${escape(intentNames[s.spiritSense.prediction.kind] ?? "")}</p>` : ""}
+    ${s.lastEnemyIntent ? `<p class="fine">上回合 · ${escape(s.lastEnemyIntent.name)}</p>` : ""}
     ${observation}
     ${techniques.length ? `<div class="card-grid learned-arts">${techniques.join("")}</div>` : ""}
     `, tag(tierName(enemy.tier), "warn"));
@@ -445,7 +467,15 @@ function gearCondition(remaining, total) {
 function gearDescription(item, gear, remaining) {
   const entry = gear.entry || `${tierName(gear.tier)}散修可用。${item.desc}`;
   const ranged = gear.ammo?.length ? "遇上从远处冲来的对手，可放箭拦住它的头一扑。" : "";
-  const description = entry + ranged + (gear.hands === 2 ? "须双手使用，不能同时持盾。" : "");
+  const perception = gear.perception >= 5 ? "完好时，持用它能明显帮你察觉来招。"
+    : gear.perception >= 3 ? "完好时，持用它更容易察觉来招。"
+    : gear.perception > 0 ? "完好时，持用它略能帮你察觉来招。"
+    : gear.perception < 0 ? "持用时，较难察觉对手的来招。" : "";
+  const reflection = [gear.trait, ...(gear.traits ?? [])].find(trait => trait?.kind === "reflect");
+  const reflect = reflection && !/反伤|反震/.test(entry)
+    ? `挨下近身${reflection.intent === "heavy" ? "重招" : "普攻"}而受伤时，能把部分力道震回去。` : "";
+  const charge = gear.chargeRequired && !/蓄势|蓄力/.test(entry) ? "得先蓄势才能用它出招。" : "";
+  const description = entry + perception + reflect + ranged + charge + (gear.hands === 2 ? "须双手使用，副手要空出来。" : "");
   return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
 }
 
@@ -1024,8 +1054,9 @@ function feedback(before, after, result, action) {
     lines.push(`${cause}，气血减少 ${result.injury.amount} 点。`);
   }
   if (result.damageDealt || result.damageTaken) {
+    const reflected = result.reflectedDamage ? `，其中反伤 ${result.reflectedDamage} 点` : "";
     lines.push([
-      result.damageDealt && `造成 ${result.damageDealt} 点伤害。`,
+      result.damageDealt && `造成 ${result.damageDealt} 点伤害${reflected}。`,
       result.damageTaken && `受到 ${result.damageTaken} 点伤害。`,
     ].filter(Boolean).join(""));
   }
@@ -1037,7 +1068,8 @@ function feedback(before, after, result, action) {
   let narrative = result.message ?? "";
   if (ate) narrative = narrative.replace(/(?:饱腹|气血)\+\d+(?:\.\d+)?[，。]?/g, "");
   if (result.damageDealt || result.damageTaken) {
-    narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "").replace(/反击，[。]?/g, "反击。");
+    narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "")
+      .replace(/，造成\d+点反伤。/g, "。").replace(/反击，[。]?/g, "反击。");
   }
   if (acquired.length) narrative = narrative.replace(/获得[^。]+。/g, "");
   if (picking && acquired.length) narrative = "";

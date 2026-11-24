@@ -47,6 +47,14 @@ const ruleDescriptions = {
   pressureThreshold: '探索压力高于此值时开始额外消耗真气（点）',
   pressureQi: '压力超限的每次探索所消耗的真气（点）',
   battleDays: '战斗操作每回合用时（天）',
+  perceptionScale: '洞察概率曲线分母的固定项。洞察差除以固定项与洞察差之和',
+  perceptionCap: '洞察优势转化为看破的概率上限',
+  observedHitLimit: '敌人参考最近几次实际承受的主动出招伤害',
+  combatDodgeCap: '完好装备对普通近击的闪避叠加上限',
+  combatChargeFloor: '蓄势下一次亲手出招的最小原始增伤',
+  combatChargeFactor: '蓄势增伤按人物攻击计算的比例',
+  enemyChargeFactor: '敌方蓄势增伤按基础攻击计算的比例',
+  chargeBreakDamage: '蓄势被气血伤害打散的单回合伤害下限',
   worthyFightPractice: '首次赢过某种同境或更强的野外对手，额外增加的历练进度',
   harvestEncounterDays: '采集中遭遇伏击时开打前用时（天）',
   retreatDays: '撤出战斗所需用时（天）',
@@ -97,9 +105,9 @@ const resources = (entries = {}) => Object.entries(entries)
 const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
   gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药',
-  attack: '普通攻势', heavy: '重招', guard: '防御', drain: '吸取真气', heal: '恢复',
+  attack: '普通攻势', heavy: '重招', guard: '防御', drain: '吸取真气', heal: '恢复', focus: '蓄势', remedy: '服药',
 };
-const slotNames = { weapon: '武器', offhand: '副手', armor: '身甲', charm: '法器' };
+const slotNames = data.equipmentSlots;
 const reveal = ({ item, quest, need } = {}) => {
   const lead = [item && `得知物品 ${ref(item)}`, quest && `完成委托 ${ref(quest)}`].filter(Boolean).join(' 或 ');
   return [lead, need && `须持有 ${resources(need)}`].filter(Boolean).join('；');
@@ -222,10 +230,10 @@ const describeChoice = (key) => {
   return choice ? `${ref(event)} · ${choice.label}` : key;
 };
 const traitText = (trait) => [
-  ({ damage: '额外伤害', pierce: '额外穿甲', guard: '额外护持' })[trait.kind] ?? trait.kind,
+  ({ damage: '额外伤害', pierce: '额外穿甲', guard: '额外护持', reflect: '受相应近击后的反伤', dodge: '闪避普通近击' })[trait.kind] ?? trait.kind,
   trait.enemyTag && `敌人标签 ${trait.enemyTag}`,
   trait.intent && (knownKinds[trait.intent] ?? trait.intent),
-  `加成 ${trait.bonus}`,
+  `加成 ${trait.kind === 'dodge' ? percent(trait.bonus) : trait.bonus}`,
 ].filter(Boolean).join(' · ');
 const intents = data.enemies.flatMap(({ id, name, intents }) =>
   intents.map((intent, index) => ({ enemyId: id, enemyName: name, order: index + 1, ...intent })));
@@ -261,7 +269,7 @@ const facilityLevels = economyData.facilities.flatMap(({ id, name, start, desc, 
       reveal,
       alternateReveal,
     })));
-const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', axe: '斧', bow: '弓', crossbow: '弩' };
+const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', axe: '斧', bow: '弓', crossbow: '弩', hammer: '锤' };
 const offeredItems = new Set(marketOffers.map(({ id }) => id));
 const itemTradeRows = data.items.map((item) => ({ ...item, price: offeredItems.has(item.id) ? item.price : 0 }));
 const localOfferRows = data.regions.flatMap(({ id: region }) => {
@@ -290,7 +298,7 @@ const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMa
     };
   }),
 ]).map((row) => ({ ...row, weapon: name(row.id) }));
-const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay', 'beast_meat', 'qi_core', 'foundation_core', 'gold_core', 'beast_eye', 'hard_scale'].map((id) => ({
+const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay', 'beast_meat', 'qi_core', 'foundation_core', 'gold_core', 'beast_eye', 'hard_scale', 'battle_sinew'].map((id) => ({
   id, name: name(id),
   pools: worldPools.filter((pool) => pool.kind === '资源' && pool.object === id && pool.growth > 0)
     .map(({ site, label }) => label ? `${siteRef(site)} · ${label}` : siteRef(site)).join('、'),
@@ -302,7 +310,8 @@ const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_c
   breakthrough: data.realms.filter(({ need }) => need?.[id]).length,
   training: trainingData.flatMap(({ ranks }) => ranks).filter(({ need }) => need?.[id]).length,
 }));
-const huntedItems = ['qi_core', 'foundation_core', 'gold_core', 'beast_meat', 'beast_eye', 'hide', 'hard_scale', 'den_neck_plate', 'quarry_back_spine'];
+const huntedItems = ['qi_core', 'foundation_core', 'gold_core', 'beast_meat', 'beast_eye', 'hide', 'hard_scale', 'battle_sinew',
+  'den_neck_plate', 'quarry_back_spine', 'dyke_backstrap', 'ridge_ramhorn'];
 const huntSources = worldPools.filter(({ kind }) => kind === '种群').flatMap((pool) => {
   const enemy = data.enemies.find(({ id }) => id === pool.object);
   const site = data.sites.find(({ id }) => id === pool.site);
@@ -420,7 +429,7 @@ const incidentJobNames = { report: '向杨芹报信', brace: '加固栏杆', mov
 
 const tables = [
   table('realms', '境界与突破', data.realms, [
-    'id', 'name', ['hp', '基础气血'], ['qi', '基础真气'], ['atk', '基础攻击'], ['def', '基础防御'],
+    'id', 'name', ['hp', '基础气血'], ['qi', '基础真气'], ['atk', '基础攻击'], ['def', '基础防御'], ['perception', '基础洞察'],
     ['insight', '突破所需修为'], ['practice', '本境有效历练日'], ['cost', '突破费用（灵钱）'], 'need',
     ['requireQuest', '所需世界进程', ref], ['requireDefeated', '须亲自击败的对手', (ids) => ids.map(ref).join('、')],
     ['pressure', '越过本境的出伤倍率'], 'days',
@@ -474,18 +483,21 @@ const tables = [
     'need', 'loot', ['cost', '费用（灵钱）'], ['days', '等待成熟天数'],
     ['reveal', '来源线索', ref], ['description', '现场说明'],
   ], { note: '炼丹和锻造的批次产量与投入见制作用方。常用品可合批，产量、材料、灵钱和工期按批数结算。成熟后可到后院收取，普通成品也可直接入仓。' }),
-  table('gear', '装备', gated(described(data.gear)), [
+  table('gear', '装备', gated(described(data.gear.map(({ trait, traits = [], ...item }) =>
+    ({ ...item, effects: [trait, ...traits].filter(Boolean) })))), [
     'id', 'name', 'slot', ['weaponClass', '兵刃类别', (id) => weaponClass[id] ?? id],
     ['hands', '用几只手'], ['brace', '主动架重招减伤'],
+    ['chargeRequired', '出招前须蓄势'], ['chargePierce', '主武器蓄势时穿甲'],
+    ['sideAtk', '副武器出手攻击修正'], ['sidePierce', '副武器出手穿甲'], ['sideGuard', '副武器出手护持'],
     ['ammo', '适用弹药', (ids) => ids.map(ref).join('、')],
-    'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'],
-    'retreat', 'durability', 'repair', ['entry', '玩家主动查读的词条'], ['trait', '特殊作用与具体数值', traitText],
+    'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'], ['perception', '洞察加成'],
+    'retreat', 'durability', 'repair', ['entry', '玩家主动查读的词条'], ['effects', '特殊作用与具体数值', (entries) => entries.map(traitText).join('、')],
     ['field', '野外作用', (field) => [
       field.fogTolerance && '开始耗气的雾压上限 +' + field.fogTolerance,
       field.gatherPadding && '每批采集减伤 ' + field.gatherPadding + '，至少受 1 点伤',
       field.roadSatiety && '鸣沙境内普通步行耗粮 −' + (field.roadSatiety.fraction * 100) + '%',
     ].filter(Boolean).join('、')],
-  ], { note: '装备耐久为 0 后失去加成。双手兵刃与副手互斥。盾主动挡重招并确实缓冲时损耗耐久。脱身系数 0.17 即减免撤退伤害 17%。' }),
+  ], { note: '装备耐久为 0 后失去加成。双手兵刃与副手互斥。盾主动挡重招并确实缓冲时损耗耐久。反伤须承受相应近战的气血损伤并能继续交手。脱身系数 0.17 即减免撤退伤害 17%。' }),
   table('weapon-acquisition', '武器获取渠道', acquisitionRows, [
     'id', ['weapon', '武器'], ['method', '获得方法'], ['source', '具体来源'], ['price', '单次成本（灵钱）'],
     'need', ['afterFight', '现场领取前需击败', ref], ['interval', '货源或对手恢复间隔（天）'],
@@ -611,12 +623,15 @@ const tables = [
   ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
   table('enemies', '敌人', enemyRows, [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
-    'def', ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'],
+    'def', ['perception', '洞察'], ['strategy', '交手策略', (id) => ({
+      instinct: '本能', predator: '抢攻', bulwark: '守中求进', duelist: '见招拆招', schemer: '耗气与破势',
+    })[id] ?? id], ['medicine', '单场携带补药', ({ id, count }) => `${ref(id)}×${count}`],
+    ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'],
     ['loot', '固定解取的身体掉落', resources], ['chanceLoot', '概率额外掉落', formatChanceLoot], 'desc',
   ], { omit: ['intents'], note: '每个普攻取基础攻击乘招式倍率后向上取整。概率掉落独立掷骰，成功与固定掉落相加。守着的草药、矿物、文书与奖品需要在现场另行取得。' }),
   table('enemy-intents', '敌人回合意图', intents, [
-    ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
-  ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
+    ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '常用动作序号'], 'name', 'kind', 'mult', ['ranged', '远程出手'],
+  ], { note: '普通妖兽大多按这些习性出招。人物和部分大妖用自己承受过的伤害估计威胁。抽中洞察后能看到玩家这回合动作的类别。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
     'id', 'name', 'region', ['tier', '标注境界'], tier, 'reveal', ['afterQuest', '展示前置委托', ref], ['requireQuest', '交付前置委托', ref], ['waitForQuest', '等待交付时的人物对话'], 'desc', 'need', 'reward', ['learnArts', '当面传授的术诀', (ids) => ids.map(ref).join('、')], ['coins', '奖励灵钱'], ['insight', '奖励修为'], ['requiresKnownMaterials', '展示需要认识材料'], ['outcome', '交付后人物或事件反馈'],
   ], { note: '先发现委托入口，材料认知默认有要求。' }),

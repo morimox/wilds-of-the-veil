@@ -121,7 +121,7 @@ test('one click retrieves one kind of remains from the fight site', () => {
   play(state, 'choose', { index: 0 });
   assert.equal(view(state).currentEnemy.id, 'mud_beast');
   for (let round = 0; state.combat && round < 24; round++) {
-    play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+    play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
   }
   assert.equal(view(state).currentEvent.id, site);
   assert.deepEqual(view(state).groundLoot, { beast_meat: 2, hide: 2, qi_core: 1 });

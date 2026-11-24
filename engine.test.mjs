@@ -465,11 +465,11 @@ test('chosen sites retain depletion, and only elapsed days replenish their local
   assert.ok(view(smith).discoveredRecipes.includes('r_hide_coat'));
   seek(hunting, 'mud_track');
   assert.equal(view(hunting).visibleChoices[0].available, true);
-  supplyFixture(hunting, { salve: 5 });
+  supplyFixture(hunting, { salve: 9 });
   for (let attempts = 0; huntCount(hunting) > 0 && attempts < 8; attempts++) {
     choose(hunting, 0);
     while (hunting.combat) {
-      const intent = view(hunting).intent.kind;
+      const intent = view(hunting).intent?.kind;
       if (intent === 'heavy') play(hunting, 'guard');
       else if (hunting.hp < 15) play(hunting, 'use', { id: 'salve' });
       else play(hunting, 'attack');
@@ -513,7 +513,7 @@ test('a guarded herb is gathered separately from the spirit that blocks the bank
     choose(state, 1);
     assert.equal(view(state).currentEnemy.id, 'marsh_ghost');
     for (let turn = 0; state.combat && turn < 8; turn++) {
-      play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+      play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
     }
     assert.equal(view(state).currentEvent?.id, 'reed_ferryman', state.log.slice(-5).join('\n'));
     assert.equal(state.inventory.reed, undefined);
@@ -573,11 +573,11 @@ test('an expedition can hunt and turn its meat into road food at the local inn',
   walk(state, 'marsh');
   seek(state, 'mud_track');
   choose(state, 5);
-  while (state.combat) play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+  while (state.combat) play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
   pickGathered(state, view(state).groundLoot);
   assert.equal(state.inventory.beast_meat, 2);
   choose(state, 5);
-  while (state.combat) play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+  while (state.combat) play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
   pickGathered(state, view(state).groundLoot);
   assert.equal(state.inventory.beast_meat, 4);
   choose(state, 1);
@@ -895,7 +895,7 @@ test('the opponent hands over the map and agreed blade only after the spar at th
   assert.equal(act(retreating, 'travel', { id: 'ridge' }).ok, false);
 
   for (let turn = 0; state.combat && turn < 10; turn++) {
-    play(state, view(state).intent.kind === 'heavy' ? 'guard' : 'attack');
+    play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
   }
   assert.ok(view(state).defeated.includes('bank_runner'));
   assert.equal(state.inventory.ridge_rubbing, undefined);
@@ -933,7 +933,7 @@ test('returning for a new shift at the sparring ground can replace a sold prize 
     choose(state, 0);
     assert.equal(view(state).currentEnemy.id, 'road_sparrer');
     for (let turns = 0; state.combat && turns < 8; turns++) {
-      const move = view(state).intent.kind === 'heavy' ? 'stone_brace' : 'reed_cleave';
+      const move = view(state).intent?.kind === 'heavy' ? 'stone_brace' : 'reed_cleave';
       if (state.qi >= 2) play(state, 'art', { id: move });
       else play(state, 'attack');
     }
@@ -996,7 +996,8 @@ test('reading a heavy attack gives free bracing and a counter while guarding a r
   const regularGuard = play(regular, 'guard');
   assert.equal(regularGuard.damageDealt, 0);
   play(state, 'attack');
-  assert.equal(view(state).intent.kind, 'heavy');
+  state.combat.plan.reader = 'player';
+  assert.equal(view(state).intent?.kind, 'heavy');
   const attacking = structuredClone(state);
   const traded = play(attacking, 'attack');
   const beforeQi = state.qi;
@@ -1411,11 +1412,11 @@ test('the old ford route and its optional hidden map remain playable with earned
   const techniqueCost = 2;
   for (let turn = 0; turn < 10 && view(state).mode === 'combat'; turn++) {
     const panel = view(state);
-    if (panel.intent.kind === 'guard' && panel.hp < panel.maxHp - 8 && state.inventory.salve) {
+    if (panel.intent?.kind === 'guard' && panel.hp < panel.maxHp - 8 && state.inventory.salve) {
       play(state, 'use', { id: 'salve' });
-    } else if (panel.intent.kind === 'heavy' && panel.qi >= 5) {
+    } else if (panel.intent?.kind === 'heavy' && panel.qi >= 5) {
       play(state, 'art', { id: 'cross_weir' });
-    } else if (panel.intent.kind === 'heavy' && panel.currentEnemy.hp > 17 && panel.qi >= techniqueCost) {
+    } else if (panel.intent?.kind === 'heavy' && panel.currentEnemy.hp > 17 && panel.qi >= techniqueCost) {
       play(state, 'art', { id: 'stone_brace' });
     } else if (state.inventory.tide_talisman && panel.currentEnemy.hp > 17) {
       play(state, 'use', { id: 'tide_talisman' });
@@ -1773,8 +1774,8 @@ test('a prepared ford expedition opens each later region through field contacts,
   visitAndChoose('white_ravine', 0);
   for (let turn = 0; turn < 15 && state.combat; turn++) {
     const panel = view(state);
-    if (panel.hp < panel.maxHp - 15 && state.inventory.heal_pill && panel.intent.kind !== 'heavy') play(state, 'use', { id: 'heal_pill' });
-    else if (panel.intent.kind === 'heavy' && state.qi >= 4) play(state, 'art', { id: 'mist_press' });
+    if (panel.hp < panel.maxHp - 15 && state.inventory.heal_pill && panel.intent?.kind !== 'heavy') play(state, 'use', { id: 'heal_pill' });
+    else if (panel.intent?.kind === 'heavy' && state.qi >= 4) play(state, 'art', { id: 'mist_press' });
     else if (state.qi >= 2) play(state, 'art', { id: 'reed_cleave' });
     else play(state, 'attack');
   }

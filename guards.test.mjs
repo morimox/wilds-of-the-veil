@@ -51,7 +51,7 @@ function defeat(state, index, enemy) {
   play(state, 'choose', { index });
   assert.equal(view(state).currentEnemy.id, enemy);
   for (let turn = 0; state.combat && turn < 40; turn += 1) {
-    if (view(state).intent.kind === 'heavy') play(state, 'guard');
+    if (view(state).intent?.kind === 'heavy') play(state, 'guard');
     else if (state.hp < 20) play(state, 'use', { id: 'salve' });
     else if (state.qi >= 4) play(state, 'art', { id: 'bell_strike' });
     else play(state, 'attack');
