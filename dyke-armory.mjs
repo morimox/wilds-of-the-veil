@@ -13,13 +13,13 @@ const items = [
   { id: 'dyke_jacket_pattern', name: '短褂的裁样', kind: 'key', price: 0, sell: 0,
     desc: '针匠蒋榛依老鳄的背筋画的纸样。两边的皮条错着下针，急转身体时肩口仍能松开。' },
   { id: 'dyke_slip_jacket', name: '避浪短褂', kind: 'gear', price: 0, sell: 0,
-    desc: '衣肩叠得薄，皮条藏在腋下。急着摆身时衣摆跟得上，接重手还得自己架住。' },
+    desc: '肩头的布裁得薄，腋下藏着几道皮带。穿着转身方便，碰上重击还得自己挡。' },
 ];
 
 const gear = [
   { id: 'dyke_slip_jacket', slot: 'armor', tier: 4, def: 5, hp: 8, qi: 3, retreat: 0.06, durability: 58, repair: 18,
     trait: { kind: 'dodge', intent: 'attack', bonus: 0.13 },
-    entry: '筑基中期可穿的轻褂。肩腋跟得上摆身，遇到贴身的普通来招偶尔能干净躲开。' },
+    entry: '筑基中期可穿的轻褂。肩膀和腋下裁得宽松。对手近身打来寻常一击时，穿它更容易闪开。' },
 ];
 
 const recipes = [
@@ -104,7 +104,7 @@ const enemies = [
     perception: 23, strategy: 'bulwark',
     intents: [attack('推起横梁抢到岸边'), guard('斜过鳞脊护住颈下', 1.48), heavy('借浮梁卷尾砸下', 1.65),
       { kind: 'heal', name: '沉入静水缓气', mult: 0.39 }, attack('贴着桩根摆身', 1.1)],
-    desc: '粗梁压过它的后背，却看不出曾受过伤。翻身时背鳞从颈后依次错开，贴水过去轻得没有声。',
+    desc: '粗梁压过它的后背，却看不出曾受过伤。翻身时背鳞从颈后依次错开，贴着水面游过，几乎不出声。',
     loot: { beast_meat: 5, hide: 3, hard_scale: 3, battle_sinew: 4, foundation_core: 3, dyke_backstrap: 1 },
     chanceLoot: { foundation_core: { count: 2, chance: 0.6 } } },
 ];

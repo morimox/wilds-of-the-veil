@@ -8,6 +8,7 @@ import { initialMechanisms, mechanismView, mechanismAction } from './mechanisms.
 import { tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution } from './tournament.mjs';
 import { chooseEnemyIntent } from './combat-tactics.mjs';
 import { checkRoadBanditStep, roadBanditRisk, roadBanditView, banditAction, winRoadBandit, banditDefeat, recoverBanditSpoils } from './bandits.mjs';
+import { sandboxDeductions } from './sandbox-deductions.mjs';
 
 const data = { ...moduleData.default, ...moduleData };
 
@@ -19,14 +20,13 @@ const experiments = Object.fromEntries(data.events.filter(({ experiment }) => ex
 const supply = 'ration';
 const hub = 'village';
 const slots = Object.keys(data.equipmentSlots);
-const hypothesisLimit = 180;
 const guideBookId = 'encyclopedia';
 const guideNoteLimit = 480;
 
 export const rules = Object.freeze({
   restDays: 0.5,
   restHp: 8,
-  restQi: 5,
+  restQi: 9,
   restWounds: 1,
   restToxin: 15,
   reliefRations: 3,
@@ -35,6 +35,10 @@ export const rules = Object.freeze({
   firstRegionInsight: 1,
   pressureThreshold: 3,
   pressureQi: 1,
+  fogPulseDays: 0.25,
+  fogDrainStep: 3,
+  fogDrainCurve: 100,
+  deductionQiCost: 3,
   battleDays: 0.125,
   regulatedBoutCooldown: 0.5,
   regulatedBoutHpFraction: 0.5,
@@ -54,6 +58,9 @@ export const rules = Object.freeze({
   combatChargeFloor: 4,
   combatChargeFactor: 0.35,
   enemyChargeFactor: 0.25,
+  resistanceTier: 6,
+  resistanceCap: 0.60,
+  magicPowerFactor: 1.32,
   chargeBreakDamage: 4,
   harvestEncounterDays: 0.125,
   ebbCycleDays: 2,
@@ -75,7 +82,7 @@ export const rules = Object.freeze({
   guardBonus: 3,
   heavyGuardBonus: 4,
   guardCounter: 3,
-  guardQiRecovery: 2,
+  guardQiRecovery: 4,
   enemyGuardBonus: 2,
   minAttackDamage: 1,
   durabilityLoss: 1,
@@ -163,11 +170,16 @@ function stats(state) {
   const trained = trainingStats(state);
   const manual = activeManualRank(state)?.base ?? {};
   const sum = (key) => worn.reduce((total, entry) => total + (entry[key] ?? 0), 0);
+  const resistance = (key) => state.realm < rules.resistanceTier ? 0
+    : clamp((realm[key] ?? 0) + sum(key) + (manual[key] ?? 0), 0, rules.resistanceCap);
   return {
     maxHp: Math.max(1, realm.hp + sum('hp') + trained.hp + (manual.hp ?? 0) - rules.woundPenalty * state.wounds),
     maxQi: Math.max(1, realm.qi + sum('qi') + trained.qi + (manual.qi ?? 0)),
     attack: realm.atk + sum('atk') + (manual.atk ?? 0),
+    magicAttack: Math.ceil(realm.atk * rules.magicPowerFactor) + sum('magicAtk') + (manual.magicAtk ?? 0),
     defense: realm.def + sum('def') + trained.def + (manual.def ?? 0),
+    physicalResist: resistance('physicalResist'),
+    magicResist: resistance('magicResist'),
     perception: (realm.perception ?? 0) + sum('perception') + (manual.perception ?? 0),
     retreat: sum('retreat') + (manual.retreat ?? 0),
   };
@@ -197,12 +209,38 @@ function setRegulatedBoutRecovery(state) {
   state.regulatedBoutUntil = state.day + rules.regulatedBoutCooldown;
 }
 
-function advance(state, days, satietyRate = rules.satietyDrainPerDay) {
+function advance(state, days, satietyRate = rules.satietyDrainPerDay, sheltered = false) {
   const elapsed = days ?? 0;
   state.day = Math.round((state.day + elapsed) * 1000) / 1000;
   state.satiety = Math.max(0, +(state.satiety - elapsed * satietyRate).toFixed(3));
+  if (!sheltered) accumulateFog(state, elapsed);
 }
 
+function fogExposureActive(state) {
+  const site = records.sites[state.event ?? state.combat?.siteId];
+  return !state.roadTrip && !site?.fogShelter && (!settlementOf(data, state.region)?.inn || site?.exposed);
+}
+
+function fogDrain(pressure, tolerance) {
+  const excess = pressure - tolerance;
+  const beyond = excess - 1;
+  return excess <= 0 ? 0 : rules.pressureQi + Math.floor(beyond / rules.fogDrainStep) + Math.floor(beyond ** 2 / rules.fogDrainCurve);
+}
+
+function accumulateFog(state, elapsed) {
+  if (elapsed <= 0 || !fogExposureActive(state)) return;
+  const exposure = Math.round(((state.fogExposure ?? 0) + elapsed) * 1000) / 1000;
+  const pulses = Math.floor(exposure / rules.fogPulseDays);
+  state.fogExposure = exposure - pulses * rules.fogPulseDays;
+  const tolerance = totalFogTolerance(state, fogProtection(state));
+  const qiBefore = state.qi;
+  const pressureBefore = state.pressure;
+  state.pressure += pulses * rules.explorePressure;
+  for (let pressure = pressureBefore + rules.explorePressure; pressure <= state.pressure && state.qi > 0; pressure += rules.explorePressure) {
+    state.qi = Math.max(0, state.qi - fogDrain(pressure, tolerance));
+  }
+  if (qiBefore > state.qi) state.actionFogLoss = (state.actionFogLoss ?? 0) + qiBefore - state.qi;
+}
 function recordPractice(state) {
   const day = Math.floor(state.day);
   if (state.practicedOn[state.realm] === day) return;
@@ -403,7 +441,7 @@ function knowsRecipe(state, recipe) {
   return recipe.tier <= state.realm && (!recipe.requiresShownHide || state.showedHideToSmith) &&
     isRevealed(state, recipe.reveal) && (recipe.formula
       ? state.knownItems.includes(recipe.formula)
-      : knowsMaterials(state, recipe.need));
+      : recipe.requiresKnownMaterials === false || knowsMaterials(state, recipe.need));
 }
 
 function canCraftScroll(state) {
@@ -489,6 +527,24 @@ function knowsDeduction(state, entry) {
   return (entry.tier ?? 0) <= state.realm && isRevealed(state, entry.reveal);
 }
 
+function hasDeduced(state, id) {
+  return state.deductionHistory.some((entry) => entry.id === id);
+}
+
+function usedDeductionClues(state) {
+  return [...new Set(state.deductionHistory.flatMap(({ id }) => Object.keys(experiments[id].need)))];
+}
+
+function deductionDraftView(state) {
+  const id = state.deductionDraftId;
+  if (!id || !hasChoiceNeeds(state, experiments[id])) return null;
+  const items = Object.keys(experiments[id].need).map((key) => {
+    const { id, name, desc } = records.items[key];
+    return { id, name, desc };
+  });
+  return { id, title: records.deductions[id].name, items };
+}
+
 export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
   const settings = data.starting ?? {};
   const state = {
@@ -509,6 +565,7 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     coins: settings.coins ?? 10,
     insight: settings.insight ?? 0,
     pressure: 0,
+    fogExposure: 0,
     wounds: 0,
     toxin: 0,
     focus: 0,
@@ -525,7 +582,8 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     economy: initialEconomyState(),
     alchemy: initialAlchemyState(),
     completedDeductions: [],
-    deductionThoughts: {},
+    deductionDraftId: null,
+    deductionHistory: [],
     explored: [],
     discovered: [],
     eventsSeen: {},
@@ -602,14 +660,14 @@ function enemyMedicine(state) {
   const { id, count } = carried;
   const name = nameOf(id);
   const action = id === 'salve' ? `敷上${name}` : id === 'jade_pill' ? `喝下${name}` : `服下${name}`;
-  return { id, name, action, hp: records.pills[id].hp, left: state.combat.medicineLeft ?? count };
+  return { id, name, action, hp: records.pills[id].hp, qi: records.pills[id].qi ?? 0, left: state.combat.medicineLeft ?? count };
 }
 
 function enemyContext(state) {
   const { round, hp, lastEnemyIntent, enemyCharged, observedHits } = state.combat;
   return {
     round, hp, previousKind: lastEnemyIntent?.kind, charged: Boolean(enemyCharged),
-    observedHits: observedHits ?? [], medicine: enemyMedicine(state),
+    observedHits: observedHits ?? [], medicine: enemyMedicine(state), qi: state.combat.enemyQi ?? enemyOf(state)?.qi ?? 0,
   };
 }
 
@@ -630,7 +688,13 @@ function prepareCombatRound(state) {
 
 function canInterceptOpening(state, intent) {
   return Boolean(state.combat?.openingRange && state.combat.round === 0 &&
-    (intent?.kind === 'attack' || intent?.kind === 'heavy'));
+    (intent?.kind === 'attack' || intent?.kind === 'heavy') && !intent.ranged && intent.damageType !== 'magic');
+}
+
+function visibleAttack(intent) {
+  if (!intent) return null;
+  const { name, kind } = intent;
+  return { name, kind, ...(attackingIntent(intent) ? { damageType: intent.damageType ?? 'physical' } : {}) };
 }
 
 function hasChoiceNeeds(state, choice) {
@@ -652,7 +716,7 @@ function knowsChoice(state, choice, site) {
   if (reissue && (!state.knownItems.includes(reissue.item) || owns(state, reissue.item) ||
       (reissue.beforeQuest && state.completedQuests.includes(reissue.beforeQuest)) ||
       (reissue.beforeItem && state.knownItems.includes(reissue.beforeItem)))) return false;
-  return (previous === undefined || state.seenChoices.includes(`${site?.id}:${previous}`)) &&
+  return (previous === undefined || state.seenChoices.includes(typeof previous === 'string' && previous.includes(':') ? previous : `${site?.id}:${previous}`)) &&
     (!choice.afterFight || siteWins(state, site, choice.afterFight) > 0) &&
     (!choice.hideWhenExcluded || !choiceExcluded(state, choice, site)) &&
     (!choice.hidden || hasChoiceNeeds(state, choice));
@@ -757,9 +821,15 @@ function siteText(state, site, event) {
 function availableExperiment(state, event) {
   const trial = event?.experiment;
   if (!trial || records.sites[event.id]?.region !== state.region || state.completedDeductions.includes(trial.id)) return null;
-  const thought = state.deductionThoughts?.[trial.id];
-  const linked = thought?.evidence.some((id) => (trial.need?.[id] ?? 0) > 0);
-  return linked && hasChoiceNeeds(state, trial) ? trial : null;
+  return hasDeduced(state, trial.id) && hasChoiceNeeds(state, trial) ? trial : null;
+}
+
+function experimentBlocker(state, event, trial) {
+  if (trial.afterFight && siteWins(state, records.sites[event.id], trial.afterFight) === 0) {
+    return `要先从${records.enemies[trial.afterFight].name}身边打开去路。`;
+  }
+  const missing = missingItems(state, trial.fieldNeed);
+  return Object.keys(missing).length ? `手边还缺${goodsText(missing)}。` : '';
 }
 
 function revisitableEvents(state) {
@@ -786,6 +856,9 @@ export function view(state) {
   const currentEvent = state.event ? records.events[state.event] : null;
   const currentSite = currentEvent && records.sites[currentEvent.id];
   const experiment = availableExperiment(state, currentEvent);
+  const usedClues = usedDeductionClues(state);
+  const activeClues = data.items.filter((item) =>
+    !item.breakthrough && isEvidence(item) && owns(state, item.id) > 0 && !usedClues.includes(item.id));
   const nextRealm = services.includes('cultivate') ? records.realms[state.realm + 1] ?? null : null;
   const groundLoot = { ...groundAt(state) };
   const combatWeapon = weaponView(state);
@@ -806,7 +879,8 @@ export function view(state) {
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
     knowsChoice(state, currentEvent.choices[index], currentSite));
   const { combatSeed, evadeSeed, enemyEvadeSeed, roadSeed, banditLootSeed, banditLossSeed, escapeSeed, combat, roadTrip,
-    roadBandit, banditCrews, banditSpoils, resolvedBandits, banditLeads, itemSightings, itemNotes, ...visibleState } = state;
+    roadBandit, banditCrews, banditSpoils, resolvedBandits, banditLeads, itemSightings, itemNotes,
+    huntTracks, deductionDraftId, deductionHistory, ...visibleState } = state;
   return {
     ...visibleState,
     ...stats(state),
@@ -830,6 +904,7 @@ export function view(state) {
       ? Object.fromEntries(data.foods.map(({ id }) => [id, batchMealCount(state, id)]).filter(([, count]) => count > 1))
       : {},
     fogTolerance: totalFogTolerance(state, fogProtection(state)),
+    fogDrain: fogExposureActive(state) ? fogDrain(state.pressure, totalFogTolerance(state, fogProtection(state))) : 0,
     mode,
     day: state.day,
     realmIndex: state.realm,
@@ -862,15 +937,16 @@ export function view(state) {
     experiment: experiment ? {
       id: experiment.id,
       desc: experiment.desc,
-      thought: state.deductionThoughts[experiment.id],
+      blockedReason: experimentBlocker(state, currentEvent, experiment),
       controls: experiment.controls.map(({ id, label, options }) => ({
         id, label, options: options.map(({ id, label }) => ({ id, label })),
       })),
     } : null,
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
     combat: combat ? { id: combat.id, siteId: combat.siteId, round: combat.round } : null,
-    currentEnemy: enemy ? { id: enemy.id, name: enemy.name, tier: enemy.tier, desc: enemy.desc,
-      sparring: inProtectedBout(state), medicineRestricted: inRegulatedBout(state), maxHp: enemy.hp, hp: combat.hp } : null,
+    currentEnemy: enemy ? { id: enemy.id, name: enemy.name, desc: enemy.desc,
+      sparring: inProtectedBout(state), medicineRestricted: inRegulatedBout(state),
+      health: Math.max(0.05, Math.round(20 * combat.hp / enemy.hp) / 20) } : null,
     boutPause: regulatedBoutWaitDays(state),
     combatWeapon,
     combatOffhand: side ? { id: side.id, name: nameOf(side.id), chargeRequired: Boolean(side.chargeRequired) } : null,
@@ -885,9 +961,8 @@ export function view(state) {
       name: combat.playerCharge.id === 'bare_fist' ? '拳势' : nameOf(combat.playerCharge.id) } : null,
     enemyCharged: Boolean(combat?.enemyCharged),
     lastEnemyIntent: combat?.lastEnemyIntent ?? null,
-    intent,
-    intentDamage: intent ? estimatedHit(state, enemy, intent) : null,
-    retreatRisk: intent && !inProtectedBout(state) ? retreatRisk(state, enemy, intent) : null,
+    intent: visibleAttack(intent),
+    retreatRisk: intent && !inProtectedBout(state) ? { blocked: attackingIntent(intent) } : null,
     breathingQi: intent?.kind === 'guard' ? breathingQi(state) : 0,
     discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
       (!art.prizeOnly && (!inSettlement || atHome(state)) && services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
@@ -899,16 +974,14 @@ export function view(state) {
     economy: economyView(state, economyKit),
     alchemy: alchemyView(state, economyKit),
     homeMaterials: inSettlement ? Object.fromEntries(data.items.map(({ id }) => [id, homeSupplies(state, id)]).filter(([, count]) => count > 0)) : {},
-    evidence: data.items.filter((item) => !item.breakthrough && isEvidence(item) && owns(state, item.id) > 0)
-      .map(({ id, name, desc }) => ({ id, name, desc, count: owns(state, id) })),
-    deductions: (data.deductions ?? []).filter((entry) => knowsDeduction(state, entry)).map((entry) => {
-      const { id, name, desc } = entry;
-      const completed = state.completedDeductions.includes(id);
-      return {
-        id, name, desc, completed, thought: state.deductionThoughts?.[id] ?? null,
-        ...(completed ? { observation: experiments[id]?.outcome } : {}),
-      };
-    }),
+    evidence: activeClues.map(({ id, name, desc }) => ({ id, name, desc, count: owns(state, id) })),
+    activeClues: activeClues.map(({ id }) => id),
+    usedClues,
+    deductionQiCost: rules.deductionQiCost,
+    deductionDraft: deductionDraftView(state),
+    deductionHistory: deductionHistory.map(({ id, day }) => ({
+      id, day, title: records.deductions[id].name, ...sandboxDeductions[id], verified: state.completedDeductions.includes(id),
+    })),
     quests: discoveredQuests.map((quest) => {
       const completed = state.completedQuests.includes(quest.id);
       const blockedReason = completed ? '' : questBlocker(state, quest);
@@ -943,10 +1016,8 @@ function wait(state) {
 
 function encounter(state, id) {
   const region = regionOf(state);
-  advance(state, rules.exploreDays);
-  const exposed = !settlementOf(data, state.region)?.inn || records.sites[id]?.exposed;
-  if (exposed) state.pressure += rules.explorePressure;
   state.event = id;
+  advance(state, rules.exploreDays);
   const known = state.eventsSeen[state.region] ?? [];
   if (!known.includes(id)) state.eventsSeen[state.region] = [...known, id];
   const first = !state.explored.includes(state.region);
@@ -956,11 +1027,8 @@ function encounter(state, id) {
   }
   const protection = fogProtection(state);
   const tolerance = totalFogTolerance(state, protection);
-  const pressurized = exposed && state.pressure > rules.pressureThreshold && state.qi > 0;
-  const burdened = pressurized && state.pressure > tolerance;
-  if (burdened) state.qi = Math.max(0, state.qi - rules.pressureQi);
-  const fog = burdened ? `在雾里走久了，真气−${rules.pressureQi}。`
-    : pressurized ? protection && state.pressure <= rules.pressureThreshold + protection.field.fogTolerance
+  const shielded = fogExposureActive(state) && state.pressure > rules.pressureThreshold && state.pressure <= tolerance;
+  const fog = shielded ? protection && state.pressure <= rules.pressureThreshold + protection.field.fogTolerance
       ? `${nameOf(protection.id)}微热，胸口逼来的雾气散了些。`
       : '你收慢呼吸，胸口逼来的雾气散了些。' : '';
   return say(state, `在${region.name}遇上${records.events[id].name}。${first ? `初探此地，见识+${rules.firstRegionInsight}。` : ''}${fog}`);
@@ -972,7 +1040,7 @@ function startCombat(state, id, siteId, openingRange = false) {
     const witnesses = ((state.siteWitnesses ??= {})[siteId] ??= []);
     if (!witnesses.includes(id)) witnesses.push(id);
   }
-  state.combat = { id, siteId, hp: enemy.hp, round: 0, escapeBonus: 0, openingRange };
+  state.combat = { id, siteId, hp: enemy.hp, enemyQi: enemy.qi ?? 0, round: 0, escapeBonus: 0, openingRange };
 }
 
 function completedSiteChoice(state, site, index) {
@@ -1011,7 +1079,7 @@ function saveHuntTrack(state) {
   if (fight?.huntChoice === undefined) return;
   const tracks = ((state.huntTracks ??= {})[fight.siteId] ??= {});
   tracks[fight.huntChoice] = { enemy: fight.id, hp: fight.hp, day: state.day,
-    observedHits: fight.observedHits ?? [], medicineLeft: fight.medicineLeft };
+    observedHits: fight.observedHits ?? [], medicineLeft: fight.medicineLeft, enemyQi: fight.enemyQi };
 }
 
 function selectEncounter(state, site, choice) {
@@ -1187,7 +1255,7 @@ function choose(state, { index, itemId, count }) {
         gathered[id] = (gathered[id] ?? 0) + portion;
       }
     }
-    advance(state, choice.days);
+    advance(state, choice.days, rules.satietyDrainPerDay, choice.fogShelter);
     if (choice.fieldTool) toolMessage += wear(state, 'offhand');
     state.hp += hpChange;
     state.qi += choice.qi ?? 0;
@@ -1226,6 +1294,8 @@ function choose(state, { index, itemId, count }) {
         state.combat.hp = Math.min(state.combat.hp, track.hp + healed);
         state.combat.observedHits = [...(track.observedHits ?? [])];
         state.combat.medicineLeft = track.medicineLeft;
+        const maxEnemyQi = enemyOf(state).qi ?? 0;
+        state.combat.enemyQi = Math.min(maxEnemyQi, (track.enemyQi ?? maxEnemyQi) + Math.floor(healed / 2));
       }
     }
   } else if (!continuesHere && !stocks.length && !Object.keys(spilled).length) {
@@ -1297,6 +1367,7 @@ function fall(state, place = groundPlace(state)) {
   state.roadTrip = null;
   state.roadBandit = null;
   state.pressure = 0;
+  state.fogExposure = 0;
   state.focus = 0;
   state.toxin = 0;
   state.wounds = Math.min(rules.maxWounds, state.wounds + rules.fallWounds);
@@ -1400,21 +1471,11 @@ export function baseEscapeChance(enemy) {
   return Math.max(0.18, base - (enemy.tier ?? 0) * 0.018 - (enemy.hp >= 90 ? 0.06 : 0));
 }
 
-function retreatRisk(state, enemy, intent, bonus = 0, guard = 0) {
-  if (!attackingIntent(intent)) {
-    const evasion = combatTraits(activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), enemy, intent).dodge
-      + (activeManualRank(state)?.base.dodge ?? 0);
-    const cap = enemy.tags?.includes('bandit') ? rules.banditEscapeChanceCap : rules.escapeChanceCap;
-    const chance = clamp(baseEscapeChance(enemy) + stats(state).retreat + evasion * rules.escapeDodgeFactor + (state.combat.escapeBonus ?? 0) + bonus,
-      0, cap);
-    return { blocked: false, chance, damage: 0, wouldFall: false };
-  }
-  const { defense } = stats(state);
-  const training = trainingPerks(state, enemy, intent);
-  const traits = combatTraits(activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), enemy, intent);
-  const damage = Math.max(0, estimatedHit(state, enemy, intent) - Math.max(0, defense - (enemy.manualPierce ?? 0))
-    - guard - training.guard - traits.guard - (intent.kind === 'drain' ? state.qi : 0));
-  return { blocked: true, chance: 0, damage, wouldFall: damage >= state.hp };
+function escapeChance(state, enemy, intent, bonus) {
+  const evasion = combatTraits(activeGear(state).flatMap(({ trait, traits = [] }) => [trait, ...traits]), enemy, intent).dodge
+    + (activeManualRank(state)?.base.dodge ?? 0);
+  const cap = enemy.tags?.includes('bandit') ? rules.banditEscapeChanceCap : rules.escapeChanceCap;
+  return clamp(baseEscapeChance(enemy) + stats(state).retreat + evasion * rules.escapeDodgeFactor + (state.combat.escapeBonus ?? 0) + bonus, 0, cap);
 }
 
 function crossRealmFactor(state, enemy) {
@@ -1474,12 +1535,20 @@ function combatTraits(traits, enemy, intent) {
   return effects;
 }
 
+function damageAfterResistance(raw, resistance) {
+  return raw > 0 ? Math.max(1, Math.floor(raw * (1 - clamp(resistance ?? 0, 0, rules.resistanceCap)))) : 0;
+}
+
 function combatEffects(state, enemy, intent, move) {
   const { damage = 0, pierce = 0, brace = false, wearWeapon = false, hungerAffected = wearWeapon, ammo } = move;
-  const { defense, attack: force } = stats(state);
+  const { defense, attack: force, physicalResist, magicResist } = stats(state);
+  const spell = move.damageType === 'magic';
+  const enemySpell = intent.damageType === 'magic';
+  const enemyResist = enemy.tier >= rules.resistanceTier ? spell ? enemy.magicResist : enemy.physicalResist : 0;
   const focus = manualFocus(state, move.weaponClass);
   const heavyBrace = brace && intent.kind === 'heavy';
-  const counter = heavyBrace ? Math.max(1, Math.floor(rules.guardCounter / realmPressure(state, enemy))) : 0;
+  const counter = heavyBrace && !enemySpell
+    ? damageAfterResistance(Math.max(1, Math.floor(rules.guardCounter / realmPressure(state, enemy))), enemy.physicalResist) : 0;
   const guard = (move.guard ?? 0) + (focus?.guard ?? 0) + (brace ? rules.guardBonus + (heavyBrace ? rules.heavyGuardBonus : 0) : 0);
   const proposedInterrupt = ['heavy', 'heal', 'focus'].includes(intent.kind) ? move.interrupt ?? 0 : 0;
   const charge = move.releaseCharge && damage > 0
@@ -1499,9 +1568,10 @@ function combatEffects(state, enemy, intent, move) {
   const hunger = hungerAffected && state.satiety === 0 ? rules.emptyAttackMultiplier : 1;
   const effectiveDamage = Math.floor((damage + charge + (focus?.atk ?? 0) + (strikingTraits?.damage ?? 0)
     + training.damage + (ammo?.atk ?? 0)) * hunger * crossRealmFactor(state, enemy));
-  const proposedDamage = damage > 0
+  const rawDamage = damage > 0
     ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - (focus?.pierce ?? 0)
       - (strikingTraits?.pierce ?? 0) - training.pierce - (ammo?.pierce ?? 0))) : 0;
+  const proposedDamage = damageAfterResistance(rawDamage, enemyResist);
   const enemyActiveDodge = intent.kind === 'dodge';
   const missChance = dodgeChance((enemy.dodge ?? 0) + (enemyActiveDodge ? rules.combatActiveDodge : 0), strikingTraits?.accuracy ?? 0,
     enemyActiveDodge ? rules.combatActiveDodgeCap : rules.combatDodgeCap);
@@ -1509,14 +1579,16 @@ function combatEffects(state, enemy, intent, move) {
   const dealt = missed ? 0 : proposedDamage;
   const interrupt = missed ? 0 : proposedInterrupt;
   const hit = Boolean(ammo && dealt > 0 && canInterceptOpening(state, intent));
+  const enemyPierce = enemySpell ? intent.pierce ?? 0 : (enemy.manualPierce ?? 0) + (intent.pierce ?? 0);
   const incoming = hit || !attackingIntent(intent) ? 0
-    : Math.max(0, estimatedHit(state, enemy, intent) - Math.max(0, defense - (enemy.manualPierce ?? 0))
+    : Math.max(0, estimatedHit(state, enemy, intent) - Math.max(0, defense - enemyPierce)
       - guard - traits.guard - training.guard - interrupt);
-  const shield = heavyBrace && incoming > 0 ? activeGear(state).find(({ slot, brace }) => slot === 'offhand' && brace) : null;
-  const received = Math.max(0, incoming - (shield?.brace ?? 0));
+  const shield = heavyBrace && !enemySpell && incoming > 0 ? activeGear(state).find(({ slot, brace }) => slot === 'offhand' && brace) : null;
+  const received = damageAfterResistance(Math.max(0, incoming - (shield?.brace ?? 0)), enemySpell ? magicResist : physicalResist);
   const healing = intent.kind === 'heal' ? Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt) : 0;
-  const reflect = !intent.ranged && (intent.kind === 'attack' || intent.kind === 'heavy') ? traits.reflect : 0;
-  const quick = intent.ranged || intent.kind === 'drain';
+  const reflect = !enemySpell && !intent.ranged && (intent.kind === 'attack' || intent.kind === 'heavy')
+    ? damageAfterResistance(traits.reflect, enemy.physicalResist) : 0;
+  const quick = enemySpell || intent.ranged || intent.kind === 'drain';
   const hardToEvade = quick || intent.kind === 'heavy';
   const passive = (traits.dodge + (activeManualRank(state)?.base.dodge ?? 0)) * (hardToEvade ? rules.combatQuickDodgeFactor : 1);
   const active = move.evade ? rules.combatActiveDodge * (quick ? rules.combatActiveQuickDodgeFactor : 1) : 0;
@@ -1568,7 +1640,7 @@ function combatTurn(state, move) {
   const qiToPlayer = intent.kind === 'drain' ? Math.min(state.qi, received) : 0;
   const damageToPlayer = received - qiToPlayer;
   const healthBefore = state.hp;
-  const enemyMove = { name: intent.name, kind: intent.kind };
+  const enemyMove = visibleAttack(intent);
   const read = state.combat.plan.reader === 'enemy' ? `${enemy.name}看破了你的起手。` : '';
   delete state.combat.spiritGuard;
   let damageDealt = Math.min(state.combat.hp, dealt + counter);
@@ -1585,7 +1657,6 @@ function combatTurn(state, move) {
   state.combat.playerCharge = move.prepareWeapon ?? null;
   const recovered = brace && intent.kind === 'guard' ? breathingQi(state) : 0;
   state.qi += recovered;
-  advance(state, rules.battleDays);
   const weaponDamage = wearWeapon ? wear(state, 'weapon') : move.wearSlot ? wear(state, move.wearSlot) : '';
   if (ammo) removeItem(state, ammo.id, 1);
   const playerMove = brace ? counter ? '你挡住重招，趁对手还没收招打了回去。'
@@ -1593,10 +1664,12 @@ function combatTurn(state, move) {
   const medicineMove = interruptedMedicine ? `你刚取出${nameOf(medicine)}，便被对手蓄好的招打断。药还在手里。` : doseMessage;
   let summary = `${read}${abandoned ? '你收住了方才蓄着的劲。' : ''}${medicineMove ?? playerMove}${charge ? '你将蓄好的劲送了出去。' : ''}${ammo ? `用掉一枚${nameOf(ammo.id)}。` : ''}${missed ? `${enemy.name}侧身闪过了这一击。` : ''}${damageDealt ? `造成${damageDealt}点伤害。` : ''}${weaponDamage}`;
   if (state.combat.hp <= 0) {
+    advance(state, rules.battleDays);
     if (counter) summary += `「${intent.name}」被你截住了。`;
     return combatVictory(state, enemy, summary, { damageDealt, damageTaken: 0, ...(counter ? { enemyMove } : {}) });
   }
   if (intent.kind !== 'remedy') summary += `${enemy.name}使出「${intent.name}」。`;
+  if (intent.qiCost > 0) state.combat.enemyQi = Math.max(0, (state.combat.enemyQi ?? enemy.qi ?? 0) - intent.qiCost);
   if (attackingIntent(intent)) state.combat.enemyCharged = false;
   if (hit) {
     summary += `这一箭拦住了${enemy.name}的冲势。`;
@@ -1626,6 +1699,7 @@ function combatTurn(state, move) {
       state.combat.medicineLeft = dose.left - 1;
       const restored = Math.min(enemy.hp - state.combat.hp, dose.hp);
       state.combat.hp += restored;
+      state.combat.enemyQi = Math.min(enemy.qi ?? 0, (state.combat.enemyQi ?? enemy.qi ?? 0) + dose.qi);
       summary += `${enemy.name}${intent.name}。`;
       if (restored > 0) {
         summary += `气血回了${restored}点。`;
@@ -1636,6 +1710,10 @@ function combatTurn(state, move) {
     summary += `${enemy.name}稳住了架势。`;
   } else if (intent.kind === 'dodge') {
     summary += missed ? '他贴着路沿站稳。' : '他错开一步，绕到了旁边。';
+  } else if (intent.kind === 'recoverQi') {
+    const before = state.combat.enemyQi ?? enemy.qi ?? 0;
+    state.combat.enemyQi = Math.min(enemy.qi ?? 0, before + (intent.recover ?? 0));
+    summary += '对手收敛气息，慢慢回了些劲。';
   } else if (intent.kind === 'focus') {
     state.combat.enemyCharged = dealt < rules.chargeBreakDamage && !interrupt;
     summary += state.combat.enemyCharged ? '它的下一记出招会更重。' : '蓄势被你打断了。';
@@ -1661,6 +1739,7 @@ function combatTurn(state, move) {
       summary += `护具把来劲弹了回去，造成${reflectedDamage}点反伤。`;
     }
   }
+  advance(state, rules.battleDays);
   if (state.combat.hp <= 0) {
     return combatVictory(state, enemy, summary, { ...medicineResult, damageDealt, damageTaken: healthBefore - state.hp, enemyMove, reflectedDamage, dodged, missed });
   }
@@ -1687,7 +1766,8 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
     return { ...say(state, `${lead}你退后一步，${enemy.name}也收了招。这场切磋到此为止。`), damageDealt: 0, damageTaken: 0 };
   }
   const intent = respondToMove(state, enemy, 'retreat');
-  const { blocked, chance } = retreatRisk(state, enemy, intent, bonus, guard);
+  const blocked = attackingIntent(intent);
+  const chance = blocked ? 0 : escapeChance(state, enemy, intent, bonus);
   if (!blocked) state.escapeSeed = (Math.imul(state.escapeSeed ?? 1, 1664525) + 1013904223) >>> 0;
   if (blocked || state.escapeSeed / 0x100000000 >= chance) {
     const failure = combatTurn(state, { kind: 'retreat', guard,
@@ -1733,8 +1813,9 @@ function cast(state, id) {
   state.focus -= focus;
   return combatTurn(state, {
     kind: 'strike', releaseCharge,
+    damageType: weaponBased ? 'physical' : 'magic',
     weaponClass: weaponBased ? (weapon?.weaponClass ?? 'fist') : null,
-    damage: stats(state).attack - (weaponBased ? 0 : weapon?.atk ?? 0) + (art.power ?? 0) + focus * rules.focusDamage,
+    damage: (weaponBased ? stats(state).attack : stats(state).magicAttack) + (art.power ?? 0) + focus * rules.focusDamage,
     pierce: (art.pierce ?? 0) + (releaseCharge ? weapon.chargePierce ?? 0 : 0),
     guard: art.guard,
     interrupt: art.break,
@@ -1887,6 +1968,7 @@ function applyMedicine(state, id) {
   const pill = records.pills[id];
   removeItem(state, id, 1);
   const hp = state.hp;
+  const qi = state.qi;
   state.hp += pill.hp ?? 0;
   state.qi += pill.qi ?? 0;
   state.toxin += pill.toxin ?? 0;
@@ -1898,12 +1980,14 @@ function applyMedicine(state, id) {
   }
   normalize(state);
   const restored = state.hp - hp;
+  const restoredQi = state.qi - qi;
   const sense = restoreTrainingSense(state, pill.sense ?? 0);
   const toxic = state.toxin >= rules.toxinThreshold;
   const toxinDamage = toxic ? Math.max(0, Math.min(state.hp - 1, rules.toxinDamage)) : 0;
   state.hp -= toxinDamage;
   const applied = id === 'salve' ? '你把松脂膏敷在伤口上。' : `你服下${nameOf(id)}。`;
-  const message = applied + (restored > 0 ? `气血回了${restored}点。` : '') + (sense > 0 ? `神识回了${sense}点。` : '')
+  const message = applied + (restored > 0 ? `气血回了${restored}点。` : '') + (restoredQi > 0 ? `真气回了${restoredQi}点。` : '')
+    + (sense > 0 ? `神识回了${sense}点。` : '')
     + (toxinDamage ? `丹毒积重，损失${toxinDamage}点生命。` : '');
   return { message, medicineRecovery: { hp: Math.max(0, restored), sense },
     injury: toxinDamage ? { cause: '丹毒发作。', amount: toxinDamage } : undefined };
@@ -1928,6 +2012,8 @@ function use(state, id, inCombat) {
     const { message, ...dose } = applyMedicine(state, id);
     return { ...say(state, message), ...dose };
   }
+  if (state.qi < (talisman.qiCost ?? 0)) return refuse('真气不足，催不动这道符。');
+  state.qi -= talisman.qiCost ?? 0;
   removeItem(state, id, 1);
   const message = `你催动${nameOf(id)}。`;
   const training = trainingPerks(state);
@@ -1936,6 +2022,7 @@ function use(state, id, inCombat) {
   state.combat.escapeBonus += talisman.retreat ?? 0;
   return combatTurn(state, {
     kind: talisman.damage > 0 ? 'strike' : 'brace',
+    damageType: 'magic',
     damage: talisman.damage > 0 ? talisman.damage + training.sealDamage : 0,
     pierce: Infinity,
     guard,
@@ -2058,6 +2145,7 @@ function applyHalfDayRest(state) {
   state.wounds -= rules.restWounds;
   state.toxin -= rules.restToxin;
   state.pressure = 0;
+  state.fogExposure = 0;
   state.hp += rules.restHp;
   state.qi += restQi(state);
   const recoveredSense = restoreTrainingSense(state);
@@ -2396,6 +2484,8 @@ const repairStockByWeapon = {
   scale_chisel: { black_iron: 1, hard_scale: 1 },
   echo_knuckles: { black_iron: 1, battle_sinew: 1 },
   gully_king_blade: { ore: 2, black_iron: 1 },
+  gold_iron_blade: { ore: 2, black_iron: 1 },
+  gold_tide_staff: { wood: 2, core: 1 },
 };
 
 export function weaponRepairNeed(id, remaining = 0) {
@@ -2489,25 +2579,37 @@ function handin(state, id) {
   return { ...say(state, outcome ?? `已交付${quest.name}。`), outcome };
 }
 
-function deduce(state, { id, evidence, hypothesis }) {
-  const deduction = records.deductions[id];
-  if (!deduction || !knowsDeduction(state, deduction)) return refuse('你还没遇到这个疑点。');
-  if (state.completedDeductions.includes(id)) return refuse('这件事已经在现场验过了。');
-  const text = typeof hypothesis === 'string' ? hypothesis.trim() : '';
-  if (!text || text.length > hypothesisLimit || !Array.isArray(evidence)) {
-    return refuse(`请写下自己的猜想，最多${hypothesisLimit}字。`);
+function meditate(state, { item }) {
+  const clue = records.items[item];
+  if (typeof item !== 'string' || !isEvidence(clue) || clue.breakthrough || !owns(state, item) || usedDeductionClues(state).includes(item)) {
+    return refuse('请选一条手边还未推演过的线索。');
   }
-  const selected = [...new Set(evidence)];
-  if (selected.some((itemId) => typeof itemId !== 'string' || !isEvidence(records.items[itemId]) || !owns(state, itemId))) {
-    return refuse('只能摆上随身可查的证物。');
+  if (state.qi < rules.deductionQiCost) return refuse('真气不足，歇一歇再想。');
+  state.qi -= rules.deductionQiCost;
+  const ready = data.deductions.find((entry) => {
+    const trial = experiments[entry.id];
+    return trial.need[item] > 0 && !hasDeduced(state, entry.id) &&
+      knowsDeduction(state, entry) && hasChoiceNeeds(state, trial);
+  });
+  if (!ready) return { ...say(state, '没什么头绪。'), meditation: 'incomplete' };
+  state.deductionDraftId = ready.id;
+  return { ...say(state, '几条线索正好能相互印证，已摆上沙盘。'), meditation: 'ready' };
+}
+
+function deduce(state, { id }) {
+  if (!id || state.deductionDraftId !== id || hasDeduced(state, id) || !hasChoiceNeeds(state, experiments[id])) {
+    return refuse('先选一条线索冥想，把相关线索摆上沙盘。');
   }
-  (state.deductionThoughts ??= {})[id] = { hypothesis: text, evidence: selected };
-  return { ...say(state, '猜想已摆在沙盘上。'), deduction: 'pinned' };
+  state.deductionHistory.push({ id, day: state.day });
+  state.deductionDraftId = null;
+  return { ...say(state, '想通了。到现场试一试。'), deduction: 'recorded' };
 }
 
 function tryExperiment(state, { id, settings }) {
   const trial = availableExperiment(state, records.events[state.event]);
-  if (!trial || trial.id !== id) return refuse('这里还缺验证这个猜想的条件。');
+  if (!trial || trial.id !== id) return refuse('这里还缺现场验证所需的线索或物件。');
+  const blocked = experimentBlocker(state, records.events[state.event], trial);
+  if (blocked) return refuse(blocked);
   if (!settings || typeof settings !== 'object' || Array.isArray(settings) ||
     Object.keys(settings).length !== trial.controls.length || trial.controls.some(({ id: control, options }) =>
       !Object.hasOwn(settings, control) || !options.some(({ id: option }) => option === settings[control]))) {
@@ -2586,6 +2688,7 @@ const generalActions = {
   upgradeManual: (state, { id }) => upgradeManual(state, id),
   take: (state, { id, count }) => takeFromGround(state, id, count),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
+  meditate,
   deduce,
 };
 
@@ -2659,6 +2762,7 @@ function takeTurn(state, action, payload) {
     if (action === 'unpackBasket') return unpackBasket(state);
     if (action === 'selectAmmo') return selectAmmo(state, payload.id);
     if (action === 'take') return takeFromGround(state, payload.id, payload.count);
+    if (action === 'meditate' || action === 'deduce') return generalActions[action](state, payload);
     if (action === 'beginGather') return beginGather(state, payload.index);
     if (action === 'choose') return choose(state, payload);
     if (action === 'experiment') return tryExperiment(state, payload);
@@ -2685,6 +2789,10 @@ export function act(state, action, payload = {}) {
   if (action === 'editGuideNote') return editGuideNote(state, payload ?? {});
   prepareCombatRound(state);
   const result = takeTurn(state, action, payload);
+  if (state.actionFogLoss) {
+    result.fogLoss = state.actionFogLoss;
+    delete state.actionFogLoss;
+  }
   if (result.ok) {
     prepareCombatRound(state);
     refreshDiscovery(state);

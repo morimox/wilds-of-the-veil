@@ -10,11 +10,12 @@ const gearRows = new Map(data.gear.map(row => [row.id, row]));
 const pillRows = new Map(data.pills.map(row => [row.id, row]));
 const talismanRows = new Map(data.talismans.map(row => [row.id, row]));
 const manualRows = new Map(data.innerStyles.map(row => [row.id, row]));
+const clueMaterials = new Set(["heart_silt", "stillwell_salt"]);
 const bookCategories = ["武器", "装备", "弹药", "丹药", "内功", "符箓", "口粮", "材料", "丹方", "线索", "其他"];
 const bookNames = new Intl.Collator("zh-CN");
 const enemyRows = Object.fromEntries(data.enemies.map(enemy => [enemy.id, enemy]));
 const slotNames = data.equipmentSlots;
-const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", dodge: "闪避", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势" };
+const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", dodge: "闪避", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势", recoverQi: "回气" };
 const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药", manual: "内功", container: "收纳" };
 const weaponNames = { fist: "拳与指虎", sword: "剑", blade: "刀斧", spear: "枪戟", staff: "棍杖", hammer: "锤", bow: "弓", crossbow: "弩" };
 const manualRankName = new Intl.NumberFormat("zh-CN-u-nu-hanidec");
@@ -61,7 +62,9 @@ let selectedItem = null;
 let openBagId = null;
 let combatObservation = null;
 const kitSectionOpen = new Map();
-let activeDeduction = null;
+let meditationClue = null;
+let deductionHistoryOpen = false;
+const openDeductions = new Set();
 let atlasProvince = null;
 let atlasPoint = null;
 let atlasEdge = null;
@@ -71,7 +74,6 @@ let bookCategory = null;
 let bookEditing = null;
 const bookDrafts = new Map();
 let pendingDisposal = null;
-const deductionDrafts = new Map();
 const experimentDrafts = new Map();
 
 function dismissOpening() {
@@ -205,9 +207,9 @@ function atLanding(s) {
   return inVillage(s) && s.region.id === "village";
 }
 
-function vital(label, current, max, low, explanation) {
-  return `<details class="vital${low ? " low" : ""}">
-    <summary>${label} <b>${Math.floor(current)}/${max}</b></summary>
+function vital(label, current, max, low, explanation, bar = "") {
+  return `<details class="vital${low ? " low" : ""}${bar ? ` vital-bar ${bar}` : ""}">
+    <summary>${label} <b>${Math.floor(current)}/${max}</b>${bar ? `<span class="meter-track" style="--fill:${100 * current / max}%" aria-hidden="true"><i></i></span>` : ""}</summary>
     <p>${escape(explanation)}</p>
   </details>`;
 }
@@ -215,28 +217,27 @@ function vital(label, current, max, low, explanation) {
 function stats(s) {
   const warnings = [];
   const meal = data.foods.find(({ id }) => s.inventory[id] > 0);
-  const showsQi = s.knownArts.length > 0 || s.pressure > rules.pressureThreshold || Boolean(s.combatFist?.chargeName);
   if (s.satiety === 0) warnings.push("空腹乏力");
   if (!meal && s.satiety < rules.rationSatiety) warnings.push("口粮已尽");
   if (s.toxin >= rules.toxinThreshold) warnings.push("丹毒发作");
   const tolerance = s.fogTolerance ?? rules.pressureThreshold;
-  const danger = s.pressure > tolerance;
+  const danger = s.fogDrain > 0;
   const marks = Array.from({ length: tolerance }, (_, i) =>
     `<i class="${i < s.pressure ? "filled" : ""}"></i>`).join("");
   const fog = s.pressure >= rules.pressureThreshold ? `<details class="pressure${danger ? " danger" : ""}">
     <summary>${danger ? "雾压过重" : "雾压"} <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
-    <span>雾积满后，再探索会耗真气。到有人歇脚的地方就会散去。</span>
+    <span>${danger ? `雾越浓，真气流失越快。当前每过四分之一日约耗 ${s.fogDrain} 点。` : "在雾中逗留会加重雾压。到住处歇脚能散雾。"} </span>
   </details>` : "";
   const medicineAllowed = !s.currentEnemy?.medicineRestricted;
   const canEat = medicineAllowed && s.mode !== "victory" && (s.mode !== "road" || onOpenRoad(s)) && meal && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
   const canUseSalve = medicineAllowed && s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
   const sense = s.spiritSense;
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
-    ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。敷伤药或在据点歇息都能恢复。")}
+    ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。敷伤药或在据点歇息都能恢复。", "health")}
     ${canUseSalve ? linkButton("敷伤药", "use", "salve", "quick-eat") : ""}
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
-    ${showsQi ? vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施展术诀、打出部分招式或在雾中久留会消耗真气。歇息时能恢复。") : ""}
+    ${vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施法、冥想和部分武技会耗气。雾压越高，真气流失越快。回气散或歇息能补回来。", "qi")}
     ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息或服补神识的药都能恢复。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
@@ -556,13 +557,8 @@ function mechanismPanel(puzzle) {
     ${puzzle.reason ? `<p class="fine">${escape(puzzle.reason)}</p>` : ""}</section>`;
 }
 
-function thoughtDetails(thought) {
-  return thought ? `<details class="trial-thought"><summary>看沙盘上的猜想</summary>
-    <p class="player-thought">${escape(thought.hypothesis)}</p>
-  </details>` : "";
-}
-
 function experimentForm(experiment) {
+  if (experiment.blockedReason) return `<section class="experiment"><p class="fine">${escape(experiment.blockedReason)}</p></section>`;
   const draft = experimentDrafts.get(experiment.id);
   const controls = experiment.controls.map(control => `<label class="experiment-control">
     <span>${escape(control.label)}</span>
@@ -573,7 +569,6 @@ function experimentForm(experiment) {
     </label>`).join("");
   return `<form class="experiment" data-experiment="${escape(experiment.id)}">
     <p class="intro">${escape(experiment.desc)}</p>
-    ${thoughtDetails(experiment.thought)}
     <div class="experiment-controls">${controls}</div>
     <div class="actions"><button type="submit" class="button">当场试一次</button></div>
   </form>`;
@@ -588,13 +583,12 @@ function talismanSummary(row) {
 }
 
 function artSummary(row) {
-  return ["消耗真气", row.pierce && "能穿甲", row.guard && "少受伤", row.break && "能截断重招与调息"].filter(Boolean).join(" · ");
+  return [row.weaponBased === false ? "法攻" : "物攻", `耗 ${row.cost} 点真气`, row.pierce && "能穿甲", row.guard && "少受伤", row.break && "能截断重招与调息"].filter(Boolean).join(" · ");
 }
 
 function combatScreen(s) {
   const enemy = s.currentEnemy;
   const intent = s.intent;
-  const hp = s.enemyHp ?? enemy.currentHp ?? enemy.hp;
   const arts = data.arts.filter(row => s.knownArts.includes(row.id));
   const weapon = s.combatWeapon;
   const side = s.combatOffhand;
@@ -623,10 +617,10 @@ function combatScreen(s) {
   const guardLabel = intent?.kind === "heavy" ? "挡住重招" : intent?.kind === "guard" && s.breathingQi ? "收势调息" : "防御";
   const flight = intent && s.retreatRisk;
   const retreatLabel = enemy.sparring ? "认输" : "撤退";
-  const retreatCue = flight?.blocked ? (flight.wouldFall ? "对方正要出手，这时脱不开身，挨上一招可能会倒下。" : "对方正要出手，这时脱不开身。")
+  const retreatCue = flight?.blocked ? "对方正要出手，这时脱不开身。"
     : flight ? "对方这回合没在进攻，可以找空当脱身。" : "";
   const intentLine = intent
-    ? `<div class="intent"><b>看破来招 · ${escape(intent.name)}</b>　${escape(intentNames[intent.kind])}</div>`
+    ? `<div class="intent"><b>看破来招 · ${escape(intent.name)}</b>　${escape(intentNames[intent.kind])}${intent.damageType ? ` · ${intent.damageType === "magic" ? "法攻" : "物攻"}` : ""}</div>`
     : `<p class="intent unread">${s.combatRead === "enemy" ? "对方盯着你的起手，没先露招。" : "一时看不清对方的来招。"}</p>`;
   const openingNote = openingShot ? "对方还隔着一段路。这一回合放箭，能拦住它的头一扑。"
     : !intent && s.openingShotPossible ? "还隔着一段路。对方若冲来，首箭能拦一下。" : "";
@@ -642,14 +636,14 @@ function combatScreen(s) {
         : mainBlocked && row.weaponBased !== false ? "先取消蓄力"
           : weapon?.chargeRequired && !mainCharged && row.weaponBased !== false ? "兵器须先蓄力" : "";
     const action = intent?.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
-    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), publicText(row.desc));
+    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), `${row.weaponBased === false ? "法攻" : "物攻"} · 耗 ${row.cost} 点真气。 ${row.desc}`);
   });
   return panel(enemy.name, `
     ${intentLine}
     ${openingNote ? `<p class="fine">${openingNote}</p>` : ""}
     ${chargeNote ? `<p class="fine">${escape(chargeNote)}</p>` : ""}
     ${enemy.sparring ? `<p class="fine">${enemy.medicineRestricted ? "裁判叫停就收招。双方在场上不能用药或吃东西。" : "约好点到为止，一方撑不住就收招。"}</p>` : ""}
-    ${meter("对方气血", hp, enemy.maxHp)}
+    ${meter("对方气血", enemy.health, 1)}
     ${ammoBar}
     <div class="actions">${linkButton(attackLabel, !canMainAttack && fist ? "fistAttack" : "attack", "", fistCharged ? "" : "primary", mainBlocked)}
       ${side ? linkButton(sideLabel, "offhandAttack", "", "", sideBlocked) : ""}
@@ -802,6 +796,11 @@ function discardActions(s, id) {
   return first + (maximum > 1 ? linkButton(all, "discard", id, "quiet", false, maximum) : "");
 }
 
+function meditationBlocked(s) {
+  return s.gathering || !["village", "field", "event"].includes(s.mode) ? "先处理眼前的事。"
+    : s.qi < s.deductionQiCost ? "真气不足。" : "";
+}
+
 function pack(s) {
   const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event" || onOpenRoad(s);
   const canManageManual = canEquip && !s.gathering;
@@ -833,7 +832,13 @@ function pack(s) {
     manualActions(activeManual, true, canManageManual, !onOpenRoad(s)) + discardActions(s, activeManual.id), "内功", 0,
     { status: activeManual.aligned ? "手头的打法合它的路数。" : "" }));
   const carried = data.items.filter(row => s.inventory[row.id] && row.id !== activeManual?.id && !Object.values(s.equipment).includes(row.id));
-  const inventory = carried.filter(row => row.kind !== "key" || row.breakthrough).map(row => {
+  const usedClues = new Set(s.usedClues);
+  const activeClues = new Set(s.activeClues);
+  const meditateReason = meditationBlocked(s);
+  const clueActions = id => activeClues.has(id)
+    ? `<span class="fine item-status">真气 ${s.qi}/${s.maxQi}${meditateReason ? ` · ${meditateReason}` : ""}</span>
+      ${linkButton(`冥想 · ${s.deductionQiCost} 真气`, "meditate", id, "quiet", Boolean(meditateReason))}` : "";
+  const inventory = carried.filter(row => row.kind !== "key" || row.breakthrough || clueMaterials.has(row.id) && usedClues.has(row.id)).map(row => {
     const gear = gearRows.get(row.id);
     const pill = pillRows.get(row.id);
     const seal = talismanRows.get(row.id);
@@ -855,7 +860,8 @@ function pack(s) {
       const label = reason ? reason.slice(0, -1) : row.id === "salve" ? (healthy ? "气血已满" : "敷伤药") : "服用";
       actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy || Boolean(reason));
     }
-    if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
+    if (seal && s.mode === "combat") actions = linkButton(seal.qiCost && s.qi < seal.qiCost ? "真气不足" : "用符", "use", row.id, "",
+      seal.tier > s.realm.id || s.qi < (seal.qiCost ?? 0));
     if (book) actions = manualActions(book, false, canManageManual, !onOpenRoad(s));
     if (foodRows[row.id] && canEat && (s.satiety < s.maxSatiety || s.hp < s.maxHp)) {
       actions = linkButton(`吃${row.name}`, "eat", row.id);
@@ -870,11 +876,11 @@ function pack(s) {
     if (row.id === "gate_scroll" && canEquip && !s.gathering && !onOpenRoad(s)) actions += tabButton("展开卷轴", "atlas");
     if (row.id === "encyclopedia") actions += '<button type="button" class="button quiet" data-open-encyclopedia>翻开全书</button>';
     actions += controls.actions ?? "";
-    actions += discardActions(s, row.id);
+    actions += clueActions(row.id) + discardActions(s, row.id);
     return itemSlot(s, row, "held", actions, "", s.inventory[row.id], { ...controls, wear: gear ? s.durability[row.id] ?? gear.durability : undefined });
   });
-  const keys = carried.filter(row => row.kind === "key" && !row.breakthrough);
-  const keySlot = row => itemSlot(s, row, "clue", discardActions(s, row.id), "", s.inventory[row.id]);
+  const keys = carried.filter(row => row.kind === "key" && !row.breakthrough && !usedClues.has(row.id));
+  const keySlot = row => itemSlot(s, row, "clue", clueActions(row.id) + discardActions(s, row.id), "", s.inventory[row.id]);
   const clues = keys.filter(row => !formulaIds.has(row.id)).map(keySlot);
   const formulae = keys.filter(row => formulaIds.has(row.id)).map(keySlot);
   const ground = canEquip && !s.roadTrip?.afterBattle ? groundRows(s) : [];
@@ -1016,10 +1022,10 @@ function workshop(s) {
   const remarks = [
     household.hide > 0 && recipes.some(row => row.id === "r_hide_coat") &&
       "工匠捻了捻兽革。「这皮韧，攒两张，我给你缝件挡牙的褂子。」",
-    s.inventory.eddy_note > 0 && recipes.some(row => row.id === "r_bank_talisman") &&
-      "工匠用炭条描过回汊图上的弯道。「把这道弯画在纸符上。有人追你时，你能借它侧身脱开。」",
     !smithMap && !recipes.length && "工匠在门边磨剪子，脚边卷着几块旧皮。",
   ].filter(Boolean).map(line => `<p class="intro">${escape(line)}</p>`).join("");
+  const bankTalismanHint = s.inventory.eddy_note > 0 && recipes.some(row => row.id === "r_bank_talisman")
+    ? '<p class="intro workshop-hint">工匠沿着回汊图划了道弯。「照这道弯能画回汊符。挨逼时借它侧身，容易脱开些。」</p>' : "";
   const mapTrade = smithMap ? `<p class="intro">${escape(smithMap.desc)}</p>${smithMap.ready ? `<div class="actions">${linkButton("递一块寒铁", "handin", smithMap.id)}</div>` : ""}` : "";
   return panel("工坊", `${recipes.length ? '<div class="workshop-art" aria-hidden="true"></div>' : ""}
     ${remarks}${mapTrade}
@@ -1028,7 +1034,7 @@ function workshop(s) {
     const reason = s.craftReasons[row.id];
     return card(result.name, `${row.cost} 灵钱 · ${row.days} 日`, tag(kindNames[result.kind] ?? ""),
       linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), itemEntry(s, row.result), row.need);
-  }).join("")}</div>`);
+  }).join("")}</div>${bankTalismanHint}`);
 }
 
 function storageRows(s, rows, action) {
@@ -1325,27 +1331,46 @@ function apprentice(s) {
   return panel("药僮", `${basket ? `<p class="intro">药僮认出了你手里的竹篓。</p><div class="actions">${basket}</div>` : ""}${tasks || (basket ? "" : '<p class="intro">药僮正忙着看火。</p>')}`);
 }
 
+function meditationForm(s) {
+  const ids = s.activeClues ?? [];
+  if (!ids.length) return "";
+  const listed = ids.includes(meditationClue);
+  const reason = meditationBlocked(s);
+  return `<form class="meditation" data-meditation>
+    <label for="meditation-clue">选一条线索</label><div class="meditation-actions">
+    <select id="meditation-clue" name="clue" required><option value="" disabled${listed ? "" : " selected"}>请选择</option>
+      ${ids.map(id => `<option value="${escape(id)}"${id === meditationClue ? " selected" : ""}>${escape(itemRows[id].name)}</option>`).join("")}
+    </select><button type="submit" class="button"${!listed || reason ? " disabled" : ""}${reason ? ' aria-describedby="meditation-blocker"' : ""}>冥想 · ${s.deductionQiCost} 真气</button></div>
+    ${reason ? `<p class="fine" id="meditation-blocker">${escape(reason)}</p>` : ""}</form>`;
+}
+
+function deductionHistory(s) {
+  const notes = s.deductionHistory ?? [];
+  if (!notes.length) return "";
+  return `<details class="deduction-history" data-deduction-history${deductionHistoryOpen ? " open" : ""}>
+    <summary>推演历史</summary>
+    ${[...notes].reverse().map(({ id, title, conclusion, reason, verified }) =>
+      `<details class="deduction-record" data-deduction-record="${escape(id)}"${openDeductions.has(id) ? " open" : ""}>
+        <summary>${escape(title)}</summary>
+        <p>${escape(conclusion)}</p><p class="fine deduction-reason">${escape(reason)}</p>
+        ${verified ? '<p class="fine">已在现场验过。</p>' : ""}
+      </details>`).join("")}
+  </details>`;
+}
+
 function deductionBoard(s) {
-  const cases = s.deductions ?? [];
-  if (!cases.length) return panel("沙盘", '<p class="intro">旅途中值得推敲的疑点会收进这里。</p>');
-  const current = cases.find(row => row.id === activeDeduction) ?? cases.find(row => !row.completed) ?? cases[0];
-  const draft = deductionDrafts.get(current.id) ?? current.thought;
-  const casesBar = cases.length > 1 ? `<div class="actions deduction-cases">${cases.map(row => `<button type="button" class="button ${row.id === current.id ? "primary" : ""}" data-case="${escape(row.id)}" aria-pressed="${row.id === current.id}">${escape(row.name)}${row.completed ? " ✓" : ""}</button>`).join("")}</div>` : "";
-  const evidence = (s.evidence ?? []).map(item => `<label class="evidence-option"><input type="checkbox" name="evidence" value="${escape(item.id)}"${draft?.evidence.includes(item.id) ? " checked" : ""}>
-    <span><strong>${escape(item.name)}</strong><small class="item-description" data-item-description="${escape(item.id)}">${escape(itemDescription(s, item.id))}</small></span></label>`).join("");
-  return panel("沙盘", casesBar + `<h3>${escape(current.name)}</h3><p class="intro training-note">${escape(publicText(current.desc))}</p>` +
-    (current.completed ? `<p class="intent">${escape(publicText(current.observation))}</p>${thoughtDetails(current.thought)}` :
-      `<form class="deduction" data-deduction="${escape(current.id)}">
-        ${evidence ? `<details class="deduction-clues"${draft?.evidence.length ? " open" : ""}><summary>摊开随身物件</summary>${evidence}</details>` : ""}
-        <label class="deduction-writing">你的猜想
-          <textarea name="hypothesis" rows="3" maxlength="180" required>${escape(draft?.hypothesis)}</textarea>
-        </label>
-        <div class="actions"><button class="button" type="submit">带着猜想去试</button></div>
-      </form>`), current.completed ? tag("已在现场验过") : current.thought ? tag("待查证", "warn") : "");
+  const draft = s.deductionDraft;
+  const history = deductionHistory(s);
+  const onTable = draft ? `<section class="deduction-table"><h3>${escape(draft.title)}</h3>
+    <ul>${draft.items.map(({ id, name }) => `<li><strong>${escape(name)}</strong>
+      <p class="fine item-description" data-item-description="${escape(id)}">${escape(itemDescription(s, id))}</p></li>`).join("")}</ul>
+    <div class="actions">${linkButton("推演", "deduce", draft.id, "primary")}</div>
+  </section>` : meditationForm(s);
+  return panel("沙盘", onTable + history);
 }
 
 const focusKeys = ["data-action", "data-value", "data-count", "data-bag-id", "data-tab", "data-facility",
-  "data-market-mode", "data-case", "data-item", "data-atlas-province", "data-atlas-point", "data-atlas-edge", "data-atlas-overview"];
+  "data-market-mode", "data-item", "data-atlas-province", "data-atlas-point", "data-atlas-edge", "data-atlas-overview"];
 
 function keyboardFocus() {
   const control = document.activeElement;
@@ -1390,14 +1415,16 @@ function render() {
   const services = inVillage(s) ? villageServices(s) : [];
   const originalHome = atLanding(s);
   const available = {
-    journey: true, village: Boolean(services.length), apprentice: originalHome, deduction: Boolean(s.deductions?.length),
+    journey: true, village: Boolean(services.length), apprentice: originalHome,
+    deduction: Boolean(s.activeClues?.length || s.deductionDraft || s.deductionHistory?.length),
     workshop: originalHome && s.services.includes("workshop"), market: originalHome && s.services.includes("market"),
     yard: originalHome && Boolean(s.economy), alchemy: originalHome && Boolean(s.alchemy),
     atlas: !inEvent || s.world.scrollCount > 0, localMarket: inVillage(s) && !originalHome && Boolean(s.localMarket),
     sect: inVillage(s) && Boolean(s.sect), tournament: inVillage(s) && Boolean(s.tournament), training: Boolean(s.training?.length),
   };
   for (const service of services) available[service] = true;
-  const tab = inEncounter || !available[screen] || (inEvent && screen !== "atlas") ? "journey" : screen;
+  const eventTabs = ["journey", "atlas", "deduction"];
+  const tab = inEncounter || !available[screen] || (inEvent && !eventTabs.includes(screen)) ? "journey" : screen;
   if (observeShopItems(s, tab)) s = view(state);
   const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, yard, alchemy, quests: questBoard,
     deduction: deductionBoard, atlas, localMarket: localMarketScreen, sect: sectScreen, tournament: tournamentScreen, training: trainingScreen };
@@ -1419,7 +1446,7 @@ function render() {
   }
   for (const button of document.querySelectorAll(".navigation button")) {
     const id = button.dataset.tab;
-    button.hidden = inEncounter || id === tab || !available[id] || (inEvent && !["journey", "atlas"].includes(id));
+    button.hidden = inEncounter || id === tab || !available[id] || (inEvent && !eventTabs.includes(id));
   }
   guide.querySelector('[data-tab="training"]').hidden = !available.training || inEncounter || inEvent;
   guideAffiliation.hidden = !s.affiliation;
@@ -1560,7 +1587,8 @@ function feedback(before, after, result, action, presentation, payload) {
     didRecover && !restored?.hp && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
     action === "guard" && after.qi > before.qi && `真气回升 ${after.qi - before.qi} 点`,
     after.qi > before.qi && (rested || action === "choose" || action === "use") && !narrative.includes("真气") && "真气恢复",
-    after.qi < before.qi && ["choose", "visit", "revisit", "art", "fistCharge"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
+    result.fogLoss > 0 && `浓雾耗去 ${result.fogLoss} 点真气`,
+    !result.fogLoss && after.qi < before.qi && ["choose", "visit", "revisit", "art", "fistCharge", "meditate"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
     after.satiety > before.satiety && (ate || action === "use") && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
     action === "restUntilRecovered" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     action === "finishGather" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
@@ -1615,6 +1643,14 @@ function performAction(action, payload) {
     confirmDisposal(result.confirmation, result.message);
     return;
   }
+  const readyToDeduce = result.ok && action === "meditate" && result.meditation === "ready";
+  const concluded = result.ok && action === "deduce";
+  if (action === "meditate") meditationClue = payload.item;
+  if (readyToDeduce || concluded) screen = "deduction";
+  if (concluded) {
+    deductionHistoryOpen = true;
+    openDeductions.add(payload.id);
+  }
   const transferred = result.ok && instantRoutes.includes(action);
   if ((result.ok && roadTravelActions.includes(action)) || ["visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
   if (transferred || (result.ok && roadTravelActions.includes(action))) {
@@ -1626,6 +1662,8 @@ function performAction(action, payload) {
   if (result.ok && action === "equipManual") selectedItem = `worn-${payload.id}`;
   if (result.ok && action === "unequipManual") selectedItem = `held-${payload.id}`;
   const presentation = render();
+  if (readyToDeduce) main.querySelector('[data-action="deduce"]')?.focus({ preventScroll: true });
+  if (concluded) main.querySelector(`[data-deduction-record="${CSS.escape(payload.id)}"] > summary`)?.focus({ preventScroll: true });
   if (action === "beginGather" && result.ok) {
     runGatherProgress(state.gathering);
     return;
@@ -1661,11 +1699,6 @@ function runGatherProgress(job) {
   }, duration);
 }
 
-function readDeduction(form) {
-  const selected = new FormData(form);
-  return { id: form.dataset.deduction, hypothesis: selected.get("hypothesis"), evidence: selected.getAll("evidence") };
-}
-
 function readExperiment(form) {
   const settings = Object.fromEntries([...new FormData(form)].map(([key, value]) => [key.slice("setting-".length), value]));
   return { id: form.dataset.experiment, settings };
@@ -1674,7 +1707,11 @@ function readExperiment(form) {
 document.addEventListener("input", event => {
   const form = event.target.form;
   if (form?.dataset.bookNote) bookDrafts.set(form.dataset.bookNote, event.target.value);
-  if (form?.dataset.deduction) deductionDrafts.set(form.dataset.deduction, readDeduction(form));
+  if (form?.hasAttribute("data-meditation")) {
+    meditationClue = event.target.value;
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = !meditationClue || button.hasAttribute("aria-describedby");
+  }
   if (form?.dataset.experiment) experimentDrafts.set(form.dataset.experiment, readExperiment(form).settings);
 });
 
@@ -1694,13 +1731,10 @@ document.addEventListener("submit", event => {
     saveEncyclopediaNote(form.dataset.bookNote, form.querySelector("textarea").value);
     return;
   }
-  if (!form.matches("[data-deduction], [data-experiment]")) return;
+  if (!form.matches("[data-meditation], [data-experiment]")) return;
   event.preventDefault();
-  if (form.dataset.deduction) {
-    const guess = readDeduction(form);
-    activeDeduction = guess.id;
-    deductionDrafts.set(guess.id, guess);
-    performAction("deduce", guess);
+  if (form.hasAttribute("data-meditation")) {
+    performAction("meditate", { item: new FormData(form).get("clue") });
   } else {
     const trial = readExperiment(form);
     experimentDrafts.set(trial.id, trial.settings);
@@ -1726,6 +1760,14 @@ document.addEventListener("click", event => {
   if (atlasSummary) atlasIndexOpen = !atlasSummary.parentElement.open;
   const roadSummary = event.target.closest(".atlas-road-index > summary");
   if (roadSummary) atlasRoadsOpen = !roadSummary.parentElement.open;
+  const historySummary = event.target.closest("[data-deduction-history] > summary");
+  if (historySummary) deductionHistoryOpen = !historySummary.parentElement.open;
+  const deductionSummary = event.target.closest("[data-deduction-record] > summary");
+  if (deductionSummary) {
+    const record = deductionSummary.parentElement;
+    if (record.open) openDeductions.delete(record.dataset.deductionRecord);
+    else openDeductions.add(record.dataset.deductionRecord);
+  }
   const button = event.target.closest("button");
   if (!button) return;
   if (button.hasAttribute("data-skip-opening")) {
@@ -1819,8 +1861,9 @@ document.addEventListener("click", event => {
     selectedItem = null;
     openBagId = null;
     for (const topic of guide.querySelectorAll("details")) topic.open = false;
-    activeDeduction = null;
-    deductionDrafts.clear();
+    meditationClue = null;
+    deductionHistoryOpen = false;
+    openDeductions.clear();
     experimentDrafts.clear();
     notices.replaceChildren();
     if (encyclopedia.open) encyclopedia.close();
@@ -1890,17 +1933,16 @@ document.addEventListener("click", event => {
     render();
     return;
   }
-  if (button.dataset.case) {
-    activeDeduction = button.dataset.case;
-    render();
-    return;
-  }
   const action = button.dataset.action;
   if (!action) return;
   const value = button.dataset.value;
   if (bagTransferActions.includes(action)) {
     const count = button.dataset.count === "all" ? "all" : Number(button.dataset.count);
     performAction(action, { bagId: button.dataset.bagId, id: value, count });
+    return;
+  }
+  if (action === "meditate") {
+    performAction(action, { item: value });
     return;
   }
   const payload = ["choose", "beginGather"].includes(action) ? { index: Number(value) } :

@@ -9,7 +9,7 @@ const items = [
   key('zhao_sluice_witness', '磨坊的通水回条', '樊娘试过水才签了条。两道闸都通了，把回条交给照原城的谷惟，她就能安排给田里放水。'),
   key('zhao_sluice_verse', '谷惟的借水手法', '谷惟把教你的手势画下来，箭头指向来劲更弱的一边。筑基后可依这势推偏一记重招。'),
   { id: 'zhao_cargo_brace', name: '缠绳护腕', kind: 'gear', price: 0, sell: 25, keepOnFall: true, oneOfAKind: true,
-    desc: '码头押货人用的厚护腕。皮环内缠了船索，空一只手架住来势时尤其稳。' },
+    desc: '码头押货人用的厚护腕。皮环里缠着船索，用空着的那只手格挡也稳。' },
 ];
 
 const gear = [
@@ -84,7 +84,7 @@ scene('zhao_city', 'zhao_public_scales', '码头的公秤房',
 scene('glass_bank', 'zhao_cargo_pole', '晒网外的搁浅货船',
   '红布系在高桩上。徐篙站在卸货架下，手里捏着池秋借的绳钩。货船斜靠在架外，短船桅把河风劈成两股。', [
     fight('从桅根截住割缆的人', '桅根阴影里有人拿刀割缆，打着节的粗绳垂到脚边。', 'zhao_cargo_roper'),
-    fight('贴着晒架逼近箱后弩手', '外沿的空箱后伸出弩尖，边上的晒架能挡住靠脚下的一段。', 'zhao_cargo_archer'),
+    fight('贴着晒架逼近箱后弩手', '外沿的空箱后伸出弩尖。晒架上挂着东西，能遮住走过去的人。', 'zhao_cargo_archer'),
     { label: '用绳钩把剩下的货搬给徐篙', desc: '徐篙守着卸货架。通到搁浅船身的两条木板都得空出来，才抬得动货。',
       guardedBy: ['zhao_cargo_roper', 'zhao_cargo_archer'], days: 0.375, loot: { zhao_cargo_receipt: 1 }, stay: true,
       outcome: '徐篙接了米袋，把绳钩锁回箱里，给你开了收货条。「船板上刻了三笔，这才两批。第三批的麻绳缠着蓝布。想追就往望船排礁找，礁灯下能望见搭板。」' },
@@ -143,7 +143,7 @@ scene('jade_mill', 'zhao_sluice_mill_intake', '石磨后面的引水口',
     2: '樊娘扶住木梯，梯脚搭到槽沿。歪掉的支脚还露着半截，槽里积起的水越过了最低一层砖沿。',
     4: '木梯横放在干地上，修好的支脚稳稳卡着砖槽，水从底下流去浅洲。樊娘提着锤子往下游验水去了。',
   }, creatureText: {
-    zhao_sluice_wash: { present: '泛白石沿下有叠在一起的黑鳞在挪。', absent: '泛白石沿旁只剩水草在摆，大鱼散了。' },
+    zhao_sluice_wash: { present: '泛白的石沿下，有条黑鳞大鱼在慢慢游动。', absent: '泛白的石沿旁只剩水草在摆，已经看不见那条大鱼。' },
     zhao_sluice_shade: { present: '砖槽对岸还响着磨轮擦石的声音。', absent: '砖槽里不再有倒着滚动的声音。' },
   }, creatures: { zhao_sluice_wash: fixed(2), zhao_sluice_shade: fixed(1), zhao_sluice_anchor: fixed(1) } });
 

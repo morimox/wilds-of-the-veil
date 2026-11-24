@@ -36,11 +36,11 @@ test('inn recovery matches the half-day cycle with wounds, pressure, poison, tra
 
   const repeated = structuredClone(state);
   const sessions = view(state).restSessions;
-  assert.equal(sessions, 7);
+  assert.equal(sessions, 9);
   for (let i = 0; i < sessions; i++) play(repeated, 'rest');
 
   const outcome = play(state, 'restUntilRecovered');
-  assert.match(outcome.message, /歇了3\.5日/);
+  assert.match(outcome.message, /歇了4\.5日/);
   assert.match(outcome.message, /匀给你2份干粮/);
   assert.deepEqual(stateWithoutLog(state), stateWithoutLog(repeated));
   assert.equal(view(state).restSessions, 0);

@@ -46,9 +46,11 @@
 叩石院（sand_bell_cloister）,试声石台（sand_cloister_trial）,叩石师姐袁息（sand_tuner）,请袁息指点方才的步法,获胜一次后可办理一次,,,,1,1,,,不回补,,已获胜便可回来办理，领取后关闭选项
 静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,解下铜钉上挂着的陶罐,获胜一次后可办理一次,,静盐井的盐霜（stillwell_salt）×1,,1,1,,,不回补,,已获胜便可回来办理，领取后关闭选项
 倒驿白廊（chalk_archive）,倒挂的驿印（sand_archive_guard）,倒驿锁影（sand_inverted_keeper）,按货牌上的记号打开货柜,获胜一次后可办理一次,,暗金（black_iron）×8、灵晶（core）×6,,1,1,,,不回补,,已获胜便可回来办理，领取后关闭选项
+倒驿白廊（chalk_archive）,倒挂的驿印（sand_archive_guard）,倒驿锁影（sand_inverted_keeper）,把货柜外沿翻垂的旧封签揭下来,获胜一次后可办理一次,,倒驿柜旁的运粮签（east_silo_way_stamp）×1,,1,1,,,不回补,,已获胜便可回来办理，领取后关闭选项
 空音桥（dry_sound_bridge）,铜扣松动的桥栏（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,从外侧石台取走多出来的松木,可直接采，活跃对手可能打断每批采集,25%,松木（wood）×2,桥板旁的旧松木（初始4、上限7、每4日补2）,2,5,4.5,1,随种群密度变化,4.5,回补后仍可直接采，有对手在场时每批可能遭遇
 落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,取出卡在晶石底下的金属片,通过前要清除该行动所列的全部看守,,落琉洼的薄铁片（sand_glass_pass）×1,,2,3,13,1,随种群密度变化,14.95,本种看守回来才须再清场，库存独立回补
 落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,挖断晶下面的大块灵晶,通过前要清除该行动所列的全部看守,,灵晶（core）×4,断棱底下的灵晶（初始5、上限8、每8日补2）,2,3,13,1,随种群密度变化,14.95,本种看守回来才须再清场，库存独立回补
+落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,去断晶背后描出两道白影的边,获胜一次后可办理一次,,晶壁背面的合圆影线（east_glass_close_shadow）×1,,2,3,13,1,随种群密度变化,,已获胜便可回来办理，领取后关闭选项
 横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,负砂豺（sand_vein_jackal）,钻进绳架后淘暗金,通过前要清除该行动所列的全部看守,,暗金（black_iron）×3,支架后的暗金（初始4、上限8、每6日补2）,2,3,8,1,随种群密度变化,10,本种看守回来才须再清场，库存独立回补
 砾盘浅沟（bone_dry_rill）,岸边竹棚（sand_basket_shed）,补箩老人（sand_basket_mender）,请老人讲讲方才那一步,获胜一次后可办理一次,,,,1,1,,,不回补,,已获胜便可回来办理，领取后关闭选项
 琉脊天室（glass_rotunda）,铜轮前（sand_glass_chamber）,照壁刀师邢既横（sand_sundial_master）,拉住铁环，和邢既横一起转动铜轮,获胜一次后可办理一次,,暗金（black_iron）×5、灵晶（core）×8、旧布袋的底纹（qiankun_inner_pattern）×1,,1,1,,,不回补,,已获胜便可回来办理，领取后关闭选项

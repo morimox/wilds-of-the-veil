@@ -177,14 +177,14 @@ test('sheltered people do not build pressure while exposed errands still do', ()
     play(indoor, 'leave');
   }
   assert.equal(indoor.pressure, 0);
-  assert.equal(indoor.qi, 12);
+  assert.equal(indoor.qi, view(indoor).maxQi);
   const outdoor = at('wind_slate');
   for (let i = 0; i < 4; i++) {
     play(outdoor, 'visit', { id: 'sand_wind_work' });
     play(outdoor, 'leave');
   }
   assert.equal(outdoor.pressure, 4);
-  assert.equal(outdoor.qi, 11);
+  assert.equal(outdoor.qi, view(outdoor).maxQi - 1);
 });
 
 test('separate wind-slate stocks are reflected in their own rock crevices', () => {

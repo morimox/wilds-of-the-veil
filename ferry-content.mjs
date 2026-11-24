@@ -5,11 +5,11 @@ export const ferryContent = {
     { id: 'ferry_watch_reply', name: '守灯人签的回条', kind: 'key', price: 0, sell: 0,
       desc: '守灯人在纸角按了一点灯油，托你给闭潮渡的掌船人报个平安。' },
     { id: 'ferry_pole', name: '渡工的撑船杆', kind: 'gear', price: 0, sell: 8,
-      desc: '渡工截短的撑船竹杆，杆头磨圆了。站在窄船上，也能横过来挡住来招。' },
+      desc: '渡工截短的撑船竹杆，杆头磨圆了。站在窄船上，横起竹杆也能挡住一击。' },
   ],
   gear: [
     { id: 'ferry_pole', slot: 'weapon', weaponClass: 'staff', tier: 1, atk: 4, def: 1, perception: 4, hp: 0, qi: 0, retreat: 0.1,
-      durability: 36, repair: 6, entry: '炼气中期使得稳的撑船杆。握得靠后能横架，想离开交手时也好借力退一步。' },
+      durability: 36, repair: 6, entry: '炼气中期使得稳的撑船杆。握住靠后一段，横过杆身就能挡招。想脱身时也好借力后退。' },
   ],
   sites: [
     { id: 'ford_watch_lamp', region: 'ford', name: '渡口换班灯', reveal: { item: 'secret_pass' }, once: [0, 2],

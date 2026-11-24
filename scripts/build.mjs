@@ -4,13 +4,13 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const file = async path => (await readFile(new URL(path, root), "utf8")).replace(/\r\n/g, "\n");
-const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, world, training, data, economy, alchemy, ferry, hazards, caravan, employers, border, hunts, dyke, ridge, kit, innerStyles, banditContentSource, banditTaleSource, encyclopediaSource, recoverySource, bandits, tactics, engine, app] = await Promise.all([
+const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, world, training, data, economy, alchemy, ferry, hazards, caravan, employers, border, hunts, dyke, ridge, kit, innerStyles, banditContentSource, banditTaleSource, encyclopediaSource, recoverySource, bandits, tactics, deductions, westQuests, eastQuests, combatBalance, engine, app] = await Promise.all([
   file("game.html"), file("style.css"), file("intro.css"), file("river-content.mjs"), file("zhao-content.mjs"), file("sand-content.mjs"),
   file("late-content.mjs"), file("puzzle-content.mjs"), file("mechanisms.mjs"), file("tournament.mjs"), file("world.mjs"), file("training.mjs"), file("data.mjs"), file("economy.mjs"),
   file("alchemy.mjs"), file("ferry-content.mjs"), file("hazards.mjs"), file("caravan-content.mjs"),
   file("employers-content.mjs"), file("border-content.mjs"), file("hunt-materials.mjs"), file("dyke-armory.mjs"), file("ridge-armory.mjs"),
   file("explorer-kit.mjs"), file("inner-style-content.mjs"), file("bandit-content.mjs"), file("bandit-tale-content.mjs"), file("encyclopedia-content.mjs"), file("progression-recovery.mjs"),
-  file("bandits.mjs"), file("combat-tactics.mjs"), file("engine.mjs"), file("app.mjs"),
+  file("bandits.mjs"), file("combat-tactics.mjs"), file("sandbox-deductions.mjs"), file("sandbox-quests-west.mjs"), file("sandbox-quests-east.mjs"), file("combat-balance.mjs"), file("engine.mjs"), file("app.mjs"),
 ]);
 const originalCss = `${style}\n${intro}`;
 const destination = process.argv[2] ? resolve(process.argv[2]) : fileURLToPath(new URL("dist/雾渡山河.html", root));
@@ -110,6 +110,22 @@ return encyclopediaContent;
 const { addProgressionRecovery } = (() => {
 ${moduleBody(recoverySource)}
 return { addProgressionRecovery };
+})();
+const { sandboxQuestsWest, sandboxQuestsWestExtras } = (() => {
+${moduleBody(westQuests)}
+return { sandboxQuestsWest, sandboxQuestsWestExtras };
+})();
+const { sandboxQuestsEast, sandboxQuestsEastExtras } = (() => {
+${moduleBody(eastQuests)}
+return { sandboxQuestsEast, sandboxQuestsEastExtras };
+})();
+const { sandboxDeductions, sandboxQuestExtras, addSandboxQuests } = (() => {
+${moduleBody(deductions)}
+return { sandboxDeductions, sandboxQuestExtras, addSandboxQuests };
+})();
+const { tuneCombatData } = (() => {
+${moduleBody(combatBalance)}
+return { tuneCombatData };
 })();
 const moduleData = (() => {
 ${moduleBody(data)}

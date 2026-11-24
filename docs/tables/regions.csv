@@ -17,7 +17,7 @@ willow_post,折水驿,雾梁州（wuliang）,66,91,闭潮渡（ford）、灰鹭�
 gauge_tower,校潮亭,雾梁州（wuliang）,25,94,蒲湾圩田（reed_meadows）、灰鹭矶（pale_shoal）,,否,否,1,炼气中期,1.5,,亭外立着一把量水位的长尺，尺脚伸进深水。人们上下台阶，把边上的平石踩得发亮。,
 screen_slope,晒盘坡,雾梁州（wuliang）,32,46,沉钟岭（ridge）、青崖松场（pine_ridge）、篁泽药谷（herb_basin）,,否,否,2,炼气后期,1.5,,山风穿过倒伏的木架。坡下晒着矿盘和草根，最上方的筛架还挂在一面断壁上。,
 lantern_court,系灯院,雾梁州（wuliang）,86,34,青崖松场（pine_ridge）、跃鱼旧渠（fish_ladder）,宗门,是,否,1,炼气中期,1.5,,院中有井有灶。日落后有人给运货的山路挂灯，通行帖就搁在院门的长凳上。,
-undertow_grotto,回潮洞,雾梁州（wuliang）,53,78,白苇滩（marsh）,,否,否,6,金丹初期,0.5,得知物品 回潮洞引线（undertow_entry）,薄薄的岩壁两侧各流过一股水。洞里隆起一道石脊，潮水淹不到。贴着洞顶的路比脚下的泥地稳。,是
+undertow_grotto,回潮洞,雾梁州（wuliang）,53,78,白苇滩（marsh）,,否,否,6,金丹初期,0.5,得知物品 回潮洞引线（undertow_entry）,岩壁两边各有一股水流。洞内靠墙隆起一道石脊，潮水淹不到，踩着也比泥地稳当。,是
 counter_bell,反声钟窟,雾梁州（wuliang）,52,49,沉钟岭（ridge）,,否,否,5,筑基后期,0.75,得知物品 反声孔通路（counter_bell_entry）,倒钟下是一条窄通道。墙边干燥的地方架着一排信，两侧的小孔还能听见地面传来的响声。,是
 zhao_city,照原城,照原州（zhaoyuan）,13,48,闭潮渡（ford）、青埂（green_dyke）、杨木水栈（flood_market）、守尺观（measuring_hall）,城池,是,是,0,炼气初期,1.25,,城砖半边泛白，是上一回洪峰留下的痕。粥铺挨着省潮司，铁货摊后传出磨刀声。,
 green_dyke,青埂,照原州（zhaoyuan）,25,29,蛙背塘（frog_pond）、没顶刻碑（old_marker）、连环浅洲（ring_isles）,,否,否,0,炼气初期,0.75,,田埂两侧都长着芦苇，只有一侧的苇叶被涨水淹过。,

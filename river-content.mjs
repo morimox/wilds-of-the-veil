@@ -6,7 +6,7 @@ const regions = [
   { id: 'gauge_tower', name: '校潮亭', tier: 1, travel: 1.5, desc: '亭外立着一把量水位的长尺，尺脚伸进深水。人们上下台阶，把边上的平石踩得发亮。' },
   { id: 'screen_slope', name: '晒盘坡', tier: 2, travel: 1.5, desc: '山风穿过倒伏的木架。坡下晒着矿盘和草根，最上方的筛架还挂在一面断壁上。' },
   { id: 'lantern_court', name: '系灯院', tier: 1, travel: 1.5, desc: '院中有井有灶。日落后有人给运货的山路挂灯，通行帖就搁在院门的长凳上。' },
-  { id: 'undertow_grotto', name: '回潮洞', tier: 6, travel: 0.5, secret: true, reveal: { item: 'undertow_entry' }, desc: '薄薄的岩壁两侧各流过一股水。洞里隆起一道石脊，潮水淹不到。贴着洞顶的路比脚下的泥地稳。' },
+  { id: 'undertow_grotto', name: '回潮洞', tier: 6, travel: 0.5, secret: true, reveal: { item: 'undertow_entry' }, desc: '岩壁两边各有一股水流。洞内靠墙隆起一道石脊，潮水淹不到，踩着也比泥地稳当。' },
   { id: 'counter_bell', name: '反声钟窟', tier: 5, travel: 0.75, secret: true, reveal: { item: 'counter_bell_entry' }, desc: '倒钟下是一条窄通道。墙边干燥的地方架着一排信，两侧的小孔还能听见地面传来的响声。' },
 ];
 
@@ -256,7 +256,7 @@ export const extendEvents = [
 
 const enemies = [
   { id: 'river_spar_captain', name: '护堤人封乔', tags: ['human'], tier: 6, hp: 128, atk: 25, def: 10, sparring: true,
-    intents: [{ name: '用软杆点向脚踝', kind: 'attack', mult: 0.95 }, { name: '横起短杆挡住来招', kind: 'heavy', mult: 1.52 }, { name: '杆尾贴着木台扫来', kind: 'guard', mult: 1.35 }, { name: '换手用杆压向袖口', kind: 'attack', mult: 1.1 }],
+    intents: [{ name: '用软杆点向脚踝', kind: 'attack', mult: 0.95 }, { name: '横扫短杆，打向肩头', kind: 'heavy', mult: 1.52 }, { name: '横杆护住胸口', kind: 'guard', mult: 1.35 }, { name: '换手用杆压向袖口', kind: 'attack', mult: 1.1 }],
     insight: 8, loot: {}, desc: '他拿的是裹了软布的杆子，台边有人照看。看他双手握近杆头，就要下重手了。' },
   { id: 'river_gateback', name: '横脊闸兽', tags: ['beast', 'scaled'], tier: 2, hp: 60, atk: 13, def: 5,
     intents: [{ name: '顺水甩鳍', kind: 'attack', mult: 1.0 }, { name: '压低脊鳍', kind: 'guard', mult: 1.4 }, { name: '沿闸梁冲来横扫', kind: 'heavy', mult: 1.55 }, { name: '贴闸游回', kind: 'attack', mult: 1.09 }],

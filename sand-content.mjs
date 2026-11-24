@@ -353,7 +353,7 @@ const events = [
 const enemies = [
   { id: 'sand_dune_hare', name: '沙丘野兔', tags: ['beast', 'furred'], tier: 0, hp: 20, atk: 6, def: 1, insight: 2,
     intents: [{ name: '跳咬脚跟', kind: 'attack', mult: 1 }, { name: '缩进草坎', kind: 'guard', mult: 1.4 }, { name: '压耳蹬地', kind: 'heavy', mult: 1.5 }],
-    loot: { beast_meat: 1, hide: 1, qi_core: 1 }, desc: '从软沙露面，蓄势时耳尖几乎贴回头上。' },
+    loot: { beast_meat: 1, hide: 1, qi_core: 1 }, desc: '常从软沙里探头。两只耳朵贴住后脑时，就要往前扑。' },
   { id: 'sand_ridge_pheasant', name: '沙脊雉', tags: ['beast'], tier: 0, hp: 22, atk: 7, def: 1, insight: 2,
     intents: [{ name: '掠地啄来', kind: 'attack', mult: 1 }, { name: '贴着草茎收翅', kind: 'guard', mult: 1.35 }, { name: '振翅扑向面门', kind: 'heavy', mult: 1.48 }],
     loot: { beast_meat: 2, qi_core: 1 }, desc: '褐羽与干草颜色很近。它先擦着草尾掠过，抬头时才扇开翅膀。' },
@@ -365,7 +365,7 @@ const enemies = [
     loot: { beast_meat: 4, hide: 1, qi_core: 3 }, desc: '宽背有一层硬鬃。见它前蹄在泥里踏出两道斜痕，下一刻就会顶上来。' },
   { id: 'sand_silo_marten', name: '仓花貂', tags: ['beast', 'furred'], tier: 0, hp: 26, atk: 7, def: 2, insight: 2,
     intents: [{ name: '借仓板侧扑', kind: 'attack', mult: 1 }, { name: '趴上木栓', kind: 'guard', mult: 1.35 }, { name: '缩腰翻板', kind: 'heavy', mult: 1.55 }],
-    loot: { beast_meat: 2, hide: 1, qi_core: 1 }, desc: '跟着废仓过日子的小兽，擅长在旧板间跳转。' },
+    loot: { beast_meat: 2, hide: 1, qi_core: 1 }, desc: '这小兽常住在废仓里，能在松动的木板间来回蹿跳。' },
   { id: 'sand_rattle_viper', name: '黄结桥蝰', tags: ['beast', 'scaled'], tier: 1, hp: 32, atk: 9, def: 2, insight: 3,
     intents: [{ name: '绕过铜扣探头咬', kind: 'attack', mult: 1 }, { name: '盘身抬起蛇头', kind: 'heavy', mult: 1.6 }, { name: '把头缩回铜扣后', kind: 'guard', mult: 1.35 }],
     loot: { beast_meat: 2, hide: 1, qi_core: 2 }, desc: '桥栏的铜结为它遮住半个头，须提防从高处伸下的毒牙。' },

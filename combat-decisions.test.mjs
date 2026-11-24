@@ -77,9 +77,7 @@ test('a known attack blocks retreat and a guard opening offers a seeded escape',
   state.hp = 3;
   const safeOpening = structuredClone(state);
   const forecast = view(state).retreatRisk;
-  assert.equal(forecast.blocked, true);
-  assert.equal(forecast.chance, 0);
-  assert.equal(forecast.wouldFall, true);
+  assert.deepEqual(forecast, { blocked: true });
   const failed = play(state, 'retreat');
   assert.equal(failed.retreated, false);
   assert.equal(failed.damageTaken, 3);
@@ -89,10 +87,7 @@ test('a known attack blocks retreat and a guard opening offers a seeded escape',
   safeOpening.hp = 18;
   play(safeOpening, 'guard');
   assert.equal(revealCurrentMove(safeOpening).intent.kind, 'guard');
-  assert.equal(view(safeOpening).retreatRisk.damage, 0);
-  assert.equal(view(safeOpening).retreatRisk.wouldFall, false);
-  assert.equal(view(safeOpening).retreatRisk.blocked, false);
-  assert.ok(view(safeOpening).retreatRisk.chance > 0);
+  assert.deepEqual(view(safeOpening).retreatRisk, { blocked: false });
   const unlucky = structuredClone(safeOpening);
   unlucky.escapeSeed = 1500;
   assert.equal(play(unlucky, 'retreat').retreated, false);

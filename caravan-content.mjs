@@ -9,7 +9,7 @@ export const caravanContent = {
     { id: 'caravan_lading', name: '劫粮人的账簿', kind: 'key', price: 0, sell: 0,
       desc: '油纸夹着几页账簿。上面记的车号和牌棚的粮车一样，末页还有两处存粮的地方。' },
     { id: 'caravan_bell', name: '驱雾车铃', kind: 'gear', price: 0, sell: 0,
-      desc: '粮队挂在领车上的旧铃。小声一响，雾里沉滞的气息会松快些。' },
+      desc: '粮队挂在领车上的旧铃。铃声不大，响起来却能让人在雾里喘得顺些。' },
   ],
   gear: [
     { id: 'caravan_bell', slot: 'charm', tier: 1, atk: 0, def: 0, hp: 0, qi: 1, retreat: 0.1,
@@ -51,7 +51,7 @@ export const caravanContent = {
         present: '栅内响着项环碰石头的声音，还有白鼻的守车兽蹲在车轮间。',
         absent: '两只咬过车轴的守车兽都不在了，栅里也没了项环声。',
       } } },
-    { id: 'caravan_granary', region: 'screen_slope', name: '崖后的粮仓', afterChoices: ['caravan_wagon_rise:2'], once: [2],
+    { id: 'caravan_granary', region: 'screen_slope', name: '崖后的粮仓', fogShelter: true, afterChoices: ['caravan_wagon_rise:2'], once: [2],
       creatures: { caravan_hook_guard: resident(2), caravan_broker: resident(1) },
       creatureText: { caravan_hook_guard: {
         present: '廊柱后有人用钩刀点着门槛，刀尖几乎扫到两边墙。',
@@ -125,11 +125,11 @@ export const caravanContent = {
     { id: 'caravan_hook_guard', name: '粮仓门口的钩刀手', tier: 2, hp: 45, atk: 11, def: 4, tags: ['human'],
       intents: [{ name: '短钩扫脚', kind: 'attack', mult: 1 }, { name: '背靠木柱架刀', kind: 'guard', mult: 1.5 },
         { name: '举钩劈肩', kind: 'heavy', mult: 1.6 }, { name: '翻腕补刀', kind: 'attack', mult: 1.1 }],
-      insight: 5, loot: {}, desc: '借廊柱藏住半身，架过一回刀后，会朝照面的人举钩重砍。' },
+      insight: 5, loot: {}, desc: '他借廊柱藏住半身，架开对手的刀后，便举钩朝面前的人砍下。' },
     { id: 'caravan_broker', name: '守粮仓的灰衣人', tier: 3, hp: 71, atk: 14, def: 5, tags: ['human'],
       intents: [{ name: '反手削向手腕', kind: 'drain', mult: 0.52 }, { name: '抡刀落肩', kind: 'heavy', mult: 1.68 },
         { name: '收刀调息', kind: 'heal', mult: 0.48 }, { name: '拖刀从下往上砍', kind: 'attack', mult: 1.13 }],
-      insight: 8, loot: {}, desc: '袖口磨得发白，持刀的手却很稳。点腕后会下重手，退半步收刀时还有余力调息。' },
+      insight: 8, loot: {}, desc: '袖口磨得发白，持刀的手却很稳。他会先用刀尖点向对方的手腕，再发力劈砍。退半步收刀时，他还能调息。' },
   ],
   quests: [],
 };

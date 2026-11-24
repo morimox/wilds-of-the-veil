@@ -14,6 +14,11 @@ function play(state, action, payload) {
   return result;
 }
 
+function deduceFrom(state, id, item) {
+  assert.equal(play(state, 'meditate', { item }).meditation, 'ready');
+  assert.equal(play(state, 'deduce', { id }).deduction, 'recorded');
+}
+
 function choose(state, index) {
   const choice = view(state).visibleChoices.find((entry) => entry.index === index);
   if (choice?.gather?.length) play(state, 'beginGather', { index });
@@ -317,7 +322,7 @@ test('harvesting only gives materials and reveals damage strictly after an actio
   assert.equal(state.inventory.reed, result.gathered.reed);
   assert.deepEqual(siteIds(state), marshLandmarks);
   assert.equal(state.inventory.reed_lines, undefined);
-  assert.equal(view(state).deductions.some(({ id }) => id === 'find_eddy'), false);
+  assert.equal(view(state).activeClues.includes('oar_mark'), false);
 
   walk(state, 'village');
   const handin = play(state, 'handin', { id: 'reed_salve' });
@@ -326,7 +331,7 @@ test('harvesting only gives materials and reveals damage strictly after an actio
   assert.equal(state.inventory.reed_lines, undefined);
   assert.equal(state.inventory.oar_mark, undefined);
   assert.equal(state.inventory.ridge_rubbing, undefined);
-  assert.ok(!view(state).deductions.some(({ id }) => id === 'find_eddy'));
+  assert.equal(view(state).deductionDraft, null);
   feed(state, 45);
   walk(state, 'marsh');
   assert.deepEqual(siteIds(state), marshLandmarks);
@@ -843,9 +848,10 @@ test('the old sluice takes both the stone map and a tested current to become a t
   chooseAt(state, 'reed_ferryman', 2);
   fedWalk(state, 'village');
   play(state, 'handin', { id: 'apprentice_waterline' });
+  play(state, 'rest');
   fedWalk(state, 'marsh');
   const guessed = structuredClone(state);
-  play(state, 'deduce', { id: 'find_eddy', evidence: ['oar_mark', 'reed_lines'], hypothesis: '水会贴着石脚往回走。' });
+  deduceFrom(state, 'find_eddy', 'reed_lines');
   seek(state, 'drowned_mast');
   const trial = play(state, 'experiment', { id: 'find_eddy', settings: { release: 'stone_back', water: 'rising' } });
   assert.equal(trial.deduction, 'verified');
@@ -1010,7 +1016,7 @@ test('reading a heavy attack gives free bracing and a counter while guarding a r
   const traded = play(attacking, 'attack');
   const beforeQi = state.qi;
   const braced = play(state, 'guard');
-  assert.equal(state.qi, beforeQi);
+  assert.equal(state.qi, beforeQi - (braced.fogLoss ?? 0));
   assert.equal(braced.damageDealt, rules.guardCounter);
   assert.equal(braced.damageTaken, Math.max(0, traded.damageTaken - rules.guardBonus - rules.heavyGuardBonus));
   assert.equal(view(state).mode, 'combat');
@@ -1179,20 +1185,17 @@ test('restoratives heal, toxin applies at the threshold, and a retreat talisman 
   assert.equal(view(state).mode, 'field');
 });
 
-test('the board keeps the player’s own guess and only the physical trial can verify it', () => {
+test('meditation brings complete evidence to the board; only a field trial gives the unique map', () => {
   const state = createGame();
   const id = 'find_eddy';
-  const guess = { id, evidence: [], hypothesis: '浮沫多的地方也许更好走。' };
   const settings = { release: 'stone_back', water: 'rising' };
-  const beforeRevealed = state.day;
-  assert.equal(view(state).deductions.some((entry) => entry.id === id), false);
-  assert.equal(act(state, 'deduce', guess).ok, false);
-  assert.equal(state.day, beforeRevealed);
+  assert.deepEqual(view(state).activeClues, []);
+  assert.equal(act(state, 'deduce', { id }).ok, false);
+  assert.equal(act(state, 'meditate', { item: 'ration' }).ok, false);
   play(state, 'buy', { id: 'ration', count: 4 });
   walk(state, 'marsh');
   seek(state, 'reed_banks');
   choose(state, 0);
-  assert.equal(view(state).deductions.some((entry) => entry.id === id), false);
   choose(state, 1);
   chooseAt(state, 'mud_track', 1);
   feed(state, 50);
@@ -1201,31 +1204,19 @@ test('the board keeps the player’s own guess and only the physical trial can v
   chooseAt(state, 'reed_ferryman', 0);
   chooseAt(state, 'reed_ferryman', 2);
   walk(state, 'village');
+  play(state, 'rest');
+  const beforePartial = state.qi;
+  assert.equal(play(state, 'meditate', { item: 'oar_mark' }).message, '没什么头绪。');
+  assert.equal(state.qi, beforePartial - rules.deductionQiCost);
+  assert.equal(view(state).deductionDraft, null);
+  assert.ok(view(state).activeClues.includes('oar_mark'));
   play(state, 'handin', { id: 'apprentice_waterline' });
   assert.equal(state.completedQuests.includes('reed_salve'), false);
-  const opened = view(state);
-  const visible = opened.deductions.find((entry) => entry.id === id);
-  assert.equal(visible.completed, false);
-  assert.equal(visible.thought, null);
-  for (const field of ['answer', 'hypotheses', 'evidence', 'reward', 'expected', 'success', 'miss']) {
-    assert.equal(Object.hasOwn(visible, field), false);
-  }
-  const evidence = ['reed_lines', 'oar_mark'];
-  assert.ok(evidence.every((itemId) => opened.evidence.some((item) => item.id === itemId && item.count > 0)));
-  const beforeDay = state.day;
-  const beforeInsight = state.insight;
-  for (const malformed of [
-    { ...guess, hypothesis: '  ' }, { ...guess, hypothesis: '猜'.repeat(181) },
-    { ...guess, evidence: ['echo_note'] }, { ...guess, evidence: ['ration'] },
-  ]) {
-    assert.equal(act(state, 'deduce', malformed).ok, false);
-  }
-  assert.equal(act(state, 'experiment', { id, settings }).ok, false);
-  assert.equal(play(state, 'deduce', guess).deduction, 'pinned');
-  assert.equal(state.day, beforeDay);
-  assert.equal(state.insight, beforeInsight);
-  assert.equal(state.inventory.eddy_note, undefined);
-  assert.equal(view(state).discoveredRecipes.includes('r_bank_talisman'), false);
+  const tired = structuredClone(state);
+  tired.qi = rules.deductionQiCost - 1;
+  assert.equal(act(tired, 'meditate', { item: 'reed_lines' }).ok, false);
+  assert.equal(tired.qi, rules.deductionQiCost - 1);
+  play(state, 'rest');
 
   feed(state, 60);
   walk(state, 'marsh');
@@ -1241,19 +1232,32 @@ test('the board keeps the player’s own guess and only the physical trial can v
   play(state, 'leave');
   assert.equal(view(state).revisitableEvents.some(({ id }) => id === 'drowned_mast'), false);
 
-  const revised = { id, evidence: ['ridge_rubbing'], hypothesis: '水退时不妨看看石头后头。' };
-  assert.equal(play(state, 'deduce', revised).deduction, 'pinned');
+  const beforeDay = state.day;
+  const beforeQi = state.qi;
+  const evidence = ['oar_mark', 'reed_lines'];
+  assert.equal(play(state, 'meditate', { item: 'reed_lines' }).meditation, 'ready');
+  const draft = view(state).deductionDraft;
+  assert.equal(draft.id, id);
+  assert.deepEqual(draft.items.map((item) => item.id), evidence);
+  assert.deepEqual(view(state).deductionHistory, []);
+  assert.equal(Object.hasOwn(draft, 'conclusion'), false);
   seek(state, 'drowned_mast');
   assert.equal(view(state).experiment, null);
-  assert.equal(act(state, 'experiment', { id, settings }).ok, false);
-  play(state, 'leave');
-
-  revised.evidence.push('oar_mark');
-  assert.equal(play(state, 'deduce', revised).deduction, 'pinned');
-  assert.deepEqual(view(state).deductions.find(entry => entry.id === id).thought, {
-    hypothesis: revised.hypothesis, evidence: revised.evidence,
-  });
-  play(state, 'revisit', { id: 'drowned_mast' });
+  const fieldDay = state.day;
+  assert.equal(play(state, 'deduce', { id }).deduction, 'recorded');
+  assert.equal(state.day, fieldDay);
+  assert.ok(fieldDay > beforeDay);
+  assert.equal(state.qi, beforeQi - rules.deductionQiCost);
+  assert.equal(view(state).deductionDraft, null);
+  const [entry] = view(state).deductionHistory;
+  assert.match(entry.conclusion, /白苇滩.*高岸.*刚上涨/);
+  assert.match(entry.reason, /靠岸图.*水线图/);
+  assert.equal(entry.verified, false);
+  assert.deepEqual(view(state).usedClues, evidence);
+  assert.ok(evidence.every((key) => !view(state).evidence.some((clue) => clue.id === key)));
+  assert.equal(act(state, 'meditate', { item: 'oar_mark' }).ok, false);
+  assert.equal(state.inventory.eddy_note, undefined);
+  assert.equal(view(state).discoveredRecipes.includes('r_bank_talisman'), false);
   assert.ok(view(state).experiment);
   for (const field of ['answer', 'expected', 'need', 'reward', 'success', 'miss']) {
     assert.equal(Object.hasOwn(view(state).experiment, field), false);
@@ -1262,9 +1266,9 @@ test('the board keeps the player’s own guess and only the physical trial can v
   delete noProof.inventory.reed_lines;
   assert.equal(view(noProof).experiment, null);
   assert.equal(act(noProof, 'experiment', { id, settings }).ok, false);
-  const noThought = structuredClone(state);
-  delete noThought.deductionThoughts;
-  assert.equal(view(noThought).experiment, null);
+  const withoutRecord = structuredClone(state);
+  withoutRecord.deductionHistory = [];
+  assert.equal(view(withoutRecord).experiment, null);
 
   const beforeTrial = state.day;
   const beforeTrialInsight = state.insight;
@@ -1276,13 +1280,16 @@ test('the board keeps the player’s own guess and only the physical trial can v
   assert.ok(state.day > beforeTrial);
   assert.ok(miss.message);
   assert.equal(view(state).currentEvent.id, 'drowned_mast');
-  assert.equal(view(state).deductions.find(entry => entry.id === id).completed, false);
+  assert.equal(view(state).deductionHistory[0].verified, false);
   assert.equal(state.insight, beforeTrialInsight);
   assert.equal(state.inventory.eddy_note, undefined);
   assert.equal(play(state, 'experiment', { id, settings }).deduction, 'verified');
   assert.ok(state.insight > beforeTrialInsight);
   assert.ok(evidence.every((itemId) => state.inventory[itemId] >= 1));
   assert.equal(state.inventory.eddy_note, 1);
+  assert.ok(!view(state).evidence.some(({ id }) => id === 'eddy_note'));
+  assert.ok(view(state).discoveredRecipes.includes('r_bank_talisman'));
+  assert.equal(act(state, 'discard', { id: 'eddy_note' }).confirmation.id, 'eddy_note');
   assert.equal(view(state).experiment, null);
   const afterTrial = structuredClone(state);
   assert.equal(act(state, 'experiment', { id, settings }).ok, false);
@@ -1294,20 +1301,58 @@ test('the board keeps the player’s own guess and only the physical trial can v
   play(state, 'attack');
   assert.equal(state.inventory.eddy_note, 1);
   const reloaded = JSON.parse(JSON.stringify(state));
-  const complete = view(reloaded).deductions.find((entry) => entry.id === id);
-  assert.equal(complete.completed, true);
-  assert.equal(complete.thought.hypothesis, revised.hypothesis);
+  const [complete] = view(reloaded).deductionHistory;
+  assert.deepEqual(complete, { ...entry, verified: true });
   const completedDay = reloaded.day;
-  assert.equal(act(reloaded, 'deduce', guess).ok, false);
+  assert.equal(act(reloaded, 'deduce', { id }).ok, false);
   assert.equal(act(reloaded, 'experiment', { id, settings }).ok, false);
   assert.equal(reloaded.day, completedDay);
   assert.equal(reloaded.inventory.eddy_note, 1);
+});
+
+test('a full pack leaves the only backwater map at its verification site for later pickup', () => {
+  const state = createGame();
+  state.region = 'marsh';
+  supplyFixture(state, { oar_mark: 1, reed_lines: 1, ration: rules.backpackCapacity * rules.backpackStackSize });
+  deduceFrom(state, 'find_eddy', 'oar_mark');
+  seek(state, 'drowned_mast');
+  const trial = { id: 'find_eddy', settings: { release: 'stone_back', water: 'rising' } };
+  assert.equal(play(state, 'experiment', trial).spilled.eddy_note, 1);
+  assert.equal(state.inventory.eddy_note, undefined);
+  assert.equal(view(state).groundLoot.eddy_note, 1);
+  assert.equal(view(state).deductionHistory[0].verified, true);
+  assert.equal(act(state, 'experiment', trial).ok, false);
+  play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
+  play(state, 'leave');
+  seek(state, 'drowned_mast');
+  play(state, 'take', { id: 'eddy_note' });
+  assert.equal(state.inventory.eddy_note, 1);
+  assert.equal(act(state, 'take', { id: 'eddy_note' }).ok, false);
+});
+
+test('the gold assay archives its clues without using up the crafting samples', () => {
+  const state = createGame();
+  state.region = 'zhao_hermit';
+  state.discovered.push('zhao_hermit');
+  const needs = { cold_kiln_record: 1, phase_chart: 1, heart_silt: 2, stillwell_salt: 1 };
+  supplyFixture(state, needs);
+  deduceFrom(state, 'gold_assay', 'phase_chart');
+  assert.deepEqual(view(state).deductionHistory.map(({ id }) => id), ['gold_assay']);
+  assert.deepEqual(view(state).usedClues, Object.keys(needs));
+  assert.ok(Object.keys(needs).every(id => !view(state).activeClues.includes(id)));
+  seek(state, 'zhao_assay_tubs');
+  assert.equal(state.inventory.gold_formula, undefined);
+  assert.equal(play(state, 'experiment', { id: 'gold_assay', settings: { fall: 'even', salt: 'warm' } }).deduction, 'verified');
+  assert.equal(state.inventory.gold_formula, 1);
+  assert.equal(state.inventory.heart_silt, needs.heart_silt);
+  assert.equal(state.inventory.stillwell_salt, needs.stillwell_salt);
 });
 
 test('separate mountain observations lead to learning a technique at the site in 炼气', () => {
   const state = createGame();
   const id = 'read_echo';
   play(state, 'buy', { id: 'ration', count: 4 });
+  play(state, 'buy', { id: 'qi_powder' });
   walk(state, 'marsh');
   chooseAt(state, 'reed_banks', 0);
   chooseAt(state, 'mud_track', 1);
@@ -1319,9 +1364,7 @@ test('separate mountain observations lead to learning a technique at the site in
   chooseAt(state, 'empty_oven', 1);
   assert.equal(state.inventory.echo_note, 1);
   assert.equal(state.knownArts.includes('earth_echo'), false);
-  play(state, 'deduce', {
-    id, evidence: ['echo_note'], hypothesis: '那幅画上的人手心朝下，也许在等岩壁回应。',
-  });
+  assert.equal(play(state, 'meditate', { item: 'echo_note' }).meditation, 'incomplete');
   assert.equal(state.inventory.echo_method, undefined);
   assert.equal(state.knownArts.includes('earth_echo'), false);
   feed(state, 54);
@@ -1333,6 +1376,8 @@ test('separate mountain observations lead to learning a technique at the site in
   feed(state, 48);
   seek(state, 'stone_niche');
   assert.match(view(state).currentEvent.text, /龛口|矿壳|细缝|石/);
+  if (state.qi < rules.deductionQiCost) play(state, 'use', { id: 'qi_powder' });
+  deduceFrom(state, id, 'stone_rubbing');
   assert.equal(view(state).experiment.id, id);
   assert.equal(play(state, 'experiment', { id, settings: { hand: 'palm', beat: 'first' } }).deduction, 'miss');
   assert.equal(state.knownArts.includes('earth_echo'), false);
@@ -1428,9 +1473,9 @@ test('the old ford route and its optional hidden map remain playable with earned
       play(state, 'use', { id: 'salve' });
     } else if (panel.intent?.kind === 'heavy' && panel.qi >= 5) {
       play(state, 'art', { id: 'cross_weir' });
-    } else if (panel.intent?.kind === 'heavy' && panel.currentEnemy.hp > 17 && panel.qi >= techniqueCost) {
+    } else if (panel.intent?.kind === 'heavy' && panel.currentEnemy.health > 0.25 && panel.qi >= techniqueCost) {
       play(state, 'art', { id: 'stone_brace' });
-    } else if (state.inventory.tide_talisman && panel.currentEnemy.hp > 17) {
+    } else if (state.inventory.tide_talisman && panel.qi >= 6 && panel.currentEnemy.health > 0.25) {
       play(state, 'use', { id: 'tide_talisman' });
     } else if (panel.qi >= 5) {
       play(state, 'art', { id: 'tide_part' });
@@ -1486,9 +1531,9 @@ test('the old ford route and its optional hidden map remain playable with earned
   assert.equal(state.inventory.backwash_mark, 1);
   assert.equal(state.inventory.secret_pass, undefined);
   assert.equal(act(state, 'travel', { id: 'hidden' }).ok, false);
-  assert.equal(play(state, 'deduce', {
-    id: 'trace_backwash', evidence: ['bell_clapper', 'backwash_mark'], hypothesis: '反写也许和火光照出来的倒影有关。',
-  }).deduction, 'pinned');
+  workFed('ford_relay', 1);
+  deduceFrom(state, 'trace_backwash', 'bell_clapper');
+  if (state.event) play(state, 'leave');
   assert.equal(state.inventory.secret_pass, undefined);
   assert.equal(view(state).discovered.includes('hidden'), false);
   assert.equal(state.region, 'ford');
@@ -1639,9 +1684,9 @@ test('ranged weapon arts spend compatible ammo, empty bows stay equipped, and in
   assert.match(play(state, 'attack').message, /空手/);
   assert.equal(state.durability.reed_bow, bowWear);
   const qi = state.qi;
-  play(state, 'art', { id: 'mist_press' });
+  const spell = play(state, 'art', { id: 'mist_press' });
   assert.equal(state.durability.reed_bow, bowWear);
-  assert.equal(qi - state.qi, data.arts.find(({ id }) => id === 'mist_press').cost);
+  assert.equal(qi - state.qi, data.arts.find(({ id }) => id === 'mist_press').cost + (spell.fogLoss ?? 0));
   if (view(state).mode === 'combat') {
     const locked = structuredClone(state);
     assert.match(act(state, 'combatEquip', { id: 'cudgel' }).message, /交手中不能换装备/);
@@ -1757,7 +1802,7 @@ test('a prepared ford expedition opens each later region through field contacts,
   visitAndChoose('old_observatory', 2);
   visitAndChoose('cloud_scree', 2);
   const deduction = 'align_axis';
-  play(state, 'deduce', { id: deduction, evidence: ['vein_pattern', 'meridian_etching'], hypothesis: '换榫脚以后，缩短的影子会与正中相合。' });
+  deduceFrom(state, deduction, 'vein_pattern');
   assert.equal(state.inventory.axis_tuning, undefined);
   seek(state, 'old_observatory');
   assert.equal(play(state, 'experiment', { id: deduction, settings: { notch: 'outer', shadow: 'center' } }).deduction, 'miss');

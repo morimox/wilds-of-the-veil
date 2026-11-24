@@ -152,7 +152,7 @@ test('an art intercepts only when it actually uses the bow or crossbow', () => {
   for (const state of [prepared, emptyHandArt, crossbow]) hunt(state, 'mud_track', 2);
 
   const art = play(emptyHandArt, 'art', { id: 'tide_part' });
-  assert.ok(art.damageTaken > 0);
+  assert.doesNotMatch(art.message, /这一箭拦住/);
   assert.equal(emptyHandArt.inventory.reed_arrow, prepared.inventory.reed_arrow);
   assert.equal(emptyHandArt.durability.reed_bow, prepared.durability.reed_bow);
   assert.equal(view(emptyHandArt).openingShotReady, false);

@@ -1,7 +1,7 @@
 ﻿标识,数值,说明
 restDays,0.5,村内休整单次用时（天）
 restHp,8,村内休整单次恢复气血（点）
-restQi,5,村内休整单次恢复真气（点）
+restQi,9,村内休整单次恢复真气（点）
 restWounds,1,村内休整单次消除伤势（处）
 restToxin,15,村内休整单次清除丹毒（点）
 reliefRations,3,休整时村民补助可补足至此份数，只供自用
@@ -9,7 +9,11 @@ exploreDays,0.25,开始一次探索的用时（天）
 explorePressure,1,每次探索增加的压力（点）
 firstRegionInsight,1,首次探索一个地区获得的修为（点）
 pressureThreshold,3,探索压力高于此值时开始额外消耗真气（点）
-pressureQi,1,压力超限的每次探索所消耗的真气（点）
+pressureQi,1,开始受雾压时每次结算的基础真气损失（点）
+fogPulseDays,0.25,露天雾压结算间隔（日）
+fogDrainStep,3,超出承受雾压后耗气的线性递增间隔
+fogDrainCurve,100,雾压超额二次项的除数
+deductionQiCost,3,冥想一次所消耗的真气（点）
 battleDays,0.125,战斗操作每回合用时（天）
 regulatedBoutCooldown,0.5,禁药比试结束后到下次开场的最短间歇（天）
 regulatedBoutHpFraction,0.5,禁药比试开场所需的最低气血比例
@@ -29,6 +33,9 @@ largeRealmAccuracy,0.035,每个超出的小境界额外提高的敌方命中
 combatChargeFloor,4,蓄势下一次亲手出招的最小原始增伤
 combatChargeFactor,0.35,蓄势增伤按人物攻击计算的比例
 enemyChargeFactor,0.25,敌方蓄势增伤按基础攻击计算的比例
+resistanceTier,6,启用物抗和魔抗的最低境界编号
+resistanceCap,0.6,单类别抗性减伤上限
+magicPowerFactor,1.32,境界基础攻击换算为独立施法力量的倍率
 chargeBreakDamage,4,蓄势被气血伤害打散的单回合伤害下限
 harvestEncounterDays,0.125,采集中遭遇伏击时开打前用时（天）
 ebbCycleDays,2,闭潮渡退水循环（游戏日）
@@ -50,7 +57,7 @@ unpackBasketDays,0.25,拆开药篓所用的游戏天数
 guardBonus,3,主动格挡增加的防御（点）
 heavyGuardBonus,4,主动格挡遇到重招时再增加的防御（点）
 guardCounter,3,格挡重招时的反击伤害（点）
-guardQiRecovery,2,对方守势时调息恢复的真气（点）
+guardQiRecovery,4,对方守势时调息恢复的真气（点）
 enemyGuardBonus,2,敌方防御意图至少增加的防御（点）
 minAttackDamage,1,有攻击伤害的行动经防御结算后的最小伤害（点）
 durabilityLoss,1,每次触发装备磨损扣除的耐久（点）

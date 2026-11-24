@@ -6,6 +6,7 @@ import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
 const enemies = Object.fromEntries(data.enemies.map((enemy) => [enemy.id, enemy]));
 const gear = Object.fromEntries(data.gear.map((entry) => [entry.id, entry]));
+const pills = Object.fromEntries(data.pills.map((pill) => [pill.id, pill]));
 
 function play(state, action, payload = {}) {
   const result = act(state, action, payload);
@@ -53,13 +54,18 @@ test('a perceptive weapon changes a real first draw without exposing or rerollin
   const before = view(novice);
   assert.equal(before.combatRead, null);
   assert.equal(before.intent, null);
-  assert.equal(before.intentDamage, null);
+  assert.equal(Object.hasOwn(before, 'intentDamage'), false);
   assert.equal(before.retreatRisk, null);
   assert.equal(before.openingShotReady, false);
   assert.equal(before.combat.plan, undefined);
   assert.equal(before.currentEnemy.intents, undefined);
-  assert.equal(view(swordsman).combatRead, 'player');
-  assert.equal(view(swordsman).intent.kind, 'attack');
+  const reading = view(swordsman);
+  assert.equal(reading.combatRead, 'player');
+  assert.deepEqual(Object.keys(reading.intent).sort(), ['damageType', 'kind', 'name']);
+  assert.equal(reading.intent.kind, 'attack');
+  assert.equal(reading.intent.damageType, 'physical');
+  assert.equal(Object.hasOwn(reading, 'intentDamage'), false);
+  assert.deepEqual(reading.retreatRisk, { blocked: true });
   const seed = novice.combatSeed;
   const world = novice.encounterSeed;
   assert.equal(act(novice, 'selectAmmo', { id: 'black_bolt' }).ok, false);
@@ -100,8 +106,10 @@ test('a read gives a human the actual chosen action, and persistent attacks stil
 test('opponents with the same observations answer the same action even when the real loadout and health differ', () => {
   const seed = seedBetween(0.05, 0.09);
   const weak = staged('sand_basket_mender', { realm: 7, seed });
-  const strong = staged('sand_basket_mender', { realm: 7, seed, items: ['foil_sword', 'tide_coat'] });
+  const strong = staged('sand_basket_mender', { realm: 7, seed, items: ['foil_sword', 'fault_coat'] });
   weak.hp = 1;
+  assert.notEqual(view(weak).physicalResist, view(strong).physicalResist);
+  assert.notEqual(view(weak).magicResist, view(strong).magicResist);
   const a = play(weak, 'attack');
   const b = play(strong, 'attack');
   assert.match(a.message, /看破了你的起手/);
@@ -113,14 +121,43 @@ test('opponents with the same observations answer the same action even when the 
   const first = strong.combat.observedHits[0].damage;
   strong.inventory.cudgel = 1;
   strong.durability.cudgel = gear.cudgel.durability;
-  strong.knownArts.push('mist_press');
+  strong.knownArts.push('gold_ember_point');
   const locked = structuredClone(strong);
   assert.match(act(strong, 'combatEquip', { id: 'cudgel' }).message, /交手中不能换装备/);
   assert.deepEqual(strong, locked);
   assert.equal(strong.combat.observedHits.length, 1);
-  const next = play(strong, 'art', { id: 'mist_press' });
+  const next = play(strong, 'art', { id: 'gold_ember_point' });
   assert.equal(strong.combat.observedHits[1].damage, next.damageDealt - next.reflectedDamage);
   assert.notEqual(first, strong.combat.observedHits[1].damage);
+});
+
+test('the opposing health band conceals different actual health and resistance even after reading the attack', () => {
+  const id = 'sand_riven_scorpion';
+  const enemy = enemies[id];
+  const original = { hp: enemy.hp, physicalResist: enemy.physicalResist, magicResist: enemy.magicResist };
+  const actor = staged(id, { realm: 7, items: ['foil_sword'], hp: Math.round(original.hp * 0.55) });
+  actor.combat.plan = { round: 0, reader: 'player', intent: enemy.intents.find(({ kind }) => kind === 'attack') };
+  const later = structuredClone(actor);
+  const before = view(actor);
+  const sturdy = play(actor, 'attack');
+  try {
+    enemy.hp += 40;
+    enemy.physicalResist = 0;
+    enemy.magicResist = 0.46;
+    later.combat.hp = Math.round(enemy.hp * 0.55);
+    const read = view(later);
+    assert.equal(read.combatRead, 'player');
+    assert.equal(read.currentEnemy.health, 0.55);
+    assert.deepEqual(read.currentEnemy, before.currentEnemy);
+    assert.deepEqual(read.intent, before.intent);
+    assert.deepEqual(read.retreatRisk, before.retreatRisk);
+    for (const key of ['hp', 'maxHp', 'def', 'qi', 'physicalResist', 'magicResist', 'tier']) {
+      assert.equal(Object.hasOwn(read.currentEnemy, key), false);
+    }
+    assert.ok(play(later, 'attack').damageDealt > sturdy.damageDealt);
+  } finally {
+    Object.assign(enemy, original);
+  }
 });
 
 test('a safe charge takes two turns and wears the selected weapon only on release', () => {
@@ -184,7 +221,7 @@ test('an injured human spends a carried medicine in one turn and cannot use it a
   assert.equal(first.enemyMove.kind, 'remedy');
   assert.match(first.message, /服下济潮丹/);
   assert.equal(state.day - initial, rules.battleDays);
-  assert.equal(state.combat.hp, 41 + 24);
+  assert.equal(state.combat.hp, 41 + pills.tide_pill.hp);
   assert.equal(state.combat.medicineLeft, 0);
   for (let turn = 0; state.combat && turn < 4; turn++) {
     assert.notEqual(play(state, 'guard').enemyMove?.kind, 'remedy');
@@ -218,7 +255,7 @@ test('a completed charged strike can stop a dose, while a miss or a normal strik
   missed.enemyEvadeSeed = seedBetween(0.02, 0.03);
   const whiff = play(missed, 'attack');
   assert.equal(whiff.missed, true);
-  assert.equal(missed.combat.hp, 68 + 24);
+  assert.equal(missed.combat.hp, 68 + pills.tide_pill.hp);
   assert.equal(missed.combat.medicineLeft, 0);
 
   const ordinary = staged(id, { realm: 5, hp: 68 });
@@ -226,7 +263,7 @@ test('a completed charged strike can stop a dose, while a miss or a normal strik
   ordinary.enemyEvadeSeed = seedBetween(0.80, 0.83);
   const quick = play(ordinary, 'attack');
   assert.ok(quick.damageDealt > 0);
-  assert.equal(ordinary.combat.hp, 68 - quick.damageDealt + 24);
+  assert.equal(ordinary.combat.hp, 68 - quick.damageDealt + pills.tide_pill.hp);
   assert.equal(ordinary.combat.medicineLeft, 0);
 });
 
@@ -245,6 +282,8 @@ test('a bandit who reads medicine releases a prepared strike, but a dodge lets t
   state.wounds = 1;
   state.toxin = 5;
   state.inventory.jade_pill = 1;
+  const healedHp = state.hp + pills.jade_pill.hp;
+  const restoredQi = state.qi + pills.jade_pill.qi;
   const miss = structuredClone(state);
   const unread = structuredClone(state);
   const meal = structuredClone(state);
@@ -269,18 +308,18 @@ test('a bandit who reads medicine releases a prepared strike, but a dodge lets t
 
   const evaded = play(miss, 'use', { id: 'jade_pill' });
   assert.equal(evaded.dodged, true);
-  assert.equal(miss.hp, 70);
-  assert.equal(miss.qi, 25);
+  assert.equal(miss.hp, healedHp);
+  assert.equal(miss.qi, restoredQi);
   assert.equal(miss.inventory.jade_pill, undefined);
   assert.equal(miss.combat.enemyCharged, false);
   const noDose = act(miss, 'use', { id: 'jade_pill' });
   assert.equal(noDose.ok, false);
-  assert.equal(miss.hp, 70);
+  assert.equal(miss.hp, healedHp);
   assert.equal(miss.combat.round, 2);
 
   const closed = play(unread, 'use', { id: 'jade_pill' });
   assert.equal(closed.enemyMove.kind, 'guard');
-  assert.equal(unread.hp, 70);
+  assert.equal(unread.hp, healedHp);
   assert.equal(unread.inventory.jade_pill, undefined);
   assert.equal(unread.combat.enemyCharged, true);
 

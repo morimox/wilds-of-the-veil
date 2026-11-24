@@ -279,6 +279,7 @@ function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) 
     state.world.lastSettlement = id;
     state.expeditionLoot = {};
     state.pressure = 0;
+    state.fogExposure = 0;
   }
 }
 

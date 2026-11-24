@@ -17,7 +17,7 @@ export const tournamentData = {
 
 const enemies = [
   { id: 'terrace_stride', name: '持短尺的陆黍', tier: 1, hp: 34, atk: 10, def: 3, tags: ['human'], sparring: true,
-    insight: 3, loot: {}, desc: '擅长用小步挤人离尺线，蓄势时前脚会踩得格外深。',
+    insight: 3, loot: {}, desc: '他常迈着小步把对手逼近红线。蓄力时，前脚会踏得格外重。',
     intents: [{ name: '用短尺打向脚边', kind: 'attack', mult: 1 }, { name: '踩住红线挥尺', kind: 'heavy', mult: 1.5 }, { name: '退一步横尺防守', kind: 'guard', mult: 1.28 }] },
   { id: 'terrace_crossbeam', name: '擅长侧击的田素功', tier: 3, hp: 57, atk: 14, def: 5, tags: ['human'], sparring: true,
     insight: 5, loot: {}, desc: '他常把尺横在身前挡招。对手一动，他就转身换到另一侧。',

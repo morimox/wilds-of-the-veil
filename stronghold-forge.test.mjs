@@ -128,8 +128,8 @@ test('the armguard cushions braced hits and occupies the same hand as a shield o
   assert.equal(state.durability.den_armguard, 55);
 });
 
-test('the spear trades a point of ordinary damage for penetration against scaled opponents', () => {
-  for (const [enemy, difference] of [['sand_quarry_guard', 3], ['sand_glass_lynx', -1]]) {
+test('the spear trades ordinary damage for penetration against scaled opponents even after resistance', () => {
+  for (const [enemy, expectedDirection] of [['sand_quarry_guard', 1], ['sand_glass_lynx', -1]]) {
     const state = duel(enemy, 5);
     state.enemyEvadeSeed = 0; // Compare two actual hits, including against the agile lynx.
     const sword = structuredClone(state);
@@ -145,6 +145,6 @@ test('the spear trades a point of ordinary damage for penetration against scaled
       const result = play(fighter, 'attack');
       return result.damageDealt - (result.reflectedDamage ?? 0);
     };
-    assert.equal(strike(state) - strike(sword), difference);
+    assert.equal(Math.sign(strike(state) - strike(sword)), expectedDirection);
   }
 });

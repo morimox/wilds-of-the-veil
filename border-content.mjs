@@ -65,7 +65,7 @@ const enemies = [
     [['抽紧腿边铁链', 'heavy', 1.71], ['按住铁链拦路', 'guard', 1.48], ['裂地扫脚', 'attack', 1.12], ['绕柱甩链', 'heavy', 1.59], ['踢链碰踝', 'attack']]),
   localEnemy('border_silo_roof', '守小窗的人', 4, 91, 19, 7, 9, '他身上的灰布会把真气往窗口引。每次回身扶墙时，脚步总要顿一下。',
     [['贴窗引气', 'drain', 1.05], ['腾身斜砍', 'attack', 1.14], ['一手摸墙站稳', 'guard', 1.43], ['借窗沿翻身下劈', 'heavy', 1.6], ['回身再抽真气', 'drain', 0.86]]),
-  localEnemy('border_silo_leader', '劫货头领阮隼', 5, 122, 22, 9, 13, '他从吞进过路货那天起，就把两扇门轮流盯住。收刀时要提防他调息，最后一记推刀躲不开就要接稳。',
+  localEnemy('border_silo_leader', '劫货头领阮隼', 5, 122, 22, 9, 13, '他扣下商队的货后，便轮着守粮仓的两扇门。见他收刀退步，多半是在调息。他双手推刀时，得避开正面。',
     [['刀尖点过麻绳', 'attack'], ['右手推刀', 'heavy', 1.62], ['横刀近身', 'guard', 1.54], ['按刃回气', 'heal', 0.67], ['左手扣住刀背猛推', 'heavy', 1.72], ['折刀牵气', 'drain', 0.87]]),
 ];
 
@@ -164,7 +164,7 @@ const events = [
         outcome: '门槽有人撑着链子；高窗里也有人守。窦芸比了比两处的位置，说可以从两边的矮墙后靠近。她愿等两边都腾开，再带人跟进去。' },
       { label: '沿右边的矮墙绕到拉铁链的人背后', afterChoice: 0, days: 0.125, enemy: 'border_silo_chain',
         outcome: '你一脚踩到墙影外，门槽里的链子猛地一紧。' },
-      { label: '贴着左墙，爬上递粮的小窗的石坎', afterChoice: 0, days: 0.125, enemy: 'border_silo_roof',
+      { label: '沿左墙爬上石坎，靠近递粮的小窗', afterChoice: 0, days: 0.125, enemy: 'border_silo_roof',
         outcome: '守窗人踢开东倒西歪的几个粮筐，翻到低处找你。' },
       { label: '退到矮墙后喝水歇息', afterChoice: 0, afterFight: 'border_silo_roof',
         guardedBy: ['border_silo_chain', 'border_silo_roof'], days: 0.375, hp: 22, qi: 16, stay: true,

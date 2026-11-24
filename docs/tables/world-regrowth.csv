@@ -217,5 +217,6 @@
 断磴盐窟（bandit_salt_cave_den）,种群,盐道灰翎弓手（bandit_salt_cave_bow）,bandit_salt_cave_bow,,9,9,36,1,固定间隔,1,是,
 断磴盐窟（bandit_salt_cave_den）,种群,盐窟魁首封霁（bandit_salt_cave_chief）,bandit_salt_cave_chief,,1,1,0,0,不回补,,是,
 断柱下的横梁（encyclopedia_weir_beam）,种群,灰背水蟒（encyclopedia_weir_snake）,encyclopedia_weir_snake,,1,1,0,0,不回补,,,
+岸门下的干工房（zhao_mill_dry_workroom）,种群,磨房石鼠（zhao_mill_stone_rat）,zhao_mill_stone_rat,,1,1,8,1,固定间隔,,是,
 封乔的护堤木台（marsh_pole_lesson）,种群,护堤人封乔（river_spar_captain）,river_spar_captain,,1,1,5,1,固定间隔,,,
 闸下无灯梯（ford_below_steps）,种群,拖梯水影（ford_lower_spirit）,ford_lower_spirit,,2,4,11,1,固定间隔,,,

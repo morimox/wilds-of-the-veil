@@ -9,7 +9,7 @@ const manuals = [
       { tier: 0, cost: 8, days: 0.5, need: { reed: 2, hide: 1 },
         base: { atk: 1, hp: 2 }, focus: { atk: 3 }, effect: '下盘稳了些，能多挨一点伤。空手和指虎的拳头更重。' },
       { tier: 2, cost: 22, days: 1.25, need: { hide: 4, qi_core: 3 },
-        base: { atk: 1, hp: 4 }, focus: { atk: 4, guard: 1 }, effect: '能多挨一点伤。以空手或指虎出拳时，收拳还能卸去来招的一点力。' },
+        base: { atk: 1, hp: 4 }, focus: { atk: 4, guard: 1 }, effect: '练过后筋骨更耐打。空手或戴指虎出拳时，收拳也能顺势护住自己。' },
     ],
   },
   {
@@ -141,7 +141,7 @@ const gear = [
     entry: '渡工用的缠皮指虎。戴着照样能使拳法，既比赤手结实，也能省着些修兵器的钱。' },
   { id: lateKnuckles, slot: 'weapon', tier: 4, weaponClass: 'fist', atk: 6, perception: 2, durability: 50, repair: 15,
     trait: { kind: 'pierce', intent: 'guard', bonus: 2 },
-    entry: '筑基中期可用。专为打拳的人做。对手缩紧时，翘起的甲缘能挑开他护身的一线缝。' },
+    entry: '筑基中期可用。专为打拳的人做。对手收臂防守时，指虎翘起的甲边还能从缝隙打进去。' },
 ];
 
 const recipes = [
@@ -242,10 +242,10 @@ function extendScenes(sites, events, allGear, enemies) {
 
   const cutter = allGear.find((item) => item.id === 'trail_cutter');
   (cutter.traits ??= []).push({ kind: 'accuracy', bonus: 0.09 });
-  cutter.entry += '护手宽，手腕顺着对手的撤步微转，刀尖也比较容易跟上。';
+  cutter.entry += '对手侧步躲闪时，刀尖也容易跟上。';
   const crossbow = allGear.find((item) => item.id === 'black_crossbow');
   (crossbow.traits ??= []).push({ kind: 'accuracy', bonus: 0.12 });
-  crossbow.entry += '弩臂压得稳，对手偏开半步时也容易把准头拨回来。';
+  crossbow.entry += '弩身握得稳，对手侧身时也不易射偏。';
 
   const eel = enemies.find((enemy) => enemy.id === 'zhao_rush_eel');
   eel.dodge = 0.12;
@@ -253,7 +253,7 @@ function extendScenes(sites, events, allGear, enemies) {
   const elder = enemies.find((enemy) => enemy.id === 'sand_basket_mender');
   elder.accuracy = 0.08;
   elder.dodge = 0.08;
-  elder.desc += '他让开棍梢只用半步，自己的竹杖倒常能点到动着的手腕。';
+  elder.desc += '他只侧身半步就让开了棍梢，手里的竹杖已点向对方握棍的手腕。';
   const tuner = enemies.find((enemy) => enemy.id === 'sand_tuner');
   tuner.accuracy = 0.06;
   tuner.desc += '钝剑总跟着脚步走，光退半步有时仍会挨上一记。';

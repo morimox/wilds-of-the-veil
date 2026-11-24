@@ -72,6 +72,10 @@ h3 { font-size: 15px; }
 }
 .vital b { color: var(--text); font-weight: 600; }
 .vital.low b { color: inherit; }
+.vital-bar > summary { display: grid; grid-template-columns: auto 1fr; column-gap: 5px; row-gap: 2px; min-width: 78px; }
+.vital-bar .meter-track { grid-column: 1 / -1; display: block; height: 3px; }
+.vital-bar.health .meter-track i { background: #ca8e77; }
+.vital-bar.qi .meter-track i { background: #87bccc; }
 .button.quick-eat { min-height: 25px; padding: 2px 6px; background: transparent; font-size: 12px; }
 .pressure { color: var(--muted); }
 .pressure summary { cursor: pointer; }
@@ -413,12 +417,9 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .alchemy-inquiry { margin: 10px 0; padding: 10px 0; border-block: 1px solid var(--line); }
 .formula-kit > summary { color: var(--jade); cursor: pointer; }
 .workshop-art { height: 64px; background-image: url("./assets/alchemy-bench.webp"); }
-.deduction { display: grid; gap: 9px; }
-.deduction-clues, .trial-thought { color: var(--muted); }
-.deduction-clues > summary, .trial-thought > summary { color: var(--jade); cursor: pointer; }
-.deduction input { margin-top: 3px; accent-color: var(--jade); }
-.deduction-writing, .experiment-control { display: grid; gap: 5px; min-width: 0; }
-.deduction textarea, .experiment select {
+.meditation, .experiment-control { display: grid; gap: 5px; min-width: 0; }
+.meditation-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.meditation select, .experiment select {
   width: 100%;
   color: var(--text);
   background: var(--bg);
@@ -426,14 +427,17 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
   border-radius: 5px;
   padding: 7px;
 }
-.deduction textarea { resize: vertical; min-height: 70px; }
-.evidence-option { display: flex; align-items: flex-start; gap: 7px; padding: 5px; cursor: pointer; }
-.evidence-option:has(input:checked) { background: #283c2d; }
-.evidence-option small { display: block; color: var(--muted); }
-.deduction-cases { margin-bottom: 9px; }
+.meditation select { flex: 1 0 min(100%, 11em); width: auto; }
+.deduction-table ul { margin: 6px 0 0; padding-left: 18px; }
+.deduction-table li + li { margin-top: 6px; }
+.deduction-history { margin-top: 12px; padding-top: 9px; border-top: 1px solid var(--line); }
+.deduction-history summary { color: var(--jade); cursor: pointer; }
+.deduction-record { margin-top: 8px; padding-left: 9px; border-left: 1px solid var(--line); }
+.deduction-record p { margin-top: 5px; }
+.deduction-reason { overflow-wrap: anywhere; white-space: pre-wrap; }
+.workshop-hint { margin-top: 10px; }
 .experiment { display: grid; gap: 8px; padding: 10px 0 2px; border-top: 1px solid var(--line); }
 .experiment-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr)); gap: 8px; }
-.player-thought { overflow-wrap: anywhere; white-space: pre-wrap; }
 dialog { width: min(414px, calc(100% - 26px)); color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
 dialog::backdrop { background: #08100bd1; }
 .dialog-head { display: flex; align-items: center; justify-content: space-between; }

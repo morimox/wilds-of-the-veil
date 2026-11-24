@@ -294,4 +294,7 @@
 生兽肉（beast_meat）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,3,,,3,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
 厚甲片（hard_scale）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,1,,,1,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
 坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,1,,,1,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
+炼气期妖丹（qi_core）,缺轮磨台（jade_mill）,岸门下的干工房（zhao_mill_dry_workroom）,磨房石鼠（zhao_mill_stone_rat）,炼气后期,1,,,1,1,1,8,1,固定间隔,得知物品 干工房的门插（zhao_mill_door_pin）,绕到工作台背后，找咬开松子的东西
+生兽肉（beast_meat）,缺轮磨台（jade_mill）,岸门下的干工房（zhao_mill_dry_workroom）,磨房石鼠（zhao_mill_stone_rat）,炼气后期,2,,,2,1,1,8,1,固定间隔,得知物品 干工房的门插（zhao_mill_door_pin）,绕到工作台背后，找咬开松子的东西
+兽革（hide）,缺轮磨台（jade_mill）,岸门下的干工房（zhao_mill_dry_workroom）,磨房石鼠（zhao_mill_stone_rat）,炼气后期,0,1,60%,0.6,1,1,8,1,固定间隔,得知物品 干工房的门插（zhao_mill_door_pin）,绕到工作台背后，找咬开松子的东西
 筑基期妖丹（foundation_core）,闭潮渡（ford）,闸下无灯梯（ford_below_steps）,拖梯水影（ford_lower_spirit）,筑基中期,2,,,2,2,4,11,1,固定间隔,,沿短绳下到第二根栏杆

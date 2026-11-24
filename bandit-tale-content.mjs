@@ -78,7 +78,7 @@ const innerStyles = [{ id: manual, name: '过堤换肩法', grade: '凡品', tie
   ranks: [
     { base: { def: 1 }, focus: { guard: 1 }, effect: '站得更稳，挨打会轻些。持棍杖出手时，也能顺势卸开来力。' },
     { tier: 2, cost: 18, days: 1, need: { wood: 3, hide: 2 }, base: { def: 1, retreat: 0.04 },
-      focus: { guard: 2 }, effect: '脚下更稳，能趁对手收手挪开。用棍杖拨开来招也更容易。' },
+      focus: { guard: 2 }, effect: '脚下更稳，能趁对手收招闪到一旁。用棍杖时，也更容易拨开迎面的兵刃。' },
   ],
 }];
 

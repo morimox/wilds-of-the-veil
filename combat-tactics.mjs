@@ -31,13 +31,16 @@ function worthwhileHeal(enemy, heal, hp, threat, threshold) {
   return restored > Math.max(2, threat);
 }
 
-export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, read, observedHits = [], medicine }) {
+export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, read, observedHits = [], medicine, qi = Infinity }) {
   const start = round % enemy.intents.length;
   const order = [...enemy.intents.slice(start), ...enemy.intents.slice(0, start)];
   const recentlyRecovered = previousKind === 'heal' || previousKind === 'remedy';
-  const available = order.filter(({ kind }) => !(kind === 'guard' && previousKind === 'guard') && !(kind === 'heal' && recentlyRecovered));
-  const planned = available[0];
+  const available = order.filter(({ kind, qiCost = 0 }) => qiCost <= qi && kind !== 'recoverQi' &&
+    !(kind === 'guard' && previousKind === 'guard') && !(kind === 'heal' && recentlyRecovered));
   const attack = available.find(({ kind }) => kind === 'attack') ?? available.find(({ kind }) => isAttack(kind));
+  const regain = order.find(({ kind }) => kind === 'recoverQi');
+  if (!attack && regain && qi < enemy.qi) return regain;
+  const planned = available[0] ?? { kind: 'guard', name: '勉强架住双手', mult: 1 };
   const heavy = previousKind === 'heavy' ? null : available.find(({ kind }) => kind === 'heavy');
   const strategy = Object.hasOwn(strategies, enemy.strategy) ? strategies[enemy.strategy] : null;
   if (read?.kind === 'medicine' && charged) return heavy ?? attack;

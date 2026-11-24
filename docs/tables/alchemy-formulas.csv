@@ -1,5 +1,6 @@
 ﻿标识,名称,产物,制法标识,来源,丹方买价（灵钱）,丹师愿出示前提,所需物品
 formula_qi,回气散丹方,回气散（qi_powder）,r_qi,丹师安蒲,10,,灵草（reed）×2、松木（wood）×1
+formula_qi,回气散丹方,归气丸（clear_qi_pill）,r_clear_qi,丹师安蒲,10,,灵草（reed）×5、灵晶（core）×2、炼气期妖丹（qi_core）×4
 formula_grain,暖谷丸丹方,暖谷丸（grain_pill）,r_grain,丹师安蒲,12,,干粮（ration）×3、松木（wood）×1
 formula_detox,清露丸丹方,清露丸（detox_pill）,r_detox,给药僮一份灵草,,,灵草（reed）×2、松木（wood）×1
 formula_focus,定息丹方,定息丹（focus_pill）,r_focus,丹师安蒲,19,,灵草（reed）×2、松木（wood）×1、炼气期妖丹（qi_core）×1

@@ -19,7 +19,7 @@ export const progressionReissues = [
     outcome: '护炉人从灯脚下取出母印，顺着熄火的刻线压出一枚补印。「你早过了试验，这枚拿稳些。」' },
   { item: 'ferry_manifest', site: 'ford_packet_boat', beforeQuest: 'last_lantern',
     label: '请夏狄给货单再抄一份', need: { reed: 1 }, days: 0.25,
-    outcome: '夏狄从船案的留底上抄了一份，照旧写上你的名字，再沿签名盖印。' },
+    outcome: '夏狄照着船案上的底稿另抄一份，写上你的名字，在一旁盖了印。' },
   { item: 'zhao_sand_chit', site: 'zhao_float_goods', beforeItem: 'sand_writ',
     label: '请余节照留底再刻一张货签', need: { wood: 1 }, days: 0.25,
     outcome: '余节翻到秋天的货账，照原号刻好木签，在背面补上柯伯认得的署名。' },

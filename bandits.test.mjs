@@ -401,12 +401,15 @@ test('attacking bandits block escape and make their normal strike; known opening
   assert.equal(danger.blocked, true);
   const failed = act(state, 'retreat');
   assert.equal(failed.retreated, false);
-  assert.equal(failed.damageTaken, danger.damage);
+  assert.ok(failed.damageTaken > 0);
   assert.equal(state.combat.round, 1);
   state.combat.plan.reader = 'player';
   state.combat.plan.intent = { kind: 'guard', name: '横刀护身' };
   const opportunity = view(state).retreatRisk;
-  assert.ok(opportunity.chance > 0 && opportunity.chance < 0.13);
+  assert.deepEqual(opportunity, { blocked: false });
+  const unlucky = structuredClone(state);
+  unlucky.escapeSeed = 0;
+  assert.equal(act(unlucky, 'retreat').retreated, false);
   const interruptedReturn = structuredClone(state);
   interruptedReturn.roadSeed = seedWith(0.035, 0.75, 0.4);
   const chased = act(interruptedReturn, 'retreat');

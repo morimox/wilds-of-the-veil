@@ -9,6 +9,7 @@ import { alchemyData } from '../alchemy.mjs';
 import { localGoods, roadGraph, settlementOf, transportRules } from '../world.mjs';
 import { trainingData } from '../training.mjs';
 import { hazardData } from '../hazards.mjs';
+import { sandboxDeductions } from '../sandbox-deductions.mjs';
 
 const output = fileURLToPath(new URL('../docs/tables/', import.meta.url));
 const names = new Map();
@@ -46,7 +47,14 @@ const ruleDescriptions = {
   explorePressure: '每次探索增加的压力（点）',
   firstRegionInsight: '首次探索一个地区获得的修为（点）',
   pressureThreshold: '探索压力高于此值时开始额外消耗真气（点）',
-  pressureQi: '压力超限的每次探索所消耗的真气（点）',
+  pressureQi: '开始受雾压时每次结算的基础真气损失（点）',
+  fogPulseDays: '露天雾压结算间隔（日）',
+  fogDrainStep: '超出承受雾压后耗气的线性递增间隔',
+  fogDrainCurve: '雾压超额二次项的除数',
+  deductionQiCost: '冥想一次所消耗的真气（点）',
+  resistanceTier: '启用物抗和魔抗的最低境界编号',
+  resistanceCap: '单类别抗性减伤上限',
+  magicPowerFactor: '境界基础攻击换算为独立施法力量的倍率',
   battleDays: '战斗操作每回合用时（天）',
   regulatedBoutCooldown: '禁药比试结束后到下次开场的最短间歇（天）',
   regulatedBoutHpFraction: '禁药比试开场所需的最低气血比例',
@@ -121,6 +129,7 @@ const realm = (id) => data.realms.find((entry) => entry.id === id)?.name ?? id;
 const knownKinds = {
   gear: '装备', material: '材料', food: '口粮', object: '任务实物', pill: '丹药', talisman: '符箓', key: '线索', ammo: '弹药', manual: '内功书', container: '容器', reference: '奇物',
   attack: '普通攻势', heavy: '重招', guard: '防御', dodge: '闪避', drain: '吸取真气', heal: '恢复', focus: '蓄势', remedy: '服药',
+  recoverQi: '回气', physical: '物攻', magic: '法攻',
 };
 const slotNames = data.equipmentSlots;
 const reveal = ({ item, quest, need } = {}) => {
@@ -251,7 +260,10 @@ const traitText = (trait) => [
   `加成 ${['dodge', 'accuracy'].includes(trait.kind) ? percent(trait.bonus) : trait.bonus}`,
 ].filter(Boolean).join(' · ');
 const intents = data.enemies.flatMap(({ id, name, intents }) =>
-  intents.map((intent, index) => ({ enemyId: id, enemyName: name, order: index + 1, ...intent })));
+  intents.map((intent, index) => ({
+    enemyId: id, enemyName: name, order: index + 1,
+    damageType: ['attack', 'heavy', 'drain'].includes(intent.kind) ? 'physical' : undefined, ...intent,
+  })));
 const deductions = data.deductions ?? [];
 const experiments = data.events.filter((event) => event.experiment)
   .map(({ id, experiment }) => ({ site: id, ...experiment }));
@@ -494,6 +506,7 @@ const innerStyleRanks = data.innerStyles.flatMap(({ id, name, grade, tier, speci
 const tables = [
   table('realms', '境界与突破', data.realms, [
     'id', 'name', ['hp', '基础气血'], ['qi', '基础真气'], ['atk', '基础攻击'], ['def', '基础防御'], ['perception', '基础洞察'],
+    ['physicalResist', '基础物抗', percent], ['magicResist', '基础魔抗', percent],
     ['insight', '突破所需修为'], ['practice', '本境有效历练日'], ['cost', '突破费用（灵钱）'], 'need',
     ['requireQuest', '所需世界进程', ref], ['requireDefeated', '须亲自击败的对手', (ids) => ids.map(ref).join('、')],
     ['pressure', '越过本境的出伤倍率'], 'days',
@@ -560,6 +573,7 @@ const tables = [
     ['sideAtk', '副武器出手攻击修正'], ['sidePierce', '副武器出手穿甲'], ['sideGuard', '副武器出手护持'],
     ['ammo', '适用弹药', (ids) => ids.map(ref).join('、')],
     'tier', tier, 'atk', 'def', ['hp', '气血上限修正'], ['qi', '真气上限修正'], ['perception', '洞察加成'],
+    ['magicAtk', '法攻加成'], ['physicalResist', '物抗加成', percent], ['magicResist', '魔抗加成', percent],
     'retreat', 'durability', 'repair', ['repairMaterials', '兵器从零耐久修满的材料', resources],
     ['entry', '玩家主动查读的词条'], ['effects', '特殊作用与具体数值', (entries) => entries.map(traitText).join('、')],
     ['field', '野外作用', (field) => [
@@ -611,14 +625,15 @@ const tables = [
     ['beforeQuest', '到此委托完成为止', ref], ['beforeItem', '到实物推进至此为止', ref], 'outcome',
   ], { omit: ['loot'], note: '已经实际取过原件、当前又未带在身上时才出现。部分凭据被后续成果接替后无需再补。' }),
   table('talismans', '符箓', gated(described(data.talismans)), [
-    'id', 'name', 'tier', tier, 'damage', 'guard', 'retreat',
+    'id', 'name', 'tier', tier, 'damage', 'guard', 'retreat', ['qiCost', '催动耗气'],
   ]),
-  table('arts', '术法', gated(data.arts), [
+  table('arts', '术法', gated(data.arts.map((art) => ({ ...art, damageType: art.weaponBased === false ? 'magic' : 'physical' }))), [
     'id', 'name', 'tier', tier, ['cost', '施术耗气'], 'power', 'pierce', 'guard', 'break', ['price', '学习费用（灵钱）'], 'reveal', 'desc',
-    ['weaponBased', '借兵刃施展'],
+    ['weaponBased', '借兵刃施展'], ['damageType', '伤害类别', (id) => knownKinds[id] ?? id],
   ]),
   table('recipes', '制作用方', gated(data.recipes), [
     'id', 'result', 'count', 'tier', tier, ['cost', '制作费用（灵钱）'], 'need', 'days', 'reveal',
+    ['requiresKnownMaterials', '展示需要认识材料'],
     ['requiresShownHide', '需给工匠看过兽革'], ['formula', '所需丹方', ref],
     ['facility', '生产设施', facilityRef], ['facilityLevel', '设施最低等级'],
   ]),
@@ -739,6 +754,7 @@ const tables = [
   ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
   table('enemies', '敌人', enemyRows, [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
+    ['qi', '单场起始真气'], ['physicalResist', '物抗', percent], ['magicResist', '魔抗', percent],
     'def', ['perception', '洞察'], ['accuracy', '命中值', percent], ['dodge', '被动闪避值', percent],
     ['escapeChance', '未被进攻时基础脱身概率', percent],
     ['innerStyleName', '使用内功'], ['manualGuard', '内功兵刃专攻护持'], ['manualPierce', '内功兵刃专攻穿甲'],
@@ -750,6 +766,7 @@ const tables = [
   ], { omit: ['intents'], note: '普攻取所列攻击乘招式倍率后向上取整。攻击等基础值已算入内功，出招专攻护持另列，差距至少三小境时另有压制。命中和被动闪避空白表示无该项加成。补药只由明确带药的对手使用。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '常用动作序号'], 'name', 'kind', 'mult', ['ranged', '远程出手'],
+    ['damageType', '伤害类别', (id) => knownKinds[id] ?? id], ['qiCost', '施法耗气'], ['recover', '调息回气量'],
   ], { note: '普通妖兽大多按这些习性出招。人物和部分大妖用自己承受过的伤害估计威胁。抽中洞察后能看到玩家这回合动作的类别。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
   table('quests', '委托', gated(data.quests), [
     'id', 'name', 'region', ['tier', '标注境界'], tier, ['recommendedTier', '建议交手境界', realm],
@@ -761,18 +778,19 @@ const tables = [
   ], {
     note: '公开村务开局即可办理。其他入口在满足表中的任一条件后记住，回村即可使用。具体人物仍需实际接触。'
   }),
-  table('deductions', '沙盘疑点', gated(deductions), [
-    'id', 'name', 'tier', tier, 'reveal', 'desc',
+  table('deductions', '沙盘推演', gated(deductions.map((entry) => ({ ...entry, ...sandboxDeductions[entry.id] }))), [
+    'id', 'name', 'tier', tier, 'reveal', 'desc', ['conclusion', '推演做法'], ['reason', '证据与根据'],
   ], {
-    note: '玩家写下自己的猜想，可选携带的物件作参考。沙盘本身不判定猜想，也不会发放奖励。'
+    note: '**剧透。** 每次冥想会消耗真气。相关证据齐全后才能得到做法和根据，推演结果留在本局历史。'
   }),
   table('field-experiments', '现场验证与发现', experiments, [
     ['id', '沙盘疑点', ref], ['site', '验证地点', siteRef], ['desc', '现场观察'], 'need',
+    ['fieldNeed', '现场须带的实物', resources], ['afterFight', '现场须清开的对手', ref],
     ['days', '每次尝试用时（天）'], 'reward', ['learnArts', '现场学会术诀', (ids) => ids.map(ref).join('、')],
     ['insight', '成功所得修为'], ['outcome', '验证后的观察'],
   ], {
     omit: ['controls', 'solution', 'misses'],
-    note: '**剧透。** 此表列出各处验证的现场条件和奖励。持有现场能用到的物件并带着猜想才能尝试。结论由操作结果成立后获得。'
+    note: '**剧透。** 完成推演并带着实物才可尝试。新路、配方、本事或物件由现场验证成功后取得。'
   }),
   table('experiment-controls', '现场操作与观察结果', experimentOptions, [
     ['deductionId', '沙盘疑点', ref], ['site', '验证地点', siteRef],
