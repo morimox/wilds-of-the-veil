@@ -37,6 +37,8 @@
 落灯村（village）,落灯村工坊,gauze_armor,水绡札甲,0,25
 落灯村（village）,落灯村工坊,fault_coat,横渊雨衣,0,33
 落灯村（village）,落灯村工坊,coal_tassel,焦灯剑穗,0,24
+落灯村（village）,落灯村工坊,den_armguard,蒲根护臂,0,18
+落灯村（village）,落灯村工坊,quarry_spear,裂鳞枪,0,24
 落灯村（village）,落灯村工坊,ferry_pole,渡工短篙,0,6
 落灯村（village）,落灯村工坊,caravan_bell,压雾车铃,0,6
 落灯村（village）,落灯村工坊,zhao_cargo_brace,缠绳护腕,0,10
@@ -79,6 +81,8 @@
 照原城（zhao_city）,蒲霖的后炉,gauze_armor,水绡札甲,2,27
 照原城（zhao_city）,蒲霖的后炉,fault_coat,横渊雨衣,2,35
 照原城（zhao_city）,蒲霖的后炉,coal_tassel,焦灯剑穗,2,26
+照原城（zhao_city）,蒲霖的后炉,den_armguard,蒲根护臂,2,20
+照原城（zhao_city）,蒲霖的后炉,quarry_spear,裂鳞枪,2,26
 照原城（zhao_city）,蒲霖的后炉,ferry_pole,渡工短篙,2,8
 照原城（zhao_city）,蒲霖的后炉,caravan_bell,压雾车铃,2,8
 照原城（zhao_city）,蒲霖的后炉,zhao_cargo_brace,缠绳护腕,2,12
@@ -121,6 +125,8 @@
 叩石院（sand_bell_cloister）,梁弦的外院修具台,gauze_armor,水绡札甲,3,28
 叩石院（sand_bell_cloister）,梁弦的外院修具台,fault_coat,横渊雨衣,3,36
 叩石院（sand_bell_cloister）,梁弦的外院修具台,coal_tassel,焦灯剑穗,3,27
+叩石院（sand_bell_cloister）,梁弦的外院修具台,den_armguard,蒲根护臂,3,21
+叩石院（sand_bell_cloister）,梁弦的外院修具台,quarry_spear,裂鳞枪,3,27
 叩石院（sand_bell_cloister）,梁弦的外院修具台,ferry_pole,渡工短篙,3,9
 叩石院（sand_bell_cloister）,梁弦的外院修具台,caravan_bell,压雾车铃,3,9
 叩石院（sand_bell_cloister）,梁弦的外院修具台,zhao_cargo_brace,缠绳护腕,3,13

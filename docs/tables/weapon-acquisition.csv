@@ -25,4 +25,5 @@ weir_knife,迎岸横刀,制作,r_weir_knife,36,寒铁（ore）×13、松木（wo
 coil_pole,回烟长杖,制作,r_coil_pole,52,寒铁（ore）×10、暗金（black_iron）×8、松木（wood）×8、灵晶（core）×4、筑基期妖丹（foundation_core）×6,,,是,
 foil_sword,霜缝剑,制作,r_foil_sword,74,寒铁（ore）×14、暗金（black_iron）×11、灵晶（core）×9、筑基期妖丹（foundation_core）×9,,,是,
 lake_bow,回湖弓,制作,r_lake_bow,68,松木（wood）×12、兽革（hide）×10、灵晶（core）×9、暗金（black_iron）×4、筑基期妖丹（foundation_core）×8,,,是,
+quarry_spear,裂鳞枪,制作,r_quarry_spear,68,暗金（black_iron）×9、灵晶（core）×7、金丹期妖丹（gold_core）×5、兽革（hide）×5、厚甲片（hard_scale）×14,,,是,
 ferry_pole,渡工短篙,现场获得,背风灯台（wharf_lee_lamp） · 用松木给灯台补两只脚,,,,,否,

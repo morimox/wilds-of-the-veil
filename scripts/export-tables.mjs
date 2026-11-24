@@ -100,10 +100,10 @@ const knownKinds = {
   attack: '普通攻势', heavy: '重招', guard: '防御', drain: '吸取真气', heal: '恢复',
 };
 const slotNames = { weapon: '武器', offhand: '副手', armor: '身甲', charm: '法器' };
-const reveal = ({ item, quest } = {}) => [
-  item && `得知物品 ${ref(item)}`,
-  quest && `完成委托 ${ref(quest)}`,
-].filter(Boolean).join(' 或 ');
+const reveal = ({ item, quest, need } = {}) => {
+  const lead = [item && `得知物品 ${ref(item)}`, quest && `完成委托 ${ref(quest)}`].filter(Boolean).join(' 或 ');
+  return [lead, need && `须持有 ${resources(need)}`].filter(Boolean).join('；');
+};
 const renderers = {
   slot: (id) => slotNames[id] ?? id,
   kind: (id) => knownKinds[id] ?? id,
@@ -290,7 +290,7 @@ const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMa
     };
   }),
 ]).map((row) => ({ ...row, weapon: name(row.id) }));
-const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay', 'beast_meat', 'qi_core', 'foundation_core', 'gold_core', 'beast_eye'].map((id) => ({
+const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_clay', 'beast_meat', 'qi_core', 'foundation_core', 'gold_core', 'beast_eye', 'hard_scale'].map((id) => ({
   id, name: name(id),
   pools: worldPools.filter((pool) => pool.kind === '资源' && pool.object === id && pool.growth > 0)
     .map(({ site, label }) => label ? `${siteRef(site)} · ${label}` : siteRef(site)).join('、'),
@@ -302,7 +302,7 @@ const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_c
   breakthrough: data.realms.filter(({ need }) => need?.[id]).length,
   training: trainingData.flatMap(({ ranks }) => ranks).filter(({ need }) => need?.[id]).length,
 }));
-const huntedItems = ['qi_core', 'foundation_core', 'gold_core', 'beast_meat', 'beast_eye', 'hide'];
+const huntedItems = ['qi_core', 'foundation_core', 'gold_core', 'beast_meat', 'beast_eye', 'hide', 'hard_scale', 'den_neck_plate', 'quarry_back_spine'];
 const huntSources = worldPools.filter(({ kind }) => kind === '种群').flatMap((pool) => {
   const enemy = data.enemies.find(({ id }) => id === pool.object);
   const site = data.sites.find(({ id }) => id === pool.site);
@@ -437,12 +437,12 @@ const tables = [
     ['fixed', '每胜保证的数量'], ['bonus', '概率额外数量'], ['chance', '额外掉率', percent], ['average', '每胜平均数量'],
     ['start', '初始数'], ['cap', '最多'], ['interval', '基准回补间隔（游戏日）'],
     ['growth', '一次回补数'], ['curve', '回补规律', curveText], ['access', '小地点的发现方式'], ['approach', '现场主动交手'],
-  ], { note: '三阶妖丹、妖目和生兽肉仅见于当场击败对应妖物，独斗和重复猎场在回补栏区分。兽革另有雪蜕类的现场库存，见常用原料表。每胜的物品仍须在脚边拾取。含隐地剧透。' }),
+  ], { note: '三阶妖丹、妖目、生兽肉和首领专属部位见于当场击败对应妖物，独斗和重复猎场在回补栏区分。兽革另有雪蜕类的现场库存，见常用原料表。每胜的物品仍须在脚边拾取。含隐地剧透。' }),
   table('mixed-hunts', '混合猎场的初始种群', mixedHunts, [
     ['site', '小地点', siteRef], 'label', 'enemy', ['unlock', '先开哪条进路'], 'days',
     ['total', '初始总数'], ['start', '本种初始数'], ['weight', '该走法中每只的抽取权重'],
     ['initialChance', '首次遇见本种的概率', percent], ['cap', '本种上限'], ['interval', '基准回补（游戏日）'],
-  ], { omit: ['growth'], note: '本种当前数量乘走法权重，再除以所有在场权重之和。同地点两条走法共享种群。撤退或倒地后，三日内重走原路会接着遇到之前的对手。' }),
+  ], { omit: ['growth'], note: '本种当前数量乘走法权重，再除以所有在场权重之和。两处大型据点每只对手权重相同，首领参与首次抽取。同地点两条走法共享种群。撤退或倒地后，三日内重走原路会接着遇到之前的对手。' }),
   table('hunt-material-costs', '猎获原料的实际消耗', huntCosts, [
     ['id', '消耗原料', ref], ['type', '玩法'], 'name', ['count', '一次耗量'], ['output', '产量（如适用）'],
   ], { note: '突破材料与制作破境丹的投入分别列出。炮制高阶丹药、做特殊箭和其他消耗品可按已有合批规则追加，每批都扣该栏原料。' }),

@@ -17,8 +17,9 @@ pitch_bear,灰脊松熊,1,炼气中期,44,10,10,4,beast、furred,,5,生兽肉（
 cinder_hound,炉渣犬,2,炼气后期,52,12,13,5,spirit、stoneborn,,6,炼气期妖丹（qi_core）×3,,身上的炉渣容易结成硬壳。回身舔灰时会把散开的地方补起来。
 vine_stag,白角藤鹿,2,炼气后期,60,14,16,5,beast、furred,,6,生兽肉（beast_meat）×3、兽革（hide）×2、妖目（beast_eye）×1、炼气期妖丹（qi_core）×3,,它能借湿藤牵走气息。白角还没压低之前，脚下总会先拨藤。
 herb_den_toad,蒲窝青蟾,1,炼气中期,31,9,9,3,beast,,3,生兽肉（beast_meat）×2,炼气期妖丹（qi_core）×1（56%）,小蟾藏在蒲根下，有东西踩湿木板才会扑上来。
-herb_den_lizard,蒲根巨蜥,3,筑基初期,66,14,14,5,beast、scaled,,7,生兽肉（beast_meat）×3、兽革（hide）×2,筑基期妖丹（foundation_core）×3（64%）、妖目（beast_eye）×1（33%）,沉进黑蒲根时，它能贴木板吸走护身真气。抬起前爪后才挥尾砸板。
-herb_den_elder,断桩老蜥,4,筑基中期,88,16,17,6,beast、scaled,,11,生兽肉（beast_meat）×5、兽革（hide）×5、筑基期妖丹（foundation_core）×3,筑基期妖丹（foundation_core）×4（62%）、妖目（beast_eye）×1（65%）,它的下颚几乎齐木桩高。老蜥咬住旧木准备卷起一层水时，把脚从板沿收回来。
+herb_den_sawfish,锯鳍鲶,1,炼气中期,29,8,9,2,beast,,3,生兽肉（beast_meat）×2,炼气期妖丹（qi_core）×1（56%）,背鳍边缘长着一排软刺。刚逼近时会伏进浅泥，出了泥再拿尾巴撩脚。
+herb_den_lizard,蒲根巨蜥,3,筑基初期,66,14,14,5,beast、scaled,,7,生兽肉（beast_meat）×3、兽革（hide）×2、厚甲片（hard_scale）×2,筑基期妖丹（foundation_core）×3（64%）、妖目（beast_eye）×1（33%）,沉进黑蒲根时，它能贴木板吸走护身真气。抬起前爪后才挥尾砸板。
+herb_den_elder,断桩老蜥,4,筑基中期,88,16,17,6,beast、scaled,,11,生兽肉（beast_meat）×5、兽革（hide）×5、筑基期妖丹（foundation_core）×3、厚甲片（hard_scale）×3、老蜥颈甲（den_neck_plate）×1,筑基期妖丹（foundation_core）×4（62%）、妖目（beast_eye）×1（65%）,它的下颚几乎齐木桩高，颈下的厚甲能分片合拢。它咬住旧木准备卷起一层水时，把脚从板沿收回来。
 vine_king,白纹鹿王,2,炼气后期,79,15,15 / 17,6,beast、furred,,9,生兽肉（beast_meat）×5、兽革（hide）×3、妖目（beast_eye）×1、炼气期妖丹（qi_core）×4,,它的角在老树上蹭出两道白痕。压角低头时，会沿着旧蹄印直撞过来。
 vein_sentinel,横肩矿傀,2,炼气后期,64,14,15 / 16,6,stoneborn、scaled,,7,炼气期妖丹（qi_core）×3,,两肩石片相合时很难砍进去。窄矢或穿甲的兵刃能省不少力。
 snow_warden,雪脊兽,3,筑基初期,81,15,16 / 17,6,beast、scaled,,10,生兽肉（beast_meat）×5、兽革（hide）×4、妖目（beast_eye）×1、筑基期妖丹（foundation_core）×3,,雪脊鳞叠得厚，压背后会沿沟猛撞。趁它还没贴近时服药或换术。
@@ -93,8 +94,13 @@ border_silo_roof,守送粮窗的人,4,筑基中期,91,19,22,7,human,,9,,,他身�
 border_silo_leader,劫货头领阮隼,5,筑基后期,122,22,22,9,human,,13,,,他从吞进过路货那天起，就把两扇门轮流盯住。收刀时要提防他调息，最后一记推刀躲不开就要接稳。
 snow_gully_otter,雪涧斑獭,3,筑基初期,61,13,13 / 15,4,beast、furred,,6,筑基期妖丹（foundation_core）×2、生兽肉（beast_meat）×3、兽革（hide）×2,妖目（beast_eye）×1（55%）,皮毛湿透仍能困住暖气。它会借涧水牵走真气，尾尖离水就要跃上冰沿。
 snow_rime_antelope,覆雪石羚,3,筑基初期,77,14,14 / 16,6,beast、furred,,8,筑基期妖丹（foundation_core）×3、生兽肉（beast_meat）×5、兽革（hide）×3,,蹄缘像磨钝的铁。它缩起前膝时能用角护颈，接着会从坡上踏碎一层雪。
-sky_spillway_lizard,双脊浮水蜥,6,金丹初期,112,22,22 / 24,7,beast、scaled,,10,金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×5、兽革（hide）×2,妖目（beast_eye）×1（60%）,平时顺流走，翻起两道脊鳍时能把流向拨转，连人的真气也会被水挟走。
-sand_anchor_scorpion,盘绳石甲蝎,6,金丹初期,103,22,22 / 25,10,beast、scaled、stoneborn,,11,生兽肉（beast_meat）×2、兽革（hide）×2,金丹期妖丹（gold_core）×4（75%）,双钳合得紧，甲缝在出钳时才露出来。它把尾钩抵进岩缝以后，整条尾巴都能甩过来。
+snow_flat_scale,扁背雪蜥,3,筑基初期,63,13,13,5,beast、scaled,,6,生兽肉（beast_meat）×2、兽革（hide）×1、厚甲片（hard_scale）×1,筑基期妖丹（foundation_core）×2（72%）,背鳞压在一起时几乎和扁石一样平。它从水边腾起时，白腹会先翻出来。
+snow_seam_crab,夹石雪蟹,4,筑基中期,87,17,18 / 16,8,beast、scaled,,9,生兽肉（beast_meat）×2、厚甲片（hard_scale）×2、筑基期妖丹（foundation_core）×1,筑基期妖丹（foundation_core）×2（54%）,一边的钳夹过许多黑石，缺了一小角。扣下双钳前，它会把硬壳沉到几乎擦着地面。
+sky_spillway_lizard,双脊浮水蜥,6,金丹初期,112,22,22 / 24,7,beast、scaled,,10,金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×5、兽革（hide）×2、厚甲片（hard_scale）×2,妖目（beast_eye）×1（60%）,平时顺流走，翻起两道脊鳍时能把流向拨转，连人的真气也会被水挟走。
+sand_anchor_scorpion,盘绳石甲蝎,6,金丹初期,103,22,22 / 25,10,beast、scaled、stoneborn,,11,生兽肉（beast_meat）×2、兽革（hide）×2、厚甲片（hard_scale）×3,金丹期妖丹（gold_core）×4（75%）,双钳合得紧，甲缝在出钳时才露出来。它把尾钩抵进岩缝以后，整条尾巴都能甩过来。
+sand_spine_lizard,棘背岩蜥,6,金丹初期,109,22,23,8,beast、scaled,,10,生兽肉（beast_meat）×3、兽革（hide）×2、厚甲片（hard_scale）×3、金丹期妖丹（gold_core）×1,金丹期妖丹（gold_core）×2（60%）,背上的棘向两边张开，卷来的碎砂会牵扯行气。它拱背时，背后的石头先动。
+sand_riven_scorpion,裂石巨蝎,7,金丹中期,131,25,26 / 27,10,beast、scaled、stoneborn,,13,厚甲片（hard_scale）×4、金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×3,金丹期妖丹（gold_core）×2（50%）,尾柄卡在半裂的琉石里，一动就会带起好几块硬石。它退到长缝边时，双钳能把颈侧护严。
 sand_quarry_skink,黑背砂蜥,4,筑基中期,64,15,15,5,beast、scaled,,5,生兽肉（beast_meat）×2、兽革（hide）×1,筑基期妖丹（foundation_core）×1（52%）,黑背鳞和砂石颜色相近，露出浅色腹侧时就能看见它整条尾巴往回弓。
-sand_quarry_guard,赤脊护巢蜥,6,金丹初期,117,23,23 / 26,8,beast、scaled,,11,生兽肉（beast_meat）×4、兽革（hide）×2,金丹期妖丹（gold_core）×3（62%）、妖目（beast_eye）×1（35%）,颈鳞磨得发红。喉间发鼓时会把石尘卷到眼前，紧跟着从靠岩的一边压过来。
-sand_quarry_matriarch,白额老蜥,7,金丹中期,155,27,27 / 31,11,beast、scaled,,16,金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×6、兽革（hide）×4,金丹期妖丹（gold_core）×5（65%）、妖目（beast_eye）×1（75%）,白额上一道旧伤已经长进鳞下。它白天卧在石垒背阴处，有人接近才会推倒前面的立石。
+sand_quarry_rockscorpion,灰钳岩蝎,4,筑基中期,60,14,16,7,beast、stoneborn,,5,生兽肉（beast_meat）×2、兽革（hide）×1、厚甲片（hard_scale）×1,筑基期妖丹（foundation_core）×1（52%）,薄甲长得像石屑。它常并钳缩在石板下，钳尖抵住石边时便要侧身抡过来。
+sand_quarry_guard,赤脊护巢蜥,6,金丹初期,117,23,23 / 26,8,beast、scaled,,11,生兽肉（beast_meat）×4、兽革（hide）×2、厚甲片（hard_scale）×2,金丹期妖丹（gold_core）×3（62%）、妖目（beast_eye）×1（35%）,颈鳞磨得发红。喉间发鼓时会把石尘卷到眼前，紧跟着从靠岩的一边压过来。
+sand_quarry_matriarch,白额老蜥,7,金丹中期,155,27,27 / 31,11,beast、scaled,,16,金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×6、兽革（hide）×4、厚甲片（hard_scale）×4、白蜥背棘（quarry_back_spine）×1,金丹期妖丹（gold_core）×5（65%）、妖目（beast_eye）×1（75%）,白额上一道旧伤已经长进鳞下。背棘贴过石垒时，会在硬石上刻出三道细痕。

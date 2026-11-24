@@ -204,6 +204,7 @@
 | gold_formula | 结丹散丹方 | 线索 | 0 | 0 | 在照原用陶罐和两股水验证过的丹方。炼制时要用到伏潮息泥和井心水盐。 |  |  |  |
 | gold_powder | 结丹散 | 线索 | 0 | 0 | 新出炉的药散，凉了也留着一股苦香。从筑基后期冲击金丹时服用。 |  |  | 是 |
 | gold_core | 金丹期妖丹 | 材料 | 0 | 37 | 金丹期妖物体内凝出的沉珠。冲击金丹中后期需要不少，能搪在高阶护具里，也能留一两枚做袋。 |  |  |  |
+| hard_scale | 厚甲片 | 材料 | 0 | 0 | 从披着硬鳞或甲壳的妖兽身上取下。磨去边角后可缝上护具，也能给枪头加衬。 |  |  |  |
 | weir_knife | 迎岸横刀 | 装备 | 0 | 37 | 照原护堤人常带的宽背刀。刀一横，便能挡下沉重的来招。 |  |  |  |
 | coil_pole | 回烟长杖 | 装备 | 0 | 45 | 木杖里包着一层层打孔的玄铁片。握住杖能稳住真气，也挡得住迎面的招。 |  |  |  |
 | foil_sword | 霜缝剑 | 装备 | 0 | 56 | 剑背有一道浅棱，尖端插进护甲的缝里时，浅棱能把甲片撬开。 |  |  |  |
@@ -211,6 +212,10 @@
 | gauze_armor | 水绡札甲 | 装备 | 0 | 48 | 宽皮带系起一片片护甲。吸气时甲片顺着胸口张开，抬手也不受阻。 |  |  |  |
 | fault_coat | 横渊雨衣 | 装备 | 0 | 61 | 鸣沙的细砂缝在几层布之间。遇上抽取真气的招式，布层能卸掉一部分来势。 |  |  |  |
 | coal_tassel | 焦灯剑穗 | 装备 | 0 | 44 | 用炉里烧剩的丝线编成。慌乱时攥住剑穗，吐气就能慢慢稳下来。 |  |  |  |
+| den_neck_plate | 老蜥颈甲 | 线索 | 0 | 0 | 三块硬鳞连在一起，弯曲时宽窄恰好错开。拿它当样子打护臂，腕子转动时甲片就会一片压着一片。 |  |  |  |
+| quarry_back_spine | 白蜥背棘 | 线索 | 0 | 0 | 老蜥背上的硬棘，根部还留着几片交错的细鳞。把枪尖往鳞缝里比一比，就知道哪几处该磨薄。 |  |  |  |
+| den_armguard | 蒲根护臂 | 装备 | 0 | 0 | 几片甲沿左腕交错扣合，手一转，甲片就滑到前面接招。 |  |  |  |
+| quarry_spear | 裂鳞枪 | 装备 | 0 | 0 | 枪尖收得薄，刃脊却留厚了。贴着鳞缝送枪时，薄刃能钻进厚鳞下面。 |  |  |  |
 | gold_salve | 缓脉丹 | 丹药 | 0 | 0 | 筑基中期的修士可在交手时服用，既能缓解伤势，也能补回真气。 |  |  |  |
 | formula_gold_salve | 缓脉丹方 | 线索 | 0 | 0 | 趁香味还在时盖好炉盖，最后添入妖丹稳住火候。出炉前轻轻撇掉药渣。 |  |  |  |
 | return_breath_pill | 归元丹 | 丹药 | 0 | 0 | 金丹修士常在连战之间服用的丹药，能回一口深气，也能缓过旧伤。 |  |  |  |
@@ -243,22 +248,23 @@
 
 | 标识 | 名称 | 可回生的现场 | 解取的对手 | 用到的配方数 | 用到的后院项目数 | 用到的设施升级数 | 野外交付选择数 | 直接用于突破的境数 | 用到的修习级数 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| wood | 松木 | 碎石水眼（mud_track）、刮脂松架（pine_stand） · 架下松片、刮脂松架（pine_stand） · 树上枯枝、背阴的断肩崖（pine_ledges）、姚六的弯渠（meadow_channel） · 沟口漂木、第三级闸口（ladder_drop） · 闸梁上的枯枝、石沟下的灯棚（slope_lantern_low） · 水沟里的细木、三姓木码头（zhao_float_goods） · 晒台松枝、浮洲松根（zhao_isle_reeds） · 洲上老松、高脚粮仓（zhao_grain_ladder） · 粮仓碎松、斜封窑棚（zhao_firedoor） · 炭棚松枝、长礁灯脚（zhao_ferry_hook） · 灯礁松木、井边老秤（sand_salt_ledger） · 坡脚挑盐用的旧木、晃铜的桥栏（sand_bridge_rail） · 桥板旁的旧松木、搁木的浅弯（sand_gravel_rill） · 沟弯搁下的松木 |  | 38 | 8 | 9 | 30 | 0 | 2 |
+| wood | 松木 | 碎石水眼（mud_track）、刮脂松架（pine_stand） · 架下松片、刮脂松架（pine_stand） · 树上枯枝、背阴的断肩崖（pine_ledges）、姚六的弯渠（meadow_channel） · 沟口漂木、第三级闸口（ladder_drop） · 闸梁上的枯枝、石沟下的灯棚（slope_lantern_low） · 水沟里的细木、三姓木码头（zhao_float_goods） · 晒台松枝、浮洲松根（zhao_isle_reeds） · 洲上老松、高脚粮仓（zhao_grain_ladder） · 粮仓碎松、斜封窑棚（zhao_firedoor） · 炭棚松枝、长礁灯脚（zhao_ferry_hook） · 灯礁松木、井边老秤（sand_salt_ledger） · 坡脚挑盐用的旧木、晃铜的桥栏（sand_bridge_rail） · 桥板旁的旧松木、搁木的浅弯（sand_gravel_rill） · 沟弯搁下的松木 |  | 39 | 8 | 9 | 30 | 0 | 2 |
 | reed | 灵草 | 浅水苇丛（reed_banks） · 浅处苇芯、浅水苇丛（reed_banks） · 深处苇芯、渡工的刨木滩（reed_ferryman）、银脉水畦（herb_beds）、蒲根下的水洞（herb_den） · 引水槽边的灵草、白藤塘（vine_pond） · 塘边银脉叶、白藤塘（vine_pond） · 上游银脉叶、姚六的弯渠（meadow_channel） · 田边灵草、灰鹭晒篮处（shoal_baskets） · 鹭草根、石沟下的灯棚（slope_lantern_low） · 挡风石后的灵草、两面低埂（zhao_dyke_bend） · 白芽、斜萍石窝（zhao_frog_shelf） · 外圈灵草、晾绳矮帐（sand_tent_watch） · 湿帐沿的灵草、关了一半的仓门（sand_silo_door） · 卸谷洞边的灵草、伏草沙坎（sand_dune_grass） · 沙坎背面的灵草、留阴瓦畦（sand_rooftile_patch） · 上畦灵草 |  | 22 | 7 | 5 | 6 | 4 | 3 |
-| hide | 兽革 | 背风雪蜥径（silk_bough） · 石窝雪蜥蜕、背风雪蜥径（silk_bough） · 冰沿雪蜥蜕 | 黑纹蟹、泥鳞兽、苇尾狐、沉桅虺、石甲獾、灰脊松熊、白角藤鹿、蒲根巨蜥、断桩老蜥、白纹鹿王、雪脊兽、雪耳山猞、横尾冰蜥、铜角冰蜥、横脊闸兽、负丘虺、黄沿水貂、泥鳞鬃犬、苔背泽鳖、伏灰炭魈、撞闩塘獭、沙丘野兔、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、负砂豺、铁斑蜥、静井伏鳞、三痕琉狮、盐泥豺、咬缰瘦獒、白鼻守车兽、雪涧斑獭、覆雪石羚、双脊浮水蜥、盘绳石甲蝎、黑背砂蜥、赤脊护巢蜥、白额老蜥 | 20 | 1 | 3 | 8 | 1 | 3 |
+| hide | 兽革 | 背风雪蜥径（silk_bough） · 石窝雪蜥蜕、背风雪蜥径（silk_bough） · 冰沿雪蜥蜕 | 黑纹蟹、泥鳞兽、苇尾狐、沉桅虺、石甲獾、灰脊松熊、白角藤鹿、蒲根巨蜥、断桩老蜥、白纹鹿王、雪脊兽、雪耳山猞、横尾冰蜥、铜角冰蜥、横脊闸兽、负丘虺、黄沿水貂、泥鳞鬃犬、苔背泽鳖、伏灰炭魈、撞闩塘獭、沙丘野兔、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、负砂豺、铁斑蜥、静井伏鳞、三痕琉狮、盐泥豺、咬缰瘦獒、白鼻守车兽、雪涧斑獭、覆雪石羚、扁背雪蜥、双脊浮水蜥、盘绳石甲蝎、棘背岩蜥、黑背砂蜥、灰钳岩蝎、赤脊护巢蜥、白额老蜥 | 22 | 1 | 3 | 8 | 1 | 3 |
 | ore | 寒铁 | 落矿的冲沟（ore_rain） · 沟边寒铁、落矿的冲沟（ore_rain） · 坡壁寒铁、旧扣旁的窄矿槽（ledge_mine） · 矿槽寒铁、有回声的矿道（miner_echo） · 旁孔寒铁、有回声的矿道（miner_echo） · 主道寒铁、第三级闸口（ladder_drop） · 槽底寒铁、断壁筛架（slope_sieves） · 坡下筛盘的寒铁、倒行刻碑（zhao_retreat_marks） · 碑脚寒铁砂、青膜硬埂（zhao_scales） · 藻下铁砂、逆纹马蹄石（sand_approach_hoof） · 白石下的寒铁片、风楔架（sand_wind_work） · 岩缝里的寒铁、贴壁支木（sand_hanging_support） · 坡角露出的寒铁、搁木的浅弯（sand_gravel_rill） · 砾盘底的寒铁 |  | 17 | 0 | 6 | 6 | 4 | 4 |
-| core | 灵晶 | 落矿的冲沟（ore_rain） · 砂槽灵晶、旧扣旁的窄矿槽（ledge_mine） · 矿槽灵晶、有回声的矿道（miner_echo）、闸外浅阶（low_tide） · 浅阶灵晶、闸外浅阶（low_tide） · 槽底灵晶、刻洪痕的石壁（flood_lines）、横肩偏井（deep_vein）、浮光晶坡（cloud_scree） · 坡边灵晶、浮光晶坡（cloud_scree） · 岩脊灵晶、灰鹭晒篮处（shoal_baskets） · 石缝灵晶、刻尺水桩（gauge_piles） · 水尺旁的灵晶、双灯照到的旧吊板（slope_lantern_high） · 矿夫在灯下筛出的晶砂、退水石脊（undertow_bed） · 侧洞灵晶、浮洲松根（zhao_isle_reeds） · 沉根灵晶、横卧的半边磨轮（zhao_old_wheel） · 磨轮灵晶、铜槽旁（zhao_submerged_table） · 量槽外晶屑、六角晒网（zhao_glass_net） · 滩中灵晶、三口相背的堰齿（zhao_broken_rake） · 断齿灵晶、井底隔水板（sand_stillwell_sill） · 盐痕下的灵晶、风楔架（sand_wind_work） · 沙槽里的灵晶、断琉棱（sand_hail_floor） · 洼沿散下的灵晶、断琉棱（sand_hail_floor） · 断棱底下的灵晶 |  | 25 | 0 | 2 | 2 | 5 | 10 |
-| black_iron | 暗金 | 废窑烟道（kiln_flue）、黑砂洗矿槽（mine_tailings） · 槽沿暗金、黑砂洗矿槽（mine_tailings） · 槽底暗金、横肩偏井（deep_vein）、断壁筛架（slope_sieves） · 高处筛盘的暗金、双灯照到的旧吊板（slope_lantern_high） · 吊板尽头石缝里的暗金、信架与钟枢（counter_bell_score） · 钟座暗金、赤泥横穴（zhao_bank_fire） · 帘内暗金、沙坠顺风线（zhao_rope_sound） · 绳结里的暗金、贴壁支木（sand_hanging_support） · 支架后的暗金 |  | 13 | 0 | 4 | 1 | 3 | 3 |
+| core | 灵晶 | 落矿的冲沟（ore_rain） · 砂槽灵晶、旧扣旁的窄矿槽（ledge_mine） · 矿槽灵晶、有回声的矿道（miner_echo）、闸外浅阶（low_tide） · 浅阶灵晶、闸外浅阶（low_tide） · 槽底灵晶、刻洪痕的石壁（flood_lines）、横肩偏井（deep_vein）、浮光晶坡（cloud_scree） · 坡边灵晶、浮光晶坡（cloud_scree） · 岩脊灵晶、灰鹭晒篮处（shoal_baskets） · 石缝灵晶、刻尺水桩（gauge_piles） · 水尺旁的灵晶、双灯照到的旧吊板（slope_lantern_high） · 矿夫在灯下筛出的晶砂、退水石脊（undertow_bed） · 侧洞灵晶、浮洲松根（zhao_isle_reeds） · 沉根灵晶、横卧的半边磨轮（zhao_old_wheel） · 磨轮灵晶、铜槽旁（zhao_submerged_table） · 量槽外晶屑、六角晒网（zhao_glass_net） · 滩中灵晶、三口相背的堰齿（zhao_broken_rake） · 断齿灵晶、井底隔水板（sand_stillwell_sill） · 盐痕下的灵晶、风楔架（sand_wind_work） · 沙槽里的灵晶、断琉棱（sand_hail_floor） · 洼沿散下的灵晶、断琉棱（sand_hail_floor） · 断棱底下的灵晶 |  | 27 | 0 | 2 | 2 | 5 | 10 |
+| black_iron | 暗金 | 废窑烟道（kiln_flue）、黑砂洗矿槽（mine_tailings） · 槽沿暗金、黑砂洗矿槽（mine_tailings） · 槽底暗金、横肩偏井（deep_vein）、断壁筛架（slope_sieves） · 高处筛盘的暗金、双灯照到的旧吊板（slope_lantern_high） · 吊板尽头石缝里的暗金、信架与钟枢（counter_bell_score） · 钟座暗金、赤泥横穴（zhao_bank_fire） · 帘内暗金、沙坠顺风线（zhao_rope_sound） · 绳结里的暗金、贴壁支木（sand_hanging_support） · 支架后的暗金 |  | 14 | 0 | 4 | 1 | 3 | 3 |
 | kiln_clay | 耐火泥 | 白泥洗坯坡（clay_bank） · 坡根耐火泥、白泥洗坯坡（clay_bank） · 干泥带耐火泥 |  | 1 | 0 | 5 | 3 | 0 | 0 |
-| beast_meat | 生兽肉 |  | 白耳兔、银背鱼、黑纹蟹、泥鳞兽、苇尾狐、沉桅虺、石甲獾、缠舟兽、灰脊松熊、白角藤鹿、蒲窝青蟾、蒲根巨蜥、断桩老蜥、白纹鹿王、雪脊兽、雪耳山猞、灰翅雪鹰、横尾冰蜥、铜角冰蜥、横脊闸兽、石鹞、负丘虺、黄沿水貂、灰苇灵鸭、火斑大蛙、泥鳞鬃犬、苔背泽鳖、缠藻泥鳗、伏灰炭魈、撞闩塘獭、沙丘野兔、沙脊雉、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、负砂豺、铁斑蜥、静井伏鳞、三痕琉狮、盐泥豺、白鼻守车兽、缠闸青鳗、贴槽游走的石鱼、雪涧斑獭、覆雪石羚、双脊浮水蜥、盘绳石甲蝎、黑背砂蜥、赤脊护巢蜥、白额老蜥 | 0 | 3 | 0 | 3 | 0 | 0 |
-| qi_core | 炼气期妖丹 |  | 白耳兔、银背鱼、黑纹蟹、泥鳞兽、苇尾狐、巡岸水鬼、沉桅虺、持锤矿煞、石甲獾、裂钟魄、缠舟兽、守潮灵、湿蓑灯蜕、灰脊松熊、炉渣犬、白角藤鹿、蒲窝青蟾、白纹鹿王、横肩矿傀、雪耳山猞、灰翅雪鹰、横尾冰蜥、护印窑影、横脊闸兽、石鹞、黄沿水貂、灰苇灵鸭、火斑大蛙、苔背泽鳖、缠藻泥鳗、撞闩塘獭、沙丘野兔、沙脊雉、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、铁斑蜥、盐泥豺、咬缰瘦獒、白鼻守车兽、缠闸青鳗、凝在碎板上的水影 | 9 | 0 | 0 | 0 | 3 | 3 |
-| foundation_core | 筑基期妖丹 |  | 蒲根巨蜥、断桩老蜥、雪脊兽、铜角冰蜥、持衡镜灵、屈膝铜影、悬梯堰影、泥鳞鬃犬、槽背水魁、负砂豺、静井伏鳞、贴槽游走的石鱼、倒挂的磨轮影、堵水的覆石灵、雪涧斑獭、覆雪石羚、黑背砂蜥 | 11 | 0 | 0 | 0 | 2 | 4 |
-| gold_core | 金丹期妖丹 |  | 负丘虺、伏灰炭魈、分柱水君、三痕琉狮、倒驿锁影、双脊浮水蜥、盘绳石甲蝎、赤脊护巢蜥、白额老蜥 | 2 | 0 | 0 | 0 | 2 | 0 |
+| beast_meat | 生兽肉 |  | 白耳兔、银背鱼、黑纹蟹、泥鳞兽、苇尾狐、沉桅虺、石甲獾、缠舟兽、灰脊松熊、白角藤鹿、蒲窝青蟾、锯鳍鲶、蒲根巨蜥、断桩老蜥、白纹鹿王、雪脊兽、雪耳山猞、灰翅雪鹰、横尾冰蜥、铜角冰蜥、横脊闸兽、石鹞、负丘虺、黄沿水貂、灰苇灵鸭、火斑大蛙、泥鳞鬃犬、苔背泽鳖、缠藻泥鳗、伏灰炭魈、撞闩塘獭、沙丘野兔、沙脊雉、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、负砂豺、铁斑蜥、静井伏鳞、三痕琉狮、盐泥豺、白鼻守车兽、缠闸青鳗、贴槽游走的石鱼、雪涧斑獭、覆雪石羚、扁背雪蜥、夹石雪蟹、双脊浮水蜥、盘绳石甲蝎、棘背岩蜥、裂石巨蝎、黑背砂蜥、灰钳岩蝎、赤脊护巢蜥、白额老蜥 | 0 | 3 | 0 | 3 | 0 | 0 |
+| qi_core | 炼气期妖丹 |  | 白耳兔、银背鱼、黑纹蟹、泥鳞兽、苇尾狐、巡岸水鬼、沉桅虺、持锤矿煞、石甲獾、裂钟魄、缠舟兽、守潮灵、湿蓑灯蜕、灰脊松熊、炉渣犬、白角藤鹿、蒲窝青蟾、锯鳍鲶、白纹鹿王、横肩矿傀、雪耳山猞、灰翅雪鹰、横尾冰蜥、护印窑影、横脊闸兽、石鹞、黄沿水貂、灰苇灵鸭、火斑大蛙、苔背泽鳖、缠藻泥鳗、撞闩塘獭、沙丘野兔、沙脊雉、盐尾狐、伏沟野猪、仓花貂、黄结桥蝰、铁斑蜥、盐泥豺、咬缰瘦獒、白鼻守车兽、缠闸青鳗、凝在碎板上的水影 | 9 | 0 | 0 | 0 | 3 | 3 |
+| foundation_core | 筑基期妖丹 |  | 蒲根巨蜥、断桩老蜥、雪脊兽、铜角冰蜥、持衡镜灵、屈膝铜影、悬梯堰影、泥鳞鬃犬、槽背水魁、负砂豺、静井伏鳞、贴槽游走的石鱼、倒挂的磨轮影、堵水的覆石灵、雪涧斑獭、覆雪石羚、扁背雪蜥、夹石雪蟹、黑背砂蜥、灰钳岩蝎 | 12 | 0 | 0 | 0 | 2 | 4 |
+| gold_core | 金丹期妖丹 |  | 负丘虺、伏灰炭魈、分柱水君、三痕琉狮、倒驿锁影、双脊浮水蜥、盘绳石甲蝎、棘背岩蜥、裂石巨蝎、赤脊护巢蜥、白额老蜥 | 3 | 0 | 0 | 0 | 2 | 0 |
 | beast_eye | 妖目 |  | 沉桅虺、缠舟兽、白角藤鹿、蒲根巨蜥、断桩老蜥、白纹鹿王、雪脊兽、灰翅雪鹰、铜角冰蜥、负丘虺、火斑大蛙、槽背水魁、分柱水君、静井伏鳞、三痕琉狮、雪涧斑獭、双脊浮水蜥、赤脊护巢蜥、白额老蜥 | 4 | 0 | 0 | 0 | 0 | 2 |
+| hard_scale | 厚甲片 |  | 蒲根巨蜥、断桩老蜥、扁背雪蜥、夹石雪蟹、双脊浮水蜥、盘绳石甲蝎、棘背岩蜥、裂石巨蝎、灰钳岩蝎、赤脊护巢蜥、白额老蜥 | 4 | 0 | 0 | 0 | 0 | 0 |
 
 ## 各地猎物材料和回补
 
-三阶妖丹、妖目和生兽肉仅见于当场击败对应妖物，独斗和重复猎场在回补栏区分。兽革另有雪蜕类的现场库存，见常用原料表。每胜的物品仍须在脚边拾取。含隐地剧透。
+三阶妖丹、妖目、生兽肉和首领专属部位见于当场击败对应妖物，独斗和重复猎场在回补栏区分。兽革另有雪蜕类的现场库存，见常用原料表。每胜的物品仍须在脚边拾取。含隐地剧透。
 
 | 材料 | 地区 | 小地点 | 引发战斗 | 对手境界 | 每胜保证的数量 | 概率额外数量 | 额外掉率 | 每胜平均数量 | 初始数 | 最多 | 基准回补间隔（游戏日） | 一次回补数 | 回补规律 | 小地点的发现方式 | 现场主动交手 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -298,16 +304,21 @@
 | 生兽肉（beast_meat） | 青崖松场（pine_ridge） | 翻车的松沟（pine_hollow） | 灰脊松熊（pitch_bear） | 炼气中期 | 4 |  |  | 4 | 2 | 4 | 7 | 1 | 固定间隔 |  | 靠近树沟里翻倒的窑车 |
 | 兽革（hide） | 青崖松场（pine_ridge） | 翻车的松沟（pine_hollow） | 灰脊松熊（pitch_bear） | 炼气中期 | 2 |  |  | 2 | 2 | 4 | 7 | 1 | 固定间隔 |  | 靠近树沟里翻倒的窑车 |
 | 炼气期妖丹（qi_core） | 云炉石谷（kiln_valley） | 废窑烟道（kiln_flue） | 炉渣犬（cinder_hound） | 炼气后期 | 3 |  |  | 3 | 2 | 3 | 8 | 1 | 固定间隔 | 冷下来的老窑（abandoned_kiln） · 从铁圈下取出石牌 | 掰开靠外的窑砖看一眼 |
-| 炼气期妖丹（qi_core） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲窝青蟾（herb_den_toad） | 炼气中期 | 0 | 1 | 56% | 0.56 | 32 | 32 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 生兽肉（beast_meat） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲窝青蟾（herb_den_toad） | 炼气中期 | 2 |  |  | 2 | 32 | 32 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 筑基期妖丹（foundation_core） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 0 | 3 | 64% | 1.92 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 生兽肉（beast_meat） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 3 |  |  | 3 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 妖目（beast_eye） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 0 | 1 | 33% | 0.33 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 兽革（hide） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 2 |  |  | 2 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 筑基期妖丹（foundation_core） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 3 | 4 | 62% | 5.48 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 生兽肉（beast_meat） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 5 |  |  | 5 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 妖目（beast_eye） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 0 | 1 | 65% | 0.65 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
-| 兽革（hide） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 5 |  |  | 5 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕 |
+| 炼气期妖丹（qi_core） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲窝青蟾（herb_den_toad） | 炼气中期 | 0 | 1 | 56% | 0.56 | 24 | 24 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 生兽肉（beast_meat） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲窝青蟾（herb_den_toad） | 炼气中期 | 2 |  |  | 2 | 24 | 24 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 炼气期妖丹（qi_core） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 锯鳍鲶（herb_den_sawfish） | 炼气中期 | 0 | 1 | 56% | 0.56 | 8 | 8 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 生兽肉（beast_meat） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 锯鳍鲶（herb_den_sawfish） | 炼气中期 | 2 |  |  | 2 | 8 | 8 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 筑基期妖丹（foundation_core） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 0 | 3 | 64% | 1.92 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 生兽肉（beast_meat） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 3 |  |  | 3 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 妖目（beast_eye） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 0 | 1 | 33% | 0.33 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 兽革（hide） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 2 |  |  | 2 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 厚甲片（hard_scale） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 筑基初期 | 2 |  |  | 2 | 6 | 6 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 筑基期妖丹（foundation_core） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 3 | 4 | 62% | 5.48 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 生兽肉（beast_meat） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 5 |  |  | 5 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 妖目（beast_eye） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 0 | 1 | 65% | 0.65 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 兽革（hide） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 5 |  |  | 5 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 厚甲片（hard_scale） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 3 |  |  | 3 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
+| 老蜥颈甲（den_neck_plate） | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 筑基中期 | 1 |  |  | 1 | 1 | 1 | 0 | 0 | 不回补 | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 | 踏上木板，朝水洞里探、踩干石绕到洞边的干岸 |
 | 炼气期妖丹（qi_core） | 篁泽药谷（herb_basin） | 白藤塘（vine_pond） | 白角藤鹿（vine_stag） | 炼气后期 | 3 |  |  | 3 | 2 | 6 | 8 | 1 | 随种群密度变化 |  | 沿浅滩的蹄印找藤鹿 |
 | 生兽肉（beast_meat） | 篁泽药谷（herb_basin） | 白藤塘（vine_pond） | 白角藤鹿（vine_stag） | 炼气后期 | 3 |  |  | 3 | 2 | 6 | 8 | 1 | 随种群密度变化 |  | 沿浅滩的蹄印找藤鹿 |
 | 妖目（beast_eye） | 篁泽药谷（herb_basin） | 白藤塘（vine_pond） | 白角藤鹿（vine_stag） | 炼气后期 | 1 |  |  | 1 | 2 | 6 | 8 | 1 | 随种群密度变化 |  | 沿浅滩的蹄印找藤鹿 |
@@ -439,40 +450,96 @@
 | 生兽肉（beast_meat） | 天衡石台（sky_terrace） | 石台背面的分水槽（sky_hunt_spillway） | 双脊浮水蜥（sky_spillway_lizard） | 金丹初期 | 5 |  |  | 5 | 2 | 3 | 10 | 1 | 随种群密度变化 | 得知物品 留水底印（fault_receipt） | 扶矮沿接近水槽里露脊鳍的东西 |
 | 妖目（beast_eye） | 天衡石台（sky_terrace） | 石台背面的分水槽（sky_hunt_spillway） | 双脊浮水蜥（sky_spillway_lizard） | 金丹初期 | 0 | 1 | 60% | 0.6 | 2 | 3 | 10 | 1 | 随种群密度变化 | 得知物品 留水底印（fault_receipt） | 扶矮沿接近水槽里露脊鳍的东西 |
 | 兽革（hide） | 天衡石台（sky_terrace） | 石台背面的分水槽（sky_hunt_spillway） | 双脊浮水蜥（sky_spillway_lizard） | 金丹初期 | 2 |  |  | 2 | 2 | 3 | 10 | 1 | 随种群密度变化 | 得知物品 留水底印（fault_receipt） | 扶矮沿接近水槽里露脊鳍的东西 |
+| 厚甲片（hard_scale） | 天衡石台（sky_terrace） | 石台背面的分水槽（sky_hunt_spillway） | 双脊浮水蜥（sky_spillway_lizard） | 金丹初期 | 2 |  |  | 2 | 2 | 3 | 10 | 1 | 随种群密度变化 | 得知物品 留水底印（fault_receipt） | 扶矮沿接近水槽里露脊鳍的东西 |
+| 筑基期妖丹（foundation_core） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 雪涧斑獭（snow_gully_otter） | 筑基初期 | 2 |  |  | 2 | 3 | 5 | 7 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹 |
+| 生兽肉（beast_meat） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 雪涧斑獭（snow_gully_otter） | 筑基初期 | 3 |  |  | 3 | 3 | 5 | 7 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹 |
+| 妖目（beast_eye） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 雪涧斑獭（snow_gully_otter） | 筑基初期 | 0 | 1 | 55% | 0.55 | 3 | 5 | 7 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹 |
+| 兽革（hide） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 雪涧斑獭（snow_gully_otter） | 筑基初期 | 2 |  |  | 2 | 3 | 5 | 7 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹 |
+| 筑基期妖丹（foundation_core） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 覆雪石羚（snow_rime_antelope） | 筑基初期 | 3 |  |  | 3 | 2 | 3 | 10 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹 |
+| 生兽肉（beast_meat） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 覆雪石羚（snow_rime_antelope） | 筑基初期 | 5 |  |  | 5 | 2 | 3 | 10 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹 |
+| 兽革（hide） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 覆雪石羚（snow_rime_antelope） | 筑基初期 | 3 |  |  | 3 | 2 | 3 | 10 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹 |
+| 筑基期妖丹（foundation_core） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 扁背雪蜥（snow_flat_scale） | 筑基初期 | 0 | 2 | 72% | 1.44 | 8 | 12 | 9 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹、沿细尾印翻开水边的扁石 |
+| 生兽肉（beast_meat） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 扁背雪蜥（snow_flat_scale） | 筑基初期 | 2 |  |  | 2 | 8 | 12 | 9 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹、沿细尾印翻开水边的扁石 |
+| 兽革（hide） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 扁背雪蜥（snow_flat_scale） | 筑基初期 | 1 |  |  | 1 | 8 | 12 | 9 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹、沿细尾印翻开水边的扁石 |
+| 厚甲片（hard_scale） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 扁背雪蜥（snow_flat_scale） | 筑基初期 | 1 |  |  | 1 | 8 | 12 | 9 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹、沿细尾印翻开水边的扁石 |
+| 筑基期妖丹（foundation_core） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 夹石雪蟹（snow_seam_crab） | 筑基中期 | 1 | 2 | 54% | 2.08 | 6 | 9 | 11 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹、绕到黑石背后，把石缝里的钳子引出来 |
+| 生兽肉（beast_meat） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 夹石雪蟹（snow_seam_crab） | 筑基中期 | 2 |  |  | 2 | 6 | 9 | 11 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹、绕到黑石背后，把石缝里的钳子引出来 |
+| 厚甲片（hard_scale） | 碎云雪关（snow_pass） | 融雪沟的黑石滩（snow_armor_bank） | 夹石雪蟹（snow_seam_crab） | 筑基中期 | 2 |  |  | 2 | 6 | 9 | 11 | 1 | 随种群密度变化 |  | 沿滩找活物留下的踪迹、绕到黑石背后，把石缝里的钳子引出来 |
+| 筑基期妖丹（foundation_core） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 灰钳岩蝎（sand_quarry_rockscorpion） | 筑基中期 | 0 | 1 | 52% | 0.52 | 6 | 10 | 9 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 生兽肉（beast_meat） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 灰钳岩蝎（sand_quarry_rockscorpion） | 筑基中期 | 2 |  |  | 2 | 6 | 10 | 9 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 兽革（hide） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 灰钳岩蝎（sand_quarry_rockscorpion） | 筑基中期 | 1 |  |  | 1 | 6 | 10 | 9 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 厚甲片（hard_scale） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 灰钳岩蝎（sand_quarry_rockscorpion） | 筑基中期 | 1 |  |  | 1 | 6 | 10 | 9 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 金丹期妖丹（gold_core） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 三痕琉狮（sand_glass_lynx） | 金丹初期 | 2 |  |  | 2 | 3 | 4 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 生兽肉（beast_meat） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 三痕琉狮（sand_glass_lynx） | 金丹初期 | 5 |  |  | 5 | 3 | 4 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 妖目（beast_eye） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 三痕琉狮（sand_glass_lynx） | 金丹初期 | 1 |  |  | 1 | 3 | 4 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 兽革（hide） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 三痕琉狮（sand_glass_lynx） | 金丹初期 | 4 |  |  | 4 | 3 | 4 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 金丹期妖丹（gold_core） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 0 | 3 | 62% | 1.86 | 4 | 6 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 生兽肉（beast_meat） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 4 |  |  | 4 | 4 | 6 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 妖目（beast_eye） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 0 | 1 | 35% | 0.35 | 4 | 6 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 兽革（hide） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 2 |  |  | 2 | 4 | 6 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 厚甲片（hard_scale） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 2 |  |  | 2 | 4 | 6 | 13 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物 |
+| 金丹期妖丹（gold_core） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 棘背岩蜥（sand_spine_lizard） | 金丹初期 | 1 | 2 | 60% | 2.2 | 5 | 8 | 12 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物、隔碎石看清刮痕，追进棘背的石隙 |
+| 生兽肉（beast_meat） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 棘背岩蜥（sand_spine_lizard） | 金丹初期 | 3 |  |  | 3 | 5 | 8 | 12 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物、隔碎石看清刮痕，追进棘背的石隙 |
+| 兽革（hide） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 棘背岩蜥（sand_spine_lizard） | 金丹初期 | 2 |  |  | 2 | 5 | 8 | 12 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物、隔碎石看清刮痕，追进棘背的石隙 |
+| 厚甲片（hard_scale） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 棘背岩蜥（sand_spine_lizard） | 金丹初期 | 3 |  |  | 3 | 5 | 8 | 12 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物、隔碎石看清刮痕，追进棘背的石隙 |
+| 金丹期妖丹（gold_core） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 裂石巨蝎（sand_riven_scorpion） | 金丹中期 | 3 | 2 | 50% | 4 | 2 | 4 | 16 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物、踩上堵石，逼深缝里的巨蝎出来 |
+| 生兽肉（beast_meat） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 裂石巨蝎（sand_riven_scorpion） | 金丹中期 | 3 |  |  | 3 | 2 | 4 | 16 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物、踩上堵石，逼深缝里的巨蝎出来 |
+| 厚甲片（hard_scale） | 落琉洼（glass_hail_sink） | 琉石堆后的背风槽（sand_armor_bank） | 裂石巨蝎（sand_riven_scorpion） | 金丹中期 | 4 |  |  | 4 | 2 | 4 | 16 | 1 | 随种群密度变化 |  | 顺背风的石脊找猎物、踩上堵石，逼深缝里的巨蝎出来 |
 | 金丹期妖丹（gold_core） | 横生脉（hanging_vein） | 旧矿索下的岩沟（sand_hunt_anchors） | 盘绳石甲蝎（sand_anchor_scorpion） | 金丹初期 | 0 | 4 | 75% | 3 | 2 | 3 | 11 | 1 | 随种群密度变化 |  | 沿石阶下沟，在矿索旁迎石甲蝎 |
 | 生兽肉（beast_meat） | 横生脉（hanging_vein） | 旧矿索下的岩沟（sand_hunt_anchors） | 盘绳石甲蝎（sand_anchor_scorpion） | 金丹初期 | 2 |  |  | 2 | 2 | 3 | 11 | 1 | 随种群密度变化 |  | 沿石阶下沟，在矿索旁迎石甲蝎 |
 | 兽革（hide） | 横生脉（hanging_vein） | 旧矿索下的岩沟（sand_hunt_anchors） | 盘绳石甲蝎（sand_anchor_scorpion） | 金丹初期 | 2 |  |  | 2 | 2 | 3 | 11 | 1 | 随种群密度变化 |  | 沿石阶下沟，在矿索旁迎石甲蝎 |
-| 筑基期妖丹（foundation_core） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 黑背砂蜥（sand_quarry_skink） | 筑基中期 | 0 | 1 | 52% | 0.52 | 72 | 72 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 生兽肉（beast_meat） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 黑背砂蜥（sand_quarry_skink） | 筑基中期 | 2 |  |  | 2 | 72 | 72 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 兽革（hide） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 黑背砂蜥（sand_quarry_skink） | 筑基中期 | 1 |  |  | 1 | 72 | 72 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 金丹期妖丹（gold_core） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 0 | 3 | 62% | 1.86 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 生兽肉（beast_meat） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 4 |  |  | 4 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 妖目（beast_eye） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 0 | 1 | 35% | 0.35 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 兽革（hide） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 2 |  |  | 2 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 金丹期妖丹（gold_core） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 3 | 5 | 65% | 6.25 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 生兽肉（beast_meat） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 6 |  |  | 6 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 妖目（beast_eye） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 0 | 1 | 75% | 0.75 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
-| 兽革（hide） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 4 |  |  | 4 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢 |
+| 厚甲片（hard_scale） | 横生脉（hanging_vein） | 旧矿索下的岩沟（sand_hunt_anchors） | 盘绳石甲蝎（sand_anchor_scorpion） | 金丹初期 | 3 |  |  | 3 | 2 | 3 | 11 | 1 | 随种群密度变化 |  | 沿石阶下沟，在矿索旁迎石甲蝎 |
+| 筑基期妖丹（foundation_core） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 黑背砂蜥（sand_quarry_skink） | 筑基中期 | 0 | 1 | 52% | 0.52 | 48 | 48 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 生兽肉（beast_meat） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 黑背砂蜥（sand_quarry_skink） | 筑基中期 | 2 |  |  | 2 | 48 | 48 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 兽革（hide） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 黑背砂蜥（sand_quarry_skink） | 筑基中期 | 1 |  |  | 1 | 48 | 48 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 筑基期妖丹（foundation_core） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 灰钳岩蝎（sand_quarry_rockscorpion） | 筑基中期 | 0 | 1 | 52% | 0.52 | 24 | 24 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 生兽肉（beast_meat） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 灰钳岩蝎（sand_quarry_rockscorpion） | 筑基中期 | 2 |  |  | 2 | 24 | 24 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 兽革（hide） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 灰钳岩蝎（sand_quarry_rockscorpion） | 筑基中期 | 1 |  |  | 1 | 24 | 24 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 厚甲片（hard_scale） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 灰钳岩蝎（sand_quarry_rockscorpion） | 筑基中期 | 1 |  |  | 1 | 24 | 24 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 金丹期妖丹（gold_core） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 0 | 3 | 62% | 1.86 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 生兽肉（beast_meat） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 4 |  |  | 4 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 妖目（beast_eye） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 0 | 1 | 35% | 0.35 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 兽革（hide） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 2 |  |  | 2 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 厚甲片（hard_scale） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 金丹初期 | 2 |  |  | 2 | 8 | 8 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 金丹期妖丹（gold_core） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 3 | 5 | 65% | 6.25 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 生兽肉（beast_meat） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 6 |  |  | 6 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 妖目（beast_eye） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 0 | 1 | 75% | 0.75 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 兽革（hide） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 4 |  |  | 4 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 厚甲片（hard_scale） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 4 |  |  | 4 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
+| 白蜥背棘（quarry_back_spine） | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 金丹中期 | 1 |  |  | 1 | 1 | 1 | 0 | 0 | 不回补 | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 | 越过倒柱，在矮石边找落脚处、扶倒柱的低棱，绕上北墙石台 |
 | 筑基期妖丹（foundation_core） | 闭潮渡（ford） | 闸下无灯梯（ford_below_steps） | 悬梯堰影（ford_lower_spirit） | 筑基中期 | 2 |  |  | 2 | 2 | 4 | 11 | 1 | 固定间隔 |  | 沿短绳下到第二根栏杆 |
 
 ## 混合猎场的初始种群
 
-本种当前数量乘走法权重，再除以所有在场权重之和。同地点两条走法共享种群。撤退或倒地后，三日内重走原路会接着遇到之前的对手。
+本种当前数量乘走法权重，再除以所有在场权重之和。两处大型据点每只对手权重相同，首领参与首次抽取。同地点两条走法共享种群。撤退或倒地后，三日内重走原路会接着遇到之前的对手。
 
-| 小地点 | 选项 | 引发战斗 | 先开哪条进路 | 时间（天） | 初始总数 | 本种初始数 | 该走法中每只的抽取权重 | 首次遇见本种的概率 | 本种上限 | 基准回补（游戏日） |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 蒲根下的水洞（herb_den） | 踏上木板，朝水洞里探 | 蒲窝青蟾（herb_den_toad） |  | 0.125 | 39 | 32 | 1 | 82.051282% | 32 | 0 |
-| 蒲根下的水洞（herb_den） | 踏上木板，朝水洞里探 | 蒲根巨蜥（herb_den_lizard） |  | 0.125 | 39 | 6 | 1 | 15.384615% | 6 | 0 |
-| 蒲根下的水洞（herb_den） | 踏上木板，朝水洞里探 | 断桩老蜥（herb_den_elder） |  | 0.125 | 39 | 1 | 1 | 2.564103% | 1 | 0 |
-| 蒲根下的水洞（herb_den） | 踩干石，扶蒲根往洞内绕 | 蒲窝青蟾（herb_den_toad） | 蒲根下的水洞（herb_den） · 蹲在板头，看看蒲根在水下往哪伸 | 0.375 | 39 | 32 | 1 | 69.565217% | 32 | 0 |
-| 蒲根下的水洞（herb_den） | 踩干石，扶蒲根往洞内绕 | 蒲根巨蜥（herb_den_lizard） | 蒲根下的水洞（herb_den） · 蹲在板头，看看蒲根在水下往哪伸 | 0.375 | 39 | 6 | 2 | 26.086957% | 6 | 0 |
-| 蒲根下的水洞（herb_den） | 踩干石，扶蒲根往洞内绕 | 断桩老蜥（herb_den_elder） | 蒲根下的水洞（herb_den） · 蹲在板头，看看蒲根在水下往哪伸 | 0.375 | 39 | 1 | 2 | 4.347826% | 1 | 0 |
-| 梁后的露天石场（sand_hunt_colony） | 越过倒柱，在蜥群边找落脚处 | 黑背砂蜥（sand_quarry_skink） |  | 0.25 | 81 | 72 | 1 | 88.888889% | 72 | 0 |
-| 梁后的露天石场（sand_hunt_colony） | 越过倒柱，在蜥群边找落脚处 | 赤脊护巢蜥（sand_quarry_guard） |  | 0.25 | 81 | 8 | 1 | 9.876543% | 8 | 0 |
-| 梁后的露天石场（sand_hunt_colony） | 越过倒柱，在蜥群边找落脚处 | 白额老蜥（sand_quarry_matriarch） |  | 0.25 | 81 | 1 | 1 | 1.234568% | 1 | 0 |
-| 梁后的露天石场（sand_hunt_colony） | 扶倒柱的低棱，贴北墙靠近内巢 | 黑背砂蜥（sand_quarry_skink） | 梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕 | 0.5 | 81 | 72 | 1 | 80% | 72 | 0 |
-| 梁后的露天石场（sand_hunt_colony） | 扶倒柱的低棱，贴北墙靠近内巢 | 赤脊护巢蜥（sand_quarry_guard） | 梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕 | 0.5 | 81 | 8 | 2 | 17.777778% | 8 | 0 |
-| 梁后的露天石场（sand_hunt_colony） | 扶倒柱的低棱，贴北墙靠近内巢 | 白额老蜥（sand_quarry_matriarch） | 梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕 | 0.5 | 81 | 1 | 2 | 2.222222% | 1 | 0 |
+| 小地点 | 选项 | 引发战斗 | 先开哪条进路 | 时间（天） | 初始总数 | 本种初始数 | 该走法中每只的抽取权重 | 首次遇见本种的概率 | 本种上限 | 基准回补（游戏日） | curve | fixedPopulation |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 蒲根下的水洞（herb_den） | 踏上木板，朝水洞里探 | 蒲窝青蟾（herb_den_toad） |  | 0.125 | 39 | 24 | 1 | 61.538462% | 24 | 0 |  |  |
+| 蒲根下的水洞（herb_den） | 踏上木板，朝水洞里探 | 锯鳍鲶（herb_den_sawfish） |  | 0.125 | 39 | 8 | 1 | 20.512821% | 8 | 0 |  |  |
+| 蒲根下的水洞（herb_den） | 踏上木板，朝水洞里探 | 蒲根巨蜥（herb_den_lizard） |  | 0.125 | 39 | 6 | 1 | 15.384615% | 6 | 0 |  |  |
+| 蒲根下的水洞（herb_den） | 踏上木板，朝水洞里探 | 断桩老蜥（herb_den_elder） |  | 0.125 | 39 | 1 | 1 | 2.564103% | 1 | 0 |  |  |
+| 蒲根下的水洞（herb_den） | 踩干石绕到洞边的干岸 | 蒲窝青蟾（herb_den_toad） | 蒲根下的水洞（herb_den） · 蹲在板头，看看蒲根在水下往哪伸 | 0.375 | 39 | 24 | 1 | 61.538462% | 24 | 0 |  |  |
+| 蒲根下的水洞（herb_den） | 踩干石绕到洞边的干岸 | 锯鳍鲶（herb_den_sawfish） | 蒲根下的水洞（herb_den） · 蹲在板头，看看蒲根在水下往哪伸 | 0.375 | 39 | 8 | 1 | 20.512821% | 8 | 0 |  |  |
+| 蒲根下的水洞（herb_den） | 踩干石绕到洞边的干岸 | 蒲根巨蜥（herb_den_lizard） | 蒲根下的水洞（herb_den） · 蹲在板头，看看蒲根在水下往哪伸 | 0.375 | 39 | 6 | 1 | 15.384615% | 6 | 0 |  |  |
+| 蒲根下的水洞（herb_den） | 踩干石绕到洞边的干岸 | 断桩老蜥（herb_den_elder） | 蒲根下的水洞（herb_den） · 蹲在板头，看看蒲根在水下往哪伸 | 0.375 | 39 | 1 | 1 | 2.564103% | 1 | 0 |  |  |
+| 融雪沟的黑石滩（snow_armor_bank） | 沿滩找活物留下的踪迹 | 雪涧斑獭（snow_gully_otter） |  | 0.25 | 19 | 3 | 1 | 15.789474% | 5 | 7 | wild | 是 |
+| 融雪沟的黑石滩（snow_armor_bank） | 沿滩找活物留下的踪迹 | 覆雪石羚（snow_rime_antelope） |  | 0.25 | 19 | 2 | 1 | 10.526316% | 3 | 10 | wild | 是 |
+| 融雪沟的黑石滩（snow_armor_bank） | 沿滩找活物留下的踪迹 | 扁背雪蜥（snow_flat_scale） |  | 0.25 | 19 | 8 | 1 | 42.105263% | 12 | 9 | wild | 是 |
+| 融雪沟的黑石滩（snow_armor_bank） | 沿滩找活物留下的踪迹 | 夹石雪蟹（snow_seam_crab） |  | 0.25 | 19 | 6 | 1 | 31.578947% | 9 | 11 | wild | 是 |
+| 琉石堆后的背风槽（sand_armor_bank） | 顺背风的石脊找猎物 | 灰钳岩蝎（sand_quarry_rockscorpion） |  | 0.375 | 20 | 6 | 1 | 30% | 10 | 9 | wild | 是 |
+| 琉石堆后的背风槽（sand_armor_bank） | 顺背风的石脊找猎物 | 三痕琉狮（sand_glass_lynx） |  | 0.375 | 20 | 3 | 1 | 15% | 4 | 13 | wild | 是 |
+| 琉石堆后的背风槽（sand_armor_bank） | 顺背风的石脊找猎物 | 赤脊护巢蜥（sand_quarry_guard） |  | 0.375 | 20 | 4 | 1 | 20% | 6 | 13 | wild | 是 |
+| 琉石堆后的背风槽（sand_armor_bank） | 顺背风的石脊找猎物 | 棘背岩蜥（sand_spine_lizard） |  | 0.375 | 20 | 5 | 1 | 25% | 8 | 12 | wild | 是 |
+| 琉石堆后的背风槽（sand_armor_bank） | 顺背风的石脊找猎物 | 裂石巨蝎（sand_riven_scorpion） |  | 0.375 | 20 | 2 | 1 | 10% | 4 | 16 | wild | 是 |
+| 梁后的露天石场（sand_hunt_colony） | 越过倒柱，在矮石边找落脚处 | 黑背砂蜥（sand_quarry_skink） |  | 0.25 | 81 | 48 | 1 | 59.259259% | 48 | 0 |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 越过倒柱，在矮石边找落脚处 | 灰钳岩蝎（sand_quarry_rockscorpion） |  | 0.25 | 81 | 24 | 1 | 29.62963% | 24 | 0 |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 越过倒柱，在矮石边找落脚处 | 赤脊护巢蜥（sand_quarry_guard） |  | 0.25 | 81 | 8 | 1 | 9.876543% | 8 | 0 |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 越过倒柱，在矮石边找落脚处 | 白额老蜥（sand_quarry_matriarch） |  | 0.25 | 81 | 1 | 1 | 1.234568% | 1 | 0 |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 扶倒柱的低棱，绕上北墙石台 | 黑背砂蜥（sand_quarry_skink） | 梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕 | 0.5 | 81 | 48 | 1 | 59.259259% | 48 | 0 |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 扶倒柱的低棱，绕上北墙石台 | 灰钳岩蝎（sand_quarry_rockscorpion） | 梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕 | 0.5 | 81 | 24 | 1 | 29.62963% | 24 | 0 |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 扶倒柱的低棱，绕上北墙石台 | 赤脊护巢蜥（sand_quarry_guard） | 梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕 | 0.5 | 81 | 8 | 1 | 9.876543% | 8 | 0 |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 扶倒柱的低棱，绕上北墙石台 | 白额老蜥（sand_quarry_matriarch） | 梁后的露天石场（sand_hunt_colony） · 翻看倒柱内侧的爪痕 | 0.5 | 81 | 1 | 1 | 1.234568% | 1 | 0 |  |  |
 
 ## 猎获原料的实际消耗
 
@@ -525,11 +592,19 @@
 | 筑基期妖丹（foundation_core） | 配方 | 回湖弓 | 8 | 1 |
 | 兽革（hide） | 配方 | 回湖弓 | 10 | 1 |
 | 筑基期妖丹（foundation_core） | 配方 | 水绡札甲 | 5 | 1 |
-| 兽革（hide） | 配方 | 水绡札甲 | 10 | 1 |
+| 兽革（hide） | 配方 | 水绡札甲 | 7 | 1 |
+| 厚甲片（hard_scale） | 配方 | 水绡札甲 | 8 | 1 |
 | 金丹期妖丹（gold_core） | 配方 | 横渊雨衣 | 8 | 1 |
-| 兽革（hide） | 配方 | 横渊雨衣 | 12 | 1 |
+| 兽革（hide） | 配方 | 横渊雨衣 | 8 | 1 |
+| 厚甲片（hard_scale） | 配方 | 横渊雨衣 | 16 | 1 |
 | 筑基期妖丹（foundation_core） | 配方 | 焦灯剑穗 | 5 | 1 |
 | 妖目（beast_eye） | 配方 | 焦灯剑穗 | 1 | 1 |
+| 筑基期妖丹（foundation_core） | 配方 | 蒲根护臂 | 4 | 1 |
+| 兽革（hide） | 配方 | 蒲根护臂 | 5 | 1 |
+| 厚甲片（hard_scale） | 配方 | 蒲根护臂 | 8 | 1 |
+| 金丹期妖丹（gold_core） | 配方 | 裂鳞枪 | 5 | 1 |
+| 兽革（hide） | 配方 | 裂鳞枪 | 5 | 1 |
+| 厚甲片（hard_scale） | 配方 | 裂鳞枪 | 14 | 1 |
 | 筑基期妖丹（foundation_core） | 配方 | 照水重矢 | 1 | 9 |
 | 筑基期妖丹（foundation_core） | 配方 | 缓脉丹 | 2 | 4 |
 | 兽革（hide） | 配方 | 缓脉丹 | 2 | 4 |
@@ -696,6 +771,8 @@
 | gauze_armor | 水绡札甲 | 身甲 |  |  |  |  | 4 | 筑基中期 |  | 8 | 12 | 4 |  | 70 | 25 | 筑基中期的护堤人常穿。甲片随呼吸开合，能存住更多真气。护臂和裙甲也能减轻摸水采药、撬石时的撞擦。 |  | 每批采集减伤 3，至少受 1 点伤 |
 | fault_coat | 横渊雨衣 | 身甲 |  |  |  |  | 6 | 金丹初期 |  | 10 | 16 | 6 |  | 76 | 33 | 金丹修士才穿得稳的雨衣。能减轻抽取真气招式的伤害。在鸣沙州内走路时裹住衣襟挡沙，赶路也少耗些饱腹。 | 额外护持 · 吸取真气 · 加成 5 | 鸣沙境内普通步行耗粮 −25% |
 | coal_tassel | 焦灯剑穗 | 法器 |  |  |  |  | 5 | 筑基后期 |  | 2 | 4 | 9 | 0.14 | 66 | 24 | 筑基后期可佩戴的旧剑穗。攥住它能稳住呼吸，也更容易抽身退开。 |  |  |
+| den_armguard | 蒲根护臂 | 副手 |  |  | 4 |  | 4 | 筑基中期 |  | 2 | 5 | 4 |  | 56 | 18 | 筑基中期可用的分片护臂，占一只手。平时护住手腕，架住蓄力重招时还能多卸一股劲。 |  |  |
+| quarry_spear | 裂鳞枪 | 武器 | 长兵 | 1 |  |  | 5 | 筑基后期 | 9 |  |  | 2 |  | 64 | 24 | 筑基后期可单手使的长枪。面对披硬鳞的妖兽，可以从鳞片的接缝扎进去。 | 额外穿甲 · 敌人标签 scaled · 加成 4 |  |
 | ferry_pole | 渡工短篙 | 武器 | 杖 | 1 |  |  | 1 | 炼气中期 | 4 | 1 | 0 | 0 | 0.1 | 36 | 6 | 炼气中期使得稳的短篙。握得靠后能横架，想离开交手时也好借力退一步。 |  |  |
 | caravan_bell | 压雾车铃 | 法器 |  |  |  |  | 1 | 炼气中期 | 0 | 0 | 0 | 1 | 0.1 | 34 | 6 | 炼气中期便能佩用。沿雾路多走一段，真气才会受到雾压，交手时也较容易抽身。 |  | 开始耗气的雾压上限 +2 |
 | zhao_cargo_brace | 缠绳护腕 | 副手 |  |  | 4 |  | 2 | 炼气后期 |  | 1 |  |  |  | 36 | 10 | 押货用的厚护腕，须留一只手。船索缠在皮环内，架住对手蓄力后的重击时会卸去一股力。 |  |  |
@@ -733,6 +810,7 @@
 | coil_pole | 回烟长杖 | 制作 | r_coil_pole | 52 | 寒铁（ore）×10、暗金（black_iron）×8、松木（wood）×8、灵晶（core）×4、筑基期妖丹（foundation_core）×6 |  |  | 是 |  |
 | foil_sword | 霜缝剑 | 制作 | r_foil_sword | 74 | 寒铁（ore）×14、暗金（black_iron）×11、灵晶（core）×9、筑基期妖丹（foundation_core）×9 |  |  | 是 |  |
 | lake_bow | 回湖弓 | 制作 | r_lake_bow | 68 | 松木（wood）×12、兽革（hide）×10、灵晶（core）×9、暗金（black_iron）×4、筑基期妖丹（foundation_core）×8 |  |  | 是 |  |
+| quarry_spear | 裂鳞枪 | 制作 | r_quarry_spear | 68 | 暗金（black_iron）×9、灵晶（core）×7、金丹期妖丹（gold_core）×5、兽革（hide）×5、厚甲片（hard_scale）×14 |  |  | 是 |  |
 | ferry_pole | 渡工短篙 | 现场获得 | 背风灯台（wharf_lee_lamp） · 用松木给灯台补两只脚 |  |  |  |  | 否 |  |
 
 ## 弹药与命中效果
@@ -842,64 +920,66 @@
 
 ## 制作用方
 
-| 标识 | 产物 | 数量 | 境界要求 | 境界名 | 制作费用（灵钱） | 所需物品 | 时间（天） | 发现条件 | 需给工匠看过兽革 | 所需丹方 | 生产设施 | 设施最低等级 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| r_salve | 松脂膏（salve） | 2 | 0 | 炼气初期 | 2 | 松木（wood）×1 | 1 |  |  |  |  |  |
-| r_qi | 回气散（qi_powder） | 3 | 0 | 炼气初期 | 3 | 灵草（reed）×2、松木（wood）×1 | 1 |  |  | 回气散丹方（formula_qi） | 炼丹炉（furnace） |  |
-| r_grain | 暖谷丸（grain_pill） | 1 | 0 | 炼气初期 | 2 | 干粮（ration）×3、松木（wood）×1 | 1 |  |  | 暖谷丸丹方（formula_grain） | 炼丹炉（furnace） |  |
-| r_detox | 清露丸（detox_pill） | 2 | 0 | 炼气初期 | 3 | 灵草（reed）×2、松木（wood）×1 | 1 |  |  | 清露丸丹方（formula_detox） | 炼丹炉（furnace） |  |
-| r_focus | 定息丹（focus_pill） | 2 | 0 | 炼气初期 | 4 | 灵草（reed）×2、松木（wood）×1、炼气期妖丹（qi_core）×1 | 1.5 |  |  | 定息丹方（formula_focus） | 炼丹炉（furnace） |  |
-| r_heal | 合络丹（heal_pill） | 2 | 1 | 炼气中期 | 4 | 灵草（reed）×3、兽革（hide）×1 | 1.5 |  |  | 合络丹丹方（formula_heal） | 炼丹炉（furnace） |  |
-| r_tide | 济潮丹（tide_pill） | 2 | 2 | 炼气后期 | 7 | 灵草（reed）×3、灵晶（core）×1、炼气期妖丹（qi_core）×2 | 2 |  |  | 济潮丹丹方（formula_tide） | 炼丹炉（furnace） | 2 |
-| r_ember | 燃枝符（ember_talisman） | 2 | 0 | 炼气初期 | 3 | 松木（wood）×1、灵草（reed）×1 | 1 | 得知物品 石炉沿的折纸样（ember_fold） |  |  |  |  |
-| r_reed | 遮痕符（reed_talisman） | 2 | 0 | 炼气初期 | 2 | 灵草（reed）×1、松木（wood）×1 | 1 | 得知物品 遮痕符（reed_talisman） |  |  |  |  |
-| r_bank_talisman | 回汊符（bank_talisman） | 2 | 0 | 炼气初期 | 3 | 灵草（reed）×1、松木（wood）×2 | 1 | 得知物品 回汊图（eddy_note） |  |  |  |  |
-| r_iron | 铁障符（iron_talisman） | 2 | 1 | 炼气中期 | 4 | 寒铁（ore）×1、松木（wood）×1 | 1 | 得知物品 铁障符（iron_talisman） |  |  |  |  |
-| r_tide_talisman | 逆潮符（tide_talisman） | 2 | 2 | 炼气后期 | 6 | 灵晶（core）×1、松木（wood）×1 | 1 | 得知物品 闸工的潮牌（tide_note） |  |  |  |  |
-| r_hide_coat | 泥蜕褂（hide_coat） | 1 | 0 | 炼气初期 | 5 | 兽革（hide）×2 | 1 |  | 是 |  |  |  |
-| r_reed_bow | 苇弦弓（reed_bow） | 1 | 0 | 炼气初期 | 4 | 松木（wood）×1、灵草（reed）×2 | 1 |  |  |  |  |  |
-| r_split_axe | 劈柴小钺（split_axe） | 1 | 0 | 炼气初期 | 7 | 寒铁（ore）×3、松木（wood）×3 | 1 | 得知物品 寒铁（ore） |  |  | 锻炉（forge） |  |
-| r_short_spear | 摊市短矛（short_spear） | 1 | 0 | 炼气初期 | 9 | 寒铁（ore）×2、松木（wood）×4 | 1.5 | 得知物品 寒铁（ore） |  |  | 锻炉（forge） |  |
-| r_iron_sword | 寒铁剑（iron_sword） | 1 | 0 | 炼气初期 | 12 | 寒铁（ore）×6、松木（wood）×3 | 2 | 得知物品 厚脊剑坯样（blade_template） |  |  | 锻炉（forge） |  |
-| r_iron_coat | 叠铁袍（iron_coat） | 1 | 1 | 炼气中期 | 16 | 寒铁（ore）×8、兽革（hide）×3 | 2 | 得知物品 挑夫的叠片缝样（plate_lacing） | 是 |  | 锻炉（forge） |  |
-| r_tide_spear | 分潮枪（tide_spear） | 1 | 1 | 炼气中期 | 17 | 寒铁（ore）×5、灵晶（core）×2、炼气期妖丹（qi_core）×4 | 2.5 | 得知物品 闸把的分水榫（spear_joint） |  |  | 锻炉（forge） |  |
-| r_tide_coat | 定潮甲（tide_coat） | 1 | 2 | 炼气后期 | 19 | 寒铁（ore）×5、兽革（hide）×3、灵晶（core）×2、炼气期妖丹（qi_core）×3 | 3 | 得知物品 旧排的护甲扣（gate_buckles） | 是 |  | 锻炉（forge） |  |
-| r_reed_charm | 苇哨结（reed_charm） | 1 | 0 | 炼气初期 | 3 | 灵草（reed）×2、松木（wood）×1 | 0.5 | 得知物品 旧桨上的靠岸图（oar_mark） |  |  |  |  |
-| r_tide_charm | 避潮玉（tide_charm） | 1 | 2 | 炼气后期 | 11 | 灵晶（core）×2、兽革（hide）×1、妖目（beast_eye）×1 | 1.5 | 得知物品 闸工的潮牌（tide_note） |  |  | 锻炉（forge） |  |
-| r_jetty_charm | 回灯坠（jetty_charm） | 1 | 2 | 炼气后期 | 8 | 松木（wood）×2、灵草（reed）×1、灵晶（core）×1 | 1 | 得知物品 灯夫手势（lamp_sketch） |  |  |  |  |
-| r_reed_arrow | 削苇箭（reed_arrow） | 8 | 0 | 炼气初期 | 1 | 松木（wood）×2、灵草（reed）×1 | 0.5 |  |  |  |  |  |
-| r_iron_arrow | 包铁箭（iron_arrow） | 6 | 1 | 炼气中期 | 3 | 寒铁（ore）×2、灵草（reed）×2 | 1 | 得知物品 包铁箭样（arrow_pattern） |  |  | 锻炉（forge） |  |
-| r_black_bolt | 暗金短矢（black_bolt） | 8 | 2 | 炼气后期 | 4 | 暗金（black_iron）×2、松木（wood）×2 | 1 | 得知物品 两寸机臂铁样（vein_pattern） |  |  | 锻炉（forge） | 2 |
-| r_cloud_arrow | 凝光箭（cloud_arrow） | 8 | 3 | 筑基初期 | 6 | 灵晶（core）×1、兽革（hide）×1、松木（wood）×2、炼气期妖丹（qi_core）×1 | 1.5 | 得知物品 晶镞轻重样（cloud_tip） |  |  | 锻炉（forge） | 2 |
-| r_pine_bow | 松筋长弓（pine_bow） | 1 | 0 | 炼气初期 | 14 | 松木（wood）×7、兽革（hide）×3 | 2 | 得知物品 松架上的试弓木（bow_stave） |  |  | 锻炉（forge） |  |
-| r_resin_staff | 藏火杖（resin_staff） | 1 | 1 | 炼气中期 | 13 | 松木（wood）×6、寒铁（ore）×3 | 2 | 得知物品 守炉杖的样柄（resin_tamper） |  |  | 锻炉（forge） |  |
-| r_black_crossbow | 暗金机弩（black_crossbow） | 1 | 2 | 炼气后期 | 30 | 暗金（black_iron）×5、松木（wood）×4、兽革（hide）×2、炼气期妖丹（qi_core）×6 | 3 | 得知物品 两寸机臂铁样（vein_pattern） |  |  | 锻炉（forge） | 2 |
-| r_coil_spear | 绕脊枪（coil_spear） | 1 | 0 | 炼气初期 | 28 | 暗金（black_iron）×5、松木（wood）×4、灵晶（core）×3 | 3 | 得知物品 两寸机臂铁样（vein_pattern） |  |  | 锻炉（forge） | 2 |
-| r_snow_halberd | 断雪戟（snow_halberd） | 1 | 2 | 炼气后期 | 28 | 暗金（black_iron）×6、松木（wood）×4、兽革（hide）×3 | 3 | 得知物品 断雪戟的回钩样（hook_iron） |  |  | 锻炉（forge） | 2 |
-| r_frost_robe | 锁温袍（frost_robe） | 1 | 2 | 炼气后期 | 24 | 兽革（hide）×8、松木（wood）×3 | 3 | 得知物品 护栈人的夹皮缝样（pass_seam） |  |  | 锻炉（forge） | 2 |
-| r_sky_sword | 归衡剑（sky_sword） | 1 | 3 | 筑基初期 | 42 | 暗金（black_iron）×7、灵晶（core）×4、兽革（hide）×3、筑基期妖丹（foundation_core）×4 | 4 | 得知物品 天衡位刻（meridian_etching） |  |  | 锻炉（forge） | 3 |
-| r_sky_bow | 鸣岳弓（sky_bow） | 1 | 3 | 筑基初期 | 39 | 松木（wood）×8、灵晶（core）×4、兽革（hide）×6、筑基期妖丹（foundation_core）×3 | 4 | 得知物品 落影调枢图（axis_tuning） |  |  | 锻炉（forge） | 3 |
-| r_sky_cloak | 合纹披甲（sky_cloak） | 1 | 3 | 筑基初期 | 36 | 兽革（hide）×8、灵晶（core）×5 | 4 | 得知物品 玉片披甲的接丝账（loom_tack） |  |  | 锻炉（forge） | 3 |
-| r_jade_pendant | 照腕佩（jade_pendant） | 1 | 3 | 筑基初期 | 26 | 灵晶（core）×5、兽革（hide）×3、妖目（beast_eye）×1 | 3 | 得知物品 落影调枢图（axis_tuning） |  |  | 锻炉（forge） | 2 |
-| r_star_blade | 暗星刀（star_blade） | 1 | 2 | 炼气后期 | 35 | 暗金（black_iron）×9、寒铁（ore）×5、灵晶（core）×4、松木（wood）×3 | 4 | 得知物品 暗星刀匣底图（star_blade_pattern） |  |  | 锻炉（forge） | 2 |
-| r_hide_shield | 包革小盾（hide_shield） | 1 | 0 | 炼气初期 | 8 | 松木（wood）×4、兽革（hide）×3 | 1.25 |  | 是 |  | 锻炉（forge） |  |
-| r_miner_pick | 短柄矿镐（miner_pick） | 1 | 0 | 炼气初期 | 8 | 寒铁（ore）×4、松木（wood）×2 | 1.5 | 得知物品 厚脊剑坯样（blade_template） |  |  | 锻炉（forge） |  |
-| r_resin_pill | 温枝丸（resin_pill） | 3 | 1 | 炼气中期 | 6 | 松木（wood）×2、灵草（reed）×3、炼气期妖丹（qi_core）×2 | 2 |  |  | 温枝丸丹方（formula_resin） | 炼丹炉（furnace） |  |
-| r_leaf_pill | 清脉饮（leaf_pill） | 3 | 2 | 炼气后期 | 10 | 灵草（reed）×4、耐火泥（kiln_clay）×1、松木（wood）×2、炼气期妖丹（qi_core）×3 | 3 |  |  | 清脉饮丹方（formula_leaf） | 炼丹炉（furnace） | 2 |
-| r_jade_pill | 照心露（jade_pill） | 3 | 3 | 筑基初期 | 16 | 灵草（reed）×4、灵晶（core）×2、松木（wood）×1、筑基期妖丹（foundation_core）×2、妖目（beast_eye）×1 | 4 |  |  | 照心露丹方（formula_jade） | 炼丹炉（furnace） | 3 |
-| r_foundation | 筑基丹（foundation_pill） | 1 | 2 | 炼气后期 | 45 | 封炉药引（foundation_charge）×1、灵草（reed）×6、灵晶（core）×5、暗金（black_iron）×4、炼气期妖丹（qi_core）×24 | 4 |  |  | 筑基丹方（formula_foundation） | 炼丹炉（furnace） | 2 |
-| r_gate_scroll | 传送卷轴（gate_scroll） | 2 | 0 | 炼气初期 | 5 | 松木（wood）×1、灵草（reed）×1、灵晶（core）×1 | 0.5 |  |  | 传送卷轴图纸（gate_scroll_formula） |  |  |
-| r_gold_powder | 结丹散（gold_powder） | 1 | 5 | 筑基后期 | 118 | 伏潮息泥（heart_silt）×1、井心水盐（stillwell_salt）×1、灵草（reed）×18、灵晶（core）×16、暗金（black_iron）×10、筑基期妖丹（foundation_core）×28 | 9 |  |  | 结丹散丹方（gold_formula） | 炼丹炉（furnace） | 3 |
-| r_weir_knife | 迎岸横刀（weir_knife） |  | 1 | 炼气中期 | 36 | 寒铁（ore）×13、松木（wood）×6、兽革（hide）×4、灵晶（core）×2 | 4 | 得知物品 倒浪楔（undertow_wedge） |  |  | 锻炉（forge） | 2 |
-| r_coil_pole | 回烟长杖（coil_pole） |  | 4 | 筑基中期 | 52 | 寒铁（ore）×10、暗金（black_iron）×8、松木（wood）×8、灵晶（core）×4、筑基期妖丹（foundation_core）×6 | 6 | 得知物品 听矿铜簧（echo_tuning_key） |  |  | 锻炉（forge） | 2 |
-| r_foil_sword | 霜缝剑（foil_sword） |  | 5 | 筑基后期 | 74 | 寒铁（ore）×14、暗金（black_iron）×11、灵晶（core）×9、筑基期妖丹（foundation_core）×9 | 7 | 得知物品 冷炉验火册（cold_kiln_record） |  |  | 锻炉（forge） | 3 |
-| r_lake_bow | 回湖弓（lake_bow） |  | 5 | 筑基后期 | 68 | 松木（wood）×12、兽革（hide）×10、灵晶（core）×9、暗金（black_iron）×4、筑基期妖丹（foundation_core）×8 | 6 | 得知物品 伏潮漏图（phase_chart） |  |  | 锻炉（forge） | 3 |
-| r_gauze_armor | 水绡札甲（gauze_armor） |  | 4 | 筑基中期 | 48 | 兽革（hide）×10、寒铁（ore）×9、灵晶（core）×5、筑基期妖丹（foundation_core）×5 | 5 | 得知物品 倒浪楔（undertow_wedge） |  |  | 锻炉（forge） | 2 |
-| r_fault_coat | 横渊雨衣（fault_coat） |  | 6 | 金丹初期 | 78 | 兽革（hide）×12、寒铁（ore）×10、暗金（black_iron）×13、金丹期妖丹（gold_core）×8 | 7 | 得知物品 结丹散丹方（gold_formula） |  |  | 锻炉（forge） | 3 |
-| r_coal_tassel | 焦灯剑穗（coal_tassel） |  | 5 | 筑基后期 | 58 | 灵草（reed）×10、松木（wood）×8、灵晶（core）×8、暗金（black_iron）×5、筑基期妖丹（foundation_core）×5、妖目（beast_eye）×1 | 5 | 得知物品 冷炉验火册（cold_kiln_record） |  |  | 锻炉（forge） | 2 |
-| r_clear_needle | 照水重矢（clear_needle） | 9 | 3 | 筑基初期 | 5 | 松木（wood）×2、寒铁（ore）×2、筑基期妖丹（foundation_core）×1 | 1 | 得知物品 伏潮漏图（phase_chart） |  |  | 锻炉（forge） | 2 |
-| r_gold_salve | 缓脉丹（gold_salve） | 4 | 4 | 筑基中期 | 20 | 灵草（reed）×6、兽革（hide）×2、灵晶（core）×3、筑基期妖丹（foundation_core）×2 | 3 |  |  | 缓脉丹方（formula_gold_salve） | 炼丹炉（furnace） | 3 |
-| r_return_breath | 归元丹（return_breath_pill） | 3 | 6 | 金丹初期 | 14 | 灵草（reed）×5、灵晶（core）×2、金丹期妖丹（gold_core）×1 | 3 |  |  | 归元丹方（formula_return_breath） | 炼丹炉（furnace） | 3 |
+| 标识 | 产物 | 数量 | 境界要求 | 境界名 | 制作费用（灵钱） | 所需物品 | 时间（天） | 发现条件 | 需给工匠看过兽革 | 所需丹方 | 生产设施 | 设施最低等级 | 说明 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| r_salve | 松脂膏（salve） | 2 | 0 | 炼气初期 | 2 | 松木（wood）×1 | 1 |  |  |  |  |  |  |
+| r_qi | 回气散（qi_powder） | 3 | 0 | 炼气初期 | 3 | 灵草（reed）×2、松木（wood）×1 | 1 |  |  | 回气散丹方（formula_qi） | 炼丹炉（furnace） |  |  |
+| r_grain | 暖谷丸（grain_pill） | 1 | 0 | 炼气初期 | 2 | 干粮（ration）×3、松木（wood）×1 | 1 |  |  | 暖谷丸丹方（formula_grain） | 炼丹炉（furnace） |  |  |
+| r_detox | 清露丸（detox_pill） | 2 | 0 | 炼气初期 | 3 | 灵草（reed）×2、松木（wood）×1 | 1 |  |  | 清露丸丹方（formula_detox） | 炼丹炉（furnace） |  |  |
+| r_focus | 定息丹（focus_pill） | 2 | 0 | 炼气初期 | 4 | 灵草（reed）×2、松木（wood）×1、炼气期妖丹（qi_core）×1 | 1.5 |  |  | 定息丹方（formula_focus） | 炼丹炉（furnace） |  |  |
+| r_heal | 合络丹（heal_pill） | 2 | 1 | 炼气中期 | 4 | 灵草（reed）×3、兽革（hide）×1 | 1.5 |  |  | 合络丹丹方（formula_heal） | 炼丹炉（furnace） |  |  |
+| r_tide | 济潮丹（tide_pill） | 2 | 2 | 炼气后期 | 7 | 灵草（reed）×3、灵晶（core）×1、炼气期妖丹（qi_core）×2 | 2 |  |  | 济潮丹丹方（formula_tide） | 炼丹炉（furnace） | 2 |  |
+| r_ember | 燃枝符（ember_talisman） | 2 | 0 | 炼气初期 | 3 | 松木（wood）×1、灵草（reed）×1 | 1 | 得知物品 石炉沿的折纸样（ember_fold） |  |  |  |  |  |
+| r_reed | 遮痕符（reed_talisman） | 2 | 0 | 炼气初期 | 2 | 灵草（reed）×1、松木（wood）×1 | 1 | 得知物品 遮痕符（reed_talisman） |  |  |  |  |  |
+| r_bank_talisman | 回汊符（bank_talisman） | 2 | 0 | 炼气初期 | 3 | 灵草（reed）×1、松木（wood）×2 | 1 | 得知物品 回汊图（eddy_note） |  |  |  |  |  |
+| r_iron | 铁障符（iron_talisman） | 2 | 1 | 炼气中期 | 4 | 寒铁（ore）×1、松木（wood）×1 | 1 | 得知物品 铁障符（iron_talisman） |  |  |  |  |  |
+| r_tide_talisman | 逆潮符（tide_talisman） | 2 | 2 | 炼气后期 | 6 | 灵晶（core）×1、松木（wood）×1 | 1 | 得知物品 闸工的潮牌（tide_note） |  |  |  |  |  |
+| r_hide_coat | 泥蜕褂（hide_coat） | 1 | 0 | 炼气初期 | 5 | 兽革（hide）×2 | 1 |  | 是 |  |  |  |  |
+| r_reed_bow | 苇弦弓（reed_bow） | 1 | 0 | 炼气初期 | 4 | 松木（wood）×1、灵草（reed）×2 | 1 |  |  |  |  |  |  |
+| r_split_axe | 劈柴小钺（split_axe） | 1 | 0 | 炼气初期 | 7 | 寒铁（ore）×3、松木（wood）×3 | 1 | 得知物品 寒铁（ore） |  |  | 锻炉（forge） |  |  |
+| r_short_spear | 摊市短矛（short_spear） | 1 | 0 | 炼气初期 | 9 | 寒铁（ore）×2、松木（wood）×4 | 1.5 | 得知物品 寒铁（ore） |  |  | 锻炉（forge） |  |  |
+| r_iron_sword | 寒铁剑（iron_sword） | 1 | 0 | 炼气初期 | 12 | 寒铁（ore）×6、松木（wood）×3 | 2 | 得知物品 厚脊剑坯样（blade_template） |  |  | 锻炉（forge） |  |  |
+| r_iron_coat | 叠铁袍（iron_coat） | 1 | 1 | 炼气中期 | 16 | 寒铁（ore）×8、兽革（hide）×3 | 2 | 得知物品 挑夫的叠片缝样（plate_lacing） | 是 |  | 锻炉（forge） |  |  |
+| r_tide_spear | 分潮枪（tide_spear） | 1 | 1 | 炼气中期 | 17 | 寒铁（ore）×5、灵晶（core）×2、炼气期妖丹（qi_core）×4 | 2.5 | 得知物品 闸把的分水榫（spear_joint） |  |  | 锻炉（forge） |  |  |
+| r_tide_coat | 定潮甲（tide_coat） | 1 | 2 | 炼气后期 | 19 | 寒铁（ore）×5、兽革（hide）×3、灵晶（core）×2、炼气期妖丹（qi_core）×3 | 3 | 得知物品 旧排的护甲扣（gate_buckles） | 是 |  | 锻炉（forge） |  |  |
+| r_reed_charm | 苇哨结（reed_charm） | 1 | 0 | 炼气初期 | 3 | 灵草（reed）×2、松木（wood）×1 | 0.5 | 得知物品 旧桨上的靠岸图（oar_mark） |  |  |  |  |  |
+| r_tide_charm | 避潮玉（tide_charm） | 1 | 2 | 炼气后期 | 11 | 灵晶（core）×2、兽革（hide）×1、妖目（beast_eye）×1 | 1.5 | 得知物品 闸工的潮牌（tide_note） |  |  | 锻炉（forge） |  |  |
+| r_jetty_charm | 回灯坠（jetty_charm） | 1 | 2 | 炼气后期 | 8 | 松木（wood）×2、灵草（reed）×1、灵晶（core）×1 | 1 | 得知物品 灯夫手势（lamp_sketch） |  |  |  |  |  |
+| r_reed_arrow | 削苇箭（reed_arrow） | 8 | 0 | 炼气初期 | 1 | 松木（wood）×2、灵草（reed）×1 | 0.5 |  |  |  |  |  |  |
+| r_iron_arrow | 包铁箭（iron_arrow） | 6 | 1 | 炼气中期 | 3 | 寒铁（ore）×2、灵草（reed）×2 | 1 | 得知物品 包铁箭样（arrow_pattern） |  |  | 锻炉（forge） |  |  |
+| r_black_bolt | 暗金短矢（black_bolt） | 8 | 2 | 炼气后期 | 4 | 暗金（black_iron）×2、松木（wood）×2 | 1 | 得知物品 两寸机臂铁样（vein_pattern） |  |  | 锻炉（forge） | 2 |  |
+| r_cloud_arrow | 凝光箭（cloud_arrow） | 8 | 3 | 筑基初期 | 6 | 灵晶（core）×1、兽革（hide）×1、松木（wood）×2、炼气期妖丹（qi_core）×1 | 1.5 | 得知物品 晶镞轻重样（cloud_tip） |  |  | 锻炉（forge） | 2 |  |
+| r_pine_bow | 松筋长弓（pine_bow） | 1 | 0 | 炼气初期 | 14 | 松木（wood）×7、兽革（hide）×3 | 2 | 得知物品 松架上的试弓木（bow_stave） |  |  | 锻炉（forge） |  |  |
+| r_resin_staff | 藏火杖（resin_staff） | 1 | 1 | 炼气中期 | 13 | 松木（wood）×6、寒铁（ore）×3 | 2 | 得知物品 守炉杖的样柄（resin_tamper） |  |  | 锻炉（forge） |  |  |
+| r_black_crossbow | 暗金机弩（black_crossbow） | 1 | 2 | 炼气后期 | 30 | 暗金（black_iron）×5、松木（wood）×4、兽革（hide）×2、炼气期妖丹（qi_core）×6 | 3 | 得知物品 两寸机臂铁样（vein_pattern） |  |  | 锻炉（forge） | 2 |  |
+| r_coil_spear | 绕脊枪（coil_spear） | 1 | 0 | 炼气初期 | 28 | 暗金（black_iron）×5、松木（wood）×4、灵晶（core）×3 | 3 | 得知物品 两寸机臂铁样（vein_pattern） |  |  | 锻炉（forge） | 2 |  |
+| r_snow_halberd | 断雪戟（snow_halberd） | 1 | 2 | 炼气后期 | 28 | 暗金（black_iron）×6、松木（wood）×4、兽革（hide）×3 | 3 | 得知物品 断雪戟的回钩样（hook_iron） |  |  | 锻炉（forge） | 2 |  |
+| r_frost_robe | 锁温袍（frost_robe） | 1 | 2 | 炼气后期 | 24 | 兽革（hide）×8、松木（wood）×3 | 3 | 得知物品 护栈人的夹皮缝样（pass_seam） |  |  | 锻炉（forge） | 2 |  |
+| r_sky_sword | 归衡剑（sky_sword） | 1 | 3 | 筑基初期 | 42 | 暗金（black_iron）×7、灵晶（core）×4、兽革（hide）×3、筑基期妖丹（foundation_core）×4 | 4 | 得知物品 天衡位刻（meridian_etching） |  |  | 锻炉（forge） | 3 |  |
+| r_sky_bow | 鸣岳弓（sky_bow） | 1 | 3 | 筑基初期 | 39 | 松木（wood）×8、灵晶（core）×4、兽革（hide）×6、筑基期妖丹（foundation_core）×3 | 4 | 得知物品 落影调枢图（axis_tuning） |  |  | 锻炉（forge） | 3 |  |
+| r_sky_cloak | 合纹披甲（sky_cloak） | 1 | 3 | 筑基初期 | 36 | 兽革（hide）×8、灵晶（core）×5 | 4 | 得知物品 玉片披甲的接丝账（loom_tack） |  |  | 锻炉（forge） | 3 |  |
+| r_jade_pendant | 照腕佩（jade_pendant） | 1 | 3 | 筑基初期 | 26 | 灵晶（core）×5、兽革（hide）×3、妖目（beast_eye）×1 | 3 | 得知物品 落影调枢图（axis_tuning） |  |  | 锻炉（forge） | 2 |  |
+| r_star_blade | 暗星刀（star_blade） | 1 | 2 | 炼气后期 | 35 | 暗金（black_iron）×9、寒铁（ore）×5、灵晶（core）×4、松木（wood）×3 | 4 | 得知物品 暗星刀匣底图（star_blade_pattern） |  |  | 锻炉（forge） | 2 |  |
+| r_hide_shield | 包革小盾（hide_shield） | 1 | 0 | 炼气初期 | 8 | 松木（wood）×4、兽革（hide）×3 | 1.25 |  | 是 |  | 锻炉（forge） |  |  |
+| r_miner_pick | 短柄矿镐（miner_pick） | 1 | 0 | 炼气初期 | 8 | 寒铁（ore）×4、松木（wood）×2 | 1.5 | 得知物品 厚脊剑坯样（blade_template） |  |  | 锻炉（forge） |  |  |
+| r_resin_pill | 温枝丸（resin_pill） | 3 | 1 | 炼气中期 | 6 | 松木（wood）×2、灵草（reed）×3、炼气期妖丹（qi_core）×2 | 2 |  |  | 温枝丸丹方（formula_resin） | 炼丹炉（furnace） |  |  |
+| r_leaf_pill | 清脉饮（leaf_pill） | 3 | 2 | 炼气后期 | 10 | 灵草（reed）×4、耐火泥（kiln_clay）×1、松木（wood）×2、炼气期妖丹（qi_core）×3 | 3 |  |  | 清脉饮丹方（formula_leaf） | 炼丹炉（furnace） | 2 |  |
+| r_jade_pill | 照心露（jade_pill） | 3 | 3 | 筑基初期 | 16 | 灵草（reed）×4、灵晶（core）×2、松木（wood）×1、筑基期妖丹（foundation_core）×2、妖目（beast_eye）×1 | 4 |  |  | 照心露丹方（formula_jade） | 炼丹炉（furnace） | 3 |  |
+| r_foundation | 筑基丹（foundation_pill） | 1 | 2 | 炼气后期 | 45 | 封炉药引（foundation_charge）×1、灵草（reed）×6、灵晶（core）×5、暗金（black_iron）×4、炼气期妖丹（qi_core）×24 | 4 |  |  | 筑基丹方（formula_foundation） | 炼丹炉（furnace） | 2 |  |
+| r_gate_scroll | 传送卷轴（gate_scroll） | 2 | 0 | 炼气初期 | 5 | 松木（wood）×1、灵草（reed）×1、灵晶（core）×1 | 0.5 |  |  | 传送卷轴图纸（gate_scroll_formula） |  |  |  |
+| r_gold_powder | 结丹散（gold_powder） | 1 | 5 | 筑基后期 | 118 | 伏潮息泥（heart_silt）×1、井心水盐（stillwell_salt）×1、灵草（reed）×18、灵晶（core）×16、暗金（black_iron）×10、筑基期妖丹（foundation_core）×28 | 9 |  |  | 结丹散丹方（gold_formula） | 炼丹炉（furnace） | 3 |  |
+| r_weir_knife | 迎岸横刀（weir_knife） |  | 1 | 炼气中期 | 36 | 寒铁（ore）×13、松木（wood）×6、兽革（hide）×4、灵晶（core）×2 | 4 | 得知物品 倒浪楔（undertow_wedge） |  |  | 锻炉（forge） | 2 |  |
+| r_coil_pole | 回烟长杖（coil_pole） |  | 4 | 筑基中期 | 52 | 寒铁（ore）×10、暗金（black_iron）×8、松木（wood）×8、灵晶（core）×4、筑基期妖丹（foundation_core）×6 | 6 | 得知物品 听矿铜簧（echo_tuning_key） |  |  | 锻炉（forge） | 2 |  |
+| r_foil_sword | 霜缝剑（foil_sword） |  | 5 | 筑基后期 | 74 | 寒铁（ore）×14、暗金（black_iron）×11、灵晶（core）×9、筑基期妖丹（foundation_core）×9 | 7 | 得知物品 冷炉验火册（cold_kiln_record） |  |  | 锻炉（forge） | 3 |  |
+| r_lake_bow | 回湖弓（lake_bow） |  | 5 | 筑基后期 | 68 | 松木（wood）×12、兽革（hide）×10、灵晶（core）×9、暗金（black_iron）×4、筑基期妖丹（foundation_core）×8 | 6 | 得知物品 伏潮漏图（phase_chart） |  |  | 锻炉（forge） | 3 |  |
+| r_gauze_armor | 水绡札甲（gauze_armor） |  | 4 | 筑基中期 | 48 | 兽革（hide）×7、厚甲片（hard_scale）×8、寒铁（ore）×9、灵晶（core）×5、筑基期妖丹（foundation_core）×5 | 5 | 得知物品 倒浪楔（undertow_wedge） |  |  | 锻炉（forge） | 2 |  |
+| r_fault_coat | 横渊雨衣（fault_coat） |  | 6 | 金丹初期 | 78 | 兽革（hide）×8、厚甲片（hard_scale）×16、寒铁（ore）×10、暗金（black_iron）×13、金丹期妖丹（gold_core）×8 | 7 | 得知物品 结丹散丹方（gold_formula） |  |  | 锻炉（forge） | 3 |  |
+| r_coal_tassel | 焦灯剑穗（coal_tassel） |  | 5 | 筑基后期 | 58 | 灵草（reed）×10、松木（wood）×8、灵晶（core）×8、暗金（black_iron）×5、筑基期妖丹（foundation_core）×5、妖目（beast_eye）×1 | 5 | 得知物品 冷炉验火册（cold_kiln_record） |  |  | 锻炉（forge） | 2 |  |
+| r_den_armguard | 蒲根护臂（den_armguard） |  | 4 | 筑基中期 | 42 | 兽革（hide）×5、厚甲片（hard_scale）×8、灵晶（core）×4、筑基期妖丹（foundation_core）×4、松木（wood）×4 | 5 | 得知物品 老蜥颈甲（den_neck_plate）；须持有 老蜥颈甲（den_neck_plate）×1 |  |  | 锻炉（forge） | 2 | 照老蜥颈甲的弧度磨好厚甲片，叠着穿到皮条上。颈甲留着，还能当样子。 |
+| r_quarry_spear | 裂鳞枪（quarry_spear） |  | 5 | 筑基后期 | 68 | 暗金（black_iron）×9、灵晶（core）×7、金丹期妖丹（gold_core）×5、兽革（hide）×5、厚甲片（hard_scale）×14 | 7 | 得知物品 白蜥背棘（quarry_back_spine）；须持有 白蜥背棘（quarry_back_spine）×1 |  |  | 锻炉（forge） | 3 | 依背棘根部的鳞缝打薄枪尖，再把磨好的厚甲片围在刃根。背棘留着，还能当样子。 |
+| r_clear_needle | 照水重矢（clear_needle） | 9 | 3 | 筑基初期 | 5 | 松木（wood）×2、寒铁（ore）×2、筑基期妖丹（foundation_core）×1 | 1 | 得知物品 伏潮漏图（phase_chart） |  |  | 锻炉（forge） | 2 |  |
+| r_gold_salve | 缓脉丹（gold_salve） | 4 | 4 | 筑基中期 | 20 | 灵草（reed）×6、兽革（hide）×2、灵晶（core）×3、筑基期妖丹（foundation_core）×2 | 3 |  |  | 缓脉丹方（formula_gold_salve） | 炼丹炉（furnace） | 3 |  |
+| r_return_breath | 归元丹（return_breath_pill） | 3 | 6 | 金丹初期 | 14 | 灵草（reed）×5、灵晶（core）×2、金丹期妖丹（gold_core）×1 | 3 |  |  | 归元丹方（formula_return_breath） | 炼丹炉（furnace） | 3 |  |
 
 ## 三州大地图点位
 
@@ -1641,6 +1721,8 @@
 | 落灯村（village） | 落灯村工坊 | gauze_armor | 水绡札甲 | 0 | 25 |
 | 落灯村（village） | 落灯村工坊 | fault_coat | 横渊雨衣 | 0 | 33 |
 | 落灯村（village） | 落灯村工坊 | coal_tassel | 焦灯剑穗 | 0 | 24 |
+| 落灯村（village） | 落灯村工坊 | den_armguard | 蒲根护臂 | 0 | 18 |
+| 落灯村（village） | 落灯村工坊 | quarry_spear | 裂鳞枪 | 0 | 24 |
 | 落灯村（village） | 落灯村工坊 | ferry_pole | 渡工短篙 | 0 | 6 |
 | 落灯村（village） | 落灯村工坊 | caravan_bell | 压雾车铃 | 0 | 6 |
 | 落灯村（village） | 落灯村工坊 | zhao_cargo_brace | 缠绳护腕 | 0 | 10 |
@@ -1683,6 +1765,8 @@
 | 照原城（zhao_city） | 蒲霖的后炉 | gauze_armor | 水绡札甲 | 2 | 27 |
 | 照原城（zhao_city） | 蒲霖的后炉 | fault_coat | 横渊雨衣 | 2 | 35 |
 | 照原城（zhao_city） | 蒲霖的后炉 | coal_tassel | 焦灯剑穗 | 2 | 26 |
+| 照原城（zhao_city） | 蒲霖的后炉 | den_armguard | 蒲根护臂 | 2 | 20 |
+| 照原城（zhao_city） | 蒲霖的后炉 | quarry_spear | 裂鳞枪 | 2 | 26 |
 | 照原城（zhao_city） | 蒲霖的后炉 | ferry_pole | 渡工短篙 | 2 | 8 |
 | 照原城（zhao_city） | 蒲霖的后炉 | caravan_bell | 压雾车铃 | 2 | 8 |
 | 照原城（zhao_city） | 蒲霖的后炉 | zhao_cargo_brace | 缠绳护腕 | 2 | 12 |
@@ -1725,6 +1809,8 @@
 | 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | gauze_armor | 水绡札甲 | 3 | 28 |
 | 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | fault_coat | 横渊雨衣 | 3 | 36 |
 | 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | coal_tassel | 焦灯剑穗 | 3 | 27 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | den_armguard | 蒲根护臂 | 3 | 21 |
+| 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | quarry_spear | 裂鳞枪 | 3 | 27 |
 | 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | ferry_pole | 渡工短篙 | 3 | 9 |
 | 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | caravan_bell | 压雾车铃 | 3 | 9 |
 | 叩石院（sand_bell_cloister） | 梁弦的外院修具台 | zhao_cargo_brace | 缠绳护腕 | 3 | 13 |
@@ -1867,7 +1953,7 @@
 | 云炉石谷（kiln_valley） | kiln_flue | 废窑烟道 |  | 冷下来的老窑（abandoned_kiln） · 从铁圈下取出石牌 |  | 3 |  | 2＝墙缝里只剩黄釉上的半片纸痕。靠外窑砖积灰，内壁石柜半开。坡下温水从后崖渗进窑沟。 |  |  |  | cinder_hound＝present＝鱼鳞似的窑砖抖动了几下，一团带着暗红的细灰在石柜前打转。、absent＝窑砖已经稳下来，通往石柜的过道空了。 |  |
 | 篁泽药谷（herb_basin） | herb_beds | 银脉水畦 |  |  |  |  | 水畦里的老叶已经剪尽。细芽还贴着湿泥，只等抽出来。 |  |  |  |  |  |  |
 | 篁泽药谷（herb_basin） | mist_shelter | 垫高脚的药棚 |  |  |  | 1、2 |  | 0＝泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。、1＝席上的捣药板已经腾出来了。泽医身边还放着几只给矿队装药的篓。 |  |  |  |  |  |
-| 篁泽药谷（herb_basin） | herb_den | 蒲根下的水洞 |  | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 |  | 2、5 |  | 4＝取水槽接好了。水越过蒲根，淌进药棚边原先干着的小畦。高处的旧灶还能添柴。 |  |  | 1＝after＝靠棚的板沿有块干石。从那里扶着粗蒲根，可以沿洞壁绕向里面。 | herb_den_toad＝present＝细碎的脚印盖过了大半泥岸。水里一阵挨一阵地鼓泡。、absent＝浅水的泡沫早已散完。、herb_den_lizard＝present＝贴根的宽尾印往几道深缝里收。、absent＝深缝里漏下的水散成细滴，再没有宽尾掠过去。、herb_den_elder＝present＝最深处的木桩上留着两道陷到木心的齿印。、absent＝被啃裂的木桩倒了，水从桩顶漫过去。 |  |
+| 篁泽药谷（herb_basin） | herb_den | 蒲根下的水洞 |  | 垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用 |  | 2、5 |  | 4＝取水槽接好了。水越过蒲根，淌进药棚边原先干着的小畦。高处的旧灶还能添柴。 |  |  | 1＝after＝靠棚的板沿有块干石。从那里扶着粗蒲根，可以沿洞壁绕向里面。 | herb_den_toad＝present＝细碎的脚印盖过了大半泥岸。水里一阵挨一阵地鼓泡。、absent＝浅水的泡沫早已散完。、herb_den_sawfish＝present＝近岸的泥里有几道直沟，沟前露着尖尖的背鳍。、absent＝近岸的泥落平了，没再划出直沟。、herb_den_lizard＝present＝贴根的宽尾印往几道深缝里收。、absent＝深缝里漏下的水散成细滴，再没有宽尾掠过去。、herb_den_elder＝present＝最深处的木桩上有两道深齿印，水面偶尔露出一角青灰色的颈甲。、absent＝被啃裂的木桩倒了，水从桩顶漫过去。 |  |
 | 篁泽药谷（herb_basin） | vine_pond | 白藤塘 |  |  |  |  | 塘里只剩尚未长开的嫩茎。去浅水的踏石没人挡着，岸外仍有块斜石可绕。 |  | 白纹鹿王（vine_king）：倒藤被顶离了老树，背水坡上露出另一片银脉叶。岸外那块斜石还在。 |  |  | vine_stag＝present＝藤下偶尔晃过白角，湿泥从踏石边滑进水里。、absent＝藤垂着不动，浅水上也没有动静。、vine_king＝present＝上游一根粗藤擦掉了树皮，旁边的蹄印比塘边的大得多。、absent＝坝根的倒藤已经伏下，可以顺着水脚上去。 |  |
 | 玄砂矿脉（black_mine） | mine_tailings | 黑砂洗矿槽 |  |  |  |  | 石槽里只剩碎砂。激流过后，有颜色的石块才会再卡进来。 |  |  |  |  |  |  |
 | 玄砂矿脉（black_mine） | winch_house | 断榫绞盘屋 |  |  |  | 1、2 |  | 0＝绞盘已经能提上矿筐。矿工把筛出的灵晶装进布袋，手边的风炉等着添柴。、1＝矿工把量尺寸的铁零件给了你。架外的石阶顺坡而下。 |  |  |  |  |  |
@@ -1977,8 +2063,10 @@
 | 空籴仓（hollow_silo） | border_silo_den | 仓脚的运粮门 |  | 坡下的卸货窑（border_kiln_depot） · 从旧货单上找下一处卸车的地方 |  | 1、4、6 |  | 5＝失货挪到了卷帘下，窦芸在等城里来套车。阮隼的分账簿已经交给你。 | 劫货头领阮隼（border_silo_leader）：阮隼松了手，刀落在粮堆边。窦芸带着两名驿差从侧窗进来，绕到货架上掀开油布。 |  |  | border_silo_chain＝present＝地面那道窄槽喀啦响了一下，一截铁链擦着石沿过去。、absent＝铁链从里门的门槽滑了下来。、border_silo_roof＝present＝送粮窗内露出一只靴子，有人跨窗盯着仓门。、absent＝送粮窗内只剩半扇歪窗，没人再从上面探身。 |  |
 | 碎云雪关（snow_pass） | snow_hunt_scree | 雪线下的暖涧 |  |  |  |  |  |  |  |  |  | snow_gully_otter＝present＝涧边的碎冰下有细小的气泡。上岸的脚印一排浅、一排深。、absent＝碎冰旁的水已经清了，裸石上没有新印。、snow_rime_antelope＝present＝坡顶有一对角时隐时现。那边的石屑偶尔会滚进热水里。、absent＝高处只剩被踩开的苔和一层旧雪。 |  |
 | 天衡石台（sky_terrace） | sky_hunt_spillway | 石台背面的分水槽 |  |  | 得知物品 留水底印（fault_receipt） |  |  |  |  |  |  | sky_spillway_lizard＝present＝水面高低错开两寸。两道贴槽游动的黑脊会在最窄处重叠。、absent＝两道水槽都能看到底。矮沿后传来流水落在石洞里的空声。 |  |
+| 碎云雪关（snow_pass） | snow_armor_bank | 融雪沟的黑石滩 |  |  |  |  |  |  |  |  |  | snow_flat_scale＝present＝贴水处有一串细尾印，弯进半露出水的石头下。、absent＝溪边那串细尾印叫水冲平了。、snow_seam_crab＝present＝两片黑石中间卡着几块旧甲壳，石缝一开一合地渗水。、absent＝黑石缝里只剩几片空壳。 |  |
+| 落琉洼（glass_hail_sink） | sand_armor_bank | 琉石堆后的背风槽 |  |  |  |  |  |  |  |  |  | sand_spine_lizard＝present＝琉石刮下一排弯钩形的碎鳞，刮痕一直伸进槽边的石隙。、absent＝石隙深处动静停了，槽边散着褪色的薄鳞。、sand_riven_scorpion＝present＝最深的石缝张开又合上，缩回去的尾钩能顶开两块拳大的石头。、absent＝最深的缝里只剩碎砂，挤裂的石块垂在边上。 |  |
 | 横生脉（hanging_vein） | sand_hunt_anchors | 旧矿索下的岩沟 |  |  |  | 2 |  |  |  |  | 1＝after＝被扳松的断梁倒在石阶旁。从缺口可以看到底下的露天石场。 | sand_anchor_scorpion＝present＝沟底的浮砂被往两边推开。旧矿索一沉一抬，石阶边冒出一只几乎与岩面同色的大钳。、absent＝矿索平垂在沟底。风把石阶边的擦痕慢慢填平。 |  |
-| 横生脉（hanging_vein） | sand_hunt_colony | 梁后的露天石场 |  | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 |  | 2、5 |  | 4＝沟口新垫的松木撑起了旧梁，车辙从架下弯向矮山。冷炉院的烟囱露在山坳上。旧竹篓挂在梁边，里面的寒铁和暗金已经给了你。 |  |  | 1＝after＝倒柱上留下一道垫脚的低棱。沿它摸到北墙，就能避开地上最松的一带碎砂。 | sand_quarry_skink＝present＝黑背砂蜥挤在矮石之间，听见碎砂响就从几个方向一起抬头。、absent＝矮石之间只剩散沙，小些的黑背蜥已经不见了。、sand_quarry_guard＝present＝柱子背后不时闪过一抹暗红，有粗尾擦着柱根绕过来。、absent＝柱根下的长尾印越来越浅，再没有红脊护着缝口。、sand_quarry_matriarch＝present＝背阴的旧石垒底下有一双白额巨蜥的眼睛，石垒随着它呼吸一抖一抖。、absent＝背阴石垒塌了一角，白额老蜥再没探出头。 |  |
+| 横生脉（hanging_vein） | sand_hunt_colony | 梁后的露天石场 |  | 旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁 |  | 2、5 |  | 4＝沟口新垫的松木撑起了旧梁，车辙从架下弯向矮山。冷炉院的烟囱露在山坳上。旧竹篓挂在梁边，里面的寒铁和暗金已经给了你。 |  |  | 1＝after＝倒柱上留下一道垫脚的低棱。沿它摸到北墙，就能避开地上最松的一带碎砂。 | sand_quarry_skink＝present＝黑背砂蜥挤在矮石之间，听见碎砂响就从几个方向一起抬头。、absent＝矮石之间只剩散沙，小些的黑背蜥已经不见了。、sand_quarry_rockscorpion＝present＝石板下露过钳尖。再走近些，能听见轻轻两下碰响。、absent＝石板没再响，缝里的细爪印被砂盖住了。、sand_quarry_guard＝present＝柱子背后不时闪过一抹暗红，有粗尾擦着柱根绕过来。、absent＝柱根下的长尾印越来越浅，再没有红脊护着缝口。、sand_quarry_matriarch＝present＝背阴石垒上的立石让什么抵歪了。石缝间偶尔能瞧见一道白额。、absent＝背阴石垒塌了一角，白额老蜥再没探出头。 |  |
 | 白苇滩（marsh） | undertow_door | 反潮石门 |  | 灰鹭晒篮处（shoal_baskets） · 问白宜哪边的滩好走、封乔的护堤木台（marsh_pole_lesson） · 问封乔河里出了什么事 | 得知物品 倒浪楔（undertow_wedge） | 2、3 |  | 1＝新铁楔卡在旧槽里，绳子通向高处的石阶。外侧的潮水还会倒流，过洞口时可以抓住绳子。 |  |  |  |  |  |
 | 白苇滩（marsh） | marsh_pole_lesson | 封乔的护堤木台 | 是 |  |  | 1、3 |  | 2＝领过试杆签，封乔把另一支短杆扶直，台角还有供照看的安全绳。 |  |  |  | river_spar_captain＝present＝封乔正拿杆尖朝练手台上点，不时让渔人过桥，手和眼睛都没乱。、absent＝封乔退到了灯影下。他把红布搁到台边，让手腕缓一缓再陪来客切磋。 |  |
 | 沉钟岭（ridge） | counter_bell_door | 倒钟后的反声门 |  |  |  | 2 |  | 1＝铜片斜卡在一宽一窄两个孔之间。第一层台阶已经落下，脚步声顺着台阶传进地下。 |  |  |  |  |  |
@@ -2036,7 +2124,8 @@
 | 废窑烟道（kiln_flue） | 种群 | 炉渣犬（cinder_hound） | cinder_hound |  | 2 | 3 | 8 | 1 | 固定间隔 | 1.5 |  |  |
 | 银脉水畦（herb_beds） | 资源 | 灵草（reed） | reed |  | 8 | 12 | 6 | 2 |  | 1.5 |  | 1 |
 | 蒲根下的水洞（herb_den） | 资源 | 灵草（reed） | reed_water | 引水槽边的灵草 | 3 | 6 | 5 | 2 |  |  |  | 6 |
-| 蒲根下的水洞（herb_den） | 种群 | 蒲窝青蟾（herb_den_toad） | herb_den_toad |  | 32 | 32 | 0 | 0 | 不回补 |  |  |  |
+| 蒲根下的水洞（herb_den） | 种群 | 蒲窝青蟾（herb_den_toad） | herb_den_toad |  | 24 | 24 | 0 | 0 | 不回补 |  |  |  |
+| 蒲根下的水洞（herb_den） | 种群 | 锯鳍鲶（herb_den_sawfish） | herb_den_sawfish |  | 8 | 8 | 0 | 0 | 不回补 |  |  |  |
 | 蒲根下的水洞（herb_den） | 种群 | 蒲根巨蜥（herb_den_lizard） | herb_den_lizard |  | 6 | 6 | 0 | 0 | 不回补 |  |  |  |
 | 蒲根下的水洞（herb_den） | 种群 | 断桩老蜥（herb_den_elder） | herb_den_elder |  | 1 | 1 | 0 | 0 | 不回补 |  |  |  |
 | 白藤塘（vine_pond） | 资源 | 灵草（reed） | reed | 塘边银脉叶 | 4 | 8 | 7 | 2 |  | 1.5 |  | 3 |
@@ -2171,8 +2260,18 @@
 | 雪线下的暖涧（snow_hunt_scree） | 种群 | 雪涧斑獭（snow_gully_otter） | snow_gully_otter |  | 3 | 4 | 5.5 | 1 | 随种群密度变化 |  | 是 |  |
 | 雪线下的暖涧（snow_hunt_scree） | 种群 | 覆雪石羚（snow_rime_antelope） | snow_rime_antelope |  | 2 | 3 | 7.5 | 1 | 随种群密度变化 |  | 是 |  |
 | 石台背面的分水槽（sky_hunt_spillway） | 种群 | 双脊浮水蜥（sky_spillway_lizard） | sky_spillway_lizard |  | 2 | 3 | 10 | 1 | 随种群密度变化 |  | 是 |  |
+| 融雪沟的黑石滩（snow_armor_bank） | 种群 | 雪涧斑獭（snow_gully_otter） | snow_gully_otter |  | 3 | 5 | 7 | 1 | 随种群密度变化 |  | 是 |  |
+| 融雪沟的黑石滩（snow_armor_bank） | 种群 | 覆雪石羚（snow_rime_antelope） | snow_rime_antelope |  | 2 | 3 | 10 | 1 | 随种群密度变化 |  | 是 |  |
+| 融雪沟的黑石滩（snow_armor_bank） | 种群 | 扁背雪蜥（snow_flat_scale） | snow_flat_scale |  | 8 | 12 | 9 | 1 | 随种群密度变化 |  | 是 |  |
+| 融雪沟的黑石滩（snow_armor_bank） | 种群 | 夹石雪蟹（snow_seam_crab） | snow_seam_crab |  | 6 | 9 | 11 | 1 | 随种群密度变化 |  | 是 |  |
+| 琉石堆后的背风槽（sand_armor_bank） | 种群 | 灰钳岩蝎（sand_quarry_rockscorpion） | sand_quarry_rockscorpion |  | 6 | 10 | 9 | 1 | 随种群密度变化 |  | 是 |  |
+| 琉石堆后的背风槽（sand_armor_bank） | 种群 | 三痕琉狮（sand_glass_lynx） | sand_glass_lynx |  | 3 | 4 | 13 | 1 | 随种群密度变化 |  | 是 |  |
+| 琉石堆后的背风槽（sand_armor_bank） | 种群 | 赤脊护巢蜥（sand_quarry_guard） | sand_quarry_guard |  | 4 | 6 | 13 | 1 | 随种群密度变化 |  | 是 |  |
+| 琉石堆后的背风槽（sand_armor_bank） | 种群 | 棘背岩蜥（sand_spine_lizard） | sand_spine_lizard |  | 5 | 8 | 12 | 1 | 随种群密度变化 |  | 是 |  |
+| 琉石堆后的背风槽（sand_armor_bank） | 种群 | 裂石巨蝎（sand_riven_scorpion） | sand_riven_scorpion |  | 2 | 4 | 16 | 1 | 随种群密度变化 |  | 是 |  |
 | 旧矿索下的岩沟（sand_hunt_anchors） | 种群 | 盘绳石甲蝎（sand_anchor_scorpion） | sand_anchor_scorpion |  | 2 | 3 | 11 | 1 | 随种群密度变化 |  | 是 |  |
-| 梁后的露天石场（sand_hunt_colony） | 种群 | 黑背砂蜥（sand_quarry_skink） | sand_quarry_skink |  | 72 | 72 | 0 | 0 | 不回补 |  |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 种群 | 黑背砂蜥（sand_quarry_skink） | sand_quarry_skink |  | 48 | 48 | 0 | 0 | 不回补 |  |  |  |
+| 梁后的露天石场（sand_hunt_colony） | 种群 | 灰钳岩蝎（sand_quarry_rockscorpion） | sand_quarry_rockscorpion |  | 24 | 24 | 0 | 0 | 不回补 |  |  |  |
 | 梁后的露天石场（sand_hunt_colony） | 种群 | 赤脊护巢蜥（sand_quarry_guard） | sand_quarry_guard |  | 8 | 8 | 0 | 0 | 不回补 |  |  |  |
 | 梁后的露天石场（sand_hunt_colony） | 种群 | 白额老蜥（sand_quarry_matriarch） | sand_quarry_matriarch |  | 1 | 1 | 0 | 0 | 不回补 |  |  |  |
 | 封乔的护堤木台（marsh_pole_lesson） | 种群 | 护堤人封乔（river_spar_captain） | river_spar_captain |  | 1 | 1 | 5 | 1 | 固定间隔 |  |  |  |
@@ -2198,7 +2297,8 @@
 | 青崖松场（pine_ridge） | 翻车的松沟（pine_hollow） | 灰脊松熊（pitch_bear） | 拾起小路边的木签 | 获胜一次后可办理一次 |  | 窑车辙样（kiln_tracks）×1 |  | 2 | 4 | 7 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
 | 青崖松场（pine_ridge） | 索棚拳场（pine_spar） | 松场巡索人（road_sparrer） | 向轮值的守索人领试刀礼 | 每次获胜解锁本班奖品 |  | 松场习刀（trail_cutter）×1 |  | 1 | 1 | 8 | 1 | 固定间隔 |  | 同一地每场胜利对应一次领取；领取间隔按现场选项计算 |
 | 云炉石谷（kiln_valley） | 废窑烟道（kiln_flue） | 炉渣犬（cinder_hound） | 取石柜底未烧过的耐火泥 | 通过前要清除该行动所列的全部看守 |  | 耐火泥（kiln_clay）×3 | 耐火泥（初始3、上限3、存量有限） | 2 | 3 | 8 | 1 | 固定间隔 | 12 | 本种看守回来时须再清场，库存采尽后不再补充 |
-| 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲窝青蟾（herb_den_toad） | 把歪斜的取水槽搭回原位 | 通过前要清除该行动所列的全部看守 |  |  |  | 32 | 32 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
+| 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲窝青蟾（herb_den_toad） | 把歪斜的取水槽搭回原位 | 通过前要清除该行动所列的全部看守 |  |  |  | 24 | 24 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
+| 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 锯鳍鲶（herb_den_sawfish） | 把歪斜的取水槽搭回原位 | 通过前要清除该行动所列的全部看守 |  |  |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 蒲根巨蜥（herb_den_lizard） | 把歪斜的取水槽搭回原位 | 通过前要清除该行动所列的全部看守 |  |  |  | 6 | 6 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 篁泽药谷（herb_basin） | 蒲根下的水洞（herb_den） | 断桩老蜥（herb_den_elder） | 把歪斜的取水槽搭回原位 | 通过前要清除该行动所列的全部看守 |  |  |  | 1 | 1 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 篁泽药谷（herb_basin） | 白藤塘（vine_pond） | 白角藤鹿（vine_stag） | 踩过浅水去剪银脉叶 | 可直接采，活跃对手可能打断每批采集 | 35% | 灵草（reed）×4 | 塘边银脉叶（初始4、上限8、每7日补2） | 2 | 6 | 8 | 1 | 随种群密度变化 | 12 | 回补后仍可直接采，有对手在场时每批可能遭遇 |
@@ -2265,7 +2365,8 @@
 | 空籴仓（hollow_silo） | 仓脚的运粮门（border_silo_den） | 门槽旁的铁链手（border_silo_chain） | 和窦芸从矮墙后进仓 | 通过前要清除该行动所列的全部看守 |  |  |  | 1 | 1 |  |  | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 空籴仓（hollow_silo） | 仓脚的运粮门（border_silo_den） | 守送粮窗的人（border_silo_roof） | 和窦芸从矮墙后进仓 | 通过前要清除该行动所列的全部看守 |  |  |  | 1 | 1 |  |  | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 空籴仓（hollow_silo） | 仓脚的运粮门（border_silo_den） | 劫货头领阮隼（border_silo_leader） | 掀开油布，把货和分账簿一起点清 | 获胜一次后可办理一次 |  | 寒铁（ore）×4、暗金（black_iron）×3、灵晶（core）×3、劫货人的分账簿（border_warehouse_ledger）×1 |  | 1 | 1 |  |  | 不回补 |  | 已获胜便可回来办理，领取后关闭选项 |
-| 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 黑背砂蜥（sand_quarry_skink） | 帮管料人撑起旧车道上的梁 | 通过前要清除该行动所列的全部看守 |  | 寒铁（ore）×5、暗金（black_iron）×3 |  | 72 | 72 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
+| 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 黑背砂蜥（sand_quarry_skink） | 帮管料人撑起旧车道上的梁 | 通过前要清除该行动所列的全部看守 |  | 寒铁（ore）×5、暗金（black_iron）×3 |  | 48 | 48 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
+| 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 灰钳岩蝎（sand_quarry_rockscorpion） | 帮管料人撑起旧车道上的梁 | 通过前要清除该行动所列的全部看守 |  | 寒铁（ore）×5、暗金（black_iron）×3 |  | 24 | 24 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 赤脊护巢蜥（sand_quarry_guard） | 帮管料人撑起旧车道上的梁 | 通过前要清除该行动所列的全部看守 |  | 寒铁（ore）×5、暗金（black_iron）×3 |  | 8 | 8 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 横生脉（hanging_vein） | 梁后的露天石场（sand_hunt_colony） | 白额老蜥（sand_quarry_matriarch） | 帮管料人撑起旧车道上的梁 | 通过前要清除该行动所列的全部看守 |  | 寒铁（ore）×5、暗金（black_iron）×3 |  | 1 | 1 | 0 | 0 | 不回补 |  | 本种看守不会回来，完成条件后可再回来办理尚未领取的事 |
 | 白苇滩（marsh） | 封乔的护堤木台（marsh_pole_lesson） | 护堤人封乔（river_spar_captain） | 接过封乔的试杆签 | 获胜一次后可办理一次 |  | 封乔的试杆签（river_trial_writ）×1 |  | 1 | 1 | 5 | 1 | 固定间隔 |  | 已获胜便可回来办理，领取后关闭选项 |
@@ -2311,7 +2412,7 @@
 | kiln_flue | 废窑烟道 |  | 墙上的烟痕一直伸到沟外。半张烧焦的纸压在碎砖间，坡下有温水渗进来，沟底沉着黑亮的砂。墙边的旧石柜半开着。 |
 | herb_beds | 银脉水畦 |  | 药畦低处积水，叶背有银纹。最低处的叶柄柔软，泽医把那几排留作育种。 |
 | mist_shelter | 垫高脚的药棚 |  | 泽医在垫高脚的竹席上扎药包。窗外的水线已经接近台阶，席上放了块压出药槽的木板。 |
-| herb_den | 蒲根下的水洞 |  | 两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。洞口下方卡着歪斜的取水槽，槽尾接着一畦药草。靠棚的板头还露在地上，岸上几块石头垒着个干燥的灶眼。 |
+| herb_den | 蒲根下的水洞 |  | 两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。取水槽斜卡在洞口，槽尾接着一畦药草。板头旁有灶眼，沿干岸几步就能回到药棚。 |
 | vine_pond | 白藤塘 |  | 白藤沿塘边翻卷，几块踏石伸进凹水里。岸外有块斜石，向上能看到坝根。 |
 | mine_tailings | 黑砂洗矿槽 |  | 长石槽把水往低处引。槽沿的铁钉拦着黑砂，槽内水更深，底下是碎岩会卡住的背水缝。 |
 | winch_house | 断榫绞盘屋 |  | 收绳的转盘卡住了，断掉的木接头掉在煤灰上。矿工拿一截铁零件贴在转盘另一边量尺寸。 |
@@ -2421,6 +2522,8 @@
 | border_silo_den | 仓脚的运粮门 |  | 外面看着空的旧仓还有一道运粮门。门边有窄槽，左边敞着一扇高窗。往里看，铺在货架上的油布被风掀起了一角。 |
 | snow_hunt_scree | 雪线下的暖涧 |  | 涧水从雪下冒出来，浅处有不冻的水洼。矮桥旁绑着护栈人系的布条，沿着往上走几步就能回火棚。高坡的一行蹄印踩穿了雪壳，沉进水里的脚印却细了许多。 |
 | sky_hunt_spillway | 石台背面的分水槽 |  | 对照湖底旧约上的水位记号，才认出石台背面两排浅刻。刻痕往下接着被雾挡住的旧分水槽。槽边有道干燥的矮沿，低头便能望见清水下的两道脊鳍。 |
+| snow_armor_bank | 融雪沟的黑石滩 |  | 融水在黑石滩上分开。长草里夹着湿毛，岸高处有啃过的苔。大块的石头半浸在水里，另一侧的石缝窄得只能伸进一只手。 |
+| sand_armor_bank | 琉石堆后的背风槽 |  | 洼地边的琉石大小不一，这道石槽躲在背风面。乱石前有浅浅的兽爪印，尾巴和钳子拖出的沟却深得能看见石皮。 |
 | sand_hunt_anchors | 旧矿索下的岩沟 |  | 矿架的几股旧绳往下垂到沟里，石阶只从靠壁那侧经过。旧绳一动，两只固定矿索的粗铁钩就撞上梁木。靠上面的石阶还有半截断梁向外支着，后面漏进一线日光。回叩石院的石路仍从支木外侧走。 |
 | sand_hunt_colony | 梁后的露天石场 |  | 旧石场有几排没立稳的柱子，柱脚外全是蜥洞。入口的日光就在身后，外墙凹处还搁着矿工的旧火盆。叩石院的管料人守在沟口。他脚边拴着只旧竹篓，后面有两道车辙断在一根塌下的木梁前。 |
 | undertow_door | 反潮石门 |  | 芦苇后露出半扇厚重的石门，门边有道空槽。水从石门两侧往不同方向流，外侧的台阶还露在水面上。 |
@@ -2537,11 +2640,11 @@
 | herb_beds | 银脉水畦 | 1 | 把上排的老叶剪下来 | 1 |  |  |  | 2 |  |  |  | 灵草（reed）×4 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 你只剪摸得着的粗柄，水下的细芽没有受伤。 |  |
 | mist_shelter | 垫高脚的药棚 | 1 | 给泽医交叶和烘干用的枝条 | 1 |  |  |  | 4 | 灵草（reed）×8、松木（wood）×4 | 是 |  | 玄砂引矿签（mine_guide）×1、干粮（ration）×3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 「阴雨浸坏了这一批，我得给矿队重扎几包药。你若进矿脉，带我的引矿签过去。」 | 泽医把木片从药匣上拆下，指给你看哪边的石槽连着玄砂矿脉。 |  |
 | mist_shelter | 垫高脚的药棚 | 2 | 问泽医板上的凹槽怎么用 | 0.5 |  |  |  | 2 |  |  |  | 泽医捣药板（herb_press）×1、清脉饮丹方（formula_leaf）×1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 木板上刻了几道不同深浅的槽，中间压着一张试药的便条。 | 泽医递来一页清脉饮丹方，又指着板上新刻的那道。「原本从蒲根底下取水，最近底下成了窝。蒲根旁还搭着两块旧木板，你过去当心。」 |  |
-| herb_den | 蒲根下的水洞 | 1 | 踏上木板，朝水洞里探 | 0.125 |  |  |  |  |  |  |  |  |  |  |  | 蒲窝青蟾（herb_den_toad）、蒲根巨蜥（herb_den_lizard）、断桩老蜥（herb_den_elder） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 走板面中间最省脚力。底下的石缝都通着，水一搅就看不清来的是谁。 | 里头的水一下越过板面，你脚边窜出一道影子。 |  |
-| herb_den | 蒲根下的水洞 | 2 | 蹲在板头，看看蒲根在水下往哪伸 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 是 |  | 你沿水线看清一块干石，再往里有几根斜伸的粗根。根上留着粗爪的擦痕，多半通到大些的东西盘踞的深水。退身时仍能踩回干石。 |  |
-| herb_den | 蒲根下的水洞 | 3 | 踩干石，扶蒲根往洞内绕 | 0.375 |  |  |  |  |  |  |  |  |  |  | 2 | 蒲窝青蟾（herb_den_toad）、蒲根巨蜥（herb_den_lizard）、断桩老蜥（herb_den_elder） | 蒲根巨蜥（herb_den_lizard）×2、断桩老蜥（herb_den_elder）×2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 要探到靠深水的一边。脚下有踏处，回身得绕过一截横根。 | 横根晃了一下。水从脚边往内涌，石缝里斜着扑出一团影子。 |  |
+| herb_den | 蒲根下的水洞 | 1 | 踏上木板，朝水洞里探 | 0.125 |  |  |  |  |  |  |  |  |  |  |  | 蒲窝青蟾（herb_den_toad）、锯鳍鲶（herb_den_sawfish）、蒲根巨蜥（herb_den_lizard）、断桩老蜥（herb_den_elder） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 走板面中间最省脚力。底下的石缝都通着，水一搅就看不清来的是谁。 | 里头的水一下越过板面，你脚边窜出一道影子。 |  |
+| herb_den | 蒲根下的水洞 | 2 | 蹲在板头，看看蒲根在水下往哪伸 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 是 |  | 绕过横根有一小片干岸，从那儿能望见对面浅水。泽医在板头比了比手腕。「我见过有人照老蜥的颈甲打护臂。颈甲就拿来做个样子，真入炉还是得攒一批厚甲片。」 |  |
+| herb_den | 蒲根下的水洞 | 3 | 踩干石绕到洞边的干岸 | 0.375 |  |  |  |  |  |  |  |  |  | 是 | 2 | 蒲窝青蟾（herb_den_toad）、锯鳍鲶（herb_den_sawfish）、蒲根巨蜥（herb_den_lizard）、断桩老蜥（herb_den_elder） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 要绕过横根。站上干岸，能隔着一段浅水看见石缝的动静。 | 你踩上干岸。对面的浅水猛地拱起，一道影子在石缝外露了头。 |  |
 | herb_den | 蒲根下的水洞 | 4 | 给板头的石灶添柴，缓一缓 | 0.5 |  | 10 | 8 |  | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 2.25 | 旧灶底下还有闷火，得等它凉透。 | 是 | 在靠药棚的高地上生火，湿衣能烤干。灶眼下次还得等余火熄透。 | 灶眼冒出一缕烟。你把湿袖烤暖，调匀气息，再听水洞里的响动。 |  |
-| herb_den | 蒲根下的水洞 | 5 | 把歪斜的取水槽搭回原位 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 蒲窝青蟾（herb_den_toad）、蒲根巨蜥（herb_den_lizard）、断桩老蜥（herb_den_elder） |  |  |  |  |  |  |  |  |  |  | 是 | 槽口搁在外面，里端却伸到洞里。得等那些石缝都静下来才能挪。 | 槽里终于过了水。泽医提着竹篮过来，拨开畦里的枯叶。「根还活着，外圈有几茎已经能剪。嫩的先留着，这水够它们长。」 |  |
+| herb_den | 蒲根下的水洞 | 5 | 把歪斜的取水槽搭回原位 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 蒲窝青蟾（herb_den_toad）、锯鳍鲶（herb_den_sawfish）、蒲根巨蜥（herb_den_lizard）、断桩老蜥（herb_den_elder） |  |  |  |  |  |  |  |  |  |  | 是 | 槽口搁在外面，里端却伸到洞里。得等那些石缝都静下来才能挪。 | 槽里终于过了水。泽医提着竹篮过来，拨开畦里的枯叶。「根还活着，外圈有几茎已经能剪。嫩的先留着，这水够它们长。」 |  |
 | herb_den | 蒲根下的水洞 | 6 | 采下引水槽旁长齐的灵草 | 0.75 |  |  |  |  |  |  |  | 灵草（reed）×3 |  |  | 5 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 湿畦外圈已经有几茎老叶，叶背的银纹长全了。 | 你顺着畦边剪叶，留了还嫩的草心。 |  |
 | vine_pond | 白藤塘 | 1 | 沿浅滩的蹄印找藤鹿 | 0.75 |  |  |  |  |  |  |  |  | 白角藤鹿（vine_stag） | 是 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 站在岸边能望见对岸，蹄印横穿一片浅水。 | 白角从对岸的藤下挑起来，藤鹿踩开浅水，朝这边赶来。 |  |
 | vine_pond | 白藤塘 | 2 | 沿斜石绕到岸外听一会儿 | 0.125 |  |  | 3 | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 藤影在另一边摇动。留在斜石上时，呼吸渐渐平匀。 |  |
@@ -2828,13 +2931,19 @@
 | snow_hunt_scree | 雪线下的暖涧 | 1 | 沿浅涧的爪印找斑獭 | 0.25 |  |  |  |  |  |  |  |  | 雪涧斑獭（snow_gully_otter） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 冰沿下露出一抹湿毛，附近的木桩上有两道刨到芯里的爪印。岸上有能站稳的干石。 | 斑獭蓦地钻出冰边。它一摆身，绷在胡须上的水珠甩过半条浅涧。 |  |
 | snow_hunt_scree | 雪线下的暖涧 | 2 | 踩露出的山石上坡，接近石羚 | 0.375 |  |  |  |  |  |  |  |  | 覆雪石羚（snow_rime_antelope） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 蹄印深到能蓄一指水，坡顶还插着半截断矛。石羚俯身时，尖角比肩还低。 | 石羚从高处退了半步，两只前蹄同时把雪壳碾碎。 |  |
 | sky_hunt_spillway | 石台背面的分水槽 | 1 | 扶矮沿接近水槽里露脊鳍的东西 | 0.375 |  |  |  |  |  |  |  |  | 双脊浮水蜥（sky_spillway_lizard） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 这段槽只有两步宽。两道水流往相反的方向弯过去。 | 两道脊鳍突然并在一起。水蜥贴着回上来的水露出头，泥水溅到了矮沿上。 |  |
+| snow_armor_bank | 融雪沟的黑石滩 | 1 | 沿滩找活物留下的踪迹 | 0.25 |  |  |  |  |  |  |  |  |  |  |  | 雪涧斑獭（snow_gully_otter）、覆雪石羚（snow_rime_antelope）、扁背雪蜥（snow_flat_scale）、夹石雪蟹（snow_seam_crab） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 一阵踏冰声近了，几粒碎冰从石头底下飞起来。 |  |
+| snow_armor_bank | 融雪沟的黑石滩 | 2 | 沿细尾印翻开水边的扁石 | 0.375 |  |  |  |  |  |  |  |  | 扁背雪蜥（snow_flat_scale） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 贴水走时能看见尾印止在扁石边。 | 石下的蜥蜴绷直尾巴，匍匐着朝岸边窜来。 |  |
+| snow_armor_bank | 融雪沟的黑石滩 | 3 | 绕到黑石背后，把石缝里的钳子引出来 | 0.5 |  |  |  |  |  |  |  |  | 夹石雪蟹（snow_seam_crab） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 那只钳子比水边断壳厚，伸出来就会撞到石头。 | 黑石被双钳挤开一点。横着走出来的蟹用一只钳护住身前。 |  |
+| sand_armor_bank | 琉石堆后的背风槽 | 1 | 顺背风的石脊找猎物 | 0.375 |  |  |  |  |  |  |  |  |  |  |  | 灰钳岩蝎（sand_quarry_rockscorpion）、三痕琉狮（sand_glass_lynx）、赤脊护巢蜥（sand_quarry_guard）、棘背岩蜥（sand_spine_lizard）、裂石巨蝎（sand_riven_scorpion） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 石脊一侧轻轻一塌，什么东西穿过碎石朝你转来。 |  |
+| sand_armor_bank | 琉石堆后的背风槽 | 2 | 隔碎石看清刮痕，追进棘背的石隙 | 0.5 |  |  |  |  |  |  |  |  | 棘背岩蜥（sand_spine_lizard） | 是 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 这条缝斜向外开，能从对面看到它出来。 | 卷起的鳞背从对面露出来。那只蜥蜴没挨着你，正沿槽向上爬。 |  |
+| sand_armor_bank | 琉石堆后的背风槽 | 3 | 踩上堵石，逼深缝里的巨蝎出来 | 0.625 |  |  |  |  |  |  |  |  | 裂石巨蝎（sand_riven_scorpion） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 缺口边全是新裂痕。沿石槽还能回头，踩低了就得贴着蝎尾走。 | 深缝里传来崩石声。巨蝎把尾钩从缝里拔出来，夹着几块碎石压上槽边。 |  |
 | sand_hunt_anchors | 旧矿索下的岩沟 | 1 | 沿石阶下沟，在矿索旁迎石甲蝎 | 0.375 |  |  |  |  |  |  |  |  | 盘绳石甲蝎（sand_anchor_scorpion） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 大钳擦过岩壁，尖端应声刮下一块薄石。钳外侧没有能插进刀刃的缝。 | 浮砂沿绳洒落。石甲蝎慢慢举起双钳，把碎石挤得咯吱响。 |  |
 | sand_hunt_anchors | 旧矿索下的岩沟 | 2 | 扳开上一级石阶旁的断梁 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 是 | 横梁受力的一头早已折断。人留在石阶上，就够得着另一端。 | 干梁一声脆响倒向墙边。后面是一片露天石场，地上的爪印有短有长，最宽的那道拖过好几块石柱基。 |  |
-| sand_hunt_colony | 梁后的露天石场 | 1 | 越过倒柱，在蜥群边找落脚处 | 0.25 |  |  |  |  |  |  |  |  |  |  |  | 黑背砂蜥（sand_quarry_skink）、赤脊护巢蜥（sand_quarry_guard）、白额老蜥（sand_quarry_matriarch） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 这边近，退回倒柱也容易。矮石挡着视线，哪条蜥先出来还说不准。 | 你刚在石地站稳，前面便窜出一道影子，石片擦着靴面翻了过去。 |  |
-| sand_hunt_colony | 梁后的露天石场 | 2 | 翻看倒柱内侧的爪痕 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 是 |  | 有几道宽爪痕刚好擦过柱上的低棱，方向都朝北墙。扶棱走可以靠近内巢，回来时只够侧身过柱脚。 |  |
-| sand_hunt_colony | 梁后的露天石场 | 3 | 扶倒柱的低棱，贴北墙靠近内巢 | 0.5 |  |  |  |  |  |  |  |  |  |  | 2 | 黑背砂蜥（sand_quarry_skink）、赤脊护巢蜥（sand_quarry_guard）、白额老蜥（sand_quarry_matriarch） | 赤脊护巢蜥（sand_quarry_guard）×2、白额老蜥（sand_quarry_matriarch）×2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 内巢容易碰上大蜥。出手的石地够宽，往回仍要侧身过柱脚。 | 你侧身挪过柱脚，北墙里传来低沉的刮擦声。一条蜥猛地贴着石地冲过来。 |  |
+| sand_hunt_colony | 梁后的露天石场 | 1 | 越过倒柱，在矮石边找落脚处 | 0.25 |  |  |  |  |  |  |  |  |  |  |  | 黑背砂蜥（sand_quarry_skink）、灰钳岩蝎（sand_quarry_rockscorpion）、赤脊护巢蜥（sand_quarry_guard）、白额老蜥（sand_quarry_matriarch） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 这边近，退回倒柱也容易。矮石挡着视线，下面是鳞还是硬钳都看不清。 | 你刚在石地站稳，前面便窜出一道影子，石片擦着靴面翻了过去。 |  |
+| sand_hunt_colony | 梁后的露天石场 | 2 | 翻看倒柱内侧的爪痕 | 0.25 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 是 |  | 宽爪痕擦过柱上的低棱，旁边有一处能望见空地的石台。管料人指着回身的缝。「旧矿刃照的就是那老蜥背棘的样子。背棘拿去比形，厚甲片得另外攒够一炉。」 |  |
+| sand_hunt_colony | 梁后的露天石场 | 3 | 扶倒柱的低棱，绕上北墙石台 | 0.5 |  |  |  |  |  |  |  |  |  | 是 | 2 | 黑背砂蜥（sand_quarry_skink）、灰钳岩蝎（sand_quarry_rockscorpion）、赤脊护巢蜥（sand_quarry_guard）、白额老蜥（sand_quarry_matriarch） |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 绕过去要多走一段。石台与巢口隔着一片空地，动静能看得清。 | 你侧身转上石台。对面巢口有石屑飞开，砂土中露出一道影子。 |  |
 | sand_hunt_colony | 梁后的露天石场 | 4 | 给外墙下的火盆添柴，缓一缓 | 0.5 |  | 12 | 8 |  | 松木（wood）×1 | 是 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 2.5 | 火盆的砖还烫，得等炉灰冷下来。 | 是 | 凹墙挡住风沙，矿工用旧砖围了半圈。火息后还要等灰凉下来。 | 木枝在火盆里慢慢烧透。你在凹墙旁坐稳，把衣领里的砂抖干净，调匀几口气。 |  |
-| sand_hunt_colony | 梁后的露天石场 | 5 | 帮管料人撑起旧车道上的梁 | 0.75 |  |  |  |  | 松木（wood）×2 | 是 |  | 寒铁（ore）×5、暗金（black_iron）×3 |  |  |  |  |  |  |  | 黑背砂蜥（sand_quarry_skink）、赤脊护巢蜥（sand_quarry_guard）、白额老蜥（sand_quarry_matriarch） |  |  |  |  |  |  |  |  |  |  | 是 | 「梁底得塞两根松木。路那头原是冷炉院，可蜥群就在道半腰，等石场静下来再去。」 | 你塞进松木，管料人托着旧梁站起身。车辙从梁下绕过矮山，正对冷炉院那根白烟囱。他解开旧竹篓，把留在篓底的寒铁和暗金当作谢工。 |  |
+| sand_hunt_colony | 梁后的露天石场 | 5 | 帮管料人撑起旧车道上的梁 | 0.75 |  |  |  |  | 松木（wood）×2 | 是 |  | 寒铁（ore）×5、暗金（black_iron）×3 |  |  |  |  |  |  |  | 黑背砂蜥（sand_quarry_skink）、灰钳岩蝎（sand_quarry_rockscorpion）、赤脊护巢蜥（sand_quarry_guard）、白额老蜥（sand_quarry_matriarch） |  |  |  |  |  |  |  |  |  |  | 是 | 「梁底得塞两根松木。路那头原是冷炉院，可石场的兽就在道半腰，等没动静了再去。」 | 你塞进松木，管料人托着旧梁站起身。车辙从梁下绕过矮山，正对冷炉院那根白烟囱。他解开旧竹篓，把留在篓底的寒铁和暗金当作谢工。 |  |
 | undertow_door | 反潮石门 | 1 | 沿外侧石阶绕一圈 | 0.25 |  |  |  | 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 墙外还有一排露出水面的石阶，一直连回岸边。 | 你扶着石阶走，水流把你慢慢送回原先的苇丛。再来一股潮，门两边的水都换了方向。水势一变，只有靠里的高阶还露在外头。 |  |
 | undertow_door | 反潮石门 | 2 | 把倒浪楔卡进石槽，固定绳子 | 0.5 |  |  |  | 3 | 倒浪楔（undertow_wedge）×1 |  | 是 | 回潮洞引线（undertow_entry）×1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 施荀给的铁楔刚好对得上石槽。潮水倒流时，可以抓着绳子找高处的台阶。 | 第二股潮水打过来，铁楔才牢牢卡住。你沿绳摸到上方的石阶，找到了去回潮母洞的路。 |  |
 | undertow_door | 反潮石门 | 3 | 用校潮亭的印纸对照潮水方向 | 0.25 |  |  |  | 2 | 校潮亭抄尺（river_gauge_copy）×1 |  | 是 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 石槽边的浅痕正对着倒流的潮水，和印纸最下面几道痕同向。 | 印纸贴在槽边，最后两道线只从内侧湿起。绳子会随水换方向，固定它的铁件得同时卡住槽的两头。 |  |
@@ -2895,8 +3004,9 @@
 | cinder_hound | 炉渣犬 | 2 | 炼气后期 | 52 | 12 | 13 | 5 | spirit、stoneborn |  | 6 | 炼气期妖丹（qi_core）×3 |  | 身上的炉渣容易结成硬壳。回身舔灰时会把散开的地方补起来。 |
 | vine_stag | 白角藤鹿 | 2 | 炼气后期 | 60 | 14 | 16 | 5 | beast、furred |  | 6 | 生兽肉（beast_meat）×3、兽革（hide）×2、妖目（beast_eye）×1、炼气期妖丹（qi_core）×3 |  | 它能借湿藤牵走气息。白角还没压低之前，脚下总会先拨藤。 |
 | herb_den_toad | 蒲窝青蟾 | 1 | 炼气中期 | 31 | 9 | 9 | 3 | beast |  | 3 | 生兽肉（beast_meat）×2 | 炼气期妖丹（qi_core）×1（56%） | 小蟾藏在蒲根下，有东西踩湿木板才会扑上来。 |
-| herb_den_lizard | 蒲根巨蜥 | 3 | 筑基初期 | 66 | 14 | 14 | 5 | beast、scaled |  | 7 | 生兽肉（beast_meat）×3、兽革（hide）×2 | 筑基期妖丹（foundation_core）×3（64%）、妖目（beast_eye）×1（33%） | 沉进黑蒲根时，它能贴木板吸走护身真气。抬起前爪后才挥尾砸板。 |
-| herb_den_elder | 断桩老蜥 | 4 | 筑基中期 | 88 | 16 | 17 | 6 | beast、scaled |  | 11 | 生兽肉（beast_meat）×5、兽革（hide）×5、筑基期妖丹（foundation_core）×3 | 筑基期妖丹（foundation_core）×4（62%）、妖目（beast_eye）×1（65%） | 它的下颚几乎齐木桩高。老蜥咬住旧木准备卷起一层水时，把脚从板沿收回来。 |
+| herb_den_sawfish | 锯鳍鲶 | 1 | 炼气中期 | 29 | 8 | 9 | 2 | beast |  | 3 | 生兽肉（beast_meat）×2 | 炼气期妖丹（qi_core）×1（56%） | 背鳍边缘长着一排软刺。刚逼近时会伏进浅泥，出了泥再拿尾巴撩脚。 |
+| herb_den_lizard | 蒲根巨蜥 | 3 | 筑基初期 | 66 | 14 | 14 | 5 | beast、scaled |  | 7 | 生兽肉（beast_meat）×3、兽革（hide）×2、厚甲片（hard_scale）×2 | 筑基期妖丹（foundation_core）×3（64%）、妖目（beast_eye）×1（33%） | 沉进黑蒲根时，它能贴木板吸走护身真气。抬起前爪后才挥尾砸板。 |
+| herb_den_elder | 断桩老蜥 | 4 | 筑基中期 | 88 | 16 | 17 | 6 | beast、scaled |  | 11 | 生兽肉（beast_meat）×5、兽革（hide）×5、筑基期妖丹（foundation_core）×3、厚甲片（hard_scale）×3、老蜥颈甲（den_neck_plate）×1 | 筑基期妖丹（foundation_core）×4（62%）、妖目（beast_eye）×1（65%） | 它的下颚几乎齐木桩高，颈下的厚甲能分片合拢。它咬住旧木准备卷起一层水时，把脚从板沿收回来。 |
 | vine_king | 白纹鹿王 | 2 | 炼气后期 | 79 | 15 | 15 / 17 | 6 | beast、furred |  | 9 | 生兽肉（beast_meat）×5、兽革（hide）×3、妖目（beast_eye）×1、炼气期妖丹（qi_core）×4 |  | 它的角在老树上蹭出两道白痕。压角低头时，会沿着旧蹄印直撞过来。 |
 | vein_sentinel | 横肩矿傀 | 2 | 炼气后期 | 64 | 14 | 15 / 16 | 6 | stoneborn、scaled |  | 7 | 炼气期妖丹（qi_core）×3 |  | 两肩石片相合时很难砍进去。窄矢或穿甲的兵刃能省不少力。 |
 | snow_warden | 雪脊兽 | 3 | 筑基初期 | 81 | 15 | 16 / 17 | 6 | beast、scaled |  | 10 | 生兽肉（beast_meat）×5、兽革（hide）×4、妖目（beast_eye）×1、筑基期妖丹（foundation_core）×3 |  | 雪脊鳞叠得厚，压背后会沿沟猛撞。趁它还没贴近时服药或换术。 |
@@ -2971,11 +3081,16 @@
 | border_silo_leader | 劫货头领阮隼 | 5 | 筑基后期 | 122 | 22 | 22 | 9 | human |  | 13 |  |  | 他从吞进过路货那天起，就把两扇门轮流盯住。收刀时要提防他调息，最后一记推刀躲不开就要接稳。 |
 | snow_gully_otter | 雪涧斑獭 | 3 | 筑基初期 | 61 | 13 | 13 / 15 | 4 | beast、furred |  | 6 | 筑基期妖丹（foundation_core）×2、生兽肉（beast_meat）×3、兽革（hide）×2 | 妖目（beast_eye）×1（55%） | 皮毛湿透仍能困住暖气。它会借涧水牵走真气，尾尖离水就要跃上冰沿。 |
 | snow_rime_antelope | 覆雪石羚 | 3 | 筑基初期 | 77 | 14 | 14 / 16 | 6 | beast、furred |  | 8 | 筑基期妖丹（foundation_core）×3、生兽肉（beast_meat）×5、兽革（hide）×3 |  | 蹄缘像磨钝的铁。它缩起前膝时能用角护颈，接着会从坡上踏碎一层雪。 |
-| sky_spillway_lizard | 双脊浮水蜥 | 6 | 金丹初期 | 112 | 22 | 22 / 24 | 7 | beast、scaled |  | 10 | 金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×5、兽革（hide）×2 | 妖目（beast_eye）×1（60%） | 平时顺流走，翻起两道脊鳍时能把流向拨转，连人的真气也会被水挟走。 |
-| sand_anchor_scorpion | 盘绳石甲蝎 | 6 | 金丹初期 | 103 | 22 | 22 / 25 | 10 | beast、scaled、stoneborn |  | 11 | 生兽肉（beast_meat）×2、兽革（hide）×2 | 金丹期妖丹（gold_core）×4（75%） | 双钳合得紧，甲缝在出钳时才露出来。它把尾钩抵进岩缝以后，整条尾巴都能甩过来。 |
+| snow_flat_scale | 扁背雪蜥 | 3 | 筑基初期 | 63 | 13 | 13 | 5 | beast、scaled |  | 6 | 生兽肉（beast_meat）×2、兽革（hide）×1、厚甲片（hard_scale）×1 | 筑基期妖丹（foundation_core）×2（72%） | 背鳞压在一起时几乎和扁石一样平。它从水边腾起时，白腹会先翻出来。 |
+| snow_seam_crab | 夹石雪蟹 | 4 | 筑基中期 | 87 | 17 | 18 / 16 | 8 | beast、scaled |  | 9 | 生兽肉（beast_meat）×2、厚甲片（hard_scale）×2、筑基期妖丹（foundation_core）×1 | 筑基期妖丹（foundation_core）×2（54%） | 一边的钳夹过许多黑石，缺了一小角。扣下双钳前，它会把硬壳沉到几乎擦着地面。 |
+| sky_spillway_lizard | 双脊浮水蜥 | 6 | 金丹初期 | 112 | 22 | 22 / 24 | 7 | beast、scaled |  | 10 | 金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×5、兽革（hide）×2、厚甲片（hard_scale）×2 | 妖目（beast_eye）×1（60%） | 平时顺流走，翻起两道脊鳍时能把流向拨转，连人的真气也会被水挟走。 |
+| sand_anchor_scorpion | 盘绳石甲蝎 | 6 | 金丹初期 | 103 | 22 | 22 / 25 | 10 | beast、scaled、stoneborn |  | 11 | 生兽肉（beast_meat）×2、兽革（hide）×2、厚甲片（hard_scale）×3 | 金丹期妖丹（gold_core）×4（75%） | 双钳合得紧，甲缝在出钳时才露出来。它把尾钩抵进岩缝以后，整条尾巴都能甩过来。 |
+| sand_spine_lizard | 棘背岩蜥 | 6 | 金丹初期 | 109 | 22 | 23 | 8 | beast、scaled |  | 10 | 生兽肉（beast_meat）×3、兽革（hide）×2、厚甲片（hard_scale）×3、金丹期妖丹（gold_core）×1 | 金丹期妖丹（gold_core）×2（60%） | 背上的棘向两边张开，卷来的碎砂会牵扯行气。它拱背时，背后的石头先动。 |
+| sand_riven_scorpion | 裂石巨蝎 | 7 | 金丹中期 | 131 | 25 | 26 / 27 | 10 | beast、scaled、stoneborn |  | 13 | 厚甲片（hard_scale）×4、金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×3 | 金丹期妖丹（gold_core）×2（50%） | 尾柄卡在半裂的琉石里，一动就会带起好几块硬石。它退到长缝边时，双钳能把颈侧护严。 |
 | sand_quarry_skink | 黑背砂蜥 | 4 | 筑基中期 | 64 | 15 | 15 | 5 | beast、scaled |  | 5 | 生兽肉（beast_meat）×2、兽革（hide）×1 | 筑基期妖丹（foundation_core）×1（52%） | 黑背鳞和砂石颜色相近，露出浅色腹侧时就能看见它整条尾巴往回弓。 |
-| sand_quarry_guard | 赤脊护巢蜥 | 6 | 金丹初期 | 117 | 23 | 23 / 26 | 8 | beast、scaled |  | 11 | 生兽肉（beast_meat）×4、兽革（hide）×2 | 金丹期妖丹（gold_core）×3（62%）、妖目（beast_eye）×1（35%） | 颈鳞磨得发红。喉间发鼓时会把石尘卷到眼前，紧跟着从靠岩的一边压过来。 |
-| sand_quarry_matriarch | 白额老蜥 | 7 | 金丹中期 | 155 | 27 | 27 / 31 | 11 | beast、scaled |  | 16 | 金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×6、兽革（hide）×4 | 金丹期妖丹（gold_core）×5（65%）、妖目（beast_eye）×1（75%） | 白额上一道旧伤已经长进鳞下。它白天卧在石垒背阴处，有人接近才会推倒前面的立石。 |
+| sand_quarry_rockscorpion | 灰钳岩蝎 | 4 | 筑基中期 | 60 | 14 | 16 | 7 | beast、stoneborn |  | 5 | 生兽肉（beast_meat）×2、兽革（hide）×1、厚甲片（hard_scale）×1 | 筑基期妖丹（foundation_core）×1（52%） | 薄甲长得像石屑。它常并钳缩在石板下，钳尖抵住石边时便要侧身抡过来。 |
+| sand_quarry_guard | 赤脊护巢蜥 | 6 | 金丹初期 | 117 | 23 | 23 / 26 | 8 | beast、scaled |  | 11 | 生兽肉（beast_meat）×4、兽革（hide）×2、厚甲片（hard_scale）×2 | 金丹期妖丹（gold_core）×3（62%）、妖目（beast_eye）×1（35%） | 颈鳞磨得发红。喉间发鼓时会把石尘卷到眼前，紧跟着从靠岩的一边压过来。 |
+| sand_quarry_matriarch | 白额老蜥 | 7 | 金丹中期 | 155 | 27 | 27 / 31 | 11 | beast、scaled |  | 16 | 金丹期妖丹（gold_core）×3、生兽肉（beast_meat）×6、兽革（hide）×4、厚甲片（hard_scale）×4、白蜥背棘（quarry_back_spine）×1 | 金丹期妖丹（gold_core）×5（65%）、妖目（beast_eye）×1（75%） | 白额上一道旧伤已经长进鳞下。背棘贴过石垒时，会在硬石上刻出三道细痕。 |
 
 ## 敌人回合意图
 
@@ -3044,6 +3159,10 @@
 | vine_stag | 白角藤鹿 | 4 | 转背护颈 | 防御 | 1.35 |
 | herb_den_toad | 蒲窝青蟾 | 1 | 贴地探爪 | 普通攻势 | 1 |
 | herb_den_toad | 蒲窝青蟾 | 2 | 撑板扑膝 | 重招 | 1.52 |
+| herb_den_sawfish | 锯鳍鲶 | 1 | 沉入浅泥护身 | 防御 | 1.38 |
+| herb_den_sawfish | 锯鳍鲶 | 2 | 摆尾撩脚 | 普通攻势 | 1.12 |
+| herb_den_sawfish | 锯鳍鲶 | 3 | 竖起背鳍冲过浅滩 | 重招 | 1.4 |
+| herb_den_sawfish | 锯鳍鲶 | 4 | 翻鳃带走水气 | 吸取真气 | 0.5 |
 | herb_den_lizard | 蒲根巨蜥 | 1 | 踩根掠足 | 普通攻势 | 1 |
 | herb_den_lizard | 蒲根巨蜥 | 2 | 衔水抽气 | 吸取真气 | 0.64 |
 | herb_den_lizard | 蒲根巨蜥 | 3 | 蹬板压尾 | 重招 | 1.61 |
@@ -3333,6 +3452,13 @@
 | snow_rime_antelope | 覆雪石羚 | 2 | 收膝护颈 | 防御 | 1.42 |
 | snow_rime_antelope | 覆雪石羚 | 3 | 蹬岩下撞 | 重招 | 1.67 |
 | snow_rime_antelope | 覆雪石羚 | 4 | 踏碎雪壳 | 普通攻势 | 1.1 |
+| snow_flat_scale | 扁背雪蜥 | 1 | 蹬石扫尾 | 普通攻势 | 1 |
+| snow_flat_scale | 扁背雪蜥 | 2 | 贴水收腹 | 防御 | 1.38 |
+| snow_flat_scale | 扁背雪蜥 | 3 | 弹起掀鳞 | 重招 | 1.54 |
+| snow_seam_crab | 夹石雪蟹 | 1 | 横钳挡脸 | 防御 | 1.45 |
+| snow_seam_crab | 夹石雪蟹 | 2 | 挟石探钳 | 普通攻势 | 1.04 |
+| snow_seam_crab | 夹石雪蟹 | 3 | 双钳扣腕 | 重招 | 1.58 |
+| snow_seam_crab | 夹石雪蟹 | 4 | 侧身压过来 | 普通攻势 | 0.9 |
 | sky_spillway_lizard | 双脊浮水蜥 | 1 | 沿矮沿扑咬 | 普通攻势 | 1 |
 | sky_spillway_lizard | 双脊浮水蜥 | 2 | 两脊拨水闭息 | 吸取真气 | 0.85 |
 | sky_spillway_lizard | 双脊浮水蜥 | 3 | 贴岸撩尾 | 重招 | 1.57 |
@@ -3341,9 +3467,21 @@
 | sand_anchor_scorpion | 盘绳石甲蝎 | 2 | 探钳夹腕 | 普通攻势 | 1 |
 | sand_anchor_scorpion | 盘绳石甲蝎 | 3 | 钩住岩缝挥尾 | 重招 | 1.59 |
 | sand_anchor_scorpion | 盘绳石甲蝎 | 4 | 横钳脱石 | 普通攻势 | 1.12 |
+| sand_spine_lizard | 棘背岩蜥 | 1 | 窜出石槽 | 普通攻势 | 1.02 |
+| sand_spine_lizard | 棘背岩蜥 | 2 | 张鳞卷砂 | 吸取真气 | 0.64 |
+| sand_spine_lizard | 棘背岩蜥 | 3 | 拱背掀石 | 重招 | 1.64 |
+| sand_spine_lizard | 棘背岩蜥 | 4 | 贴地合鳞 | 防御 | 1.42 |
+| sand_riven_scorpion | 裂石巨蝎 | 1 | 吊尾砸石 | 重招 | 1.59 |
+| sand_riven_scorpion | 裂石巨蝎 | 2 | 横钳拦路 | 普通攻势 | 1.03 |
+| sand_riven_scorpion | 裂石巨蝎 | 3 | 双钳压地 | 防御 | 1.55 |
+| sand_riven_scorpion | 裂石巨蝎 | 4 | 落钩掀地 | 重招 | 1.43 |
+| sand_riven_scorpion | 裂石巨蝎 | 5 | 侧身扯开 | 普通攻势 | 1.08 |
 | sand_quarry_skink | 黑背砂蜥 | 1 | 绕石咬脚 | 普通攻势 | 1 |
 | sand_quarry_skink | 黑背砂蜥 | 2 | 缩腹贴石 | 防御 | 1.32 |
 | sand_quarry_skink | 黑背砂蜥 | 3 | 侧身甩尾 | 重招 | 1.54 |
+| sand_quarry_rockscorpion | 灰钳岩蝎 | 1 | 并钳护身 | 防御 | 1.4 |
+| sand_quarry_rockscorpion | 灰钳岩蝎 | 2 | 借石抡钳 | 重招 | 1.48 |
+| sand_quarry_rockscorpion | 灰钳岩蝎 | 3 | 低身探钩 | 普通攻势 | 1.08 |
 | sand_quarry_guard | 赤脊护巢蜥 | 1 | 贴柱探爪 | 普通攻势 | 1 |
 | sand_quarry_guard | 赤脊护巢蜥 | 2 | 张喉卷走石尘 | 吸取真气 | 0.8 |
 | sand_quarry_guard | 赤脊护巢蜥 | 3 | 横压柱脚 | 重招 | 1.65 |

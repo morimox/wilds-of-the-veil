@@ -50,6 +50,7 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
   assert.equal(enemies.size, data.enemies.length);
   assert.equal(data.sites.length, data.events.length);
   const animalParts = new Set(['beast_meat', 'hide', 'beast_eye']);
+  const leaderParts = { herb_den_elder: 'den_neck_plate', sand_quarry_matriarch: 'quarry_back_spine' };
   const officialOpponents = new Set(data.tournament.matches.map(({ enemy }) => enemy));
   for (const enemy of data.enemies) {
     const { id, intents, tags, tier = 0, sparring } = enemy;
@@ -63,7 +64,9 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
     }
     if (tags.includes('human')) assert.equal(loot.size, 0, id);
     const core = tier < 3 ? 'qi_core' : tier < 6 ? 'foundation_core' : 'gold_core';
-    assert.ok([...loot].every((key) => key === core || animalParts.has(key)), id);
+    const hasThickArmor = tier >= 3 && (tags.includes('scaled') || tags.includes('stoneborn'));
+    assert.ok([...loot].every((key) => key === core || animalParts.has(key) || key === leaderParts[id] ||
+      key === 'hard_scale' && hasThickArmor), id);
     for (const { count, chance } of Object.values(enemy.chanceLoot ?? {})) {
       assert.ok(Number.isSafeInteger(count) && count > 0 && chance > 0 && chance < 1, id);
     }

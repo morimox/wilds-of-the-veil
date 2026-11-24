@@ -6,7 +6,7 @@
 
 ## 开始玩
 
-用浏览器打开 [网页试玩](https://morimox.github.io/wilds-of-the-veil/?play=24)，即可从落灯村出发。
+用浏览器打开 [网页试玩](https://morimox.github.io/wilds-of-the-veil/?play=25)，即可从落灯村出发。
 
 ### 在本机运行
 
@@ -55,6 +55,8 @@ GitHub Pages 的入口是同一份单文件构建。修改 `game.html`、源码�
 [第 23 版横向复查](docs/play-audit-23.md)记录二十个影响走法的问题、两种猎径、清场后与补给操作的实测，含隐地剧透。
 
 [第 24 版走法对照](docs/balance-pass-24.md)记录采矿、狩猎、远射、探路和修行的对照试玩，含路线与机关剧透。
+
+[第 25 版据点和战材](docs/stronghold-forging.md)记录主要据点人数、抽取规则、新装备、掉落和实测战斗量，含隐藏地点剧透。
 
 [经济验收](docs/economy-audit.md)记录原作回生算法、各摊货源、熟客条件和设施来历。[筑基版平衡考核](docs/balance.md)记录武器、丹方、材料与新局验证。[上一版地图与养成验收](docs/growth-and-world-audit.md)记录十张图的路由与现场试验，含剧透。
 

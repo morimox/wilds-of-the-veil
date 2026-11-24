@@ -5,15 +5,13 @@ import { act, createGame, view } from './engine.mjs';
 
 const herb = {
   site: 'herb_den', region: 'herb_basin', lead: 'mist_shelter',
-  regular: 'herb_den_toad', elite: 'herb_den_lizard', chief: 'herb_den_elder',
-  counts: [32, 6, 1], outerLimit: 32 / 39, innerLimit: 32 / 46,
-  observation: /干石/, healing: 10, cooldown: 2.25,
+  chief: 'herb_den_elder', counts: [24, 8, 6, 1],
+  observation: /干岸.*颈甲/, healing: 10, cooldown: 2.25,
 };
 const quarry = {
   site: 'sand_hunt_colony', region: 'hanging_vein', lead: 'sand_hunt_anchors',
-  regular: 'sand_quarry_skink', elite: 'sand_quarry_guard', chief: 'sand_quarry_matriarch',
-  counts: [72, 8, 1], outerLimit: 72 / 81, innerLimit: 72 / 90,
-  observation: /北墙/, healing: 12, cooldown: 2.5,
+  chief: 'sand_quarry_matriarch', counts: [48, 24, 8, 1],
+  observation: /石台.*背棘/, healing: 12, cooldown: 2.5,
 };
 
 function play(state, action, detail = {}) {
@@ -43,8 +41,9 @@ function arrive(ground, seed = 1, creatures = null) {
   play(state, 'choose', { index: 1 });
   if (state.event) play(state, 'leave');
   if (creatures) {
+    const members = Object.keys(data.sites.find(({ id }) => id === ground.site).creatures);
     state.localPools[ground.site] = { creatures: Object.fromEntries(
-      [ground.regular, ground.elite, ground.chief].map((id, index) => [id, { count: creatures[index], nextAt: null }]),
+      members.map((id, index) => [id, { count: creatures[index] ?? 0, nextAt: null }]),
     ) };
   }
   play(state, 'visit', { id: ground.site });
@@ -65,11 +64,12 @@ function finishFight(state) {
 }
 
 for (const ground of [herb, quarry]) {
-  test(`reading the terrain exposes a weighted route through the same group at ${ground.site}`, () => {
+  test(`either approach can meet the chief on the first draw at ${ground.site}`, () => {
     const rolls = Array.from({ length: 1_000 }, (_, index) => (Math.imul(index + 1, 2654435761) >>> 0));
+    const size = ground.counts.reduce((total, n) => total + n, 0);
     const seed = rolls.find((id) => {
       const roll = ((Math.imul(1664525, id) + 1013904223) >>> 0) / 0x100000000;
-      return roll > ground.innerLimit && roll < ground.outerLimit;
+      return roll >= (size - 1) / size;
     });
     assert.ok(seed);
     const outer = arrive(ground, seed);
@@ -82,10 +82,20 @@ for (const ground of [herb, quarry]) {
     assert.equal(option(inner, 2).available, true);
     play(outer, 'choose', { index: 0 });
     play(inner, 'choose', { index: 2 });
-    assert.equal(outer.combat.id, ground.regular);
-    assert.equal(inner.combat.id, ground.elite);
+    assert.equal(outer.combat.id, ground.chief);
+    assert.equal(inner.combat.id, ground.chief);
+    assert.equal(outer.combat.openingRange, false);
+    assert.equal(inner.combat.openingRange, true);
+    const duration = (state) => data.events.find(({ id }) => id === state.combat.siteId).choices[state.combat.huntChoice].days;
+    assert.ok(duration(outer) < duration(inner));
     finishFight(inner);
-    assert.deepEqual(residents(inner, ground), [ground.counts[0], ground.counts[1] - 1, ground.counts[2]]);
+    assert.deepEqual(residents(inner, ground), [...ground.counts.slice(0, -1), 0]);
+    const part = ground === herb ? 'den_neck_plate' : 'quarry_back_spine';
+    assert.equal(inner.inventory[part], undefined);
+    assert.equal(view(inner).groundLoot[part], 1);
+    play(inner, 'take', { id: part });
+    assert.equal(inner.inventory[part], 1);
+    assert.match(option(inner, 4).lockedReason, new RegExp(`还有 ${size - 1} 只`));
   });
 
   test(`the temporary rest at ${ground.site} consumes wood and waits for the fire to cool`, () => {
@@ -117,7 +127,7 @@ test('only clearing the cave and reconnecting the channel opens its own replenis
   const state = arrive(herb, 1, [1, 0, 0]);
   play(state, 'choose', { index: 0 });
   finishFight(state);
-  assert.deepEqual(residents(state, herb), [0, 0, 0]);
+  assert.deepEqual(residents(state, herb), [0, 0, 0, 0]);
   assert.equal(option(state, 4).available, true);
   play(state, 'choose', { index: 4 });
   assert.equal(option(state, 4), undefined);
@@ -139,7 +149,7 @@ test('only clearing the cave and reconnecting the channel opens its own replenis
   }
   play(state, 'visit', { id: herb.site });
   assert.ok(herbs() > 0);
-  assert.deepEqual(residents(state, herb), [0, 0, 0]);
+  assert.deepEqual(residents(state, herb), [0, 0, 0, 0]);
 });
 
 test('bringing wood after the last quarry enemy opens the actual old cart road', () => {

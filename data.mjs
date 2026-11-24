@@ -309,7 +309,7 @@ const regions = [
   { id: 'sky_terrace', name: '天衡石台', tier: 3, travel: 3, reveal: { item: 'sky_cord' }, desc: '走过最后一条带扶绳的木梁，脚下便是宽阔的山脊。晶石在坡上闪着光。雾薄的时候，能望见西边架着一条观星用的石梁。' },
 ];
 
-const herbDenPack = ['herb_den_toad', 'herb_den_lizard', 'herb_den_elder'];
+const herbDenPack = ['herb_den_toad', 'herb_den_sawfish', 'herb_den_lizard', 'herb_den_elder'];
 
 const sites = [
   { id: 'reed_banks', region: 'marsh', name: '浅水苇丛', once: [2],
@@ -484,14 +484,16 @@ const sites = [
     choiceText: { 1: { after: '靠棚的板沿有块干石。从那里扶着粗蒲根，可以沿洞壁绕向里面。' } },
     afterOnceText: { 4: '取水槽接好了。水越过蒲根，淌进药棚边原先干着的小畦。高处的旧灶还能添柴。' },
     creatures: {
-      herb_den_toad: { start: 32, cap: 32, interval: 0, growth: 0 },
+      herb_den_toad: { start: 24, cap: 24, interval: 0, growth: 0 },
+      herb_den_sawfish: { start: 8, cap: 8, interval: 0, growth: 0 },
       herb_den_lizard: { start: 6, cap: 6, interval: 0, growth: 0 },
       herb_den_elder: { start: 1, cap: 1, interval: 0, growth: 0 },
     },
     creatureText: {
       herb_den_toad: { present: '细碎的脚印盖过了大半泥岸。水里一阵挨一阵地鼓泡。', absent: '浅水的泡沫早已散完。' },
+      herb_den_sawfish: { present: '近岸的泥里有几道直沟，沟前露着尖尖的背鳍。', absent: '近岸的泥落平了，没再划出直沟。' },
       herb_den_lizard: { present: '贴根的宽尾印往几道深缝里收。', absent: '深缝里漏下的水散成细滴，再没有宽尾掠过去。' },
-      herb_den_elder: { present: '最深处的木桩上留着两道陷到木心的齿印。', absent: '被啃裂的木桩倒了，水从桩顶漫过去。' },
+      herb_den_elder: { present: '最深处的木桩上有两道深齿印，水面偶尔露出一角青灰色的颈甲。', absent: '被啃裂的木桩倒了，水从桩顶漫过去。' },
     } },
   { id: 'vine_pond', region: 'herb_basin', name: '白藤塘',
     stocks: { reed: { label: '塘边银脉叶', start: 4, cap: 8, interval: 7, growth: 2, depletedFactor: 1.5, choices: [2] },
@@ -812,14 +814,14 @@ const events = [
       need: { reed: 8, wood: 4 }, consume: true, days: 1, insight: 4, loot: { mine_guide: 1, ration: 3 }, outcome: '泽医把木片从药匣上拆下，指给你看哪边的石槽连着玄砂矿脉。' },
     { label: '问泽医板上的凹槽怎么用', desc: '木板上刻了几道不同深浅的槽，中间压着一张试药的便条。', days: 0.5, insight: 2, loot: { herb_press: 1, formula_leaf: 1 }, outcome: '泽医递来一页清脉饮丹方，又指着板上新刻的那道。「原本从蒲根底下取水，最近底下成了窝。蒲根旁还搭着两块旧木板，你过去当心。」' },
   ] },
-  { id: 'herb_den', name: '蒲根下的水洞', text: '两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。洞口下方卡着歪斜的取水槽，槽尾接着一畦药草。靠棚的板头还露在地上，岸上几块石头垒着个干燥的灶眼。', choices: [
+  { id: 'herb_den', name: '蒲根下的水洞', text: '两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。取水槽斜卡在洞口，槽尾接着一畦药草。板头旁有灶眼，沿干岸几步就能回到药棚。', choices: [
     { label: '踏上木板，朝水洞里探', desc: '走板面中间最省脚力。底下的石缝都通着，水一搅就看不清来的是谁。', days: 0.125,
       encounter: herbDenPack, outcome: '里头的水一下越过板面，你脚边窜出一道影子。' },
     { label: '蹲在板头，看看蒲根在水下往哪伸', days: 0.25, stay: true,
-      outcome: '你沿水线看清一块干石，再往里有几根斜伸的粗根。根上留着粗爪的擦痕，多半通到大些的东西盘踞的深水。退身时仍能踩回干石。' },
-    { label: '踩干石，扶蒲根往洞内绕', desc: '要探到靠深水的一边。脚下有踏处，回身得绕过一截横根。', afterChoice: 1, days: 0.375,
-      encounter: herbDenPack, encounterWeights: { herb_den_lizard: 2, herb_den_elder: 2 },
-      outcome: '横根晃了一下。水从脚边往内涌，石缝里斜着扑出一团影子。' },
+      outcome: '绕过横根有一小片干岸，从那儿能望见对面浅水。泽医在板头比了比手腕。「我见过有人照老蜥的颈甲打护臂。颈甲就拿来做个样子，真入炉还是得攒一批厚甲片。」' },
+    { label: '踩干石绕到洞边的干岸', desc: '要绕过横根。站上干岸，能隔着一段浅水看见石缝的动静。', afterChoice: 1, days: 0.375,
+      encounter: herbDenPack, openingRange: true,
+      outcome: '你踩上干岸。对面的浅水猛地拱起，一道影子在石缝外露了头。' },
     { label: '给板头的石灶添柴，缓一缓', desc: '在靠药棚的高地上生火，湿衣能烤干。灶眼下次还得等余火熄透。', days: 0.5, stay: true,
       need: { wood: 1 }, consume: true, cooldown: 2.25, cooldownText: '旧灶底下还有闷火，得等它凉透。', hp: 10, qi: 8,
       outcome: '灶眼冒出一缕烟。你把湿袖烤暖，调匀气息，再听水洞里的响动。' },
@@ -977,17 +979,22 @@ const enemies = [
     intents: [{ name: '贴地探爪', kind: 'attack', mult: 1 }, { name: '撑板扑膝', kind: 'heavy', mult: 1.52 }],
     insight: 3, loot: { beast_meat: 2 }, chanceLoot: { qi_core: { count: 1, chance: 0.56 } },
     desc: '小蟾藏在蒲根下，有东西踩湿木板才会扑上来。' },
+  { id: 'herb_den_sawfish', name: '锯鳍鲶', tags: ['beast'], tier: 1, hp: 29, atk: 8, def: 2,
+    intents: [{ name: '沉入浅泥护身', kind: 'guard', mult: 1.38 }, { name: '摆尾撩脚', kind: 'attack', mult: 1.12 },
+      { name: '竖起背鳍冲过浅滩', kind: 'heavy', mult: 1.4 }, { name: '翻鳃带走水气', kind: 'drain', mult: 0.5 }],
+    insight: 3, loot: { beast_meat: 2 }, chanceLoot: { qi_core: { count: 1, chance: 0.56 } },
+    desc: '背鳍边缘长着一排软刺。刚逼近时会伏进浅泥，出了泥再拿尾巴撩脚。' },
   { id: 'herb_den_lizard', name: '蒲根巨蜥', tags: ['beast', 'scaled'], tier: 3, hp: 66, atk: 14, def: 5,
     intents: [{ name: '踩根掠足', kind: 'attack', mult: 1 }, { name: '衔水抽气', kind: 'drain', mult: 0.64 },
       { name: '蹬板压尾', kind: 'heavy', mult: 1.61 }],
-    insight: 7, loot: { beast_meat: 3, hide: 2 }, chanceLoot: { foundation_core: { count: 3, chance: 0.64 }, beast_eye: { count: 1, chance: 0.33 } },
+    insight: 7, loot: { beast_meat: 3, hide: 2, hard_scale: 2 }, chanceLoot: { foundation_core: { count: 3, chance: 0.64 }, beast_eye: { count: 1, chance: 0.33 } },
     desc: '沉进黑蒲根时，它能贴木板吸走护身真气。抬起前爪后才挥尾砸板。' },
   { id: 'herb_den_elder', name: '断桩老蜥', tags: ['beast', 'scaled'], tier: 4, hp: 88, atk: 16, def: 6,
     intents: [{ name: '推木撞肩', kind: 'attack', mult: 1.02 }, { name: '贴桩护首', kind: 'guard', mult: 1.45 },
       { name: '咬桩抡水', kind: 'heavy', mult: 1.68 }, { name: '吸水回气', kind: 'heal', mult: 0.36 }],
-    insight: 11, loot: { beast_meat: 5, hide: 5, foundation_core: 3 },
+    insight: 11, loot: { beast_meat: 5, hide: 5, foundation_core: 3, hard_scale: 3, den_neck_plate: 1 },
     chanceLoot: { foundation_core: { count: 4, chance: 0.62 }, beast_eye: { count: 1, chance: 0.65 } },
-    desc: '它的下颚几乎齐木桩高。老蜥咬住旧木准备卷起一层水时，把脚从板沿收回来。' },
+    desc: '它的下颚几乎齐木桩高，颈下的厚甲能分片合拢。它咬住旧木准备卷起一层水时，把脚从板沿收回来。' },
   { id: 'vine_king', name: '白纹鹿王', tags: ['beast', 'furred'], tier: 2, hp: 79, atk: 15, def: 6,
     intents: [{ name: '昂角探石', kind: 'attack', mult: 1 }, { name: '低角顶坝', kind: 'heavy', mult: 1.7 },
       { name: '贴藤守颈', kind: 'guard', mult: 1.42 }, { name: '转身摔角', kind: 'attack', mult: 1.1 }],
@@ -1143,7 +1150,7 @@ events.push(...extendEvents);
 
 const solitaryTerritories = new Set(['river_cliff_kite', 'snow_warden', 'ember_yak']);
 const twoHandedClasses = new Set(['bow', 'crossbow', 'spear', 'staff']);
-const oneHandedWeapons = new Set(['cudgel', 'short_spear', 'ferry_pole']);
+const oneHandedWeapons = new Set(['cudgel', 'short_spear', 'ferry_pole', 'quarry_spear']);
 for (const item of gear) {
   if (item.slot === 'weapon') item.hands = twoHandedClasses.has(item.weaponClass) && !oneHandedWeapons.has(item.id) ? 2 : 1;
 }
