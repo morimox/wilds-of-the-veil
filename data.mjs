@@ -309,6 +309,8 @@ const regions = [
   { id: 'sky_terrace', name: '天衡石台', tier: 3, travel: 3, reveal: { item: 'sky_cord' }, desc: '走过最后一条带扶绳的木梁，脚下便是宽阔的山脊。晶石在坡上闪着光。雾薄的时候，能望见西边架着一条观星用的石梁。' },
 ];
 
+const herbDenPack = ['herb_den_toad', 'herb_den_lizard', 'herb_den_elder'];
+
 const sites = [
   { id: 'reed_banks', region: 'marsh', name: '浅水苇丛', once: [2],
     stocks: {
@@ -468,7 +470,10 @@ const sites = [
     emptyText: '水畦里的老叶已经剪尽。细芽还贴着湿泥，只等抽出来。' },
   { id: 'mist_shelter', region: 'herb_basin', name: '垫高脚的药棚', once: [0, 1],
     afterOnceText: { 0: '泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。', 1: '席上的捣药板已经腾出来了。泽医身边还放着几只给矿队装药的篓。' } },
-  { id: 'herb_den', region: 'herb_basin', name: '蒲根下的水洞', afterChoices: ['mist_shelter:1'],
+  { id: 'herb_den', region: 'herb_basin', name: '蒲根下的水洞', afterChoices: ['mist_shelter:1'], once: [1, 4],
+    stocks: { reed_water: { item: 'reed', label: '引水槽边的灵草', start: 3, cap: 6, interval: 5, growth: 2, choices: [5] } },
+    choiceText: { 1: { after: '靠棚的板沿有块干石。从那里扶着粗蒲根，可以沿洞壁绕向里面。' } },
+    afterOnceText: { 4: '取水槽接好了。水越过蒲根，淌进药棚边原先干着的小畦。高处的旧灶还能添柴。' },
     creatures: {
       herb_den_toad: { start: 32, cap: 32, interval: 0, growth: 0 },
       herb_den_lizard: { start: 6, cap: 6, interval: 0, growth: 0 },
@@ -478,8 +483,7 @@ const sites = [
       herb_den_toad: { present: '细碎的脚印盖过了大半泥岸。水里一阵挨一阵地鼓泡。', absent: '浅水的泡沫早已散完。' },
       herb_den_lizard: { present: '贴根的宽尾印往几道深缝里收。', absent: '深缝里漏下的水散成细滴，再没有宽尾掠过去。' },
       herb_den_elder: { present: '最深处的木桩上留着两道陷到木心的齿印。', absent: '被啃裂的木桩倒了，水从桩顶漫过去。' },
-    },
-    emptyText: '两块湿木板浮在洞口，泥岸上没有新脚印。药棚那头又有人来取水。' },
+    } },
   { id: 'vine_pond', region: 'herb_basin', name: '白藤塘',
     stocks: { reed: { label: '塘边银脉叶', start: 4, cap: 8, interval: 7, growth: 2, depletedFactor: 1.5, choices: [2] },
       reed_upper: { item: 'reed', label: '上游银脉叶', start: 5, cap: 6, interval: 10, growth: 2, choices: [4] } },
@@ -790,9 +794,21 @@ const events = [
       need: { reed: 8, wood: 4 }, consume: true, days: 1, insight: 4, loot: { mine_guide: 1, ration: 3 }, outcome: '泽医把木片从药匣上拆下，指给你看哪边的石槽连着玄砂矿脉。' },
     { label: '问泽医板上的凹槽怎么用', desc: '木板上刻了几道不同深浅的槽，中间压着一张试药的便条。', days: 0.5, insight: 2, loot: { herb_press: 1, formula_leaf: 1 }, outcome: '泽医递来一页清脉饮丹方，又指着板上新刻的那道。「原本从蒲根底下取水，最近底下成了窝。蒲根旁还搭着两块旧木板，你过去当心。」' },
   ] },
-  { id: 'herb_den', name: '蒲根下的水洞', text: '两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。洞里的枝条被水冲掉，上下几处石缝全通着。踩里板时要听清水下的动静。', choices: [
-    { label: '踏上木板，朝水洞里探', desc: '泥底看不透。若整块板都在晃，靠棚的板头还露在地上。', days: 0.125,
-      encounter: ['herb_den_toad', 'herb_den_lizard', 'herb_den_elder'], outcome: '里头的水一下越过板面，你脚边窜出一道影子。' },
+  { id: 'herb_den', name: '蒲根下的水洞', text: '两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。洞口下方卡着歪斜的取水槽，槽尾接着一畦药草。靠棚的板头还露在地上，岸上几块石头垒着个干燥的灶眼。', choices: [
+    { label: '踏上木板，朝水洞里探', desc: '走板面中间最省脚力。底下的石缝都通着，水一搅就看不清来的是谁。', days: 0.125,
+      encounter: herbDenPack, outcome: '里头的水一下越过板面，你脚边窜出一道影子。' },
+    { label: '蹲在板头，看看蒲根在水下往哪伸', days: 0.25, stay: true,
+      outcome: '你沿水线看清一块干石，再往里有几根斜伸的粗根。根上留着粗爪的擦痕，多半通到大些的东西盘踞的深水。退身时仍能踩回干石。' },
+    { label: '踩干石，扶蒲根往洞内绕', desc: '要探到靠深水的一边。脚下有踏处，回身得绕过一截横根。', afterChoice: 1, days: 0.375,
+      encounter: herbDenPack, encounterWeights: { herb_den_lizard: 2, herb_den_elder: 2 },
+      outcome: '横根晃了一下。水从脚边往内涌，石缝里斜着扑出一团影子。' },
+    { label: '给板头的石灶添柴，缓一缓', desc: '在靠药棚的高地上生火，湿衣能烤干。灶眼下次还得等余火熄透。', days: 0.5, stay: true,
+      need: { wood: 1 }, consume: true, cooldown: 2.25, cooldownText: '旧灶底下还有闷火，得等它凉透。', hp: 10, qi: 8,
+      outcome: '灶眼冒出一缕烟。你把湿袖烤暖，调匀气息，再听水洞里的响动。' },
+    { label: '把歪斜的取水槽搭回原位', desc: '槽口搁在外面，里端却伸到洞里。得等那些石缝都静下来才能挪。', days: 0.25, stay: true,
+      guardedBy: herbDenPack, outcome: '槽里终于过了水。泽医提着竹篮过来，拨开畦里的枯叶。「根还活着，外圈有几茎已经能剪。嫩的先留着，这水够它们长。」' },
+    { label: '采下引水槽旁长齐的灵草', desc: '湿畦外圈已经有几茎老叶，叶背的银纹长全了。', afterChoice: 4, days: 0.75,
+      loot: { reed: 3 }, outcome: '你顺着畦边剪叶，留了还嫩的草心。' },
   ] },
   { id: 'vine_pond', name: '白藤塘', text: '白藤沿塘边翻卷，几块踏石伸进凹水里。岸外有块斜石，向上能看到坝根。', choices: [
     { label: '沿浅滩的蹄印找藤鹿', days: 0.75, enemy: 'vine_stag', outcome: '白角从藤下挑起来，鹿蹄刨开一片湿泥。' },

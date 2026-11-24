@@ -39,6 +39,7 @@
 废窑烟道（kiln_flue）,资源,耐火泥（kiln_clay）,kiln_clay,,3,3,0,0,,,,5
 废窑烟道（kiln_flue）,种群,炉渣犬（cinder_hound）,cinder_hound,,2,3,8,1,固定间隔,1.5,,
 银脉水畦（herb_beds）,资源,灵草（reed）,reed,,8,12,6,2,,1.5,,1
+蒲根下的水洞（herb_den）,资源,灵草（reed）,reed_water,引水槽边的灵草,3,6,5,2,,,,6
 蒲根下的水洞（herb_den）,种群,蒲窝青蟾（herb_den_toad）,herb_den_toad,,32,32,0,0,不回补,,,
 蒲根下的水洞（herb_den）,种群,蒲根巨蜥（herb_den_lizard）,herb_den_lizard,,6,6,0,0,不回补,,,
 蒲根下的水洞（herb_den）,种群,断桩老蜥（herb_den_elder）,herb_den_elder,,1,1,0,0,不回补,,,

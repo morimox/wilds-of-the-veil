@@ -4,12 +4,16 @@ const crossings = [
   { a: 'ford', b: 'zhao_city', label: '外港水路', days: 5.5, item: 'ferry_manifest', quest: 'last_lantern', reason: '旧渡重新开船后可以走这条路。也可以拿货单搭商船。' },
   { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' },
 ];
+const shortcuts = [
+  { a: 'hanging_vein', b: 'cold_kiln', label: '石场旧车道', days: 0.875, openedBy: 'sand_hunt_colony:4' },
+];
 const arrayPlans = {
   wuliang: { coins: 96, need: { wood: 36, ore: 20, core: 18, black_iron: 8 } },
   zhaoyuan: { coins: 115, need: { wood: 32, ore: 28, core: 24, black_iron: 18 } },
   mingsha: { coins: 140, need: { wood: 28, ore: 32, core: 32, black_iron: 25 } },
 };
-export const transportRules = Object.freeze({ gatePrice: 2, gateDays: 0.125, arrayPrice: 4, arrayDays: 0.25, scrollDays: 0.125, arrayPlans, crossings });
+export const transportRules = Object.freeze({ gatePrice: 2, gateDays: 0.125, arrayPrice: 4, arrayDays: 0.25, scrollDays: 0.125,
+  arrayPlans, crossings, shortcuts });
 
 export function initialWorld() {
   return { lastSettlement: home, gates: [], arrays: {}, shops: {}, recovery: {}, affiliation: null, memberships: {} };
@@ -48,12 +52,14 @@ function signedRoad(data, from, to) {
   return detail(data, from).links?.includes(to) || detail(data, to).links?.includes(from);
 }
 
-function directRoad(from, to, kit) {
+function directRoad(state, from, to, kit) {
   const fromRegion = kit.records.regions[from];
   const toRegion = kit.records.regions[to];
   if (!fromRegion || !toRegion || from === to) return null;
   const cross = crossRoute(from, to);
   if (cross) return { days: cross.days, cross };
+  const shortcut = shortcuts.find((road) => otherside(road, from) === to && state.seenChoices.includes(road.openedBy));
+  if (shortcut) return { days: shortcut.days, label: shortcut.label };
   if (provinceOf(kit.data, from) !== provinceOf(kit.data, to) || !signedRoad(kit.data, from, to)) return null;
   if (legacy.has(from) && legacy.has(to)) {
     const days = from === home || to === home ? (from === home ? toRegion : fromRegion).travel
@@ -66,7 +72,7 @@ function directRoad(from, to, kit) {
 
 export function learnAdjacentRegions(state, kit) {
   for (const region of kit.data.regions) {
-    if (marked(state, region.id) || !directRoad(state.region, region.id, kit)) continue;
+    if (marked(state, region.id) || !directRoad(state, state.region, region.id, kit)) continue;
     const cross = crossRoute(state.region, region.id);
     if (cross ? crossBlocker(state, cross) : region.reveal || region.secret) continue;
     state.discovered.push(region.id);
@@ -91,7 +97,7 @@ function knownRoutes(state, kit) {
     if (!nearest) break;
     unvisited.delete(nearest);
     for (const id of unvisited) {
-      const road = directRoad(nearest, id, kit);
+      const road = directRoad(state, nearest, id, kit);
       if (!road || road.cross) continue;
       const nextCost = nearestCost + road.days;
       if (nextCost < (routes.get(id)?.days ?? Infinity)) {
@@ -123,7 +129,7 @@ function quoteRoad(state, id, kit, routes) {
   if (!kit.records.regions[id]) return { reason: '找不到这条路。' };
   if (!marked(state, id)) return { reason: '你还没有找到那条路。' };
   if (state.region === id) return { reason: '你已经在这里。' };
-  const road = directRoad(state.region, id, kit) ?? (routes ?? knownRoutes(state, kit)).get(id);
+  const road = directRoad(state, state.region, id, kit) ?? (routes ?? knownRoutes(state, kit)).get(id);
   if (!road) return { reason: '没找到能从这里接上的路。' };
   const blockedCrossing = crossBlocker(state, road.cross);
   if (blockedCrossing) return { ...road, reason: blockedCrossing };
@@ -172,7 +178,7 @@ export function travelRoad(state, id, kit) {
   const travelText = road.rescue ? '腹中没了力气，沿路慢走了一程。'
     : protection && state.satiety > unprotectedSatiety ? `裹紧${kit.nameOf(protection.id)}的衣襟挡住风沙，这一程没那么耗力。` : '';
   const used = road.meals && kit.goodsText(road.meals);
-  return { ...kit.say(state, `抵达${kit.records.regions[id].name}。${used ? `途中吃了${used}。` : ''}${travelText}`),
+  return { ...kit.say(state, `抵达${kit.records.regions[id].name}。${road.label ? `这次走的是${road.label}。` : ''}${used ? `途中吃了${used}。` : ''}${travelText}`),
     ...(used ? { travelMeals: road.meals } : {}) };
 }
 
@@ -443,7 +449,7 @@ export function worldView(state, kit) {
   const journeys = discovered.flatMap((region) => {
     if (region.id === state.region) return [];
     const quote = quoteRoad(state, region.id, kit, routesFromHere);
-    const ordinary = directRoad(state.region, region.id, kit);
+    const ordinary = directRoad(state, state.region, region.id, kit);
     const via = (quote.via ?? []).map((id) => kit.records.regions[id].name);
     return quote.days === undefined ? [] :
       [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue),

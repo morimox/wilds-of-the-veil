@@ -34,16 +34,16 @@
 生兽肉（beast_meat）,青崖松场（pine_ridge）,翻车的松沟（pine_hollow）,灰脊松熊（pitch_bear）,炼气中期,4,,,4,2,4,7,1,固定间隔,,靠近树沟里翻倒的窑车
 兽革（hide）,青崖松场（pine_ridge）,翻车的松沟（pine_hollow）,灰脊松熊（pitch_bear）,炼气中期,2,,,2,2,4,7,1,固定间隔,,靠近树沟里翻倒的窑车
 炼气期妖丹（qi_core）,云炉石谷（kiln_valley）,废窑烟道（kiln_flue）,炉渣犬（cinder_hound）,炼气后期,3,,,3,2,3,8,1,固定间隔,冷下来的老窑（abandoned_kiln） · 从铁圈下取出石牌,掰开靠外的窑砖看一眼
-炼气期妖丹（qi_core）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲窝青蟾（herb_den_toad）,炼气中期,0,1,56%,0.56,32,32,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-生兽肉（beast_meat）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲窝青蟾（herb_den_toad）,炼气中期,2,,,2,32,32,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-筑基期妖丹（foundation_core）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲根巨蜥（herb_den_lizard）,筑基初期,0,3,64%,1.92,6,6,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-生兽肉（beast_meat）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲根巨蜥（herb_den_lizard）,筑基初期,3,,,3,6,6,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-妖目（beast_eye）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲根巨蜥（herb_den_lizard）,筑基初期,0,1,33%,0.33,6,6,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-兽革（hide）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲根巨蜥（herb_den_lizard）,筑基初期,2,,,2,6,6,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-筑基期妖丹（foundation_core）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,断桩老蜥（herb_den_elder）,筑基中期,3,4,62%,5.48,1,1,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-生兽肉（beast_meat）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,断桩老蜥（herb_den_elder）,筑基中期,5,,,5,1,1,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-妖目（beast_eye）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,断桩老蜥（herb_den_elder）,筑基中期,0,1,65%,0.65,1,1,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
-兽革（hide）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,断桩老蜥（herb_den_elder）,筑基中期,5,,,5,1,1,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探
+炼气期妖丹（qi_core）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲窝青蟾（herb_den_toad）,炼气中期,0,1,56%,0.56,32,32,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+生兽肉（beast_meat）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲窝青蟾（herb_den_toad）,炼气中期,2,,,2,32,32,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+筑基期妖丹（foundation_core）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲根巨蜥（herb_den_lizard）,筑基初期,0,3,64%,1.92,6,6,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+生兽肉（beast_meat）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲根巨蜥（herb_den_lizard）,筑基初期,3,,,3,6,6,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+妖目（beast_eye）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲根巨蜥（herb_den_lizard）,筑基初期,0,1,33%,0.33,6,6,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+兽革（hide）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,蒲根巨蜥（herb_den_lizard）,筑基初期,2,,,2,6,6,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+筑基期妖丹（foundation_core）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,断桩老蜥（herb_den_elder）,筑基中期,3,4,62%,5.48,1,1,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+生兽肉（beast_meat）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,断桩老蜥（herb_den_elder）,筑基中期,5,,,5,1,1,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+妖目（beast_eye）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,断桩老蜥（herb_den_elder）,筑基中期,0,1,65%,0.65,1,1,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
+兽革（hide）,篁泽药谷（herb_basin）,蒲根下的水洞（herb_den）,断桩老蜥（herb_den_elder）,筑基中期,5,,,5,1,1,0,0,不回补,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,踏上木板，朝水洞里探、踩干石，扶蒲根往洞内绕
 炼气期妖丹（qi_core）,篁泽药谷（herb_basin）,白藤塘（vine_pond）,白角藤鹿（vine_stag）,炼气后期,3,,,3,2,6,8,1,随种群密度变化,,沿浅滩的蹄印找藤鹿
 生兽肉（beast_meat）,篁泽药谷（herb_basin）,白藤塘（vine_pond）,白角藤鹿（vine_stag）,炼气后期,3,,,3,2,6,8,1,随种群密度变化,,沿浅滩的蹄印找藤鹿
 妖目（beast_eye）,篁泽药谷（herb_basin）,白藤塘（vine_pond）,白角藤鹿（vine_stag）,炼气后期,1,,,1,2,6,8,1,随种群密度变化,,沿浅滩的蹄印找藤鹿
@@ -178,15 +178,15 @@
 金丹期妖丹（gold_core）,横生脉（hanging_vein）,旧矿索下的岩沟（sand_hunt_anchors）,盘绳石甲蝎（sand_anchor_scorpion）,金丹初期,0,4,75%,3,2,3,11,1,随种群密度变化,,沿石阶下沟，在矿索旁迎石甲蝎
 生兽肉（beast_meat）,横生脉（hanging_vein）,旧矿索下的岩沟（sand_hunt_anchors）,盘绳石甲蝎（sand_anchor_scorpion）,金丹初期,2,,,2,2,3,11,1,随种群密度变化,,沿石阶下沟，在矿索旁迎石甲蝎
 兽革（hide）,横生脉（hanging_vein）,旧矿索下的岩沟（sand_hunt_anchors）,盘绳石甲蝎（sand_anchor_scorpion）,金丹初期,2,,,2,2,3,11,1,随种群密度变化,,沿石阶下沟，在矿索旁迎石甲蝎
-筑基期妖丹（foundation_core）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,黑背砂蜥（sand_quarry_skink）,筑基中期,0,1,52%,0.52,72,72,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-生兽肉（beast_meat）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,黑背砂蜥（sand_quarry_skink）,筑基中期,2,,,2,72,72,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-兽革（hide）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,黑背砂蜥（sand_quarry_skink）,筑基中期,1,,,1,72,72,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-金丹期妖丹（gold_core）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,0,3,62%,1.86,8,8,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-生兽肉（beast_meat）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,4,,,4,8,8,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-妖目（beast_eye）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,0,1,35%,0.35,8,8,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-兽革（hide）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,2,,,2,8,8,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-金丹期妖丹（gold_core）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,3,5,65%,6.25,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-生兽肉（beast_meat）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,6,,,6,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-妖目（beast_eye）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,0,1,75%,0.75,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
-兽革（hide）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,4,,,4,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处
+筑基期妖丹（foundation_core）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,黑背砂蜥（sand_quarry_skink）,筑基中期,0,1,52%,0.52,72,72,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+生兽肉（beast_meat）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,黑背砂蜥（sand_quarry_skink）,筑基中期,2,,,2,72,72,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+兽革（hide）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,黑背砂蜥（sand_quarry_skink）,筑基中期,1,,,1,72,72,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+金丹期妖丹（gold_core）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,0,3,62%,1.86,8,8,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+生兽肉（beast_meat）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,4,,,4,8,8,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+妖目（beast_eye）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,0,1,35%,0.35,8,8,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+兽革（hide）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,赤脊护巢蜥（sand_quarry_guard）,金丹初期,2,,,2,8,8,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+金丹期妖丹（gold_core）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,3,5,65%,6.25,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+生兽肉（beast_meat）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,6,,,6,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+妖目（beast_eye）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,0,1,75%,0.75,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
+兽革（hide）,横生脉（hanging_vein）,梁后的露天石场（sand_hunt_colony）,白额老蜥（sand_quarry_matriarch）,金丹中期,4,,,4,1,1,0,0,不回补,旧矿索下的岩沟（sand_hunt_anchors） · 扳开上一级石阶旁的断梁,越过倒柱，在蜥群边找落脚处、扶倒柱的低棱，贴北墙靠近内巢
 筑基期妖丹（foundation_core）,闭潮渡（ford）,闸下无灯梯（ford_below_steps）,悬梯堰影（ford_lower_spirit）,筑基中期,2,,,2,2,4,11,1,固定间隔,,沿短绳下到第二根栏杆

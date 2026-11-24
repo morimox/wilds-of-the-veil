@@ -80,6 +80,9 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
       if (action.encounter) {
         assert.ok(action.encounter.length > 1 && action.encounter.length === new Set(action.encounter).size, site.id);
         assert.ok(!action.enemy && !action.ambush && !action.loot, site.id);
+        for (const [enemy, weight] of Object.entries(action.encounterWeights ?? {})) {
+          assert.ok(action.encounter.includes(enemy) && Number.isFinite(weight) && weight > 0, `${site.id}:${index}:${enemy}`);
+        }
       }
       for (const enemy of [action.enemy, ...[].concat(action.guardedBy ?? []), action.afterFight, action.ambush?.enemy,
         ...(action.encounter ?? [])].filter(Boolean)) {

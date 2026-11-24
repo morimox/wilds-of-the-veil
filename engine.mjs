@@ -37,9 +37,12 @@ export const rules = Object.freeze({
   ebbWindowDays: 0.625,
   retreatDays: 0.25,
   retreatDamageFactor: 0.5,
+  mixedTrackDays: 3,
+  mixedTrackHealingPerDay: 6,
   emptyReturnDays: 0.25,
   waitDays: 0.5,
   maxSatiety: 100,
+  batchMealTarget: 80,
   satietyDrainPerDay: 16,
   rationSatiety: records.foods.ration.satiety,
   emptyAttackMultiplier: 0.75,
@@ -372,6 +375,7 @@ export function createGame(seed = Math.floor(Math.random() * 0x100000000)) {
     localPools: {},
     siteVictories: {},
     siteClaims: {},
+    huntTracks: {},
     siteWitnesses: {},
     encounterSeed: seed >>> 0,
     basketInspected: false,
@@ -567,7 +571,9 @@ export function view(state) {
     const blocker = choiceBlocker(state, choice, currentSite, index);
     const { label, desc, hidden } = choice;
     const gather = gatherOptions(state, choice, currentSite, index);
-    return { label, desc: blocker?.depleted ? '' : desc, hidden, index, cost: Math.max(0, -(choice.coins ?? 0)),
+    const track = choice.encounter && activeHuntTrack(state, currentSite, index);
+    const trace = track ? `上回遇到的${records.enemies[track.enemy].name}还守在这条路上。` : '';
+    return { label, desc: blocker?.depleted ? '' : `${desc ?? ''}${trace}`, hidden, index, cost: Math.max(0, -(choice.coins ?? 0)),
       available: !blocker, lockedReason: blocker?.reason ?? '',
       ...(gather.length ? { gather } : {}) };
   }).filter(({ index }) => !completedSiteChoice(state, currentSite, index) &&
@@ -582,6 +588,10 @@ export function view(state) {
     spiritSense: studies.spiritSense,
     tournament: tournamentView(state, economyKit),
     maxSatiety: rules.maxSatiety,
+    restSessions: mode === 'village' && settlementOf(data, state.region)?.inn ? recoverySessions(state) : 0,
+    batchMeals: ['field', 'village', 'event'].includes(mode) && !state.gathering
+      ? Object.fromEntries(data.foods.map(({ id }) => [id, batchMealCount(state, id)]).filter(([, count]) => count > 1))
+      : {},
     fogTolerance: rules.pressureThreshold + (fogProtection(state)?.field.fogTolerance ?? 0),
     mode,
     day: state.day,
@@ -731,8 +741,22 @@ function encounterPools(state, site, encounter) {
   return encounter.map((id) => [id, poolAt(state, site, 'creatures', id).count]);
 }
 
-function selectEncounter(state, site, encounter) {
-  const pools = encounterPools(state, site, encounter);
+function activeHuntTrack(state, site, index) {
+  const trace = state.huntTracks?.[site.id]?.[index];
+  return trace && state.day - trace.day < rules.mixedTrackDays &&
+    poolAt(state, site, 'creatures', trace.enemy).count > 0 ? trace : null;
+}
+
+function saveHuntTrack(state) {
+  const fight = state.combat;
+  if (fight?.huntChoice === undefined) return;
+  const tracks = ((state.huntTracks ??= {})[fight.siteId] ??= {});
+  tracks[fight.huntChoice] = { enemy: fight.id, hp: fight.hp, day: state.day };
+}
+
+function selectEncounter(state, site, choice) {
+  const pools = encounterPools(state, site, choice.encounter)
+    .map(([id, count]) => [id, count * (choice.encounterWeights?.[id] ?? 1)]);
   const total = pools.reduce((sum, [, count]) => sum + count, 0);
   if (!total) return null;
   let ticket = Math.floor(worldRoll(state) * total);
@@ -841,6 +865,7 @@ function choose(state, { index, itemId, count }) {
   }
   const blocker = choiceBlocker(state, choice, site, index);
   if (blocker) return refuse(blocker.reason);
+  const track = choice.encounter && activeHuntTrack(state, site, index);
   const options = gatherOptions(state, choice, site, index);
   const gatherArmor = options.length && choice.injury && choice.hp < 0
     ? activeGear(state).find(({ field }) => field?.gatherPadding > 0) : undefined;
@@ -923,12 +948,19 @@ function choose(state, { index, itemId, count }) {
   const gatheredRegion = state.region;
   const gatheredGoods = goodsText(gathered);
   leaveOnGround(state, gathered);
-  const enemy = ambush?.enemy ?? choice.enemy ??
-    (completedBatches > 0 && choice.encounter ? selectEncounter(state, site, choice.encounter) : null);
+  const hunt = completedBatches > 0 && choice.encounter;
+  const enemy = ambush?.enemy ?? choice.enemy ?? (hunt ? track?.enemy ?? selectEncounter(state, site, choice) : null);
   const continuesHere = choice.stay || event.choices.some((next) => next.afterChoice === index);
   if (enemy && records.enemies[enemy]) {
     state.event = null;
     startCombat(state, enemy, site?.id);
+    if (hunt) {
+      state.combat.huntChoice = index;
+      if (track) {
+        const healed = Math.floor((state.day - track.day) * rules.mixedTrackHealingPerDay);
+        state.combat.hp = Math.min(state.combat.hp, track.hp + healed);
+      }
+    }
   } else if (!continuesHere && !stocks.length && !Object.keys(spilled).length) {
     state.event = null;
   }
@@ -967,6 +999,7 @@ function endSparring(state, enemy) {
 function fall(state, place = groundPlace(state)) {
   const enemy = enemyOf(state);
   if (inProtectedBout(state)) return endSparring(state, enemy);
+  saveHuntTrack(state);
   const coinsLost = Math.min(rules.fallMaxCoinLoss, Math.ceil(state.coins * rules.fallCoinLossFactor));
   const lostGoods = Object.fromEntries(Object.entries(state.expeditionLoot)
     .map(([id, count]) => [id, Math.min(owns(state, id), count)])
@@ -1007,6 +1040,10 @@ function finishCombat(state, enemy) {
     spendPool(state, site, 'creatures', enemy.id, 1);
     const wins = (state.siteVictories[site.id] ??= {});
     wins[enemy.id] = (wins[enemy.id] ?? 0) + 1;
+    const tracks = state.huntTracks?.[site.id];
+    for (const [index, track] of Object.entries(tracks ?? {})) {
+      if (track.enemy === enemy.id) delete tracks[index];
+    }
   }
   const tournament = tournamentResolution(state, combat, true);
   state.combat = null;
@@ -1182,9 +1219,15 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   state.hp -= received;
   normalize(state);
   const damageTaken = Math.max(0, healthBefore - state.hp);
-  const summary = `${lead}你退出了与${enemy.name}的交手，仍在${regionOf(state).name}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
+  const outerEdge = state.combat.huntChoice !== undefined ? state.combat.siteId : null;
+  const position = outerEdge ? '退回了这处猎场的外沿' : `仍在${regionOf(state).name}`;
+  const summary = `${lead}你退出了与${enemy.name}的交手，${position}。${received ? `脱身时受了${received}点伤。` : ''}${charmDamage}${armorDamage}`;
   say(state, summary);
   if (state.hp === 0) return { ...fall(state), damageDealt: 0, damageTaken };
+  if (outerEdge) {
+    saveHuntTrack(state);
+    state.event = outerEdge;
+  }
   state.combat = null;
   return { ok: true, message: summary, damageDealt: 0, damageTaken };
 }
@@ -1226,21 +1269,30 @@ function attack(state) {
   });
 }
 
-function eat(state, inCombat, id = supply) {
+function batchMealCount(state, id) {
+  const food = records.foods[id];
+  if (!food?.satiety || state.satiety >= rules.batchMealTarget) return 0;
+  return Math.min(owns(state, id), Math.ceil((rules.batchMealTarget - state.satiety) / food.satiety),
+    Math.floor((rules.maxSatiety - state.satiety) / food.satiety));
+}
+
+function eat(state, inCombat, id = supply, batch = false) {
   if (id === 'beast_meat' && owns(state, id)) return refuse('肉还生着。带回村用灶煮熟就能吃。');
   const food = records.foods[id];
   if (!food || !owns(state, id)) return refuse('没有这份可吃的口粮。');
   if (state.satiety >= rules.maxSatiety && state.hp >= stats(state).maxHp) return refuse('你还很饱，气血也足。');
-  removeItem(state, id, 1);
+  const count = batch ? batchMealCount(state, id) : 1;
+  if (batch && count < 2) return refuse('眼下不必连吃。');
+  removeItem(state, id, count);
   state.didEat = true;
   const before = state.hp;
   const initialSatiety = state.satiety;
-  state.satiety = Math.min(rules.maxSatiety, state.satiety + food.satiety);
-  state.hp += food.hp;
+  state.satiety = Math.min(rules.maxSatiety, state.satiety + food.satiety * count);
+  state.hp += food.hp * count;
   normalize(state);
   const satietyRestored = state.satiety - initialSatiety;
   const recovered = [satietyRestored && `饱腹+${satietyRestored}`, state.hp > before && `气血+${state.hp - before}`].filter(Boolean);
-  const message = `你吃下${nameOf(id)}。${recovered.length ? `${recovered.join('，')}。` : ''}`;
+  const message = `你吃下${count > 1 ? `${count}份` : ''}${nameOf(id)}。${recovered.length ? `${recovered.join('，')}。` : ''}`;
   return inCombat ? combatTurn(state, { message }) : say(state, message);
 }
 
@@ -1373,13 +1425,18 @@ function takeFromGround(state, id, requested) {
     ...(requested === undefined && ground[id] ? { leftOnGround: { [id]: ground[id] } } : {}) };
 }
 
-function rest(state) {
+function recoverySessions(state) {
   const { maxHp, maxQi } = stats(state);
-  const needsRest = state.hp < maxHp || state.qi < maxQi || state.wounds || state.toxin || state.pressure || needsSenseRest(state);
-  const relief = Math.max(0, rules.reliefRations - owns(state, supply));
-  if (!needsRest && !relief) return refuse('你已经歇足了。');
-  const granted = fittingItems(state, { [supply]: relief }).accepted[supply] ?? 0;
-  if (relief && !granted && !needsRest) return refuse('行囊已满，拿不了干粮。');
+  const unwoundedHp = maxHp + state.wounds * rules.woundPenalty;
+  return Math.max(
+    Math.ceil((unwoundedHp - state.hp) / rules.restHp),
+    Math.ceil((maxQi - state.qi) / (rules.restQi + trainingPerks(state).restQi)),
+    Math.ceil(state.wounds / rules.restWounds), Math.ceil(state.toxin / rules.restToxin),
+    state.pressure || needsSenseRest(state) ? 1 : 0,
+  );
+}
+
+function applyHalfDayRest(state) {
   advance(state, rules.restDays);
   state.wounds -= rules.restWounds;
   state.toxin -= rules.restToxin;
@@ -1388,11 +1445,26 @@ function rest(state) {
   state.qi += rules.restQi + trainingPerks(state).restQi;
   const recoveredSense = restoreTrainingSense(state);
   normalize(state);
+  return recoveredSense > 0;
+}
+
+function rest(state, untilRecovered = false) {
+  const required = recoverySessions(state);
+  const relief = Math.max(0, rules.reliefRations - owns(state, supply));
+  if (!required && (!relief || untilRecovered)) return refuse('你已经歇足了。');
+  const granted = fittingItems(state, { [supply]: relief }).accepted[supply] ?? 0;
+  if (relief && !granted && !required) return refuse('行囊已满，拿不了干粮。');
+  const sessions = untilRecovered ? required : 1;
+  let recoveredSense = false;
+  for (let i = 0; i < sessions; i++) {
+    if (applyHalfDayRest(state)) recoveredSense = true;
+  }
   if (granted) {
     state.reliefRations += granted;
     addItems(state, { [supply]: granted });
   }
-  return say(state, `在${regionOf(state).name}歇了半日。${recoveredSense ? '神识也养回来了。' : ''}${granted ? `灶上匀给你${granted}份${nameOf(supply)}。` : relief ? '行囊已满，拿不了干粮。' : ''}`);
+  const duration = sessions === 1 ? '半日' : `${sessions * rules.restDays}日`;
+  return say(state, `在${regionOf(state).name}歇了${duration}。${recoveredSense ? '神识也养回来了。' : ''}${granted ? `灶上匀给你${granted}份${nameOf(supply)}。` : relief ? '行囊已满，拿不了干粮。' : ''}`);
 }
 
 function learn(state, id) {
@@ -1719,7 +1791,7 @@ const economyKit = {
 };
 
 function canUseVillageAction(state, action, payload) {
-  if (action === 'rest') return settlementOf(data, state.region)?.inn;
+  if (action === 'rest' || action === 'restUntilRecovered') return settlementOf(data, state.region)?.inn;
   if (action === 'repair') return Boolean(settlementOf(data, state.region)?.repair);
   if (atHome(state)) return true;
   if (!isSettlement(state)) return false;
@@ -1729,6 +1801,7 @@ function canUseVillageAction(state, action, payload) {
 
 const villageActions = {
   rest: (state) => rest(state),
+  restUntilRecovered: (state) => rest(state, true),
   learn: (state, { id }) => learn(state, id),
   research: (state) => research(state),
   breakthrough: (state) => breakthrough(state),
@@ -1751,6 +1824,7 @@ const generalActions = {
   revisit: (state, { id }) => revisit(state, id),
   wait,
   eat: (state, { id }) => eat(state, false, id || supply),
+  batchEat: (state, { id }) => eat(state, false, id || supply, true),
   inspectBasket,
   unpackBasket,
   use: (state, { id }) => use(state, id, false),
@@ -1811,6 +1885,7 @@ function takeTurn(state, action, payload) {
     const mechanism = mechanismAction(state, action, payload, economyKit);
     if (mechanism) return mechanism;
     if (action === 'eat') return eat(state, false, payload.id || supply);
+    if (action === 'batchEat') return eat(state, false, payload.id || supply, true);
     if (action === 'use') return use(state, payload.id, false);
     if (action === 'equip') return equip(state, payload.id);
     if (action === 'unequip') return unequip(state, payload.slot);

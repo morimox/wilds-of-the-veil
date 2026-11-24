@@ -16,9 +16,12 @@ ebbCycleDays,2,闭潮渡退水循环（游戏日）
 ebbWindowDays,0.625,每次退水维持时间（游戏日）
 retreatDays,0.25,撤出战斗所需用时（天）
 retreatDamageFactor,0.5,脱身时先乘此值，再计算减伤和防御
+mixedTrackDays,3,混合猎场的同一路脚印消散用时（游戏日）
+mixedTrackHealingPerDay,6,失去接触的猎物每日恢复气血（向下取整）
 emptyReturnDays,0.25,空腹返村额外用时（天）
 waitDays,0.5,主动等候一次的游戏天数
 maxSatiety,100,饱腹度上限
+batchMealTarget,80,主动连吃时的饱腹目标（须容纳每份食物完整的饱腹增量）
 satietyDrainPerDay,16,每游戏日消耗的饱腹度
 rationSatiety,32,每份普通干粮恢复的饱腹度
 emptyAttackMultiplier,0.75,空腹交手时对普通与兵刃术诀出伤的倍率

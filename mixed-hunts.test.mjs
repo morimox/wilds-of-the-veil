@@ -38,10 +38,30 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   assert.deepEqual(countAt(full), [72, 8, 1]);
   play(full, 'choose', { index: 0 });
   assert.equal(full.combat.id, actors[0]);
+  const randomAfterFirst = full.encounterSeed;
+  play(full, 'attack');
+  const previousFoeHealth = full.combat.hp;
   play(full, 'retreat');
   assert.deepEqual(countAt(full), [72, 8, 1]);
   assert.ok(!full.siteVictories[quarry]);
   assert.ok(!full.ground[quarry]);
+  assert.equal(view(full).currentEvent.id, quarry);
+  assert.match(view(full).visibleChoices.find(({ index }) => index === 0).desc, /上回遇到的黑背砂蜥/);
+  play(full, 'choose', { index: 0 });
+  assert.equal(full.combat.id, actors[0]);
+  assert.equal(full.encounterSeed, randomAfterFirst);
+  assert.equal(full.combat.hp, previousFoeHealth + 1);
+  play(full, 'retreat');
+  play(full, 'leave');
+  play(full, 'eat', { id: 'ration' });
+  for (let day = 0; day < 3; day++) {
+    play(full, 'wait');
+    play(full, 'wait');
+  }
+  play(full, 'visit', { id: quarry });
+  assert.doesNotMatch(view(full).visibleChoices.find(({ index }) => index === 0).desc, /上回遇到/);
+  play(full, 'choose', { index: 0 });
+  assert.notEqual(full.encounterSeed, randomAfterFirst);
 
   const late = arrive(1, [0, 0, 1]);
   play(late, 'choose', { index: 0 });
@@ -55,6 +75,23 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   assert.equal(act(late, 'choose', { index: 0 }).ok, false);
   play(late, 'take', { id: 'gold_core' });
   assert.equal(late.inventory.gold_core, result.gathered.gold_core);
+});
+
+test('looking at real tracks opens a second approach with different odds and the same animals', () => {
+  const initial = arrive(300, [2, 1, 1]);
+  assert.equal(view(initial).visibleChoices.some(({ index }) => index === 2), false);
+  play(initial, 'choose', { index: 1 });
+  assert.equal(view(initial).visibleChoices.some(({ index }) => index === 2), true);
+  const outer = structuredClone(initial);
+  const inner = structuredClone(initial);
+  play(outer, 'choose', { index: 0 });
+  play(inner, 'choose', { index: 2 });
+  assert.equal(outer.combat.id, actors[0]);
+  assert.equal(inner.combat.id, actors[1]);
+  inner.combat.hp = 1;
+  play(inner, 'attack');
+  assert.deepEqual(countAt(inner), [2, 0, 1]);
+  assert.equal(view(inner).currentEvent.id, quarry);
 });
 
 test('fixed and independent chance drops can differ even against the same type of opponent', () => {

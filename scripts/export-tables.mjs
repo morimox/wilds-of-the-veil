@@ -51,9 +51,12 @@ const ruleDescriptions = {
   harvestEncounterDays: '采集中遭遇伏击时开打前用时（天）',
   retreatDays: '撤出战斗所需用时（天）',
   retreatDamageFactor: '脱身时先乘此值，再计算减伤和防御',
+  mixedTrackDays: '混合猎场的同一路脚印消散用时（游戏日）',
+  mixedTrackHealingPerDay: '失去接触的猎物每日恢复气血（向下取整）',
   emptyReturnDays: '空腹返村额外用时（天）',
   waitDays: '主动等候一次的游戏天数',
   maxSatiety: '饱腹度上限',
+  batchMealTarget: '主动连吃时的饱腹目标（须容纳每份食物完整的饱腹增量）',
   satietyDrainPerDay: '每游戏日消耗的饱腹度',
   rationSatiety: '每份普通干粮恢复的饱腹度',
   emptyAttackMultiplier: '空腹交手时对普通与兵刃术诀出伤的倍率',
@@ -317,11 +320,15 @@ const huntSources = worldPools.filter(({ kind }) => kind === '种群').flatMap((
     };
   });
 });
-const mixedHunts = choices.filter(({ encounter }) => encounter).flatMap(({ event, label, encounter }) => {
+const mixedHunts = choices.filter(({ encounter }) => encounter).flatMap(({ event, label, encounter, encounterWeights, days, afterChoice }) => {
   const site = data.sites.find(({ id }) => id === event);
   const initial = encounter.reduce((count, id) => count + site.creatures[id].start, 0);
+  const weight = (id) => encounterWeights?.[id] ?? 1;
+  const weighted = encounter.reduce((count, id) => count + site.creatures[id].start * weight(id), 0);
   return encounter.map((id) => ({
-    site: event, label, enemy: id, total: initial, initialChance: initial ? site.creatures[id].start / initial : 0, ...site.creatures[id],
+    site: event, label, enemy: id, total: initial, days, weight: weight(id),
+    unlock: afterChoice === undefined ? '' : describeChoice(`${event}:${afterChoice}`),
+    initialChance: weighted ? site.creatures[id].start * weight(id) / weighted : 0, ...site.creatures[id],
   }));
 });
 const formatChanceLoot = (entries) => Object.entries(entries).map(([id, { count, chance }]) =>
@@ -385,6 +392,7 @@ const sectRanks = data.sects.flatMap((sect) => sect.ranks.map((rank) => ({ regio
 const trainingRows = trainingData.flatMap(({ ranks, ...track }) => ranks.map((rank, index) => ({ ...track, ...rank, level: index + 1 })));
 const transportRows = [
   ...transportRules.crossings.map(({ a, b, label, days, item, quest, reason }) => ({ label, a, b, days, item, quest, reason })),
+  ...transportRules.shortcuts.map(({ a, b, label, days, openedBy }) => ({ label, a, b, days, reason: describeChoice(openedBy) })),
   { label: '州内门至门', price: transportRules.gatePrice, days: transportRules.gateDays, reason: '亲自认下两端传送门。' },
   { label: '传送卷轴', days: transportRules.scrollDays, item: 'gate_scroll', reason: '每次使用一张，从任意安全停靠点传往已认门。' },
   { label: '跨州阵至阵', price: transportRules.arrayPrice, days: transportRules.arrayDays, reason: '两端州阵已修通。' },
@@ -427,9 +435,10 @@ const tables = [
     ['growth', '一次回补数'], ['curve', '回补规律', curveText], ['access', '小地点的发现方式'], ['approach', '现场主动交手'],
   ], { note: '三阶妖丹、妖目和生兽肉仅见于当场击败对应妖物，独斗和重复猎场在回补栏区分。兽革另有雪蜕类的现场库存，见常用原料表。每胜的物品仍须在脚边拾取。含隐地剧透。' }),
   table('mixed-hunts', '混合猎场的初始种群', mixedHunts, [
-    ['site', '小地点', siteRef], 'label', 'enemy', ['total', '初始总数'], ['start', '本种初始数'],
+    ['site', '小地点', siteRef], 'label', 'enemy', ['unlock', '先开哪条进路'], 'days',
+    ['total', '初始总数'], ['start', '本种初始数'], ['weight', '该走法中每只的抽取权重'],
     ['initialChance', '首次遇见本种的概率', percent], ['cap', '本种上限'], ['interval', '基准回补（游戏日）'],
-  ], { omit: ['growth'], note: '每次从当前在场个体等权抽取。任一敌种当场的遇敌率为其当前数量除以各队总数。胜利才减少该只，撤退和败退保留群落。表中的两处据点不回补。' }),
+  ], { omit: ['growth'], note: '本种当前数量乘走法权重，再除以所有在场权重之和。同地点两条走法共享种群。撤退或倒地后，三日内重走原路会接着遇到之前的对手。' }),
   table('hunt-material-costs', '猎获原料的实际消耗', huntCosts, [
     ['id', '消耗原料', ref], ['type', '玩法'], 'name', ['count', '一次耗量'], ['output', '产量（如适用）'],
   ], { note: '突破材料与制作破境丹的投入分别列出。炮制高阶丹药、做特殊箭和其他消耗品可按已有合批规则追加，每批都扣该栏原料。' }),
@@ -576,6 +585,7 @@ const tables = [
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
     'need', 'consume', 'hidden', 'loot', 'enemy', ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
     ['encounter', '抽取的当地种群', (ids) => ids.map(ref).join('、')],
+    ['encounterWeights', '此进路不同对手的权重', (values) => Object.entries(values).map(([id, weight]) => `${ref(id)}×${weight}`).join('、')],
     ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
     ['guardedBy', '在场会挡住选择的对手', (ids) => [].concat(ids).map(ref).join('、')],
     ['excludesChoices', '与同一地点这些选项互斥', (indexes) => indexes.map((index) => index + 1).join('、')],

@@ -242,6 +242,7 @@ function journey(s) {
     ${originalHome && s.economy ? tabButton("去后院", "yard") : ""}
     ${originalHome && s.alchemy ? tabButton("找丹师", "alchemy") : ""}
     ${isHome && (needRest || !originalHome) ? linkButton("歇息", "rest") : ""}
+    ${s.restSessions > 1 ? linkButton(`歇到缓过来 · ${s.restSessions * rules.restDays}日`, "restUntilRecovered", "", "quiet") : ""}
     ${s.sect ? tabButton("找宗门管事", "sect") : ""}
     ${s.tournament ? tabButton("去看宗门大比", "tournament") : ""}
     ${isHome && s.training?.some(({ region }) => region === s.region.id) ? tabButton("请教修习", "training") : ""}
@@ -493,7 +494,11 @@ function pack(s) {
       actions = linkButton(label, "use", row.id, "", pill.tier > s.realm.id || healthy);
     }
     if (seal && s.mode === "combat") actions = linkButton("用符", "use", row.id, "", seal.tier > s.realm.id);
-    if (foodRows[row.id] && canEat && (s.satiety < s.maxSatiety || s.hp < s.maxHp)) actions = linkButton(`吃${row.name}`, "eat", row.id);
+    if (foodRows[row.id] && canEat && (s.satiety < s.maxSatiety || s.hp < s.maxHp)) {
+      actions = linkButton(`吃${row.name}`, "eat", row.id);
+      const quantity = s.batchMeals[row.id];
+      if (quantity > 1) actions += linkButton(`连吃 ${quantity} 份`, "batchEat", row.id, "quiet");
+    }
     if (row.id === "lost_basket" && canEquip) {
       if (!s.basketInspected) actions += linkButton("查看药篓", "inspectBasket");
       if (inVillage(s)) actions += tabButton("找药僮", "apprentice");
@@ -963,6 +968,8 @@ function showNotice(lines, warning) {
 }
 
 function feedback(before, after, result, action) {
+  const ate = action === "eat" || action === "batchEat";
+  const rested = action === "rest" || action === "restUntilRecovered";
   if (result.ok && ["buy", "sell", "localBuy", "localSell"].includes(action)) {
     const selling = action === "sell" || action === "localSell";
     const quantity = item => ((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0)) * (selling ? -1 : 1);
@@ -998,7 +1005,7 @@ function feedback(before, after, result, action) {
   const picking = result.ok && action === "take";
   const gathered = supplies(result.gathered);
   let narrative = result.message ?? "";
-  if (action === "eat") narrative = narrative.replace(/(?:饱腹|气血)\+\d+(?:\.\d+)?[，。]?/g, "");
+  if (ate) narrative = narrative.replace(/(?:饱腹|气血)\+\d+(?:\.\d+)?[，。]?/g, "");
   if (result.damageDealt || result.damageTaken) {
     narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "").replace(/反击，[。]?/g, "反击。");
   }
@@ -1010,7 +1017,8 @@ function feedback(before, after, result, action) {
     narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
   }
   if (result.travelMeals) narrative = narrative.replace(/途中吃了[^。]+。/, "");
-  narrative = publicText(narrative).replace(/^初探此地[，。]?/, "").trim();
+  if (!result.ok || (action !== "batchEat" && action !== "restUntilRecovered")) narrative = publicText(narrative);
+  narrative = narrative.replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
   if (result.travelMeals) lines.push(`途中吃了${supplies(result.travelMeals)}。抵达时饱腹 ${Math.floor(after.satiety)} 点。`);
   if (gathered) {
@@ -1022,13 +1030,14 @@ function feedback(before, after, result, action) {
   if (goods.length) lines.push(`${picking ? "拾起" : "获得"}${goods.map(item => `${item.name} ×${after.inventory[item.id] - (before.inventory[item.id] ?? 0)}`).join("、")}。`);
   if (result.leftOnGround) lines.push(`行囊装不下剩下的，${supplies(result.leftOnGround)}留在脚边。`);
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
-  const didRecover = ["choose", "eat", "use", "rest"].includes(action) && after.hp > before.hp && !result.injury;
+  const didRecover = (ate || rested || action === "choose" || action === "use") && after.hp > before.hp && !result.injury;
   const changes = [
     didRecover && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
     action === "guard" && after.qi > before.qi && `真气回升 ${after.qi - before.qi} 点`,
-    after.qi > before.qi && ["choose", "use", "rest"].includes(action) && !narrative.includes("真气") && "真气恢复",
+    after.qi > before.qi && (rested || action === "choose" || action === "use") && !narrative.includes("真气") && "真气恢复",
     after.qi < before.qi && ["choose", "visit", "revisit", "art"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
-    after.satiety > before.satiety && ["eat", "use"].includes(action) && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
+    after.satiety > before.satiety && (ate || action === "use") && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
+    action === "restUntilRecovered" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     action === "finishGather" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     action === "travel" && !result.travelMeals && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
     after.coins > before.coins && !["sell"].includes(action) && "获得灵钱",

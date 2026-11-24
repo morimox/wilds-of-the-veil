@@ -24,14 +24,15 @@ const sites = [
     creatureText: {
       sand_anchor_scorpion: { present: '沟底的浮砂被往两边推开。旧矿索一沉一抬，石阶边冒出一只几乎与岩面同色的大钳。', absent: '矿索平垂在沟底。风把石阶边的擦痕慢慢填平。' },
     } },
-  { id: 'sand_hunt_colony', region: 'hanging_vein', name: '梁后的露天石场', afterChoices: ['sand_hunt_anchors:1'],
+  { id: 'sand_hunt_colony', region: 'hanging_vein', name: '梁后的露天石场', afterChoices: ['sand_hunt_anchors:1'], once: [1, 4],
     creatures: { sand_quarry_skink: resident(72), sand_quarry_guard: resident(8), sand_quarry_matriarch: resident(1) },
+    choiceText: { 1: { after: '倒柱上留下一道垫脚的低棱。沿它摸到北墙，就能避开地上最松的一带碎砂。' } },
+    afterOnceText: { 4: '沟口新垫的松木撑起了旧梁，车辙从架下弯向矮山。冷炉院的烟囱露在山坳上。旧竹篓挂在梁边，里面的寒铁和暗金已经给了你。' },
     creatureText: {
       sand_quarry_skink: { present: '黑背砂蜥挤在矮石之间，听见碎砂响就从几个方向一起抬头。', absent: '矮石之间只剩散沙，小些的黑背蜥已经不见了。' },
       sand_quarry_guard: { present: '柱子背后不时闪过一抹暗红，有粗尾擦着柱根绕过来。', absent: '柱根下的长尾印越来越浅，再没有红脊护着缝口。' },
       sand_quarry_matriarch: { present: '背阴的旧石垒底下有一双白额巨蜥的眼睛，石垒随着它呼吸一抖一抖。', absent: '背阴石垒塌了一角，白额老蜥再没探出头。' },
-    },
-    emptyText: '倒石柱下已经听不见尾巴刮砂的声音。岩缝里只剩薄薄的干沙，出去的窄道仍照得见日光。' },
+    } },
 ];
 
 const events = [
@@ -58,10 +59,21 @@ const events = [
         outcome: '干梁一声脆响倒向墙边。后面是一片露天石场，地上的爪印有短有长，最宽的那道拖过好几块石柱基。' },
     ] },
   { id: 'sand_hunt_colony', name: '梁后的露天石场',
-    text: '旧石场有几排没立稳的柱子，柱脚外全是蜥洞。矮石会挡住视线，听见爪响也分不清是哪条蜥先靠过来。入口的日光就在身后。',
+    text: '旧石场有几排没立稳的柱子，柱脚外全是蜥洞。入口的日光就在身后，外墙凹处还搁着矿工的旧火盆。叩石院的管料人守在沟口。他脚边拴着只旧竹篓，后面有两道车辙断在一根塌下的木梁前。',
     choices: [
-      { label: '越过倒柱，在蜥群边找落脚处', desc: '越过倒柱便有石地可打。前面两道缝离得很近，走哪一边都可能遇上守巢的大蜥。', days: 0.25, encounter: quarryPack,
+      { label: '越过倒柱，在蜥群边找落脚处', desc: '这边近，退回倒柱也容易。矮石挡着视线，哪条蜥先出来还说不准。', days: 0.25, encounter: quarryPack,
         outcome: '你刚在石地站稳，前面便窜出一道影子，石片擦着靴面翻了过去。' },
+      { label: '翻看倒柱内侧的爪痕', days: 0.25, stay: true,
+        outcome: '有几道宽爪痕刚好擦过柱上的低棱，方向都朝北墙。扶棱走可以靠近内巢，回来时只够侧身过柱脚。' },
+      { label: '扶倒柱的低棱，贴北墙靠近内巢', desc: '内巢容易碰上大蜥。出手的石地够宽，往回仍要侧身过柱脚。', afterChoice: 1, days: 0.5,
+        encounter: quarryPack, encounterWeights: { sand_quarry_guard: 2, sand_quarry_matriarch: 2 },
+        outcome: '你侧身挪过柱脚，北墙里传来低沉的刮擦声。一条蜥猛地贴着石地冲过来。' },
+      { label: '给外墙下的火盆添柴，缓一缓', desc: '凹墙挡住风沙，矿工用旧砖围了半圈。火息后还要等灰凉下来。', days: 0.5, stay: true,
+        need: { wood: 1 }, consume: true, cooldown: 2.5, cooldownText: '火盆的砖还烫，得等炉灰冷下来。', hp: 12, qi: 8,
+        outcome: '木枝在火盆里慢慢烧透。你在凹墙旁坐稳，把衣领里的砂抖干净，调匀几口气。' },
+      { label: '帮管料人撑起旧车道上的梁', desc: '「梁底得塞两根松木。路那头原是冷炉院，可蜥群就在道半腰，等石场静下来再去。」', days: 0.75, stay: true,
+        guardedBy: quarryPack, need: { wood: 2 }, consume: true, loot: { ore: 5, black_iron: 3 },
+        outcome: '你塞进松木，管料人托着旧梁站起身。车辙从梁下绕过矮山，正对冷炉院那根白烟囱。他解开旧竹篓，把留在篓底的寒铁和暗金当作谢工。' },
     ] },
 ];
 
