@@ -815,6 +815,65 @@ test('the boatman and village smith trade maps that open travel for a beginning 
   assert.deepEqual(siteIds(reloaded), ['low_tide', 'boat_shade', 'flood_lines', 'lock_deck', 'ford_packet_boat', 'ford_below_steps']);
 });
 
+test('the old sluice takes both the stone map and a tested current to become a two-way road', () => {
+  const state = createGame(20261123);
+  const site = 'ford_lamp_channel';
+  const roadTo = (run, id) => view(run).world.journeys.find((road) => road.id === id);
+  const fedWalk = (run, id) => {
+    feed(run, 64);
+    walk(run, id);
+  };
+
+  play(state, 'buy', { id: 'ration', count: 4 });
+  fedWalk(state, 'marsh');
+  chooseAt(state, 'reed_banks', 0);
+  chooseAt(state, 'reed_banks', 1);
+  chooseAt(state, 'mud_track', 1);
+  uncoverFerryman(state);
+  feed(state, 48);
+  chooseAt(state, 'reed_ferryman', 0);
+  chooseAt(state, 'reed_ferryman', 2);
+  fedWalk(state, 'village');
+  play(state, 'handin', { id: 'apprentice_waterline' });
+  fedWalk(state, 'marsh');
+  const guessed = structuredClone(state);
+  play(state, 'deduce', { id: 'find_eddy', evidence: ['oar_mark', 'reed_lines'], hypothesis: '水会贴着石脚往回走。' });
+  seek(state, 'drowned_mast');
+  const trial = play(state, 'experiment', { id: 'find_eddy', settings: { release: 'stone_back', water: 'rising' } });
+  assert.equal(trial.deduction, 'verified');
+
+  fedWalk(guessed, 'ridge');
+  chooseAt(guessed, 'miner_echo', 2);
+  assert.match(chooseAt(guessed, 'stone_niche', 0).outcome, /村口灯座/);
+  fedWalk(guessed, 'ford');
+  assert.ok(siteIds(guessed).includes(site));
+  seek(guessed, site);
+  assert.ok(!view(guessed).visibleChoices.some(({ index }) => index === 0));
+  assert.match(choose(guessed, 1).outcome, /白苇滩/);
+  assert.equal(roadTo(guessed, 'village').direct, false);
+
+  fedWalk(state, 'ridge');
+  chooseAt(state, 'ore_rain', 0);
+  fedWalk(state, 'village');
+  play(state, 'handin', { id: 'sell_forging' });
+  fedWalk(state, 'ford');
+  assert.ok(!siteIds(state).includes(site));
+  const ordinary = roadTo(state, 'village');
+  assert.equal(ordinary.direct, false);
+
+  fedWalk(state, 'ridge');
+  chooseAt(state, 'miner_echo', 2);
+  chooseAt(state, 'stone_niche', 0);
+  fedWalk(state, 'ford');
+  assert.equal(roadTo(state, 'village').days, ordinary.days);
+  assert.match(chooseAt(state, site, 0).outcome, /打个双结/);
+  for (const destination of ['village', 'ford']) {
+    assert.equal(roadTo(state, destination).direct, true);
+    assert.equal(roadTo(state, destination).days, 0.5);
+    assert.match(play(state, 'travel', { id: destination }).message, /旧灯渠/);
+  }
+});
+
 test('the opponent hands over the map and agreed blade only after the spar at that site', () => {
   const state = createGame();
   walk(state, 'marsh');

@@ -1,5 +1,5 @@
 import * as moduleData from './data.mjs';
-import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName } from './economy.mjs';
+import { initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale } from './economy.mjs';
 import { hazardView, hazardAction, hazardVictory } from './hazards.mjs';
 import { initialAlchemyState, alchemyView, alchemyAction } from './alchemy.mjs';
 import { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement } from './world.mjs';
@@ -420,6 +420,11 @@ function currentIntent(state) {
   return enemy.intents[state.combat.round % enemy.intents.length];
 }
 
+function canInterceptOpening(state, intent) {
+  return Boolean(state.combat?.openingRange && state.combat.round === 0 &&
+    (intent?.kind === 'attack' || intent?.kind === 'heavy'));
+}
+
 function hasChoiceNeeds(state, choice) {
   return Object.keys(missingItems(state, choice.need)).length === 0;
 }
@@ -566,6 +571,7 @@ export function view(state) {
   const experiment = availableExperiment(state, currentEvent);
   const nextRealm = services.includes('cultivate') ? records.realms[state.realm + 1] ?? null : null;
   const groundLoot = { ...groundAt(state) };
+  const combatWeapon = weaponView(state);
   const studies = trainingView(state, economyKit);
   const visibleChoices = (currentEvent?.choices ?? []).map((choice, index) => {
     const blocker = choiceBlocker(state, choice, currentSite, index);
@@ -627,7 +633,8 @@ export function view(state) {
     } : null,
     revisitableEvents: revisitableEvents(state).map(({ id, name }) => ({ id, name })),
     currentEnemy: enemy ? { ...enemy, sparring: inProtectedBout(state), maxHp: enemy.hp, hp: state.combat.hp } : null,
-    combatWeapon: weaponView(state),
+    combatWeapon,
+    openingShotReady: canInterceptOpening(state, intent) && Boolean(combatWeapon.selectedAmmo),
     intent,
     intentDamage: enemy && intent ? estimatedHit(enemy, intent) : 0,
     retreatRisk: enemy && !inProtectedBout(state) ? retreatRisk(state, enemy, intent) : null,
@@ -707,13 +714,13 @@ function encounter(state, id) {
   return say(state, `在${region.name}遇上${records.events[id].name}。${first ? `初探此地，见识+${rules.firstRegionInsight}。` : ''}${fog}`);
 }
 
-function startCombat(state, id, siteId) {
+function startCombat(state, id, siteId, openingRange = false) {
   const enemy = records.enemies[id];
   if (siteId) {
     const witnesses = ((state.siteWitnesses ??= {})[siteId] ??= []);
     if (!witnesses.includes(id)) witnesses.push(id);
   }
-  state.combat = { id, siteId, hp: enemy.hp, round: 0, escapeBonus: 0 };
+  state.combat = { id, siteId, hp: enemy.hp, round: 0, escapeBonus: 0, openingRange };
 }
 
 function completedSiteChoice(state, site, index) {
@@ -953,7 +960,7 @@ function choose(state, { index, itemId, count }) {
   const continuesHere = choice.stay || event.choices.some((next) => next.afterChoice === index);
   if (enemy && records.enemies[enemy]) {
     state.event = null;
-    startCombat(state, enemy, site?.id);
+    startCombat(state, enemy, site?.id, !ambush && !track && choice.openingRange === true);
     if (hunt) {
       state.combat.huntChoice = index;
       if (track) {
@@ -1168,7 +1175,9 @@ function combatTurn(state, { damage = 0, pierce = 0, guard = 0, interrupt = 0, c
     normalize(state);
     return { ...say(state, summary + outcome), damageDealt, damageTaken: 0, ...results };
   }
-  if (intent.kind === 'heal') {
+  if (ammo && dealt > 0 && canInterceptOpening(state, intent)) {
+    summary += `这一箭拦住了${enemy.name}的冲势。`;
+  } else if (intent.kind === 'heal') {
     const before = state.combat.hp;
     state.combat.hp = Math.min(enemy.hp, before + Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt));
     const restored = state.combat.hp - before;
@@ -1645,7 +1654,7 @@ function marketView(state) {
   })).filter(({ offers }) => offers.length);
   const sales = data.items.filter(({ id, sell }) => sell > 0 && owns(state, id)).map(({ id, sell }) => {
     const { count, blockedReason } = saleTerms(state, id);
-    return { id, price: sell, count, canSell: !blockedReason, blockedReason };
+    return { id, ...saleQuote(state, id, sell), count, canSell: !blockedReason, blockedReason };
   });
   return { stalls, sales };
 }
@@ -1656,6 +1665,7 @@ function trade(state, id, count, buying, stallId) {
   const price = buying ? item.price : item.sell;
   if (!(price > 0)) return refuse('坊市没有这门买卖。');
   let merchantMessage = '';
+  let total = price * count;
   if (buying) {
     const stall = data.market.stalls.find((row) => (!stallId || stallId === row.id) &&
       stockedOffers(state, row.offers).some((offer) => offer.id === id));
@@ -1663,16 +1673,19 @@ function trade(state, id, count, buying, stallId) {
     const offer = stockedOffers(state, stall.offers).find((row) => row.id === id);
     const blockedReason = purchaseBlocker(state, item, count, marketStock(state, stall.id, offer));
     if (blockedReason) return refuse(blockedReason);
-    state.coins -= price * count;
+    state.coins -= total;
     addItems(state, { [id]: count });
     merchantMessage = recordPurchase(state, stall.id, count, offer);
   } else {
     const { blockedReason } = saleTerms(state, id, count);
     if (blockedReason) return refuse(blockedReason);
+    const quote = saleQuote(state, id, price);
+    total = saleTotal(quote, count);
     removeItem(state, id, count, false);
-    state.coins += price * count;
+    state.coins += total;
+    recordSale(state, id, count, quote);
   }
-  return { ...say(state, `${buying ? '买入' : '卖出'}${item.name}×${count}，${price * count}枚灵钱。${merchantMessage}`), merchantMessage };
+  return { ...say(state, `${buying ? '买入' : '卖出'}${item.name}×${count}，${total}枚灵钱。${merchantMessage}`), merchantMessage };
 }
 
 function repairServiceView(state) {

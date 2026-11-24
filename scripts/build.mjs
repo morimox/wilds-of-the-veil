@@ -96,9 +96,9 @@ return { initialMechanisms, mechanismView, mechanismAction };
 })();
 const economyModule = (() => {
 ${moduleBody(economy)}
-return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName };
+return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale };
 })();
-const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName } = economyModule;
+const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale } = economyModule;
 const { alchemyData, initialAlchemyState, alchemyView, alchemyAction } = (() => {
 ${moduleBody(alchemy)}
 return { alchemyData, initialAlchemyState, alchemyView, alchemyAction };

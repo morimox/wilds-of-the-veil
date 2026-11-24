@@ -127,6 +127,42 @@ test('an unguarded shallow pile has independent stock from the deeper deposit', 
   }
 });
 
+test('the assayer points out a guarded paying job with its own ore seam and return cycle', () => {
+  const id = 'ledge_mine';
+  const enemy = 'ore_wight';
+  const state = expedition(id);
+  state.seenChoices = state.seenChoices.filter((key) => key !== 'ore_rain:2');
+  assert.equal(field(state, id), undefined);
+  enter(state, 'ore_rain');
+  play(state, 'choose', { index: 2 });
+  const neighboringStock = field(state, 'ore_rain').stocks;
+  play(state, 'leave');
+  enter(state, id);
+  assert.equal(choice(state, 1).available, false);
+  assert.equal(choice(state, 2)?.available ?? false, false);
+  defeat(state, 0, enemy);
+  const returnTime = state.localPools[id].creatures[enemy].nextAt;
+  const before = state.coins;
+  const rations = state.inventory.ration;
+  play(state, 'choose', { index: 2 });
+  assert.equal(state.coins - before, 8);
+  assert.equal(state.inventory.ration, rations + 1);
+  assert.equal(choice(state, 2)?.available ?? false, false);
+  assert.deepEqual(gather(state, 1).gathered, { ore: 4, core: 2 });
+  assert.deepEqual(gather(state, 1).gathered, { ore: 4, core: 2 });
+  assert.equal(choice(state, 1)?.available ?? false, false);
+  assert.deepEqual(field(state, 'ore_rain').stocks, neighboringStock);
+  play(state, 'leave');
+  waitUntil(state, returnTime);
+  enter(state, id);
+  assert.equal(field(state, id).creatures[enemy], 1);
+  assert.equal(choice(state, 1).available, false);
+  assert.equal(choice(state, 2)?.available ?? false, false);
+  defeat(state, 0, enemy);
+  play(state, 'choose', { index: 2 });
+  assert.equal(state.coins - before, 16);
+});
+
 test('a returning kiln hound does not replenish the finite clay in the cabinet', () => {
   const site = 'kiln_flue';
   const enemy = 'cinder_hound';

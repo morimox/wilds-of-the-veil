@@ -1,3 +1,5 @@
+import { saleQuote, saleTotal, recordSale } from './economy.mjs';
+
 const home = 'village';
 const legacy = new Set(['village', 'marsh', 'ridge', 'ford', 'hidden', 'pine_ridge', 'kiln_valley', 'herb_basin', 'black_mine', 'snow_pass', 'sky_terrace']);
 const crossings = [
@@ -5,6 +7,7 @@ const crossings = [
   { a: 'zhao_pass', b: 'mingsha_city', label: '穿沙商路', days: 6.5, item: 'sand_writ', reason: '沙驿的守门人会查通行凭证。可以先去叠石驿关问问。' },
 ];
 const shortcuts = [
+  { a: 'village', b: 'ford', label: '旧灯渠', days: 0.5, openedBy: 'ford_lamp_channel:0' },
   { a: 'hanging_vein', b: 'cold_kiln', label: '石场旧车道', days: 0.875, openedBy: 'sand_hunt_colony:4' },
 ];
 const arrayPlans = {
@@ -284,8 +287,10 @@ export function localGoods(place) {
 const localPrice = (item, offer) => Math.max(item.sell ?? 0, offer.price);
 
 function salePrice(place, item, kit) {
-  if (!(item?.sell > 0) || kit.isEvidence(item)) return 0;
-  const offered = [place.buys?.[item.id] ?? item.sell];
+  if (!item || kit.isEvidence(item)) return 0;
+  const localOffer = place.buys?.[item.id] ?? item.sell;
+  if (!(localOffer > 0)) return 0;
+  const offered = [localOffer];
   if (item.price > 0 && kit.data.market?.stalls.some((stall) => stall.offers.some(({ id }) => id === item.id))) offered.push(item.price);
   for (const settlement of Object.values(kit.data.regionDetails ?? {}).map((region) => region.settlement).filter(Boolean)) {
     const supply = localGoods(settlement)[item.id];
@@ -323,7 +328,7 @@ function localMarket(state, kit) {
     return { id, count, price, maximum, reason };
   });
   const buys = kit.data.items.filter((item) => kit.owns(state, item.id) > 0).map((item) => ({ id: item.id,
-    price: salePrice(place, item, kit), ...localSaleTerms(state, item.id, kit) })).filter(({ price }) => price > 0);
+    ...saleQuote(state, item.id, salePrice(place, item, kit)), ...localSaleTerms(state, item.id, kit) })).filter(({ price }) => price > 0);
   return { offers, buys, talk: place.talk ? { label: place.talk.label, heard: known(state, place.talk.lead) } : null };
 }
 
@@ -346,9 +351,12 @@ function localTrade(state, id, count, kit, buying) {
     if (!price) return kit.refuse('这件东西不能卖。');
     const sale = localSaleTerms(state, id, kit, count);
     if (sale.reason) return kit.refuse(sale.reason);
+    const quote = saleQuote(state, id, price);
+    const total = saleTotal(quote, count);
     kit.removeItem(state, id, count);
-    state.coins += price * count;
-    return kit.say(state, `卖出${record.name}×${count}，收了${price * count}枚灵钱。`);
+    state.coins += total;
+    recordSale(state, id, count, quote);
+    return kit.say(state, `卖出${record.name}×${count}，收了${total}枚灵钱。`);
   }
   const offer = localGoods(place)[id];
   if (!offer || kit.isEvidence(record)) return kit.refuse('这个摊位没卖那件东西。');

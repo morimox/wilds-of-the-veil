@@ -114,3 +114,28 @@ test('a full serving of relief food is available for use even though the local v
   play(state, 'eat', { id: 'ration' });
   assert.ok(state.satiety > 0);
 });
+
+test('regional bulk quotes and explicit meal sellers respect their local market rules', () => {
+  const state = reachZhaoCity();
+  Object.assign(state.inventory, { core: 26, beast_meat: 5 });
+  const listing = (id) => view(state).localMarket.buys.find((item) => item.id === id);
+  assert.deepEqual(listing('core').demand, { regular: 10, reserve: 6, remaining: 10, nextAt: null });
+  const start = state.coins;
+  play(state, 'localSell', { id: 'core', count: 12 });
+  assert.equal(state.coins - start, 112);
+  assert.equal(listing('core').price, 6);
+  assert.equal(listing('beast_meat'), undefined);
+  refuses(state, 'localSell', { id: 'beast_meat' }, '这件东西不能卖。');
+
+  state.region = 'willow_post';
+  assert.equal(listing('core').demand.remaining, 10);
+  assert.equal(listing('beast_meat').price, 2);
+  const before = state.coins;
+  play(state, 'localSell', { id: 'beast_meat', count: 3 });
+  assert.equal(state.coins - before, 6);
+  assert.equal(state.inventory.beast_meat, 2);
+  state.region = 'cinder_inn';
+  assert.equal(listing('beast_meat').price, 2);
+  state.region = 'zhao_city';
+  assert.equal(listing('core').demand.remaining, 0);
+});

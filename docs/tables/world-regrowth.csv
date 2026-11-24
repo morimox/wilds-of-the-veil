@@ -13,6 +13,9 @@
 落矿的冲沟（ore_rain）,资源,寒铁（ore）,ore,沟边寒铁,3,4,3.5,1,,,,1
 落矿的冲沟（ore_rain）,资源,寒铁（ore）,ore_slope,坡壁寒铁,4,6,3.5,2,,,,2、5
 落矿的冲沟（ore_rain）,资源,灵晶（core）,core,砂槽灵晶,2,4,5,1,,,,4
+旧扣旁的窄矿槽（ledge_mine）,资源,寒铁（ore）,ore,矿槽寒铁,8,8,7,4,,,,2
+旧扣旁的窄矿槽（ledge_mine）,资源,灵晶（core）,core,矿槽灵晶,4,4,7,2,,,,2
+旧扣旁的窄矿槽（ledge_mine）,种群,持锤矿煞（ore_wight）,ore_wight,,1,1,7,1,固定间隔,,是,
 有回声的矿道（miner_echo）,资源,寒铁（ore）,ore,旁孔寒铁,1,2,3,1,,,,2
 有回声的矿道（miner_echo）,资源,寒铁（ore）,ore_wall,主道寒铁,2,4,3,1,,,,4
 有回声的矿道（miner_echo）,资源,灵晶（core）,core,,2,4,5,1,,,,4

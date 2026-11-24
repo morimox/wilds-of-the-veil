@@ -1,5 +1,6 @@
 import { data } from "./data.mjs";
 import { act, createGame, handConflict, rules, view } from "./engine.mjs";
+import { saleTotal } from "./economy.mjs";
 
 const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
 const foodRows = Object.fromEntries(data.foods.map(food => [food.id, food]));
@@ -410,6 +411,7 @@ function combatScreen(s) {
     )).join("")}</div>
   </div>` : "";
   const backup = weapon?.needsAmmo && !weapon.isLoaded && weapon.meleeAlternative;
+  const attackLabel = s.openingShotReady ? "抢先放箭" : weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手";
   const guardLabel = intent.kind === "heavy" ? "挡住重招" : s.breathingQi ? "收势调息" : "防御";
   const retreatLabel = enemy.sparring ? "认输" : s.retreatRisk?.wouldFall ? "撤退会倒下"
     : s.retreatRisk?.damage ? `撤退 · 追伤 ${s.retreatRisk.damage}` : "撤退 · 无追伤";
@@ -422,10 +424,11 @@ function combatScreen(s) {
   });
   return panel(enemy.name, `
     <div class="intent"><b>下一招 · ${escape(intent?.name)}</b>　${escape(intentNames[intent?.kind] ?? "")}</div>
+    ${s.openingShotReady ? '<p class="fine">对方还隔着一段路。这一回合放箭，能拦住它的头一扑。</p>' : ""}
     ${enemy.sparring ? '<p class="fine">约好点到为止，一方撑不住就收招。</p>' : ""}
     ${meter("对方气血", hp, enemy.maxHp)}
     ${ammoBar}
-    <div class="actions">${linkButton(weapon?.needsAmmo && !weapon.isLoaded ? "徒手出手" : "出手", "attack", "", "primary")}${linkButton(guardLabel, "guard")}${linkButton(retreatLabel, "retreat", "", !enemy.sparring && s.retreatRisk?.damage ? "danger" : "quiet")}
+    <div class="actions">${linkButton(attackLabel, "attack", "", "primary")}${linkButton(guardLabel, "guard")}${linkButton(retreatLabel, "retreat", "", !enemy.sparring && s.retreatRisk?.damage ? "danger" : "quiet")}
       ${backup ? linkButton(`换用${backup.name}`, "combatEquip", backup.id, "quiet") : ""}
       ${s.spiritSense ? linkButton("预看再下一招", "readSpirit", "", "quiet", !s.spiritSense.canRead) : ""}
     </div>
@@ -441,7 +444,8 @@ function gearCondition(remaining, total) {
 
 function gearDescription(item, gear, remaining) {
   const entry = gear.entry || `${tierName(gear.tier)}散修可用。${item.desc}`;
-  const description = gear.hands === 2 ? entry + "须双手使用，不能同时持盾。" : entry;
+  const ranged = gear.ammo?.length ? "遇上从远处冲来的对手，可放箭拦住它的头一扑。" : "";
+  const description = entry + ranged + (gear.hands === 2 ? "须双手使用，不能同时持盾。" : "");
   return remaining === undefined ? description : `${description} 目前${gearCondition(remaining, gear.durability)}。`;
 }
 
@@ -680,6 +684,29 @@ function backpackScreen(backpack) {
     ${upgrades ? `<div class="card-grid">${upgrades}</div>` : ""}`;
 }
 
+function salePriceTag(entry) {
+  const label = entry.demand ? `${entry.demand.reserve}–${entry.demand.regular}` : entry.price;
+  return tag(`${label} 灵钱/件`);
+}
+
+function saleDemandNote({ demand }) {
+  if (!demand) return "";
+  const note = demand.remaining ? `常价还收 ${demand.remaining} 件，余货每件 ${demand.reserve} 灵钱。`
+    : `这批常价已收满。第${Math.floor(demand.nextAt)}日再收，眼下每件 ${demand.reserve} 灵钱。`;
+  return `<span class="fine">${note}</span>`;
+}
+
+function saleButtonLabel(label, entry, count) {
+  return entry.demand ? `${label} · ${saleTotal(entry, count)} 灵钱` : label;
+}
+
+function regularSaleButton(entry, action, batch) {
+  const count = entry.demand?.remaining;
+  return count > 1 && count < batch
+    ? linkButton(saleButtonLabel(`常价卖出 ×${count}`, entry, count), action, entry.id, "quiet", false, count)
+    : "";
+}
+
 function marketItem(s, entry, selling) {
   const item = itemRows[entry.id];
   const gear = data.gear.find(row => row.id === item.id);
@@ -689,13 +716,15 @@ function marketItem(s, entry, selling) {
   const label = allowed ? (selling ? "卖出" : "购入") : entry.blockedReason;
   const detail = gear ? gearDescription(item, gear, selling ? s.durability[item.id] : undefined) :
     pill ? pillSummary(pill) : seal ? talismanSummary(seal) : item.desc;
-  const price = tag(`${entry.price} 灵钱/件`);
+  const price = selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`);
   const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}</span>` : "";
   const action = selling ? "sell" : "buy";
-  const batch = Math.min(5, rules.maxTradeCount, selling ? entry.count : entry.maximum);
-  const bulk = allowed && !gear && batch > 1 ? linkButton(`${selling ? "卖出" : "购入"} ×${batch}`, action, item.id, "quiet", false, batch) : "";
+  const batch = Math.min(entry.demand ? rules.maxTradeCount : 5, selling ? entry.count : entry.maximum);
+  const batchLabel = `${selling ? "卖出" : "购入"} ×${batch}`;
+  const bulk = allowed && !gear && batch > 1 ? linkButton(saleButtonLabel(batchLabel, entry, batch), action, item.id, "quiet", false, batch) : "";
+  const regular = selling && allowed ? regularSaleButton(entry, action, batch) : "";
   const stock = !selling && Number.isFinite(entry.stock) ? `<span class="fine">摊上余 ${entry.stock}</span>` : "";
-  return card(item.name, "", price, `${linkButton(label, action, item.id, "", !allowed)}${bulk}${quantity}${stock}`, detail);
+  return card(item.name, "", price, `${linkButton(allowed ? saleButtonLabel(label, entry, 1) : label, action, item.id, "", !allowed)}${regular}${bulk}${quantity}${stock}${saleDemandNote(entry)}`, detail);
 }
 
 function merchantOffer(stall) {
@@ -738,10 +767,11 @@ function localMarketItem(entry, selling) {
   const label = selling ? "卖出" : "购入";
   const action = selling ? "localSell" : "localBuy";
   const reason = entry.reason || (selling ? "暂不能出手" : entry.count ? "眼下买不了" : "已卖完");
-  const buttons = linkButton(maximum ? label : reason, action, item.id, "", !maximum) +
-    (maximum > 1 ? linkButton(`${label} ×${maximum}`, action, item.id, "quiet", false, maximum) : "");
+  const buttons = linkButton(maximum ? saleButtonLabel(label, entry, 1) : reason, action, item.id, "", !maximum) +
+    (selling ? regularSaleButton(entry, action, maximum) : "") +
+    (maximum > 1 ? linkButton(saleButtonLabel(`${label} ×${maximum}`, entry, maximum), action, item.id, "quiet", false, maximum) : "");
   const stock = `<span class="fine">${selling ? "可卖" : "在摊"} ×${entry.count}</span>`;
-  return card(item.name, "", tag(`${entry.price} 灵钱/件`), `${buttons}${stock}`,
+  return card(item.name, "", selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`), `${buttons}${stock}${saleDemandNote(entry)}`,
     gear ? gearDescription(item, gear) : pill ? pillSummary(pill) : item.desc);
 }
 

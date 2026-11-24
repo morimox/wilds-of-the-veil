@@ -200,6 +200,10 @@ const collectDays = 0.25;
 const consumableBatchLimit = 4;
 const facilityOrderMultiplier = 2;
 const batchKinds = new Set(['ammo', 'food', 'pill', 'talisman']);
+export const bulkSaleRules = Object.freeze({
+  ore: Object.freeze({ capacity: 12, replenished: 4, days: 5, reserveRate: 0.6 }),
+  core: Object.freeze({ capacity: 10, replenished: 3, days: 5, reserveRate: 0.6 }),
+});
 
 export const economyData = {
   facilities, projects, merchantOrders, warehouseStack, warehouseCap, backpackExpansions,
@@ -216,6 +220,40 @@ export function initialEconomyState() {
     nextJob: 1,
     merchants: {},
     stock: {},
+    saleDemand: {},
+  };
+}
+
+export function saleQuote(state, id, regular) {
+  const rule = Object.hasOwn(bulkSaleRules, id) ? bulkSaleRules[id] : null;
+  if (!rule || regular < 2) return { price: regular };
+  const { capacity, replenished, days, reserveRate } = rule;
+  const stored = state.economy.saleDemand?.[state.region]?.[id];
+  let remaining = stored?.remaining ?? capacity;
+  let nextAt = stored?.nextAt ?? null;
+  if (nextAt !== null && state.day >= nextAt) {
+    const periods = 1 + Math.floor((state.day - nextAt) / days);
+    remaining = Math.min(capacity, remaining + periods * replenished);
+    nextAt = remaining < capacity ? nextAt + periods * days : null;
+  }
+  const reserve = Math.max(1, Math.round(regular * reserveRate));
+  return { price: remaining > 0 ? regular : reserve, demand: { regular, reserve, remaining, nextAt } };
+}
+
+export function saleTotal(quote, count) {
+  if (!quote.demand) return quote.price * count;
+  const { regular, reserve, remaining } = quote.demand;
+  const atRegular = Math.min(remaining, count);
+  return atRegular * regular + (count - atRegular) * reserve;
+}
+
+export function recordSale(state, id, count, quote) {
+  if (!quote.demand?.remaining) return;
+  const { remaining, nextAt } = quote.demand;
+  const demand = state.economy.saleDemand ??= {};
+  (demand[state.region] ??= {})[id] = {
+    remaining: Math.max(0, remaining - count),
+    nextAt: nextAt ?? state.day + bulkSaleRules[id].days,
   };
 }
 

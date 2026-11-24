@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import data from '../data.mjs';
 import { createGame, rules, view } from '../engine.mjs';
-import { economyData } from '../economy.mjs';
+import { bulkSaleRules, economyData } from '../economy.mjs';
 import { alchemyData } from '../alchemy.mjs';
 import { localGoods, settlementOf, transportRules } from '../world.mjs';
 import { trainingData } from '../training.mjs';
@@ -377,7 +377,11 @@ const marketProbe = createGame(15);
 marketProbe.inventory = Object.fromEntries(data.items.map(({ id }) => [id, 1]));
 const localSaleRows = towns.flatMap(({ id: region }) => {
   marketProbe.region = region;
-  return view(marketProbe).localMarket.buys.map(({ id, price }) => ({ region, id, name: name(id), price }));
+  return view(marketProbe).localMarket.buys.map(({ id, price, demand }) => ({
+    region, id, name: name(id), price, reserve: demand?.reserve,
+    capacity: demand?.remaining, replenished: demand ? bulkSaleRules[id].replenished : undefined,
+    days: demand ? bulkSaleRules[id].days : undefined,
+  }));
 });
 const localRepairRows = towns.flatMap(({ id: region }) => {
   marketProbe.region = region;
@@ -528,7 +532,8 @@ const tables = [
     { note: '可分批交钱和材料。两端全部修通即可通行。修好后传送时另计路费。' }),
   table('settlement-goods', '各定居点本地买进货单', localOfferRows, ['region', 'id', 'name', 'price', ['start', '初始存货'], ['cap', '存货上限'], ['interval', '补货间隔（天）'], ['growth', '每次补货量']],
     { note: '未标每次补货数量时为一件。落灯村的具名货架另见坊市货单。' }),
-  table('settlement-buyback', '各定居点通用卖出价', localSaleRows, ['region', 'id', 'name', ['price', '卖得灵钱（每件）']],
+  table('settlement-buyback', '各定居点收购价与常价收量', localSaleRows, ['region', 'id', 'name', ['price', '常价（每件）'],
+    ['reserve', '当期超量价（每件）'], ['capacity', '常价收满件数'], ['replenished', '每期恢复件数'], ['days', '恢复间隔（日）']],
     { note: '关键物品、装备中的物品与救济干粮的收取限制另行校验。旧坊市专门商人的实际报价见对应表。' }),
   table('settlement-repairs', '接修地点与逐件工钱', localRepairRows,
     ['region', ['service', '修具处'], 'id', 'name', ['surcharge', '异地加价（灵钱）'], ['price', '修满费用（灵钱）']],
@@ -583,7 +588,7 @@ const tables = [
   table('event-choices', '事件选项', choices, [
     ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days',
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
-    'need', 'consume', 'hidden', 'loot', 'enemy', ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
+    'need', 'consume', 'hidden', 'loot', 'enemy', ['openingRange', '远处开战，可先发一箭'], ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
     ['encounter', '抽取的当地种群', (ids) => ids.map(ref).join('、')],
     ['encounterWeights', '此进路不同对手的权重', (values) => Object.entries(values).map(([id, weight]) => `${ref(id)}×${weight}`).join('、')],
     ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],

@@ -12,6 +12,7 @@
 生兽肉（beast_meat）,白苇滩（marsh）,沉桅高埂（drowned_mast）,沉桅虺（mast_beast）,炼气中期,2,,,2,1,1,0,0,不回补,得知物品 旧桨上的靠岸图（oar_mark）,踩上断桅杆，看看水下
 妖目（beast_eye）,白苇滩（marsh）,沉桅高埂（drowned_mast）,沉桅虺（mast_beast）,炼气中期,1,,,1,1,1,0,0,不回补,得知物品 旧桨上的靠岸图（oar_mark）,踩上断桅杆，看看水下
 兽革（hide）,白苇滩（marsh）,沉桅高埂（drowned_mast）,沉桅虺（mast_beast）,炼气中期,2,,,2,1,1,0,0,不回补,得知物品 旧桨上的靠岸图（oar_mark）,踩上断桅杆，看看水下
+炼气期妖丹（qi_core）,沉钟岭（ridge）,旧扣旁的窄矿槽（ledge_mine）,持锤矿煞（ore_wight）,炼气中期,2,,,2,1,1,7,1,固定间隔,落矿的冲沟（ore_rain） · 问护篷下敲的是什么坯,顺着篮绳下到干石，拦住锤影
 炼气期妖丹（qi_core）,沉钟岭（ridge）,有回声的矿道（miner_echo）,持锤矿煞（ore_wight）,炼气中期,2,,,2,2,3,3,1,固定间隔,,沿主道往里走
 炼气期妖丹（qi_core）,沉钟岭（ridge）,断绳坡（rope_run）,石甲獾（stone_badger）,炼气中期,2,,,2,2,4,3,1,固定间隔,,在车辙旁守一会儿
 生兽肉（beast_meat）,沉钟岭（ridge）,断绳坡（rope_run）,石甲獾（stone_badger）,炼气中期,2,,,2,2,4,3,1,固定间隔,,在车辙旁守一会儿
@@ -56,9 +57,9 @@
 炼气期妖丹（qi_core）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,雪耳山猞（snow_rail_lynx）,炼气中期,1,,,1,2,2,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,去梯脚挡开啃骨的山猞
 生兽肉（beast_meat）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,雪耳山猞（snow_rail_lynx）,炼气中期,2,,,2,2,2,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,去梯脚挡开啃骨的山猞
 兽革（hide）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,雪耳山猞（snow_rail_lynx）,炼气中期,1,,,1,2,2,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,去梯脚挡开啃骨的山猞
-炼气期妖丹（qi_core）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,灰翅雪鹰（snow_rail_hawk）,炼气后期,2,,,2,1,1,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,沿石槽上去，迎住盘旋的灰翅鹰
-生兽肉（beast_meat）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,灰翅雪鹰（snow_rail_hawk）,炼气后期,2,,,2,1,1,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,沿石槽上去，迎住盘旋的灰翅鹰
-妖目（beast_eye）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,灰翅雪鹰（snow_rail_hawk）,炼气后期,1,,,1,1,1,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,沿石槽上去，迎住盘旋的灰翅鹰
+炼气期妖丹（qi_core）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,灰翅雪鹰（snow_rail_hawk）,炼气后期,2,,,2,1,1,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,站到石槽边，迎住盘旋的灰翅鹰
+生兽肉（beast_meat）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,灰翅雪鹰（snow_rail_hawk）,炼气后期,2,,,2,1,1,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,站到石槽边，迎住盘旋的灰翅鹰
+妖目（beast_eye）,碎云雪关（snow_pass）,石墙后的木梯（snow_ladder）,灰翅雪鹰（snow_rail_hawk）,炼气后期,1,,,1,1,1,0,0,不回补,得知物品 画有木梯的栈道图（snow_escort_note）,站到石槽边，迎住盘旋的灰翅鹰
 炼气期妖丹（qi_core）,碎云雪关（snow_pass）,第三根横梁（snow_beam）,横尾冰蜥（snow_rail_shell）,炼气后期,2,,,2,1,1,0,0,不回补,石墙后的木梯（snow_ladder） · 攀到梯顶，在木桩上系布条,从靠墙的木板驱开冰蜥
 生兽肉（beast_meat）,碎云雪关（snow_pass）,第三根横梁（snow_beam）,横尾冰蜥（snow_rail_shell）,炼气后期,2,,,2,1,1,0,0,不回补,石墙后的木梯（snow_ladder） · 攀到梯顶，在木桩上系布条,从靠墙的木板驱开冰蜥
 兽革（hide）,碎云雪关（snow_pass）,第三根横梁（snow_beam）,横尾冰蜥（snow_rail_shell）,炼气后期,1,,,1,1,1,0,0,不回补,石墙后的木梯（snow_ladder） · 攀到梯顶，在木桩上系布条,从靠墙的木板驱开冰蜥

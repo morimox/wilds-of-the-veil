@@ -216,6 +216,8 @@ export const extendSites = [
     creatures: { ford_lower_spirit: animal(1, 2, 11, 1) },
     creatureText: { ford_lower_spirit: { present: '下面的灯架没亮，但什么东西踢到了第二根石栏，撞得空响。', absent: '第二根石栏下面只剩脱落的湿泥，水面也安静了。' } },
   },
+  { id: 'ford_lamp_channel', region: 'ford', name: '断桩旁的石渠', afterChoices: ['stone_niche:0'], once: [0, 1],
+    afterOnceText: { 0: '旧缆上已经打好记号。石脚过去有一段干路，那头是落灯村的灯座。' } },
 ];
 
 export const extendEvents = [
@@ -241,6 +243,12 @@ export const extendEvents = [
     { label: '留在上层，看看梯边的木牌', days: 0.125, insight: 1, outcome: '小旗在暗处也摸得到。旁边的木牌写着，照原城的人来修过排水口。换了水尺后，巡闸人就很少再下到第三级。' },
     { label: '沿短绳下到第二根栏杆', desc: '石阶刚够转身，一手仍能攥住绳尾。', days: 0.5, enemy: 'ford_lower_spirit', outcome: '薄灯下有道皱着的长影，听见绳扣响，猛地甩开下面两层灯架。' },
     { label: '翻看松动的修闸名牌', afterFight: 'ford_lower_spirit', days: 0.25, insight: 3, outcome: '牌背刻着照原量水司和三名工人的名字。你把木牌留在栏上，扶绳回到外桩。' },
+  ] },
+  { id: 'ford_lamp_channel', name: '断桩旁的石渠', text: '最矮的木桩齐水折断了，跟石龛里的图对得上。渠口只有一人宽。两片木屑一前一后冲过来，到了石脚却不往一处去。', choices: [
+    { label: '扶住旧缆，顺回水踩上石脚', hidden: true, need: { eddy_note: 1 }, days: 0.25, insight: 2,
+      outcome: '回水将你推上了干阶。拐过头一个弯，落灯村灯座底下的光就透进来了。你在旧缆上打个双结，循着刚认出的路回到渡口。' },
+    { label: '站在断桩旁看看木屑怎么漂', days: 0.125,
+      outcome: '最大的那片一下就冲远了，另有一片贴着石脚往渠里走。水路不像图上画的一道直线。白苇滩那段回水或许能看得清些。' },
   ] },
 ];
 

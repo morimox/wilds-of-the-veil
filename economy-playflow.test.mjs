@@ -45,6 +45,37 @@ test('vendor dialogue agrees with an empty stall and the actual hand-in reward',
   assert.equal(state.inventory.reed_arrow, before);
 });
 
+test('village bulk sales settle both prices in one order and replenish on the shared clock', () => {
+  const state = createGame(814);
+  Object.assign(state.inventory, { ore: 32, core: 20 });
+  const offer = (id) => view(state).market.sales.find((item) => item.id === id);
+  const before = state.coins;
+  assert.deepEqual(offer('ore').demand, { regular: 5, reserve: 3, remaining: 12, nextAt: null });
+  const split = structuredClone(state);
+  play(split, 'sell', { id: 'ore', count: 8 });
+  play(split, 'localSell', { id: 'ore', count: 7 });
+  const result = play(state, 'sell', { id: 'ore', count: 15 });
+  assert.match(result.message, /69枚灵钱/);
+  assert.equal(state.coins - before, 69);
+  assert.equal(split.coins, state.coins);
+  assert.deepEqual(split.economy.saleDemand, state.economy.saleDemand);
+  assert.equal(offer('ore').price, 3);
+  assert.equal(offer('core').demand.remaining, 10);
+  const refused = structuredClone(state);
+  assert.equal(act(state, 'sell', { id: 'ore', count: 18 }).ok, false);
+  assert.deepEqual(state, refused);
+
+  for (let i = 0; i < 9; i++) play(state, 'wait');
+  assert.equal(offer('ore').demand.remaining, 0);
+  play(state, 'wait');
+  assert.equal(offer('ore').demand.remaining, 4);
+  assert.equal(offer('ore').price, 5);
+  const balance = state.coins;
+  play(state, 'localSell', { id: 'ore', count: 9 });
+  assert.equal(state.coins - balance, 35);
+  assert.equal(offer('ore').demand.remaining, 0);
+});
+
 test('the alchemist only gives directions for the current proof and follows the brew to breakthrough', () => {
   const state = createGame(812);
   state.realm = 2;
