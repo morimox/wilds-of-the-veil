@@ -470,7 +470,7 @@ dialog ol { padding-left: 22px; color: var(--muted); }
   <section id="boot-status" class="boot-status">
     <h1>雾渡山河</h1>
     <p>游戏正在载入。如果一直停在这里，请用浏览器打开试玩页。</p>
-    <a href="https://morimox.github.io/wilds-of-the-veil/?play=21" target="_blank" rel="noopener">在浏览器中打开</a>
+    <a href="https://morimox.github.io/wilds-of-the-veil/?play=22" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
     <div class="travel-column">
@@ -906,7 +906,7 @@ const enemies = [
     intents: [attack('伸舌甩来泥点'), attack('鼓起两腮顶撞', 1.1), heavy('收腹蹬腿猛跳')], loot: { beast_meat: 3, beast_eye: 1, qi_core: 2 } },
   { id: 'mud_shrike', name: '泥鳞鬃犬', tier: 3, hp: 73, atk: 15, def: 7, tags: ['furred', 'beast'], insight: 4,
     intents: [attack('摆尾抽脚'), heavy('压低鬃毛'), { kind: 'guard', name: '尾巴卷作一环' }, attack('贴地扯咬', 1.12)],
-    loot: { beast_meat: 5, hide: 3, foundation_core: 1 } },
+    loot: { beast_meat: 5, hide: 3, foundation_core: 2 } },
   { id: 'zhao_moss_turtle', name: '苔背泽鳖', tier: 2, hp: 54, atk: 13, def: 7, tags: ['beast', 'scaled'], insight: 4,
     intents: [{ kind: 'guard', name: '缩颈顶起背甲', mult: 1.35 }, attack('侧转咬向脚腕'), heavy('抬甲掀开脚下的泥')],
     desc: '远看像一截生了苔的浮石。它侧转探头时，肩边会露一道甲缝。甲缘那圈厚皮浸水也折不断，裁下来能给护具包边。',
@@ -920,7 +920,7 @@ const enemies = [
     loot: { beast_eye: 1, foundation_core: 3 } },
   { id: 'ember_yak', name: '伏灰炭魈', tier: 6, hp: 119, atk: 24, def: 10, tags: ['beast', 'furred'], insight: 9,
     intents: [attack('踏碎灰层'), heavy('抱地窜起', 1.63), attack('甩尾卷火', 1.12), { kind: 'guard', name: '护住抱在胸前的灰团' }],
-    loot: { beast_meat: 7, hide: 4, gold_core: 1 } },
+    loot: { beast_meat: 7, hide: 4, gold_core: 2 } },
   { id: 'fault_warden', name: '分柱水君', tier: 7, hp: 163, atk: 29, def: 13, tags: ['spirit'], insight: 16,
     intents: [attack('借水柱跃起拍向岸边'), { kind: 'guard', name: '退到两根水柱中间' }, heavy('双手挥下两道水刃', 1.59),
       { kind: 'drain', name: '引来水流抽走真气', mult: 1.17 }, attack('顺着回潮斜劈', 1.1)], loot: { beast_eye: 2, gold_core: 4 } },
@@ -1581,7 +1581,7 @@ const enemies = [
     loot: {}, desc: '叩石院的授习师姐，使用钝剑。摆剑守势后会跟半步斜斩。' },
   { id: 'sand_vein_jackal', name: '负砂豺', tags: ['beast', 'furred'], tier: 4, hp: 63, atk: 15, def: 5, insight: 5,
     intents: [{ name: '踩着木架扑来', kind: 'attack', mult: 1 }, { name: '躲到木梁后', kind: 'guard', mult: 1.45 }, { name: '顶落梁上的重物', kind: 'heavy', mult: 1.62 }],
-    loot: { beast_meat: 3, hide: 3, foundation_core: 1 }, desc: '一只耳朵曾被矿架夹伤。它在架子下面一转身，固定木梁的重物就开始摇晃。' },
+    loot: { beast_meat: 3, hide: 3, foundation_core: 2 }, desc: '一只耳朵曾被矿架夹伤。它在架子下面一转身，固定木梁的重物就开始摇晃。' },
   { id: 'sand_iron_skink', name: '铁斑蜥', tags: ['beast', 'scaled'], tier: 1, hp: 30, atk: 8, def: 3, insight: 3,
     intents: [{ name: '探头咬向鞋边', kind: 'attack', mult: 1 }, { name: '翻过鳞背护腹', kind: 'guard', mult: 1.4 }, { name: '甩起长尾横扫', kind: 'heavy', mult: 1.55 }],
     loot: { beast_meat: 1, hide: 1, qi_core: 2 }, desc: '外坡石缝里常见的蜥。鳞面斑纹像铁锈，尾巴离开石面便要横扫。' },
@@ -1592,7 +1592,7 @@ const enemies = [
   { id: 'sand_glass_lynx', name: '三痕琉狮', tags: ['beast', 'furred'], tier: 6, hp: 110, atk: 22, def: 8, insight: 11,
     intents: [{ name: '碎晶擦肩', kind: 'attack', mult: 1 }, { name: '卷鬃护目', kind: 'guard', mult: 1.4 },
       { name: '撞倒一大块晶石', kind: 'heavy', mult: 1.68 }, { name: '扬起呛人的晶尘', kind: 'drain', mult: 0.7 }, { name: '抖回脱落的晶片', kind: 'heal', mult: 0.45 }],
-    loot: { beast_meat: 5, hide: 4, beast_eye: 1, gold_core: 1 }, desc: '肩背和鬃毛间嵌满晶片。每次把眼睛藏进鬃毛，它都会用肩膀撞向附近的晶石。' },
+    loot: { beast_meat: 5, hide: 4, beast_eye: 1, gold_core: 2 }, desc: '肩背和鬃毛间嵌满晶片。每次把眼睛藏进鬃毛，它都会用肩膀撞向附近的晶石。' },
   { id: 'sand_inverted_keeper', name: '倒驿锁影', tags: ['spirit'], tier: 7, hp: 122, atk: 24, def: 9, insight: 12,
     intents: [{ name: '牵锁扫地', kind: 'attack', mult: 1 }, { name: '急收印锁', kind: 'drain', mult: 0.66 },
       { name: '柱背压锁', kind: 'heavy', mult: 1.64 }, { name: '绕梁抱臂', kind: 'guard', mult: 1.45 }],
@@ -1649,15 +1649,15 @@ const item = (id, name, kind, desc, extra = {}) => ({ id, name, kind, desc, pric
 const lateContent = {
   realms: [
     { id: 4, name: '筑基中期', hp: 58, qi: 31, atk: 13, def: 6, insight: 100, practice: 18, cost: 64,
-      need: { ore: 12, core: 10, reed: 12, qi_core: 8 }, pressure: 0.95, days: 4.5 },
+      need: { ore: 9, core: 7, reed: 8, qi_core: 8, foundation_core: 10 }, pressure: 0.95, days: 4.5 },
     { id: 5, name: '筑基后期', hp: 68, qi: 37, atk: 15, def: 8, insight: 140, practice: 22, cost: 100,
-      need: { ore: 16, core: 16, black_iron: 12, foundation_core: 5 }, pressure: 0.94, days: 5 },
+      need: { ore: 12, core: 12, black_iron: 10, foundation_core: 20 }, pressure: 0.94, days: 5 },
     { id: 6, name: '金丹初期', hp: 80, qi: 44, atk: 18, def: 10, insight: 180, practice: 26, cost: 126,
       need: { gold_powder: 1 }, pressure: 0.89, days: 6.5 },
     { id: 7, name: '金丹中期', hp: 92, qi: 51, atk: 21, def: 12, insight: 225, practice: 30, cost: 152,
-      need: { gold_core: 4, core: 25, reed: 24, black_iron: 16 }, pressure: 0.94, days: 7 },
+      need: { gold_core: 18, core: 17, reed: 16, black_iron: 12 }, pressure: 0.94, days: 7 },
     { id: 8, name: '金丹后期', hp: 106, qi: 60, atk: 24, def: 14, insight: 275, practice: 35, cost: 185,
-      need: { gold_core: 8, core: 32, ore: 22, black_iron: 24 }, pressure: 0.94, days: 8,
+      need: { gold_core: 30, core: 22, ore: 17, black_iron: 18 }, pressure: 0.94, days: 8,
       requireDefeated: ['fault_warden'] },
   ],
   items: [
@@ -1673,7 +1673,7 @@ const lateContent = {
     item('phase_chart', '伏潮漏图', 'key', '从照原水下的铜板印下来的图。两串水滴并排刻在槽上，每一滴都和另一边的点对齐，槽底的泥画得很平。'),
     item('gold_formula', '结丹散丹方', 'key', '在照原用陶罐和两股水验证过的丹方。炼制时要用到伏潮息泥和井心水盐。'),
     item('gold_powder', '结丹散', 'key', '新出炉的药散，凉了也留着一股苦香。从筑基后期冲击金丹时服用。', { breakthrough: true }),
-    item('gold_core', '金丹期妖丹', 'material', '金丹期妖物的内丹，沉甸甸的一颗。炼丹、炼器和金丹期修行都用得上。', { sell: 37 }),
+    item('gold_core', '金丹期妖丹', 'material', '金丹期妖物体内凝出的沉珠。冲击金丹中后期需要不少，能搪在高阶护具里，也能留一两枚做袋。', { sell: 37 }),
     item('weir_knife', '迎岸横刀', 'gear', '照原护堤人常带的宽背刀。刀一横，便能挡下沉重的来招。', { sell: 37 }),
     item('coil_pole', '回烟长杖', 'gear', '木杖里包着一层层打孔的玄铁片。握住杖能稳住真气，也挡得住迎面的招。', { sell: 45 }),
     item('foil_sword', '霜缝剑', 'gear', '剑背有一道浅棱，尖端插进护甲的缝里时，浅棱能把甲片撬开。', { sell: 56 }),
@@ -1683,6 +1683,8 @@ const lateContent = {
     item('coal_tassel', '焦灯剑穗', 'gear', '用炉里烧剩的丝线编成。慌乱时攥住剑穗，吐气就能慢慢稳下来。', { sell: 44 }),
     item('gold_salve', '缓脉丹', 'pill', '筑基中期的修士可在交手时服用，既能缓解伤势，也能补回真气。'),
     item('formula_gold_salve', '缓脉丹方', 'key', '趁香味还在时盖好炉盖，最后添入妖丹稳住火候。出炉前轻轻撇掉药渣。'),
+    item('return_breath_pill', '归元丹', 'pill', '金丹修士常在连战之间服用的丹药，能回一口深气，也能缓过旧伤。'),
+    item('formula_return_breath', '归元丹方', 'key', '安蒲照湖底旧约上的分水法重新算过火候。研碎一枚金丹妖丹，和灵草分两次入炉。'),
     item('clear_needle', '照水重矢', 'ammo', '箭杆用沉木做成，沾湿了也射得稳。箭尖尤其擅长穿透石甲。'),
   ],
   gear: [
@@ -1705,7 +1707,10 @@ const lateContent = {
       entry: '筑基后期可佩戴的旧剑穗。攥住它能稳住呼吸，也更容易抽身退开。' },
   ],
   ammunition: [{ id: 'clear_needle', atk: 2, pierce: 2, trait: { kind: 'pierce', enemyTag: 'stoneborn', bonus: 2 } }],
-  pills: [{ id: 'gold_salve', tier: 4, hp: 38, qi: 15, toxin: 19, wound: 1, focus: 1 }],
+  pills: [
+    { id: 'gold_salve', tier: 4, hp: 38, qi: 15, toxin: 19, wound: 1, focus: 1 },
+    { id: 'return_breath_pill', tier: 6, hp: 24, qi: 32, toxin: 17, wound: 1, focus: 0 },
+  ],
   arts: [
     { id: 'level_hand', name: '水平掌', tier: 0, cost: 4, power: 0, guard: 10, break: 4, pierce: 0, price: 0, weaponBased: false, prizeOnly: true,
       desc: '守尺观的防身掌法。手腕放平，出掌格开来招，也能打乱对手的动作。' },
@@ -1717,25 +1722,27 @@ const lateContent = {
   recipes: [
     { id: 'r_gate_scroll', result: 'gate_scroll', tier: 0, count: 2, formula: 'gate_scroll_formula', cost: 5, need: { wood: 1, reed: 1, core: 1 }, days: 0.5 },
     { id: 'r_gold_powder', result: 'gold_powder', tier: 5, count: 1, facility: 'furnace', facilityLevel: 3, formula: 'gold_formula',
-      cost: 118, need: { heart_silt: 1, stillwell_salt: 1, reed: 28, core: 24, black_iron: 15, foundation_core: 5 }, days: 9 },
+      cost: 118, need: { heart_silt: 1, stillwell_salt: 1, reed: 18, core: 16, black_iron: 10, foundation_core: 28 }, days: 9 },
     { id: 'r_weir_knife', result: 'weir_knife', tier: 1, facility: 'forge', facilityLevel: 2, reveal: { item: 'undertow_wedge' },
       cost: 36, need: { ore: 13, wood: 6, hide: 4, core: 2 }, days: 4 },
     { id: 'r_coil_pole', result: 'coil_pole', tier: 4, facility: 'forge', facilityLevel: 2, reveal: { item: 'echo_tuning_key' },
-      cost: 52, need: { ore: 12, black_iron: 10, wood: 10, core: 5, foundation_core: 1 }, days: 6 },
+      cost: 52, need: { ore: 10, black_iron: 8, wood: 8, core: 4, foundation_core: 6 }, days: 6 },
     { id: 'r_foil_sword', result: 'foil_sword', tier: 5, facility: 'forge', facilityLevel: 3, reveal: { item: 'cold_kiln_record' },
-      cost: 74, need: { ore: 19, black_iron: 14, core: 12, foundation_core: 3 }, days: 7 },
+      cost: 74, need: { ore: 14, black_iron: 11, core: 9, foundation_core: 9 }, days: 7 },
     { id: 'r_lake_bow', result: 'lake_bow', tier: 5, facility: 'forge', facilityLevel: 3, reveal: { item: 'phase_chart' },
-      cost: 68, need: { wood: 16, hide: 10, core: 13, black_iron: 4, foundation_core: 2 }, days: 6 },
+      cost: 68, need: { wood: 12, hide: 10, core: 9, black_iron: 4, foundation_core: 8 }, days: 6 },
     { id: 'r_gauze_armor', result: 'gauze_armor', tier: 4, facility: 'forge', facilityLevel: 2, reveal: { item: 'undertow_wedge' },
-      cost: 48, need: { hide: 12, ore: 11, core: 5 }, days: 5 },
+      cost: 48, need: { hide: 10, ore: 9, core: 5, foundation_core: 5 }, days: 5 },
     { id: 'r_fault_coat', result: 'fault_coat', tier: 6, facility: 'forge', facilityLevel: 3, reveal: { item: 'gold_formula' },
-      cost: 78, need: { hide: 16, ore: 14, black_iron: 17, gold_core: 2 }, days: 7 },
+      cost: 78, need: { hide: 12, ore: 10, black_iron: 13, gold_core: 8 }, days: 7 },
     { id: 'r_coal_tassel', result: 'coal_tassel', tier: 5, facility: 'forge', facilityLevel: 2, reveal: { item: 'cold_kiln_record' },
-      cost: 58, need: { reed: 14, wood: 12, core: 11, black_iron: 7 }, days: 5 },
+      cost: 58, need: { reed: 10, wood: 8, core: 8, black_iron: 5, foundation_core: 5, beast_eye: 1 }, days: 5 },
     { id: 'r_clear_needle', result: 'clear_needle', tier: 3, count: 9, facility: 'forge', facilityLevel: 2, reveal: { item: 'phase_chart' },
-      cost: 5, need: { wood: 2, ore: 2, core: 1 }, days: 1 },
+      cost: 5, need: { wood: 2, ore: 2, foundation_core: 1 }, days: 1 },
     { id: 'r_gold_salve', result: 'gold_salve', tier: 4, count: 4, facility: 'furnace', facilityLevel: 3, formula: 'formula_gold_salve',
-      cost: 20, need: { reed: 7, hide: 3, core: 4, foundation_core: 1 }, days: 3 },
+      cost: 20, need: { reed: 6, hide: 2, core: 3, foundation_core: 2 }, days: 3 },
+    { id: 'r_return_breath', result: 'return_breath_pill', tier: 6, count: 3, facility: 'furnace', facilityLevel: 3,
+      formula: 'formula_return_breath', cost: 14, need: { reed: 5, core: 2, gold_core: 1 }, days: 3 },
   ],
   deductions: [{ id: 'gold_assay', name: '两股不同的水', tier: 0, reveal: { item: 'cold_kiln_record' },
     desc: '冷炉旧册在熄火那行描了圈盐，照原铜板上画着两股水。这两样东西怎么放到一处验？' }],
@@ -1856,11 +1863,11 @@ const mechanisms = [
     solution: [2, 2, 1],
     lead: { item: 'zhao_weigh_note', text: '高婆给的小木块插进去，左盘就不晃了。照木块上的图，盘里的重量要乘它离小柱的格数。有两个盘，就把两笔数加在一起。左右一样，秤就能放平。',
       blockedText: '左盘底下有个小方孔，少了一块塞进去的木头，一碰就晃。孔旁刻着一个小小的「高」字。' },
-    success: '秤杆停在正中，柜门咔哒一声打开。柜里有药草、灵晶和一枚裹在布里的妖丹。',
+    success: '秤杆停在正中，柜门咔哒一声打开。柜里有晾干的药草和几片包在布里的灵晶。',
     miss: '秤杆一歪，柜门的弹簧弹回来，把你的手夹在柜边。',
     failure: { damage: 9 },
     completeText: '旧柜门开着。弟子塞紧左盘下的小木块，秤杆没再晃。',
-    reward: { reed: 6, core: 5, foundation_core: 1 }, insight: 6,
+    reward: { reed: 6, core: 7 }, insight: 6,
   },
   { id: 'bridge_return_post', site: 'puzzle_sound_relay', title: '听桥上的回声', mode: 'sequence', maxLength: 6,
     desc: '桥下的筒能把六声原样传回来。拉铃、铜片和瓦片的线，站在栏杆里就行。要听回声，得踩上桥外悬着的粗绳，去拉筒下那根绳。六声要是接不上，脚下的绳子就会掉下去。',
@@ -2849,7 +2856,117 @@ const borderContent = { items, gear, arts: [], sites, events, enemies, quests };
 
 return borderContent;
 })();
+const huntMaterialContent = (() => {
+const wild = (start, cap, interval) => ({ start, cap, interval, growth: 1, curve: 'wild', fixedPopulation: true });
+const resident = (count) => ({ start: count, cap: count, interval: 0, growth: 0 });
+const attack = (name, mult = 1) => ({ name, kind: 'attack', mult });
+const heavy = (name, mult) => ({ name, kind: 'heavy', mult });
+const guard = (name, mult) => ({ name, kind: 'guard', mult });
+const drain = (name, mult) => ({ name, kind: 'drain', mult });
+const quarryPack = ['sand_quarry_skink', 'sand_quarry_guard', 'sand_quarry_matriarch'];
+
+const sites = [
+  { id: 'snow_hunt_scree', region: 'snow_pass', name: '雪线下的暖涧',
+    creatures: { snow_gully_otter: wild(3, 4, 5.5), snow_rime_antelope: wild(2, 3, 7.5) },
+    creatureText: {
+      snow_gully_otter: { present: '涧边的碎冰下有细小的气泡。上岸的脚印一排浅、一排深。', absent: '碎冰旁的水已经清了，裸石上没有新印。' },
+      snow_rime_antelope: { present: '坡顶有一对角时隐时现。那边的石屑偶尔会滚进热水里。', absent: '高处只剩被踩开的苔和一层旧雪。' },
+    } },
+  { id: 'sky_hunt_spillway', region: 'sky_terrace', name: '石台背面的分水槽', reveal: { item: 'fault_receipt' },
+    creatures: { sky_spillway_lizard: wild(2, 3, 10) },
+    creatureText: {
+      sky_spillway_lizard: { present: '水面高低错开两寸。两道贴槽游动的黑脊会在最窄处重叠。', absent: '两道水槽都能看到底。矮沿后传来流水落在石洞里的空声。' },
+    } },
+  { id: 'sand_hunt_anchors', region: 'hanging_vein', name: '旧矿索下的岩沟', once: [1],
+    creatures: { sand_anchor_scorpion: wild(2, 3, 11) },
+    choiceText: { 1: { after: '被扳松的断梁倒在石阶旁。从缺口可以看到底下的露天石场。' } },
+    creatureText: {
+      sand_anchor_scorpion: { present: '沟底的浮砂被往两边推开。旧矿索一沉一抬，石阶边冒出一只几乎与岩面同色的大钳。', absent: '矿索平垂在沟底。风把石阶边的擦痕慢慢填平。' },
+    } },
+  { id: 'sand_hunt_colony', region: 'hanging_vein', name: '梁后的露天石场', afterChoices: ['sand_hunt_anchors:1'],
+    creatures: { sand_quarry_skink: resident(72), sand_quarry_guard: resident(8), sand_quarry_matriarch: resident(1) },
+    creatureText: {
+      sand_quarry_skink: { present: '黑背砂蜥挤在矮石之间，听见碎砂响就从几个方向一起抬头。', absent: '矮石之间只剩散沙，小些的黑背蜥已经不见了。' },
+      sand_quarry_guard: { present: '柱子背后不时闪过一抹暗红，有粗尾擦着柱根绕过来。', absent: '柱根下的长尾印越来越浅，再没有红脊护着缝口。' },
+      sand_quarry_matriarch: { present: '背阴的旧石垒底下有一双白额巨蜥的眼睛，石垒随着它呼吸一抖一抖。', absent: '背阴石垒塌了一角，白额老蜥再没探出头。' },
+    },
+    emptyText: '倒石柱下已经听不见尾巴刮砂的声音。岩缝里只剩薄薄的干沙，出去的窄道仍照得见日光。' },
+];
+
+const events = [
+  { id: 'snow_hunt_scree', name: '雪线下的暖涧',
+    text: '涧水从雪下冒出来，浅处有不冻的水洼。矮桥旁绑着护栈人系的布条，沿着往上走几步就能回火棚。高坡的一行蹄印踩穿了雪壳，沉进水里的脚印却细了许多。',
+    choices: [
+      { label: '沿浅涧的爪印找斑獭', desc: '冰沿下露出一抹湿毛，附近的木桩上有两道刨到芯里的爪印。岸上有能站稳的干石。', days: 0.25, enemy: 'snow_gully_otter',
+        outcome: '斑獭蓦地钻出冰边。它一摆身，绷在胡须上的水珠甩过半条浅涧。' },
+      { label: '踩露出的山石上坡，接近石羚', desc: '蹄印深到能蓄一指水，坡顶还插着半截断矛。石羚俯身时，尖角比肩还低。', days: 0.375, enemy: 'snow_rime_antelope',
+        outcome: '石羚从高处退了半步，两只前蹄同时把雪壳碾碎。' },
+    ] },
+  { id: 'sky_hunt_spillway', name: '石台背面的分水槽',
+    text: '对照湖底旧约上的水位记号，才认出石台背面两排浅刻。刻痕往下接着被雾挡住的旧分水槽。槽边有道干燥的矮沿，低头便能望见清水下的两道脊鳍。',
+    choices: [
+      { label: '扶矮沿接近水槽里露脊鳍的东西', desc: '这段槽只有两步宽。两道水流往相反的方向弯过去。', days: 0.375, enemy: 'sky_spillway_lizard',
+        outcome: '两道脊鳍突然并在一起。水蜥贴着回上来的水露出头，泥水溅到了矮沿上。' },
+    ] },
+  { id: 'sand_hunt_anchors', name: '旧矿索下的岩沟',
+    text: '矿架的几股旧绳往下垂到沟里，石阶只从靠壁那侧经过。旧绳一动，两只固定矿索的粗铁钩就撞上梁木。靠上面的石阶还有半截断梁向外支着，后面漏进一线日光。回叩石院的石路仍从支木外侧走。',
+    choices: [
+      { label: '沿石阶下沟，在矿索旁迎石甲蝎', desc: '大钳擦过岩壁，尖端应声刮下一块薄石。钳外侧没有能插进刀刃的缝。', days: 0.375, enemy: 'sand_anchor_scorpion',
+        outcome: '浮砂沿绳洒落。石甲蝎慢慢举起双钳，把碎石挤得咯吱响。' },
+      { label: '扳开上一级石阶旁的断梁', desc: '横梁受力的一头早已折断。人留在石阶上，就够得着另一端。', days: 0.25, stay: true,
+        outcome: '干梁一声脆响倒向墙边。后面是一片露天石场，地上的爪印有短有长，最宽的那道拖过好几块石柱基。' },
+    ] },
+  { id: 'sand_hunt_colony', name: '梁后的露天石场',
+    text: '旧石场有几排没立稳的柱子，柱脚外全是蜥洞。矮石会挡住视线，听见爪响也分不清是哪条蜥先靠过来。入口的日光就在身后。',
+    choices: [
+      { label: '越过倒柱，在蜥群边找落脚处', desc: '越过倒柱便有石地可打。前面两道缝离得很近，走哪一边都可能遇上守巢的大蜥。', days: 0.25, encounter: quarryPack,
+        outcome: '你刚在石地站稳，前面便窜出一道影子，石片擦着靴面翻了过去。' },
+    ] },
+];
+
+const enemies = [
+  { id: 'snow_gully_otter', name: '雪涧斑獭', tier: 3, hp: 61, atk: 13, def: 4, tags: ['beast', 'furred'], insight: 6,
+    intents: [attack('贴冰掠爪'), drain('团水纳息', 0.65), heavy('卷水跃岸', 1.55), attack('转尾打腕', 1.08)],
+    desc: '皮毛湿透仍能困住暖气。它会借涧水牵走真气，尾尖离水就要跃上冰沿。',
+    loot: { foundation_core: 2, beast_meat: 3, hide: 2 },
+    chanceLoot: { beast_eye: { count: 1, chance: 0.55 } } },
+  { id: 'snow_rime_antelope', name: '覆雪石羚', tier: 3, hp: 77, atk: 14, def: 6, tags: ['beast', 'furred'], insight: 8,
+    intents: [attack('侧肩撞开薄冰'), guard('收膝护颈', 1.42), heavy('蹬岩下撞', 1.67), attack('踏碎雪壳', 1.1)],
+    desc: '蹄缘像磨钝的铁。它缩起前膝时能用角护颈，接着会从坡上踏碎一层雪。',
+    loot: { foundation_core: 3, beast_meat: 5, hide: 3 } },
+  { id: 'sky_spillway_lizard', name: '双脊浮水蜥', tier: 6, hp: 112, atk: 22, def: 7, tags: ['beast', 'scaled'], insight: 10,
+    intents: [attack('沿矮沿扑咬'), drain('两脊拨水闭息', 0.85), heavy('贴岸撩尾', 1.57), attack('回身探爪', 1.06)],
+    desc: '平时顺流走，翻起两道脊鳍时能把流向拨转，连人的真气也会被水挟走。',
+    loot: { gold_core: 3, beast_meat: 5, hide: 2 },
+    chanceLoot: { beast_eye: { count: 1, chance: 0.60 } } },
+  { id: 'sand_anchor_scorpion', name: '盘绳石甲蝎', tier: 6, hp: 103, atk: 22, def: 10, tags: ['beast', 'scaled', 'stoneborn'], insight: 11,
+    intents: [guard('合钳挡住颈下', 1.48), attack('探钳夹腕'), heavy('钩住岩缝挥尾', 1.59), attack('横钳脱石', 1.12)],
+    desc: '双钳合得紧，甲缝在出钳时才露出来。它把尾钩抵进岩缝以后，整条尾巴都能甩过来。',
+    loot: { beast_meat: 2, hide: 2 },
+    chanceLoot: { gold_core: { count: 4, chance: 0.75 } } },
+  { id: 'sand_quarry_skink', name: '黑背砂蜥', tier: 4, hp: 64, atk: 15, def: 5, tags: ['beast', 'scaled'], insight: 5,
+    intents: [attack('绕石咬脚'), guard('缩腹贴石', 1.32), heavy('侧身甩尾', 1.54)],
+    desc: '黑背鳞和砂石颜色相近，露出浅色腹侧时就能看见它整条尾巴往回弓。',
+    loot: { beast_meat: 2, hide: 1 },
+    chanceLoot: { foundation_core: { count: 1, chance: 0.52 } } },
+  { id: 'sand_quarry_guard', name: '赤脊护巢蜥', tier: 6, hp: 117, atk: 23, def: 8, tags: ['beast', 'scaled'], insight: 11,
+    intents: [attack('贴柱探爪'), drain('张喉卷走石尘', 0.8), heavy('横压柱脚', 1.65), attack('摆尾截路', 1.1)],
+    desc: '颈鳞磨得发红。喉间发鼓时会把石尘卷到眼前，紧跟着从靠岩的一边压过来。',
+    loot: { beast_meat: 4, hide: 2 },
+    chanceLoot: { gold_core: { count: 3, chance: 0.62 }, beast_eye: { count: 1, chance: 0.35 } } },
+  { id: 'sand_quarry_matriarch', name: '白额老蜥', tier: 7, hp: 155, atk: 27, def: 11, tags: ['beast', 'scaled'], insight: 16,
+    intents: [attack('昂首拨倒立石'), guard('伏进石垒', 1.46), heavy('拖尾扫过石垒', 1.68), drain('张口吸进冷砂', 0.95), attack('低身攀咬', 1.12)],
+    desc: '白额上一道旧伤已经长进鳞下。它白天卧在石垒背阴处，有人接近才会推倒前面的立石。',
+    loot: { gold_core: 3, beast_meat: 6, hide: 4 },
+    chanceLoot: { gold_core: { count: 5, chance: 0.65 }, beast_eye: { count: 1, chance: 0.75 } } },
+];
+
+const huntMaterialContent = { sites, events, enemies };
+
+return huntMaterialContent;
+})();
 const moduleData = (() => {
+
 
 
 
@@ -2864,8 +2981,8 @@ const moduleData = (() => {
 
 const realms = [
   { id: 0, name: '炼气初期', hp: 30, qi: 12, atk: 8, def: 2, insight: 0, cost: 0, need: {}, pressure: 1, days: 0 },
-  { id: 1, name: '炼气中期', hp: 35, qi: 15, atk: 9, def: 3, insight: 14, practice: 5, cost: 18, need: { reed: 6, hide: 2 }, pressure: 0.97, days: 1.5 },
-  { id: 2, name: '炼气后期', hp: 42, qi: 20, atk: 10, def: 4, insight: 36, practice: 9, cost: 36, need: { ore: 6, core: 4, reed: 8 }, pressure: 0.94, days: 2.5 },
+  { id: 1, name: '炼气中期', hp: 35, qi: 15, atk: 9, def: 3, insight: 14, practice: 5, cost: 18, need: { reed: 6, hide: 2, qi_core: 5 }, pressure: 0.97, days: 1.5 },
+  { id: 2, name: '炼气后期', hp: 42, qi: 20, atk: 10, def: 4, insight: 36, practice: 9, cost: 36, need: { ore: 5, core: 3, reed: 6, qi_core: 12 }, pressure: 0.94, days: 2.5 },
   { id: 3, name: '筑基初期', hp: 50, qi: 26, atk: 11, def: 5, insight: 70, practice: 14, cost: 18,
     need: { foundation_pill: 1 }, pressure: 0.90, days: 4 },
 ];
@@ -2876,8 +2993,8 @@ const items = [
   { id: 'reed', name: '灵草', kind: 'material', price: 6, sell: 2, desc: '滩边采的白苇芯或内山长的银脉叶，拣紧实的留下。煎药、炼丹和育苗都用得上。' },
   { id: 'hide', name: '兽革', kind: 'material', price: 0, sell: 3, desc: '从妖兽身上取下的皮，也包括雪蜥换下的厚皮。能做护甲、皮绳和弓弦，也可以卖给收皮商。' },
   { id: 'beast_meat', name: '生兽肉', kind: 'material', price: 0, sell: 0, desc: '刚剖下来的兽肉。到能生火的灶边煮透，才能当行粮。' },
-  { id: 'qi_core', name: '炼气期妖丹', kind: 'material', price: 0, sell: 7, desc: '炼气妖兽或精怪体内凝出的丹核。收货的人肯出钱，丹方也有用它稳火的做法。' },
-  { id: 'foundation_core', name: '筑基期妖丹', kind: 'material', price: 0, sell: 21, desc: '筑基期妖兽体内凝成的硬珠。高级丹方会用到，也能卖个好价。' },
+  { id: 'qi_core', name: '炼气期妖丹', kind: 'material', price: 0, sell: 7, desc: '从炼气妖兽或精怪身上取的丹核。散修借它冲开经脉，丹师也要用一批来稳住筑基丹的炉火。' },
+  { id: 'foundation_core', name: '筑基期妖丹', kind: 'material', price: 0, sell: 21, desc: '从筑基妖物身上取的硬珠。稳固气脉、炼结丹散和铸高阶兵刃都用得上。' },
   { id: 'beast_eye', name: '妖目', kind: 'material', price: 0, sell: 0, desc: '妖兽的眼珠，离体后还有灵力。能入药，也能做成帮助稳住气息的饰物。' },
   { id: 'qiankun_pattern', name: '旧行商的袋样', kind: 'key', price: 0, sell: 0,
     desc: '一块照着旧乾坤袋裁下的样布。一边留了个朝里翻的袋角，可以拿给落灯村的皮匠看。' },
@@ -3104,9 +3221,9 @@ const recipes = [
   { id: 'r_qi', result: 'qi_powder', count: 3, tier: 0, facility: 'furnace', formula: 'formula_qi', cost: 3, need: { reed: 2, wood: 1 }, days: 1 },
   { id: 'r_grain', result: 'grain_pill', count: 1, tier: 0, facility: 'furnace', formula: 'formula_grain', cost: 2, need: { ration: 3, wood: 1 }, days: 1 },
   { id: 'r_detox', result: 'detox_pill', count: 2, tier: 0, facility: 'furnace', formula: 'formula_detox', cost: 3, need: { reed: 2, wood: 1 }, days: 1 },
-  { id: 'r_focus', result: 'focus_pill', count: 2, tier: 0, facility: 'furnace', formula: 'formula_focus', cost: 4, need: { reed: 2, wood: 2 }, days: 1.5 },
+  { id: 'r_focus', result: 'focus_pill', count: 2, tier: 0, facility: 'furnace', formula: 'formula_focus', cost: 4, need: { reed: 2, wood: 1, qi_core: 1 }, days: 1.5 },
   { id: 'r_heal', result: 'heal_pill', count: 2, tier: 1, facility: 'furnace', formula: 'formula_heal', cost: 4, need: { reed: 3, hide: 1 }, days: 1.5 },
-  { id: 'r_tide', result: 'tide_pill', count: 2, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_tide', cost: 7, need: { reed: 3, core: 2 }, days: 2 },
+  { id: 'r_tide', result: 'tide_pill', count: 2, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_tide', cost: 7, need: { reed: 3, core: 1, qi_core: 2 }, days: 2 },
   { id: 'r_ember', result: 'ember_talisman', count: 2, tier: 0, cost: 3, need: { wood: 1, reed: 1 }, days: 1, reveal: { item: 'ember_fold' } },
   { id: 'r_reed', result: 'reed_talisman', count: 2, tier: 0, cost: 2, need: { reed: 1, wood: 1 }, days: 1, reveal: { item: 'reed_talisman' } },
   { id: 'r_bank_talisman', result: 'bank_talisman', count: 2, tier: 0, cost: 3, need: { reed: 1, wood: 2 }, days: 1, reveal: { item: 'eddy_note' } },
@@ -3118,32 +3235,32 @@ const recipes = [
   { id: 'r_short_spear', result: 'short_spear', count: 1, tier: 0, facility: 'forge', cost: 9, need: { ore: 2, wood: 4 }, days: 1.5, reveal: { item: 'ore' } },
   { id: 'r_iron_sword', result: 'iron_sword', count: 1, tier: 0, facility: 'forge', cost: 12, need: { ore: 6, wood: 3 }, days: 2, reveal: { item: 'blade_template' } },
   { id: 'r_iron_coat', result: 'iron_coat', count: 1, tier: 1, facility: 'forge', cost: 16, need: { ore: 8, hide: 3 }, requiresShownHide: true, days: 2, reveal: { item: 'plate_lacing' } },
-  { id: 'r_tide_spear', result: 'tide_spear', count: 1, tier: 1, facility: 'forge', cost: 17, need: { ore: 5, core: 3 }, days: 2.5, reveal: { item: 'spear_joint' } },
-  { id: 'r_tide_coat', result: 'tide_coat', count: 1, tier: 2, facility: 'forge', cost: 19, need: { ore: 5, hide: 3, core: 3 }, requiresShownHide: true, days: 3, reveal: { item: 'gate_buckles' } },
+  { id: 'r_tide_spear', result: 'tide_spear', count: 1, tier: 1, facility: 'forge', cost: 17, need: { ore: 5, core: 2, qi_core: 4 }, days: 2.5, reveal: { item: 'spear_joint' } },
+  { id: 'r_tide_coat', result: 'tide_coat', count: 1, tier: 2, facility: 'forge', cost: 19, need: { ore: 5, hide: 3, core: 2, qi_core: 3 }, requiresShownHide: true, days: 3, reveal: { item: 'gate_buckles' } },
   { id: 'r_reed_charm', result: 'reed_charm', count: 1, tier: 0, cost: 3, need: { reed: 2, wood: 1 }, days: 0.5, reveal: { item: 'oar_mark' } },
   { id: 'r_tide_charm', result: 'tide_charm', count: 1, tier: 2, facility: 'forge', cost: 11, need: { core: 2, hide: 1, beast_eye: 1 }, days: 1.5, reveal: { item: 'tide_note' } },
   { id: 'r_jetty_charm', result: 'jetty_charm', count: 1, tier: 2, cost: 8, need: { wood: 2, reed: 1, core: 1 }, days: 1, reveal: { item: 'lamp_sketch' } },
   { id: 'r_reed_arrow', result: 'reed_arrow', count: 8, tier: 0, cost: 1, need: { wood: 2, reed: 1 }, days: 0.5 },
   { id: 'r_iron_arrow', result: 'iron_arrow', count: 6, tier: 1, facility: 'forge', cost: 3, need: { ore: 2, reed: 2 }, days: 1, reveal: { item: 'arrow_pattern' } },
   { id: 'r_black_bolt', result: 'black_bolt', count: 8, tier: 2, facility: 'forge', facilityLevel: 2, cost: 4, need: { black_iron: 2, wood: 2 }, days: 1, reveal: { item: 'vein_pattern' } },
-  { id: 'r_cloud_arrow', result: 'cloud_arrow', count: 8, tier: 3, facility: 'forge', facilityLevel: 2, cost: 6, need: { core: 2, hide: 1, wood: 2 }, days: 1.5, reveal: { item: 'cloud_tip' } },
+  { id: 'r_cloud_arrow', result: 'cloud_arrow', count: 8, tier: 3, facility: 'forge', facilityLevel: 2, cost: 6, need: { core: 1, hide: 1, wood: 2, qi_core: 1 }, days: 1.5, reveal: { item: 'cloud_tip' } },
   { id: 'r_pine_bow', result: 'pine_bow', count: 1, tier: 0, facility: 'forge', cost: 14, need: { wood: 7, hide: 3 }, days: 2, reveal: { item: 'bow_stave' } },
   { id: 'r_resin_staff', result: 'resin_staff', count: 1, tier: 1, facility: 'forge', cost: 13, need: { wood: 6, ore: 3 }, days: 2, reveal: { item: 'resin_tamper' } },
-  { id: 'r_black_crossbow', result: 'black_crossbow', count: 1, tier: 2, facility: 'forge', facilityLevel: 2, cost: 30, need: { black_iron: 6, wood: 5, hide: 2 }, days: 3, reveal: { item: 'vein_pattern' } },
+  { id: 'r_black_crossbow', result: 'black_crossbow', count: 1, tier: 2, facility: 'forge', facilityLevel: 2, cost: 30, need: { black_iron: 5, wood: 4, hide: 2, qi_core: 6 }, days: 3, reveal: { item: 'vein_pattern' } },
   { id: 'r_coil_spear', result: 'coil_spear', count: 1, tier: 0, facility: 'forge', facilityLevel: 2, cost: 28, need: { black_iron: 5, wood: 4, core: 3 }, days: 3, reveal: { item: 'vein_pattern' } },
   { id: 'r_snow_halberd', result: 'snow_halberd', count: 1, tier: 2, facility: 'forge', facilityLevel: 2, cost: 28, need: { black_iron: 6, wood: 4, hide: 3 }, days: 3, reveal: { item: 'hook_iron' } },
   { id: 'r_frost_robe', result: 'frost_robe', count: 1, tier: 2, facility: 'forge', facilityLevel: 2, cost: 24, need: { hide: 8, wood: 3 }, days: 3, reveal: { item: 'pass_seam' } },
-  { id: 'r_sky_sword', result: 'sky_sword', count: 1, tier: 3, facility: 'forge', facilityLevel: 3, cost: 42, need: { black_iron: 7, core: 6, hide: 3 }, days: 4, reveal: { item: 'meridian_etching' } },
-  { id: 'r_sky_bow', result: 'sky_bow', count: 1, tier: 3, facility: 'forge', facilityLevel: 3, cost: 39, need: { wood: 8, core: 6, hide: 6 }, days: 4, reveal: { item: 'axis_tuning' } },
+  { id: 'r_sky_sword', result: 'sky_sword', count: 1, tier: 3, facility: 'forge', facilityLevel: 3, cost: 42, need: { black_iron: 7, core: 4, hide: 3, foundation_core: 4 }, days: 4, reveal: { item: 'meridian_etching' } },
+  { id: 'r_sky_bow', result: 'sky_bow', count: 1, tier: 3, facility: 'forge', facilityLevel: 3, cost: 39, need: { wood: 8, core: 4, hide: 6, foundation_core: 3 }, days: 4, reveal: { item: 'axis_tuning' } },
   { id: 'r_sky_cloak', result: 'sky_cloak', count: 1, tier: 3, facility: 'forge', facilityLevel: 3, cost: 36, need: { hide: 8, core: 5 }, days: 4, reveal: { item: 'loom_tack' } },
   { id: 'r_jade_pendant', result: 'jade_pendant', count: 1, tier: 3, facility: 'forge', facilityLevel: 2, cost: 26, need: { core: 5, hide: 3, beast_eye: 1 }, days: 3, reveal: { item: 'axis_tuning' } },
   { id: 'r_star_blade', result: 'star_blade', count: 1, tier: 2, facility: 'forge', facilityLevel: 2, cost: 35, need: { black_iron: 9, ore: 5, core: 4, wood: 3 }, days: 4, reveal: { item: 'star_blade_pattern' } },
   { id: 'r_hide_shield', result: 'hide_shield', count: 1, tier: 0, facility: 'forge', cost: 8, need: { wood: 4, hide: 3 }, days: 1.25, requiresShownHide: true },
   { id: 'r_miner_pick', result: 'miner_pick', count: 1, tier: 0, facility: 'forge', cost: 8, need: { ore: 4, wood: 2 }, days: 1.5, reveal: { item: 'blade_template' } },
-  { id: 'r_resin_pill', result: 'resin_pill', count: 3, tier: 1, facility: 'furnace', formula: 'formula_resin', cost: 6, need: { wood: 3, reed: 3, qi_core: 1 }, days: 2 },
-  { id: 'r_leaf_pill', result: 'leaf_pill', count: 3, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_leaf', cost: 10, need: { reed: 4, kiln_clay: 2, wood: 2, qi_core: 2 }, days: 3 },
-  { id: 'r_jade_pill', result: 'jade_pill', count: 3, tier: 3, facility: 'furnace', facilityLevel: 3, formula: 'formula_jade', cost: 16, need: { reed: 5, core: 2, wood: 2, foundation_core: 1, beast_eye: 1 }, days: 4 },
-  { id: 'r_foundation', result: 'foundation_pill', count: 1, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_foundation', cost: 45, need: { foundation_charge: 1, reed: 8, core: 8, black_iron: 4 }, days: 4 },
+  { id: 'r_resin_pill', result: 'resin_pill', count: 3, tier: 1, facility: 'furnace', formula: 'formula_resin', cost: 6, need: { wood: 2, reed: 3, qi_core: 2 }, days: 2 },
+  { id: 'r_leaf_pill', result: 'leaf_pill', count: 3, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_leaf', cost: 10, need: { reed: 4, kiln_clay: 1, wood: 2, qi_core: 3 }, days: 3 },
+  { id: 'r_jade_pill', result: 'jade_pill', count: 3, tier: 3, facility: 'furnace', facilityLevel: 3, formula: 'formula_jade', cost: 16, need: { reed: 4, core: 2, wood: 1, foundation_core: 2, beast_eye: 1 }, days: 4 },
+  { id: 'r_foundation', result: 'foundation_pill', count: 1, tier: 2, facility: 'furnace', facilityLevel: 2, formula: 'formula_foundation', cost: 45, need: { foundation_charge: 1, reed: 6, core: 5, black_iron: 4, qi_core: 24 }, days: 4 },
 ];
 
 const regions = [
@@ -3319,6 +3436,18 @@ const sites = [
     emptyText: '水畦里的老叶已经剪尽。细芽还贴着湿泥，只等抽出来。' },
   { id: 'mist_shelter', region: 'herb_basin', name: '垫高脚的药棚', once: [0, 1],
     afterOnceText: { 0: '泽医把通矿队的木匣系好，膝边的木板还压着张验药小札。', 1: '席上的捣药板已经腾出来了。泽医身边还放着几只给矿队装药的篓。' } },
+  { id: 'herb_den', region: 'herb_basin', name: '蒲根下的水洞', afterChoices: ['mist_shelter:1'],
+    creatures: {
+      herb_den_toad: { start: 32, cap: 32, interval: 0, growth: 0 },
+      herb_den_lizard: { start: 6, cap: 6, interval: 0, growth: 0 },
+      herb_den_elder: { start: 1, cap: 1, interval: 0, growth: 0 },
+    },
+    creatureText: {
+      herb_den_toad: { present: '细碎的脚印盖过了大半泥岸。水里一阵挨一阵地鼓泡。', absent: '浅水的泡沫早已散完。' },
+      herb_den_lizard: { present: '贴根的宽尾印往几道深缝里收。', absent: '深缝里漏下的水散成细滴，再没有宽尾掠过去。' },
+      herb_den_elder: { present: '最深处的木桩上留着两道陷到木心的齿印。', absent: '被啃裂的木桩倒了，水从桩顶漫过去。' },
+    },
+    emptyText: '两块湿木板浮在洞口，泥岸上没有新脚印。药棚那头又有人来取水。' },
   { id: 'vine_pond', region: 'herb_basin', name: '白藤塘',
     stocks: { reed: { label: '塘边银脉叶', start: 4, cap: 8, interval: 7, growth: 2, depletedFactor: 1.5, choices: [2] },
       reed_upper: { item: 'reed', label: '上游银脉叶', start: 5, cap: 6, interval: 10, growth: 2, choices: [4] } },
@@ -3627,7 +3756,11 @@ const events = [
   { id: 'mist_shelter', name: '垫高脚的药棚', text: '泽医在垫高脚的竹席上扎药包。窗外的水线已经接近台阶，席上放了块压出药槽的木板。', choices: [
     { label: '给泽医交叶和烘干用的枝条', desc: '「阴雨浸坏了这一批，我得给矿队重扎几包药。你若进矿脉，带我的引矿签过去。」',
       need: { reed: 8, wood: 4 }, consume: true, days: 1, insight: 4, loot: { mine_guide: 1, ration: 3 }, outcome: '泽医把木片从药匣上拆下，指给你看哪边的石槽连着玄砂矿脉。' },
-    { label: '问泽医板上的凹槽怎么用', desc: '木板上刻了几道不同深浅的槽，中间压着一张试药的便条。', days: 0.5, insight: 2, loot: { herb_press: 1, formula_leaf: 1 }, outcome: '泽医拿药板比给你看，又递来一页清脉饮丹方。「药汁先过一道槽，再过第二道，少一道味就不对。」' },
+    { label: '问泽医板上的凹槽怎么用', desc: '木板上刻了几道不同深浅的槽，中间压着一张试药的便条。', days: 0.5, insight: 2, loot: { herb_press: 1, formula_leaf: 1 }, outcome: '泽医递来一页清脉饮丹方，又指着板上新刻的那道。「原本从蒲根底下取水，最近底下成了窝。蒲根旁还搭着两块旧木板，你过去当心。」' },
+  ] },
+  { id: 'herb_den', name: '蒲根下的水洞', text: '两块旧木板搭着泥岸，一头挨药棚，一头伸到蒲根下面。洞里的枝条被水冲掉，上下几处石缝全通着。踩里板时要听清水下的动静。', choices: [
+    { label: '踏上木板，朝水洞里探', desc: '泥底看不透。若整块板都在晃，靠棚的板头还露在地上。', days: 0.125,
+      encounter: ['herb_den_toad', 'herb_den_lizard', 'herb_den_elder'], outcome: '里头的水一下越过板面，你脚边窜出一道影子。' },
   ] },
   { id: 'vine_pond', name: '白藤塘', text: '白藤沿塘边翻卷，几块踏石伸进凹水里。岸外有块斜石，向上能看到坝根。', choices: [
     { label: '沿浅滩的蹄印找藤鹿', days: 0.75, enemy: 'vine_stag', outcome: '白角从藤下挑起来，鹿蹄刨开一片湿泥。' },
@@ -3774,6 +3907,21 @@ const enemies = [
   { id: 'vine_stag', name: '白角藤鹿', tags: ['beast', 'furred'], tier: 2, hp: 60, atk: 14, def: 5,
     intents: [{ name: '探蹄拨藤', kind: 'attack', mult: 1.08 }, { name: '角上引湿', kind: 'drain', mult: 0.52 }, { name: '低眉突刺', kind: 'heavy', mult: 1.62 }, { name: '转背护颈', kind: 'guard', mult: 1.35 }],
     insight: 6, loot: { beast_meat: 3, hide: 2, beast_eye: 1, qi_core: 3 }, desc: '它能借湿藤牵走气息。白角还没压低之前，脚下总会先拨藤。' },
+  { id: 'herb_den_toad', name: '蒲窝青蟾', tags: ['beast'], tier: 1, hp: 31, atk: 9, def: 3,
+    intents: [{ name: '贴地探爪', kind: 'attack', mult: 1 }, { name: '撑板扑膝', kind: 'heavy', mult: 1.52 }],
+    insight: 3, loot: { beast_meat: 2 }, chanceLoot: { qi_core: { count: 1, chance: 0.56 } },
+    desc: '小蟾藏在蒲根下，有东西踩湿木板才会扑上来。' },
+  { id: 'herb_den_lizard', name: '蒲根巨蜥', tags: ['beast', 'scaled'], tier: 3, hp: 66, atk: 14, def: 5,
+    intents: [{ name: '踩根掠足', kind: 'attack', mult: 1 }, { name: '衔水抽气', kind: 'drain', mult: 0.64 },
+      { name: '蹬板压尾', kind: 'heavy', mult: 1.61 }],
+    insight: 7, loot: { beast_meat: 3, hide: 2 }, chanceLoot: { foundation_core: { count: 3, chance: 0.64 }, beast_eye: { count: 1, chance: 0.33 } },
+    desc: '沉进黑蒲根时，它能贴木板吸走护身真气。抬起前爪后才挥尾砸板。' },
+  { id: 'herb_den_elder', name: '断桩老蜥', tags: ['beast', 'scaled'], tier: 4, hp: 88, atk: 16, def: 6,
+    intents: [{ name: '推木撞肩', kind: 'attack', mult: 1.02 }, { name: '贴桩护首', kind: 'guard', mult: 1.45 },
+      { name: '咬桩抡水', kind: 'heavy', mult: 1.68 }, { name: '吸水回气', kind: 'heal', mult: 0.36 }],
+    insight: 11, loot: { beast_meat: 5, hide: 5, foundation_core: 3 },
+    chanceLoot: { foundation_core: { count: 4, chance: 0.62 }, beast_eye: { count: 1, chance: 0.65 } },
+    desc: '它的下颚几乎齐木桩高。老蜥咬住旧木准备卷起一层水时，把脚从板沿收回来。' },
   { id: 'vine_king', name: '白纹鹿王', tags: ['beast', 'furred'], tier: 2, hp: 79, atk: 15, def: 6,
     intents: [{ name: '昂角探石', kind: 'attack', mult: 1 }, { name: '低角顶坝', kind: 'heavy', mult: 1.7 },
       { name: '贴藤守颈', kind: 'guard', mult: 1.42 }, { name: '转身摔角', kind: 'attack', mult: 1.1 }],
@@ -3783,7 +3931,7 @@ const enemies = [
     insight: 7, loot: { qi_core: 3 }, desc: '两肩石片相合时很难砍进去。窄矢或穿甲的兵刃能省不少力。' },
   { id: 'snow_warden', name: '雪脊兽', tags: ['beast', 'scaled'], tier: 3, hp: 81, atk: 15, def: 6,
     intents: [{ name: '甩雪探路', kind: 'attack', mult: 1.02 }, { name: '伏背撞沟', kind: 'heavy', mult: 1.7 }, { name: '蜷鳞藏气', kind: 'guard', mult: 1.4 }, { name: '卷冷风', kind: 'drain', mult: 0.66 }, { name: '翻颈扫石', kind: 'attack', mult: 1.1 }],
-    insight: 10, loot: { beast_meat: 5, hide: 4, beast_eye: 1, foundation_core: 2 }, desc: '雪脊鳞叠得厚，压背后会沿沟猛撞。趁它还没贴近时服药或换术。' },
+    insight: 10, loot: { beast_meat: 5, hide: 4, beast_eye: 1, foundation_core: 3 }, desc: '雪脊鳞叠得厚，压背后会沿沟猛撞。趁它还没贴近时服药或换术。' },
   { id: 'snow_rail_lynx', name: '雪耳山猞', tags: ['beast', 'furred'], tier: 1, hp: 33, atk: 11, def: 3,
     intents: [{ name: '矮身抄足', kind: 'attack', mult: 1 }, { name: '蹬梯扑脸', kind: 'heavy', mult: 1.55 }],
     insight: 3, loot: { beast_meat: 2, hide: 1, qi_core: 1 }, desc: '前足碰到梯脚时，会借梯身猛扑。' },
@@ -3918,7 +4066,7 @@ const sects = [riverContent, zhaoContent, sandContent].flatMap((content) => cont
 const mechanisms = puzzleContent.mechanisms;
 
 for (const content of [riverContent, zhaoContent, sandContent, lateContent, puzzleContent, tournamentContent,
-  ferryContent, hazardContent, caravanContent, employersContent, borderContent]) {
+  ferryContent, hazardContent, caravanContent, employersContent, borderContent, huntMaterialContent]) {
   for (const [key, entries] of Object.entries({ realms, items, gear, ammunition, foods, pills, talismans, arts, recipes,
     regions, sites, events, enemies, quests, deductions })) {
     entries.push(...(content[key] ?? []));
@@ -5375,7 +5523,7 @@ const town = {
   intro: '桌边晾着几张抄好的丹方。安蒲用湿布裹住药炉，等它凉下来。',
   greeting: '安蒲抽出压在秤底的图。「院里找面背风的墙，就能搭炉。先用小火，闻到焦味就停。」',
   knownGreeting: '「想炼哪种药，先找那一味的丹方。炉子也得经得住那个火候。」',
-  coreRemark: '安蒲指了指药案上分开的两只小罐。「妖丹按品级收。丹方用得到的可以留着，缺盘缠时拿到坊市也能换钱。」',
+  coreRemark: '安蒲指了指药案上分开的药罐。「不同妖丹不能混用。活着取回的先留些，运气破关、开炉和打兵器都用得上。剩下的拿去坊市能换钱。」',
 };
 
 const offers = [
@@ -5387,6 +5535,8 @@ const offers = [
     desc: '「这丹入口苦，你若接着用术法，打出去就更有劲。」' },
   { id: 'formula_resin', recipe: 'r_resin_pill', name: '温枝丸丹方', price: 28, reveal: 'kiln_manual',
     desc: '安蒲比了比你带回的火候牌。石谷人会把炉口盖住，让小火慢慢把药温透。到炼气中期才能服用。' },
+  { id: 'formula_return_breath', recipe: 'r_return_breath', name: '归元丹方', price: 38, reveal: 'fault_receipt',
+    desc: '安蒲用两只碗照旧约的画法分水。「一枚金丹妖丹能炼三颗。赶远路连打几阵，气跟不上时吃一颗。」' },
 ];
 
 const inquiry = [
@@ -5418,8 +5568,8 @@ const inquiry = [
     text: '验药印背面刻着熄火的时机，正好补上丹方缺的一段。安蒲得买一只没开裂的密封药盒，再用自己的炉试一遍，才能备好那份药引。',
     proof: 'foundation_warden_proof', defeated: 'foundation_warden', price: 86, days: 1.25,
     reward: { formula_foundation: 1, foundation_charge: 1 },
-    reply: '安蒲交给你补全的筑基丹方和一剂封炉药引。「只够炼一炉。等家里的炼丹炉升到二级，再开封下料。」',
-    progress: '筑基丹方已经补全。封炉药引只够用一次。',
+    reply: '安蒲交给你补全的筑基丹方和一剂封炉药引。「这味药引只够一炉。得备足炼气妖丹添在炉心，几轮炉火才稳得住。」',
+    progress: '筑基丹方已经补全。备齐炼气妖丹和辅料，和药引一起放进二级丹炉。',
   },
 ];
 
@@ -6250,11 +6400,31 @@ function remainingGuards(state, site, choice) {
   return choiceGuards(choice).reduce((count, id) => count + (site?.creatures?.[id] ? poolAt(state, site, 'creatures', id).count : 0), 0);
 }
 
+function worldRoll(state) {
+  state.encounterSeed = (Math.imul(1664525, state.encounterSeed) + 1013904223) >>> 0;
+  return state.encounterSeed / 0x100000000;
+}
+
+function encounterPools(state, site, encounter) {
+  return encounter.map((id) => [id, poolAt(state, site, 'creatures', id).count]);
+}
+
+function selectEncounter(state, site, encounter) {
+  const pools = encounterPools(state, site, encounter);
+  const total = pools.reduce((sum, [, count]) => sum + count, 0);
+  if (!total) return null;
+  let ticket = Math.floor(worldRoll(state) * total);
+  for (const [id, count] of pools) {
+    if (ticket < count) return id;
+    ticket -= count;
+  }
+  return null;
+}
+
 function rollHarvestAmbush(state, site, ambush) {
   if (!ambush || !records.enemies[ambush.enemy] || !(ambush.chance > 0) || !site?.creatures?.[ambush.enemy] ||
       poolAt(state, site, 'creatures', ambush.enemy).count === 0) return false;
-  state.encounterSeed = (Math.imul(1664525, state.encounterSeed) + 1013904223) >>> 0;
-  return state.encounterSeed / 0x100000000 < ambush.chance;
+  return worldRoll(state) < ambush.chance;
 }
 
 function ebbTimeLeft(state) {
@@ -6300,6 +6470,9 @@ function choiceBlocker(state, choice, site, index) {
       : '眼下没有可追的对手。';
     return { reason, depleted: true };
   }
+  if (choice.encounter && !encounterPools(state, site, choice.encounter).some(([, count]) => count > 0)) {
+    return { reason: '这里已经静下来了，找不到还能交手的对手。', depleted: true };
+  }
   const stocks = choiceStocks(site, choice, index);
   if (stocks.length && stocks.every(({ key }) => poolAt(state, site, 'stocks', key).count === 0)) {
     const renewable = stocks.some(({ pool }) => pool.interval > 0 && pool.growth > 0);
@@ -6316,7 +6489,7 @@ function choiceBlocker(state, choice, site, index) {
       (gearReserved(state, id) || Object.values(state.ground).some((pile) => pile[id])))) {
     return { reason: '同样的奖品已有一份。' };
   }
-  if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy)) return { reason: '腹中空空，先吃些东西。' };
+  if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy || choice.encounter)) return { reason: '腹中空空，先吃些东西。' };
   const coins = choice.coins ?? 0;
   const missing = missingItems(state, choice.need);
   if (Object.keys(missing).length) return { reason: `还缺${goodsText(missing)}。` };
@@ -6428,7 +6601,8 @@ function choose(state, { index, itemId, count }) {
   const gatheredRegion = state.region;
   const gatheredGoods = goodsText(gathered);
   leaveOnGround(state, gathered);
-  const enemy = ambush?.enemy ?? choice.enemy;
+  const enemy = ambush?.enemy ?? choice.enemy ??
+    (completedBatches > 0 && choice.encounter ? selectEncounter(state, site, choice.encounter) : null);
   const continuesHere = choice.stay || event.choices.some((next) => next.afterChoice === index);
   if (enemy && records.enemies[enemy]) {
     state.event = null;
@@ -6523,6 +6697,11 @@ function finishCombat(state, enemy) {
   const worthy = first && !protectedBout && enemy.tier >= state.realm;
   if (worthy) state.practice[state.realm] = (state.practice[state.realm] ?? 0) + rules.worthyFightPractice;
   const gathered = protectedBout ? {} : { ...enemy.loot };
+  if (!protectedBout) {
+    for (const [id, { count, chance }] of Object.entries(enemy.chanceLoot ?? {})) {
+      if (worldRoll(state) < chance) gathered[id] = (gathered[id] ?? 0) + count;
+    }
+  }
   leaveOnGround(state, gathered);
   const loot = goodsText(gathered);
   const hazard = hazardVictory(state, enemy.id, site?.id);

@@ -79,7 +79,7 @@ test('a fresh hunt leaves anatomy outside the bag until the player picks what to
   assert.equal(state.inventory.qi_core, undefined);
 });
 
-test('the renewable snow beast yields two foundation cores that sell for 21 each', () => {
+test('the renewable snow beast yields three foundation cores that sell for 21 each', () => {
   const state = createGame();
   // Start with earned equipment already fitted to isolate the snow fight and its population clock.
   state.realm = 3;
@@ -100,7 +100,7 @@ test('the renewable snow beast yields two foundation cores that sell for 21 each
   assert.equal(state.region, 'snow_pass');
   assert.equal(state.coins, openingCoins);
   assert.deepEqual(state.inventory, { ration: 14, sky_sword: 1, sky_cloak: 1, jade_pendant: 1 });
-  assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4, beast_eye: 1, foundation_core: 2 });
+  assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4, beast_eye: 1, foundation_core: 3 });
   play(state, 'take', { id: 'foundation_core' });
   play(state, 'take', { id: 'beast_eye' });
   assert.deepEqual(view(state).groundLoot, { beast_meat: 5, hide: 4 });
@@ -120,8 +120,8 @@ test('the renewable snow beast yields two foundation cores that sell for 21 each
   assert.equal(population(), 1);
   play(state, 'travel', { id: 'village' });
   deny(state, 'sell', { id: 'beast_eye' });
-  play(state, 'sell', { id: 'foundation_core', count: 2 });
-  assert.equal(state.coins, openingCoins + 42);
+  play(state, 'sell', { id: 'foundation_core', count: 3 });
+  assert.equal(state.coins, openingCoins + 63);
   assert.equal(state.inventory.foundation_core, undefined);
 });
 

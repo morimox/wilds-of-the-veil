@@ -2,13 +2,14 @@
 formula_qi,回气散丹方,回气散（qi_powder）,r_qi,丹师安蒲,10,,灵草（reed）×2、松木（wood）×1
 formula_grain,暖谷丸丹方,暖谷丸（grain_pill）,r_grain,丹师安蒲,12,,干粮（ration）×3、松木（wood）×1
 formula_detox,清露丸丹方,清露丸（detox_pill）,r_detox,给药僮一份灵草,,,灵草（reed）×2、松木（wood）×1
-formula_focus,定息丹方,定息丹（focus_pill）,r_focus,丹师安蒲,19,,灵草（reed）×2、松木（wood）×2
+formula_focus,定息丹方,定息丹（focus_pill）,r_focus,丹师安蒲,19,,灵草（reed）×2、松木（wood）×1、炼气期妖丹（qi_core）×1
 formula_heal,合络丹丹方,合络丹（heal_pill）,r_heal,把旧渡的印带回来,,,灵草（reed）×3、兽革（hide）×1
-formula_tide,济潮丹丹方,济潮丹（tide_pill）,r_tide,刻洪痕的石壁（flood_lines） · 从石缝里拽出布包,,,灵草（reed）×3、灵晶（core）×2
-formula_resin,温枝丸丹方,温枝丸（resin_pill）,r_resin_pill,丹师安蒲,28,窑匠火候牌（kiln_manual）,松木（wood）×3、灵草（reed）×3、炼气期妖丹（qi_core）×1
-formula_leaf,清脉饮丹方,清脉饮（leaf_pill）,r_leaf_pill,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,,,灵草（reed）×4、耐火泥（kiln_clay）×2、松木（wood）×2、炼气期妖丹（qi_core）×2
-formula_jade,照心露丹方,照心露（jade_pill）,r_jade_pill,浮光晶坡（cloud_scree） · 托住火盏拨开封泥,,,灵草（reed）×5、灵晶（core）×2、松木（wood）×2、筑基期妖丹（foundation_core）×1、妖目（beast_eye）×1
-formula_foundation,筑基丹方,筑基丹（foundation_pill）,r_foundation,把验药印交给安蒲,,,封炉药引（foundation_charge）×1、灵草（reed）×8、灵晶（core）×8、暗金（black_iron）×4
+formula_tide,济潮丹丹方,济潮丹（tide_pill）,r_tide,刻洪痕的石壁（flood_lines） · 从石缝里拽出布包,,,灵草（reed）×3、灵晶（core）×1、炼气期妖丹（qi_core）×2
+formula_resin,温枝丸丹方,温枝丸（resin_pill）,r_resin_pill,丹师安蒲,28,窑匠火候牌（kiln_manual）,松木（wood）×2、灵草（reed）×3、炼气期妖丹（qi_core）×2
+formula_leaf,清脉饮丹方,清脉饮（leaf_pill）,r_leaf_pill,垫高脚的药棚（mist_shelter） · 问泽医板上的凹槽怎么用,,,灵草（reed）×4、耐火泥（kiln_clay）×1、松木（wood）×2、炼气期妖丹（qi_core）×3
+formula_jade,照心露丹方,照心露（jade_pill）,r_jade_pill,浮光晶坡（cloud_scree） · 托住火盏拨开封泥,,,灵草（reed）×4、灵晶（core）×2、松木（wood）×1、筑基期妖丹（foundation_core）×2、妖目（beast_eye）×1
+formula_foundation,筑基丹方,筑基丹（foundation_pill）,r_foundation,把验药印交给安蒲,,,封炉药引（foundation_charge）×1、灵草（reed）×6、灵晶（core）×5、暗金（black_iron）×4、炼气期妖丹（qi_core）×24
 gate_scroll_formula,传送卷轴图纸,传送卷轴（gate_scroll）,r_gate_scroll,信架与钟枢（counter_bell_score） · 取出信架下的传送卷轴图纸,,,松木（wood）×1、灵草（reed）×1、灵晶（core）×1
-gold_formula,结丹散丹方,结丹散（gold_powder）,r_gold_powder,回水试槽（zhao_assay_tubs）,,,伏潮息泥（heart_silt）×1、井心水盐（stillwell_salt）×1、灵草（reed）×28、灵晶（core）×24、暗金（black_iron）×15、筑基期妖丹（foundation_core）×5
-formula_gold_salve,缓脉丹方,缓脉丹（gold_salve）,r_gold_salve,守尺观,,,灵草（reed）×7、兽革（hide）×3、灵晶（core）×4、筑基期妖丹（foundation_core）×1
+gold_formula,结丹散丹方,结丹散（gold_powder）,r_gold_powder,回水试槽（zhao_assay_tubs）,,,伏潮息泥（heart_silt）×1、井心水盐（stillwell_salt）×1、灵草（reed）×18、灵晶（core）×16、暗金（black_iron）×10、筑基期妖丹（foundation_core）×28
+formula_gold_salve,缓脉丹方,缓脉丹（gold_salve）,r_gold_salve,守尺观,,,灵草（reed）×6、兽革（hide）×2、灵晶（core）×3、筑基期妖丹（foundation_core）×2
+formula_return_breath,归元丹方,归元丹（return_breath_pill）,r_return_breath,丹师安蒲,38,留水底印（fault_receipt）,灵草（reed）×5、灵晶（core）×2、金丹期妖丹（gold_core）×1

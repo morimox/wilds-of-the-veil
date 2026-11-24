@@ -1719,8 +1719,8 @@ test('a prepared ford expedition opens each later region through field contacts,
     else if (state.qi >= 2) play(state, 'art', { id: 'reed_cleave' });
     else play(state, 'attack');
   }
-  assert.equal(view(state).groundLoot.foundation_core, 2, state.log.slice(-8).join('\n'));
-  play(state, 'take', { id: 'foundation_core', count: 2 });
+  assert.equal(view(state).groundLoot.foundation_core, 3, state.log.slice(-8).join('\n'));
+  play(state, 'take', { id: 'foundation_core', count: 3 });
   assert.ok(state.defeated.includes('snow_warden'));
 
   provision();
@@ -1749,14 +1749,14 @@ test('a prepared ford expedition opens each later region through field contacts,
   assert.equal(act(state, 'choose', { index: 2 }).ok, false);
   choose(state, 0);
   const ammo = state.inventory.cloud_arrow;
-  const cores = state.inventory.foundation_core;
+  const cores = state.inventory.foundation_core ?? 0;
   for (let turn = 0; turn < 12 && state.combat; turn++) {
     if (state.qi >= 7 && state.inventory.cloud_arrow) play(state, 'art', { id: 'sky_axis' });
     else play(state, 'attack');
   }
   assert.ok(state.inventory.cloud_arrow < ammo);
   assert.ok(state.defeated.includes('mirror_warden'), state.log.slice(-8).join('\n'));
-  assert.equal(state.inventory.foundation_core, cores);
+  assert.equal(state.inventory.foundation_core ?? 0, cores);
   assert.equal(view(state).groundLoot.foundation_core, 2);
   play(state, 'take', { id: 'foundation_core', count: 2 });
   assert.equal(state.inventory.foundation_core, cores + 2);

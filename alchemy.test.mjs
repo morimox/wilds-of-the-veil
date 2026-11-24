@@ -71,6 +71,35 @@ test('bringing a real herb to the apprentice introduces the alchemist and a boug
   assert.equal(state.inventory.qi_powder, data.recipes.find(({ id }) => id === 'r_qi').count);
 });
 
+test('the late recovery formula uses a gold core for each batch after the old agreement is known', () => {
+  const state = createGame(23);
+  state.realm = 6;
+  state.coins = 150;
+  state.inventory.ration = 6;
+  state.knownItems.push('clinic_note');
+  state.economy.buildings.furnace = 3;
+  state.economy.warehouse = { reed: 10, core: 4, foundation_core: 2 };
+  deny(state, 'alchemyBuyFormula', { id: 'formula_return_breath' });
+  state.knownItems.push('fault_receipt');
+  play(state, 'alchemyBuyFormula', { id: 'formula_return_breath' });
+  assert.match(act(state, 'econStart', { id: 'r_return_breath' }).message, /金丹期妖丹×1/);
+  state.economy.warehouse.gold_core = 1;
+  play(state, 'econStart', { id: 'r_return_breath' });
+  assert.ok(!state.economy.warehouse.gold_core);
+  assert.equal(state.economy.warehouse.foundation_core, 2);
+  const [batch] = state.economy.jobs;
+  while (state.day < batch.readyDay) {
+    if (state.satiety < 20) play(state, 'eat', { id: 'ration' });
+    play(state, 'wait');
+  }
+  play(state, 'econCollect', { id: batch.id });
+  assert.equal(state.inventory.return_breath_pill, 3);
+  state.qi = 0;
+  play(state, 'use', { id: 'return_breath_pill' });
+  assert.equal(state.qi, 32);
+  assert.equal(state.inventory.return_breath_pill, 2);
+});
+
 test('foundation payments reveal only the next earned site and the final charge can brew once', () => {
   const state = createGame(0);
   state.realm = 2;
@@ -116,9 +145,13 @@ test('foundation payments reveal only the next earned site and the final charge 
   play(state, 'econBuild', { id: 'furnace' });
   deny(state, 'econStart', { id: 'r_foundation' });
   play(state, 'econBuild', { id: 'furnace' });
+  assert.match(act(state, 'econStart', { id: 'r_foundation' }).message, /炼气期妖丹×24/);
+  assert.equal(state.inventory.foundation_charge, 1);
+  state.economy.warehouse.qi_core = 24;
   play(state, 'econStart', { id: 'r_foundation' });
   const furnace = () => view(state).economy.facilities.find(({ id }) => id === 'furnace');
   assert.ok(!state.inventory.foundation_charge);
+  assert.ok(!state.economy.warehouse.qi_core);
   deny(state, 'econStart', { id: 'r_foundation' });
   deny(state, 'breakthrough');
   while (!furnace().jobs[0].ready) play(state, 'wait');

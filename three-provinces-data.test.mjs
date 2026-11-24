@@ -2,7 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { data } from './data.mjs';
 import { createGame } from './engine.mjs';
+import { alchemyData } from './alchemy.mjs';
+import { economyData } from './economy.mjs';
 import { trainingData } from './training.mjs';
+import { localGoods } from './world.mjs';
 
 const byId = (rows) => new Map(rows.map((row) => [row.id, row]));
 const regions = byId(data.regions);
@@ -52,15 +55,18 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
     const { id, intents, tags, tier = 0, sparring } = enemy;
     assert.ok(intents.some(({ kind }) => kind === 'attack'), id);
     assert.ok(intents.some(({ kind }) => kind === 'heavy'), id);
-    const loot = Object.keys(enemy.loot ?? {});
+    const loot = new Set([...Object.keys(enemy.loot ?? {}), ...Object.keys(enemy.chanceLoot ?? {})]);
     if (sparring) {
       assert.ok(tags.includes('human'), id);
       const hosts = data.sites.filter((site) => site.creatures?.[id] || (site.id === data.tournament.site && officialOpponents.has(id)));
       assert.ok(hosts.length > 0 && hosts.every(({ protectedArena }) => protectedArena), id);
     }
-    if (tags.includes('human')) assert.equal(loot.length, 0, id);
+    if (tags.includes('human')) assert.equal(loot.size, 0, id);
     const core = tier < 3 ? 'qi_core' : tier < 6 ? 'foundation_core' : 'gold_core';
-    assert.ok(loot.every((key) => key === core || animalParts.has(key)), id);
+    assert.ok([...loot].every((key) => key === core || animalParts.has(key)), id);
+    for (const { count, chance } of Object.values(enemy.chanceLoot ?? {})) {
+      assert.ok(Number.isSafeInteger(count) && count > 0 && chance > 0 && chance < 1, id);
+    }
   }
   for (const site of data.sites) {
     assert.ok(regions.has(site.region), site.id);
@@ -71,9 +77,14 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
       for (const other of action.excludesChoices ?? []) {
         assert.ok(other !== index && choices[other] && site.once?.includes(other), `${site.id}:${index}:${other}`);
       }
-      for (const enemy of [action.enemy, ...[].concat(action.guardedBy ?? []), action.afterFight, action.ambush?.enemy].filter(Boolean)) {
+      if (action.encounter) {
+        assert.ok(action.encounter.length > 1 && action.encounter.length === new Set(action.encounter).size, site.id);
+        assert.ok(!action.enemy && !action.ambush && !action.loot, site.id);
+      }
+      for (const enemy of [action.enemy, ...[].concat(action.guardedBy ?? []), action.afterFight, action.ambush?.enemy,
+        ...(action.encounter ?? [])].filter(Boolean)) {
         assert.ok(enemies.has(enemy) && creatures[enemy], `${site.id}:${index}:${enemy}`);
-        assert.ok(choices.some((choice) => choice.enemy === enemy), `${site.id}:${index}:${enemy}`);
+        assert.ok(choices.some((choice) => choice.enemy === enemy || choice.encounter?.includes(enemy)), `${site.id}:${index}:${enemy}`);
       }
       if (action.ambush) assert.ok(action.ambush.chance > 0 && action.ambush.chance < 1, site.id);
       for (const id of Object.keys(action.need ?? {})) assert.ok(items.has(id), `${site.id}:${index}:${id}`);
@@ -106,6 +117,33 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
     assert.ok(sites.has(site), id);
     if (lead) assert.ok(items.has(lead.item), id);
     for (const key of Object.keys(reward ?? {})) assert.ok(items.has(key), `${id}:${key}`);
+  }
+});
+
+test('three grades of beast cores are obtained in the field and renewable in each province', () => {
+  const cores = ['qi_core', 'foundation_core', 'gold_core'];
+  const nonCombatLoot = [
+    data.starting.inventory, data.basket.unpack.loot,
+    ...data.events.flatMap(({ choices, experiment }) => [experiment?.reward, ...choices.map(({ loot }) => loot)]),
+    ...data.quests.map(({ reward }) => reward),
+    ...data.mechanisms.map(({ reward }) => reward),
+    ...data.tournament.prizes.map(({ reward }) => reward),
+    ...data.sects.flatMap(({ jobs, ranks }) => [...jobs, ...ranks].map(({ reward }) => reward)),
+    ...economyData.projects.map(({ loot }) => loot),
+    ...Object.values(economyData.merchantOrders).flatMap(({ reward, repeat }) => [reward, repeat?.reward]),
+    ...alchemyData.inquiry.map(({ reward }) => reward),
+    ...Object.values(data.regionDetails).flatMap(({ settlement }) => settlement ? [localGoods(settlement)] : []),
+  ];
+  for (const core of cores) {
+    assert.ok(!nonCombatLoot.some((loot) => loot?.[core]), core);
+    assert.ok(!data.market.stalls.some(({ offers }) => offers.some(({ id }) => id === core)), core);
+    assert.ok(!data.sites.some(({ stocks }) => Object.entries(stocks ?? {}).some(([id, pool]) => (pool.item ?? id) === core)), core);
+    assert.ok(!data.recipes.some(({ result }) => result === core), core);
+    for (const { id: province } of data.provinces) {
+      assert.ok(data.sites.some(({ region, creatures }) => provinceOf(region) === province &&
+        Object.entries(creatures ?? {}).some(([id, pool]) => pool.interval > 0 && pool.growth > 0 &&
+          (enemies.get(id).loot?.[core] || enemies.get(id).chanceLoot?.[core]))), `${province}:${core}`);
+    }
   }
 });
 

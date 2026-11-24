@@ -722,11 +722,31 @@ function remainingGuards(state, site, choice) {
   return choiceGuards(choice).reduce((count, id) => count + (site?.creatures?.[id] ? poolAt(state, site, 'creatures', id).count : 0), 0);
 }
 
+function worldRoll(state) {
+  state.encounterSeed = (Math.imul(1664525, state.encounterSeed) + 1013904223) >>> 0;
+  return state.encounterSeed / 0x100000000;
+}
+
+function encounterPools(state, site, encounter) {
+  return encounter.map((id) => [id, poolAt(state, site, 'creatures', id).count]);
+}
+
+function selectEncounter(state, site, encounter) {
+  const pools = encounterPools(state, site, encounter);
+  const total = pools.reduce((sum, [, count]) => sum + count, 0);
+  if (!total) return null;
+  let ticket = Math.floor(worldRoll(state) * total);
+  for (const [id, count] of pools) {
+    if (ticket < count) return id;
+    ticket -= count;
+  }
+  return null;
+}
+
 function rollHarvestAmbush(state, site, ambush) {
   if (!ambush || !records.enemies[ambush.enemy] || !(ambush.chance > 0) || !site?.creatures?.[ambush.enemy] ||
       poolAt(state, site, 'creatures', ambush.enemy).count === 0) return false;
-  state.encounterSeed = (Math.imul(1664525, state.encounterSeed) + 1013904223) >>> 0;
-  return state.encounterSeed / 0x100000000 < ambush.chance;
+  return worldRoll(state) < ambush.chance;
 }
 
 function ebbTimeLeft(state) {
@@ -772,6 +792,9 @@ function choiceBlocker(state, choice, site, index) {
       : '眼下没有可追的对手。';
     return { reason, depleted: true };
   }
+  if (choice.encounter && !encounterPools(state, site, choice.encounter).some(([, count]) => count > 0)) {
+    return { reason: '这里已经静下来了，找不到还能交手的对手。', depleted: true };
+  }
   const stocks = choiceStocks(site, choice, index);
   if (stocks.length && stocks.every(({ key }) => poolAt(state, site, 'stocks', key).count === 0)) {
     const renewable = stocks.some(({ pool }) => pool.interval > 0 && pool.growth > 0);
@@ -788,7 +811,7 @@ function choiceBlocker(state, choice, site, index) {
       (gearReserved(state, id) || Object.values(state.ground).some((pile) => pile[id])))) {
     return { reason: '同样的奖品已有一份。' };
   }
-  if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy)) return { reason: '腹中空空，先吃些东西。' };
+  if (state.satiety === 0 && ((choice.days ?? 0) > 0 || choice.enemy || choice.encounter)) return { reason: '腹中空空，先吃些东西。' };
   const coins = choice.coins ?? 0;
   const missing = missingItems(state, choice.need);
   if (Object.keys(missing).length) return { reason: `还缺${goodsText(missing)}。` };
@@ -900,7 +923,8 @@ function choose(state, { index, itemId, count }) {
   const gatheredRegion = state.region;
   const gatheredGoods = goodsText(gathered);
   leaveOnGround(state, gathered);
-  const enemy = ambush?.enemy ?? choice.enemy;
+  const enemy = ambush?.enemy ?? choice.enemy ??
+    (completedBatches > 0 && choice.encounter ? selectEncounter(state, site, choice.encounter) : null);
   const continuesHere = choice.stay || event.choices.some((next) => next.afterChoice === index);
   if (enemy && records.enemies[enemy]) {
     state.event = null;
@@ -995,6 +1019,11 @@ function finishCombat(state, enemy) {
   const worthy = first && !protectedBout && enemy.tier >= state.realm;
   if (worthy) state.practice[state.realm] = (state.practice[state.realm] ?? 0) + rules.worthyFightPractice;
   const gathered = protectedBout ? {} : { ...enemy.loot };
+  if (!protectedBout) {
+    for (const [id, { count, chance }] of Object.entries(enemy.chanceLoot ?? {})) {
+      if (worldRoll(state) < chance) gathered[id] = (gathered[id] ?? 0) + count;
+    }
+  }
   leaveOnGround(state, gathered);
   const loot = goodsText(gathered);
   const hazard = hazardVictory(state, enemy.id, site?.id);

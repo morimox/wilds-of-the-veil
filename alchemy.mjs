@@ -5,7 +5,7 @@ const town = {
   intro: '桌边晾着几张抄好的丹方。安蒲用湿布裹住药炉，等它凉下来。',
   greeting: '安蒲抽出压在秤底的图。「院里找面背风的墙，就能搭炉。先用小火，闻到焦味就停。」',
   knownGreeting: '「想炼哪种药，先找那一味的丹方。炉子也得经得住那个火候。」',
-  coreRemark: '安蒲指了指药案上分开的两只小罐。「妖丹按品级收。丹方用得到的可以留着，缺盘缠时拿到坊市也能换钱。」',
+  coreRemark: '安蒲指了指药案上分开的药罐。「不同妖丹不能混用。活着取回的先留些，运气破关、开炉和打兵器都用得上。剩下的拿去坊市能换钱。」',
 };
 
 const offers = [
@@ -17,6 +17,8 @@ const offers = [
     desc: '「这丹入口苦，你若接着用术法，打出去就更有劲。」' },
   { id: 'formula_resin', recipe: 'r_resin_pill', name: '温枝丸丹方', price: 28, reveal: 'kiln_manual',
     desc: '安蒲比了比你带回的火候牌。石谷人会把炉口盖住，让小火慢慢把药温透。到炼气中期才能服用。' },
+  { id: 'formula_return_breath', recipe: 'r_return_breath', name: '归元丹方', price: 38, reveal: 'fault_receipt',
+    desc: '安蒲用两只碗照旧约的画法分水。「一枚金丹妖丹能炼三颗。赶远路连打几阵，气跟不上时吃一颗。」' },
 ];
 
 const inquiry = [
@@ -48,8 +50,8 @@ const inquiry = [
     text: '验药印背面刻着熄火的时机，正好补上丹方缺的一段。安蒲得买一只没开裂的密封药盒，再用自己的炉试一遍，才能备好那份药引。',
     proof: 'foundation_warden_proof', defeated: 'foundation_warden', price: 86, days: 1.25,
     reward: { formula_foundation: 1, foundation_charge: 1 },
-    reply: '安蒲交给你补全的筑基丹方和一剂封炉药引。「只够炼一炉。等家里的炼丹炉升到二级，再开封下料。」',
-    progress: '筑基丹方已经补全。封炉药引只够用一次。',
+    reply: '安蒲交给你补全的筑基丹方和一剂封炉药引。「这味药引只够一炉。得备足炼气妖丹添在炉心，几轮炉火才稳得住。」',
+    progress: '筑基丹方已经补全。备齐炼气妖丹和辅料，和药引一起放进二级丹炉。',
   },
 ];
 

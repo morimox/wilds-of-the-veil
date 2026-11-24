@@ -54,7 +54,7 @@ test('the alchemist only gives directions for the current proof and follows the 
   state.knownItems.push('foundation_ledger', 'kiln_manual');
   state.alchemy.inquiryIndex = 3;
   state.economy.buildings.furnace = 2;
-  state.economy.warehouse = { reed: 8, core: 8, black_iron: 4 };
+  state.economy.warehouse = { reed: 8, core: 8, black_iron: 4, qi_core: 24 };
 
   assert.match(view(state).alchemy.progressText, /碎云雪关/);
   state.inventory.foundation_warden_proof = 1;

@@ -291,7 +291,7 @@ const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_c
   id, name: name(id),
   pools: worldPools.filter((pool) => pool.kind === '资源' && pool.object === id && pool.growth > 0)
     .map(({ site, label }) => label ? `${siteRef(site)} · ${label}` : siteRef(site)).join('、'),
-  enemySources: data.enemies.filter((enemy) => enemy.loot?.[id]).map((enemy) => enemy.name).join('、'),
+  enemySources: data.enemies.filter((enemy) => enemy.loot?.[id] || enemy.chanceLoot?.[id]).map((enemy) => enemy.name).join('、'),
   recipes: data.recipes.filter(({ need }) => need?.[id]).length,
   facilities: facilityLevels.filter(({ need }) => need?.[id]).length,
   projects: economyData.projects.filter(({ need }) => need?.[id]).length,
@@ -299,6 +299,41 @@ const stapleRows = ['wood', 'reed', 'hide', 'ore', 'core', 'black_iron', 'kiln_c
   breakthrough: data.realms.filter(({ need }) => need?.[id]).length,
   training: trainingData.flatMap(({ ranks }) => ranks).filter(({ need }) => need?.[id]).length,
 }));
+const huntedItems = ['qi_core', 'foundation_core', 'gold_core', 'beast_meat', 'beast_eye', 'hide'];
+const huntSources = worldPools.filter(({ kind }) => kind === '种群').flatMap((pool) => {
+  const enemy = data.enemies.find(({ id }) => id === pool.object);
+  const site = data.sites.find(({ id }) => id === pool.site);
+  const { choices } = data.events.find(({ id }) => id === site.id);
+  const approach = choices.filter(({ enemy: id, encounter }) => id === enemy.id || encounter?.includes(enemy.id))
+    .map(({ label }) => label).join('、');
+  return huntedItems.filter((id) => enemy.loot?.[id] || enemy.chanceLoot?.[id]).map((id) => {
+    const { count: bonus, chance } = enemy.chanceLoot?.[id] ?? {};
+    const fixed = enemy.loot?.[id] ?? 0;
+    return {
+      id, enemy: enemy.id, realm: realm(enemy.tier), place: site.region, site: site.id, approach, fixed, bonus, chance,
+      average: Number((fixed + (bonus ?? 0) * (chance ?? 0)).toFixed(3)),
+      start: pool.start, cap: pool.cap, interval: pool.interval, growth: pool.growth, curve: pool.curve,
+      access: [reveal(site.reveal), ...(site.afterChoices ?? []).map(describeChoice)].filter(Boolean).join('、'),
+    };
+  });
+});
+const mixedHunts = choices.filter(({ encounter }) => encounter).flatMap(({ event, label, encounter }) => {
+  const site = data.sites.find(({ id }) => id === event);
+  const initial = encounter.reduce((count, id) => count + site.creatures[id].start, 0);
+  return encounter.map((id) => ({
+    site: event, label, enemy: id, total: initial, initialChance: initial ? site.creatures[id].start / initial : 0, ...site.creatures[id],
+  }));
+});
+const formatChanceLoot = (entries) => Object.entries(entries).map(([id, { count, chance }]) =>
+  `${ref(id)}×${count}（${percent(chance)}）`).join('、');
+const huntCosts = [
+  ...data.realms.map(({ name, need }) => ({ type: '突破', name, need })),
+  ...data.recipes.map(({ result, need, count }) => ({ type: '配方', name: name(result), need, output: count ?? 1 })),
+  ...trainingData.flatMap(({ name, ranks }) => ranks.map(({ need }, index) => ({ type: '修习', name: `${name} 第${index + 1}阶`, need }))),
+  ...economyData.backpackExpansions.map(({ name, need }) => ({ type: '行囊', name, need })),
+  ...economyData.projects.map(({ name, need, loot }) => ({ type: '后院生产', name, need, output: resources(loot) })),
+].flatMap(({ type, name, need, output }) => huntedItems.filter((id) => need?.[id])
+  .map((id) => ({ id, type, name, count: need[id], output })));
 const alchemyFormulae = data.recipes.filter(({ formula }) => formula).map((recipe) => {
   const offer = alchemyData.offers.find(({ id }) => id === recipe.formula);
   const step = alchemyData.inquiry.find(({ reward }) => reward?.[recipe.formula]);
@@ -385,6 +420,19 @@ const tables = [
     ['recipes', '用到的配方数'], ['projects', '用到的后院项目数'], ['facilities', '用到的设施升级数'],
     ['exchanges', '野外交付选择数'], ['breakthrough', '直接用于突破的境数'], ['training', '用到的修习级数'],
   ]),
+  table('hunt-material-sources', '各地猎物材料和回补', huntSources, [
+    ['id', '材料', ref], ['place', '地区', ref], ['site', '小地点', siteRef], 'enemy', ['realm', '对手境界'],
+    ['fixed', '每胜保证的数量'], ['bonus', '概率额外数量'], ['chance', '额外掉率', percent], ['average', '每胜平均数量'],
+    ['start', '初始数'], ['cap', '最多'], ['interval', '基准回补间隔（游戏日）'],
+    ['growth', '一次回补数'], ['curve', '回补规律', curveText], ['access', '小地点的发现方式'], ['approach', '现场主动交手'],
+  ], { note: '三阶妖丹、妖目和生兽肉仅见于当场击败对应妖物，独斗和重复猎场在回补栏区分。兽革另有雪蜕类的现场库存，见常用原料表。每胜的物品仍须在脚边拾取。含隐地剧透。' }),
+  table('mixed-hunts', '混合猎场的初始种群', mixedHunts, [
+    ['site', '小地点', siteRef], 'label', 'enemy', ['total', '初始总数'], ['start', '本种初始数'],
+    ['initialChance', '首次遇见本种的概率', percent], ['cap', '本种上限'], ['interval', '基准回补（游戏日）'],
+  ], { omit: ['growth'], note: '每次从当前在场个体等权抽取。任一敌种当场的遇敌率为其当前数量除以各队总数。胜利才减少该只，撤退和败退保留群落。表中的两处据点不回补。' }),
+  table('hunt-material-costs', '猎获原料的实际消耗', huntCosts, [
+    ['id', '消耗原料', ref], ['type', '玩法'], 'name', ['count', '一次耗量'], ['output', '产量（如适用）'],
+  ], { note: '突破材料与制作破境丹的投入分别列出。炮制高阶丹药、做特殊箭和其他消耗品可按已有合批规则追加，每批都扣该栏原料。' }),
   table('market-offers', '坊市货单', marketOffers, [
     ['stallId', '摊位标识'], ['stallName', '摊位'], 'id', 'name', 'price',
     ['afterQuest', '实际到货所需的委托', ref], ['purchaseTier', '购入所需境界', realm],
@@ -527,6 +575,7 @@ const tables = [
     ['event', '事件标识'], ['eventName', '事件名称'], ['order', '选项序号'], 'label', 'days',
     ['coins', '灵钱变化'], ['hp', '气血变化'], ['qi', '真气变化'], ['insight', '首次选中所得修为'],
     'need', 'consume', 'hidden', 'loot', 'enemy', ['afterChoice', '先做同一地点的选项序号', (index) => index + 1],
+    ['encounter', '抽取的当地种群', (ids) => ids.map(ref).join('、')],
     ['afterFight', '现场选项需先击败', ref], ['perWin', '每次胜利才可再次领取'],
     ['guardedBy', '在场会挡住选择的对手', (ids) => [].concat(ids).map(ref).join('、')],
     ['excludesChoices', '与同一地点这些选项互斥', (indexes) => indexes.map((index) => index + 1).join('、')],
@@ -547,8 +596,9 @@ const tables = [
   ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
   table('enemies', '敌人', enemyRows, [
     'id', 'name', ['tier', '敌方境界'], tier, 'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
-    'def', ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'], ['loot', '实际身体掉落', resources], 'desc',
-  ], { omit: ['intents'], note: '每个普攻取基础攻击乘招式倍率后向上取整。重招另列于意图表。对手守着的草药、矿物、文书与奖品需要在现场另行取得。' }),
+    'def', ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'],
+    ['loot', '固定解取的身体掉落', resources], ['chanceLoot', '概率额外掉落', formatChanceLoot], 'desc',
+  ], { omit: ['intents'], note: '每个普攻取基础攻击乘招式倍率后向上取整。概率掉落独立掷骰，成功与固定掉落相加。守着的草药、矿物、文书与奖品需要在现场另行取得。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '动作序号'], 'name', 'kind', 'mult',
   ], { note: '每场交手从动作 1 开始，按序循环。攻势倍率修正基础攻击，防御意图倍率用于计算敌方防御。' }),
