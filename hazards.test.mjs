@@ -176,14 +176,14 @@ test('sheltered people do not build pressure while exposed errands still do', ()
     play(indoor, 'visit', { id: 'sand_cinder_kitchen' });
     play(indoor, 'leave');
   }
-  assert.equal(indoor.pressure, 0);
+  assert.equal(view(indoor).fogTier, 0);
   assert.equal(indoor.qi, view(indoor).maxQi);
   const outdoor = at('wind_slate');
   for (let i = 0; i < 4; i++) {
     play(outdoor, 'visit', { id: 'sand_wind_work' });
     play(outdoor, 'leave');
   }
-  assert.equal(outdoor.pressure, 4);
+  assert.equal(view(outdoor).fogTier, 3);
   assert.equal(outdoor.qi, view(outdoor).maxQi - 1);
 });
 

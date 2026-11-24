@@ -207,7 +207,7 @@ test('the full expedition clears both guard groups and collects its cargo proof 
   play(state, 'discard', { id: relaxed.id, count: 1 });
   play(state, 'take', { id: 'caravan_bell' });
   play(state, 'equip', { id: 'caravan_bell' });
-  assert.equal(view(state).fogTolerance, 5);
+  assert.equal(state.equipment.charm, 'caravan_bell');
   assert.equal(act(state, 'choose', { index: 2 }).ok, false);
   leave(state);
 

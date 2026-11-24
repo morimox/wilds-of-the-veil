@@ -50,7 +50,7 @@ export const lateContent = {
     { id: 'weir_knife', slot: 'weapon', weaponClass: 'sword', tier: 0, atk: 7, def: 1, perception: 2, durability: 53, repair: 15,
       entry: '走水路的散修常带的宽背刀，入门便能用。用来挡对手蓄力后的重击，能卸掉一部分力道。', trait: { kind: 'guard', intent: 'heavy', bonus: 2 } },
     { id: 'coil_pole', slot: 'weapon', weaponClass: 'staff', tier: 4, atk: 8, def: 2, perception: 6, qi: 4, durability: 62, repair: 22,
-      entry: '筑基中期可用的长杖。杖里的铁片能挡招、存真气。握着它走进雾里，能多探几处才开始消耗真气。',
+      entry: '筑基中期可用的长杖。杖里的铁片能挡招、存真气。在雾里握住它，雾压升得慢一些。',
       field: { fogTolerance: 2 } },
     { id: 'foil_sword', slot: 'weapon', weaponClass: 'sword', tier: 5, atk: 10, def: 1, perception: 5, qi: 3, durability: 66, repair: 25,
       entry: '筑基后期能用稳的细剑。对手摆出防守姿势时，剑尖反而更容易刺进护甲的缝里。', trait: { kind: 'pierce', intent: 'guard', bonus: 4 } },

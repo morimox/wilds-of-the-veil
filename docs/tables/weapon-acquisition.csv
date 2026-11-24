@@ -33,3 +33,4 @@ echo_knuckles,叩石指虎,制作,r_echo_knuckles,38,暗金（black_iron）×6�
 gully_king_blade,许涧的宽背刀,胜后另行领取,灰沟坡寨（bandit_slope_den） · 从背坡拖出货柜，清点许涧留下的东西,,,灰沟贼王许涧（bandit_den_leader）,,否,
 gold_iron_blade,厚背寒铁刀,制作,r_gold_iron_blade,73,寒铁（ore）×16、暗金（black_iron）×11、兽革（hide）×4、灵晶（core）×6、金丹期妖丹（gold_core）×5,,,是,
 gold_tide_staff,引潮杖,制作,r_gold_tide_staff,77,松木（wood）×10、寒铁（ore）×6、灵晶（core）×12、暗金（black_iron）×7、金丹期妖丹（gold_core）×5,,,是,
+gold_confluence_staff,合流杖,制作,r_gold_confluence_staff,96,松木（wood）×11、寒铁（ore）×8、灵晶（core）×15、暗金（black_iron）×10、金丹期妖丹（gold_core）×7,,,是,

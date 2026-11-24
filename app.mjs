@@ -220,14 +220,7 @@ function stats(s) {
   if (s.satiety === 0) warnings.push("空腹乏力");
   if (!meal && s.satiety < rules.rationSatiety) warnings.push("口粮已尽");
   if (s.toxin >= rules.toxinThreshold) warnings.push("丹毒发作");
-  const tolerance = s.fogTolerance ?? rules.pressureThreshold;
-  const danger = s.fogDrain > 0;
-  const marks = Array.from({ length: tolerance }, (_, i) =>
-    `<i class="${i < s.pressure ? "filled" : ""}"></i>`).join("");
-  const fog = s.pressure >= rules.pressureThreshold ? `<details class="pressure${danger ? " danger" : ""}">
-    <summary>${danger ? "雾压过重" : "雾压"} <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
-    <span>${danger ? `雾越浓，真气流失越快。当前每过四分之一日约耗 ${s.fogDrain} 点。` : "在雾中逗留会加重雾压。到住处歇脚能散雾。"} </span>
-  </details>` : "";
+  const fog = fogMeter(s);
   const medicineAllowed = !s.currentEnemy?.medicineRestricted;
   const canEat = medicineAllowed && s.mode !== "victory" && (s.mode !== "road" || onOpenRoad(s)) && meal && (s.satiety < s.maxSatiety || s.hp < s.maxHp);
   const canUseSalve = medicineAllowed && s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
@@ -237,11 +230,26 @@ function stats(s) {
     ${canUseSalve ? linkButton("敷伤药", "use", "salve", "quick-eat") : ""}
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
-    ${vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施法、冥想和部分武技会耗气。雾压越高，真气流失越快。回气散或歇息能补回来。", "qi")}
+    ${vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施法、冥想和部分武技会耗气。雾压到了第三格也会耗气。回气散或歇息能补回来。", "qi")}
     ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>用一点神识，能减轻这一回合的伤。对方若已经拿定了招，也能看清它。歇息或服补神识的药都能恢复。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
+function fogMeter(s) {
+  if (!s.fogTier) return "";
+  const color = s.fogTier === rules.fogNotches ? " severe" : s.fogTier >= rules.pressureThreshold ? " danger" : "";
+  const marks = Array.from({ length: rules.fogNotches }, (_, index) =>
+    `<i${index < s.fogTier ? ' class="filled"' : ''}></i>`).join("");
+  const explanation = !s.fogExposed ? "这里避雾，真气暂时不会被雾耗去。"
+    : s.fogTier === 5 ? "真气流失极快。回到落脚处能散雾。"
+    : s.fogTier === 4 ? "真气流失得更快。回到落脚处能散雾。"
+    : s.fogTier === 3 ? "真气开始流失。回到落脚处能散雾。"
+    : "露天待得越久，雾压越高。第三格开始耗真气。";
+  return `<details class="pressure${s.fogExposed ? color : ""}">
+    <summary aria-label="雾压 ${s.fogTier} 格，共 ${rules.fogNotches} 格">雾压 <span class="fog-marks" aria-hidden="true">${marks}</span></summary>
+    <span>${explanation}</span>
+  </details>`;
+}
 function distance(units) {
   return `${units * banditRules.distanceUnit} 里`;
 }
@@ -372,7 +380,7 @@ function journey(s) {
   const further = roads.slice(5);
   const isHome = inVillage(s);
   const originalHome = atLanding(s);
-  const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.pressure || (s.inventory.ration ?? 0) < rules.reliefRations ||
+  const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.fogTier || (s.inventory.ration ?? 0) < rules.reliefRations ||
     (s.spiritSense && s.spiritSense.current < s.spiritSense.max);
   return panel(s.region.name, `${siteList(s)}${hazardNotice(s.localHazard)}<div class="actions place-actions">
     ${nearby.map(road => routeAction(road, s.world.edges)).join("")}
@@ -582,8 +590,12 @@ function talismanSummary(row) {
   return [row.damage && "伤敌", row.guard && "少受伤", row.retreat && "撤退时好脱身"].filter(Boolean).join(" · ");
 }
 
-function artSummary(row) {
-  return [row.weaponBased === false ? "法攻" : "物攻", `耗 ${row.cost} 点真气`, row.pierce && "能穿甲", row.guard && "少受伤", row.break && "能截断重招与调息"].filter(Boolean).join(" · ");
+function artCostDescription(row, cost) {
+  return `${row.weaponBased === false ? "法攻" : "物攻"} · 耗 ${cost} 点真气${cost > row.cost ? "（含兵器引气）" : ""}`;
+}
+
+function artSummary(row, cost) {
+  return [artCostDescription(row, cost), row.pierce && "能穿甲", row.guard && "少受伤", row.break && "能截断重招与调息"].filter(Boolean).join(" · ");
 }
 
 function combatScreen(s) {
@@ -631,12 +643,13 @@ function combatScreen(s) {
   const spiritLabel = intent || s.combatRead === "enemy" ? "凝神护身" : "凝神看招";
   const observation = enemy.desc ? `<details class="field-note"${combatObservation === state.combat ? " open" : ""}><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
   const techniques = arts.map(row => {
-    const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < row.cost ? "真气不足" :
+    const cost = s.artQiCosts[row.id];
+    const reason = row.tier > s.realm.id ? `${tierName(row.tier)}可施展` : s.qi < cost ? "真气不足" :
       weapon?.needsAmmo && !weapon.isLoaded && row.weaponBased !== false ? "弹药已尽"
         : mainBlocked && row.weaponBased !== false ? "先取消蓄力"
           : weapon?.chargeRequired && !mainCharged && row.weaponBased !== false ? "兵器须先蓄力" : "";
     const action = intent?.kind === "heal" && row.break > 0 ? "施展 · 压住调息" : "施展";
-    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), `${row.weaponBased === false ? "法攻" : "物攻"} · 耗 ${row.cost} 点真气。 ${row.desc}`);
+    return card(row.name, "", "", linkButton(reason || action, "art", row.id, "", Boolean(reason)), `${artCostDescription(row, cost)}。 ${row.desc}`);
   });
   return panel(enemy.name, `
     ${intentLine}
@@ -1011,7 +1024,7 @@ function cultivation(s) {
   return training + (visibleArts.length ? panel("术诀", `<div class="card-grid">${visibleArts.map(row => {
     const known = s.knownArts.includes(row.id);
     return card(row.name, "", known ? tag("已习得") : "",
-      known ? "" : linkButton(s.coins < row.price ? "灵钱不足" : "习得", "learn", row.id, "", s.coins < row.price), publicText(`${artSummary(row)}。 ${row.desc}`));
+      known ? "" : linkButton(s.coins < row.price ? "灵钱不足" : "习得", "learn", row.id, "", s.coins < row.price), publicText(`${artSummary(row, s.artQiCosts[row.id])}。 ${row.desc}`));
   }).join("")}</div>`) : "");
 }
 
@@ -1025,7 +1038,7 @@ function workshop(s) {
     !smithMap && !recipes.length && "工匠在门边磨剪子，脚边卷着几块旧皮。",
   ].filter(Boolean).map(line => `<p class="intro">${escape(line)}</p>`).join("");
   const bankTalismanHint = s.inventory.eddy_note > 0 && recipes.some(row => row.id === "r_bank_talisman")
-    ? '<p class="intro workshop-hint">工匠沿着回汊图划了道弯。「照这道弯能画回汊符。挨逼时借它侧身，容易脱开些。」</p>' : "";
+    ? '<p class="intro workshop-hint">工匠沿着回汊图描出一道弯，把原图还给你。「照这一笔能画回汊符。挨逼时借它侧身，容易脱开些。」</p>' : "";
   const mapTrade = smithMap ? `<p class="intro">${escape(smithMap.desc)}</p>${smithMap.ready ? `<div class="actions">${linkButton("递一块寒铁", "handin", smithMap.id)}</div>` : ""}` : "";
   return panel("工坊", `${recipes.length ? '<div class="workshop-art" aria-hidden="true"></div>' : ""}
     ${remarks}${mapTrade}

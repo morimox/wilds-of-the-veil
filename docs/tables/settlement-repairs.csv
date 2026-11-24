@@ -64,6 +64,7 @@
 落灯村（village）,落灯村工坊,gold_spirit_pendant,静水护心佩,0,24,
 落灯村（village）,落灯村工坊,gold_iron_blade,厚背寒铁刀,0,27,寒铁（ore）×2、暗金（black_iron）×1
 落灯村（village）,落灯村工坊,gold_tide_staff,引潮杖,0,27,松木（wood）×2、灵晶（core）×1
+落灯村（village）,落灯村工坊,gold_confluence_staff,合流杖,0,32,松木（wood）×2、灵晶（core）×2、暗金（black_iron）×1
 照原城（zhao_city）,蒲霖的后炉,cudgel,枣木杖,2,5,松木（wood）×2
 照原城（zhao_city）,蒲霖的后炉,knife,割苇短刀,2,7,寒铁（ore）×1
 照原城（zhao_city）,蒲霖的后炉,split_axe,劈柴小钺,2,6,寒铁（ore）×2
@@ -129,6 +130,7 @@
 照原城（zhao_city）,蒲霖的后炉,gold_spirit_pendant,静水护心佩,2,26,
 照原城（zhao_city）,蒲霖的后炉,gold_iron_blade,厚背寒铁刀,2,29,寒铁（ore）×2、暗金（black_iron）×1
 照原城（zhao_city）,蒲霖的后炉,gold_tide_staff,引潮杖,2,29,松木（wood）×2、灵晶（core）×1
+照原城（zhao_city）,蒲霖的后炉,gold_confluence_staff,合流杖,2,34,松木（wood）×2、灵晶（core）×2、暗金（black_iron）×1
 叩石院（sand_bell_cloister）,梁弦的外院修具台,cudgel,枣木杖,3,6,松木（wood）×2
 叩石院（sand_bell_cloister）,梁弦的外院修具台,knife,割苇短刀,3,8,寒铁（ore）×1
 叩石院（sand_bell_cloister）,梁弦的外院修具台,split_axe,劈柴小钺,3,7,寒铁（ore）×2
@@ -194,3 +196,4 @@
 叩石院（sand_bell_cloister）,梁弦的外院修具台,gold_spirit_pendant,静水护心佩,3,27,
 叩石院（sand_bell_cloister）,梁弦的外院修具台,gold_iron_blade,厚背寒铁刀,3,30,寒铁（ore）×2、暗金（black_iron）×1
 叩石院（sand_bell_cloister）,梁弦的外院修具台,gold_tide_staff,引潮杖,3,30,松木（wood）×2、灵晶（core）×1
+叩石院（sand_bell_cloister）,梁弦的外院修具台,gold_confluence_staff,合流杖,3,35,松木（wood）×2、灵晶（core）×2、暗金（black_iron）×1

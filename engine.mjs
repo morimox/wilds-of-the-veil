@@ -31,13 +31,17 @@ export const rules = Object.freeze({
   restToxin: 15,
   reliefRations: 3,
   exploreDays: 0.25,
-  explorePressure: 1,
+  explorePressure: 0.8,
   firstRegionInsight: 1,
+  fogNotches: 5,
   pressureThreshold: 3,
   pressureQi: 1,
   fogPulseDays: 0.25,
-  fogDrainStep: 3,
-  fogDrainCurve: 100,
+  fogProtectionPerPoint: 0.2,
+  fogProtectionCap: 0.6,
+  fogMaxPressure: 7,
+  fogMaxDrain: 14,
+  fogRestPerDay: 4.8,
   deductionQiCost: 3,
   battleDays: 0.125,
   regulatedBoutCooldown: 0.5,
@@ -148,16 +152,11 @@ function manualFocus(state, weaponClass) {
   return manual?.specialty.includes(weaponClass) ? activeManualRank(state)?.focus : null;
 }
 
-function fogProtection(state) {
-  let protection;
-  for (const gear of activeGear(state)) {
-    if ((gear.field?.fogTolerance ?? 0) > (protection?.field.fogTolerance ?? 0)) protection = gear;
-  }
-  return protection;
-}
-
-function totalFogTolerance(state, protection) {
-  return rules.pressureThreshold + (protection?.field.fogTolerance ?? 0) + (activeManualRank(state)?.base.fogTolerance ?? 0);
+function fogBuildup(state) {
+  const gearProtection = Math.max(0, ...activeGear(state).map(({ field }) => field?.fogTolerance ?? 0));
+  const manualProtection = activeManualRank(state)?.base.fogTolerance ?? 0;
+  const reduction = Math.min(rules.fogProtectionCap, (gearProtection + manualProtection) * rules.fogProtectionPerPoint);
+  return rules.explorePressure * (1 - reduction);
 }
 
 function roadProtection(state, province) {
@@ -218,13 +217,17 @@ function advance(state, days, satietyRate = rules.satietyDrainPerDay, sheltered 
 
 function fogExposureActive(state) {
   const site = records.sites[state.event ?? state.combat?.siteId];
-  return !state.roadTrip && !site?.fogShelter && (!settlementOf(data, state.region)?.inn || site?.exposed);
+  return !state.roadTrip && !site?.fogShelter && (!settlementOf(data, state.region)?.inn || Boolean(site?.exposed));
 }
 
-function fogDrain(pressure, tolerance) {
-  const excess = pressure - tolerance;
-  const beyond = excess - 1;
-  return excess <= 0 ? 0 : rules.pressureQi + Math.floor(beyond / rules.fogDrainStep) + Math.floor(beyond ** 2 / rules.fogDrainCurve);
+function fogTier(pressure) {
+  return pressure > 0 ? clamp(Math.floor(pressure), 1, rules.fogNotches) : 0;
+}
+
+function fogDrain(pressure) {
+  const excess = pressure - rules.pressureThreshold;
+  if (excess < 0) return 0;
+  return Math.min(rules.fogMaxDrain, Math.floor(rules.pressureQi + excess + excess ** 2));
 }
 
 function accumulateFog(state, elapsed) {
@@ -232,14 +235,19 @@ function accumulateFog(state, elapsed) {
   const exposure = Math.round(((state.fogExposure ?? 0) + elapsed) * 1000) / 1000;
   const pulses = Math.floor(exposure / rules.fogPulseDays);
   state.fogExposure = exposure - pulses * rules.fogPulseDays;
-  const tolerance = totalFogTolerance(state, fogProtection(state));
+  if (!pulses) return;
+  const buildup = fogBuildup(state);
   const qiBefore = state.qi;
-  const pressureBefore = state.pressure;
-  state.pressure += pulses * rules.explorePressure;
-  for (let pressure = pressureBefore + rules.explorePressure; pressure <= state.pressure && state.qi > 0; pressure += rules.explorePressure) {
-    state.qi = Math.max(0, state.qi - fogDrain(pressure, tolerance));
+  for (let pulse = 0; pulse < pulses; pulse += 1) {
+    state.pressure = Math.min(rules.fogMaxPressure, Math.round((state.pressure + buildup) * 1000) / 1000);
+    state.qi = Math.max(0, state.qi - fogDrain(state.pressure));
   }
   if (qiBefore > state.qi) state.actionFogLoss = (state.actionFogLoss ?? 0) + qiBefore - state.qi;
+}
+
+function restOutOfFog(state, elapsed) {
+  state.pressure = Math.max(0, Math.round((state.pressure - elapsed * rules.fogRestPerDay) * 1000) / 1000);
+  state.fogExposure = 0;
 }
 function recordPractice(state) {
   const day = Math.floor(state.day);
@@ -862,6 +870,9 @@ export function view(state) {
   const nextRealm = services.includes('cultivate') ? records.realms[state.realm + 1] ?? null : null;
   const groundLoot = { ...groundAt(state) };
   const combatWeapon = weaponView(state);
+  const channel = records.gear[combatWeapon.id];
+  const visibleArts = data.arts.filter((art) => state.knownArts.includes(art.id) ||
+    (!art.prizeOnly && (!inSettlement || atHome(state)) && services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal)));
   const side = sideWeapon(state);
   const fist = fistWeapon(state);
   const fistTechnique = activeManualRank(state)?.fistCharge;
@@ -880,7 +891,7 @@ export function view(state) {
     knowsChoice(state, currentEvent.choices[index], currentSite));
   const { combatSeed, evadeSeed, enemyEvadeSeed, roadSeed, banditLootSeed, banditLossSeed, escapeSeed, combat, roadTrip,
     roadBandit, banditCrews, banditSpoils, resolvedBandits, banditLeads, itemSightings, itemNotes,
-    huntTracks, deductionDraftId, deductionHistory, ...visibleState } = state;
+    huntTracks, deductionDraftId, deductionHistory, pressure, fogExposure, actionFogLoss, ...visibleState } = state;
   return {
     ...visibleState,
     ...stats(state),
@@ -903,8 +914,8 @@ export function view(state) {
     batchMeals: (['field', 'village', 'event'].includes(mode) || (mode === 'road' && (!roadBandit || roadBandit.aftermath))) && !state.gathering
       ? Object.fromEntries(data.foods.map(({ id }) => [id, batchMealCount(state, id)]).filter(([, count]) => count > 1))
       : {},
-    fogTolerance: totalFogTolerance(state, fogProtection(state)),
-    fogDrain: fogExposureActive(state) ? fogDrain(state.pressure, totalFogTolerance(state, fogProtection(state))) : 0,
+    fogTier: fogTier(pressure),
+    fogExposed: fogExposureActive(state),
     mode,
     day: state.day,
     realmIndex: state.realm,
@@ -964,8 +975,8 @@ export function view(state) {
     intent: visibleAttack(intent),
     retreatRisk: intent && !inProtectedBout(state) ? { blocked: attackingIntent(intent) } : null,
     breathingQi: intent?.kind === 'guard' ? breathingQi(state) : 0,
-    discoveredArts: data.arts.filter((art) => state.knownArts.includes(art.id) ||
-      (!art.prizeOnly && (!inSettlement || atHome(state)) && services.includes('cultivate') && art.tier <= state.realm && isRevealed(state, art.reveal))).map(({ id }) => id),
+    discoveredArts: visibleArts.map(({ id }) => id),
+    artQiCosts: Object.fromEntries(visibleArts.map((art) => [art.id, artQiCost(art, channel)])),
     discoveredRecipes: knownRecipes.map(({ id }) => id),
     craftReasons: inSettlement ? Object.fromEntries(knownRecipes.map((recipe) => [recipe.id, craftBlocker(state, recipe)])) : {},
     discoveredQuests: discoveredQuests.map(({ id }) => id),
@@ -1025,13 +1036,7 @@ function encounter(state, id) {
     state.explored.push(state.region);
     state.insight += rules.firstRegionInsight;
   }
-  const protection = fogProtection(state);
-  const tolerance = totalFogTolerance(state, protection);
-  const shielded = fogExposureActive(state) && state.pressure > rules.pressureThreshold && state.pressure <= tolerance;
-  const fog = shielded ? protection && state.pressure <= rules.pressureThreshold + protection.field.fogTolerance
-      ? `${nameOf(protection.id)}微热，胸口逼来的雾气散了些。`
-      : '你收慢呼吸，胸口逼来的雾气散了些。' : '';
-  return say(state, `在${region.name}遇上${records.events[id].name}。${first ? `初探此地，见识+${rules.firstRegionInsight}。` : ''}${fog}`);
+  return say(state, `在${region.name}遇上${records.events[id].name}。${first ? `初探此地，见识+${rules.firstRegionInsight}。` : ''}`);
 }
 
 function startCombat(state, id, siteId, openingRange = false) {
@@ -1233,6 +1238,7 @@ function choose(state, { index, itemId, count }) {
   let toolMessage = '';
   const coins = choice.coins ?? 0;
   const healthBefore = state.hp;
+  const fogBefore = fogTier(state.pressure);
   for (let batch = 0; batch < batches; batch += 1) {
     if (remainingGuards(state, site, choice) > 0) {
       interrupted = true;
@@ -1255,7 +1261,8 @@ function choose(state, { index, itemId, count }) {
         gathered[id] = (gathered[id] ?? 0) + portion;
       }
     }
-    advance(state, choice.days, rules.satietyDrainPerDay, choice.fogShelter);
+    advance(state, choice.days, rules.satietyDrainPerDay, choice.fogRest || choice.fogShelter);
+    if (choice.fogRest) restOutOfFog(state, choice.days);
     if (choice.fieldTool) toolMessage += wear(state, 'offhand');
     state.hp += hpChange;
     state.qi += choice.qi ?? 0;
@@ -1305,8 +1312,9 @@ function choose(state, { index, itemId, count }) {
   const ambushText = ambush ? ambush.outcome ?? '你正在采集，有东西忽然扑了过来。' : null;
   const outcome = ambushText ?? choice.outcome;
   const protectedFromInjury = completedBatches > 0 && padding > 0 && `${nameOf(gatherArmor.id)}卸掉了一些力道。`;
+  const fogRelief = choice.fogRest && fogBefore > fogTier(state.pressure);
   const detail = [completedBatches > 0 && choice.outcome, interrupted && '看守又回来了，你收手退到外面。', gatheredGoods && `采得${gatheredGoods}，留在脚边。`,
-    toolMessage, protectedFromInjury, ambushText, loot && `获得${loot}。`,
+    toolMessage, protectedFromInjury, fogRelief && '雾压缓了下来。', ambushText, loot && `获得${loot}。`,
     insight > 0 && `见识+${insight}。`].filter(Boolean).join('');
   const result = say(state, detail || choice.label);
   return {
@@ -1795,13 +1803,17 @@ function retreat(state, bonus = 0, lead = '', guard = 0) {
   return { ...say(state, summary), damageDealt: 0, damageTaken: 0, retreated: true };
 }
 
+function artQiCost(art, weapon) {
+  return (art.cost ?? 0) + (art.weaponBased === false ? weapon?.spellQi ?? 0 : 0);
+}
+
 function cast(state, id) {
   const art = records.arts[id];
   if (!art || !state.knownArts.includes(id)) return refuse('你还没学会这门术。');
   if (art.tier > state.realm) return refuse('这门术需要更高境界。');
-  const cost = art.cost ?? 0;
-  if (state.qi < cost) return refuse('真气不足。');
   const { weapon, compatible, ammo } = weaponLoadout(state);
+  const cost = artQiCost(art, weapon);
+  if (state.qi < cost) return refuse('真气不足。');
   const weaponBased = art.weaponBased !== false;
   if (weaponBased && compatible.length && !ammo) return refuse('这门术要借兵器出手，先备上弹药。');
   const pending = state.combat.playerCharge;
@@ -2486,6 +2498,7 @@ const repairStockByWeapon = {
   gully_king_blade: { ore: 2, black_iron: 1 },
   gold_iron_blade: { ore: 2, black_iron: 1 },
   gold_tide_staff: { wood: 2, core: 1 },
+  gold_confluence_staff: { wood: 2, core: 2, black_iron: 1 },
 };
 
 export function weaponRepairNeed(id, remaining = 0) {

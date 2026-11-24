@@ -110,20 +110,30 @@ const forgedGear = [
   {
     item: { id: 'gold_tide_staff', name: '引潮杖', kind: 'gear', price: 0, sell: 53,
       desc: '杖头装着两块对合的灵晶。从侧面看，中间留了道细缝。' },
-    gear: { slot: 'weapon', weaponClass: 'staff', hands: 2, tier: 7, atk: 8, magicAtk: 4, def: 1, perception: 4, qi: 8,
+    gear: { slot: 'weapon', weaponClass: 'staff', hands: 2, tier: 7, atk: 8, magicAtk: 4, spellQi: 3, def: 1, perception: 4, qi: 8,
       durability: 66, repair: 27,
-      entry: '金丹中期可持的双手杖。杖头将放出的真气拢在一线，施展伤人的术法更有力。拿它直接打人时是普通杖击。' },
+      entry: '金丹中期可持的双手杖。杖头把真气拢成一线，借它施术更有力，也更费真气。抡起来照常打，不耗真气。' },
     recipe: { tier: 7, reveal: { item: 'phase_chart' }, cost: 77, days: 6,
       need: { wood: 10, ore: 6, core: 12, black_iron: 7, gold_core: 5 },
       desc: '两块灵晶照铜板上的滴水间距排开，中间的小缝给真气留路。' },
   },
+  {
+    item: { id: 'gold_confluence_staff', name: '合流杖', kind: 'gear', price: 0, sell: 69,
+      desc: '两道嵌进杖身的晶线从掌边向上，到了杖头汇成一路。' },
+    gear: { slot: 'weapon', weaponClass: 'staff', hands: 2, tier: 8, atk: 7, magicAtk: 7, spellQi: 6, perception: 2, qi: 5,
+      durability: 68, repair: 32,
+      entry: '金丹后期可使的双手杖。把两股真气在杖头并成一股，术法更重，也比引潮杖费气。平常挥杖不需运气。' },
+    recipe: { tier: 8, reveal: { item: 'fault_receipt' }, cost: 96, days: 7,
+      need: { wood: 11, ore: 8, core: 15, black_iron: 10, gold_core: 7 },
+      desc: '照湖底旧约记的水位试排晶线，把原来分开的两路真气往同一处引。两路须同时到杖头，才能合到一起。' },
+  },
 ];
 
 const goldArts = [
-  { id: 'gold_ember_point', name: '伏火指', tier: 6, cost: 11, power: 17, pierce: 4, guard: 0, break: 0,
+  { id: 'gold_ember_point', name: '伏火指', tier: 6, cost: 14, power: 17, pierce: 4, guard: 0, break: 0,
     price: 61, weaponBased: false, damageType: 'magic', reveal: { item: 'cold_kiln_record' },
     desc: '照冷炉册的熄火时机收住一口气，再从指尖送出。力道集中，适合打穿硬壳。' },
-  { id: 'gold_push_tide', name: '推潮掌', tier: 8, cost: 14, power: 24, pierce: 4, guard: 2, break: 0,
+  { id: 'gold_push_tide', name: '推潮掌', tier: 8, cost: 20, power: 24, pierce: 4, guard: 2, break: 0,
     price: 86, weaponBased: false, damageType: 'magic', reveal: { item: 'fault_receipt' },
     desc: '按湖底的分水法把气送入两掌，合掌时一并推出。出手很重，也要费不少真气。' },
 ];
@@ -158,7 +168,7 @@ export function tuneCombatData({ enemies, gear, items, recipes, arts }) {
 
   const doubleFlow = arts.find(({ id }) => id === 'core_spindle');
   if (doubleFlow) {
-    Object.assign(doubleFlow, { cost: 12, power: 16, pierce: 3, guard: 3, break: 6 });
+    Object.assign(doubleFlow, { cost: 15, power: 16, pierce: 3, guard: 3, break: 6 });
   }
   arts.push(...goldArts);
 }

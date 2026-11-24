@@ -1364,6 +1364,8 @@ test('separate mountain observations lead to learning a technique at the site in
   chooseAt(state, 'empty_oven', 1);
   assert.equal(state.inventory.echo_note, 1);
   assert.equal(state.knownArts.includes('earth_echo'), false);
+  const shelter = chooseAt(state, 'empty_oven', 0);
+  assert.match(shelter.message, /雾压缓了下来/);
   assert.equal(play(state, 'meditate', { item: 'echo_note' }).meditation, 'incomplete');
   assert.equal(state.inventory.echo_method, undefined);
   assert.equal(state.knownArts.includes('earth_echo'), false);
@@ -1454,11 +1456,15 @@ test('the old ford route and its optional hidden map remain playable with earned
   state.coins = Math.max(state.coins, 66);
   play(state, 'learn', { id: 'tide_part' });
   play(state, 'learn', { id: 'cross_weir' });
+  play(state, 'sell', { id: 'core', count: 2 });
+  play(state, 'buy', { id: 'qi_powder' });
   while (state.hp < view(state).maxHp || state.qi < view(state).maxQi) play(state, 'rest');
   travelFed('ford');
   assert.equal(siteIds(state).includes('tide_keeper'), false);
   workFed('lock_deck', 1);
   assert.ok(siteIds(state).includes('tide_keeper'));
+  for (let stop = 0; stop < 2; stop += 1) workFed('ford_relay', 1);
+  play(state, 'use', { id: 'qi_powder' });
   feed(state, 45);
   seek(state, 'tide_keeper');
   assert.equal(view(state).visibleChoices.some(({ index }) => index === 2), false);
@@ -1471,6 +1477,8 @@ test('the old ford route and its optional hidden map remain playable with earned
     const panel = view(state);
     if (panel.intent?.kind === 'guard' && panel.hp < panel.maxHp - 8 && state.inventory.salve) {
       play(state, 'use', { id: 'salve' });
+    } else if (panel.intent?.kind === 'guard' && panel.qi < 5 && state.inventory.qi_powder) {
+      play(state, 'use', { id: 'qi_powder' });
     } else if (panel.intent?.kind === 'heavy' && panel.qi >= 5) {
       play(state, 'art', { id: 'cross_weir' });
     } else if (panel.intent?.kind === 'heavy' && panel.currentEnemy.health > 0.25 && panel.qi >= techniqueCost) {
@@ -1653,7 +1661,7 @@ test('ranged weapon arts spend compatible ammo, empty bows stay equipped, and in
   state.realm = 2;
   state.hp = 47;
   state.qi = 22;
-  supplyFixture(state, { reed_bow: 1, reed_arrow: 1, iron_arrow: 1, black_bolt: 3 });
+  supplyFixture(state, { reed_bow: 1, reed_arrow: 1, iron_arrow: 1, black_bolt: 3, qi_powder: 1 });
   state.durability.reed_bow = data.gear.find(({ id }) => id === 'reed_bow').durability;
   state.knownArts.push('reed_cleave', 'mist_press');
   play(state, 'equip', { id: 'reed_bow' });
@@ -1675,7 +1683,8 @@ test('ranged weapon arts spend compatible ammo, empty bows stay equipped, and in
   assert.equal(view(state).currentEvent?.id, 'mud_track');
   assert.equal(state.inventory.reed_arrow, undefined);
 
-  chooseAt(state, 'mud_track', 2);
+  play(state, 'use', { id: 'qi_powder' });
+  choose(state, 2);
   assert.equal(view(state).combatWeapon.isLoaded, false);
   const bowWear = state.durability.reed_bow;
   const unloaded = structuredClone(state);
@@ -1801,6 +1810,7 @@ test('a prepared ford expedition opens each later region through field contacts,
   assert.ok(view(state).sites.some(({ id }) => id === 'mirror_gate'));
   visitAndChoose('old_observatory', 2);
   visitAndChoose('cloud_scree', 2);
+  visitAndChoose('old_observatory', 1);
   const deduction = 'align_axis';
   deduceFrom(state, deduction, 'vein_pattern');
   assert.equal(state.inventory.axis_tuning, undefined);

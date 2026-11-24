@@ -115,6 +115,7 @@ function meditateAndRecord(state, quest, clue) {
 function verifyOnSite(state, quest) {
   visit(state, quest.site);
   assert.equal(view(state).experiment, null);
+  if (state.qi < rules.deductionQiCost && state.inventory.qi_powder) play(state, 'use', { id: 'qi_powder' });
   meditateAndRecord(state, quest, quest.clues[0]);
   const { id, experiment } = quest;
   assert.equal(view(state).experiment.id, id);
@@ -232,6 +233,7 @@ test('a fresh journey uncovers the marsh stove and the ferryman by actions at ne
   const state = createQuietGame(154);
   const quest = quests.find(({ id }) => id === 'rainproof_fire');
   supply(state, { ration: 8 });
+  play(state, 'buy', { id: 'qi_powder' });
   walk(state, 'marsh');
   const [ferryman, soot] = quest.clues;
   const knowsSite = (id) => view(state).sites.some((site) => site.id === id);
@@ -257,7 +259,7 @@ test('the ferry and sand-road permits lead to discoveries at the reef and the sa
   state.region = 'ford';
   state.world.arrived = true;
   state.coins = 100;
-  supply(state, { wood: 16, ore: 2, hide: 3, ration: 30 });
+  supply(state, { wood: 16, ore: 2, hide: 3, ration: 30, qi_powder: 2 });
   assert.equal(view(state).world.points.some((point) => point.id === 'zhao_city'), false);
   visit(state, 'ford_packet_boat');
   play(state, 'choose', { index: 0 });

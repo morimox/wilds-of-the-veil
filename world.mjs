@@ -271,7 +271,7 @@ function quoteRoad(state, id, kit, edges, routes) {
 }
 
 function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) {
-  kit.advance(state, days, satietyRate);
+  kit.advance(state, days, satietyRate, true);
   state.region = id;
   state.world.arrived = true;
   if (clearEvent) state.event = null;

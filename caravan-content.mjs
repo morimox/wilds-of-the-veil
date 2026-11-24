@@ -14,7 +14,7 @@ export const caravanContent = {
   gear: [
     { id: 'caravan_bell', slot: 'charm', tier: 1, atk: 0, def: 0, hp: 0, qi: 1, retreat: 0.1,
       field: { fogTolerance: 2 }, durability: 34, repair: 6,
-      entry: '炼气中期便能佩用。沿雾路多走一段，真气才会受到雾压，交手时也较容易抽身。' },
+      entry: '炼气中期便能佩用。车铃轻响，能拖慢雾压积累，交手时也较容易抽身。' },
   ],
   sites: [
     { id: 'caravan_slate', region: 'ridge', name: '车牌棚', once: [0, 1, 2],
@@ -71,9 +71,9 @@ export const caravanContent = {
       { label: '把脚夫的蓝布条交给林嫂', hidden: true, need: { caravan_token: 1 }, consume: true, days: 0.125, stay: true,
         coins: 18, loot: { ration: 2, salve: 1 },
         outcome: '林嫂认出布签上的手印，立即让小伙带热汤去石屋。「人还在，比货要紧。这份脚钱你先收，不必替我们进栈。」' },
-      { label: '把账簿摊开给林嫂看', hidden: true, need: { caravan_lading: 1 }, consume: true, days: 0.25, stay: true,
+      { label: '把账簿交给林嫂', hidden: true, need: { caravan_lading: 1 }, consume: true, days: 0.25, stay: true,
         coins: 52, loot: { caravan_bell: 1 },
-        outcome: '林嫂照着账页核对车牌。原来有两车粮沿背崖卸在旧粮栈，翻车那批粮另藏在下坡的草窖里。她叫人分头运粮，把谢钱和领车用的旧铃交给你。下一船粮要从闭潮渡发。' },
+        outcome: '林嫂照着账页核对车牌。原来有两车粮沿背崖卸在旧粮栈，翻车那批粮另藏在下坡的草窖里。她收下账簿，叫人分头运粮，把谢钱和领车用的旧铃交给你。下一船粮要从闭潮渡发。' },
     ] },
     { id: 'caravan_wreck', name: '翻车弯', text: '车轮挂在外坡，辙里混着发软的谷粒。拦车的横绳平整地断成了两截。', choices: [
       { label: '赶开咬着缰绳的瘦獒', days: 0.125, enemy: 'caravan_mule_hound',

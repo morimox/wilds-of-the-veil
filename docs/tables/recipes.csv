@@ -75,3 +75,4 @@ r_gold_brow_guard,寒铁护额（gold_brow_guard）,1,7,金丹中期,54,寒铁�
 r_gold_spirit_pendant,静水护心佩（gold_spirit_pendant）,1,8,金丹后期,72,灵晶（core）×10、暗金（black_iron）×8、寒铁（ore）×5、金丹期妖丹（gold_core）×5,6,得知物品 湖底旧约（fault_receipt）,,,,锻炉（forge）,3,旧约记着先向哪边放水。护心佩照这个次序刻开水纹，让打来的气劲沿浅槽分散。
 r_gold_iron_blade,厚背寒铁刀（gold_iron_blade）,1,6,金丹初期,73,寒铁（ore）×16、暗金（black_iron）×11、兽革（hide）×4、灵晶（core）×6、金丹期妖丹（gold_core）×5,6,得知物品 冷炉验火册（cold_kiln_record）,,,,锻炉（forge）,3,照冷炉册的火候淬薄刃，刀背在炉外慢慢放凉。
 r_gold_tide_staff,引潮杖（gold_tide_staff）,1,7,金丹中期,77,松木（wood）×10、寒铁（ore）×6、灵晶（core）×12、暗金（black_iron）×7、金丹期妖丹（gold_core）×5,6,得知物品 铜板上的滴水图（phase_chart）,,,,锻炉（forge）,3,两块灵晶照铜板上的滴水间距排开，中间的小缝给真气留路。
+r_gold_confluence_staff,合流杖（gold_confluence_staff）,1,8,金丹后期,96,松木（wood）×11、寒铁（ore）×8、灵晶（core）×15、暗金（black_iron）×10、金丹期妖丹（gold_core）×7,7,得知物品 湖底旧约（fault_receipt）,,,,锻炉（forge）,3,照湖底旧约记的水位试排晶线，把原来分开的两路真气往同一处引。两路须同时到杖头，才能合到一起。

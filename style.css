@@ -80,11 +80,12 @@ h3 { font-size: 15px; }
 .pressure { color: var(--muted); }
 .pressure summary { cursor: pointer; }
 .pressure > span { color: var(--muted); display: block; padding-top: 4px; }
-.pressure.danger summary { color: var(--amber); }
+.pressure.danger { --fog-color: var(--amber); }
+.pressure.severe { --fog-color: var(--red); }
+.pressure summary { color: var(--fog-color, var(--muted)); }
 .fog-marks { display: inline-flex; gap: 3px; vertical-align: middle; }
 .fog-marks i { width: 7px; height: 7px; border-radius: 2px; border: 1px solid #657b6c; }
-.fog-marks i.filled { background: #8eae97; }
-.pressure.danger .fog-marks i { border-color: var(--amber); background: var(--amber); }
+.fog-marks i.filled { border-color: var(--fog-color, #8eae97); background: var(--fog-color, #8eae97); }
 main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line); padding-top: 13px; }
 .panel { min-width: 0; }
 .panel + .panel { border-top: 1px solid var(--line); margin-top: 3px; padding-top: 11px; }

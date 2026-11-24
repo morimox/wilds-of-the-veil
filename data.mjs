@@ -644,7 +644,7 @@ const events = [
     { label: '到背水坡猎白耳兔', days: 0.25, enemy: 'reed_hare', openingRange: true, outcome: '一对白耳从坡下的短苇里抬起。野兔沿着没有遮挡的斜坡猛蹬过来。' },
   ] },
   { id: 'old_fire', name: '背雨石渠', text: '半截石渠能挡雨。小石炉砌在背风处，炉边搁着一口陶锅，锅沿的缺口高过水线。', choices: [
-    { label: '添柴歇脚', desc: '石炉还通风，挨着背风一侧便能烤火。', need: { wood: 1 }, consume: true, days: 0.5, coins: 0, hp: 6, qi: 4, insight: 0, loot: {}, enemy: null, outcome: '火把石壁烘热，湿鞋上慢慢蒸出白气。' },
+    { label: '添柴歇脚', desc: '石炉还通风，挨着背风一侧便能烤火。', need: { wood: 1 }, consume: true, days: 0.5, fogRest: true, coins: 0, hp: 6, qi: 4, insight: 0, loot: {}, enemy: null, outcome: '火把石壁烘热，湿鞋上慢慢蒸出白气。' },
     { label: '捆些干柴', desc: '有人把松枝藏在渠边石板下，风吹不着。', days: 1, coins: 0, hp: 0, qi: 0, insight: 1, loot: { wood: 3 }, enemy: null, outcome: '压在石渠里的松枝还干着，折一下便响。' },
     { label: '掀开渠底的破瓦', desc: '灰里露着瓦沿，边上像有划痕。', days: 0, coins: 0, hp: 0, qi: 0, insight: 1, loot: { kiln_shard: 1 }, enemy: null, outcome: '瓦上的字是反着刻的。抹掉一层灰，才辨出「敲两下，停一停」。' },
     { label: '从冷炉边取下残纸', desc: '炉沿的砖缝夹着一点纸边。', days: 0.25, insight: 1, loot: { ember_fold: 1 }, outcome: '残纸还存着三道折痕。最里一层的松灰没散开，纸边却烧穿了。' },
@@ -698,7 +698,7 @@ const events = [
       outcome: '验矿人接住篮子，从篮底倒出自己留下的矿屑。他数好工钱，把带来的另一包干粮分给你。' },
   ] },
   { id: 'empty_oven', name: '歇炉的茶棚', text: '棚檐还能挡雨。石灶留着烧过的痕，旁边一块薄板挡着没淋湿的柴。', choices: [
-    { label: '在石灶里添柴，烤衣歇脚', need: { wood: 1 }, consume: true, days: 0.5, coins: 0, hp: 9, qi: 6, insight: 1, loot: {}, enemy: null, outcome: '湿衣蒸出了白气，烤过火才慢慢暖透。' },
+    { label: '在石灶里添柴，烤衣歇脚', need: { wood: 1 }, consume: true, days: 0.5, fogRest: true, coins: 0, hp: 9, qi: 6, insight: 1, loot: {}, enemy: null, outcome: '湿衣蒸出了白气，烤过火才慢慢暖透。' },
     { label: '掀开木板取些柴', days: 1, coins: 0, hp: 0, qi: 1, insight: 3, loot: { wood: 2, echo_note: 1 }, enemy: null, outcome: '木板反面画着个侧耳贴石的人，掌下还刻有几道难认的线。' },
   ] },
   { id: 'miner_echo', name: '有回声的矿道', text: '矿道深处有两条岔口。旁孔窄，风贴着岩壁往外钻。再高些还有道透光的石缝。', choices: [
@@ -748,7 +748,7 @@ const events = [
       outcome: '你从外侧的平石上伸筛去淘槽底，船绳那头的水声隔着整道石脊。' },
   ] },
   { id: 'boat_shade', name: '没篷的渡舟', revisit: true, text: '老船卡在闸边，船舷正好挡着风。旧船绳挂在外侧，绳圈上结了一层白盐。船头的灯架熏黑了一半。', choices: [
-    { label: '坐上船里的凳子歇脚', days: 1, coins: 0, hp: 13, qi: 8, insight: 1, loot: {}, enemy: null, outcome: '船舷挡住了风。你坐到水势变缓，手脚才不再发冷。' },
+    { label: '坐上船里的凳子歇脚', days: 1, fogRest: true, coins: 0, hp: 13, qi: 8, insight: 1, loot: {}, enemy: null, outcome: '船舷挡住了风。你坐到水势变缓，手脚才不再发冷。' },
     { label: '捞起船底的木柜', days: 1, coins: 15, hp: -4, qi: -2, insight: 2, loot: { core: 1 }, enemy: null, desc: '船沿下有两只木柜脚。门板被水压着，还没漂开。', outcome: '柜门里积着碎灵晶，摸到底还有几枚灵钱。', injury: '抬柜时水一顶，胳膊撞上了船底的一圈铁带。' },
     { label: '比一比铃上的绳子和旧船绳', desc: '两根绳子的结都朝同一边收紧，绳圈也磨在同一边。', hidden: true, need: { bell_clapper: 1 }, days: 0.5, coins: 0, hp: 0, qi: 0, insight: 1, loot: { backwash_mark: 1 }, enemy: null, outcome: '把两个绳圈并排挂起来，旧船绳就松开了一截。船身摆开半尺，露出一道朝上游的槽，槽口夹着块薄铜片。' },
   ], experiment: {
@@ -783,11 +783,11 @@ const events = [
   ] },
   { id: 'ford_relay', name: '旧闸外的驮棚', text: '窄铺道到头挂着油布。老船工在量棚柱，柱脚已经进了水。墙上钉着他以前从松场走过的路图。', choices: [
     { label: '给船工送来支柱和口粮', desc: '「我得在这里守到雨住。松场的路图你要有用，拿一张去。」', need: { wood: 4, ration: 3 }, consume: true, days: 0.5, coins: 0, hp: 0, qi: 0, insight: 2, loot: { pine_pass: 1 }, enemy: null, outcome: '老船工支稳棚柱，指着图上断桥后的几棵松树告诉你哪一边尚能过去。' },
-    { label: '坐在棚里等雨歇', days: 0.5, coins: 0, hp: 5, qi: 3, insight: 0, loot: {}, enemy: null, outcome: '风把雨推到驮棚另一面，你往里让了半步。' },
+    { label: '坐在棚里等雨歇', days: 0.5, fogRest: true, coins: 0, hp: 5, qi: 3, insight: 0, loot: {}, enemy: null, outcome: '风把雨推到驮棚另一面，你往里让了半步。' },
   ] },
   { id: 'upstream_lights', name: '朝上游的灯架', text: '成排旧灯都朝上游开口，灯座外淌着水，引火线却能从干处续进槽里。灯架背后正好避风。', choices: [
     { label: '用松枝点起槽里的火', need: { wood: 1 }, consume: true, days: 1, coins: 0, hp: 0, qi: 4, insight: 2, loot: {}, enemy: null, outcome: '火沿干槽传进灯腹，半寸旧灯芯缩了一下便亮了。迎着这点火光坐了一阵，水汽也从袖口散开。' },
-    { label: '在灯座背风处坐一阵', days: 1, coins: 0, hp: 14, qi: 7, insight: 1, loot: {}, enemy: null, outcome: '埠里少有潮声，连风也是绕开这里走的。' },
+    { label: '在灯座背风处坐一阵', days: 1, fogRest: true, coins: 0, hp: 14, qi: 7, insight: 1, loot: {}, enemy: null, outcome: '埠里少有潮声，连风也是绕开这里走的。' },
   ] },
   { id: 'sunken_mooring', name: '低水船桩', text: '船桩低得几乎碰水。一件湿蓑衣搭在桩边，桩顶是一盏有铜罩的旧灯。一截绳结贴水浮着，绳头牵进苇丛。', choices: [
     { label: '下埠拨开湿蓑衣', days: 1, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'wick_husk', outcome: '蓑衣下那只手一翻，灯芯升起一线火。' },
@@ -807,7 +807,7 @@ const events = [
   { id: 'timber_bridge', name: '缺板的驮桥', text: '赶车人用一块尖木塞在车轮底下，车停在断开的桥板前。他扶着车，手里是一张画着车轮印的旧图。石墩背后还算避风。', choices: [
     { label: '给赶车人松木补桥', desc: '赶车人用胳膊顶住车轮。「厚木补缺口，薄木带松脂的烤软了填缝。桥能走了，我就把窑车的路图给你。」',
       need: { wood: 5 }, consume: true, days: 1, insight: 3, loot: { kiln_tracks: 1, ration: 3 }, outcome: '赶车人指给你看松树根边的两道车轮印。桥补好了，沿着车轮印绕山便能进窑谷。' },
-    { label: '在石墩背后歇脚', days: 0.5, hp: 6, qi: 4, insight: 0, loot: {}, outcome: '石墩挡掉了山口横风，你把肩上的箩筐靠到石面。' },
+    { label: '在石墩背后歇脚', days: 0.5, fogRest: true, hp: 6, qi: 4, insight: 0, loot: {}, outcome: '石墩挡掉了山口横风，你把肩上的箩筐靠到石面。' },
   ] },
   { id: 'pine_hollow', name: '翻车的松沟', text: '旧窑车翻在树沟。车轴上绑着看不清的木签，车边踩出来的爪印很深。', choices: [
     { label: '靠近树沟里翻倒的窑车', days: 0.75, enemy: 'pitch_bear', outcome: '一只灰脊松熊从车后滚下来，先把车轴压进湿土。' },
@@ -829,7 +829,7 @@ const events = [
   ] },
   { id: 'abandoned_kiln', name: '冷下来的老窑', text: '窑门积着灰，固定石牌的铁圈有被撬过的痕迹。灰被风吹出几道波纹，墙边还靠着一段烧焦的木柄。', choices: [
     { label: '从铁圈下取出石牌', days: 0.5, insight: 3, loot: { kiln_manual: 1 }, outcome: '石牌刻着怎么掌火，还有落灯村丹师安蒲的印。铁圈一松，灰从缝里吹向窑后一道低门。那扇门通往烟道。' },
-    { label: '靠灰线后的平石歇脚', days: 0.5, hp: 6, qi: 5, insight: 0, loot: {}, outcome: '平石替你挡住了穿窑风，灰没有吹到衣领里。' },
+    { label: '靠灰线后的平石歇脚', days: 0.5, fogRest: true, hp: 6, qi: 5, insight: 0, loot: {}, outcome: '平石替你挡住了穿窑风，灰没有吹到衣领里。' },
     { label: '擦去木柄末端的焦灰', days: 0.25, insight: 2, loot: { resin_tamper: 1 }, outcome: '木柄裂开，露出灌松脂的小孔。尾端还刻着守炉人用来聚气的手势。' },
   ] },
   { id: 'kiln_carter', name: '药篓车棚', text: '赶车人扶着裂开的车板，脚边竖着空药篓。篓绳的结和村里的打法不一样，车底还压着一团旧布。', choices: [
@@ -865,7 +865,7 @@ const events = [
     { label: '踩干石绕到洞边的干岸', desc: '要绕过横根。站上干岸，能隔着一段浅水看见石缝的动静。', afterChoice: 1, days: 0.375,
       encounter: herbDenPack, openingRange: true,
       outcome: '你踩上干岸。对面的浅水猛地拱起，一道影子在石缝外露了头。' },
-    { label: '给板头的石灶添柴，缓一缓', desc: '在靠药棚的高地上生火，湿衣能烤干。灶眼下次还得等余火熄透。', days: 0.5, stay: true, fogShelter: true,
+    { label: '给板头的石灶添柴，缓一缓', desc: '在靠药棚的高地上生火，湿衣能烤干。灶眼下次还得等余火熄透。', days: 0.5, stay: true, fogRest: true,
       need: { wood: 1 }, consume: true, cooldown: 2.25, cooldownText: '旧灶底下还有闷火，得等它凉透。', hp: 10, qi: 8,
       outcome: '灶眼冒出一缕烟。你把湿袖烤暖，调匀气息，再听水洞里的响动。' },
     { label: '把歪斜的取水槽搭回原位', desc: '槽口搁在外面，里端却伸到洞里。得等那些石缝都静下来才能挪。', days: 0.25, stay: true,
@@ -913,7 +913,7 @@ const events = [
   { id: 'snow_fire', name: '护栈火棚', text: '棚外是过山的木栈道，边上的扶绳磨破了皮套。守栈人坐在火盆旁缝新套，拽两下线，就得揉一揉手腕。旁边的年轻人背着一捆新绳，正往雪盖住的矮墙后张望。', choices: [
     { label: '把兽革和灵草交给守栈人', desc: '「兽革缝个新套，灵草敷敷手。你若要上天衡石台，我教你怎么看岔路上的绳结。」',
       excludesChoices: [4], excludedReason: '守栈人已把看岔路的绳结教给你了。', need: { hide: 6, reed: 5 }, consume: true, days: 1, insight: 5, loot: { sky_cord: 1, ration: 4 }, outcome: '他在短绳上打了三个不同的结。「每遇一道岔路，挑绳结跟这个对得上的梁走。走过第三条，便是天衡石台。」' },
-    { label: '添干枝借火烘衣', need: { wood: 1 }, consume: true, days: 0.5, hp: 12, qi: 6, insight: 0, loot: {}, outcome: '你拨开灰，把干枝贴到火星上。火烧起来时，湿衣的下摆慢慢暖了。' },
+    { label: '添干枝借火烘衣', need: { wood: 1 }, consume: true, days: 0.5, fogRest: true, hp: 12, qi: 6, insight: 0, loot: {}, outcome: '你拨开灰，把干枝贴到火星上。火烧起来时，湿衣的下摆慢慢暖了。' },
     { label: '问他皮套怎么缝才挡雪', desc: '守栈人摊开缝到一半的皮套，两层粗布之间夹着一片兽皮。', days: 0.5, insight: 2, loot: { pass_seam: 1 }, outcome: '他让你摸里面的缝线。「线藏进来，外头下雪也浸不透。」说完递来一片缝好的样子。' },
     { label: '问背绳的人打算从哪上山', desc: '年轻人把新绳换到另一边肩头，朝雪下的矮墙看了两次。', days: 0.25, loot: { snow_escort_note: 1 },
       outcome: '「老栈最上边断了绳。我能爬上去换，墙后那架梯却给两窝兽占了。若有人先帮我探过去，第三根梁上见。累了就回棚烤火，还有三包多带的粮饼。」他把木梯和横梁圈在纸上。' },
@@ -953,7 +953,7 @@ const events = [
   ] },
   { id: 'old_observatory', name: '偏影观星梁', revisit: true, text: '三道刻圈沿石梁排开，雾散时它们的边缘完整地落在石上。梁后的小槽还压着一片工匠木账。', choices: [
     { label: '趁雾散拓下石梁里的刻圈', days: 1, insight: 5, loot: { meridian_etching: 1 }, outcome: '拓完抬头，最靠外的刻圈反光照到梁背。沿光走，尽头有扇反照远峰的镜门。' },
-    { label: '在石梁旁向阳的地方歇一会儿', days: 0.5, hp: 8, qi: 7, insight: 1, loot: {}, outcome: '你坐在石梁背风的一侧。石头晒得暖和，远处扶绳拍打木梁的响声也轻了。' },
+    { label: '在石梁旁向阳的地方歇一会儿', days: 0.5, fogRest: true, hp: 8, qi: 7, insight: 1, loot: {}, outcome: '你坐在石梁背风的一侧。石头晒得暖和，远处扶绳拍打木梁的响声也轻了。' },
     { label: '从梁后取那块木账片看看', days: 0.25, insight: 2, loot: { loom_tack: 1 }, outcome: '账片记的是披甲。工匠在每次收紧软丝的地方都压了一道线。' },
   ], experiment: {
     id: 'align_axis', desc: '石梁背后有个能转动的底座。旁边旧镜的镜脚上有个小凸头。外侧深孔的底下能摸到一道横挡，内侧浅孔的边缘已经磨亮。梁影正慢慢移过石面。',
@@ -1315,7 +1315,7 @@ for (const site of sites) {
   }
 }
 
-const realmQi = [30, 38, 50, 63, 77, 92, 108, 127, 150];
+const realmQi = [30, 38, 50, 63, 77, 92, 120, 146, 177];
 for (const realm of realms) {
   realm.qi = realmQi[realm.id];
   if (realm.id >= 6) {

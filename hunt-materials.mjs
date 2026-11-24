@@ -105,7 +105,7 @@ const events = [
       { label: '扶着倒下的石柱，绕上北墙石台', desc: '绕过去要多走一段。石台与巢口隔着一片空地，动静能看得清。', afterChoice: 1, days: 0.5,
         encounter: quarryPack, openingRange: true,
         outcome: '你侧身转上石台。对面巢口有石屑飞开，砂土中露出一道影子。' },
-      { label: '给外墙下的火盆添柴，歇一会儿', desc: '凹墙挡住风沙，矿工用旧砖围了半圈。火息后还要等灰凉下来。', days: 0.5, stay: true, fogShelter: true,
+      { label: '给外墙下的火盆添柴，歇一会儿', desc: '凹墙挡住风沙，矿工用旧砖围了半圈。火息后还要等灰凉下来。', days: 0.5, stay: true, fogRest: true,
         need: { wood: 1 }, consume: true, cooldown: 2.5, cooldownText: '火盆的砖还烫，得等炉灰冷下来。', hp: 12, qi: 8,
         outcome: '木枝在火盆里慢慢烧透。你在凹墙旁坐稳，把衣领里的砂抖干净，调匀几口气。' },
       { label: '帮看管石料的人撑起车道上的横梁', desc: '「梁底得塞两根松木。路那头原是冷炉院，可石场的兽就在道半腰，等没动静了再去。」', days: 0.75, stay: true,

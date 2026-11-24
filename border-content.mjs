@@ -9,7 +9,7 @@ const gear = [
   { id: 'border_watch_charm', slot: 'charm', tier: 3, atk: 0, def: 1, hp: 2, qi: 1, retreat: 0.12,
     durability: 45, repair: 12, trait: { kind: 'guard', intent: 'heavy', bonus: 2 },
     field: { fogTolerance: 1 },
-    entry: '鸣沙驿差压住宽袖用的铜扣，筑基后才能稳稳运气。抬臂挡重招或抽身后退时能少挨些打。遇上雾，铜扣发热，可以多走一段才开始耗真气。' },
+    entry: '鸣沙驿差压住宽袖用的铜扣，筑基后才能稳稳运气。抬臂挡重招或抽身后退时能少挨些打。遇雾时铜扣发热，雾压升得慢一些。' },
 ];
 
 const patrols = [

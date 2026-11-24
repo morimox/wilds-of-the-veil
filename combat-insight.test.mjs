@@ -406,7 +406,6 @@ test('both ordinary and charge-only weapons can be paired and selected in either
   const hammer = staged('ford_shale_crab', { realm: 4, items: ['anvil_hammer', 'side_hook', 'reed_hat', 'reed_boots', 'breath_belt'] });
   assert.equal(view(hammer).combatOffhand.name, '系绳短钩');
   assert.equal(view(hammer).combatWeapon.chargeRequired, true);
-  assert.equal(view(hammer).fogTolerance, rules.pressureThreshold + 1);
   const prepared = structuredClone(hammer);
   const quick = play(hammer, 'offhandAttack');
   assert.ok(quick.damageDealt > 0);
