@@ -20,6 +20,7 @@ black_crossbow,暗金机弩,制作,r_black_crossbow,30,暗金（black_iron）×6
 snow_halberd,断雪戟,制作,r_snow_halberd,28,暗金（black_iron）×6、松木（wood）×4、兽革（hide）×3,,,是,
 sky_sword,归衡剑,制作,r_sky_sword,42,暗金（black_iron）×7、灵晶（core）×6、兽革（hide）×3,,,是,
 sky_bow,鸣岳弓,制作,r_sky_bow,39,松木（wood）×8、灵晶（core）×6、兽革（hide）×6,,,是,
+weir_knife,迎岸横刀,定居点货架,照原城（zhao_city）,118,,,18,是,
 weir_knife,迎岸横刀,制作,r_weir_knife,36,寒铁（ore）×13、松木（wood）×6、兽革（hide）×4、灵晶（core）×2,,,是,
 coil_pole,回烟长杖,制作,r_coil_pole,52,寒铁（ore）×12、暗金（black_iron）×10、松木（wood）×10、灵晶（core）×5、筑基期妖丹（foundation_core）×1,,,是,
 foil_sword,霜缝剑,制作,r_foil_sword,74,寒铁（ore）×19、暗金（black_iron）×14、灵晶（core）×12、筑基期妖丹（foundation_core）×3,,,是,

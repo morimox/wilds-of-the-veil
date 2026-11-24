@@ -256,11 +256,20 @@ const facilityLevels = economyData.facilities.flatMap(({ id, name, start, desc, 
 const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', axe: '斧', bow: '弓', crossbow: '弩' };
 const offeredItems = new Set(marketOffers.map(({ id }) => id));
 const itemTradeRows = data.items.map((item) => ({ ...item, price: offeredItems.has(item.id) ? item.price : 0 }));
+const localOfferRows = data.regions.flatMap(({ id: region }) => {
+  const settlement = settlementOf(data, region);
+  if (!settlement) return [];
+  return Object.entries(localGoods(settlement)).map(([id, offer]) => ({ region, id, name: name(id), ...offer }));
+});
 const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMap(({ id }) => [
   ...(Object.values(data.starting.gear).includes(id) ? [{ id, method: '初始装备' }] : []),
   ...marketOffers.filter((offer) => offer.id === id).map((offer) => ({
     id, method: '坊市', source: offer.stallName, price: offer.price, interval: offer.interval, afterQuest: offer.afterQuest,
     repeatable: offer.cap === undefined || offer.growth > 0,
+  })),
+  ...localOfferRows.filter((offer) => offer.id === id).map((offer) => ({
+    id, method: '定居点货架', source: ref(offer.region), price: offer.price, interval: offer.interval,
+    repeatable: offer.interval > 0 && (offer.growth ?? 1) > 0,
   })),
   ...data.recipes.filter((recipe) => recipe.result === id).map((recipe) => ({
     id, method: '制作', source: recipe.id, price: recipe.cost, need: recipe.need, repeatable: true,
@@ -317,8 +326,6 @@ const regionRows = data.regions.map((region) => {
 const towns = regionRows.filter(({ town }) => town);
 const marketProbe = createGame(15);
 marketProbe.inventory = Object.fromEntries(data.items.map(({ id }) => [id, 1]));
-const localOfferRows = towns.flatMap(({ id: region }) => Object.entries(localGoods(settlementOf(data, region)))
-  .map(([id, offer]) => ({ region, id, name: name(id), ...offer })));
 const localSaleRows = towns.flatMap(({ id: region }) => {
   marketProbe.region = region;
   return view(marketProbe).localMarket.buys.map(({ id, price }) => ({ region, id, name: name(id), price }));
