@@ -77,19 +77,22 @@ test('a new character can hunt bare-handed with their walking stick still equipp
     assert.equal(view(state).combatFist.chargeAvailable, false);
     deny(state, 'fistCharge');
     const startingDay = state.day;
-    for (let turn = 0; turn < 8 && state.combat; turn++) {
+    let turns = 0;
+    while (turns < 8 && state.combat) {
       play(state, view(state).intent?.kind === 'heavy' ? 'guard' : action);
+      turns += 1;
     }
     assert.ok(state.defeated.includes('reed_fox'));
     assert.equal(state.equipment.weapon, 'cudgel');
-    return { hp: state.hp, days: state.day - startingDay, wear: gear.cudgel.durability - state.durability.cudgel };
+    assert.equal(state.day, startingDay);
+    return { hp: state.hp, turns, wear: gear.cudgel.durability - state.durability.cudgel };
   };
   const bare = hunt('fistAttack');
   const armed = hunt('attack');
   assert.equal(bare.wear, 0);
   assert.ok(armed.wear > 0);
   assert.ok(bare.hp > 0 && bare.hp <= armed.hp);
-  assert.ok(bare.days > armed.days);
+  assert.ok(bare.turns > armed.turns);
 });
 
 test('the ferryman introduces a single real book and a full bag leaves it available for collection', () => {

@@ -67,6 +67,7 @@ test('three provinces expose only situationally known points and roads with exac
 
   walk(state, 'flood_market');
   walk(state, 'glass_bank');
+  walk(state, 'beacon_reefs');
   walk(state, 'rope_sands');
   walk(state, 'zhao_pass');
   deniedWithoutChanges(state, 'travel', { id: 'mingsha_city' }, /找.*路/);
@@ -118,10 +119,15 @@ test('a known distant destination shows its intermediate roads and cannot skip a
   assert.equal(view(state).world.journeys.some(({ id }) => id === 'sky_terrace'), false);
   deniedWithoutChanges(state, 'travel', { id: 'sky_terrace' }, /接不上|接上/);
   state.discovered.push('ridge', 'black_mine', 'snow_pass');
+  state.satiety = 32;
   const journey = view(state).world.journeys.find(({ id }) => id === 'sky_terrace');
   assert.deepEqual(journey.path, ['village', 'marsh', 'ridge', 'black_mine', 'snow_pass', 'sky_terrace']);
   assert.deepEqual(journey.via, ['白苇滩', '沉钟岭', '玄砂矿脉', '碎云雪关']);
-  assert.ok(journey.days > data.regions.find(({ id }) => id === 'sky_terrace').travel);
+  const paths = roadGraph(data);
+  const totalDays = journey.path.slice(1).reduce((sum, id, index) => {
+    return sum + paths.find(({ key }) => key === [journey.path[index], id].sort().join('|')).days;
+  }, 0);
+  assert.equal(journey.days, totalDays);
   assert.equal(view(state).world.roads.some(({ id }) => id === 'sky_terrace'), false);
   assert.ok(journey.meals.ration > 0);
   const beforeMeals = state.inventory.ration;
@@ -139,21 +145,23 @@ test('marking a known edge red detours along the remaining shortest road and pre
   const state = createGame();
   const edge = (id) => view(state).world.edges.find(({ key }) => key === id);
   const journey = (id) => view(state).world.journeys.find((road) => road.id === id);
-  deniedWithoutChanges(state, 'roadAvoid', { id: 'pale_shoal|reed_meadows' }, /还没有/);
+  deniedWithoutChanges(state, 'roadAvoid', { id: 'gauge_tower|pale_shoal' }, /还没有/);
   assert.equal(edge('marsh|village').canAvoid, false);
   deniedWithoutChanges(state, 'roadAvoid', { id: 'marsh|village' }, /断开/);
+  walk(state, 'marsh');
+  walk(state, 'reed_meadows');
   walk(state, 'marsh');
   assert.deepEqual(journey('pale_shoal').path, ['marsh', 'pale_shoal']);
   const day = state.day;
   assert.equal(edge('marsh|pale_shoal').canAvoid, true);
   play(state, 'roadAvoid', { id: 'marsh|pale_shoal' });
   assert.equal(edge('marsh|pale_shoal').avoided, true);
-  assert.deepEqual(journey('pale_shoal').path, ['marsh', 'reed_meadows', 'pale_shoal']);
+  assert.deepEqual(journey('pale_shoal').path, ['marsh', 'reed_meadows', 'gauge_tower', 'pale_shoal']);
   play(state, 'roadAvoid', { id: 'marsh|reed_meadows' });
   assert.equal(state.day, day);
   const detour = journey('pale_shoal');
-  assert.deepEqual(detour.path, ['marsh', 'village', 'reed_meadows', 'pale_shoal']);
-  deniedWithoutChanges(state, 'roadAvoid', { id: 'pale_shoal|reed_meadows' }, /断开/);
+  assert.deepEqual(detour.path, ['marsh', 'village', 'reed_meadows', 'gauge_tower', 'pale_shoal']);
+  deniedWithoutChanges(state, 'roadAvoid', { id: 'gauge_tower|pale_shoal' }, /断开/);
   walk(state, 'pale_shoal');
   assert.equal(state.day - day, detour.days);
   play(state, 'roadAvoid', { id: 'marsh|pale_shoal' });
@@ -185,6 +193,7 @@ test('secondary crossings follow the same permits and draw stubs without reveali
   assert.ok(points().includes('flood_market'));
   walk(state, 'flood_market');
   walk(state, 'glass_bank');
+  walk(state, 'beacon_reefs');
   walk(state, 'rope_sands');
   walk(state, 'zhao_pass');
   assert.ok(points().includes('rope_sands'));
@@ -207,6 +216,7 @@ test('the shorter border edges stay safe and active while a secondary crossing c
     const state = createGame();
     state.knownItems.push('ferry_manifest', 'sand_writ');
     state.discovered.push(from, to, ...alternate.split('|'));
+    if (from === 'ford') state.discovered.push('lantern_court', 'fish_ladder');
     state.region = from;
     state.inventory.ration = 20;
     const short = roadGraph(data).find(({ key }) => key === main);

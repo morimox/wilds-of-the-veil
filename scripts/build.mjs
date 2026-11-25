@@ -132,9 +132,9 @@ ${moduleBody(data)}
 return { default: data, ...data };
 })();
 const { data } = (() => ({ data: moduleData.default }))();
-const { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath, removedAtlasRoads } = (() => {
+const { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath } = (() => {
 ${moduleBody(geography)}
-return { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath, removedAtlasRoads };
+return { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath };
 })();
 const { alwaysKnownRegion, learnAdjacentRegions, settlementOf, initialWorld, worldView, worldAction, travelRoad, rescueSettlement, continueRoad, backFromRoad, roadTripView, localGoods } = (() => {
 ${moduleBody(world)}

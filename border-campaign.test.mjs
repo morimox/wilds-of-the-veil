@@ -147,7 +147,7 @@ test('a normal outfitted traveler clears ten opponents with distinct tactics, ma
   assert.equal(view(state).quests.some(({ id }) => id === 'border_close_account'), false);
 
   // Start with the middle patrol. The rewards are for work and are left unclaimed until payment.
-  shift(state, ['silk_tent_road'], 'border_cart_patrol');
+  shift(state, ['sand_bell_cloister', 'silk_tent_road'], 'border_cart_patrol');
   assert.equal(available(state, 1), false);
   const coinsBefore = state.coins;
   fight(state, 0, 'border_axle_poleman', ledger);

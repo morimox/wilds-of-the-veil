@@ -167,6 +167,18 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
   pointer-events: none;
 }
 .item-description, .item-tip { white-space: pre-wrap; }
+.item-tip-flavor { display: block; }
+.item-tip-values {
+  display: grid;
+  gap: 3px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #526b59;
+  white-space: normal;
+}
+.item-tip-stat { display: flex; justify-content: space-between; align-items: baseline; gap: 9px; }
+.item-tip-stat > b { color: var(--jade); font-variant-numeric: tabular-nums; text-align: right; }
+.book-entry .item-tip-values { margin-bottom: 7px; }
 .item-status { flex-basis: 100%; }
 .entry-anchor, .action-hint { position: relative; display: inline-block; max-width: 100%; }
 .action-hint > .item-tip { position: absolute; z-index: 3; top: 100%; left: 50%; width: min(190px, 50vw); transform: translateX(-50%); }
@@ -293,7 +305,8 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .atlas-scroll { overflow: auto; border-radius: 7px; }
 .atlas-map { min-width: 680px; }
 .atlas-road { cursor: pointer; }
-.atlas-road-ink, .atlas-road-hit { fill: none; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.atlas-road:focus { outline: none; }
+.atlas-road-ink, .atlas-road-hit { fill: none; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
 .atlas-road-ink { stroke: #c6c9a9; stroke-width: 1.45; pointer-events: none; }
 .atlas-road-hit { stroke: transparent; stroke-width: 12; pointer-events: stroke; }
 .atlas-road.water .atlas-road-ink { stroke: #a8d4dc; stroke-dasharray: 5 4; }
@@ -302,7 +315,9 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .atlas-road.closed .atlas-road-ink { opacity: .55; stroke-dasharray: 2 4; }
 .atlas-road.chosen .atlas-road-ink { stroke: #ffe0a2; stroke-width: 3; }
 .atlas-road.avoided .atlas-road-ink { stroke: #ff8e7e; stroke-width: 2.5; stroke-dasharray: 4 3; }
-.atlas-road:hover .atlas-road-ink, .atlas-road:focus-visible .atlas-road-ink, .atlas-road[aria-pressed="true"] .atlas-road-ink { stroke-width: 4; }
+.atlas-road:hover .atlas-road-ink { stroke-width: 2.4; }
+.atlas-road:focus-visible .atlas-road-ink, .atlas-road[aria-pressed="true"] .atlas-road-ink { stroke-width: 3.2; }
+.atlas-road:focus-visible:not(.avoided) .atlas-road-ink, .atlas-road[aria-pressed="true"]:not(.avoided) .atlas-road-ink { stroke: #fff1bb; }
 .atlas-border-arrow, .atlas-cross-label {
   position: absolute; z-index: 1; left: var(--x); top: var(--y);
   pointer-events: none;

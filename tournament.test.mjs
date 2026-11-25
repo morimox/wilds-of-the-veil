@@ -231,18 +231,20 @@ test('enemy medicine is withheld by strict referee rules even when an opponent c
   }
 });
 
-test('the real cave swordsman has no official referee protection on defeat', () => {
+test('the cave swordsman honors the promised trial without official tournament rules', () => {
   const state = createGame(33);
   state.region = 'glass_rotunda';
   state.world.lastSettlement = 'mingsha_city';
   state.hp = 1;
   const purse = state.coins;
   play(state, 'visit', { id: 'sand_glass_chamber' });
+  assert.match(view(state).visibleChoices[0].desc, /我就收刀/);
   play(state, 'choose', { index: 0 });
-  assert.equal(view(state).currentEnemy.sparring, false);
+  assert.equal(view(state).currentEnemy.sparring, true);
+  assert.equal(view(state).currentEnemy.medicineRestricted, false);
   play(state, 'attack');
-  assert.equal(state.region, 'mingsha_city');
-  assert.equal(state.wounds, 1);
-  assert.ok(state.coins < purse);
+  assert.equal(state.region, 'glass_rotunda');
+  assert.equal(state.wounds, 0);
+  assert.equal(state.coins, purse);
   assert.equal(state.siteVictories.sand_glass_chamber, undefined);
 });

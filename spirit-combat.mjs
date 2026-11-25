@@ -1,11 +1,11 @@
 import data from './data.mjs';
 
 export const spiritSkills = [
-  { id: 'fold_armor', name: '折甲', cost: 2, duration: 3, cooldown: 6, stat: 'physicalResist',
+  { id: 'fold_armor', name: '折甲', cost: 2, duration: 3, cooldown: 6, strength: 0.5, stat: 'physicalResist',
     region: 'zhao_city', teacher: '杜椿', defeated: 'fault_warden',
     desc: '物抗减半，架招失去卸力效果。对手还可以闪避。',
     lesson: '杜椿把分柱水君拦下来的那一股水引入浅盘，拨开两截交错的竹片。甲再厚，架不住两边的力同时抽开。' },
-  { id: 'split_stream', name: '并流', cost: 3, duration: 2, cooldown: 7,
+  { id: 'split_stream', name: '并流', cost: 3, duration: 2, cooldown: 7, strength: 3,
     region: 'glass_rotunda', teacher: '邢既横', defeated: 'sand_sundial_master',
     desc: '下一回合打中的一击造成三倍伤害。可以趁发动时蓄势。',
     lesson: '邢既横把铜轮转了一圈，支住一重一轻两股回力，让你等它们碰到一处再出手。' },
@@ -13,11 +13,11 @@ export const spiritSkills = [
     region: 'measuring_hall', teacher: '傅澄', price: 180,
     desc: '这回合对手若发动攻击，来招折回对手身上。',
     lesson: '傅澄把尺横在你腕下。你连着三次往下压，第三次刚发力，尺身已经转了半圈。' },
-  { id: 'veil_eye', name: '遮眼', cost: 1, duration: 3, cooldown: 5, stat: 'perception',
+  { id: 'veil_eye', name: '遮眼', cost: 1, duration: 3, cooldown: 5, strength: 0.5, stat: 'perception',
     region: 'mingsha_city', teacher: '阮杪', proof: 'cold_kiln_record', price: 90,
     desc: '对手洞察减半。这个回合已经看破的动作照常，往后两回合更容易瞒住起手。',
     lesson: '阮杪把冷炉验火册翻到画着水汽的一页。他教你让动作起在雾纹外，把要落的地方留在雾纹里。' },
-  { id: 'press_edge', name: '压锋', cost: 2, duration: 2, cooldown: 5, stat: 'attack',
+  { id: 'press_edge', name: '压锋', cost: 2, duration: 2, cooldown: 5, strength: 0.6, stat: 'attack',
     region: 'mingsha_city', teacher: '阮杪', defeated: 'sand_inverted_keeper',
     desc: '对手两回合内的出手力道削去四成。',
     lesson: '阮杪听完倒驿锁影的事，在一截铁链上另挂了只齐重的秤砣。你照他的指点重新拽了一下，链子尚未回紧，力先泄了。' },
@@ -25,7 +25,7 @@ export const spiritSkills = [
 
 const spirits = new Map(spiritSkills.map((skill) => [skill.id, skill]));
 const firstTier = 6;
-const reserves = new Set(data.gear.filter((gear) => gear.tier >= firstTier && gear.spiritReserve).map(({ id }) => id));
+const reserves = new Map(data.gear.filter((gear) => gear.tier >= firstTier && gear.spiritReserve).map(({ id, tier }) => [id, tier]));
 const statNames = { physicalResist: '物抗', perception: '洞察', attack: '攻击' };
 const enemyPractices = {
   fault_warden: 'fold_armor',
@@ -33,10 +33,16 @@ const enemyPractices = {
   sand_sundial_master: 'split_stream',
 };
 
+function reserveGear(state) {
+  return Object.values(state.equipment).find((id) => state.realm >= (reserves.get(id) ?? Infinity) && state.durability[id] > 0);
+}
+
+function naturalCapacity(state) {
+  return state.realm < firstTier ? 0 : state.realm === firstTier ? 2 : 3;
+}
+
 export function spiritCapacity(state) {
-  if (state.realm < firstTier) return 0;
-  const supported = Object.values(state.equipment).some((id) => reserves.has(id) && state.durability[id] > 0);
-  return (state.realm === firstTier ? 2 : 3) + Number(supported);
+  return naturalCapacity(state) + Number(Boolean(reserveGear(state)));
 }
 
 export function spiritFrame(combat, enemy = false) {
@@ -45,7 +51,7 @@ export function spiritFrame(combat, enemy = false) {
 }
 
 function frameFor(skill, round) {
-  return { id: skill.id, start: round, end: round + skill.duration, ready: round + skill.cooldown };
+  return { id: skill.id, strength: skill.strength, start: round, end: round + skill.duration, ready: round + skill.cooldown };
 }
 
 function spiritBlocker(state, skill) {
@@ -96,6 +102,11 @@ export function spiritStudies(state, kit) {
   const max = spiritCapacity(state);
   if (!max) return null;
   const { combat, training } = state;
+  const reserve = reserveGear(state);
+  const source = {
+    natural: naturalCapacity(state),
+    equipment: reserve ? { id: reserve, name: kit.nameOf(reserve), bonus: 1 } : null,
+  };
   const known = training?.spiritKnown ?? [];
   const active = spirits.get(training?.spiritActive);
   const rows = spiritSkills.filter((skill) => known.includes(skill.id) || (state.region === skill.region && sourceOpen(state, skill)))
@@ -107,7 +118,7 @@ export function spiritStudies(state, kit) {
       value: stat === 'attack' ? enemy.atk : stat === 'physicalResist'
         ? `${Number(((enemy.physicalResist ?? 0) * 100).toFixed(3))}%` : (enemy[stat] ?? 0) })) : [];
   const current = spiritFrame(combat);
-  return { max, current: Math.min(training?.sense ?? 0, max), active, rows, readings,
+  return { max, current: Math.min(training?.sense ?? 0, max), source, active, rows, readings,
     waiting: combat ? Math.max(0, (combat.playerSpirit?.ready ?? 0) - combat.round) : 0,
     remaining: current ? current.end - combat.round : 0,
     invokeBlocker: spiritBlocker(state, active), strikeBlocked: spiritBlocksStrike(combat) };

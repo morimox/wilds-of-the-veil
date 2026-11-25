@@ -104,6 +104,10 @@ function meditateAndRecord(state, quest, clue) {
   assert.deepEqual({
     id, conclusion, reason, verified,
   }, { id: quest.id, conclusion: quest.conclusion, reason: quest.reason, verified: false });
+  const destination = sites.get(quest.site);
+  assert.deepEqual(view(state).deductionHistory.at(-1).destination, {
+    region: regions.get(destination.region).name, site: destination.name,
+  });
   const archived = view(state);
   for (const { id } of quest.clues) {
     assert.ok(archived.usedClues.includes(id));
@@ -169,6 +173,15 @@ for (const quest of quests) {
         assert.equal(choiceNamed(state, clue.action.label), undefined);
         defeatGuard(state, clue.site, clue.action.afterFight);
       }
+      if (clue.action.guardedBy) {
+        while (!choiceNamed(state, clue.action.label).available) defeatGuard(state, clue.site, clue.action.guardedBy);
+        const returning = structuredClone(state);
+        returning.day += 40;
+        const choice = choiceNamed(returning, clue.action.label);
+        assert.equal(choice.available, false);
+        assert.equal(act(returning, 'choose', { index: choice.index }).ok, false);
+        while (!choiceNamed(returning, clue.action.label).available) defeatGuard(returning, clue.site, clue.action.guardedBy);
+      }
       if (clue.action.hidden && clue.action.need) assert.equal(choiceNamed(state, clue.action.label), undefined);
       supply(state, clue.action.need);
       collectClue(state, clue);
@@ -186,6 +199,10 @@ for (const quest of quests) {
     visitFromRegionFixture(state, site);
     assert.equal(view(state).experiment, null);
     assert.equal(act(state, 'experiment', correctly).ok, false);
+    if (state.qi < rules.deductionQiCost) {
+      supply(state, { qi_powder: 1 });
+      play(state, 'use', { id: 'qi_powder' });
+    }
     meditateAndRecord(state, quest, quest.clues.at(-1));
     if (experiment.afterFight) {
       const enemy = enemies.get(experiment.afterFight);
@@ -193,6 +210,15 @@ for (const quest of quests) {
       assert.equal(refused.ok, false);
       assert.ok(refused.message.includes(enemy.name));
       defeatGuard(state, site, enemy.id);
+    }
+    if (experiment.guardedBy) {
+      const enemy = enemies.get(experiment.guardedBy);
+      while (view(state).experiment.blockedReason.includes(enemy.name)) defeatGuard(state, site, enemy.id);
+      const returning = structuredClone(state);
+      returning.day += 40;
+      assert.ok(view(returning).experiment.blockedReason.includes(enemy.name));
+      assert.match(act(returning, 'experiment', correctly).message, /又堵住了去路/);
+      while (view(returning).experiment.blockedReason.includes(enemy.name)) defeatGuard(returning, site, enemy.id);
     }
     for (const [item, count] of Object.entries(experiment.fieldNeed ?? {})) {
       delete state.inventory[item];
@@ -225,6 +251,10 @@ for (const quest of quests) {
     assert.equal(view(state).deductionHistory[0].verified, true);
     if (experiment.afterText) {
       assert.ok(view(state).currentEvent.text.startsWith(experiment.afterText));
+      if (state.satiety === 0) {
+        supply(state, { ration: 1 });
+        play(state, 'eat', { id: 'ration' });
+      }
       visit(state, site);
       assert.ok(view(state).currentEvent.text.startsWith(experiment.afterText));
     }
@@ -299,6 +329,7 @@ test('the ferry and sand-road permits lead to discoveries at the reef and the sa
   assert.equal(view(state).world.points.some((point) => point.id === 'guest_mill'), false);
   visit(state, invoice.site);
   collectClue(state, invoice);
+  walk(state, 'sand_bell_cloister');
   walk(state, 'silk_tent_road');
   walk(state, 'guest_mill');
   visit(state, sack.site);
@@ -348,4 +379,29 @@ test('the bridge smith leaves the unique short hook at the bridge when the pack 
   assert.equal(state.inventory.east_bridge_hook, 1);
   assert.equal(act(state, 'experiment', payload).ok, false);
   assert.equal(act(state, 'discard', { id: 'east_bridge_hook' }).confirmation.id, 'east_bridge_hook');
+});
+
+test('the wheel keeper stops the trial on a loss and stays to operate the wheel after a win', () => {
+  const state = createQuietGame(833);
+  const site = 'sand_glass_chamber';
+  const enemy = 'sand_sundial_master';
+  const contest = events.get(site).choices.findIndex((choice) => choice.enemy === enemy);
+  visitFromRegionFixture(state, site);
+  const lost = structuredClone(state);
+  lost.hp = 1;
+  play(lost, 'choose', { index: contest });
+  assert.equal(view(lost).currentEnemy.sparring, true);
+  assert.equal(view(lost).currentEnemy.medicineRestricted, false);
+  for (let turn = 0; lost.combat && turn < 12; turn += 1) play(lost, 'attack');
+  assert.equal(lost.combat, null);
+  assert.equal(lost.region, 'glass_rotunda');
+  assert.equal(view(lost).currentEvent.id, site);
+  assert.match(lost.log.at(-1), /收手/);
+  assert.equal(view(lost).visibleChoices.some(({ index }) => index === 1), false);
+
+  defeatGuard(state, site, enemy);
+  assert.match(state.log.at(-1), /切磋|试招/);
+  assert.equal(view(state).visibleChoices.some(({ index, available }) => index === 1 && available), true);
+  play(state, 'choose', { index: 1 });
+  assert.equal(state.inventory.qiankun_inner_pattern, 1);
 });

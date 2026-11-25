@@ -24,11 +24,12 @@ const sites = [
     } },
   { id: papers, region: 'glass_bank', name: '晒网旁的旧账单', afterChoices: [`${shed}:1`], once: [0],
     afterOnceText: { 0: '章老把空油纸袋晾到网上。压纸的石板翻了个面，底下晒出一方干地。' } },
-  { id: counter, region: 'crane_granary', name: '后廊的粮秤', afterChoices: [`${shed}:1`], once: [0, 1, 2],
+  { id: counter, region: 'crane_granary', name: '后廊的粮秤', afterChoices: [`${shed}:1`], once: [0, 1, 2, 3],
     afterOnceText: {
       0: '何绢把三袋粮隔开平码在秤旁。侧门通往领粮的小埂，正门外钉着一块给各家对账的木板。',
       1: '粮袋已经从侧门分出去了。秤下摊着一张空席，门边还有人来借秤掂东西。',
       2: '正门贴着刚换的寄粮单，石茂的旧印挂在木板下。来领粮的人按自家的木签过秤。',
+      3: '苏苇已经背着空扁担回去了。后埂上留下两行走得不紧不慢的脚印。',
     } },
 ];
 
@@ -60,12 +61,15 @@ const events = [
         hidden: true, need: { [receipt]: 1 }, days: 0.5, stay: true, coins: 14, loot: { ration: 2, salve: 1 },
         desc: '章老肯来指认留底，柳荷也愿认字据。贴出旧单后，来领粮的人都能看见两人的名字。',
         outcome: '章老认出两个货号一样。柳荷起先只肯念斤两，待杜家把缝在袋里的旧账根掏出来，她也在木板边说了侧门的事。买家把挂在上头的卖粮单揭了，堵着石茂要订钱。三家按新过的秤领粮，何绢在账上划去卖单，留了跑腿钱、干粮和一罐药给你。' },
+      { label: '送苏苇走过后埂', afterChoice: 2, days: 0.25, stay: true, loot: { [manual]: 1 },
+        desc: '围着账板的人还没散。苏苇提着那根裂扁担，在后门等你。',
+        outcome: '到了埂上，苏苇从旧布里揭出几张图。「回来的时候没挑东西，反倒走得稳。」他拿扁担比了比脚下两道窄缝。「上次过埂亏你帮忙。这几步你要是用得上，就留着。」' },
     ] },
 ];
 
 const fixed = [{
   id: 'road_borrowed_grain', a: 'crane_granary', b: 'glass_bank',
-  name: '扶粮车的人', chance: 0.66, allowFight: false,
+  name: '扶粮车的人', chance: 0.12, allowFight: false,
   intro: '枯芦刮着一辆窄车的轮辐。一个人蹲在车边给裂扁担缠麻线，脚边搁着一枚拴过青线的木签。车已经靠到一边。',
   passOutcome: '那人把伸到路上的扁担收回膝上，你贴着车边走了过去。',
   actions: [{ id: 'hear_grain_oath', label: '捡起木签，问这车送的是什么',

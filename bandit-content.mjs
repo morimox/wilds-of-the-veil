@@ -95,12 +95,10 @@ const crewRoads = {
     ['screen_slope', 'kiln_valley', 0.16, '窑谷一侧有新砍的路障，几串脚印都在坡口停过。'],
     ['pine_ridge', 'ridge', 0.075, '松场南坡有几处荒矮墙，日落后往往有人蹲守。'],
     ['kiln_valley', 'herb_basin', 0.12, '两间废窑后墙之间是条窄道，车夫说有人在那里查过粮袋。'],
-    ['ridge', 'herb_basin', 0.12, '药工旧路边有砍开的绳头。挑夫多半等人结伴才肯走。'],
   ],
   ferryHills: [
     ['pine_ridge', 'kiln_valley', 0.050, '林脚这边松枝太密，从路上看不见坡底。'],
     ['kiln_valley', 'snow_pass', 0.055, '上雪关的石阶边有一处废木亭，常有人躲在背风一面。'],
-    ['herb_basin', 'snow_pass', 0.047, '背风山道上有拖木头的旧辙，最近又添了几道。'],
   ],
   quarryTracks: [
     ['ridge', 'black_mine', 0.028, '废矿车正挡在矿脊便道的一处拐角。'],
@@ -111,11 +109,10 @@ const crewRoads = {
     ['flood_market', 'glass_bank', 0.033, '碎琉璃滩外有一道简陋的横杆，水上看不清谁在守。'],
     ['flood_market', 'crane_granary', 0.023, '粮仓的后路绕过一排平日没人看的空高脚屋。'],
     ['crane_granary', 'glass_bank', 0.028, '枯芦把下岸的路挤成一条单行窄道。'],
-    ['glass_bank', 'rope_sands', 0.039, '白石和晒网之间有几条人走出来的岔，岸头人少。'],
   ],
   reedBank: [
     ['green_dyke', 'old_marker', 0.021, '堤下水浅，夹布的空篮卡在半截矮桩上。'],
-    ['green_dyke', 'ring_isles', 0.026, '一连串踏石中间有两处看不见对岸。'],
+    ['old_marker', 'scale_bog', 0.026, '石碑后的踏石藏在苇丛里，水线旁有磨断的船缆。'],
     ['frog_pond', 'scale_bog', 0.032, '苔堤狭长，沿线有几处能从泥滩绕到身后。'],
   ],
   weirReef: [

@@ -70,7 +70,7 @@ function fight(state, index, enemy, { wieldStaff = false } = {}) {
   }
   assert.equal(state.event, from, state.log.slice(-8).join('\n'));
   assert.equal(state.coins, coins, 'there is no automatic purse from winning a battle');
-  assert.equal(state.day - start, (rounds + 1) / 8);
+  assert.equal(state.day - start, 0.125);
   return rounds;
 }
 

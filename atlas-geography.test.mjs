@@ -48,6 +48,28 @@ test('both ends of each cross-province path point to the same real border crossi
   }
 });
 
+test('roads that share a junction visibly separate, and the ferry reach follows the old channel', () => {
+  for (const { id } of data.regions) {
+    const origin = atlasLocation(id);
+    const outgoing = maps.filter(({ from, to }) => from === id || to === id)
+      .map((edge) => ({ key: edge.key, tip: edge.from === id ? edge.survey[1] : edge.survey.at(-2) }));
+    for (const [index, { key, tip }] of outgoing.entries()) {
+      const [dx, dy] = [tip[0] - origin[0], tip[1] - origin[1]];
+      for (const other of outgoing.slice(index + 1)) {
+        const [ux, uy] = [other.tip[0] - origin[0], other.tip[1] - origin[1]];
+        const cosine = (dx * ux + dy * uy) / (Math.hypot(dx, dy) * Math.hypot(ux, uy));
+        assert.ok(cosine < Math.cos(8 * Math.PI / 180), `${key} and ${other.key} nearly trace the same road`);
+      }
+    }
+  }
+  assert.ok(!maps.some(({ key }) => key === 'ford|willow_post'));
+  const state = createGame(5);
+  state.region = 'ford';
+  state.discovered.push('ford', 'lantern_court', 'fish_ladder', 'willow_post');
+  const journey = view(state).world.journeys.find(({ id }) => id === 'willow_post');
+  assert.deepEqual(journey.path, ['ford', 'lantern_court', 'fish_ladder', 'willow_post']);
+});
+
 test('starter supply roads are protected but Gray Gully patrols a real outer ring', () => {
   const { roads } = data.roadBandits;
   const risk = new Map(roads.map(({ a, b, chance }) => [[a, b].sort().join('|'), chance]));
@@ -56,7 +78,7 @@ test('starter supply roads are protected but Gray Gully patrols a real outer rin
     assert.equal(risk.get(road.key) ?? 0, 0, `${road.key} risks a starter route or guarded street`);
   }
   const gray = roads.filter(({ crew }) => crew === 'grey_gully');
-  assert.ok(gray.length >= 7);
+  assert.ok(gray.length >= 6);
   const approaches = gray.map(({ a, b, chance }) => {
     const { units } = maps.find(({ key }) => [a, b].sort().join('|') === key);
     return { mean: units * chance, oneOrMore: 1 - (1 - chance) ** units };

@@ -1,5 +1,5 @@
 import { saleQuote, saleTotal, recordSale } from './economy.mjs';
-import { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath, removedAtlasRoads } from './atlas-geography.mjs';
+import { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath } from './atlas-geography.mjs';
 
 const home = 'village';
 const roadUnitDays = 0.25;
@@ -14,20 +14,17 @@ const crossings = [
   { a: 'rope_sands', b: 'cinder_inn', label: '沿沙坡的驿路', ...sandPass },
 ].map(withMileage);
 const regionalRoads = [
-  ['reed_meadows', 'pale_shoal', '蒲湾外堤'],
   ['screen_slope', 'kiln_valley', '晒盘坡北面的窑路'],
   ['kiln_valley', 'snow_pass', '窑谷上雪关的石阶'],
-  ['herb_basin', 'snow_pass', '背风山道'],
   ['pine_ridge', 'ridge', '松场南坡路'],
   ['ridge', 'kiln_valley', '窑车旧路'],
-  ['ridge', 'herb_basin', '老药工走的山腰路'],
+  ['ford', 'lantern_court', '渡口的挂灯驮道'],
   ['fish_ladder', 'willow_post', '沿旧渠的纤道'],
   ['green_dyke', 'measuring_hall', '守尺观外的堤路'],
   ['frog_pond', 'ring_isles', '浅塘东岸路'],
   ['old_marker', 'scale_bog', '石碑后的小堤'],
   ['zhao_hermit', 'charcoal_ridge', '水驿南面的山道'],
   ['zhao_hermit', 'burnt_weir', '内堰西路'],
-  ['glass_bank', 'rope_sands', '晒网滩外的沙脊'],
   ['glass_bank', 'burnt_weir', '碎沙堤'],
   ['flood_market', 'measuring_hall', '运尺的河堤路'],
   ['cinder_inn', 'silk_tent_road', '炭篷驿外的帐道'],
@@ -88,7 +85,6 @@ export function roadGraph(data, { state } = {}) {
   const add = (a, b, extra = {}) => {
     if (!regions.has(a) || !regions.has(b) || a === b) return;
     const key = roadKey(a, b);
-    if (removedAtlasRoads.has(key)) return;
     const [from, to] = key.split('|');
     const path = atlasRoadPath(from, to);
     if (!path) return;
@@ -264,8 +260,21 @@ function quoteRoad(state, id, kit, edges, routes) {
   const reserve = longWalk ? 20 : 0;
   const autoMeals = road.cross || longWalk;
   const food = autoMeals ? roadFood(state, provisions + reserve, kit) : null;
+  const foodShort = road.cross && food.deficit > reserve;
+  let restock;
+  if (foodShort) {
+    const availableFood = state.satiety + food.satiety;
+    let traveledCost = 0;
+    for (const leg of legs.slice(0, -1)) {
+      traveledCost += leg.days * leg.rate;
+      if (traveledCost > availableFood) break;
+      if (!settlementOf(kit.data, leg.to)?.inn) continue;
+      restock = { id: leg.to, name: kit.records.regions[leg.to].name };
+      break;
+    }
+  }
   return { ...road, autoMeals, reserve, meals: food?.meals, emptyOnArrival: remaining + (food?.satiety ?? 0) <= 0,
-    reason: road.cross && food.deficit > reserve ? '带的口粮还不够走完这段路。' : '' };
+    restock, reason: foodShort ? '带的口粮还不够走完全程。' : '' };
 }
 
 function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) {
@@ -697,7 +706,7 @@ export function worldView(state, kit) {
     return quote.days === undefined ? [] :
       [targetSummary(region, kit.data, quote.reason, { days: quote.days, rescue: Boolean(quote.rescue),
         units: quote.units, direct: Boolean(ordinary && !isAvoidedRoad(ordinary, avoidedRoads)), via: via.map((id) => kit.records.regions[id].name), path: [state.region, ...via, region.id],
-        meals: quote.meals, emptyOnArrival: quote.emptyOnArrival })];
+        meals: quote.meals, emptyOnArrival: quote.emptyOnArrival, restock: quote.restock })];
   });
   const roads = journeys.filter((road) => road.direct || road.rescue);
   const neighbors = roadNeighbors(openKnownRoads(state, edges));

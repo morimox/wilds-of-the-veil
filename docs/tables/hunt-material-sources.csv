@@ -89,10 +89,10 @@
 兽革（hide）,晒盘坡（screen_slope）,断壁筛架（slope_sieves）,石甲獾（stone_badger）,炼气中期,2,,,2,2,4,6,1,随种群密度变化,,走近上坡那两根木柱
 炼气期妖丹（qi_core）,晒盘坡（screen_slope）,双灯照到的旧吊板（slope_lantern_high）,石鹞（river_cliff_kite）,炼气后期,1,,,1,1,1,8,1,随种群密度变化,背风处的断灯（slope_lantern_gap） · 修好护绳，把高低两盏灯挂回原处,沿吊板去看白羽从哪落下
 生兽肉（beast_meat）,晒盘坡（screen_slope）,双灯照到的旧吊板（slope_lantern_high）,石鹞（river_cliff_kite）,炼气后期,1,,,1,1,1,8,1,随种群密度变化,背风处的断灯（slope_lantern_gap） · 修好护绳，把高低两盏灯挂回原处,沿吊板去看白羽从哪落下
-金丹期妖丹（gold_core）,回潮洞（undertow_grotto）,退水石脊（undertow_bed）,驮泥大蛇（undertow_moundback）,金丹初期,1,,,1,1,1,0,0,不回补,,沿石脊走近那片泥地
-生兽肉（beast_meat）,回潮洞（undertow_grotto）,退水石脊（undertow_bed）,驮泥大蛇（undertow_moundback）,金丹初期,6,,,6,1,1,0,0,不回补,,沿石脊走近那片泥地
-妖目（beast_eye）,回潮洞（undertow_grotto）,退水石脊（undertow_bed）,驮泥大蛇（undertow_moundback）,金丹初期,1,,,1,1,1,0,0,不回补,,沿石脊走近那片泥地
-兽革（hide）,回潮洞（undertow_grotto）,退水石脊（undertow_bed）,驮泥大蛇（undertow_moundback）,金丹初期,4,,,4,1,1,0,0,不回补,,沿石脊走近那片泥地
+金丹期妖丹（gold_core）,回潮洞（undertow_grotto）,退水石脊（undertow_bed）,驮泥大蛇（undertow_moundback）,金丹初期,1,,,1,1,1,0,0,不回补,,沿石脊走向深水边的拖痕
+生兽肉（beast_meat）,回潮洞（undertow_grotto）,退水石脊（undertow_bed）,驮泥大蛇（undertow_moundback）,金丹初期,6,,,6,1,1,0,0,不回补,,沿石脊走向深水边的拖痕
+妖目（beast_eye）,回潮洞（undertow_grotto）,退水石脊（undertow_bed）,驮泥大蛇（undertow_moundback）,金丹初期,1,,,1,1,1,0,0,不回补,,沿石脊走向深水边的拖痕
+兽革（hide）,回潮洞（undertow_grotto）,退水石脊（undertow_bed）,驮泥大蛇（undertow_moundback）,金丹初期,4,,,4,1,1,0,0,不回补,,沿石脊走向深水边的拖痕
 筑基期妖丹（foundation_core）,反声钟窟（counter_bell）,古钟旁的信架（counter_bell_score）,屈膝铜影（river_copper_echo）,筑基后期,3,,,3,1,1,0,0,不回补,,顺着钟槌留下的擦痕去看古钟
 炼气期妖丹（qi_core）,青埂（green_dyke）,两面低埂（zhao_dyke_bend）,黄沿水貂（dyke_marten）,炼气初期,1,,,1,2,5,4,1,随种群密度变化,,到抓痕处守一阵
 生兽肉（beast_meat）,青埂（green_dyke）,两面低埂（zhao_dyke_bend）,黄沿水貂（dyke_marten）,炼气初期,2,,,2,2,5,4,1,随种群密度变化,,到抓痕处守一阵
@@ -131,9 +131,9 @@
 妖目（beast_eye）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,1,,,1,1,1,,,不回补,,踩着井壁的凹坑过去，引开那头鳞兽
 兽革（hide）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,3,,,3,1,1,,,不回补,,踩着井壁的凹坑过去，引开那头鳞兽
 金丹期妖丹（gold_core）,倒驿白廊（chalk_archive）,倒挂的驿印（sand_archive_guard）,倒驿锁影（sand_inverted_keeper）,金丹中期,2,,,2,1,1,,,不回补,,举起兵器，走向白柱后的守影
-炼气期妖丹（qi_core）,空音桥（dry_sound_bridge）,铜扣松动的桥栏（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,炼气中期,2,,,2,2,5,4.5,1,随种群密度变化,,拨开晃响的铜扣，看看栏下
-生兽肉（beast_meat）,空音桥（dry_sound_bridge）,铜扣松动的桥栏（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,炼气中期,2,,,2,2,5,4.5,1,随种群密度变化,,拨开晃响的铜扣，看看栏下
-兽革（hide）,空音桥（dry_sound_bridge）,铜扣松动的桥栏（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,炼气中期,1,,,1,2,5,4.5,1,随种群密度变化,,拨开晃响的铜扣，看看栏下
+炼气期妖丹（qi_core）,空音桥（dry_sound_bridge）,桥边的铜扣（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,炼气中期,2,,,2,2,5,4.5,1,随种群密度变化,,扶住桥栏，探头看栏下
+生兽肉（beast_meat）,空音桥（dry_sound_bridge）,桥边的铜扣（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,炼气中期,2,,,2,2,5,4.5,1,随种群密度变化,,扶住桥栏，探头看栏下
+兽革（hide）,空音桥（dry_sound_bridge）,桥边的铜扣（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,炼气中期,1,,,1,2,5,4.5,1,随种群密度变化,,扶住桥栏，探头看栏下
 炼气期妖丹（qi_core）,空粮仓（hollow_silo）,关了一半的仓门（sand_silo_door）,仓花貂（sand_silo_marten）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,站到滑槽旁等小兽出来
 生兽肉（beast_meat）,空粮仓（hollow_silo）,关了一半的仓门（sand_silo_door）,仓花貂（sand_silo_marten）,炼气初期,2,,,2,3,6,4,1,随种群密度变化,,站到滑槽旁等小兽出来
 兽革（hide）,空粮仓（hollow_silo）,关了一半的仓门（sand_silo_door）,仓花貂（sand_silo_marten）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,站到滑槽旁等小兽出来

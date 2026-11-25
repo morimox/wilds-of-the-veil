@@ -55,7 +55,7 @@ test('the shortest route uses only known roads and improves when a shortcut open
 });
 
 test('a single planned journey can pass through both permitted province crossings', () => {
-  const through = ['ford', 'zhao_city', 'flood_market', 'glass_bank', 'rope_sands', 'zhao_pass', 'mingsha_city'];
+  const through = ['ford', 'zhao_city', 'flood_market', 'glass_bank', 'beacon_reefs', 'rope_sands', 'zhao_pass', 'mingsha_city'];
   const state = traveler('village', through);
   state.inventory.ration = 15;
   const route = () => view(state).world.journeys.find(({ id }) => id === 'mingsha_city');

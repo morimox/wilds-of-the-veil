@@ -18,7 +18,7 @@ fogMaxPressure,7,隐藏雾压浓度上限（点）
 fogMaxDrain,14,单次雾压结算的耗气上限（点）；达阈值后，基础耗气加超出量与其平方，向下取整
 fogRestPerDay,4.8,避风歇脚每游戏日减少的隐藏雾压（点）
 deductionQiCost,3,冥想一次所消耗的真气（点）
-battleDays,0.125,战斗操作每回合用时（天）
+battleDays,0,战斗操作每回合用时（天）
 regulatedBoutCooldown,0.5,禁药比试结束后到下次开场的最短间歇（天）
 regulatedBoutHpFraction,0.5,禁药比试开场所需的最低气血比例
 perceptionScale,12,洞察概率曲线分母的固定项。洞察差除以固定项与洞察差之和
@@ -44,7 +44,7 @@ chargeBreakDamage,4,蓄势被气血伤害打散的单回合伤害下限
 harvestEncounterDays,0.125,采集中遭遇伏击时开打前用时（天）
 ebbCycleDays,2,闭潮渡退水循环（游戏日）
 ebbWindowDays,0.625,每次退水维持时间（游戏日）
-retreatDays,0.25,撤出战斗所需用时（天）
+retreatDays,0,撤出战斗所需用时（天）
 escapeDodgeFactor,0.75,战斗闪避值折算成脱身概率的倍率
 escapeChanceCap,0.85,普通敌手有空当时的脱身概率上限
 banditEscapeChanceCap,0.4,强盗有空当时的脱身概率上限

@@ -68,6 +68,8 @@ test('an opening arrow against a visible charge spends one arrow and one turn, a
   assert.equal(state.combat.round, 1);
   assert.equal(view(state).openingShotReady, false);
   play(state, 'guard');
+  // Ensure the next shot leaves a live attacker so the reply can be checked.
+  state.combat.hp += 4;
   const later = play(state, 'attack');
   assert.equal(later.enemyMove.kind, 'heavy');
   assert.ok(later.damageTaken > 0);

@@ -31,16 +31,34 @@ function reachZhaoCity() {
 const roadTo = (state, target) => view(state).world.roads.find(({ id }) => id === target);
 const offerFor = (state, item) => view(state).localMarket.offers.find(({ id }) => id === item);
 
+test('a long crossing blocked by provisions suggests a reachable known inn along the same path', () => {
+  const state = createGame(40);
+  state.region = 'sand_bell_cloister';
+  state.discovered.push('sand_bell_cloister', 'mingsha_city', 'zhao_pass', 'rope_sands', 'burnt_weir',
+    'glass_bank', 'flood_market', 'zhao_city', 'ford', 'marsh', 'village');
+  state.knownItems.push('sand_writ', 'ferry_manifest');
+  state.satiety = 65;
+  delete state.inventory.ration;
+  const route = view(state).world.journeys.find(({ id }) => id === 'village');
+  assert.equal(route.available, false);
+  assert.match(route.reason, /口粮/);
+  assert.ok(route.path.slice(1, -1).includes(route.restock?.id));
+  assert.equal(view(state).world.journeys.find(({ id }) => id === route.restock.id).available, true);
+  play(state, 'travel', { id: route.restock.id });
+  assert.equal(state.region, route.restock.id);
+  assert.ok(view(state).settlement?.inn);
+});
+
 test('an empty-bellied traveler can reach a local bed and recover before taking a cross-province road', () => {
   const state = reachZhaoCity();
   play(state, 'rest');
+  play(state, 'localBuy', { id: 'ration', count: 2 });
   while (state.inventory.ration && state.satiety < 55) play(state, 'eat', { id: 'ration' });
   play(state, 'travel', { id: 'flood_market' });
-  for (const id of ['glass_bank', 'rope_sands']) {
+  for (const id of ['glass_bank', 'beacon_reefs', 'rope_sands', 'zhao_pass']) {
     while (state.inventory.ration && state.satiety < 55) play(state, 'eat', { id: 'ration' });
     play(state, 'travel', { id });
   }
-  play(state, 'travel', { id: 'zhao_pass' });
   state.knownItems.push('sand_writ');
   play(state, 'wait');
 

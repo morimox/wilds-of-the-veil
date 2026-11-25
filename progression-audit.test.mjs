@@ -2,6 +2,53 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { act, createGame, view } from './engine.mjs';
 
+test('the sheltered alcove lets a traveler prepare for the undertow guardian', () => {
+  const state = createGame(42);
+  state.region = 'undertow_grotto';
+  state.discovered.push(state.region);
+  state.inventory.undertow_entry = 1;
+  state.knownItems.push('undertow_entry');
+  state.satiety = 100;
+  state.pressure = 5;
+  state.qi = 0;
+  assert.ok(act(state, 'visit', { id: 'undertow_bed' }).ok);
+  const before = view(state);
+  assert.match(before.currentEvent.text, /背风的石凹/);
+  assert.ok(act(state, 'choose', { index: 4 }).ok);
+  const recovered = view(state);
+  assert.equal(recovered.qi, 12);
+  assert.ok(recovered.fogTier < before.fogTier);
+  assert.equal(recovered.day - before.day, 0.5);
+  assert.equal(recovered.currentEvent.id, 'undertow_bed');
+  assert.equal(act(state, 'choose', { index: 4 }).ok, false);
+  assert.equal(act(state, 'choose', { index: 0 }).ok, true);
+  assert.equal(view(state).currentEnemy.id, 'undertow_moundback');
+});
+
+test('the cold-kiln record uses authentic proof and can be earned without cash', () => {
+  const state = createGame(40);
+  state.region = 'cold_kiln';
+  state.discovered.push(state.region);
+  state.coins = 0;
+  state.satiety = 100;
+  state.inventory.sand_well_chit = 1;
+  state.inventory.stillwell_salt = 1;
+  assert.ok(act(state, 'visit', { id: 'sand_cold_kiln_house' }).ok);
+  assert.match(act(state, 'choose', { index: 1 }).message, /18/);
+  assert.ok(!view(state).visibleChoices.some(choice => choice.index === 2));
+  assert.ok(act(state, 'choose', { index: 0 }).ok);
+  assert.equal(state.event, 'sand_cold_kiln_house');
+  assert.ok(view(state).visibleChoices.some(choice => choice.index === 2 && choice.available));
+  assert.ok(act(state, 'choose', { index: 2 }).ok);
+  assert.equal(state.inventory.cold_kiln_record, 1);
+  assert.equal(state.inventory.sand_well_chit, 1);
+  assert.equal(state.inventory.stillwell_salt, 1);
+  assert.equal(state.coins, 0);
+  assert.ok(act(state, 'visit', { id: 'sand_cold_kiln_house' }).ok);
+  assert.match(view(state).currentEvent.text, /炉门重新挂上/);
+  assert.ok(!view(state).visibleChoices.some(choice => choice.index === 1 || choice.index === 2));
+});
+
 test('the heirloom seal can be brought home early, and dispatch waits for the ferry', () => {
   const state = createGame(9);
   assert.equal(view(state).quests.some(({ id }) => id === 'sky_treaty'), false);

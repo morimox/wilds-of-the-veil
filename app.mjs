@@ -1,6 +1,6 @@
 import { data } from "./data.mjs";
 import { act, createGame, handConflict, rules, view } from "./engine.mjs";
-import { saleTotal } from "./economy.mjs";
+import { economyData, saleTotal } from "./economy.mjs";
 import { banditRules } from "./bandits.mjs";
 
 const itemRows = Object.fromEntries(data.items.map(item => [item.id, item]));
@@ -11,6 +11,8 @@ const gearRows = new Map(data.gear.map(row => [row.id, row]));
 const pillRows = new Map(data.pills.map(row => [row.id, row]));
 const talismanRows = new Map(data.talismans.map(row => [row.id, row]));
 const manualRows = new Map(data.innerStyles.map(row => [row.id, row]));
+const ammoRows = new Map(data.ammunition.map(row => [row.id, row]));
+const containerRows = new Map(economyData.containerPlans.map(row => [row.id, row]));
 const clueMaterials = new Set(["heart_silt", "stillwell_salt"]);
 const bookCategories = ["武器", "装备", "弹药", "丹药", "内功", "符箓", "口粮", "材料", "丹方", "线索", "其他"];
 const bookNames = new Intl.Collator("zh-CN");
@@ -19,7 +21,6 @@ const slotNames = data.equipmentSlots;
 const intentNames = { attack: "进攻", heavy: "重击", guard: "防御", dodge: "闪避", heal: "疗伤", remedy: "服药", drain: "吸取真气", focus: "蓄势", recoverQi: "回气" };
 const kindNames = { material: "材料", food: "口粮", object: "随身物件", gear: "装备", pill: "丹药", talisman: "符箓", key: "线索", ammo: "弹药", manual: "内功", container: "收纳", currency: "灵钱" };
 const weaponNames = { fist: "拳与指虎", sword: "剑", blade: "刀斧", spear: "枪戟", staff: "棍杖", hammer: "锤", bow: "弓", crossbow: "弩" };
-const manualRankName = new Intl.NumberFormat("zh-CN-u-nu-hanidec");
 const serviceNames = { cultivate: "修行", workshop: "工坊", market: "坊市", quests: "委托" };
 const apprenticeQuests = ["lost_basket_return", "reed_salve", "apprentice_waterline"];
 const app = document.querySelector("#app");
@@ -141,9 +142,8 @@ function tag(text, tone = "") {
 }
 
 function entryLabel(title, entry) {
-  const item = entry?.id ? ` data-item-description="${escape(entry.id)}"` : "";
   return entry ? `<span class="entry-anchor"><button class="item-trigger" type="button" data-entry aria-expanded="false">${escape(title)}</button>
-    <span class="item-tip" role="tooltip"${item}>${escape(entry.text ?? entry)}</span></span>` : escape(title);
+    <span class="item-tip" role="tooltip">${itemTipBody(entry.text ?? entry, entry.stats, entry.id)}</span></span>` : escape(title);
 }
 
 function card(title, desc, badge = "", actions = "", entry = "", need = null) {
@@ -227,13 +227,14 @@ function stats(s) {
     meal && s.edibleMeals.includes(meal.id);
   const canUseSalve = medicineAllowed && s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
   const sense = s.spiritSense;
+  const senseSource = sense && `境界 ${sense.source.natural} 格${sense.source.equipment ? `＋${sense.source.equipment.name} ${sense.source.equipment.bonus} 格` : ""}`;
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
     ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。敷伤药或在据点歇息都能恢复。", "health")}
     ${canUseSalve ? linkButton("敷伤药", "use", "salve", "quick-eat") : ""}
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
     ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
-    ${vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "施法、冥想和部分武技会耗气。雾压到了第三格也会耗气。回气散或歇息能补回来。", "qi")}
-    ${sense ? `<details class="vital sense"><summary>神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>交手时可用选好的神识。歇息或用相应药物能恢复。</p></details>` : ""}
+    ${vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "催动法攻兵器或冥想会耗气。露天活动时，雾压到了第三格也会耗气。回气散或歇息能补回来。", "qi")}
+    ${sense ? `<details class="vital sense"><summary title="${escape(senseSource)}">神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>${escape(senseSource)}。交手时可用选好的神识，歇息或用相应药物能恢复。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
 }
 
@@ -241,7 +242,8 @@ function fogMeter(s) {
   const color = s.fogTier === rules.fogNotches ? " severe" : s.fogTier >= rules.pressureThreshold ? " danger" : "";
   const marks = Array.from({ length: rules.fogNotches }, (_, index) =>
     `<i${index < s.fogTier ? ' class="filled"' : ''}></i>`).join("");
-  const explanation = !s.fogExposed ? "这里避雾，真气暂时不会被雾耗去。"
+  const explanation = s.mode === "combat" ? "交手时雾压保持不动。继续在露天探查、采集或等候才会积雾。"
+    : !s.fogExposed ? "这里避雾，真气暂时不会被雾耗去。"
     : s.fogTier === 5 ? "真气流失极快。回到落脚处能散雾。"
     : s.fogTier === 4 ? "真气流失得更快。回到落脚处能散雾。"
     : s.fogTier === 3 ? "真气开始流失。回到落脚处能散雾。"
@@ -264,7 +266,8 @@ function routeAction(road, edges = [], label = road.rescue ? `慢慢走到${road
   const directlyConnects = ({ from, to }) => path.some((id, index) => (id === from && path[index + 1] === to) || (id === to && path[index + 1] === from));
   const warnings = [...new Set(edges.filter(edge => edge.riskText && directlyConnects(edge)).map(edge => edge.riskText))];
   return `<div class="route-action">${linkButton(label, "travel", road.id, "", !road.available)}
-    <div class="route-notes"><span class="fine">${escape(note)}</span>${warnings.map(warning => `<p class="fine route-warning">${escape(warning)}</p>`).join("")}</div></div>`;
+    <div class="route-notes"><span class="fine">${escape(note)}</span>${warnings.map(warning => `<p class="fine route-warning">${escape(warning)}</p>`).join("")}
+      ${road.restock ? linkButton(`先去${road.restock.name}补给`, "travel", road.restock.id, "quiet") : ""}</div></div>`;
 }
 
 function siteResources(s, site) {
@@ -350,9 +353,8 @@ function banditScreen(s, bandit, preparation = "") {
 function roadScreen(s) {
   const road = s.roadTrip;
   const ground = road.afterBattle ? groundRows(s) : [];
-  const preparation = road.afterBattle ? `<section class="road-aftermath" aria-label="战后整备">
-    ${ground.length ? `<h3>脚边的战利品</h3>${ground.join("")}` : '<p class="fine">脚边没有物品可捡。</p>'}
-    <p class="fine">可以先用药，或点行囊里的装备换上。</p>
+  const preparation = ground.length ? `<section class="road-aftermath" aria-label="战利品">
+    <h3>脚边的战利品</h3>${ground.join("")}
   </section>` : "";
   if (road.bandit) return banditScreen(s, road.bandit, preparation);
   const turnBack = road.fromName ? `折回${road.fromName}` : "沿原路折返";
@@ -468,7 +470,8 @@ function atlasLabelOffsets(points, frame, selected) {
 function atlasMap(world, province, points, byId, selected, route, edges) {
   const frame = world.geography.provinces[province].frame;
   const routeLegs = new Set((route?.path ?? []).slice(1).map((id, index) => [route.path[index], id].sort().join("|")));
-  const lines = [...edges].sort((a, b) => Number(routeLegs.has(a.key)) - Number(routeLegs.has(b.key)))
+  const inkOrder = (edge) => edge.key === atlasEdge ? 2 : Number(routeLegs.has(edge.key));
+  const lines = [...edges].sort((a, b) => inkOrder(a) - inkOrder(b))
     .map((edge) => atlasRoadMark(edge, routeLegs.has(edge.key), atlasRoadName(edge, byId))).join("");
   const borders = new Map();
   for (const edge of edges) {
@@ -635,14 +638,6 @@ function experimentForm(experiment) {
   </form>`;
 }
 
-function pillSummary(row) {
-  return [row.hp && "恢复气血", row.qi && "恢复真气", row.sense && "恢复神识", row.satiety && "充饥", row.toxin < 0 && "减轻丹毒", row.wound && "减轻伤势", row.focus && "加强下次兵器法攻"].filter(Boolean).join(" · ");
-}
-
-function talismanSummary(row) {
-  return [row.damage && "伤敌", row.guard && "少受伤", row.retreat && "撤退时好脱身"].filter(Boolean).join(" · ");
-}
-
 function combatScreen(s) {
   const enemy = s.currentEnemy;
   const intent = s.intent;
@@ -724,34 +719,130 @@ function gearCondition(remaining, total) {
   return !remaining ? "损坏" : remaining / total < 0.25 ? "将坏" : remaining < total ? "磨损" : "完好";
 }
 
-function gearDescription(item, gear) {
-  const entry = gear.entry || `${tierName(gear.tier)}散修可用。${item.desc}`;
-  const ranged = gear.ammo?.length ? "遇上从远处冲来的对手，可放箭拦住它的头一扑。" : "";
-  const perception = gear.perception >= 5 ? "完好时，持用它能明显帮你察觉来招。"
-    : gear.perception >= 3 ? "完好时，持用它更容易察觉来招。"
-    : gear.perception > 0 ? "完好时，持用它略能帮你察觉来招。"
-    : gear.perception < 0 ? "持用时，较难察觉对手的来招。" : "";
-  const reflection = [gear.trait, ...(gear.traits ?? [])].find(trait => trait?.kind === "reflect");
-  const reflect = reflection && !/反伤|反震/.test(entry)
-    ? `挨下近身${reflection.intent === "heavy" ? "重招" : "普攻"}而受伤时，能把部分力道震回去。` : "";
-  const charge = gear.chargeRequired && !/蓄势|蓄力/.test(entry) ? "得先蓄势才能用它出招。" : "";
-  return entry + perception + reflect + ranged + charge + (gear.hands === 2 ? "须双手使用，副手要空出来。" : "");
-}
-
 function itemDescription(s, id) {
   if (Object.hasOwn(s.itemNotes ?? {}, id)) return s.itemNotes[id];
   const item = itemRows[id];
   const gear = gearRows.get(id);
-  const pill = pillRows.get(id);
-  const seal = talismanRows.get(id);
   const manual = manualRows.get(id);
-  const original = gear ? gearDescription(item, gear) : pill ? pillSummary(pill) : seal ? talismanSummary(seal)
-    : manual ? manualDescription(manual, s.manualRanks?.[id] ?? 1) : item?.desc;
-  return publicText(original);
+  return publicText(gear?.entry || manual?.desc || item?.desc);
+}
+
+const flatEffects = [
+  ["atk", "攻击"], ["def", "防御"], ["magicAtk", "法攻"], ["hp", "气血上限"], ["qi", "真气上限"],
+  ["perception", "洞察"], ["spiritReserve", "神识上限"], ["physicalResist", "物抗", true], ["magicResist", "魔抗", true],
+  ["retreat", "脱身", true], ["dodge", "闪避值", true],
+];
+const recoveryEffects = [["hp", "气血"], ["satiety", "饱腹"], ["qi", "真气"], ["sense", "神识"]];
+const traitNames = { damage: "伤害", pierce: "穿甲", guard: "护持", reflect: "反伤", dodge: "闪避值", accuracy: "命中值" };
+const targetNames = { scaled: "鳞甲", stoneborn: "石甲", furred: "带毛", beast: "妖兽", spirit: "精怪" };
+const traitIntents = { attack: "普攻", heavy: "重招", drain: "夺气", guard: "防御" };
+
+function numberEffect(value, percent = false) {
+  const amount = Math.abs(value);
+  return `${value < 0 ? "−" : value > 0 ? "+" : ""}${percent ? Number((amount * 100).toFixed(3)) + "%" : amount}`;
+}
+
+function effectRows(record, fields) {
+  return fields.filter(([key]) => record[key]).map(([key, label, percent]) => [label, numberEffect(record[key], percent)]);
+}
+
+function traitRows(record) {
+  return [record.trait, ...(record.traits ?? [])].filter(Boolean).map(({ kind, enemyTag, intent, bonus }) => {
+    const condition = [targetNames[enemyTag], traitIntents[intent]].filter(Boolean).join(" · ");
+    return [condition ? `${traitNames[kind]} · ${condition}` : traitNames[kind],
+      numberEffect(bonus, kind === "dodge" || kind === "accuracy")];
+  });
+}
+
+function gearStats(s, gear, wear) {
+  const hold = gear.slot === "weapon" ? `${gear.hands ?? 1} 手` : "";
+  const field = gear.field ?? {};
+  return [
+    ...(wear === 0 ? [["损坏", "加成暂时失效"]] : []),
+    ...effectRows(gear, flatEffects),
+    ...(gear.fixedDamage ? [["普攻固定伤害", s.creatorSwordDamage]] : []),
+    ...(gear.spellQi ? [["催动法攻耗气", `−${gear.spellQi}`]] : []),
+    ...effectRows(gear, [
+      ["spellPower", "法攻招式威力"], ["spellPierce", "法攻穿甲"], ["spellGuard", "法攻护持"],
+      ["spellInterrupt", "法攻压制"], ["chargePierce", "蓄力穿甲"], ["sideAtk", "副手攻击"],
+      ["sidePierce", "副手穿甲"], ["sideGuard", "副手护持"], ["brace", "挡重招额外减伤"],
+    ]),
+    ...traitRows(gear),
+    ...effectRows(field, [["fogTolerance", "挡雾强度"]]),
+    ...(field.gatherPadding ? [["采集受伤", numberEffect(-field.gatherPadding)]] : []),
+    ...(field.roadSatiety ? [["鸣沙州步行耗粮", numberEffect(-field.roadSatiety.fraction, true)]] : []),
+    ...(gear.chargeRequired ? [["出招", "蓄力 1 回合"]] : []),
+    ...(gear.ammo?.length ? [["弹药 · 每招 1 发", gear.ammo.map(id => itemRows[id].name).join("、")]] : []),
+    ...(hold ? [["持用", hold]] : []),
+    ["耐久", `${wear ?? gear.durability} / ${gear.durability}`],
+    ["境界要求", gear.fixedDamage ? "无" : tierName(gear.tier)],
+  ];
+}
+
+function manualStats(book, level) {
+  const rank = book.ranks[level - 1];
+  const specialty = [...new Set(book.specialty.map(kind => weaponNames[kind]).filter(Boolean))].join("、");
+  const fist = rank.fistCharge;
+  return [
+    ["品阶", book.grade], ["层数", `${level} / ${book.ranks.length}`], ["运功要求", tierName(book.tier)],
+    ...effectRows(rank.base, [
+      ...flatEffects, ["fogTolerance", "挡雾强度"], ["restQi", "歇息回气"], ["evadeQi", "闪避成功回气"],
+      ["heavyGuard", "挡重招减伤"], ["heavyGuardQi", "挡重招回气"], ["counter", "架招反击伤害"],
+    ]),
+    ...(specialty ? [["专攻", specialty]] : []),
+    ...effectRows(rank.focus ?? {}, [["atk", "专攻攻击"], ["pierce", "专攻穿甲"], ["guard", "专攻护持"]]),
+    ...(fist ? [[fist.name, "先蓄势 1 回合"], ...effectRows(fist, [["power", "蓄势拳攻击"], ["pierce", "蓄势拳穿甲"]])] : []),
+  ];
+}
+
+function itemStats(s, id, wear) {
+  const gear = gearRows.get(id);
+  if (gear) return gearStats(s, gear, wear);
+  const pill = pillRows.get(id);
+  if (pill) return [
+    ...effectRows({ ...pill, wound: -pill.wound }, [...recoveryEffects, ["toxin", "丹毒"], ["wound", "伤势"]]),
+    ...(pill.focus ? [["强化法攻", `${numberEffect(rules.focusDamage)} · ${pill.focus} 次`]] : []),
+    ["境界要求", tierName(pill.tier)],
+    ...(pill.sense ? [["恢复神识要求", tierName(rules.resistanceTier)]] : []),
+  ];
+  const food = foodRows[id];
+  if (food) return effectRows(food, recoveryEffects);
+  const ammo = ammoRows.get(id);
+  if (ammo) return [["攻击", numberEffect(ammo.atk)], ["穿甲", numberEffect(ammo.pierce)], ...traitRows(ammo)];
+  const seal = talismanRows.get(id);
+  if (seal) return [
+    ...effectRows(seal, [["damage", "出手威力"], ["guard", "护持"], ["retreat", "脱身", true]]),
+    ["境界要求", tierName(seal.tier)],
+  ];
+  const manual = manualRows.get(id);
+  if (manual) return manualStats(manual, s.manualRanks?.[id] ?? 1);
+  const bag = containerRows.get(id);
+  if (bag) return [["袋内容量", `${bag.capacity} 格`]];
+  if (itemRows[id]?.kind === "currency") return [["行囊占用", "1 格"]];
+  return [];
+}
+
+function statList(rows = []) {
+  return rows.length ? `<span class="item-tip-values">${rows.map(([label, value]) =>
+    `<span class="item-tip-stat"><span>${escape(label)}</span><b>${escape(value)}</b></span>`).join("")}</span>` : "";
+}
+
+function itemTipBody(description, stats, id) {
+  const item = id ? ` data-item-description="${escape(id)}"` : "";
+  return `<span class="item-tip-flavor"${item}>${escape(description)}</span>${statList(stats)}`;
+}
+
+function spiritStats(skill) {
+  const modifiers = { physicalResist: "对手物抗", perception: "对手洞察", attack: "对手出手威力" };
+  return [
+    ["神识消耗", `−${skill.cost}`], ["持续", `${skill.duration} 回合`], ["冷却", `${skill.cooldown} 回合`],
+    ...(skill.stat ? [[modifiers[skill.stat], numberEffect(skill.strength - 1, true)]] : []),
+    ...(skill.id === "split_stream" ? [["下一击伤害", `×${skill.strength}`]] : []),
+  ];
 }
 
 function itemEntry(s, id) {
-  return { id, text: itemDescription(s, id) };
+  return { id, text: itemDescription(s, id), stats: itemStats(s, id) };
 }
 
 function itemSlot(s, item, location, actions = "", label = "", count = 0, controls = {}) {
@@ -762,10 +853,11 @@ function itemSlot(s, item, location, actions = "", label = "", count = 0, contro
     ? ` data-bag-action="${controls.shortcut.action}" data-bag-id="${escape(controls.shortcut.bagId)}" data-bag-item="${escape(item.id)}"` : "";
   const gear = gearRows.get(item.id);
   const status = gear && controls.wear != null ? `目前${gearCondition(controls.wear, gear.durability)}。` : controls.status ?? "";
+  const entry = controls.entry ?? { id: item.id, text: itemDescription(s, item.id), stats: itemStats(s, item.id, controls.wear) };
   return `<div class="item-row" data-item-row="${escape(key)}">
     ${label ? `<span class="slot-label">${escape(label)}</span>` : ""}
     <button type="button" class="item-trigger" data-item="${escape(key)}"${openAction}${shortcut} aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
-    <span class="item-tip" id="tip-${escape(key)}" role="tooltip" data-item-description="${escape(item.id)}">${escape(itemDescription(s, item.id))}</span>
+    <span class="item-tip" id="tip-${escape(key)}" role="tooltip">${itemTipBody(entry.text, entry.stats, entry.id)}</span>
     ${actions || status ? `<div class="item-tools"${open ? "" : " hidden"}>${status ? `<span class="fine item-status">${escape(status)}</span>` : ""}${actions}</div>` : ""}
   </div>`;
 }
@@ -801,15 +893,6 @@ function bagContents(s, bag, canMove) {
       <h2>${escape(bag.name)}</h2><span class="fine">${bag.used}/${bag.capacity} 格</span></div>
     <progress class="pack-meter" max="${bag.capacity}" value="${bag.used}" aria-label="${escape(bag.name)}已用${bag.used}格，共${bag.capacity}格"></progress>
     ${storage || '<p class="fine">空</p>'}</section>`;
-}
-
-function manualDescription(book, level) {
-  const specialty = [...new Set(book.specialty.map(kind => weaponNames[kind]).filter(Boolean))].join("、");
-  const max = book.ranks.length;
-  const rank = manualRankName.format(level);
-  const rankText = level >= max ? `已练到最高的第${rank}层。`
-    : `已练到第${rank}层，可练至第${manualRankName.format(max)}层。`;
-  return [book.grade && `${book.grade}内功。`, book.desc, book.ranks[level - 1]?.effect, specialty && `专练${specialty}。`, rankText].filter(Boolean).join(" ");
 }
 
 function manualActions(book, active, canManage, canTrain) {
@@ -888,6 +971,9 @@ function pack(s) {
   if (activeManual) worn.push(itemSlot(s, itemRows[activeManual.id], "worn",
     manualActions(activeManual, true, canManageManual, !onOpenRoad(s)) + discardActions(s, activeManual.id), "内功", 0,
     { status: activeManual.aligned ? "手头的打法合它的路数。" : "" }));
+  const activeSpirit = s.spiritSense?.active;
+  if (activeSpirit) worn.push(itemSlot(s, { id: `spirit-${activeSpirit.id}`, name: activeSpirit.name }, "worn",
+    "", "神识", 0, { entry: { text: activeSpirit.desc, stats: spiritStats(activeSpirit) } }));
   const carried = data.items.filter(row => s.inventory[row.id] && row.id !== activeManual?.id && !Object.values(s.equipment).includes(row.id));
   const usedClues = new Set(s.usedClues);
   const activeClues = new Set(s.activeClues);
@@ -959,7 +1045,7 @@ function pack(s) {
       ? (s.edibleMeals.includes(meal.id) ? linkButton("吃", "eat", meal.id) : "") +
         (s.batchMeals[meal.id] > 1 ? linkButton(`连吃 ${s.batchMeals[meal.id]} 份`, "batchEat", meal.id, "quiet") : "") +
         linkButton("移回行囊", "setMealPouch", "none", "quiet") : "", "", meal.count)
-    : '<p class="fine">空</p>';
+    : `<p class="fine">${canEat && carried.some(({ id }) => foodRows[id]) ? "点一份口粮装进来。" : "空"}</p>`;
   return `<section class="kit-section"><h2>装备</h2>${worn.join("") || '<p class="fine">空</p>'}</section>
     <section class="kit-section"><div class="kit-head"><h2>${escape(s.backpackName)}</h2><span class="fine" title="${capacityLabel}">${useProgress ? `${s.backpackUsed}/${s.backpackCapacity} 格` : room}</span></div>
       ${meter}
@@ -1001,7 +1087,7 @@ ${escape(bookDrafts.get(item.id) ?? description)}</textarea>
     <div class="actions"><button type="submit" class="button primary">保存介绍</button>
       <button type="button" class="button quiet" data-book-cancel="${id}">取消</button>
       ${modified ? `<button type="button" class="button quiet" data-book-reset="${id}">恢复原文</button>` : ""}
-    </div></form>` : `<p class="item-description">${escape(description)}</p>
+    </div></form>` : `<p class="item-description">${escape(description)}</p>${statList(itemStats(s, item.id, s.durability[item.id]))}
     <div class="actions"><button type="button" class="button quiet" data-book-edit="${id}">改介绍</button>
       ${modified ? `<button type="button" class="button quiet" data-book-reset="${id}">恢复原文</button>` : ""}</div>`;
   return `<article class="book-entry" data-book-entry="${id}"><h3>${escape(item.name)}</h3>${body}</article>`;
@@ -1415,19 +1501,22 @@ function meditationForm(s) {
     <select id="meditation-clue" name="clue" required><option value="" disabled${listed ? "" : " selected"}>请选择</option>
       ${ids.map(id => `<option value="${escape(id)}"${id === meditationClue ? " selected" : ""}>${escape(itemRows[id].name)}</option>`).join("")}
     </select><button type="submit" class="button"${!listed || reason ? " disabled" : ""}${reason ? ' aria-describedby="meditation-blocker"' : ""}>冥想 · ${s.deductionQiCost} 真气</button></div>
+    <p class="fine item-description" data-clue-preview${listed ? "" : " hidden"}>${listed ? escape(itemDescription(s, meditationClue)) : ""}</p>
     ${reason ? `<p class="fine" id="meditation-blocker">${escape(reason)}</p>` : ""}</form>`;
 }
 
 function deductionHistory(s) {
   const notes = s.deductionHistory ?? [];
   if (!notes.length) return "";
+  const recent = [...notes].reverse();
+  const ordered = [...recent.filter(note => !note.verified), ...recent.filter(note => note.verified)];
   return `<details class="deduction-history" data-deduction-history${deductionHistoryOpen ? " open" : ""}>
     <summary>推演历史</summary>
-    ${[...notes].reverse().map(({ id, title, conclusion, reason, verified }) =>
+    ${ordered.map(({ id, title, conclusion, reason, verified, destination }) =>
       `<details class="deduction-record" data-deduction-record="${escape(id)}"${openDeductions.has(id) ? " open" : ""}>
-        <summary>${escape(title)}</summary>
+        <summary>${escape(title)} <span class="fine">· ${verified ? "已验证" : "待验证"}</span></summary>
+        ${destination ? `<p class="fine">${escape(destination.region)} · ${escape(destination.site)}</p>` : ""}
         <p>${escape(conclusion)}</p><p class="fine deduction-reason">${escape(reason)}</p>
-        ${verified ? '<p class="fine">已在现场验过。</p>' : ""}
       </details>`).join("")}
   </details>`;
 }
@@ -1789,6 +1878,9 @@ document.addEventListener("input", event => {
     meditationClue = event.target.value;
     const button = form.querySelector('button[type="submit"]');
     button.disabled = !meditationClue || button.hasAttribute("aria-describedby");
+    const preview = form.querySelector("[data-clue-preview]");
+    preview.textContent = meditationClue ? itemDescription(state, meditationClue) : "";
+    preview.hidden = !meditationClue;
   }
   if (form?.dataset.experiment) experimentDrafts.set(form.dataset.experiment, readExperiment(form).settings);
 });

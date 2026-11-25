@@ -92,7 +92,7 @@ const forgedGear = [
       desc: '水纹从佩心往外刻，直到一圈没有接缝的暗金边。' },
     gear: { slot: 'charm', tier: 8, def: 1, hp: 4, qi: 10, durability: 61, repair: 24,
       physicalResist: 0.04, magicResist: 0.15, spiritReserve: 1,
-      entry: '金丹后期可佩，能多存些真气，多蓄一点神识。打来的术法沿水纹散开，也能卸掉一点兵刃力道。' },
+      entry: '金丹后期可佩，能多存些真气。打来的术法沿水纹散开，也能卸掉一点兵刃力道。' },
     recipe: { tier: 8, reveal: { item: 'fault_receipt' }, cost: 72, days: 6,
       need: { core: 10, black_iron: 8, ore: 5, gold_core: 5 },
       desc: '旧约记着先向哪边放水。护心佩照这个次序刻开水纹，让打来的气劲沿浅槽分散。' },

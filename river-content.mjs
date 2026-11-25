@@ -11,11 +11,11 @@ const regions = [
 ];
 
 const regionDetails = {
-  village: { province: 'wuliang', x: 14, y: 53, links: ['marsh', 'reed_meadows', 'pine_ridge'], portal: true, array: true,
+  village: { province: 'wuliang', x: 14, y: 53, links: ['marsh', 'reed_meadows'], portal: true, array: true,
     settlement: { type: '村庄', repair: { name: '落灯村工坊', description: '裴匠和迟师傅轮着照看炉火。磨刃、补甲和修佩件都可以拿过去。', surcharge: 0 } } },
   marsh: { province: 'wuliang', x: 28, y: 68, links: ['village', 'ridge', 'ford', 'reed_meadows', 'pale_shoal', 'undertow_grotto'] },
   ridge: { province: 'wuliang', x: 47, y: 60, links: ['marsh', 'ford', 'screen_slope', 'counter_bell', 'black_mine'] },
-  ford: { province: 'wuliang', x: 73, y: 74, links: ['ridge', 'hidden', 'pine_ridge', 'fish_ladder', 'willow_post', 'zhao_city'] },
+  ford: { province: 'wuliang', x: 73, y: 74, links: ['ridge', 'hidden', 'pine_ridge', 'zhao_city'] },
   hidden: { province: 'wuliang', x: 91, y: 89, links: ['ford'] },
   pine_ridge: { province: 'wuliang', x: 66, y: 45, links: ['ford', 'kiln_valley', 'screen_slope', 'lantern_court'] },
   kiln_valley: { province: 'wuliang', x: 50, y: 35, links: ['pine_ridge', 'herb_basin'] },
@@ -25,8 +25,8 @@ const regionDetails = {
   sky_terrace: { province: 'wuliang', x: 72, y: 10, links: ['snow_pass'] },
   reed_meadows: { province: 'wuliang', x: 13, y: 77, links: ['village', 'marsh', 'gauge_tower'] },
   pale_shoal: { province: 'wuliang', x: 42, y: 89, links: ['marsh', 'gauge_tower', 'willow_post'] },
-  fish_ladder: { province: 'wuliang', x: 87, y: 62, links: ['ford', 'lantern_court'] },
-  willow_post: { province: 'wuliang', x: 66, y: 91, links: ['ford', 'pale_shoal'], portal: true,
+  fish_ladder: { province: 'wuliang', x: 87, y: 62, links: ['lantern_court'] },
+  willow_post: { province: 'wuliang', x: 66, y: 91, links: ['pale_shoal'], portal: true,
     settlement: { type: '驿站', inn: 2, goods: { ration: { price: 5, start: 10, cap: 12, interval: 2 }, salve: { price: 9, start: 3, cap: 4, interval: 4 }, wood: { price: 4, start: 5, cap: 7, interval: 4 } }, buys: { hide: 4, qi_core: 6, beast_meat: 2 } } },
   gauge_tower: { province: 'wuliang', x: 25, y: 94, links: ['reed_meadows', 'pale_shoal'] },
   screen_slope: { province: 'wuliang', x: 32, y: 46, links: ['ridge', 'pine_ridge', 'herb_basin'] },
@@ -187,12 +187,14 @@ const events = [
     { label: '抓牢护绳，筛吊板尽头的暗金', guardedBy: 'river_cliff_kite', days: 0.75, loot: { black_iron: 2 },
       outcome: '绳套没有再碰岩尖，你能腾出一只手把石缝里的暗金拨进布袋。' },
   ] },
-  { id: 'undertow_bed', name: '退水石脊', text: '两股潮水都漫不过中间的石脊。顺绳下来，前面是一片平泥地，侧洞的口就在外侧。', choices: [
-    { label: '沿石脊走近那片泥地', days: 0.5, enemy: 'undertow_moundback', outcome: '驮泥大蛇从水里顶起整片泥地，侧身把你逼到石脊尽头。' },
+  { id: 'undertow_bed', name: '退水石脊', text: '两股潮水都漫不过中间的石脊。绳尾旁有道背风的石凹。再往下就是泥地，一排比手掌还宽的压痕一直拖进深水，侧洞几乎被搅上来的泥堵住。', choices: [
+    { label: '沿石脊走向深水边的拖痕', days: 0.5, enemy: 'undertow_moundback', outcome: '驮泥大蛇从水里顶起整片泥地，侧身把你逼到石脊尽头。' },
     { label: '挖泥地正中的黑泥', afterFight: 'undertow_moundback', days: 0.625, insight: 6, loot: { heart_silt: 2 }, outcome: '潮水还在石脊两边响，黑泥表面却不起一丝水纹。你挖出两份回潮洞的黑泥，包好时指尖还凉着。' },
     { label: '沿石脊绕去侧洞，采灵晶', guardedBy: 'undertow_moundback', days: 1, insight: 3, loot: { core: 4 }, outcome: '晶砂从岩壁落进筛里。侧洞的水来得慢，你还能循这条路回到高处。' },
     { label: '挖潮沟里新沉的黑泥', desc: '等静水沉下一层，沿潮沟的石沿就能舀到。', afterChoice: 1, days: 0.625, loot: { heart_silt: 1 },
       outcome: '你把沉在沟沿的新泥捧到石面上，沥干多余的水。' },
+    { label: '在绳尾旁的石凹里调息', desc: '外面的雾贴着水面流，绕不到石凹里来。', days: 0.5, stay: true, fogRest: true, qi: 12, cooldown: 2,
+      cooldownText: '刚在这里调过息，气息得缓一阵。', outcome: '石凹里只听得见水声。你靠着干石，把一口散乱的真气慢慢收回。' },
   ] },
   { id: 'counter_bell_score', name: '古钟旁的信架', text: '你停下了，脚步声还从钟里多回来一下。墙上擦痕高过肩头，一直伸到古钟后面。角落的信架歪着，底下压了几页厚纸。', choices: [
     { label: '顺着钟槌留下的擦痕去看古钟', days: 0.375, enemy: 'river_copper_echo', outcome: '铜影从墙边抬起手臂，挤进窄缝，一槌砸向通道正中。' },

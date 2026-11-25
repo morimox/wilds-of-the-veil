@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { data } from './data.mjs';
 import { act, createGame, rules, view } from './engine.mjs';
+import { stageRetreatOpening } from './game-test-fixtures.mjs';
 
 function play(state, action, payload) {
   const result = act(state, action, payload);
@@ -32,6 +33,33 @@ test('mist grows with elapsed field time; a deeper reserve delays exhaustion', (
   const caps = data.realms.map(({ qi }) => qi);
   assert.ok(caps.every((qi, index) => index === 0 || qi > caps[index - 1]));
   assert.ok(exposure(8) > exposure(0));
+});
+
+test('field combat and local withdrawal leave the clock, food and mist untouched', () => {
+  const state = createGame(51);
+  play(state, 'travel', { id: 'marsh' });
+  play(state, 'visit', { id: 'mud_track' });
+  play(state, 'choose', { index: 0 });
+  const clock = () => ({
+    day: state.day, satiety: state.satiety, pressure: state.pressure, exposure: state.fogExposure,
+  });
+  const before = clock();
+  const startingHp = state.hp;
+  for (let turn = 0; turn < 5; turn += 1) {
+    const result = play(state, 'guard');
+    assert.equal(result.fogLoss, undefined);
+    assert.deepEqual(clock(), before);
+    assert.equal(state.combat.round, turn + 1);
+  }
+  assert.ok(state.hp < startingHp);
+  stageRetreatOpening(state);
+  assert.equal(play(state, 'retreat').retreated, true);
+  assert.deepEqual(clock(), before);
+  if (state.event) play(state, 'leave');
+  assert.ok(play(state, 'wait').fogLoss > 0);
+  assert.ok(state.day > before.day);
+  assert.ok(state.satiety < before.satiety);
+  assert.ok(state.pressure > before.pressure);
 });
 
 test('offensive symbols spend the paper while recovery medicine restores only Qi', () => {

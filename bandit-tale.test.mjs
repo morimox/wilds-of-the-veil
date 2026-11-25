@@ -20,15 +20,17 @@ function canChoose(state, index) {
   return view(state).visibleChoices.some(choice => choice.index === index && choice.available);
 }
 
-function meetCarrier(from, to, full = false) {
+function meetCarrier(from, to, { full = false, clearPatrol = false } = {}) {
   const state = createGame(731);
   state.region = from;
   state.discovered.push(from, to);
-  state.roadSeed = 1972;
+  state.roadSeed = 2081;
+  if (clearPatrol) state.siteVictories.bandit_red_rope_den = { bandit_red_rope_chief: 1 };
   if (full) state.inventory.ration = rules.backpackCapacity * rules.backpackStackSize;
   const result = play(state, 'travel', { id: to });
   assert.equal(result.roadInterrupted, true);
   assert.equal(state.roadBandit.fixed, story.id);
+  assert.equal(state.banditCrews.ferryWood, undefined);
   return state;
 }
 
@@ -60,8 +62,8 @@ test('the grain carrier can be passed without a fee or a fight and never opens t
   continueTo(state, glass);
 });
 
-test('both grain resolutions follow real evidence and remain playable with a full bag', () => {
-  const state = meetCarrier(glass, granary, true);
+test('both grain resolutions follow real evidence and award the manual with a full bag even after the pirates are defeated', () => {
+  const state = meetCarrier(glass, granary, { full: true, clearPatrol: true });
   const capacity = view(state).backpackCapacity;
   assert.equal(view(state).backpackUsed, capacity);
   const remaining = view(state).roadTrip.remainingUnits;
@@ -108,10 +110,18 @@ test('both grain resolutions follow real evidence and remain playable with a ful
   play(publicHearing, 'visit', { id: counter });
   play(publicHearing, 'choose', { index: 0 });
   assert.ok(canChoose(publicHearing, 1) && canChoose(publicHearing, 2));
+  assert.equal(canChoose(publicHearing, 3), false);
   const coins = publicHearing.coins;
   play(publicHearing, 'choose', { index: 2 });
   assert.equal(publicHearing.coins, coins + 14);
   assert.equal(publicHearing.inventory[manual], undefined);
   assert.equal(act(publicHearing, 'choose', { index: 1 }).ok, false);
   assert.equal(act(publicHearing, 'choose', { index: 2 }).ok, false);
+  play(publicHearing, 'choose', { index: 3 });
+  if (view(publicHearing).groundLoot[manual]) {
+    play(publicHearing, 'discard', { id: 'ration', count: rules.backpackStackSize });
+    play(publicHearing, 'take', { id: manual });
+  }
+  assert.equal(publicHearing.inventory[manual], 1);
+  assert.equal(act(publicHearing, 'choose', { index: 3 }).ok, false);
 });

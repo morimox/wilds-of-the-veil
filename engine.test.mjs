@@ -1556,6 +1556,7 @@ test('the old ford route and its optional hidden map remain playable with earned
   choose(state, 0);
   assert.equal(state.inventory.wood ?? 0, wood - 1);
   assert.equal(state.qi, Math.min(view(state).maxQi, qi + 4));
+  feed(state, 20);
   chooseAt(state, 'still_pole', 0);
   assert.equal(state.inventory.lamp_sketch, 1);
   assert.equal(state.wonDay, wonDay);

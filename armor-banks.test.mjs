@@ -146,6 +146,7 @@ test('scorpion victories in the renewable sand bank and the finite quarry stay i
   assert.deepEqual(group(state, quarry), { ...fullQuarry, [sharedScorpion]: fullQuarry[sharedScorpion] - 1 });
   play(state, 'leave');
   play(state, 'travel', { id: sand.region });
+  if (!state.satiety) play(state, 'eat', { id: 'ration' });
   play(state, 'visit', { id: sand.id });
   assert.deepEqual(group(state, sand.id), fullBank);
 });

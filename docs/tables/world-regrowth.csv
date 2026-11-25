@@ -129,8 +129,8 @@
 井底隔水板（sand_stillwell_sill）,资源,灵晶（core）,core,盐痕下的灵晶,3,6,6,2,,,,1
 刻着反向蹄印的白石（sand_approach_hoof）,资源,寒铁（ore）,ore,白石下的寒铁片,3,5,5,1,,,,3
 倒挂的驿印（sand_archive_guard）,种群,倒驿锁影（sand_inverted_keeper）,sand_inverted_keeper,,1,1,,,不回补,,,
-铜扣松动的桥栏（sand_bridge_rail）,资源,松木（wood）,wood,桥板旁的旧松木,4,7,4,2,,,,3
-铜扣松动的桥栏（sand_bridge_rail）,种群,黄结桥蝰（sand_rattle_viper）,sand_rattle_viper,,2,5,4.5,1,随种群密度变化,,,
+桥边的铜扣（sand_bridge_rail）,资源,松木（wood）,wood,桥板旁的旧松木,4,7,4,2,,,,3
+桥边的铜扣（sand_bridge_rail）,种群,黄结桥蝰（sand_rattle_viper）,sand_rattle_viper,,2,5,4.5,1,随种群密度变化,,,
 石板间的铁楔（sand_wind_work）,资源,寒铁（ore）,ore,岩缝里的寒铁,4,7,5,2,,,,1
 石板间的铁楔（sand_wind_work）,资源,灵晶（core）,core,沙槽里的灵晶,3,6,6,2,,,,2
 关了一半的仓门（sand_silo_door）,资源,灵草（reed）,reed,卸谷洞边的灵草,3,6,4,2,,,,3

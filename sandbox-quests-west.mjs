@@ -382,6 +382,7 @@ export const sandboxQuestsWest = [
       },
       days: 0.5, insight: 5, reward: { zhao_mill_door_pin: 1 },
       outcome: '木楔顶起门环，矮门向岸上翻开，里面有段干石梯。门后原样拴着一截插门用的短木，你把它托住，往后能循这道矮门下去看旧磨工的干工房。',
+      afterText: '半扇磨轮还是歪在屋脚。朝岸的矮门开了一人宽，门下露出几级干石梯。磨轮背后的木牌仍压在原处。',
     },
   },
 ];

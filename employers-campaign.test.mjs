@@ -173,7 +173,7 @@ test('sluice guard spends the actual wood, hide and ore before paying the repair
   assert.equal(state.inventory.wood ?? 0, 0);
   assert.equal(state.inventory.hide ?? 0, 0);
   assert.equal(act(state, 'choose', { index: 0 }).ok, false);
-  takeRoad(state, 'green_dyke', 'ring_isles');
+  takeRoad(state, 'green_dyke', 'frog_pond', 'ring_isles');
   play(state, 'visit', { id: 'zhao_sluice_outer_isle' });
   let turns = finishStops(state, 'zhao_sluice_eel', 'zhao_sluice_echo', 'zhao_sluice_receipt');
   assert.deepEqual(view(state).groundLoot, { beast_meat: 4, qi_core: 4 });

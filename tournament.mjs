@@ -140,10 +140,7 @@ export function tournamentAction(state, action, kit) {
   }
   if (action === 'tournamentWithdraw') {
     if (!score.enrolled) return kit.refuse('你现在没有报名。');
-    if (inMatch) {
-      kit.advance(state, tournamentData.boutDays);
-      kit.setRegulatedBoutRecovery(state);
-    }
+    if (inMatch) kit.setRegulatedBoutRecovery(state);
     state.combat = null;
     state.event = null;
     state.focus = 0;

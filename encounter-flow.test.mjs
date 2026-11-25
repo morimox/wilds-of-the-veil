@@ -79,7 +79,7 @@ test('the three bag patterns are tied to work, an observed object, and victory',
   assert.match(view(state).currentEvent.text, /刀鞘.*铁环/);
   assert.ok(!choices(state).includes(1));
   play(state, 'choose', { index: 0 });
-  assert.equal(view(state).currentEnemy.sparring, false);
+  assert.equal(view(state).currentEnemy.sparring, true);
   state.combat.hp = 1;
   play(state, 'attack');
   assert.match(view(state).currentEvent.text, /收了刀.*铁环/);

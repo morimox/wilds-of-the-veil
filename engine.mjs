@@ -18,6 +18,8 @@ const records = Object.fromEntries(
     .map((key) => [key, Object.assign(Object.create(null), Object.fromEntries((data[key] ?? []).map((entry) => [entry.id, entry])))]),
 );
 const experiments = Object.fromEntries(data.events.filter(({ experiment }) => experiment).map(({ experiment }) => [experiment.id, experiment]));
+const experimentSites = Object.fromEntries(data.events.filter(({ experiment }) => experiment)
+  .map(({ id, experiment }) => [experiment.id, id]));
 const supply = 'ration';
 const currency = 'spirit_coin';
 const hub = 'village';
@@ -45,7 +47,7 @@ export const rules = Object.freeze({
   fogMaxDrain: 14,
   fogRestPerDay: 4.8,
   deductionQiCost: 3,
-  battleDays: 0.125,
+  battleDays: 0,
   regulatedBoutCooldown: 0.5,
   regulatedBoutHpFraction: 0.5,
   perceptionScale: 12,
@@ -71,7 +73,7 @@ export const rules = Object.freeze({
   harvestEncounterDays: 0.125,
   ebbCycleDays: 2,
   ebbWindowDays: 0.625,
-  retreatDays: 0.25,
+  retreatDays: 0,
   escapeDodgeFactor: 0.75,
   escapeChanceCap: 0.85,
   banditEscapeChanceCap: 0.40,
@@ -213,6 +215,7 @@ function setRegulatedBoutRecovery(state) {
 
 function advance(state, days, satietyRate = rules.satietyDrainPerDay, sheltered = false) {
   const elapsed = days ?? 0;
+  if (elapsed === 0) return;
   state.day = Math.round((state.day + elapsed) * 1000) / 1000;
   state.satiety = Math.max(0, +(state.satiety - elapsed * satietyRate).toFixed(3));
   if (!sheltered) accumulateFog(state, elapsed);
@@ -720,8 +723,10 @@ function prepareCombatRound(state) {
   if (!combat || combat.plan?.round === combat.round) return;
   const enemy = enemyOf(state);
   const context = enemyContext(state);
-  const perceivedPlayer = stats(state).perception * (spiritFrame(combat, true)?.id === 'veil_eye' ? 0.5 : 1);
-  const perceivedEnemy = (enemy.perception ?? 0) * (spiritFrame(combat)?.id === 'veil_eye' ? 0.5 : 1);
+  const affectsPlayer = spiritFrame(combat, true);
+  const affectsEnemy = spiritFrame(combat);
+  const perceivedPlayer = stats(state).perception * (affectsPlayer?.id === 'veil_eye' ? affectsPlayer.strength : 1);
+  const perceivedEnemy = (enemy.perception ?? 0) * (affectsEnemy?.id === 'veil_eye' ? affectsEnemy.strength : 1);
   const gap = perceivedPlayer - perceivedEnemy;
   const magnitude = Math.abs(gap);
   const chance = Math.min(rules.perceptionCap, magnitude / (rules.perceptionScale + magnitude));
@@ -873,8 +878,13 @@ function availableExperiment(state, event) {
 }
 
 function experimentBlocker(state, event, trial) {
-  if (trial.afterFight && siteWins(state, records.sites[event.id], trial.afterFight) === 0) {
-    return `要先从${records.enemies[trial.afterFight].name}身边打开去路。`;
+  const site = records.sites[event.id];
+  if (trial.afterFight && siteWins(state, site, trial.afterFight) === 0) {
+    return `先过${records.enemies[trial.afterFight].name}这一关。`;
+  }
+  if (remainingGuards(state, site, trial) > 0) {
+    const guards = choiceGuards(trial).filter((id) => site.creatures[id] && poolAt(state, site, 'creatures', id).count > 0);
+    return `${guards.map((id) => records.enemies[id].name).join('、')}又堵住了去路。`;
   }
   const missing = missingItems(state, trial.fieldNeed);
   return Object.keys(missing).length ? `手边还缺${goodsText(missing)}。` : '';
@@ -1028,9 +1038,14 @@ export function view(state) {
     usedClues,
     deductionQiCost: rules.deductionQiCost,
     deductionDraft: deductionDraftView(state),
-    deductionHistory: deductionHistory.map(({ id, day }) => ({
-      id, day, title: records.deductions[id].name, ...sandboxDeductions[id], verified: state.completedDeductions.includes(id),
-    })),
+    deductionHistory: deductionHistory.map(({ id, day }) => {
+      const site = records.sites[experimentSites[id]];
+      return {
+        id, day, title: records.deductions[id].name, ...sandboxDeductions[id],
+        destination: site && { region: records.regions[site.region].name, site: site.name },
+        verified: state.completedDeductions.includes(id),
+      };
+    }),
     quests: discoveredQuests.map((quest) => {
       const completed = state.completedQuests.includes(quest.id);
       const blockedReason = completed ? '' : questBlocker(state, quest);
@@ -1595,7 +1610,7 @@ function combatEffects(state, enemy, intent, move) {
   const breaksPlayerGuard = enemySpirit?.id === 'fold_armor';
   const spell = move.damageType === 'magic';
   const enemySpell = intent.damageType === 'magic';
-  const enemyPhysical = enemy.tier >= rules.resistanceTier ? (enemy.physicalResist ?? 0) * (breaksEnemyGuard ? 0.5 : 1) : 0;
+  const enemyPhysical = enemy.tier >= rules.resistanceTier ? (enemy.physicalResist ?? 0) * (breaksEnemyGuard ? playerSpirit.strength : 1) : 0;
   const enemyMagic = enemy.tier >= rules.resistanceTier ? enemy.magicResist : 0;
   const enemyResist = spell ? enemyMagic : enemyPhysical;
   const focus = manualFocus(state, move.weaponClass);
@@ -1628,7 +1643,7 @@ function combatEffects(state, enemy, intent, move) {
   const rawDamage = damage > 0
     ? Math.max(rules.minAttackDamage, effectiveDamage - Math.max(0, armor - pierce - (focus?.pierce ?? 0)
       - (strikingTraits?.pierce ?? 0) - training.pierce - (ammo?.pierce ?? 0))) : 0;
-  const playerBurst = playerSpirit?.id === 'split_stream' && state.combat.round === playerSpirit.start + 1 ? 3 : 1;
+  const playerBurst = playerSpirit?.id === 'split_stream' && state.combat.round === playerSpirit.start + 1 ? playerSpirit.strength : 1;
   const proposedDamage = move.fixedDamage ?? damageAfterResistance(rawDamage, enemyResist) * playerBurst;
   const enemyActiveDodge = intent.kind === 'dodge';
   const missChance = dodgeChance((enemy.dodge ?? 0) + (enemyActiveDodge ? rules.combatActiveDodge : 0), strikingTraits?.accuracy ?? 0,
@@ -1639,8 +1654,8 @@ function combatEffects(state, enemy, intent, move) {
   const interrupt = missed || selfStrike ? 0 : proposedInterrupt;
   const hit = Boolean(ammo && dealt > 0 && canInterceptOpening(state, intent));
   const enemyPierce = enemySpell ? intent.pierce ?? 0 : (enemy.manualPierce ?? 0) + (intent.pierce ?? 0);
-  const enemyBurst = enemySpirit?.id === 'split_stream' && state.combat.round === enemySpirit.start + 1 ? 3 : 1;
-  const incomingPower = Math.ceil(estimatedHit(state, enemy, intent) * (playerSpirit?.id === 'press_edge' ? 0.6 : 1));
+  const enemyBurst = enemySpirit?.id === 'split_stream' && state.combat.round === enemySpirit.start + 1 ? enemySpirit.strength : 1;
+  const incomingPower = Math.ceil(estimatedHit(state, enemy, intent) * (playerSpirit?.id === 'press_edge' ? playerSpirit.strength : 1));
   const returnsIncoming = playerSpirit?.id === 'turn_edge' && attackingIntent(intent) && !hit;
   const returned = returnsIncoming
     ? damageAfterResistance(Math.max(1, incomingPower - Math.max(0, enemy.def - enemyPierce)), enemySpell ? enemyMagic : enemyPhysical) * enemyBurst : 0;
@@ -1652,7 +1667,7 @@ function combatEffects(state, enemy, intent, move) {
   const shield = heavyBrace && !enemySpell && incoming > 0 && !breaksPlayerGuard
     ? activeGear(state).find(({ slot, brace }) => slot === 'offhand' && brace) : null;
   const received = damageAfterResistance(Math.max(0, incoming - (shield?.brace ?? 0)),
-    enemySpell ? magicResist : physicalResist * (breaksPlayerGuard ? 0.5 : 1)) * enemyBurst;
+    enemySpell ? magicResist : physicalResist * (breaksPlayerGuard ? enemySpirit.strength : 1)) * enemyBurst;
   const healing = intent.kind === 'heal' ? Math.max(0, Math.ceil(enemy.atk * (intent.mult ?? 1)) - interrupt) : 0;
   const reflect = !enemySpell && !intent.ranged && (intent.kind === 'attack' || intent.kind === 'heavy')
     ? damageAfterResistance(traits.reflect, enemy.physicalResist) : 0;

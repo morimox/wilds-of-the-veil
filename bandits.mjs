@@ -143,15 +143,28 @@ function pickBandit(state, appearance, crewId, kit) {
   return stage && chooseWeighted(state, stage.members, ({ tier }) => [4, 3, 2][tier % 3]);
 }
 
-function roadStory(state, leg, crewId, grade, kit) {
+function unvisitedRoadStories(state, kit) {
   const met = state.roadTrip.banditsMet ?? [];
-  const options = kit.data.roadBandits.fixed.filter(({ id }) => !state.resolvedBandits.includes(id) && !met.includes(id));
+  return kit.data.roadBandits.fixed.filter(({ id }) => !state.resolvedBandits.includes(id) && !met.includes(id));
+}
+
+function roadStory(state, leg, crewId, grade, kit) {
+  const options = unvisitedRoadStories(state, kit).filter(({ allowFight }) => allowFight !== false);
   const encounters = state.banditCrews[crewId]?.encounters ?? 0;
   const forced = options.find((story) => story.crew === crewId && story.forceAt && encounters + 1 >= story.forceAt);
   if (forced) return forced;
   const story = options.find(({ a, b, enemy, fee }) => roadKey(a, b) === leg.key &&
     (fee == null || Math.floor(kit.records.enemies[enemy].tier / 3) === grade));
   return story && draw(state) < story.chance ? story : null;
+}
+
+function stopForPasserby(state, leg, units, kit) {
+  const story = unvisitedRoadStories(state, kit)
+    .find(({ a, b, allowFight }) => allowFight === false && roadKey(a, b) === leg.key);
+  if (!story || draw(state) >= 1 - (1 - story.chance) ** units) return null;
+  (state.roadTrip.banditsMet ??= []).push(story.id);
+  state.roadBandit = { fixed: story.id, nonThreat: true, fee: null, intro: story.intro };
+  return { ...kit.say(state, story.intro), roadInterrupted: true };
 }
 
 function stopForBandit(state, leg, crewId, kit) {
@@ -198,6 +211,8 @@ export function checkRoadBanditStep(state, leg, index, kit) {
     const pause = stopForBandit(state, leg, profile.crew, kit);
     if (pause) return pause;
   }
+  const passerby = stopForPasserby(state, leg, units, kit);
+  if (passerby) return passerby;
   if (Object.keys(kit.groundAt(state)).length) {
     return { ...kit.say(state, '你认出路边这处石脚，地上还有些东西。'), roadInterrupted: true };
   }

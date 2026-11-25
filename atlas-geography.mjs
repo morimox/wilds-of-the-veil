@@ -4,19 +4,19 @@ const step = 14;
 const positions = {
   village: [237, 100], marsh: [201, 141], ridge: [225, 127], ford: [287, 85],
   hidden: [335, 122], pine_ridge: [292, 106], kiln_valley: [273, 133], herb_basin: [288, 181],
-  black_mine: [238, 138], snow_pass: [281, 163], sky_terrace: [253, 149], reed_meadows: [171, 119],
+  black_mine: [238, 138], snow_pass: [267, 155], sky_terrace: [262, 139], reed_meadows: [171, 119],
   pale_shoal: [241, 172], fish_ladder: [315, 173], willow_post: [328, 211], gauge_tower: [137, 127],
-  screen_slope: [310, 202], lantern_court: [304, 141], undertow_grotto: [203, 111], counter_bell: [266, 115],
+  screen_slope: [310, 202], lantern_court: [304, 141], undertow_grotto: [203, 111], counter_bell: [263, 124],
   zhao_city: [591, 200], green_dyke: [639, 167], flood_market: [623, 267], measuring_hall: [647, 219],
   frog_pond: [672, 148], old_marker: [686, 187], zhao_hermit: [740, 194], ring_isles: [705, 123],
-  scale_bog: [723, 159], crane_granary: [663, 269], zhao_pass: [845, 210], jade_mill: [764, 143],
-  charcoal_ridge: [697, 235], sunken_lab: [756, 88], night_pit: [742, 234], glass_bank: [708, 274],
+  scale_bog: [723, 159], crane_granary: [666, 294], zhao_pass: [845, 210], jade_mill: [764, 143],
+  charcoal_ridge: [697, 235], sunken_lab: [756, 88], night_pit: [742, 215], glass_bank: [708, 274],
   fault_lake: [780, 183], rope_sands: [812, 284], burnt_weir: [794, 235], beacon_reefs: [761, 278],
   mingsha_city: [1135.3, 35.8], cinder_inn: [1132.5, 150.7], sand_bell_cloister: [1162.5, 98.1], silk_tent_road: [1169.1, 116.1],
-  salt_ledger_barrows: [1171.1, 41.7], stillwell_mouth: [1251.2, 54.6], stillwell_vault: [1222, 50.9], cold_kiln: [1318.9, 66.1],
+  salt_ledger_barrows: [1171.1, 41.7], stillwell_mouth: [1251.2, 54.6], stillwell_vault: [1223, 34.9], cold_kiln: [1318.9, 66.1],
   chalk_hoof_trail: [1167.5, 74.1], chalk_archive: [1198.1, 48.1], dry_sound_bridge: [1283.9, 60.2], wind_slate: [1236.6, 90.5],
   hollow_silo: [1416.4, 80.3], glass_hail_sink: [1377.2, 82.4], hanging_vein: [1277.9, 89.7], camel_grass_dunes: [1240, 123.5],
-  guest_mill: [1205.9, 95.4], kiln_roof_farm: [1197.5, 134.3], bone_dry_rill: [1161.5, 141.7], glass_rotunda: [1339.9, 84.4],
+  guest_mill: [1205.9, 95.4], kiln_roof_farm: [1197.5, 134.3], bone_dry_rill: [1161.5, 141.7], glass_rotunda: [1341.9, 98.4],
 };
 
 const fogBorder = [[432, 86], [441, 127], [429, 173], [446, 210], [454, 252], [445, 297], [453, 356]];
@@ -64,17 +64,18 @@ export const atlasGeography = {
 };
 
 const roadBends = {
+  'ford|marsh': [[241, 107]],
+  'ridge|screen_slope': [[249, 173]],
+  'ford|lantern_court': [[305, 111]],
+  'lantern_court|pine_ridge': [[298, 118]],
+  'guest_mill|sand_bell_cloister': [[1176, 101]],
+  'salt_ledger_barrows|sand_bell_cloister': [[1158, 53]],
+  'cold_kiln|hollow_silo': [[1382, 62]],
   'ford|zhao_city': [[344, 69], [404, 84], [440, 116], [498, 126], [551, 141]],
   'flood_market|willow_post': [[551, 290], [489, 339], [435, 292], [382, 262], [344, 218]],
   'mingsha_city|zhao_pass': [[1096, 43], [1019, 76], [947, 130], [909, 146], [879, 141]],
   'cinder_inn|rope_sands': [[1096, 160], [1043, 214], [994, 277], [952, 322], [912, 318], [879, 290]],
 };
-
-// Redundant direct links removed where they cross working roads or bypass whole valleys.
-export const removedAtlasRoads = new Set([
-  'pine_ridge|village', 'flood_market|zhao_pass', 'beacon_reefs|ring_isles',
-  'glass_bank|ring_isles', 'sand_bell_cloister|silk_tent_road',
-]);
 
 export function atlasLocation(id) {
   return positions[id];

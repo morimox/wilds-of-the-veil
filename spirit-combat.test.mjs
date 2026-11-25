@@ -51,10 +51,18 @@ test('all five teachings unlock at their source, while a gold pendant adds only 
   assert.equal(view(state).spiritSense.max, 3);
   state.realm = 8;
   assert.equal(view(state).spiritSense.max, 3);
+  assert.deepEqual(view(state).spiritSense.source, { natural: 3, equipment: null });
   wield(state, 'gold_spirit_pendant');
   assert.equal(view(state).spiritSense.max, 4);
+  assert.deepEqual(view(state).spiritSense.source, { natural: 3, equipment: {
+    id: 'gold_spirit_pendant', name: '静水护心佩', bonus: 1,
+  } });
+  state.realm = 7;
+  assert.equal(view(state).spiritSense.max, 3);
+  state.realm = 8;
   state.durability.gold_spirit_pendant = 0;
   assert.equal(view(state).spiritSense.max, 3);
+  assert.deepEqual(view(state).spiritSense.source, { natural: 3, equipment: null });
   for (const skill of spiritSkills) {
     state.region = skill.region;
     if (skill.proof || skill.defeated) {

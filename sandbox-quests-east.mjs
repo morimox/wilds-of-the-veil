@@ -79,6 +79,7 @@ export const sandboxQuestsEast = [
         flap: { low: '短板下面卷出一股水，刚退下的水线又爬回台脚。' } },
       days: 0.5, insight: 5, reward: { ore: 4, core: 4 },
       outcome: '湿痕退到台脚之下，不再往回爬。你擦干夹层牌子，上面写的是给后来修槽的人留下的铁垫和灵晶。你按原话取走了那包备料。',
+      afterText: '干台脚下的木塞还在，短挡板挂在靠岩壁的上孔。铜槽里每隔一会儿落一滴水，湿痕停在台脚下面。',
     },
   },
   {
@@ -103,7 +104,8 @@ export const sandboxQuestsEast = [
       misses: { cloth: { raised: '烟倒是往上走了，火舌还是从帘脚探出来。马荻伸脚把泥盆推远。' },
         vent: { base: '贴地的火往外一舔，泥面上马上多了一道红边。马荻用长柄把火拨回去。' } },
       days: 0.375, insight: 5, reward: { kiln_clay: 4, black_iron: 2 },
-      outcome: '泥沿压严，烟自窑帽上拐出去。帘脚不再发热，马荻把新补泥剩下的耐火泥和试筛的重砂交给你。',
+      outcome: '泥沿压严，烟从窑口上方散出去。帘脚不再发热，马荻把补缝剩下的耐火泥和筛好的重砂交给你。',
+      afterText: '窑棚的湿帘一直垂到地上，墙根抹过的泥已经干了。烟从窑口上方那道缝出去，晾炭的棚架还靠在外头。',
     },
   },
   {
@@ -153,16 +155,17 @@ export const sandboxQuestsEast = [
         tip: { crack: '瓦底的水流顺了，落地却被粗裂口带去了田埂外。' } },
       days: 0.375, insight: 3, reward: { reed: 5, millet_seed: 2 },
       outcome: '一滴露水从瓦尖落下，沿着细沙颜色变深的地方一直渗到药草旁。骆椿从留种的一把谷里分了两撮，又给你包上剪过的灵草。',
+      afterText: '骆椿把几片瓦一律粗面朝下架着。细槽里的沙比田埂颜色深，一直湿到药草根旁。西边的小道仍从瓦棚下穿过。',
     },
   },
   {
     id: 'east_caravan_flag', title: '吹向岔路的旧帐角', site: 'sand_crossing_rail',
-    conclusion: '去断帐旧道的岔路木牌找曾微。把旧帐角挂到朝背风坡的低环，用一条皮绳系死短边，让长边落下。往下站看一眼，旗角要能伸出雾沙。',
+    conclusion: '去断帐旧道的岔路木牌找曾微。让新裁的帐角挂在朝背风坡的低环，用皮绳系牢短边，任长边垂下来。到坡脚回头看，沙过来时旗角也该看得见。',
     reason: '矮帐的旧样上，记背风坡的是一面下垂的长尾。草丘人画出的落风线只有在低处还能看见。把长尾也扎死会看不出标记，挂高在风前反被沙埋。',
     clues: [
       { id: 'east_caravan_patch', name: '荀霜留的旧巡路样', desc: '旧帐布剪去一角，长边坠下。图旁写着「背风下坡」，布角的两道旧绳眼只在短边上。',
         site: 'sand_tent_watch', action: { label: '替荀霜把掉下的旧帐角收起来', desc: '晒绳下挂着一块松线织布，荀霜不敢先抬脚去踩湿席。', days: 0.25,
-          outcome: '她掸去沙粒，辨出是给岔口领路的旧样。「真旗已经换了，人没带针线。你若往木牌那头走，再问曾微挂哪儿。」' } },
+          outcome: '她掸去沙粒，辨出是给岔口领路的旧样。「曾微刚裁了块新布，正愁往哪儿挂。你若走岔口，拿过去给他瞧一眼。」' } },
       { id: 'east_caravan_low_wind', name: '草丘旗杆的落风线', desc: '牧人用竹片划出两道高度。高处被沙遮住，贴低坡的矮草顶还从风里露出来。',
         site: 'sand_dune_grass', action: { label: '蹲下看一回风沙越过草尖', desc: '沙坎外面风硬，从背阴沟这边能一直望到坡下。', days: 0.125,
           outcome: '你跟采草人并排蹲在沟里。草尖以下一阵清楚一阵模糊，较高的枝头反而尽被黄沙盖住。他让你拿走原先量风时削的竹片。' } },
@@ -177,6 +180,7 @@ export const sandboxQuestsEast = [
         tie: { all: '绑紧的布只剩一团厚边。远处的驮队仍分不出往哪头走。' } },
       days: 0.25, insight: 4, reward: { gate_scroll: 1, meat_broth: 2 },
       outcome: '长尾落到木牌背后的暗面上，坡脚仍看得出一线发白的布。曾微见驮队顺着背风坡过关，从驮袋里拿出备用卷轴和两罐热汤给你。',
+      afterText: '木牌低处垂出一角白布。坡脚的驮队照着布角拐进背风的一边，末尾的马蹄没进新刮起来的沙里。',
     },
   },
   {
@@ -201,6 +205,7 @@ export const sandboxQuestsEast = [
         step: { outside: '靠栏的一边先被踩沉，内侧没吃力，外沿是否松动还试不出来。' } },
       days: 0.375, insight: 4, reward: { east_bridge_hook: 1, ore: 2 },
       outcome: '踩下内侧，外沿只轻轻退了一点，从前的木响没有再传出来。黄桥匠捡起带旧把的短钩。「拆错向的铜扣就靠它。余下那一只你带着吧。」',
+      afterText: '翻过来的铜扣贴住栏杆，小缺口朝外。踩在内侧时，外沿的板能退一点，铜扣也不再啃木。黄桥匠还在桥边收拾工具。',
     },
   },
   {
@@ -225,6 +230,7 @@ export const sandboxQuestsEast = [
         route: { mouth: '把驿名贴进内领口，旧账上的几家立刻变成了地名。蒋芨把处置单抽出来。' } },
       days: 0.375, insight: 6, reward: { crystal_feast: 2, ration: 3 },
       outcome: '两栏抄过一遍，旧欠账终于分成了谁应领、谁已代送。蒋芨收好分开的封签，把今天备给来清账的热肉和干粮分给你。',
+      afterText: '蒋芨把写着户姓的封签贴在仓里，驿名贴在外头的卸粮口。仓门依然半开，前来认旧账的人能在门边找见自己的名字。',
     },
   },
   {
@@ -242,6 +248,7 @@ export const sandboxQuestsEast = [
     experiment: {
       desc: '木架外、里各空着一对凹窝。垂着的坠绳只能从外侧拨，手伸到里面要从里梁下穿过。',
       afterFight: 'sand_vein_jackal',
+      guardedBy: 'sand_vein_jackal',
       fieldNeed: { wood: 2 },
       controls: [
         control('foot', '松木先临时垫在哪', { out: '外头两个石窝', in: '里梁脚下', none: '先不垫' }),
@@ -263,7 +270,7 @@ export const sandboxQuestsEast = [
           need: { sand_glass_pass: 1 }, desc: '档房墙下还有一只扁模，外缘的小口颜色比别处深。', days: 0.375,
           outcome: '阮杪把铁片叠在旧模图上，正好够到描黑的止口。「原炉口早让风磨平了。带着图看看天室的轮，会不会只是学了同一个法子。」' } },
       { id: 'east_glass_close_shadow', name: '合圆影线和手印', desc: '晶壁上两道弧可以压成一个圆。褐色指印从靠柱侧一路抹在外沿，正对着圆的缺口。',
-        site: 'sand_hail_floor', action: { label: '去断晶背后描出两道白影的边', desc: '翻晶声停了，后面一片白石上有两道不相接的半圆。', days: 0.375, afterFight: 'sand_glass_lynx',
+        site: 'sand_hail_floor', action: { label: '去断晶背后描出两道白影的边', desc: '翻晶声停了，后面一片白石上有两道不相接的半圆。', days: 0.375, afterFight: 'sand_glass_lynx', guardedBy: 'sand_glass_lynx',
           outcome: '你按弧线描到靠柱那头，碰到几道干了的褐印。两道半圆若对合，手印正好绕到缺口外，留得下一只手。' } },
     ],
     experiment: {

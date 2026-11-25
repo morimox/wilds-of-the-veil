@@ -23,6 +23,9 @@ function at(region) {
 }
 
 function to(state, id, count) {
+  if ((state.region === inn && id === farm) || (state.region === farm && id === inn)) {
+    play(state, 'travel', { id: rill }, count);
+  }
   return play(state, 'travel', { id }, count);
 }
 
@@ -49,7 +52,7 @@ function materials(state, count) {
 
 function reported(count, prepare = false) {
   const state = at(inn);
-  state.discovered.push(inn, farm);
+  state.discovered.push(inn, rill, farm);
   state.world.lastSettlement = inn;
   assert.equal(view(state).localHazard, null);
   assert.equal(act(state, 'hazard', { id: 'report' }).ok, false);

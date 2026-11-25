@@ -99,10 +99,10 @@
 秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,sack,拿哪只来称空袋重,full,从刚挑来的盐袋取样,否,那包里是盐，空袋重得单独称。邢茧把货放回秤架。
 秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,entry,重填票时记多少,net,单列四两袋重，盐记十六两,是,
 秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,entry,重填票时记多少,gross,只记整袋二十两,否,点钱的人把旧票翻到背面，圈出了「去袋」。他肯按实出的盐付钱。
-桥栏是哪一头在咬木（east_bridge_copper）,铜扣松动的桥栏（sand_bridge_rail）,notch,铜扣的小缺口朝哪里,out,桥栏外沿,是,
-桥栏是哪一头在咬木（east_bridge_copper）,铜扣松动的桥栏（sand_bridge_rail）,notch,铜扣的小缺口朝哪里,in,桥面中心,否,铜扣转过去倒是扣得上，桥板一受力，仍咬出几丝新木屑。
-桥栏是哪一头在咬木（east_bridge_copper）,铜扣松动的桥栏（sand_bridge_rail）,step,试踩时先压哪里,inside,桥板内侧,是,
-桥栏是哪一头在咬木（east_bridge_copper）,铜扣松动的桥栏（sand_bridge_rail）,step,试踩时先压哪里,outside,靠栏的外沿,否,靠栏的一边先被踩沉，内侧没吃力，外沿是否松动还试不出来。
+桥栏是哪一头在咬木（east_bridge_copper）,桥边的铜扣（sand_bridge_rail）,notch,铜扣的小缺口朝哪里,out,桥栏外沿,是,
+桥栏是哪一头在咬木（east_bridge_copper）,桥边的铜扣（sand_bridge_rail）,notch,铜扣的小缺口朝哪里,in,桥面中心,否,铜扣转过去倒是扣得上，桥板一受力，仍咬出几丝新木屑。
+桥栏是哪一头在咬木（east_bridge_copper）,桥边的铜扣（sand_bridge_rail）,step,试踩时先压哪里,inside,桥板内侧,是,
+桥栏是哪一头在咬木（east_bridge_copper）,桥边的铜扣（sand_bridge_rail）,step,试踩时先压哪里,outside,靠栏的外沿,否,靠栏的一边先被踩沉，内侧没吃力，外沿是否松动还试不出来。
 两张封签都没写错（east_silo_marks）,关了一半的仓门（sand_silo_door）,house,写领粮户姓氏的签放在哪,mouth,仓内的领粮口,是,
 两张封签都没写错（east_silo_marks）,关了一半的仓门（sand_silo_door）,house,写领粮户姓氏的签放在哪,chute,仓外的卸粮口,否,外头是卸粮的地方。同一家前后有三张，蒋芨照这个贴法又得多写两户。
 两张封签都没写错（east_silo_marks）,关了一半的仓门（sand_silo_door）,route,写途经驿站的签放在哪,chute,仓外的卸粮口,是,

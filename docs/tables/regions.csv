@@ -1,51 +1,51 @@
 ﻿标识,名称,州,横坐标,纵坐标,标定邻路,定居点类型,有普通传送门,有州阵,威胁参考阶,威胁参考境界,发现条件,说明,跳过通常的去向提示
 village,落灯村,雾梁州（wuliang）,237,100,白苇滩（marsh）、蒲湾圩田（reed_meadows）、闭潮渡（ford）,村庄,是,是,0,炼气初期,,旧渡停了之后，村人每晚仍点一盏灯。这里可问路、休整、补给。,
 marsh,白苇滩,雾梁州（wuliang）,201,141,落灯村（village）、沉钟岭（ridge）、闭潮渡（ford）、蒲湾圩田（reed_meadows）、灰鹭矶（pale_shoal）、回潮洞（undertow_grotto）,,否,否,0,炼气初期,,白苇贴着浅岸长。碎石间冒着水泡，再远一点的河岔里竖着几根木桩。干地上还有一道矮石堤。,
-ridge,沉钟岭,雾梁州（wuliang）,225,127,白苇滩（marsh）、闭潮渡（ford）、晒盘坡（screen_slope）、反声钟窟（counter_bell）、玄砂矿脉（black_mine）、青崖松场（pine_ridge）、云炉石谷（kiln_valley）、篁泽药谷（herb_basin）,,否,否,1,炼气中期,得知物品 沉钟岭路图（ridge_rubbing）,旧矿口朝着山路，茶棚、冲沟和断绳坡都在坡面上。岩壁还留着这里曾经通水的痕迹。,
-ford,闭潮渡,雾梁州（wuliang）,287,85,白苇滩（marsh）、沉钟岭（ridge）、回灯埠（hidden）、青崖松场（pine_ridge）、跃鱼旧渠（fish_ladder）、折水驿（willow_post）、照原城（zhao_city）、落灯村（village）,,否,否,2,炼气后期,得知物品 旧渡水图（ford_chart）,旧闸还随潮开合。浅阶从刻着水痕的石壁下伸入渡口，前头搁着渡舟与吊着铁环的木排。,
+ridge,沉钟岭,雾梁州（wuliang）,225,127,白苇滩（marsh）、闭潮渡（ford）、晒盘坡（screen_slope）、反声钟窟（counter_bell）、玄砂矿脉（black_mine）、青崖松场（pine_ridge）、云炉石谷（kiln_valley）,,否,否,1,炼气中期,得知物品 沉钟岭路图（ridge_rubbing）,旧矿口朝着山路，茶棚、冲沟和断绳坡都在坡面上。岩壁还留着这里曾经通水的痕迹。,
+ford,闭潮渡,雾梁州（wuliang）,287,85,白苇滩（marsh）、沉钟岭（ridge）、回灯埠（hidden）、青崖松场（pine_ridge）、系灯院（lantern_court）、照原城（zhao_city）、落灯村（village）,,否,否,2,炼气后期,得知物品 旧渡水图（ford_chart）,旧闸还随潮开合。浅阶从刻着水痕的石壁下伸入渡口，前头搁着渡舟与吊着铁环的木排。,
 hidden,回灯埠,雾梁州（wuliang）,335,122,闭潮渡（ford）,,否,否,2,炼气后期,得知物品 伏流路引（secret_pass）,夹在两道水流间的避风小码头，渡工从前在这里换灯，让乘客下船。,是
 pine_ridge,青崖松场,雾梁州（wuliang）,292,106,闭潮渡（ford）、云炉石谷（kiln_valley）、晒盘坡（screen_slope）、系灯院（lantern_court）、沉钟岭（ridge）,,否,否,1,炼气中期,得知物品 松场驮道图（pine_pass）,山路从收松脂的木架旁下到一座摇晃的桥。窑车倒在背坡，桥头棚子外铺着几张练武的草垫。,
 kiln_valley,云炉石谷,雾梁州（wuliang）,273,133,青崖松场（pine_ridge）、篁泽药谷（herb_basin）、晒盘坡（screen_slope）、碎云雪关（snow_pass）、沉钟岭（ridge）,,否,否,2,炼气后期,得知物品 窑车辙样（kiln_tracks）,石谷口是淘白泥的斜坡。车棚靠着坡脚，檐下叠着药篓。背后的老窑没有冒烟。,
-herb_basin,篁泽药谷,雾梁州（wuliang）,288,181,云炉石谷（kiln_valley）、玄砂矿脉（black_mine）、晒盘坡（screen_slope）、碎云雪关（snow_pass）、沉钟岭（ridge）,,否,否,2,炼气后期,得知物品 篁泽的药篓绳（herb_tie）,竹梁到头是半片药田。茅棚外堆着药篓，踩进田边的水里能望见伏着藤影的石塘。,
+herb_basin,篁泽药谷,雾梁州（wuliang）,288,181,云炉石谷（kiln_valley）、玄砂矿脉（black_mine）、晒盘坡（screen_slope）,,否,否,2,炼气后期,得知物品 篁泽的药篓绳（herb_tie）,竹梁到头是半片药田。茅棚外堆着药篓，踩进田边的水里能望见伏着藤影的石塘。,
 black_mine,玄砂矿脉,雾梁州（wuliang）,238,138,沉钟岭（ridge）、篁泽药谷（herb_basin）、碎云雪关（snow_pass）,,否,否,2,炼气后期,得知物品 玄砂引矿签（mine_guide）,沿签上画的石槽进山，飞砂一阵阵贴着矿架吹。绞车和矿渣都留在井口，深处偶有钝响。,
-snow_pass,碎云雪关,雾梁州（wuliang）,281,163,玄砂矿脉（black_mine）、天衡石台（sky_terrace）、云炉石谷（kiln_valley）、篁泽药谷（herb_basin）,,否,否,2,炼气后期,得知物品 翻雪关的栈牌（snow_token）,踏出旧栈道便看见山雪。山火棚仍有人看守，棚旁的蜥道和南沟隔着两道短栈。,
-sky_terrace,天衡石台,雾梁州（wuliang）,253,149,碎云雪关（snow_pass）,,否,否,3,筑基初期,得知物品 雪关的三结路绳（sky_cord）,走过最后一条带扶绳的木梁，脚下便是宽阔的山脊。晶石在坡上闪着光。雾薄的时候，能望见西边架着一条观星用的石梁。,
-reed_meadows,蒲湾圩田,雾梁州（wuliang）,171,119,落灯村（village）、白苇滩（marsh）、校潮亭（gauge_tower）、灰鹭矶（pale_shoal）,,否,否,0,炼气初期,,弯堤把浅水拦成几块田。田里还有人在清水沟，靠水的泥地被野雁啄秃了几片。,
-pale_shoal,灰鹭矶,雾梁州（wuliang）,241,172,白苇滩（marsh）、校潮亭（gauge_tower）、折水驿（willow_post）、蒲湾圩田（reed_meadows）,,否,否,0,炼气初期,,岸边尽是细碎的白石。挑药篓的人偶尔停下补草鞋，水急的一边没人敢搁东西。,
-fish_ladder,跃鱼旧渠,雾梁州（wuliang）,315,173,闭潮渡（ford）、系灯院（lantern_court）、折水驿（willow_post）,,否,否,2,炼气后期,,木闸让水分三层落下。最下面的槽积着碎石，钓客脚下那块平石只够搁一张小凳。,
-willow_post,折水驿,雾梁州（wuliang）,328,211,闭潮渡（ford）、灰鹭矶（pale_shoal）、跃鱼旧渠（fish_ladder）、杨木水栈（flood_market）,驿站,是,否,0,炼气初期,,驿站夹在两股水之间，挑担人和船工都在檐下换鞋。后院留着半座旧门。,
+snow_pass,碎云雪关,雾梁州（wuliang）,267,155,玄砂矿脉（black_mine）、天衡石台（sky_terrace）、云炉石谷（kiln_valley）,,否,否,2,炼气后期,得知物品 翻雪关的栈牌（snow_token）,踏出旧栈道便看见山雪。山火棚仍有人看守，棚旁的蜥道和南沟隔着两道短栈。,
+sky_terrace,天衡石台,雾梁州（wuliang）,262,139,碎云雪关（snow_pass）,,否,否,3,筑基初期,得知物品 雪关的三结路绳（sky_cord）,走过最后一条带扶绳的木梁，脚下便是宽阔的山脊。晶石在坡上闪着光。雾薄的时候，能望见西边架着一条观星用的石梁。,
+reed_meadows,蒲湾圩田,雾梁州（wuliang）,171,119,落灯村（village）、白苇滩（marsh）、校潮亭（gauge_tower）,,否,否,0,炼气初期,,弯堤把浅水拦成几块田。田里还有人在清水沟，靠水的泥地被野雁啄秃了几片。,
+pale_shoal,灰鹭矶,雾梁州（wuliang）,241,172,白苇滩（marsh）、校潮亭（gauge_tower）、折水驿（willow_post）,,否,否,0,炼气初期,,岸边尽是细碎的白石。挑药篓的人偶尔停下补草鞋，水急的一边没人敢搁东西。,
+fish_ladder,跃鱼旧渠,雾梁州（wuliang）,315,173,系灯院（lantern_court）、折水驿（willow_post）,,否,否,2,炼气后期,,木闸让水分三层落下。最下面的槽积着碎石，钓客脚下那块平石只够搁一张小凳。,
+willow_post,折水驿,雾梁州（wuliang）,328,211,灰鹭矶（pale_shoal）、跃鱼旧渠（fish_ladder）、杨木水栈（flood_market）,驿站,是,否,0,炼气初期,,驿站夹在两股水之间，挑担人和船工都在檐下换鞋。后院留着半座旧门。,
 gauge_tower,校潮亭,雾梁州（wuliang）,137,127,蒲湾圩田（reed_meadows）、灰鹭矶（pale_shoal）,,否,否,1,炼气中期,,亭外立着一把量水位的长尺，尺脚伸进深水。人们上下台阶，把边上的平石踩得发亮。,
 screen_slope,晒盘坡,雾梁州（wuliang）,310,202,沉钟岭（ridge）、青崖松场（pine_ridge）、篁泽药谷（herb_basin）、云炉石谷（kiln_valley）,,否,否,2,炼气后期,,山风穿过倒伏的木架。坡下晒着矿盘和草根，最上方的筛架还挂在一面断壁上。,
-lantern_court,系灯院,雾梁州（wuliang）,304,141,青崖松场（pine_ridge）、跃鱼旧渠（fish_ladder）,宗门,是,否,1,炼气中期,,院中有井有灶。日落后有人给运货的山路挂灯，通行帖就搁在院门的长凳上。,
+lantern_court,系灯院,雾梁州（wuliang）,304,141,青崖松场（pine_ridge）、跃鱼旧渠（fish_ladder）、闭潮渡（ford）,宗门,是,否,1,炼气中期,,院中有井有灶。日落后有人给运货的山路挂灯，通行帖就搁在院门的长凳上。,
 undertow_grotto,回潮洞,雾梁州（wuliang）,203,111,白苇滩（marsh）,,否,否,6,金丹初期,得知物品 回潮洞引线（undertow_entry）,岩壁两边各有一股水流。洞内靠墙隆起一道石脊，潮水淹不到，踩着也比泥地稳当。,是
-counter_bell,反声钟窟,雾梁州（wuliang）,266,115,沉钟岭（ridge）,,否,否,5,筑基后期,得知物品 反声孔通路（counter_bell_entry）,倒钟下是一条窄通道。墙边干燥的地方架着一排信，两侧的小孔还能听见地面传来的响声。,是
+counter_bell,反声钟窟,雾梁州（wuliang）,263,124,沉钟岭（ridge）,,否,否,5,筑基后期,得知物品 反声孔通路（counter_bell_entry）,倒钟下是一条窄通道。墙边干燥的地方架着一排信，两侧的小孔还能听见地面传来的响声。,是
 zhao_city,照原城,照原州（zhaoyuan）,591,200,青埂（green_dyke）、杨木水栈（flood_market）、守尺观（measuring_hall）、闭潮渡（ford）,城池,是,是,0,炼气初期,,城砖半边泛白，是上一回洪峰留下的痕。粥铺挨着省潮司，铁货摊后传出磨刀声。,
-green_dyke,青埂,照原州（zhaoyuan）,639,167,照原城（zhao_city）、蛙背塘（frog_pond）、没顶刻碑（old_marker）、连环浅洲（ring_isles）、守尺观（measuring_hall）,,否,否,0,炼气初期,,田埂两侧都长着芦苇，只有一侧的苇叶被涨水淹过。,
+green_dyke,青埂,照原州（zhaoyuan）,639,167,照原城（zhao_city）、蛙背塘（frog_pond）、没顶刻碑（old_marker）、守尺观（measuring_hall）,,否,否,0,炼气初期,,田埂两侧都长着芦苇，只有一侧的苇叶被涨水淹过。,
 flood_market,杨木水栈,照原州（zhaoyuan）,623,267,照原城（zhao_city）、白鹤粮仓（crane_granary）、碎琉璃滩（glass_bank）、守尺观（measuring_hall）、折水驿（willow_post）,,否,否,0,炼气初期,,接船的木台漂在水上，钉子上挂着写有各家姓氏的货签。,
 measuring_hall,守尺观,照原州（zhaoyuan）,647,219,照原城（zhao_city）、没顶刻碑（old_marker）、挂炭坳（charcoal_ridge）、青埂（green_dyke）、杨木水栈（flood_market）,宗门,是,否,1,炼气中期,,乌瓦院门晾着测水绳，来客和弟子在同一间灶房用饭。,
 frog_pond,蛙背塘,照原州（zhaoyuan）,672,148,青埂（green_dyke）、水藻泥湾（scale_bog）、连环浅洲（ring_isles）,,否,否,0,炼气初期,,矮草后蛙声一片。顺着浮萍漂去的方向，能沿岸走到塘东。,
 old_marker,没顶刻碑,照原州（zhaoyuan）,686,187,青埂（green_dyke）、守尺观（measuring_hall）、斜漏水驿（zhao_hermit）、水藻泥湾（scale_bog）,,否,否,0,炼气初期,,半截石碑立在浅沟，水上能看见朝反方向刻的浪纹。,
 zhao_hermit,斜漏水驿,照原州（zhaoyuan）,740,194,没顶刻碑（old_marker）、缺轮磨台（jade_mill）、挂炭坳（charcoal_ridge）、断齿内堰（burnt_weir）,,是,否,1,炼气中期,,驿棚钉满别处借来的水尺，一支铁楔正压住桌角。,
-ring_isles,连环浅洲,照原州（zhaoyuan）,705,123,青埂（green_dyke）、蛙背塘（frog_pond）,,否,否,1,炼气中期,,浮草稀的地方露着几块踏脚石，踩着它们能走到几座浅水小岛。,
+ring_isles,连环浅洲,照原州（zhaoyuan）,705,123,蛙背塘（frog_pond）,,否,否,1,炼气中期,,浮草稀的地方露着几块踏脚石，踩着它们能走到几座浅水小岛。,
 scale_bog,水藻泥湾,照原州（zhaoyuan）,723,159,蛙背塘（frog_pond）、缺轮磨台（jade_mill）、沉水量站（sunken_lab）、没顶刻碑（old_marker）,,否,否,2,炼气后期,,水藻裹着泥里的铁砂。青苔长满窄堤，后头偶尔有东西窜过去。,
-crane_granary,白鹤粮仓,照原州（zhaoyuan）,663,269,杨木水栈（flood_market）、碎琉璃滩（glass_bank）,,否,否,0,炼气初期,,粮仓的木桩架得很高。漏下的谷壳被鸟衔走，枯木堆在后门。,
+crane_granary,白鹤粮仓,照原州（zhaoyuan）,666,294,杨木水栈（flood_market）、碎琉璃滩（glass_bank）,,否,否,0,炼气初期,,粮仓的木桩架得很高。漏下的谷壳被鸟衔走，枯木堆在后门。,
 zhao_pass,叠石驿关,照原州（zhaoyuan）,845,210,拴绳沙洼（rope_sands）、鸣沙城（mingsha_city）,,是,否,1,炼气中期,,关后是一道没树的长坡。领路人腰间挂着一串能扣在一起的木通行牌。,
 jade_mill,缺轮磨台,照原州（zhaoyuan）,764,143,斜漏水驿（zhao_hermit）、水藻泥湾（scale_bog）、沉水量站（sunken_lab）、错水湖底（fault_lake）,,否,否,2,炼气后期,,石磨只剩半只轮，中心的圆孔朝着一道塌掉的浅渠。,
 charcoal_ridge,挂炭坳,照原州（zhaoyuan）,697,235,守尺观（measuring_hall）、烧黑的伏火坑（night_pit）、断齿内堰（burnt_weir）、斜漏水驿（zhao_hermit）,,否,否,1,炼气中期,,炭袋挂在山间低处晾干。窑工掀起布角，炉灰的红光后露出一座封了多年的窑。,
-sunken_lab,沉水量站,照原州（zhaoyuan）,756,88,水藻泥湾（scale_bog）、缺轮磨台（jade_mill）、错水湖底（fault_lake）,,否,否,4,筑基中期,得知物品 照岩壁的旧灯（lab_beacon）,一排台阶朝水，一排贴着岩壁。水一急，只能靠新挂的灯辨认哪条路通往旧水槽。,是
-night_pit,烧黑的伏火坑,照原州（zhaoyuan）,742,234,挂炭坳（charcoal_ridge）、断齿内堰（burnt_weir）,,否,否,5,筑基后期,得知物品 泡过草汁的湿帘（fire_cloth）,炭坑后是一条横着挖开的火道。用湿帘挡住贴地的暗火，里面才有余地换气。,是
-glass_bank,碎琉璃滩,照原州（zhaoyuan）,708,274,杨木水栈（flood_market）、白鹤粮仓（crane_granary）、望船排礁（beacon_reefs）、拴绳沙洼（rope_sands）、断齿内堰（burnt_weir）,,否,否,1,炼气中期,,琉璃多是浑色的，带刻度的那一片被人摆在晒网上。,
-fault_lake,错水湖底,照原州（zhaoyuan）,780,183,缺轮磨台（jade_mill）、沉水量站（sunken_lab）、断齿内堰（burnt_weir）,,否,否,7,金丹中期,得知物品 错水湖的折尺（fault_route）,两线水分开绕过一枚石柱，柱底的剑痕比露在水面的深得多。,是
-rope_sands,拴绳沙洼,照原州（zhaoyuan）,812,284,叠石驿关（zhao_pass）、断齿内堰（burnt_weir）、望船排礁（beacon_reefs）、碎琉璃滩（glass_bank）、炭篷驿（cinder_inn）,,否,否,2,炼气后期,,探沙绳七步打一个结，绳的前端被沉在石坠里。,
+sunken_lab,沉水量站,照原州（zhaoyuan）,756,88,水藻泥湾（scale_bog）、缺轮磨台（jade_mill）,,否,否,4,筑基中期,得知物品 照岩壁的旧灯（lab_beacon）,一排台阶朝水，一排贴着岩壁。水一急，只能靠新挂的灯辨认哪条路通往旧水槽。,是
+night_pit,烧黑的伏火坑,照原州（zhaoyuan）,742,215,挂炭坳（charcoal_ridge）、断齿内堰（burnt_weir）,,否,否,5,筑基后期,得知物品 泡过草汁的湿帘（fire_cloth）,炭坑后是一条横着挖开的火道。用湿帘挡住贴地的暗火，里面才有余地换气。,是
+glass_bank,碎琉璃滩,照原州（zhaoyuan）,708,274,杨木水栈（flood_market）、白鹤粮仓（crane_granary）、望船排礁（beacon_reefs）、断齿内堰（burnt_weir）,,否,否,1,炼气中期,,琉璃多是浑色的，带刻度的那一片被人摆在晒网上。,
+fault_lake,错水湖底,照原州（zhaoyuan）,780,183,缺轮磨台（jade_mill）、断齿内堰（burnt_weir）,,否,否,7,金丹中期,得知物品 错水湖的折尺（fault_route）,两线水分开绕过一枚石柱，柱底的剑痕比露在水面的深得多。,是
+rope_sands,拴绳沙洼,照原州（zhaoyuan）,812,284,叠石驿关（zhao_pass）、断齿内堰（burnt_weir）、望船排礁（beacon_reefs）、炭篷驿（cinder_inn）,,否,否,2,炼气后期,,探沙绳七步打一个结，绳的前端被沉在石坠里。,
 burnt_weir,断齿内堰,照原州（zhaoyuan）,794,235,挂炭坳（charcoal_ridge）、烧黑的伏火坑（night_pit）、错水湖底（fault_lake）、拴绳沙洼（rope_sands）、望船排礁（beacon_reefs）、斜漏水驿（zhao_hermit）、碎琉璃滩（glass_bank）,,否,否,3,筑基初期,,旧水坝的石柱像残缺的牙，把河水分成宽窄不一的几道。露在水外的石缝会结出灵晶。,
 beacon_reefs,望船排礁,照原州（zhaoyuan）,761,278,碎琉璃滩（glass_bank）、拴绳沙洼（rope_sands）、断齿内堰（burnt_weir）,,否,否,1,炼气中期,,礁石上的灯快灭了，灯下拴着一支接货小船用的桨。,
-mingsha_city,鸣沙城,鸣沙州（mingsha）,1135.3,35.8,炭篷驿（cinder_inn）、叩石院（sand_bell_cloister）、断帐旧道（silk_tent_road）、担盐岗（salt_ledger_barrows）、叠石驿关（zhao_pass）,州城,是,是,1,炼气中期,,城墙折了两道弯，挡住低处卷来的沙。进城就能看见登记用井的屋子、客店，以及用铁条封住的旧传送阵。,
-cinder_inn,炭篷驿,鸣沙州（mingsha）,1132.5,150.7,鸣沙城（mingsha_city）、砾盘浅沟（bone_dry_rill）、覆瓦旱畦（kiln_roof_farm）、断帐旧道（silk_tent_road）、拴绳沙洼（rope_sands）,驿镇,是,否,0,炼气初期,,三口铁锅架在同一棚下。负责换马的杨芹在背风墙内收拾上下铺。,
-sand_bell_cloister,叩石院,鸣沙州（mingsha）,1162.5,98.1,鸣沙城（mingsha_city）、架风板（wind_slate）、并磨坊（guest_mill）、横生脉（hanging_vein）、担盐岗（salt_ledger_barrows）,宗门,是,否,2,炼气后期,,学徒敲着两块吊起来的石头听回声。外院有客房，门外有铺着旧毡的修具台。,
-silk_tent_road,断帐旧道,鸣沙州（mingsha）,1169.1,116.1,鸣沙城（mingsha_city）、并磨坊（guest_mill）、伏兔草丘（camel_grass_dunes）、炭篷驿（cinder_inn）,,否,否,1,炼气中期,,剪掉半幅的旧帐挂在路标上。行队在帐的阴影里翻晒湿绳。,
+mingsha_city,鸣沙城,鸣沙州（mingsha）,1135.3,35.8,炭篷驿（cinder_inn）、叩石院（sand_bell_cloister）、担盐岗（salt_ledger_barrows）、叠石驿关（zhao_pass）,州城,是,是,1,炼气中期,,城墙折了两道弯，挡住低处卷来的沙。进城就能看见登记用井的屋子、客店，以及用铁条封住的旧传送阵。,
+cinder_inn,炭篷驿,鸣沙州（mingsha）,1132.5,150.7,鸣沙城（mingsha_city）、砾盘浅沟（bone_dry_rill）、断帐旧道（silk_tent_road）、拴绳沙洼（rope_sands）,驿镇,是,否,0,炼气初期,,三口铁锅架在同一棚下。负责换马的杨芹在背风墙内收拾上下铺。,
+sand_bell_cloister,叩石院,鸣沙州（mingsha）,1162.5,98.1,鸣沙城（mingsha_city）、架风板（wind_slate）、并磨坊（guest_mill）、断帐旧道（silk_tent_road）、担盐岗（salt_ledger_barrows）,宗门,是,否,2,炼气后期,,学徒敲着两块吊起来的石头听回声。外院有客房，门外有铺着旧毡的修具台。,
+silk_tent_road,断帐旧道,鸣沙州（mingsha）,1169.1,116.1,并磨坊（guest_mill）、伏兔草丘（camel_grass_dunes）、炭篷驿（cinder_inn）、叩石院（sand_bell_cloister）,,否,否,1,炼气中期,,剪掉半幅的旧帐挂在路标上。行队在帐的阴影里翻晒湿绳。,
 salt_ledger_barrows,担盐岗,鸣沙州（mingsha）,1171.1,41.7,鸣沙城（mingsha_city）、静盐井口（stillwell_mouth）、白蹄旧道（chalk_hoof_trail）、叩石院（sand_bell_cloister）,,否,否,1,炼气中期,,看秤的人把旧井票夹在带蹄印的石头下面。坡脚还搁着挑盐的旧扁担，木面晒出一层白霜。,
 stillwell_mouth,静盐井口,鸣沙州（mingsha）,1251.2,54.6,担盐岗（salt_ledger_barrows）、静盐井心（stillwell_vault）、空音桥（dry_sound_bridge）、白蹄旧道（chalk_hoof_trail）、架风板（wind_slate）,,否,否,1,炼气中期,,拱形的井口有两道半圆槽，空槽旁还剩几行开关井口的说明。井绳在卷绳的石轮上来回磨。,
-stillwell_vault,静盐井心,鸣沙州（mingsha）,1222,50.9,静盐井口（stillwell_mouth）,,否,否,5,筑基后期,得知物品 井梯铜扣（sand_well_open）,越往下，井壁的盐从白变灰。脚下响一声，身后便传回一声。守井人留下的小陶罐挂在远墙的铜钉上。,是
+stillwell_vault,静盐井心,鸣沙州（mingsha）,1223,34.9,静盐井口（stillwell_mouth）,,否,否,5,筑基后期,得知物品 井梯铜扣（sand_well_open）,越往下，井壁的盐从白变灰。脚下响一声，身后便传回一声。守井人留下的小陶罐挂在远墙的铜钉上。,是
 cold_kiln,冷炉院,鸣沙州（mingsha）,1318.9,66.1,空音桥（dry_sound_bridge）、空粮仓（hollow_silo）、架风板（wind_slate）、落琉洼（glass_hail_sink）、横生脉（hanging_vein）,,否,否,2,炼气后期,,档房挨着两间不用添柴的旧窑。阮杪裁纸时，把一本旧的测温记录垫在木板下面。,
 chalk_hoof_trail,白蹄旧道,鸣沙州（mingsha）,1167.5,74.1,担盐岗（salt_ledger_barrows）、倒驿白廊（chalk_archive）、静盐井口（stillwell_mouth）,,否,否,1,炼气中期,,路上嵌进几道马蹄形的白石，转过的地方又飘回一小股风。,
 chalk_archive,倒驿白廊,鸣沙州（mingsha）,1198.1,48.1,白蹄旧道（chalk_hoof_trail）,,否,否,7,金丹中期,得知物品 马蹄石上的铜楔（sand_archive_trace）,白廊的柱脚悬在地面上。走到墙角才看明白，整座旧驿站是倒过来的。,是
@@ -53,9 +53,9 @@ dry_sound_bridge,空音桥,鸣沙州（mingsha）,1283.9,60.2,静盐井口（sti
 wind_slate,架风板,鸣沙州（mingsha）,1236.6,90.5,叩石院（sand_bell_cloister）、冷炉院（cold_kiln）、空音桥（dry_sound_bridge）、静盐井口（stillwell_mouth）、横生脉（hanging_vein）,,否,否,3,筑基初期,,几块灰石板迎风立着。压得紧的地方磨出了白印，松动的板子随风翻动。,
 hollow_silo,空粮仓,鸣沙州（mingsha）,1416.4,80.3,冷炉院（cold_kiln）、落琉洼（glass_hail_sink）,,否,否,0,炼气初期,,粮仓已经空了，墙上还刻着称谷子的记号。卸粮的小门被拆了，日光照在仓里的沙地上。,
 glass_hail_sink,落琉洼,鸣沙州（mingsha）,1377.2,82.4,冷炉院（cold_kiln）、横生脉（hanging_vein）、琉脊天室（glass_rotunda）、空粮仓（hollow_silo）,,否,否,6,金丹初期,,洼地边散着薄薄的亮石片。深处整片晶石被掀了起来，旁边有几道深得惊人的爪印。,
-hanging_vein,横生脉,鸣沙州（mingsha）,1277.9,89.7,叩石院（sand_bell_cloister）、落琉洼（glass_hail_sink）、架风板（wind_slate）、冷炉院（cold_kiln）,,否,否,4,筑基中期,,矿脉抬出坡面。矿脚有旧支架，近路只够一个人侧身挪过去。,
+hanging_vein,横生脉,鸣沙州（mingsha）,1277.9,89.7,落琉洼（glass_hail_sink）、架风板（wind_slate）、冷炉院（cold_kiln）,,否,否,4,筑基中期,,矿脉抬出坡面。矿脚有旧支架，近路只够一个人侧身挪过去。,
 camel_grass_dunes,伏兔草丘,鸣沙州（mingsha）,1240,123.5,断帐旧道（silk_tent_road）、覆瓦旱畦（kiln_roof_farm）、并磨坊（guest_mill）,,否,否,0,炼气初期,,草根伏在流沙下面，一长段沙脊把阳光挡在矮坎外。,
 guest_mill,并磨坊,鸣沙州（mingsha）,1205.9,95.4,叩石院（sand_bell_cloister）、断帐旧道（silk_tent_road）、伏兔草丘（camel_grass_dunes）,,否,否,0,炼气初期,,两帮客商共用一盘石磨，空隙里插着水钱分摊竹签。,
-kiln_roof_farm,覆瓦旱畦,鸣沙州（mingsha）,1197.5,134.3,炭篷驿（cinder_inn）、伏兔草丘（camel_grass_dunes）、砾盘浅沟（bone_dry_rill）,,否,否,0,炼气初期,,人把旧炉瓦沿畦排了几层。太阳晒过瓦面，瓦底的土仍潮。,
+kiln_roof_farm,覆瓦旱畦,鸣沙州（mingsha）,1197.5,134.3,伏兔草丘（camel_grass_dunes）、砾盘浅沟（bone_dry_rill）,,否,否,0,炼气初期,,人把旧炉瓦沿畦排了几层。太阳晒过瓦面，瓦底的土仍潮。,
 bone_dry_rill,砾盘浅沟,鸣沙州（mingsha）,1161.5,141.7,炭篷驿（cinder_inn）、覆瓦旱畦（kiln_roof_farm）,,否,否,0,炼气初期,,雨停后这条沟只流水半天。石弯拦住了漂来的碎木，岸上还有座用竹帘挡风的小棚。,
-glass_rotunda,琉脊天室,鸣沙州（mingsha）,1339.9,84.4,落琉洼（glass_hail_sink）,,否,否,8,金丹后期,得知物品 落琉洼的薄铁片（sand_glass_pass）,光从岩缝里透进来，照着石座上嵌着的铜轮。外面的风声轻了，细沙还顺着石缝往下漏。,是
+glass_rotunda,琉脊天室,鸣沙州（mingsha）,1341.9,98.4,落琉洼（glass_hail_sink）,,否,否,8,金丹后期,得知物品 落琉洼的薄铁片（sand_glass_pass）,光从岩缝里透进来，照着石座上嵌着的铜轮。外面的风声轻了，细沙还顺着石缝往下漏。,是
