@@ -90,11 +90,10 @@ const crews = {
 const crewRoads = {
   [greyGully]: [
     ['ridge', 'screen_slope', 0.16, '往晒盘坡的矿道收窄，矮石墙后常有人拦车。'],
-    ['pine_ridge', 'screen_slope', 0.14, '枯松遮着晒盘坡口，路上有人拆掉了指路的木牌。'],
     ['screen_slope', 'herb_basin', 0.17, '去药谷的坡道经过两处废棚。挑担人近来都绕着走。'],
-    ['screen_slope', 'kiln_valley', 0.16, '窑谷一侧有新砍的路障，几串脚印都在坡口停过。'],
-    ['pine_ridge', 'ridge', 0.075, '松场南坡有几处荒矮墙，日落后往往有人蹲守。'],
-    ['kiln_valley', 'herb_basin', 0.12, '两间废窑后墙之间是条窄道，车夫说有人在那里查过粮袋。'],
+    ['ridge', 'kiln_valley', 0.11, '矿车平日从老窑墙下走。有人搬了几块大石，把能过车的路收成了一道窄缝。'],
+    ['kiln_valley', 'herb_basin', 0.16, '两间废窑后墙之间是条窄道，车夫说有人在那里查过粮袋。'],
+    ['herb_basin', 'black_mine', 0.14, '废矿道绕过旧草棚。近来连卖草药的人都在棚外被截住过。'],
   ],
   ferryHills: [
     ['pine_ridge', 'kiln_valley', 0.050, '林脚这边松枝太密，从路上看不见坡底。'],
@@ -102,7 +101,6 @@ const crewRoads = {
   ],
   quarryTracks: [
     ['ridge', 'black_mine', 0.028, '废矿车正挡在矿脊便道的一处拐角。'],
-    ['herb_basin', 'black_mine', 0.026, '废掉的矿道窄，沿路几个旧窝棚近日有火星。'],
     ['black_mine', 'snow_pass', 0.024, '越过裸岩后风大，背石的那侧有人走过的痕迹。'],
   ],
   ferryWood: [
@@ -118,10 +116,9 @@ const crewRoads = {
   weirReef: [
     ['charcoal_ridge', 'night_pit', 0.037, '伏火坑一侧没灯，低处的绳桩像是近来才打上去的。'],
     ['glass_bank', 'beacon_reefs', 0.032, '浅岸边的破船壳一直卡在两块礁中间。'],
-    ['charcoal_ridge', 'burnt_weir', 0.030, '挂炭袋的树一直排到堰边。最远两只背后有窄坎。'],
+    ['zhao_hermit', 'burnt_weir', 0.030, '驿墙外的缺口正对内堰。这几日有人搬了两条旧凳，在坡下候着。'],
     ['rope_sands', 'burnt_weir', 0.034, '沙路越过几根拴索的木桩，堰脚还有一排断柱。'],
     ['burnt_weir', 'beacon_reefs', 0.042, '内堰到外礁的岸坎下捆过货箱，沙里还埋着新断的绳。'],
-    ['glass_bank', 'burnt_weir', 0.023, '废堰旁一条碎石坡绕在树后，坡底有盖过脚印的新沙。'],
   ],
   windBridge: [
     ['salt_ledger_barrows', 'stillwell_mouth', 0.027, '背阴的盐袋架旁有两道窄脚印。'],
@@ -129,7 +126,7 @@ const crewRoads = {
     ['stillwell_mouth', 'dry_sound_bridge', 0.027, '盐井外拴着运货绳，绳后有一面裂开的石墙。'],
     ['wind_slate', 'dry_sound_bridge', 0.033, '石板夹出的路一直通到桥肩，最窄处不好回身。'],
     ['dry_sound_bridge', 'cold_kiln', 0.046, '冷窑坡下那几个雨棚，近日有人重新补了草帘。'],
-    ['wind_slate', 'cold_kiln', 0.029, '石板背风的一排小孔边积着新鞋印。'],
+    ['wind_slate', 'hanging_vein', 0.024, '矿梁下低处背风，几块石板遮得住一个蹲着的人。'],
     ['stillwell_mouth', 'wind_slate', 0.024, '石壁下的背风处能看见几堆刚压灭的柴火。'],
   ],
   glassRidge: [
@@ -137,7 +134,7 @@ const crewRoads = {
     ['hanging_vein', 'glass_hail_sink', 0.031, '浅梁下的矿包曾有人打开过，麻绳留在石上。'],
   ],
   tentDunes: [
-    ['silk_tent_road', 'camel_grass_dunes', 0.025, '沿途有松垮的旧帐布，看不清矮丘背面。'],
+    ['guest_mill', 'camel_grass_dunes', 0.025, '石磨南面的沙坡有几堆没刮平的炭灰，入夜后还冒着一点烟。'],
     ['silk_tent_road', 'guest_mill', 0.028, '石磨上游的低沟能一直绕到路旁。'],
   ],
 };

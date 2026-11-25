@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { data } from './data.mjs';
-import { act, view } from './engine.mjs';
+import { act, rules, view } from './engine.mjs';
 import { createQuietGame as createGame, stageRetreatOpening } from './game-test-fixtures.mjs';
 
 const quarry = 'sand_hunt_colony';
@@ -51,10 +51,12 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   assert.ok(!full.ground[quarry]);
   assert.equal(view(full).currentEvent.id, quarry);
   assert.match(view(full).visibleChoices.find(({ index }) => index === 0).desc, /上回遇到的黑背砂蜥/);
+  const edgeDay = full.day;
   play(full, 'choose', { index: 0 });
   assert.equal(full.combat.id, actors[0]);
   assert.equal(full.encounterSeed, randomAfterFirst);
-  assert.equal(full.combat.hp, previousFoeHealth + 1);
+  assert.equal(full.day - edgeDay, rules.huntEdgeApproachDays);
+  assert.equal(full.combat.hp, previousFoeHealth);
   assert.deepEqual(full.combat.observedHits, observed);
   stageRetreatOpening(full);
   assert.equal(play(full, 'retreat').retreated, true);
@@ -66,7 +68,10 @@ test('the quarry samples living opponents, preserves them on retreat and closes 
   }
   play(full, 'visit', { id: quarry });
   assert.doesNotMatch(view(full).visibleChoices.find(({ index }) => index === 0).desc, /上回遇到/);
+  const freshDay = full.day;
+  const ordinaryApproach = data.events.find(({ id }) => id === quarry).choices[0].days;
   play(full, 'choose', { index: 0 });
+  assert.equal(full.day - freshDay, ordinaryApproach);
   assert.notEqual(full.encounterSeed, randomAfterFirst);
 
   const late = arrive(1, [0, 0, 1]);

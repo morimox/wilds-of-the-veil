@@ -20,9 +20,10 @@ function play(state, action, payload = {}) {
 function beginAtTheHall(realm = 0) {
   const state = createQuietGame(42);
   state.realm = realm;
-  state.region = 'measuring_hall';
+  state.region = 'zhao_city';
   state.world.lastSettlement = state.region;
-  state.discovered.push(state.region, 'charcoal_ridge');
+  state.discovered.push('zhao_city', 'measuring_hall');
+  walk(state, 'measuring_hall');
   return state;
 }
 
@@ -75,7 +76,7 @@ test('the two leads require an actual fight and repair, then a free physical slo
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;
   askAndAccept(state);
-  walk(state, 'charcoal_ridge', 'burnt_weir');
+  walk(state, 'old_marker', 'zhao_hermit', 'burnt_weir');
   play(state, 'visit', { id: 'encyclopedia_weir_beam' });
   assert.ok(!view(state).visibleChoices.some(({ index }) => index === 1));
   if (state.satiety < 40) play(state, 'eat', { id: 'ration' });
@@ -97,7 +98,7 @@ test('the two leads require an actual fight and repair, then a free physical slo
   if (!state.satiety) play(state, 'eat', { id: 'ration' });
   play(state, 'choose', { index: 1 });
   assert.equal(state.inventory[weirLeaf], 1);
-  walk(state, 'rope_sands', 'zhao_pass', 'mingsha_city', 'sand_bell_cloister', 'wind_slate', 'cold_kiln');
+  walk(state, 'rope_sands', 'zhao_pass', 'mingsha_city', 'sand_bell_cloister', 'wind_slate', 'dry_sound_bridge', 'cold_kiln');
   play(state, 'visit', { id: 'encyclopedia_paper_shed' });
   if (state.satiety < 18) play(state, 'eat', { id: 'ration' });
   play(state, 'choose', { index: 0 });

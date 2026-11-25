@@ -48,6 +48,7 @@ test('the official names the water-station witness and quotes the extra fare bef
   const state = throughTown();
   travel(state, 'flood_market');
   travel(state, 'glass_bank');
+  travel(state, 'beacon_reefs');
   travel(state, 'burnt_weir');
   travel(state, 'rope_sands');
   travel(state, 'zhao_pass');

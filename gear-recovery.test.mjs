@@ -91,6 +91,7 @@ test('only designated local smiths repair the gear in hand at the quoted price',
   assert.ok(worn < 26);
   assert.equal(view(state).repairService, null);
   assert.equal(act(state, 'repair', { id: 'cudgel' }).ok, false);
+  play(state, 'leave');
 
   // Resume the same expedition at its later settlement arrivals with the worn staff.
   for (const [region, name, price] of [
@@ -143,6 +144,7 @@ test('a staff worn to zero by a real strike can be fixed with carried and stored
   stageRetreatOpening(state);
   assert.equal(play(state, 'retreat').retreated, true);
   assert.equal(act(state, 'repairMaterials', { id: 'cudgel' }).ok, false);
+  play(state, 'leave');
   play(state, 'travel', { id: 'village' });
   state.coins = 0;
 

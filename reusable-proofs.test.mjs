@@ -74,7 +74,8 @@ function obtainMapAndLearnTheFord() {
     id: 'find_eddy', settings: { release: 'stone_back', water: 'rising' },
   }).deduction, 'verified');
   assert.equal(state.inventory[map], 1);
-  assert.ok(view(state).discoveredRecipes.includes(recipe));
+  assert.ok(!view(state).discoveredRecipes.includes(recipe));
+  assert.equal(act(state, 'showEddyMapToSmith').ok, false);
 
   walk(state, 'ridge');
   chooseAt(state, 'ore_rain', 0);
@@ -86,6 +87,12 @@ function obtainMapAndLearnTheFord() {
 }
 
 function craftTwice(state) {
+  assert.ok(!view(state).discoveredRecipes.includes(recipe));
+  const before = state.day;
+  play(state, 'showEddyMapToSmith');
+  assert.equal(state.day, before);
+  assert.equal(state.inventory[map], 1);
+  assert.equal(act(state, 'showEddyMapToSmith').ok, false);
   for (const total of [2, 4]) {
     assert.ok(view(state).discoveredRecipes.includes(recipe));
     play(state, 'craft', { id: recipe });

@@ -22,6 +22,7 @@ function reachZhaoCity() {
   const state = createGame(42);
   play(state, 'travel', { id: 'marsh' });
   state.knownItems.push('ferry_manifest');
+  state.discovered.push('ridge');
   play(state, 'wait');
   play(state, 'travel', { id: 'ford' });
   play(state, 'travel', { id: 'zhao_city' });
@@ -35,7 +36,7 @@ test('a long crossing blocked by provisions suggests a reachable known inn along
   const state = createGame(40);
   state.region = 'sand_bell_cloister';
   state.discovered.push('sand_bell_cloister', 'mingsha_city', 'zhao_pass', 'rope_sands', 'burnt_weir',
-    'glass_bank', 'flood_market', 'zhao_city', 'ford', 'marsh', 'village');
+    'beacon_reefs', 'glass_bank', 'flood_market', 'zhao_city', 'ford', 'ridge', 'marsh', 'village');
   state.knownItems.push('sand_writ', 'ferry_manifest');
   state.satiety = 65;
   delete state.inventory.ration;

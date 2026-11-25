@@ -14,6 +14,7 @@ function walk(state, ...places) {
     if (state.event) play(state, 'leave');
     if (state.satiety < 45) play(state, 'eat', { id: 'ration' });
     play(state, 'travel', { id });
+    assert.equal(state.region, id);
   }
 }
 
@@ -29,12 +30,21 @@ function fieldChoice(state, index) {
 const sites = (state) => view(state).sites.map(({ id }) => id);
 const jobs = (state) => view(state).sect.jobs;
 
+function arriveAtLanternCourt(state) {
+  // The ferryman, the ridge cave and the old relay shelter already supplied their maps.
+  state.knownItems.push('ridge_rubbing', 'ford_chart', 'pine_pass');
+  state.discovered.push('ridge', 'ford', 'pine_ridge');
+  state.inventory.ration = 12;
+  walk(state, 'marsh', 'ridge', 'ford', 'pine_ridge', 'lantern_court');
+}
+
 function footOfTheSlope(state) {
   visit(state, 'lantern_term');
   assert.match(view(state).currentEvent.text, /两个灯钩/);
-  fieldChoice(state, 2);
+  assert.match(fieldChoice(state, 2).outcome, /刨木滩.*进山/);
   assert.equal(state.inventory.lantern_route_copy, 1);
-  walk(state, 'pine_ridge', 'screen_slope');
+  walk(state, 'pine_ridge', 'ford', 'ridge', 'screen_slope');
+  if (state.satiety < 45) play(state, 'eat', { id: 'ration' });
   assert.ok(sites(state).includes('slope_lantern_gap'));
   assert.ok(!sites(state).includes('slope_lantern_high'));
   assert.ok(!sites(state).includes('slope_lantern_low'));
@@ -46,9 +56,8 @@ function footOfTheSlope(state) {
 
 test('an unaffiliated traveler can light and report the lower road without a fight', () => {
   const state = createGame(19);
-  state.discovered.push('ford', 'pine_ridge');
   play(state, 'buy', { id: 'wood' });
-  walk(state, 'pine_ridge', 'lantern_court');
+  arriveAtLanternCourt(state);
   play(state, 'localBuy', { id: 'ration', count: 2 });
   assert.ok(!jobs(state).some(({ id }) => id === 'lantern_spare_watch'));
   footOfTheSlope(state);
@@ -72,7 +81,7 @@ test('an unaffiliated traveler can light and report the lower road without a fig
   play(state, 'beginGather', { index: 0 });
   play(state, 'finishGather');
   assert.equal(view(state).groundLoot.reed, 2);
-  walk(state, 'pine_ridge', 'lantern_court');
+  walk(state, 'ridge', 'ford', 'pine_ridge', 'lantern_court');
   const coins = state.coins;
   play(state, 'handin', { id: 'lantern_low_report' });
   assert.equal(state.coins, coins + 10);
@@ -84,10 +93,9 @@ test('an unaffiliated traveler can light and report the lower road without a fig
 
 test('the upper repair opens protected mineral access and members can take a recurring lamp shift', () => {
   const state = createGame(19);
-  state.discovered.push('ford', 'pine_ridge');
   Object.assign(state.inventory, { wood: 10, hide: 4, ore: 2, reed: 7 });
   state.coins = 30;
-  walk(state, 'pine_ridge', 'lantern_court');
+  arriveAtLanternCourt(state);
   play(state, 'sectJoin');
   play(state, 'localBuy', { id: 'ration', count: 2 });
   assert.ok(!jobs(state).some(({ id }) => id === 'lantern_spare_watch'));
@@ -102,7 +110,7 @@ test('the upper repair opens protected mineral access and members can take a rec
   play(state, 'beginGather', { index: 0 });
   play(state, 'finishGather');
   assert.equal(view(state).groundLoot.core, 2);
-  walk(state, 'pine_ridge', 'lantern_court');
+  walk(state, 'ridge', 'ford', 'pine_ridge', 'lantern_court');
   play(state, 'handin', { id: 'lantern_high_report' });
   const coins = state.coins;
   const day = state.day;
@@ -118,10 +126,9 @@ test('the upper repair opens protected mineral access and members can take a rec
 
 test('the nominal title is already on the register and ward cooldown uses elapsed time', () => {
   const state = createGame(19);
-  state.discovered.push('ford', 'pine_ridge');
   Object.assign(state.inventory, { wood: 10, hide: 3, reed: 8 });
   state.coins = 30;
-  walk(state, 'pine_ridge', 'lantern_court');
+  arriveAtLanternCourt(state);
   play(state, 'sectJoin');
   const title = view(state).sect.ranks[0];
   assert.equal(title.name, '候灯人');

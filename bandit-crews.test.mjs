@@ -217,7 +217,7 @@ test('one victory barely changes a fresh large crew and its loot does not reroll
   state.realm = 8;
   state.hp = view(state).maxHp;
   state.resolvedBandits.push('road_slate_peg');
-  const otherCrewRoad = map.find(({ key }) => key === 'black_mine|herb_basin');
+  const otherCrewRoad = map.find(({ key }) => key === 'black_mine|snow_pass');
   const base = [risk(state, firstRoad), risk(state, secondRoad), risk(state, otherCrewRoad)];
   const size = crewMembers().length;
   assert.ok(size >= 40);
@@ -324,7 +324,7 @@ test('a first-fight leader win opens the one-time cache and ends linked road thr
   const treasury = 1;
   const blade = 'gully_king_blade';
   const related = data.roadBandits.roads.filter(({ crew }) => crew === crewId);
-  const otherRoad = map.find(({ key }) => key === 'black_mine|herb_basin');
+  const otherRoad = map.find(({ key }) => key === 'black_mine|snow_pass');
   const linkedEdges = related.map(({ a, b }) => map.find(({ key }) => key === [a, b].sort().join('|')));
   const unaffectedRisk = risk(state, otherRoad);
   assert.ok(unaffectedRisk > 0);

@@ -446,9 +446,25 @@ test('chosen sites retain depletion, and only elapsed days replenish their local
   const huntCoins = hunting.coins;
   const retreating = structuredClone(hunting);
   choose(retreating, 0);
+  play(retreating, 'attack');
+  const wounded = retreating.combat.hp;
   stageRetreatOpening(retreating);
   assert.equal(play(retreating, 'retreat').retreated, true);
   assert.equal(huntCount(retreating), initial);
+  assert.equal(retreating.event, 'mud_track');
+  assert.match(view(retreating).visibleChoices.find(({ index }) => index === 0).desc, /上回遇到的泥鳞兽/);
+  const returnDay = retreating.day;
+  const walkAround = structuredClone(retreating);
+  const renewed = play(retreating, 'choose', { index: 0 });
+  assert.match(renewed.outcome, /循着方才的踪迹回去，泥鳞兽还在近处/);
+  assert.equal(retreating.day - returnDay, rules.huntEdgeApproachDays);
+  assert.equal(retreating.combat.hp, wounded);
+  assert.ok(retreating.combat.hp < data.enemies.find(({ id }) => id === 'mud_beast').hp);
+  play(walkAround, 'leave');
+  seek(walkAround, 'mud_track');
+  const laterDay = walkAround.day;
+  choose(walkAround, 0);
+  assert.equal(walkAround.day - laterDay, 0.5);
   choose(hunting, 0);
   for (let turn = 0; hunting.combat && turn < 6; turn++) play(hunting, 'attack');
   assert.equal(hunting.combat, null);
@@ -685,7 +701,11 @@ test('the actual lost basket can be inspected and returned once, or its contents
   assert.equal(wounded.inventory.lost_basket, 1);
 
   const opened = structuredClone(state);
-  play(opened, 'unpackBasket');
+  const prompt = act(opened, 'unpackBasket');
+  assert.match(prompt.message, /药僮就收不到/);
+  assert.deepEqual(opened, state);
+  assert.equal(act(opened, 'unpackBasket', { confirmed: true, expectedPlace: 'village' }).ok, false);
+  play(opened, 'unpackBasket', { confirmed: true, expectedPlace: prompt.confirmation.place });
   assert.equal(view(opened).basketDisposition, 'unpacked');
   assert.equal(opened.inventory.lost_basket, undefined);
   assert.ok(opened.inventory.salve);
@@ -1285,7 +1305,8 @@ test('meditation brings complete evidence to the board; only a field trial gives
   assert.ok(evidence.every((itemId) => state.inventory[itemId] >= 1));
   assert.equal(state.inventory.eddy_note, 1);
   assert.ok(!view(state).evidence.some(({ id }) => id === 'eddy_note'));
-  assert.ok(view(state).discoveredRecipes.includes('r_bank_talisman'));
+  assert.equal(view(state).discoveredRecipes.includes('r_bank_talisman'), false);
+  assert.equal(act(state, 'showEddyMapToSmith').ok, false);
   assert.equal(act(state, 'discard', { id: 'eddy_note' }).confirmation.id, 'eddy_note');
   assert.equal(view(state).experiment, null);
   const afterTrial = structuredClone(state);
@@ -1567,7 +1588,7 @@ test('the old ford route and its optional hidden map remain playable with earned
 test('the moved ford platform stays moved when its food was recovered before or afterward', () => {
   for (const order of [[0, 1], [1, 0]]) {
     const state = createGame();
-    supplyFixture(state, { ford_chart: 1 });
+    supplyFixture(state, { ridge_rubbing: 1, ford_chart: 1, ration: 5 });
     play(state, 'wait');
     feed(state, 100);
     walk(state, 'ford');

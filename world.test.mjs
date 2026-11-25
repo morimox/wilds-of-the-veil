@@ -30,7 +30,7 @@ function reachWillow(state) {
 }
 
 function reachZhao(state, permit = 'ferry_manifest') {
-  state.discovered.push('ford');
+  state.discovered.push('ridge', 'ford');
   if (permit === 'last_lantern') state.completedQuests.push(permit);
   else state.knownItems.push(permit);
   walk(state, 'ford');
@@ -44,7 +44,7 @@ test('three provinces expose only situationally known points and roads with exac
   assert.equal(data.regions.length, 60);
   deniedWithoutChanges(state, 'travel', { id: 'undertow_grotto' }, /找.*路/);
 
-  state.discovered.push('ford');
+  state.discovered.push('ridge', 'ford');
   walk(state, 'ford');
   assert.equal(view(state).world.points.some(({ id }) => id === 'zhao_city'), false);
   const crossingHint = /旧渡.*开船.*货单.*商船/;
@@ -216,7 +216,7 @@ test('the shorter border edges stay safe and active while a secondary crossing c
     const state = createGame();
     state.knownItems.push('ferry_manifest', 'sand_writ');
     state.discovered.push(from, to, ...alternate.split('|'));
-    if (from === 'ford') state.discovered.push('lantern_court', 'fish_ladder');
+    if (from === 'ford') state.discovered.push('pine_ridge', 'lantern_court', 'fish_ladder');
     state.region = from;
     state.inventory.ration = 20;
     const short = roadGraph(data).find(({ key }) => key === main);
@@ -516,7 +516,7 @@ test('protected novice sparring preserves luggage and cannot grant a win', () =>
 
 test('sect admission, contributions, cooldowns and a master reward form an optional loop', () => {
   const state = createGame();
-  state.discovered.push('ford');
+  state.discovered.push('ridge', 'ford');
   for (const id of ['pine_ridge', 'lantern_court']) {
     if (id === 'pine_ridge') state.discovered.push(id);
     walk(state, id);

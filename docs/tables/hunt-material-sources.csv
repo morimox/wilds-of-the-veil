@@ -7,7 +7,7 @@
 兽革（hide）,白苇滩（marsh）,碎石水眼（mud_track）,苇尾狐（reed_fox）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,沿土路上的脚印看看
 炼气期妖丹（qi_core）,白苇滩（marsh）,碎石水眼（mud_track）,白耳兔（reed_hare）,炼气初期,1,,,1,3,7,3.25,1,随种群密度变化,,到背水坡猎白耳兔
 生兽肉（beast_meat）,白苇滩（marsh）,碎石水眼（mud_track）,白耳兔（reed_hare）,炼气初期,2,,,2,3,7,3.25,1,随种群密度变化,,到背水坡猎白耳兔
-炼气期妖丹（qi_core）,白苇滩（marsh）,渡工的刨木滩（reed_ferryman）,巡岸水鬼（marsh_ghost）,炼气初期,1,,,1,2,3,5,1,固定间隔,浅水苇丛（reed_banks） · 沿岸去看看谁在刨木、木桩旁的浅水道（sunk_pack） · 沿木桩内侧的石路往前看、矮石堤（bank_watch） · 问有没有别的进山办法,往对岸的白苇走去
+炼气期妖丹（qi_core）,白苇滩（marsh）,渡工的刨木滩（reed_ferryman）,巡岸水鬼（marsh_ghost）,炼气初期,1,,,1,2,3,5,1,固定间隔,浅水苇丛（reed_banks） · 沿岸去看看谁在刨木、木桩旁的浅水道（sunk_pack） · 沿木桩内侧的石路往前看、矮石堤（bank_watch） · 问去沉钟岭还有没有别的路,往对岸的白苇走去
 炼气期妖丹（qi_core）,白苇滩（marsh）,断船桅旁的高岸（drowned_mast）,沉桅虺（mast_beast）,炼气中期,2,,,2,1,1,0,0,不回补,得知物品 旧桨上的靠岸图（oar_mark）,踩上断桅杆，看看水下
 生兽肉（beast_meat）,白苇滩（marsh）,断船桅旁的高岸（drowned_mast）,沉桅虺（mast_beast）,炼气中期,2,,,2,1,1,0,0,不回补,得知物品 旧桨上的靠岸图（oar_mark）,踩上断桅杆，看看水下
 妖目（beast_eye）,白苇滩（marsh）,断船桅旁的高岸（drowned_mast）,沉桅虺（mast_beast）,炼气中期,1,,,1,1,1,0,0,不回补,得知物品 旧桨上的靠岸图（oar_mark）,踩上断桅杆，看看水下

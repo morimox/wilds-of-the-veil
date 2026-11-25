@@ -144,7 +144,7 @@ test('one click retrieves one kind of remains from the fight site', () => {
 
 test('a timed harvest can be interrupted without moving stock into the pickup pile', () => {
   const state = createGame(0);
-  state.discovered.push('ford');
+  state.discovered.push('ridge', 'ford');
   play(state, 'travel', { id: 'ford' });
   const site = 'low_tide';
   play(state, 'visit', { id: site });

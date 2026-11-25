@@ -63,7 +63,7 @@ const items = [
   { id: 'ore', name: '寒铁', kind: 'material', price: 0, sell: 5, desc: '沉钟岭最常见的铁料，断面摸着冰凉。炉盖、铁具和兵刃都能用它。' },
   { id: 'core', name: '灵晶', kind: 'material', price: 14, sell: 5, desc: '有细亮纹的晶石。能从潮床或石缝里筛出细粒，硬些的可镶入兵刃。' },
   { id: 'seal', name: '镇渡印', kind: 'object', price: 0, sell: 0, keepOnFall: true, desc: '闭潮渡旧闸上的渡印，落灯村有人认得它。' },
-  { id: 'lost_basket', name: '落水药篓', kind: 'object', price: 0, sell: 0, keepOnFall: true, desc: '篓把缠着一圈青绳，落灯村药房的篓子都有这个记号。篓口扣得很紧，里面还透着药香。' },
+  { id: 'lost_basket', name: '落水药篓', kind: 'object', price: 0, sell: 0, keepOnFall: true, oneOfAKind: true, desc: '篓把缠着一圈青绳，落灯村药房的篓子都有这个记号。篓口扣得很紧，里面还透着药香。' },
   { id: 'ridge_rubbing', name: '沉钟岭路图', kind: 'key', price: 0, sell: 0, desc: '画着白苇滩北面进山的路，循着路上的倒钟就能到沉钟岭。' },
   { id: 'ford_chart', name: '旧渡水图', kind: 'key', price: 0, sell: 0, desc: '上面画着废矿与旧渡之间的水路，尚可辨认。' },
   { id: 'echo_note', name: '茶棚木板上的掌谱', kind: 'key', price: 0, sell: 0, desc: '一块烤黑的薄木板。画里的人伸手撑住石壁，贴石的那只手露出指甲。手边还有一圈快被烟痕遮住的墨线。' },
@@ -284,7 +284,7 @@ const recipes = [
   { id: 'r_ember', result: 'ember_talisman', count: 2, tier: 0, cost: 3, need: { wood: 1, reed: 1 }, days: 1, reveal: { item: 'ember_fold' } },
   { id: 'r_reed', result: 'reed_talisman', count: 2, tier: 0, cost: 2, need: { reed: 1, wood: 1 }, days: 1, reveal: { item: 'reed_talisman' } },
   { id: 'r_bank_talisman', result: 'bank_talisman', count: 2, tier: 0, cost: 3, need: { reed: 1, wood: 2 }, days: 1,
-    reveal: { item: 'eddy_note' }, requiresKnownMaterials: false },
+    reveal: { item: 'eddy_note' }, requiresShownEddyMap: true, requiresKnownMaterials: false },
   { id: 'r_iron', result: 'iron_talisman', count: 2, tier: 1, cost: 4, need: { ore: 1, wood: 1 }, days: 1, reveal: { item: 'iron_talisman' } },
   { id: 'r_tide_talisman', result: 'tide_talisman', count: 2, tier: 2, cost: 6, need: { core: 1, wood: 1 }, days: 1, reveal: { item: 'tide_note' } },
   { id: 'r_hide_coat', result: 'hide_coat', count: 1, tier: 0, cost: 5, need: { hide: 2 }, requiresShownHide: true, days: 1 },
@@ -618,7 +618,7 @@ const sites = [
 const events = [
   { id: 'reed_banks', name: '浅水苇丛', text: '岸边铺着几块踏石。往深处是个回水湾。沿岸绕开深水，能望见一座旧船棚，那里不时传来刨木声。', choices: [
     { label: '挖浅处的苇芯', desc: '站在踏石上，手能伸到近岸的泥边。', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 2, loot: { reed: 2 }, enemy: null, outcome: '你从踏石边的泥里挑出长实的白苇芯。' },
-    { label: '蹚过去挖深处的苇芯', desc: '露水沾在水湾那丛苇叶上。', days: 0.5, coins: 0, hp: -4, qi: 0, insight: 3, loot: { reed: 3 }, enemy: null, outcome: '你蹚到水湾，抽出底下发白的嫩芯。', injury: '泥里埋着碎蚌壳，拔脚时划破了小腿。' },
+    { label: '蹚过去挖深处的苇芯', desc: '踏石在回水湾前就断了。再往里要踩着软泥走，水底看不清。', days: 0.5, coins: 0, hp: -4, qi: 0, insight: 3, loot: { reed: 3 }, enemy: null, outcome: '你蹚到水湾，抽出底下发白的嫩芯。', injury: '泥里埋着碎蚌壳，拔脚时划破了小腿。' },
     { label: '沿岸去看看谁在刨木', days: 0.125, stay: true, outcome: '一个老渡工把裂桨架在石头上。「真会挑苇芯？匀些给我补桨，我手头有张旧山路图。」沿岸走过船棚，就到他的刨木滩。' },
   ] },
   { id: 'sunk_pack', name: '木桩旁的浅水道', text: '河边岔出一条浅水道，几根歪木桩从水里探出来。最外头那根卡着一只竹篓，桩内侧有条石路，沿着河弯往前。', choices: [
@@ -649,9 +649,9 @@ const events = [
     { label: '帮他把旧桨翻过来', desc: '泥盖住了半截刻线，渡工用拇指擦了几下。', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 1, loot: { oar_mark: 1 }, enemy: null, outcome: '旧桨背上刻了三根船桩。渡工把灰抹进槽里，线条亮了出来。他指着绕开最后一桩的细线说，那是他娘早年挑水用的船路。眼下下水太急，若要看清，先往断桅旁的高埂站。' },
     { label: '采下对岸的熟苇芯', desc: '白苇就长在水边的浅石间，叶尖已经黄了。', guardedBy: 'marsh_ghost', days: 0.5, insight: 2, loot: { reed: 3 }, outcome: '踩过空下来的石路，你伸手从齐腰的白苇中抽出熟芯。' },
   ] },
-  { id: 'bank_watch', name: '矮石堤', text: '有人在堤边歇脚，腰间别着一张折图，身边的石面上搁着一把钩刃。', choices: [
+  { id: 'bank_watch', name: '矮石堤', text: '有人在堤边歇脚，腰间别着一张折图，身边搁着一把钩刃。见你看那张图，他用手拍了拍膝边的木杖。「落灯村常有人来问北边的路。你也要上沉钟岭？」', choices: [
     { label: '跟拦滩客过招', desc: '「想借图？跟我过两招，赢了连这把备刀也拿去。撑不住就抬手，我收杖。」', days: 0.25, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: 'bank_runner', outcome: '拦滩客把备刀留在石上，紧了紧腰带，横着木杖站稳。' },
-    { label: '问有没有别的进山办法', desc: '那张折图上的船桨印像个记号，也许是渡工画的。', days: 0, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '他朝那几根歪木桩一抬下巴。「不必非跟我打。刨木滩的老渡工总往沉钟岭捎信。他正缺补桨的料，说不准肯跟你换张图。」' },
+    { label: '问去沉钟岭还有没有别的路', desc: '折图边角盖着一个船桨印。', days: 0, coins: 0, hp: 0, qi: 0, insight: 0, loot: {}, enemy: null, outcome: '他朝那几根歪木桩一抬下巴。「刨木滩的老渡工常去沉钟岭捎信。我这张就是他画的。他正缺补桨的料，你若肯帮忙，省得跟我比划。」' },
     { label: '等拦滩客兑现交手的约定', desc: '他解开腰间缚住折图的细绳，招手让你过去。', afterFight: 'bank_runner', days: 0, loot: { ridge_rubbing: 1, hook_blade: 1 }, outcome: '拦滩客把折图和备刀一起推过来。「说过的算数。走到北边倒钟下，细看图上那道岔。」' },
   ] },
   { id: 'drowned_mast', name: '断船桅旁的高岸', text: '一根折断的船桅斜插在木桩外。从高岸往下看，露出水面的石头把浅水分成两股。', choices: [

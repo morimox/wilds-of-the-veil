@@ -173,7 +173,7 @@ test('a normal outfitted traveler clears ten opponents with distinct tactics, ma
   fight(state, 1, 'border_rope_warden', ledger);
   choose(state, 3);
 
-  shift(state, ['cold_kiln'], 'border_kiln_depot');
+  shift(state, ['dry_sound_bridge', 'cold_kiln'], 'border_kiln_depot');
   assert.equal(available(state, 3), false);
   fight(state, 0, 'border_kiln_shield', ledger);
   choose(state, 1);
@@ -184,7 +184,7 @@ test('a normal outfitted traveler clears ten opponents with distinct tactics, ma
   refillAtInn(state);
   const repairBill = view(state).repairService.prices.coil_pole;
   play(state, 'repair', { id: 'coil_pole' });
-  shift(state, ['hollow_silo'], 'border_silo_den');
+  shift(state, ['wind_slate', 'dry_sound_bridge', 'cold_kiln', 'glass_hail_sink', 'hollow_silo'], 'border_silo_den');
   choose(state, 0);
   assert.equal(available(state, 4), false);
   fight(state, 2, 'border_silo_roof', ledger);
@@ -282,6 +282,8 @@ test('a weak arrival can turn back, or fall and return without opening stages or
   stageRetreatOpening(state);
   assert.equal(play(state, 'retreat').retreated, true);
   assert.equal(state.region, 'chalk_hoof_trail');
+  assert.equal(view(state).currentEvent.id, 'border_hoof_patrol');
+  play(state, 'leave');
   visit(state, 'border_hoof_patrol');
   assert.equal(available(state, 0), true);
   assert.equal(available(state, 1), false);

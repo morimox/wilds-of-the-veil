@@ -10,7 +10,7 @@ const lead = { item: request };
 export const encyclopediaContent = {
   items: [
     { id: request, name: '周简的字条', kind: 'key', price: 0, sell: 0,
-      desc: '周简列了两件事。断齿内堰的第三根断柱下，找一只裹油布的匣子。再到冷炉院找阮杪，看看关于鸣沙的校样。' },
+      desc: '从守尺观过没顶刻碑，沿斜漏水驿下游的小路去断齿内堰，在第三根断柱下找油布匣。去鸣沙后，过叩石院和架风板，从空音桥到冷炉院找阮杪。' },
     { id: weirLeaf, name: '内堰旧路图', kind: 'key', price: 0, sell: 0,
       desc: '匣中有一张折得发白的路图。洪水淹过的旧道旁添了一行小字，签名正是周简说的那位巡堤人。' },
     { id: kilnProof, name: '鸣沙校样', kind: 'key', price: 0, sell: 0,
@@ -41,7 +41,7 @@ export const encyclopediaContent = {
         { label: '问周简哪一幅路图出了错', days: 0.125,
           outcome: '周简指着图上一排断柱。「下过大水，两幅都未必对。巡堤人的新图用油布裹着，要是没冲远，多半卡在内堰。阮杪那头还有一份校样。你若愿意替我跑一趟，这儿有两处地址。」' },
         { label: '接过字条，答应跑一趟', desc: '周简把纸放在案边，等你拿主意。', afterChoice: 0,
-          days: 0.125, loot: { [request]: 1 }, outcome: '你收下字条。周简在堰图上点了点第三根断柱，又叮嘱你去冷炉院找阮杪。' },
+          days: 0.125, loot: { [request]: 1 }, outcome: '周简把纸交给你。「两幅堰图都靠不住，先过没顶刻碑去找施荀。水驿下游那条路还走得通。冷炉院在鸣沙，去的时候记得先问关口查什么凭证。」' },
       ] },
     { id: beam, name: '断柱下的横梁',
       text: '第三根断柱边斜着一根横梁，石槽紧挨梁脚。水一退，踩着断柱就能够到那根梁。',

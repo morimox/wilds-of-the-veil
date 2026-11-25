@@ -41,10 +41,10 @@ function traveler(region, known = []) {
 }
 
 test('the shortest route uses only known roads and improves when a shortcut opens', () => {
-  const state = traveler('village', ['marsh', 'pine_ridge', 'ford']);
+  const state = traveler('village', ['marsh', 'ridge', 'pine_ridge', 'ford']);
   const journey = (destination) => view(state).world.journeys.find(({ id }) => id === destination);
   const before = journey('pine_ridge');
-  assert.deepEqual(before.path, ['village', 'marsh', 'ford', 'pine_ridge']);
+  assert.deepEqual(before.path, ['village', 'marsh', 'ridge', 'ford', 'pine_ridge']);
   assert.ok(!view(state).world.edges.some(({ key }) => key === 'ford|village'));
   state.seenChoices.push('ford_lamp_channel:0');
   const shorter = journey('pine_ridge');
@@ -55,7 +55,7 @@ test('the shortest route uses only known roads and improves when a shortcut open
 });
 
 test('a single planned journey can pass through both permitted province crossings', () => {
-  const through = ['ford', 'zhao_city', 'flood_market', 'glass_bank', 'beacon_reefs', 'rope_sands', 'zhao_pass', 'mingsha_city'];
+  const through = ['ridge', 'ford', 'zhao_city', 'flood_market', 'glass_bank', 'beacon_reefs', 'rope_sands', 'zhao_pass', 'mingsha_city'];
   const state = traveler('village', through);
   state.inventory.ration = 15;
   const route = () => view(state).world.journeys.find(({ id }) => id === 'mingsha_city');

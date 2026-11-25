@@ -230,7 +230,8 @@ function stats(s) {
   const medicineAllowed = !s.currentEnemy?.medicineRestricted;
   const canEat = !s.gathering && (["village", "field", "event"].includes(s.mode) || onOpenRoad(s)) &&
     meal && s.edibleMeals.includes(meal.id);
-  const canUseSalve = medicineAllowed && s.hp < s.maxHp && s.inventory.salve > 0 && (["village", "field", "combat"].includes(s.mode) || onOpenRoad(s));
+  const canUseSalve = !s.gathering && medicineAllowed && s.hp < s.maxHp && s.inventory.salve > 0 &&
+    (["village", "field", "event", "combat"].includes(s.mode) || onOpenRoad(s));
   const sense = s.spiritSense;
   const senseSource = sense && `境界 ${sense.source.natural} 格${sense.source.equipment ? `＋${sense.source.equipment.name} ${sense.source.equipment.bonus} 格` : ""}`;
   return `<div class="player-line"><span class="realm">${escape(s.realm.name)}</span>
@@ -495,6 +496,36 @@ function atlasRoadMark(edge, chosen, name) {
   return `<g class="atlas-road${edge.avoided ? " avoided" : ""}${chosen ? " chosen" : ""}${!edge.available ? " closed" : ""}${edge.water ? " water" : ""}${edge.province ? " cross" : ""}${edge.risky ? " risky" : ""}"
     data-atlas-edge="${escape(edge.key)}" role="button" tabindex="0" aria-label="${escape(name + (edge.avoided ? "，已避开" : ""))}" aria-pressed="${edge.key === atlasEdge}">
     <title>${escape(name)}</title><polyline class="atlas-road-ink" points="${coords}"/><polyline class="atlas-road-hit" points="${coords}"/></g>`;
+}
+
+function atlasRoadUnderPointer(target, event) {
+  if (!event.detail || !target.matches(".atlas-road")) return target;
+  const svg = target.ownerSVGElement;
+  const projection = svg.getScreenCTM();
+  if (!projection) return target;
+  const fromPointer = road => {
+    const points = Array.from(road.querySelector(".atlas-road-ink").points,
+      point => new DOMPoint(point.x, point.y).matrixTransform(projection));
+    return points.slice(1).reduce((best, end, index) => {
+      const start = points[index];
+      const dx = end.x - start.x, dy = end.y - start.y;
+      const x = event.clientX - start.x, y = event.clientY - start.y;
+      const lengthSquared = dx * dx + dy * dy;
+      const along = lengthSquared ? Math.max(0, Math.min(1, (x * dx + y * dy) / lengthSquared)) : 0;
+      return Math.min(best, (x - dx * along) ** 2 + (y - dy * along) ** 2);
+    }, Infinity);
+  };
+  let closest = target;
+  let nearest = fromPointer(target);
+  for (const road of svg.querySelectorAll(".atlas-road[data-atlas-edge]")) {
+    if (road === target) continue;
+    const gap = fromPointer(road);
+    if (gap + 0.25 < nearest) {
+      closest = road;
+      nearest = gap;
+    }
+  }
+  return closest;
 }
 
 function atlasLabelOffsets(points, frame, selected) {
@@ -819,6 +850,8 @@ function traitRows(record) {
 function gearStats(s, gear, wear) {
   const hold = gear.slot === "weapon" ? `${gear.hands ?? 1} 手` : "";
   const field = gear.field ?? {};
+  const ammo = gear.ammo ?? [];
+  const stockedAmmo = ammo.reduce((count, id) => count + (s.inventory[id] ?? 0), 0);
   return [
     ...(wear === 0 ? [["损坏", "加成暂时失效"]] : []),
     ...effectRows(gear, flatEffects),
@@ -834,7 +867,8 @@ function gearStats(s, gear, wear) {
     ...(field.gatherPadding ? [["采集受伤", numberEffect(-field.gatherPadding)]] : []),
     ...(field.roadSatiety ? [["鸣沙州步行耗粮", numberEffect(-field.roadSatiety.fraction, true)]] : []),
     ...(gear.chargeRequired ? [["出招", "蓄力 1 回合"]] : []),
-    ...(gear.ammo?.length ? [["弹药 · 每招 1 发", gear.ammo.map(id => itemRows[id].name).join("、")]] : []),
+    ...(ammo.length ? [["弹药 · 每招 1 发", ammo.map(id => itemRows[id].name).join("、")]] : []),
+    ...(ammo.length && s.inventory[gear.id] ? [["随身合用弹药", `${stockedAmmo} 发`]] : []),
     ...(hold ? [["持用", hold]] : []),
     ["耐久", `${wear ?? gear.durability} / ${gear.durability}`],
     ["境界要求", gear.fixedDamage ? "无" : tierName(gear.tier)],
@@ -1098,7 +1132,7 @@ function pack(s, showGround) {
     }
     if (row.id === "lost_basket" && canEquip && !onOpenRoad(s)) {
       if (!s.basketInspected) actions += linkButton("查看药篓", "inspectBasket");
-      if (inVillage(s)) actions += tabButton("找药僮", "apprentice");
+      if (atLanding(s)) actions += tabButton("找药僮", "apprentice");
       actions += linkButton("拆篓取药", "unpackBasket", "", "danger");
     }
     if (row.id === "gate_scroll" && canEquip && !s.gathering && !onOpenRoad(s)) actions += tabButton("展开卷轴", "atlas");
@@ -1255,17 +1289,18 @@ function workshop(s) {
       "工匠捻了捻兽革。「这皮韧，攒两张，我给你缝件挡牙的褂子。」",
     !smithMap && !recipes.length && "工匠在门边磨剪子，脚边卷着几块旧皮。",
   ].filter(Boolean).map(line => `<p class="intro">${escape(line)}</p>`).join("");
-  const bankTalismanHint = s.inventory.eddy_note > 0 && recipes.some(row => row.id === "r_bank_talisman")
-    ? '<p class="intro workshop-hint">工匠沿着回汊图描出一道弯，把原图还给你。「照这一笔能画回汊符。挨逼时借它侧身，容易脱开些。」</p>' : "";
+  const showEddyMap = s.inventory.eddy_note > 0 && !recipes.some(row => row.id === "r_bank_talisman")
+    ? `<p class="intro workshop-hint">纸卷的边角还有些潮。裴匠收起剪子，给你腾出一角干案。</p>
+      <div class="actions">${linkButton("给裴匠看回汊图", "showEddyMapToSmith")}</div>` : "";
   const mapTrade = smithMap ? `<p class="intro">${escape(smithMap.desc)}</p>${smithMap.ready ? `<div class="actions">${linkButton("递一块寒铁", "handin", smithMap.id)}</div>` : ""}` : "";
   return panel("工坊", `${recipes.length ? '<div class="workshop-art" aria-hidden="true"></div>' : ""}
-    ${remarks}${mapTrade}
+    ${remarks}${mapTrade}${showEddyMap}
     <div class="card-grid">${recipes.map(row => {
     const result = itemRows[row.result];
     const reason = s.craftReasons[row.id];
-    return card(result.name, `${row.cost} 灵钱 · ${row.days} 日`, tag(kindNames[result.kind] ?? ""),
+    return card(result.name, "", tag(`${kindNames[result.kind]} · ${row.cost} 灵钱 · ${row.days} 日`),
       linkButton(reason || "制备", "craft", row.id, "", Boolean(reason)), itemEntry(s, row.result), row.need);
-  }).join("")}</div>${bankTalismanHint}`);
+  }).join("")}</div>`);
 }
 
 function storageRows(s, rows, action) {
@@ -1772,10 +1807,6 @@ function feedback(before, after, result, action, presentation, payload) {
     if (lost) lines.push(`强盗拿走了${lost}。`);
   }
   if (result.roadCoins > 0) lines.push(`从路上捡到 ${result.roadCoins} 灵钱。`);
-  if (result.ok && action === "attack") {
-    const spent = (data.ammunition ?? []).filter(({ id }) => (before.inventory[id] ?? 0) > (after.inventory[id] ?? 0));
-    for (const { id } of spent) lines.push(`消耗${itemRows[id].name} ×${before.inventory[id] - (after.inventory[id] ?? 0)}。`);
-  }
   if (result.injury?.amount) {
     const cause = result.injury.cause.replace(/[。！]+$/, "");
     lines.push(`${cause}，气血减少 ${result.injury.amount} 点。`);
@@ -1847,7 +1878,7 @@ function feedback(before, after, result, action, presentation, payload) {
     action === "restUntilRecovered" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     action === "finishGather" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     roadTravelActions.includes(action) && !result.travelMeals && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
-    after.coins > before.coins && !result.roadCoins && !banditPaymentActions.includes(action) && action !== "sell" && "获得灵钱",
+    after.coins > before.coins && !result.roadCoins && !banditPaymentActions.includes(action) && action !== "sell" && `获得 ${after.coins - before.coins} 灵钱`,
     after.coins < before.coins && ["alchemyBuyFormula", "alchemyAdvance"].includes(action) && `付出 ${before.coins - after.coins} 灵钱`,
   ].filter(Boolean);
   if (changes.length) lines.push(changes.join("，") + "。");
@@ -1868,12 +1899,14 @@ function feedback(before, after, result, action, presentation, payload) {
 
 function confirmDisposal(options, message) {
   pendingDisposal = options;
-  const verb = options.action === "discard" ? "放下" : "卖出";
+  const unpacking = options.action === "unpackBasket";
+  const verb = options.action === "discard" ? "放下" : unpacking ? "拆篓取药" : "卖出";
   disposal.querySelector("#disposal-title").textContent = `确认${verb}`;
   disposal.querySelector("[data-disposal-item]").textContent = options.name;
   disposal.querySelector("#disposal-description").textContent = options.action === "discard"
     ? `这件物品无法重新取得。放下后仍可回${options.placeName}找。` : message;
   const quantity = disposal.querySelector('[name="count"]');
+  quantity.closest("label").hidden = unpacking;
   quantity.value = options.count;
   quantity.max = options.maximum;
   quantity.readOnly = options.maximum === 1;
@@ -2250,7 +2283,7 @@ document.addEventListener("click", event => {
   }
   if (button.dataset.atlasEdge) {
     const fromList = Boolean(button.closest(".atlas-road-index"));
-    atlasEdge = button.dataset.atlasEdge;
+    atlasEdge = atlasRoadUnderPointer(button, event).dataset.atlasEdge;
     render();
     const detail = main.querySelector("#atlas-edge-detail");
     const road = main.querySelector(`.atlas-map [data-atlas-edge="${CSS.escape(atlasEdge)}"]`);

@@ -78,7 +78,8 @@ const ruleDescriptions = {
   escapeDodgeFactor: '战斗闪避值折算成脱身概率的倍率',
   escapeChanceCap: '普通敌手有空当时的脱身概率上限',
   banditEscapeChanceCap: '强盗有空当时的脱身概率上限',
-  mixedTrackDays: '混合猎场的同一路脚印消散用时（游戏日）',
+  mixedTrackDays: '猎点同一路的脚印消散用时（游戏日）',
+  huntEdgeApproachDays: '在原处外沿循踪返回所耗时间上限（游戏日）',
   mixedTrackHealingPerDay: '失去接触的猎物每日恢复气血（向下取整）',
   emptyReturnDays: '空腹返村额外用时（天）',
   waitDays: '主动等候一次的游戏天数',
@@ -649,7 +650,7 @@ const tables = [
   table('recipes', '制作用方', gated(data.recipes), [
     'id', 'result', 'count', 'tier', tier, ['cost', '制作费用（灵钱）'], 'need', 'days', 'reveal',
     ['requiresKnownMaterials', '展示需要认识材料'],
-    ['requiresShownHide', '需给工匠看过兽革'], ['formula', '所需丹方', ref],
+    ['requiresShownHide', '需给工匠看过兽革'], ['requiresShownEddyMap', '需给裴匠看过回汊图'], ['formula', '所需丹方', ref],
     ['facility', '生产设施', facilityRef], ['facilityLevel', '设施最低等级'],
   ]),
   table('regions', '三州大地图点位', gated(regionRows), [
