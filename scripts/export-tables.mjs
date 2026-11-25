@@ -643,7 +643,7 @@ const tables = [
   ]),
   table('spirit-skills', '神识技能', spiritSkills, [
     'id', 'name', ['cost', '神识消耗'], ['duration', '持续回合'], ['cooldown', '冷却回合'],
-    ['stat', '可读对方属性'], 'region', ['teacher', '习得时请教的人'], ['defeated', '须击败的对手', ref],
+    ['strength', '特效倍率'], ['stat', '可读对方属性'], 'region', ['site', '请教地点', ref], ['teacher', '习得时请教的人'], ['defeated', '须击败的对手', ref],
     ['proof', '对应凭证', ref], ['price', '学习费用（灵钱）'], 'desc', ['lesson', '习得剧情'],
   ], { note: '施展回合计入持续和冷却。当回合可防御、闪避、蓄势。金丹初期神识上限 2，之后金丹上限 3，静水护心佩最多再加 1。' }),
   table('recipes', '制作用方', gated(data.recipes), [

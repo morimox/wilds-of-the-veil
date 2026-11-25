@@ -72,6 +72,11 @@ let atlasPoint = null;
 let atlasEdge = null;
 let atlasIndexOpen = false;
 let atlasRoadsOpen = false;
+const atlasZoomLevels = [0.75, 1, 1.25, 1.5, 2, 2.5];
+const atlasCameras = new Map();
+let atlasWheel = null;
+let atlasDrag = null;
+let atlasSuppressClick = false;
 let bookCategory = null;
 let bookEditing = null;
 const bookDrafts = new Map();
@@ -352,10 +357,7 @@ function banditScreen(s, bandit, preparation = "") {
 
 function roadScreen(s) {
   const road = s.roadTrip;
-  const ground = road.afterBattle ? groundRows(s) : [];
-  const preparation = ground.length ? `<section class="road-aftermath" aria-label="战利品">
-    <h3>脚边的战利品</h3>${ground.join("")}
-  </section>` : "";
+  const preparation = road.afterBattle ? groundSection(s, "脚边的战利品") : "";
   if (road.bandit) return banditScreen(s, road.bandit, preparation);
   const turnBack = road.fromName ? `折回${road.fromName}` : "沿原路折返";
   return panel(road.afterBattle ? "交手之后" : "路上", `${preparation}<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
@@ -383,7 +385,7 @@ function journey(s) {
   const originalHome = atLanding(s);
   const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.fogTier || (s.inventory.ration ?? 0) < rules.reliefRations ||
     (s.spiritSense && s.spiritSense.current < s.spiritSense.max);
-  return panel(s.region.name, `${siteList(s)}${hazardNotice(s.localHazard)}
+  return panel(s.region.name, `${groundSection(s)}${siteList(s)}${hazardNotice(s.localHazard)}
   ${roads.length ? `<div class="atlas-local-roads">${roads.map(road => routeAction(road, s.world.edges)).join("")}</div>` : ""}
   <div class="actions place-actions">
     ${originalHome ? tabButton("找药僮", "apprentice") : ""}
@@ -397,7 +399,7 @@ function journey(s) {
     ${s.restSessions > 1 ? linkButton(`歇到缓过来 · ${s.restSessions * rules.restDays}日`, "restUntilRecovered", "", "quiet") : ""}
     ${s.sect ? tabButton("找宗门管事", "sect") : ""}
     ${s.tournament ? tabButton("去看宗门大比", "tournament") : ""}
-    ${((isHome && s.training?.some(({ region }) => region === s.region.id)) || s.spiritSense?.rows.some(({ region, learned }) => region === s.region.id && !learned)) ? tabButton("请教修习", "training") : ""}
+    ${isHome && s.training?.some(({ region }) => region === s.region.id) ? tabButton("请教修习", "training") : ""}
     ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) :
       s.region.id === data.tournament.region && s.boutPause > 0 && !needRest ? linkButton("在场边等半日", "wait", "", "quiet") : ""}
   </div>
@@ -427,7 +429,61 @@ function atlasOverview(world) {
   const { overview: frame, provinces: shapes } = world.geography;
   const provinces = world.provinces.map(({ id, name }) =>
     `<button type="button" class="atlas-province" style="${atlasAt(shapes[id].label, frame)}" data-atlas-province="${escape(id)}"${id === world.province ? ' aria-current="location"' : ""}>${escape(name)}</button>`).join("");
-  return panel("山河总图", `<div class="atlas-view atlas-overview" aria-label="各州地图" style="--map-ratio:${frame[2]} / ${frame[3]}">${atlasInk(world, frame, "", true)}${provinces}</div>`);
+  return panel("山河总图", `<div class="atlas-view">${atlasViewport("overview", frame, "各州地图", atlasInk(world, frame, "", true) + provinces)}</div>`);
+}
+
+function atlasViewport(id, frame, label, ink) {
+  const zoom = atlasCameras.get(id)?.zoom ?? 1;
+  const position = atlasZoomLevels.indexOf(zoom);
+  const zoomButton = (direction, name, symbol, disabled) =>
+    `<button type="button" class="button quiet atlas-zoom" data-atlas-zoom="${direction}" aria-controls="atlas-viewport"
+      aria-label="${name}" aria-disabled="${disabled}">${symbol}</button>`;
+  return `<div class="atlas-frame">
+    <div class="atlas-zoom-tools" role="group" aria-label="地图缩放">
+      ${zoomButton(-1, "缩小地图", "−", position === 0)}
+      <span class="atlas-zoom-level" aria-live="polite">${Math.round(100 * zoom)}%</span>
+      ${zoomButton(1, "放大地图", "+", position === atlasZoomLevels.length - 1)}
+    </div>
+    <div class="atlas-scroll${id === "overview" ? " atlas-scroll-overview" : ""}" id="atlas-viewport" data-atlas-scroll="${id}" data-atlas-enlarged="${zoom > 1}"
+      style="--map-ratio:${frame[2]} / ${frame[3]};--atlas-zoom:${zoom}" role="region" aria-label="${label}" tabindex="0">
+      <div class="atlas-canvas ${id === "overview" ? "atlas-overview" : "atlas-map"}">${ink}</div>
+    </div>
+  </div>`;
+}
+
+const atlasZoom = (viewport) => Number(viewport.style.getPropertyValue("--atlas-zoom"));
+
+function moveAtlas(viewport, dx, dy) {
+  viewport.scrollTo(viewport.scrollLeft + dx, viewport.scrollTop + dy);
+}
+
+function centerAtlasOn(viewport, target) {
+  if (!target) return;
+  const bounds = viewport.getBoundingClientRect();
+  const point = target.getBoundingClientRect();
+  moveAtlas(viewport, point.left + point.width / 2 - bounds.left - viewport.clientWidth / 2,
+    point.top + point.height / 2 - bounds.top - viewport.clientHeight / 2);
+}
+
+function changeAtlasZoom(viewport, step, pointer) {
+  const position = atlasZoomLevels.indexOf(atlasZoom(viewport)) + step;
+  const next = atlasZoomLevels[position];
+  if (!next) return;
+  const bounds = viewport.getBoundingClientRect();
+  const x = pointer?.clientX ?? bounds.left + viewport.clientWidth / 2;
+  const y = pointer?.clientY ?? bounds.top + viewport.clientHeight / 2;
+  const canvas = viewport.firstElementChild;
+  const before = canvas.getBoundingClientRect();
+  const mapX = Math.max(0, Math.min(1, (x - before.left) / before.width));
+  const mapY = Math.max(0, Math.min(1, (y - before.top) / before.height));
+  viewport.style.setProperty("--atlas-zoom", next);
+  viewport.dataset.atlasEnlarged = next > 1;
+  const after = canvas.getBoundingClientRect();
+  moveAtlas(viewport, after.left + mapX * after.width - x, after.top + mapY * after.height - y);
+  const tools = viewport.previousElementSibling;
+  tools.querySelector(".atlas-zoom-level").textContent = Math.round(next * 100) + "%";
+  tools.querySelector('[data-atlas-zoom="-1"]').setAttribute("aria-disabled", position === 0);
+  tools.querySelector('[data-atlas-zoom="1"]').setAttribute("aria-disabled", position === atlasZoomLevels.length - 1);
 }
 
 function atlasRoadName(edge, points) {
@@ -491,8 +547,7 @@ function atlasMap(world, province, points, byId, selected, route, edges) {
   const marks = points.map(point => `<button type="button" class="atlas-mark${point.current ? " here" : ""}${point.settlement ? " town" : ""}${point.portal ? " portal" : ""}${point.attuned ? " linked" : ""}"
     style="${atlasAt([point.x, point.y], frame)};${offsets[point.id]}" data-atlas-point="${escape(point.id)}" aria-label="${escape(point.name)}" aria-pressed="${point.id === selected.id}">
     <span class="atlas-dot"></span><span class="atlas-label">${escape(point.name)}</span></button>`).join("");
-  return `<div class="atlas-scroll" data-atlas-scroll="${escape(province)}"><div class="atlas-map" style="--map-ratio:${frame[2]} / ${frame[3]}" aria-label="已知地点和道路">
-    ${atlasInk(world, frame, lines)}${marks}${crossLabels}</div></div>
+  return `${atlasViewport(province, frame, "已知地点和道路", atlasInk(world, frame, lines) + marks + crossLabels)}
     <p class="atlas-legend"><span class="atlas-key key-wild">野外</span><span class="atlas-key key-town">休息点</span><span class="atlas-key key-portal">传送门</span>${edges.some(({ risky }) => risky) ? '<span class="atlas-key key-risk">险路</span>' : ""}</p>`;
 }
 
@@ -601,10 +656,13 @@ function eventScreen(s) {
       ${blocker ? `<p class="choice-blocker">${escape(blocker)}</p>` : ""}
     </div>`;
   }).join("");
+  const lessons = (s.spiritSense?.rows ?? []).filter(skill => skill.site === event.id && !skill.learned);
   return panel(event.name, `${painted ? `<div class="scene scene-${escape(s.region.id)}" aria-hidden="true"></div>` : ""}
     <p class="intro">${escape(publicText(description))}</p>
     ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
+    ${groundSection(s)}
     <div class="choice-list">${choices}</div>
+    ${lessons.length ? `<div class="choice-list">${lessons.map(skill => `<div class="choice">${spiritLesson(skill, gathering)}</div>`).join("")}</div>` : ""}
     ${s.mechanism && !s.mechanism.complete ? mechanismPanel(s.mechanism) : ""}
     ${s.experiment ? `<fieldset class="event-experiment"${gathering ? " disabled" : ""}>${experimentForm(s.experiment)}</fieldset>` : ""}
     <div class="actions">${linkButton("离开", "leave", "", "quiet", Boolean(gathering))}</div>`, tag(s.region.name));
@@ -685,9 +743,13 @@ function combatScreen(s) {
   const observation = enemy.desc ? `<details class="field-note"${combatObservation === state.combat ? " open" : ""}><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
   const spell = weapon?.spellQi && linkButton(`催动${weapon.name} · ${weapon.spellQi} 真气`, "weaponSpell", "", "",
     s.qi < weapon.spellQi || Boolean(charging || suppress));
-  const spiritButton = spirit?.active && linkButton(suppress ? "神识已发动" : spirit.waiting
-    ? `${spirit.active.name} · 尚需 ${spirit.waiting} 回合` : `${spirit.active.name} · ${spirit.active.cost} 神识`,
-  "invokeSpirit", "", "quiet", Boolean(spirit.invokeBlocker));
+  const knownSpirit = spirit?.active;
+  const spiritDescription = suppress ? `这回合可以防御、闪避、蓄势${enemy.medicineRestricted ? "" : "或服药"}。`
+    : spirit?.remaining ? `效果还剩 ${spirit.remaining} 回合。` : spirit?.invokeBlocker || knownSpirit?.desc;
+  const spiritButton = knownSpirit && `<span class="action-hint">${linkButton(suppress ? `${knownSpirit.name}已发动` : spirit.waiting
+    ? `${knownSpirit.name} · 尚需 ${spirit.waiting} 回合` : `${knownSpirit.name} · ${knownSpirit.cost} 神识`,
+  "invokeSpirit", "", "quiet", Boolean(spirit.invokeBlocker), 1, "combat-spirit-tip")}<span class="item-tip" id="combat-spirit-tip"
+    role="tooltip">${itemTipBody(spiritDescription, spiritStats(knownSpirit))}</span></span>`;
   const readings = spirit?.readings.map(({ label, value }) => `${label} ${value}`).join(" · ");
   return panel(enemy.name, `
     ${intentLine}
@@ -841,6 +903,12 @@ function spiritStats(skill) {
   ];
 }
 
+function spiritLesson(skill, gathering) {
+  const price = skill.price ? ` · ${skill.price} 灵钱` : "";
+  return linkButton(`向${skill.teacher}请教${skill.name}${price}`, "spiritStudy", skill.id, "quiet",
+    Boolean(skill.blocker || gathering)) + (skill.blocker ? `<p class="fine">${escape(skill.blocker)}</p>` : "");
+}
+
 function itemEntry(s, id) {
   return { id, text: itemDescription(s, id), stats: itemStats(s, id) };
 }
@@ -913,17 +981,21 @@ function manualActions(book, active, canManage, canTrain) {
 function groundRows(s) {
   return Object.entries(s.groundLoot ?? {}).map(([id, count]) => {
     const item = itemRows[id];
-    const gear = gearRows.get(id);
     const maximum = s.groundPickup?.[id] ?? 0;
-    const reason = s.groundPickupReasons?.[id];
+    const reason = s.groundPickupReasons?.[id] || (!maximum ? "行囊已满，先腾一格。" : "");
     const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
-    const cue = maximum ? `${label} · ${item.name}` : reason ? `${item.name} · ${reason}` : gear ? `${item.name}暂时拿不了` : `${item.name} · 行囊已满`;
+    const cue = maximum ? `${label} · ${item.name}` : `${item.name} · ${reason}`;
     return `<div class="ground-row">
       ${itemSlot(s, item, "ground", "", "", count, { wear: s.groundWear[id] })}
       <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
       ${reason ? `<p class="fine ground-reason">${escape(reason)}</p>` : ""}
     </div>`;
   });
+}
+
+function groundSection(s, title = "脚边的物品") {
+  const rows = groundRows(s);
+  return rows.length ? `<section class="ground-pickups" aria-label="${title}"><h3>${title}</h3>${rows.join("")}</section>` : "";
 }
 
 function discardActions(s, id) {
@@ -941,7 +1013,7 @@ function meditationBlocked(s) {
     : s.qi < s.deductionQiCost ? "真气不足。" : "";
 }
 
-function pack(s) {
+function pack(s, showGround) {
   const canEquip = inVillage(s) || s.mode === "field" || s.mode === "event" || onOpenRoad(s);
   const canManageManual = canEquip && !s.gathering;
   const containers = s.economy?.containers ?? [];
@@ -971,9 +1043,16 @@ function pack(s) {
   if (activeManual) worn.push(itemSlot(s, itemRows[activeManual.id], "worn",
     manualActions(activeManual, true, canManageManual, !onOpenRoad(s)) + discardActions(s, activeManual.id), "内功", 0,
     { status: activeManual.aligned ? "手头的打法合它的路数。" : "" }));
-  const activeSpirit = s.spiritSense?.active;
-  if (activeSpirit) worn.push(itemSlot(s, { id: `spirit-${activeSpirit.id}`, name: activeSpirit.name }, "worn",
-    "", "神识", 0, { entry: { text: activeSpirit.desc, stats: spiritStats(activeSpirit) } }));
+  const spirit = s.spiritSense;
+  if (spirit) {
+    const selected = spirit.active;
+    const alternatives = spirit.rows.filter(skill => skill.learned && !skill.selected);
+    const changes = canManageManual ? alternatives.map(skill =>
+      linkButton(`${selected ? "改用" : "选用"}${skill.name}`, "spiritEquip", skill.id, "quiet")).join("") : "";
+    const description = selected?.desc || (alternatives.length ? "点开后，可选用一门已习得的神识。" : "可去守尺观的竹尺庭向傅澄请教。");
+    worn.push(itemSlot(s, { id: "active-spirit", name: selected?.name || "尚未选用" }, "worn",
+      changes, "神识", 0, { entry: { text: description, stats: selected ? spiritStats(selected) : [] } }));
+  }
   const carried = data.items.filter(row => s.inventory[row.id] && row.id !== activeManual?.id && !Object.values(s.equipment).includes(row.id));
   const usedClues = new Set(s.usedClues);
   const activeClues = new Set(s.activeClues);
@@ -1033,7 +1112,7 @@ function pack(s) {
   const clues = keys.filter(row => !formulaIds.has(row.id) && !foodRecipeIds.has(row.id)).map(keySlot);
   const formulae = keys.filter(row => formulaIds.has(row.id)).map(keySlot);
   const foodRecipes = keys.filter(row => foodRecipeIds.has(row.id)).map(keySlot);
-  const ground = canEquip && !s.roadTrip?.afterBattle ? groundRows(s) : [];
+  const ground = showGround && canEquip && !s.roadTrip?.afterBattle ? groundRows(s) : [];
   const capacityLabel = `已用${s.backpackUsed}格，共${s.backpackCapacity}格`;
   const useProgress = s.backpackCapacity > 20;
   const meter = useProgress
@@ -1427,15 +1506,13 @@ function trainingScreen(s) {
   }).join("");
   const affiliation = s.affiliation ? tag(`${s.affiliation.name} · ${s.affiliation.disciple.name}`) : "";
   const spirit = s.spiritSense;
-  const skills = spirit?.rows.map((skill) => {
-    const action = skill.learned ? linkButton(skill.selected ? "正在运用" : "选用", "spiritEquip", skill.id, "", skill.selected)
-      : linkButton(skill.blocker || (skill.price ? `向${skill.teacher}请教 · ${skill.price} 灵钱` : `向${skill.teacher}请教`),
-        "spiritStudy", skill.id, "", Boolean(skill.blocker));
-    return card(skill.name, skill.desc, tag(`${skill.cost} 神识 · ${skill.cooldown} 回合缓好`), action);
+  const skills = spirit?.rows.filter(skill => skill.learned).map((skill) => {
+    const action = linkButton(skill.selected ? "正在运用" : "选用", "spiritEquip", skill.id, "", skill.selected);
+    return card(skill.name, "", "", action, { text: skill.desc, stats: spiritStats(skill) });
   }).join("");
   const practices = contents ? panel("修习进度", `<div class="card-grid">${contents}</div>`, affiliation) : "";
   return practices + (spirit ? panel("神识", skills ? `<div class="card-grid">${skills}</div>` :
-    '<p class="fine">可以去守尺观向傅澄请教。</p>') : "");
+    '<p class="fine">可以去守尺观的竹尺庭向傅澄请教。</p>') : "");
 }
 
 function alchemy(s) {
@@ -1470,13 +1547,13 @@ function visibleQuests(s) {
 
 function questBoard(s) {
   const list = visibleQuests(s);
-  return panel("委托", `<div class="card-grid">${list.map(row => {
-    const done = questDone(s, row);
-    const note = !done && row.blockedReason ? ` ${row.blockedReason}` : "";
-    return card(row.name, row.desc + note,
-      done ? tag("已交付", "off") : "",
-      done ? "" : linkButton(row.ready ? "交付" : "暂不能交付", "handin", row.id, "primary", !row.ready), "", row.need);
-  }).join("")}</div>`);
+  const pending = list.filter(row => !questDone(s, row));
+  const delivered = list.filter(row => questDone(s, row));
+  const current = pending.map(row => card(row.name, row.desc + (row.blockedReason ? ` ${row.blockedReason}` : ""), "",
+    linkButton(row.ready ? "交付" : "暂不能交付", "handin", row.id, "primary", !row.ready), "", row.need)).join("");
+  const history = delivered.map(row => card(row.name, row.desc)).join("");
+  return panel("委托", `${current ? `<div class="card-grid">${current}</div>` : ""}
+    ${history ? `<details class="merchant-order"${pending.length ? "" : " open"}><summary>已交付 · ${delivered.length}</summary><div class="card-grid">${history}</div></details>` : ""}`);
 }
 
 function apprentice(s) {
@@ -1484,11 +1561,11 @@ function apprentice(s) {
   const reeds = s.quests.find(quest => quest.id === "reed_salve" && !quest.completed);
   const waterline = s.quests.find(quest => quest.id === "apprentice_waterline" && !quest.completed);
   const holding = Boolean(s.inventory.lost_basket);
-  const basket = holding && delivery ? linkButton("交还药篓", "handin", delivery.id, "primary") : "";
-  const tasks = [[reeds, "递一份灵草"], [waterline, "拿灵草换水线图"]].filter(([quest]) => quest)
-    .map(([quest, label]) => `<p class="intro">${escape(quest.desc)}</p>
-      ${quest.ready ? `<div class="actions">${linkButton(label, "handin", quest.id)}</div>` : ""}`).join("");
-  return panel("药僮", `${basket ? `<p class="intro">药僮认出了你手里的竹篓。</p><div class="actions">${basket}</div>` : ""}${tasks || (basket ? "" : '<p class="intro">药僮正忙着看火。</p>')}`);
+  const tasks = [[holding && delivery, "交还药篓"], [reeds, "递一份灵草"], [waterline, "拿灵草换水线图"]]
+    .filter(([quest]) => quest).map(([quest, label]) => `<p class="intro">${escape(quest.desc)}</p>
+      ${quest.ready ? `<div class="actions">${linkButton(label, "handin", quest.id, "primary")}</div>` : ""}
+      ${quest.blockedReason ? `<p class="choice-blocker">${escape(quest.blockedReason)}</p>` : ""}`).join("");
+  return panel("药僮", tasks || '<p class="intro">药僮正忙着看火。</p>');
 }
 
 function meditationForm(s) {
@@ -1527,17 +1604,19 @@ function deductionBoard(s) {
   const onTable = draft ? `<section class="deduction-table"><h3>${escape(draft.title)}</h3>
     <ul>${draft.items.map(({ id, name }) => `<li><strong>${escape(name)}</strong>
       <p class="fine item-description" data-item-description="${escape(id)}">${escape(itemDescription(s, id))}</p></li>`).join("")}</ul>
-    <div class="actions">${linkButton("推演", "deduce", draft.id, "primary")}</div>
+    <div class="actions">${linkButton("推演", "deduce", draft.id, "primary")}${linkButton("收起线索", "clearDeductionDraft", "", "quiet")}</div>
   </section>` : meditationForm(s);
   return atlas(s) + panel("沙盘", onTable + history);
 }
 
 const focusKeys = ["data-action", "data-value", "data-count", "data-bag-id", "data-tab", "data-facility",
-  "data-market-mode", "data-item", "data-atlas-province", "data-atlas-point", "data-atlas-edge", "data-atlas-overview"];
+  "data-market-mode", "data-item", "data-atlas-province", "data-atlas-point", "data-atlas-edge", "data-atlas-overview", "data-atlas-zoom", "data-atlas-scroll"];
+const focusControls = ["button", ".atlas-road[data-atlas-edge]", "[data-atlas-scroll]"];
+const visibleFocusControls = focusControls.map(selector => selector + ":focus-visible").join(", ");
 
 function keyboardFocus() {
   const control = document.activeElement;
-  if (!control?.matches("button:focus-visible")) return null;
+  if (!control?.matches(visibleFocusControls)) return null;
   const area = control.closest("#main, #player-status, #kit, .navigation");
   if (!area) return null;
   const keys = focusKeys.filter(key => control.hasAttribute(key))
@@ -1547,7 +1626,9 @@ function keyboardFocus() {
 
 function restoreKeyboardFocus(focus) {
   if (!focus) return;
-  const candidates = focus.keys ? [...focus.area.querySelectorAll(`button${focus.keys}:enabled`)] : [];
+  const candidates = focus.keys
+    ? [...focus.area.querySelectorAll(focusControls.map(selector => selector + focus.keys + ":not(:disabled)").join(", "))]
+    : [];
   const inspected = focus.area === kit && selectedItem ? kit.querySelector(`[data-item="${CSS.escape(selectedItem)}"]`) : null;
   const offerFollowUp = focus.area === main && banditOfferActions.includes(focus.action)
     ? main.querySelector('[data-action="banditSettle"]:enabled') ?? main.querySelector('[data-road-offers] summary') : null;
@@ -1569,6 +1650,9 @@ function restoreKeyboardFocus(focus) {
 function render() {
   const focus = keyboardFocus();
   const previousMap = main.querySelector("[data-atlas-scroll]");
+  if (previousMap) atlasCameras.set(previousMap.dataset.atlasScroll, {
+    zoom: atlasZoom(previousMap), x: previousMap.scrollLeft, y: previousMap.scrollTop,
+  });
   let s = view(state);
   const carriedBags = s.economy?.containers ?? [];
   if (openBagId && !carriedBags.some(row => row.id === openBagId)) openBagId = null;
@@ -1597,7 +1681,7 @@ function render() {
   playerStatus.hidden = dead;
   playerStatus.innerHTML = dead ? "" : stats(s);
   kit.hidden = dead;
-  kit.innerHTML = dead ? "" : pack(s);
+  kit.innerHTML = dead ? "" : pack(s, tab !== "journey");
   app.querySelector("[data-help]").hidden = dead;
   bookToggle.hidden = dead || !s.guideBook;
   if (dead && guide.open) guide.close();
@@ -1619,14 +1703,18 @@ function render() {
   guideDeduction.hidden = !available.deduction;
   main.innerHTML = (dead ? "" : roadPosition(s.roadTrip)) + content[tab](s);
   const nextMap = main.querySelector("[data-atlas-scroll]");
-  if (nextMap && nextMap.dataset.atlasScroll === previousMap?.dataset.atlasScroll) nextMap.scrollLeft = previousMap.scrollLeft;
+  if (nextMap) {
+    const camera = atlasCameras.get(nextMap.dataset.atlasScroll);
+    if (camera) nextMap.scrollTo(camera.x, camera.y);
+    else centerAtlasOn(nextMap, nextMap.querySelector(".atlas-mark[aria-pressed='true']"));
+  }
   restoreKeyboardFocus(focus);
   return s;
 }
 
 function selectItem(key) {
   selectedItem = selectedItem === key ? null : key;
-  for (const trigger of app.querySelectorAll("#kit [data-item], .road-aftermath [data-item]")) {
+  for (const trigger of app.querySelectorAll("#kit [data-item], .ground-pickups [data-item]")) {
     const open = trigger.dataset.openBag ? trigger.dataset.openBag === openBagId : trigger.dataset.item === selectedItem;
     trigger.setAttribute("aria-expanded", String(open));
     const tools = trigger.parentElement.querySelector(".item-tools");
@@ -1921,7 +2009,68 @@ kit.addEventListener("contextmenu", event => {
   performAction(trigger.dataset.bagAction, { bagId: trigger.dataset.bagId, id: trigger.dataset.bagItem, count: event.shiftKey ? 1 : "all" });
 });
 
+main.addEventListener("wheel", event => {
+  const viewport = event.target.closest?.("[data-atlas-scroll]");
+  if (!viewport || event.ctrlKey || event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY) || !event.deltaY) return;
+  event.preventDefault();
+  if (atlasWheel?.viewport !== viewport || event.timeStamp - atlasWheel.time > 180) {
+    atlasWheel = { viewport, time: event.timeStamp, distance: 0 };
+  }
+  const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 120 : 1);
+  atlasWheel.time = event.timeStamp;
+  if (Math.sign(delta) !== Math.sign(atlasWheel.distance)) atlasWheel.distance = 0;
+  atlasWheel.distance += delta;
+  if (Math.abs(atlasWheel.distance) < 48) return;
+  changeAtlasZoom(viewport, -Math.sign(atlasWheel.distance), event);
+  atlasWheel.distance = 0;
+}, { passive: false });
+
+document.addEventListener("pointerdown", event => {
+  atlasSuppressClick = false;
+  const viewport = event.target.closest?.("[data-atlas-scroll]");
+  if (!viewport || event.pointerType === "touch" || event.button !== 0 || !event.isPrimary ||
+    (viewport.scrollWidth <= viewport.clientWidth && viewport.scrollHeight <= viewport.clientHeight)) return;
+  atlasDrag = { id: event.pointerId, viewport, startX: event.clientX, startY: event.clientY,
+    x: viewport.scrollLeft, y: viewport.scrollTop, moving: false };
+});
+
+document.addEventListener("pointermove", event => {
+  const drag = atlasDrag;
+  if (drag?.id !== event.pointerId || !drag.viewport.isConnected) return;
+  const dx = event.clientX - drag.startX;
+  const dy = event.clientY - drag.startY;
+  if (!drag.moving) {
+    if (Math.hypot(dx, dy) < 5) return;
+    drag.viewport.setPointerCapture(event.pointerId);
+    drag.viewport.classList.add("atlas-dragging");
+    drag.moving = true;
+  }
+  drag.viewport.scrollTo(drag.x - dx, drag.y - dy);
+  event.preventDefault();
+});
+
+function endAtlasDrag(event) {
+  if (atlasDrag?.id !== event.pointerId) return;
+  atlasDrag.viewport.classList.remove("atlas-dragging");
+  atlasSuppressClick = atlasDrag.moving;
+  atlasDrag = null;
+}
+
+document.addEventListener("pointerup", endAtlasDrag);
+document.addEventListener("pointercancel", endAtlasDrag);
+main.addEventListener("click", event => {
+  if (!atlasSuppressClick || !event.detail) return;
+  atlasSuppressClick = false;
+  if (event.target.closest?.("[data-atlas-scroll]")) event.stopPropagation();
+}, true);
+
 document.addEventListener("keydown", event => {
+  const viewport = event.target.matches?.("[data-atlas-scroll]") ? event.target : null;
+  if (viewport && ["+", "=", "-", "−"].includes(event.key) && !event.ctrlKey && !event.metaKey) {
+    event.preventDefault();
+    changeAtlasZoom(viewport, event.key === "+" || event.key === "=" ? 1 : -1);
+    return;
+  }
   const road = event.target.closest?.(".atlas-road[data-atlas-edge]");
   if (road && (event.key === "Enter" || event.key === " ")) {
     event.preventDefault();
@@ -2048,6 +2197,7 @@ document.addEventListener("click", event => {
     if (disposal.open) closeDisposal();
     guide.close();
     render();
+    atlasCameras.clear();
     restartNotice = true;
     showOpening();
     return;
@@ -2060,6 +2210,11 @@ document.addEventListener("click", event => {
   if (button.dataset.facility) {
     activeFacility = button.dataset.facility;
     render();
+    return;
+  }
+  if (button.dataset.atlasZoom) {
+    const viewport = button.closest(".atlas-frame").querySelector("[data-atlas-scroll]");
+    changeAtlasZoom(viewport, Number(button.dataset.atlasZoom));
     return;
   }
   if (button.dataset.atlasProvince) {
@@ -2089,16 +2244,19 @@ document.addEventListener("click", event => {
     if (origin === ".atlas-index") {
       const scroll = main.querySelector("[data-atlas-scroll]");
       const label = scroll?.querySelector(`[data-atlas-point="${CSS.escape(atlasPoint)}"]`);
-      if (label) scroll.scrollLeft = label.offsetLeft - scroll.clientWidth / 2;
+      if (scroll) centerAtlasOn(scroll, label);
     }
     return;
   }
   if (button.dataset.atlasEdge) {
+    const fromList = Boolean(button.closest(".atlas-road-index"));
     atlasEdge = button.dataset.atlasEdge;
     render();
     const detail = main.querySelector("#atlas-edge-detail");
-    (detail?.querySelector("button:enabled") ?? main.querySelector(`.atlas-map [data-atlas-edge="${CSS.escape(atlasEdge)}"]`))
-      ?.focus({ preventScroll: true });
+    const road = main.querySelector(`.atlas-map [data-atlas-edge="${CSS.escape(atlasEdge)}"]`);
+    const scroll = road?.closest("[data-atlas-scroll]");
+    if (fromList && scroll) centerAtlasOn(scroll, road);
+    (detail?.querySelector("button:enabled") ?? road)?.focus({ preventScroll: true });
     detail?.scrollIntoView({ block: "nearest" });
     return;
   }

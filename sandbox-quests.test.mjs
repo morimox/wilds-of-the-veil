@@ -288,6 +288,35 @@ test('a fresh journey uncovers the marsh stove and the ferryman by actions at ne
   assert.equal(state.inventory.salve, 2);
 });
 
+test('sandboard offers usable clues, and a draft can be set aside without recording or spending anything', () => {
+  const state = createQuietGame(154);
+  const ready = quests.find(({ id }) => id === 'rainproof_fire');
+  const partial = quests.find(({ id }) => id === 'select_millet').clues[0];
+  supply(state, { clinic_note: 1 });
+  for (const clue of [...ready.clues, partial]) {
+    visitFromRegionFixture(state, clue.site);
+    collectClue(state, clue);
+  }
+  assert.deepEqual(view(state).activeClues.sort(), [...ready.clues.map(({ id }) => id), partial.id].sort());
+  const before = state.qi;
+  assert.equal(act(state, 'meditate', { item: 'clinic_note' }).ok, false);
+  assert.equal(state.qi, before);
+
+  const item = ready.clues[0].id;
+  play(state, 'meditate', { item });
+  assert.equal(view(state).deductionDraft.id, ready.id);
+  const after = { qi: state.qi, day: state.day, inventory: { ...state.inventory } };
+  play(state, 'clearDeductionDraft');
+  assert.deepEqual({ qi: state.qi, day: state.day, inventory: state.inventory }, after);
+  assert.equal(view(state).deductionDraft, null);
+  assert.equal(act(state, 'deduce', { id: ready.id }).ok, false);
+  assert.deepEqual(view(state).deductionHistory, []);
+
+  assert.equal(play(state, 'meditate', { item }).meditation, 'ready');
+  assert.equal(play(state, 'meditate', { item: partial.id }).meditation, 'incomplete');
+  assert.equal(view(state).deductionDraft, null);
+});
+
 test('the ferry and sand-road permits lead to discoveries at the reef and the salt works', () => {
   const state = createQuietGame(154);
   // Begin at the old ferry, after the earlier quest to find the ford.

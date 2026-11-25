@@ -18,6 +18,10 @@ const records = Object.fromEntries(
     .map((key) => [key, Object.assign(Object.create(null), Object.fromEntries((data[key] ?? []).map((entry) => [entry.id, entry])))]),
 );
 const experiments = Object.fromEntries(data.events.filter(({ experiment }) => experiment).map(({ experiment }) => [experiment.id, experiment]));
+const meditationItems = new Set(Object.values(experiments).flatMap(({ need }) => Object.keys(need)).filter((id) => {
+  const item = records.items[id];
+  return isEvidence(item) && !item.breakthrough && !item.recipeOnly;
+}));
 const experimentSites = Object.fromEntries(data.events.filter(({ experiment }) => experiment)
   .map(({ id, experiment }) => [experiment.id, id]));
 const supply = 'ration';
@@ -332,16 +336,16 @@ function groundPlace(state) {
 }
 
 const roadsideActions = new Set(['eat', 'batchEat', 'use', 'equip', 'unequip', 'equipManual',
-  'unequipManual', 'selectAmmo', 'take', 'setMealPouch']);
+  'unequipManual', 'spiritEquip', 'selectAmmo', 'take', 'setMealPouch']);
 const containerTransfers = new Set(['econBagDeposit', 'econBagWithdraw']);
-const equipmentChanges = new Set(['equip', 'unequip', 'combatEquip', 'equipManual', 'unequipManual', 'upgradeManual']);
+const equipmentChanges = new Set(['equip', 'unequip', 'combatEquip', 'equipManual', 'unequipManual', 'upgradeManual', 'spiritEquip']);
 
 function groundAt(state, place = groundPlace(state)) {
   return state.ground?.[place] ?? {};
 }
 
 function groundPickupLimit(state, id, available = groundAt(state)[id]) {
-  if (!available || (records.gear[id] && gearReserved(state, id)) || groundPickupReason(state, id)) return 0;
+  if (!available || groundPickupReason(state, id)) return 0;
   return fittingItems(state, { [id]: available }).accepted[id] ?? 0;
 }
 
@@ -349,6 +353,7 @@ function groundPickupReason(state, id, count) {
   const kind = records.items[id]?.kind;
   if (kind === 'container') return containerCarryReason(state.inventory, count);
   if (kind === 'reference' && gearReserved(state, id)) return '你已有这本书。';
+  if (records.gear[id] && gearReserved(state, id)) return '同名装备已在手上、仓里或锻炉里。';
   return '';
 }
 
@@ -915,8 +920,7 @@ export function view(state) {
   const currentSite = currentEvent && records.sites[currentEvent.id];
   const experiment = availableExperiment(state, currentEvent);
   const usedClues = usedDeductionClues(state);
-  const activeClues = data.items.filter((item) =>
-    !item.breakthrough && !item.recipeOnly && isEvidence(item) && owns(state, item.id) > 0 && !usedClues.includes(item.id));
+  const activeClues = data.items.filter(({ id }) => meditationItems.has(id) && owns(state, id) > 0 && !usedClues.includes(id));
   const nextRealm = services.includes('cultivate') ? records.realms[state.realm + 1] ?? null : null;
   const groundLoot = { ...groundAt(state) };
   const combatWeapon = weaponView(state);
@@ -2219,7 +2223,6 @@ function takeFromGround(state, id, requested) {
   if (!records.items[id] || available < 1 || (requested !== undefined &&
       (!Number.isSafeInteger(requested) || requested < 1 || requested > available))) return refuse('这里没有这么多东西可捡。');
   const gear = records.gear[id];
-  if (gear && gearReserved(state, id)) return refuse('同名装备已在手上、仓里或锻炉里。');
   const reason = groundPickupReason(state, id, requested);
   if (reason) return refuse(reason);
   const maximum = groundPickupLimit(state, id);
@@ -2680,8 +2683,7 @@ function handin(state, id) {
 }
 
 function meditate(state, { item }) {
-  const clue = records.items[item];
-  if (typeof item !== 'string' || !isEvidence(clue) || clue.breakthrough || clue.recipeOnly || !owns(state, item) || usedDeductionClues(state).includes(item)) {
+  if (!meditationItems.has(item) || !owns(state, item) || usedDeductionClues(state).includes(item)) {
     return refuse('请选一条手边还未推演过的线索。');
   }
   if (state.qi < rules.deductionQiCost) return refuse('真气不足，歇一歇再想。');
@@ -2691,9 +2693,15 @@ function meditate(state, { item }) {
     return trial.need[item] > 0 && !hasDeduced(state, entry.id) &&
       knowsDeduction(state, entry) && hasChoiceNeeds(state, trial);
   });
+  state.deductionDraftId = ready?.id ?? null;
   if (!ready) return { ...say(state, '没什么头绪。'), meditation: 'incomplete' };
-  state.deductionDraftId = ready.id;
   return { ...say(state, '几条线索正好能相互印证，已摆上沙盘。'), meditation: 'ready' };
+}
+
+function clearDeductionDraft(state) {
+  if (!state.deductionDraftId) return refuse('沙盘上没有待推演的线索。');
+  state.deductionDraftId = null;
+  return say(state, '你收起了沙盘上的线索。');
 }
 
 function deduce(state, { id }) {
@@ -2783,9 +2791,11 @@ const generalActions = {
   equipManual: (state, { id }) => equipManual(state, id),
   unequipManual,
   upgradeManual: (state, { id }) => upgradeManual(state, id),
+  spiritEquip: (state, payload) => trainingAction(state, 'spiritEquip', payload, economyKit),
   take: (state, { id, count }) => takeFromGround(state, id, count),
   selectAmmo: (state, { id }) => selectAmmo(state, id),
   meditate,
+  clearDeductionDraft,
   deduce,
 };
 
@@ -2854,11 +2864,12 @@ function takeTurn(state, action, payload) {
     if (action === 'equipManual') return equipManual(state, payload.id);
     if (action === 'unequipManual') return unequipManual(state);
     if (action === 'upgradeManual') return upgradeManual(state, payload.id);
+    if (action === 'spiritEquip' || action === 'spiritStudy') return trainingAction(state, action, payload, economyKit);
     if (action === 'inspectBasket') return inspectBasket(state);
     if (action === 'unpackBasket') return unpackBasket(state);
     if (action === 'selectAmmo') return selectAmmo(state, payload.id);
     if (action === 'take') return takeFromGround(state, payload.id, payload.count);
-    if (action === 'meditate' || action === 'deduce') return generalActions[action](state, payload);
+    if (action === 'meditate' || action === 'clearDeductionDraft' || action === 'deduce') return generalActions[action](state, payload);
     if (action === 'beginGather') return beginGather(state, payload.index);
     if (action === 'choose') return choose(state, payload);
     if (action === 'experiment') return tryExperiment(state, payload);

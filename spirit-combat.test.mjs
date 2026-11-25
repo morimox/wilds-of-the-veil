@@ -65,19 +65,84 @@ test('all five teachings unlock at their source, while a gold pendant adds only 
   assert.deepEqual(view(state).spiritSense.source, { natural: 3, equipment: null });
   for (const skill of spiritSkills) {
     state.region = skill.region;
+    assert.equal(act(state, 'spiritStudy', { id: skill.id }).ok, false);
+    actOk(state, 'visit', { id: skill.site });
     if (skill.proof || skill.defeated) {
       assert.equal(act(state, 'spiritStudy', { id: skill.id }).ok, false);
       if (skill.proof) state.knownItems.push(skill.proof);
       if (skill.defeated) state.defeated.push(skill.defeated);
     }
     const before = state.coins;
+    assert.ok(view(state).spiritSense.rows.some(row => row.id === skill.id && !row.learned && row.site === state.event));
     actOk(state, 'spiritStudy', { id: skill.id });
     assert.equal(state.coins, before - (skill.price ?? 0));
     assert.equal(act(state, 'spiritStudy', { id: skill.id }).ok, false);
-    actOk(state, 'spiritEquip', { id: skill.id });
+    if (skill === spiritSkills[0]) assert.equal(act(state, 'spiritEquip', { id: skill.id }).ok, false);
+    else actOk(state, 'spiritEquip', { id: skill.id });
     assert.equal(view(state).spiritSense.active.id, skill.id);
+    actOk(state, 'leave');
   }
   assert.equal(view(state).spiritSense.rows.filter(({ learned }) => learned).length, 5);
+});
+
+test('lesson fees, equipment changes and an empty spirit reserve cannot be bypassed', () => {
+  const state = createQuietGame(310);
+  state.realm = 6;
+  state.region = 'measuring_hall';
+  state.coins = 179;
+  actOk(state, 'visit', { id: 'zhao_bamboo_duel' });
+  const before = view(state).spiritSense;
+  assert.equal(before.active, null);
+  assert.deepEqual(before.rows.map(({ id, blocker }) => [id, blocker]), [['turn_edge', '灵钱不足。']]);
+  assert.equal(act(state, 'spiritStudy', { id: 'turn_edge' }).ok, false);
+  assert.equal(state.coins, 179);
+  assert.equal(act(state, 'spiritEquip', { id: 'turn_edge' }).ok, false);
+  state.coins++;
+  actOk(state, 'spiritStudy', { id: 'turn_edge' });
+  assert.equal(state.coins, 0);
+  assert.equal(view(state).spiritSense.active.id, 'turn_edge');
+  assert.equal(state.training.sense, 0);
+
+  const attack = duel('split_stream', { weapon: 'gold_confluence_staff' });
+  attack.training.sense = 2;
+  assert.match(act(attack, 'invokeSpirit').message, /不足/);
+  assert.equal(attack.training.sense, 2);
+  attack.training.sense = 3;
+  attack.training.spiritKnown.push('turn_edge');
+  attack.inventory.ember_talisman = 1;
+  actOk(attack, 'invokeSpirit');
+  const beforeQi = attack.qi;
+  assert.equal(act(attack, 'weaponSpell').ok, false);
+  assert.equal(attack.qi, beforeQi);
+  assert.equal(act(attack, 'use', { id: 'ember_talisman' }).ok, false);
+  assert.equal(attack.inventory.ember_talisman, 1);
+  assert.equal(act(attack, 'spiritEquip', { id: 'turn_edge' }).ok, false);
+  assert.equal(act(attack, 'invokeSpirit').ok, false);
+  assert.equal(attack.combat.round, 0);
+  assert.equal(view(attack).spiritSense.active.id, 'split_stream');
+  actOk(attack, 'guard');
+  assert.match(act(attack, 'invokeSpirit').message, /还没缓过来/);
+});
+
+test('cooldown includes the casting round and defensive medicine can finish that round', () => {
+  const state = duel('turn_edge');
+  state.hp -= 5;
+  state.inventory.salve = 1;
+  actOk(state, 'invokeSpirit');
+  assert.equal(view(state).spiritSense.waiting, 4);
+  actOk(state, 'use', { id: 'salve' });
+  assert.equal(state.inventory.salve, undefined);
+  assert.equal(state.combat.round, 1);
+  assert.equal(view(state).spiritSense.remaining, 0);
+  for (const cooldown of [3, 2, 1]) {
+    assert.equal(view(state).spiritSense.waiting, cooldown);
+    assert.match(act(state, 'invokeSpirit').message, /还没缓过来/);
+    roundIntent(state, 'guard');
+    actOk(state, 'guard');
+  }
+  assert.equal(view(state).spiritSense.waiting, 0);
+  actOk(state, 'invokeSpirit');
+  assert.equal(state.training.sense, 1);
 });
 
 test('fold armor includes the activation turn, disables stance, preserves enemy dodge, then expires', () => {

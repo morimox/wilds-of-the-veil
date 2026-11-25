@@ -2,23 +2,23 @@ import data from './data.mjs';
 
 export const spiritSkills = [
   { id: 'fold_armor', name: '折甲', cost: 2, duration: 3, cooldown: 6, strength: 0.5, stat: 'physicalResist',
-    region: 'zhao_city', teacher: '杜椿', defeated: 'fault_warden',
+    region: 'zhao_city', site: 'zhao_flood_office', teacher: '杜椿', defeated: 'fault_warden',
     desc: '物抗减半，架招失去卸力效果。对手还可以闪避。',
     lesson: '杜椿把分柱水君拦下来的那一股水引入浅盘，拨开两截交错的竹片。甲再厚，架不住两边的力同时抽开。' },
   { id: 'split_stream', name: '并流', cost: 3, duration: 2, cooldown: 7, strength: 3,
-    region: 'glass_rotunda', teacher: '邢既横', defeated: 'sand_sundial_master',
+    region: 'glass_rotunda', site: 'sand_glass_chamber', teacher: '邢既横', defeated: 'sand_sundial_master',
     desc: '下一回合打中的一击造成三倍伤害。可以趁发动时蓄势。',
     lesson: '邢既横把铜轮转了一圈，支住一重一轻两股回力，让你等它们碰到一处再出手。' },
   { id: 'turn_edge', name: '返势', cost: 1, duration: 1, cooldown: 4,
-    region: 'measuring_hall', teacher: '傅澄', price: 180,
+    region: 'measuring_hall', site: 'zhao_bamboo_duel', teacher: '傅澄', price: 180,
     desc: '这回合对手若发动攻击，来招折回对手身上。',
     lesson: '傅澄把尺横在你腕下。你连着三次往下压，第三次刚发力，尺身已经转了半圈。' },
   { id: 'veil_eye', name: '遮眼', cost: 1, duration: 3, cooldown: 5, strength: 0.5, stat: 'perception',
-    region: 'mingsha_city', teacher: '阮杪', proof: 'cold_kiln_record', price: 90,
+    region: 'cold_kiln', site: 'sand_cold_kiln_house', teacher: '阮杪', proof: 'cold_kiln_record', price: 90,
     desc: '对手洞察减半。这个回合已经看破的动作照常，往后两回合更容易瞒住起手。',
     lesson: '阮杪把冷炉验火册翻到画着水汽的一页。他教你让动作起在雾纹外，把要落的地方留在雾纹里。' },
   { id: 'press_edge', name: '压锋', cost: 2, duration: 2, cooldown: 5, strength: 0.6, stat: 'attack',
-    region: 'mingsha_city', teacher: '阮杪', defeated: 'sand_inverted_keeper',
+    region: 'cold_kiln', site: 'sand_cold_kiln_house', teacher: '阮杪', defeated: 'sand_inverted_keeper',
     desc: '对手两回合内的出手力道削去四成。',
     lesson: '阮杪听完倒驿锁影的事，在一截铁链上另挂了只齐重的秤砣。你照他的指点重新拽了一下，链子尚未回紧，力先泄了。' },
 ];
@@ -93,7 +93,7 @@ function sourceOpen(state, skill) {
 }
 
 function instructionBlocker(state, skill, kit) {
-  if (state.region !== skill.region) return `得去${kit.records.regions[skill.region].name}找${skill.teacher}。`;
+  if (state.region !== skill.region || state.event !== skill.site) return `得去${kit.records.sites[skill.site].name}找${skill.teacher}。`;
   if (state.coins < (skill.price ?? 0)) return '灵钱不足。';
   return '';
 }
@@ -108,8 +108,8 @@ export function spiritStudies(state, kit) {
     equipment: reserve ? { id: reserve, name: kit.nameOf(reserve), bonus: 1 } : null,
   };
   const known = training?.spiritKnown ?? [];
-  const active = spirits.get(training?.spiritActive);
-  const rows = spiritSkills.filter((skill) => known.includes(skill.id) || (state.region === skill.region && sourceOpen(state, skill)))
+  const active = known.includes(training?.spiritActive) ? spirits.get(training.spiritActive) : null;
+  const rows = spiritSkills.filter((skill) => known.includes(skill.id) || (state.event === skill.site && sourceOpen(state, skill)))
     .map((skill) => ({ ...skill, learned: known.includes(skill.id), selected: active?.id === skill.id,
       blocker: instructionBlocker(state, skill, kit) }));
   const enemy = combat && kit.records.enemies[combat.id];
@@ -133,6 +133,7 @@ export function spiritAction(state, action, { id }, kit) {
   const known = training.spiritKnown ?? [];
   if (action === 'spiritEquip') {
     if (!known.includes(id)) return kit.refuse('你还没习得这门神识。');
+    if (training.spiritActive === id) return kit.refuse(`你已选用「${skill.name}」。`);
     training.spiritActive = id;
     return kit.say(state, `选用神识「${skill.name}」。`);
   }
@@ -142,6 +143,6 @@ export function spiritAction(state, action, { id }, kit) {
   if (reason) return kit.refuse(reason);
   state.coins -= skill.price ?? 0;
   training.spiritKnown = [...known, id];
-  training.spiritActive ??= id;
+  if (!known.includes(training.spiritActive)) training.spiritActive = id;
   return kit.say(state, `${skill.lesson} 你习得了「${skill.name}」。`);
 }

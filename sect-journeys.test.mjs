@@ -141,7 +141,9 @@ test('an unused reflection expires over a real opponent’s defensive turn', () 
   state.hp = view(state).maxHp;
   state.coins = 180;
   state.region = 'measuring_hall';
+  visit(state, 'zhao_bamboo_duel');
   play(state, 'spiritStudy', { id: 'turn_edge' });
+  play(state, 'leave');
   play(state, 'rest');
   state.region = 'reed_meadows';
   visit(state, 'meadow_ruts');
