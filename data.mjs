@@ -885,7 +885,7 @@ const events = [
     { label: '给板头的石灶添柴，缓一缓', desc: '在靠药棚的高地上生火，湿衣能烤干。灶眼下次还得等余火熄透。', days: 0.5, stay: true, fogRest: true,
       need: { wood: 1 }, consume: true, cooldown: 2.25, cooldownText: '旧灶底下还有闷火，得等它凉透。', hp: 10, qi: 8,
       outcome: '灶眼冒出一缕烟。你把湿袖烤暖，调匀气息，再听水洞里的响动。' },
-    { label: '把歪斜的取水槽搭回原位', desc: '槽口搁在外面，里端却伸到洞里。得等那些石缝都静下来才能挪。', days: 0.25, stay: true,
+    { label: '把歪斜的取水槽搭回原位', desc: '槽口伸在泥岸上，里端卡在蒲根下。泽医已把垫木搁在踏板边。', days: 0.25, stay: true,
       guardedBy: herbDenPack, outcome: '槽里终于过了水。泽医提着竹篮过来，拨开药田里的枯叶。「根还活着，外圈有几茎已经能剪。嫩的先留着，这水够它们长。」' },
     { label: '采下引水槽旁长齐的灵草', desc: '靠外一排已经有几茎老叶，叶背的银纹长全了。', afterChoice: 4, days: 0.75,
       loot: { reed: 3 }, outcome: '你顺着药田边剪叶，留了还嫩的草心。' },

@@ -108,7 +108,7 @@ const events = [
       { label: '给外墙下的火盆添柴，歇一会儿', desc: '凹墙挡住风沙，矿工用旧砖围了半圈。火息后还要等灰凉下来。', days: 0.5, stay: true, fogRest: true,
         need: { wood: 1 }, consume: true, cooldown: 2.5, cooldownText: '火盆的砖还烫，得等炉灰冷下来。', hp: 12, qi: 8,
         outcome: '木枝在火盆里慢慢烧透。你在凹墙旁坐稳，把衣领里的砂抖干净，调匀几口气。' },
-      { label: '帮看管石料的人撑起车道上的横梁', desc: '「梁底得塞两根松木。路那头原是冷炉院，可石场的兽就在道半腰，等没动静了再去。」', days: 0.75, stay: true,
+      { label: '帮看管石料的人撑起车道上的横梁', desc: '管料人抹掉梁头的砂。「冷炉院在车辙尽头。梁底垫上两根松木，车才能从这里走。」', days: 0.75, stay: true,
         guardedBy: quarryPack, need: { wood: 2 }, consume: true, loot: { ore: 5, black_iron: 3 },
         outcome: '你塞进松木，管料人托着旧梁站起身。车辙从梁下绕过矮山，正对冷炉院那根白烟囱。他解开旧竹篓，把留在篓底的寒铁和暗金当作谢工。' },
     ] },
