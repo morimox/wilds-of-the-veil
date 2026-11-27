@@ -15139,9 +15139,12 @@ function siteResources(s, site) {
   const stock = (site?.stockDetails ?? []).map(({ label, count, renewable }) =>
     count > 0 ? `${label} ×${count}` : `${label}${renewable ? "已采空" : "已取尽"}`);
   const witnessedEnemies = site?.witnessedEnemies ?? [];
-  const creatures = Object.entries(site?.creatures ?? {}).filter(([id]) => witnessedEnemies.includes(id) && !site?.clearedCreatures?.includes(id)).map(([id, count]) =>
+  const types = Object.entries(site?.creatures ?? {});
+  const creatures = types.filter(([id]) => witnessedEnemies.includes(id) && !site?.clearedCreatures?.includes(id)).map(([id, count]) =>
     count > 0 ? `${enemyRows[id].name} ×${count}` : `暂未见${enemyRows[id].name}`);
-  return [...stock, ...creatures].join(" · ");
+  const someUnseen = types.some(([id, count]) => count > 0 && !witnessedEnemies.includes(id));
+  const sightings = creatures.length && `${someUnseen ? "已遇见 " : ""}${creatures.join(" · ")}`;
+  return [...stock, sightings].filter(Boolean).join(" · ");
 }
 
 function siteList(s) {
