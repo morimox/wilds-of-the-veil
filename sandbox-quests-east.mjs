@@ -84,7 +84,7 @@ export const sandboxQuestsEast = [
   },
   {
     id: 'east_kiln_ash', title: '火道口该留哪一道缝', site: 'zhao_firedoor',
-    conclusion: '带湿帘回挂炭坳的「挂湿帘的窑棚」。把湿帘垂到地面，留着窑口上方那道小缝通风。请马荻从外面抹好泥，等烟升起来再去看帘脚。',
+    conclusion: '带马荻给你的短帘回挂炭坳。把窑棚门上的长帘垂到地面，留着窑口上方那道小缝通风。请马荻从外面抹泥封住墙根，等烟升上去再去察看帘脚。',
     reason: '横穴外的灰纸上，贴地那圈已烧穿，上端只染黑。运窑料时用的旧垫砖却只留上缝，并把靠下的泥槽抹平。两份都说明脚边得挡住，火烟才从上面散。',
     clues: [
       { id: 'east_kiln_ash_paper', name: '横穴风孔旁的灰纸', desc: '从湿帘旁一只空铁钉取下。纸脚烧了个豁口，纸顶只是被烟熏黑。',
@@ -95,10 +95,10 @@ export const sandboxQuestsEast = [
           outcome: '砖箱立稳后，余节拿薄纸拂去垫砖上的泥，顺手给你印了一份。「马荻让我们按这个面朝上送，上边留道缝，下边抹平。」' } },
     ],
     experiment: {
-      desc: '马荻端来泥盆。帘下原本悬空一截，窑口上沿和墙根各还留着一处窄缝。',
+      desc: '马荻端来泥盆，用你带回的短帘护住试火的人。窑棚门上的长帘离地还有一截，上沿和墙根各留着一处窄缝。',
       fieldNeed: { fire_cloth: 1 },
       controls: [
-        control('cloth', '湿帘垂到哪里', { ground: '垂到地面', raised: '保留帘脚的空隙' }),
+        control('cloth', '窑棚的长帘垂到哪里', { ground: '垂到地面', raised: '保留帘脚的空隙' }),
         control('vent', '把哪一道窄缝留作出气口', { crown: '窑口上沿', base: '墙根' }),
       ], solution: { cloth: 'ground', vent: 'crown' },
       misses: { cloth: { raised: '烟倒是往上走了，火舌还是从帘脚探出来。马荻伸脚把泥盆推远。' },
@@ -113,9 +113,9 @@ export const sandboxQuestsEast = [
     conclusion: '去担盐岗的井边老秤。用沥过盐水的空袋连旧系绳一起称，另记空袋的分量；再把这一份从盐货的整袋分量里扣掉。',
     reason: '鲁勤的井票只结盐钱。栾火称的是盐岗送来的同种袋子，袋子刚滴干时，连绳比干的重两两。两份账争的恰是这两两，应先实称湿袋再看是不是少了盐。',
     clues: [
-      { id: 'east_salt_invoice', name: '鲁勤的称盐旧票', desc: '印清楚的原联上写着「十六两盐，去袋」。岗上的副联没写袋重，实收一栏后来添了「十八两」。',
+      { id: 'east_salt_invoice', name: '鲁勤的称盐旧票', desc: '印清楚的原联上写着「十六两盐，已扣袋重」。岗上的副联漏了袋重一栏，后来在实收处添了「十八两」。',
         site: 'sand_city_registry', action: { label: '替鲁勤把两联称盐票重排一遍', desc: '有一叠纸被糊到了一起，鲁勤正拿笔杆从边角挑开。', days: 0.125,
-          outcome: '鲁勤用笔杆挑开纸边。「这张少了『去袋』两个字，可别叫他们为账吵起来。」他留了旧票，又给你一张认得清的副本。' } },
+          outcome: '鲁勤用笔杆挑开纸边。「原票只付盐钱，须先扣袋重。这张漏抄了袋重一栏。」他留下那联，又把印字清楚的副本给你。' } },
       { id: 'east_salt_empty_sack', name: '栾火的空袋重数', desc: '盐岗送来的旧袋连绳称，干的二两，泡湿又沥过的四两。',
         site: 'sand_guest_miller', action: { label: '帮栾火称一回洗过的空粮袋', desc: '他把干湿两只袋挂到磨盘边，正等水从湿袋角滴完。', days: 0.25,
           outcome: '袋角停滴以后，栾火先称干的，又称湿的。「两条绳一样，连绳算进去，二两和四两。回去他们再嫌我袋子沉，留这纸给他们看。」' } },
@@ -124,10 +124,10 @@ export const sandboxQuestsEast = [
       desc: '收据写了十八两，点钱的人却只肯按十六两付。邢茧说今日这袋连绳重二十两，旧账按干袋扣了二两。他找了两只同样的空袋，一只刚沥干，另一只已经晒得发白。',
       controls: [
         control('sack', '拿哪只来称空袋重', { wet: '刚沥过的湿袋连系绳', dry: '晒干的空袋连系绳', full: '从刚挑来的盐袋取样' }),
-        control('entry', '重填票时记多少', { net: '单列四两袋重，盐记十六两', gross: '只记整袋二十两' }),
+        control('entry', '空袋称过后怎么记账', { net: '把袋重另写一行，从整袋里扣去', gross: '按整袋的分量记账' }),
       ], solution: { sack: 'wet', entry: 'net' },
       misses: { sack: { dry: '邢茧把盐袋角捏给你看，还渗得出水。二两的干袋代不上这只湿袋。', full: '那包里是盐，空袋重得单独称。邢茧把货放回秤架。' },
-        entry: { gross: '点钱的人把旧票翻到背面，圈出了「去袋」。他肯按实出的盐付钱。' } },
+        entry: { gross: '点钱的人把旧票翻到背面，圈住「已扣袋重」，又把你写的二十两整袋重量推回来。' } },
       days: 0.25, insight: 3, reward: { ration: 4, ore: 2 },
       outcome: '秤杆平了。邢茧把四两另开一行，点钱的人照十六两结了账，让那只盐袋过了秤架。邢茧这才肯把明天的班次接下来，分了你几包路粮和两枚待回炉的旧秤钩。',
       afterText: '新票上另写了湿袋的分量，贴在秤梁下。挑盐的人重新排了队，最前面的一只正往下沥水。',
@@ -235,11 +235,11 @@ export const sandboxQuestsEast = [
   },
   {
     id: 'east_vein_support', title: '绳架吃的是哪一头力', site: 'sand_hanging_support',
-    conclusion: '去横生脉贴矿壁的木架。先赶开咬着坠石的负砂豺。用两根松木暂垫在外侧石窝，再从外头松坠绳一扣。里梁站稳了，才撬旁边的积砂。',
+    conclusion: '去横生脉贴矿壁的木架。先赶走守在木架边的豺群。用两根松木垫住外侧的两个石窝，再从外头松开坠绳一扣。等里梁站稳，再去扒旁边的积砂。',
     reason: '梁弦画的架样让坠石从外面拉住里梁，先松绳会把里梁放倒。白蹄旧道还留着同样结构的木脚窝，搬架人留下的退路和支木都从外侧摆上去。',
     clues: [
-      { id: 'east_vein_joinery', name: '梁弦的坠绳架样', desc: '坠石画在木架外。纸上加粗的是里梁，两处垫木圈都在外侧石窝。',
-        site: 'sand_ring_maker', action: { label: '请梁弦看看矿里哪种架子靠坠绳撑', desc: '工坊门边靠着几根带棕绳的旧支脚，绳眼还有新换的麻线。', days: 0.25,
+      { id: 'east_vein_joinery', name: '梁弦画的配重架', desc: '吊坠石的绳子画在木架外，两处垫木的位置也都在外侧石窝。纸上描粗的是里梁。',
+        site: 'sand_ring_maker', action: { label: '问梁弦矿架外为何吊着沉石', desc: '工坊门边靠着几根旧支脚，末端磨圆的棕绳绕过上头的木梁，可以挂重物。', days: 0.25,
           outcome: '梁弦在旧纸上画了内外两梁，再把一颗铅坠搁在外边给你看。「搬过的矿架上还留着这样的结，撑稳才松。」' } },
       { id: 'east_vein_footing', name: '白蹄道搬木人留下的尺寸', desc: '石边一行短刻记的是两根松木插进石窝的深浅。两处记号都在外，不挨里梁。',
         site: 'sand_approach_hoof', action: { label: '辨一辨白石脚下的两道方窝', desc: '蹄纹旁还有人撬过重木。石窝内侧平，外侧有木脚拖过的印。', days: 0.25,
@@ -270,11 +270,11 @@ export const sandboxQuestsEast = [
           need: { sand_glass_pass: 1 }, desc: '档房墙下还有一只扁模，外缘的小口颜色比别处深。', days: 0.375,
           outcome: '阮杪把铁片叠在旧模图上，正好够到描黑的止口。「原炉口早让风磨平了。带着图看看天室的轮，会不会只是学了同一个法子。」' } },
       { id: 'east_glass_close_shadow', name: '合圆影线和手印', desc: '晶壁上两道弧可以压成一个圆。褐色指印从靠柱侧一路抹在外沿，正对着圆的缺口。',
-        site: 'sand_hail_floor', action: { label: '去断晶背后描出两道白影的边', desc: '翻晶声停了，后面一片白石上有两道不相接的半圆。', days: 0.375, afterFight: 'sand_glass_lynx', guardedBy: 'sand_glass_lynx',
+        site: 'sand_hail_floor', action: { label: '去断晶背后描出两道白影的边', desc: '断晶背后有一片白石，斜着照去能看见两道半圆。', days: 0.375, afterFight: 'sand_glass_lynx', guardedBy: 'sand_glass_lynx',
           outcome: '你按弧线描到靠柱那头，碰到几道干了的褐印。两道半圆若对合，手印正好绕到缺口外，留得下一只手。' } },
     ],
     experiment: {
-      desc: '铜轮内外各有扁槽，转时会照出两道白影。邢既横用两手抵住轮边，问你是绕过柱子取，还是伸手到铁轮底下。',
+      desc: '小圆镜卡在转轮背面，离石柱只有半臂远。邢既横从柱边起身，双手抵住轮缘，等你选好从哪边伸手。',
       afterFight: 'sand_sundial_master',
       fieldNeed: { sand_glass_pass: 1 },
       controls: [
@@ -286,7 +286,7 @@ export const sandboxQuestsEast = [
         turn: { center: '轮心亮时背面仍是整块铜，只有外缘映出一点红光。', cross: '镜缝曾张开一线，错位后又被重轮合上。你先转回两道影线之间。' },
         reach: { underneath: '邢既横把膝盖顶进轮背，叫你把手抽回来。镜子看得见，靠下却伸不出两指，铁轮还在缓缓下沉。' } },
       days: 0.5, insight: 8, reward: { east_wheel_lens: 1, core: 5 },
-      outcome: '邢既横叫你取镜时，手没松一下。你从柱侧伸进去，摸出一块带挂眼的小铜镜和几枚垫在镜下的灵晶。他卸了轮上的力，自己试着用手印处比了一遍。「早几年有人就是这样伸手，我偏当他多此一举。」他把另一包散晶也给你，托你找人重磨镜面。',
+      outcome: '两片白影一合，铜轮背面的接缝便张开。邢既横托住轮，你从柱侧取出带挂眼的小镜。他等你收回手才放低轮缘，从柱脚翻出一包磨镜余下的灵晶给你。',
       afterText: '铜轮已经落稳，两道白影不再并拢。石柱旁的铜面有几道暗褐色手印，原先搁着小圆镜的缝已空。邢既横又蹲回轮底那只铁环旁。',
     },
   },

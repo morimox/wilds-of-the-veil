@@ -56,6 +56,8 @@ const bagTransferActions = ["econBagDeposit", "econBagWithdraw"];
 let state = freshGame();
 let screen = "journey";
 let marketMode = "buy";
+let measuringSectMode = "main";
+const measuringSectionsOpen = new Map();
 let activeFacility = "warehouse";
 let openingTimer;
 let restartNotice = false;
@@ -66,7 +68,7 @@ let combatObservation = null;
 const kitSectionOpen = new Map();
 let meditationClue = null;
 let deductionHistoryOpen = false;
-const openDeductions = new Set();
+let openDeduction = null;
 let atlasProvince = null;
 let atlasPoint = null;
 let atlasEdge = null;
@@ -169,8 +171,11 @@ function supplies(entries) {
 
 function condition(current, total) {
   if (current <= 0) return "耗尽";
-  if (current / total < 0.3) return "危急";
-  return current < total ? "有损" : "充足";
+  const fraction = current / total;
+  if (fraction <= 0.2) return "将竭";
+  if (fraction <= 0.4) return "危急";
+  if (fraction <= 0.65) return "明显受损";
+  return fraction < 1 ? "有损" : "充足";
 }
 
 function publicText(text, damage = false) {
@@ -228,8 +233,9 @@ function stats(s) {
   if (s.toxin >= rules.toxinThreshold) warnings.push("丹毒发作");
   const fog = fogMeter(s);
   const medicineAllowed = !s.currentEnemy?.medicineRestricted;
-  const canEat = !s.gathering && (["village", "field", "event"].includes(s.mode) || onOpenRoad(s)) &&
-    meal && s.edibleMeals.includes(meal.id);
+  const canManageMeal = !s.gathering && (["village", "field", "event"].includes(s.mode) || onOpenRoad(s));
+  const canEat = canManageMeal && meal && s.edibleMeals.includes(meal.id);
+  const refill = canManageMeal && !meal && s.edibleMeals.includes("ration");
   const canUseSalve = !s.gathering && medicineAllowed && s.hp < s.maxHp && s.inventory.salve > 0 &&
     (["village", "field", "event", "combat"].includes(s.mode) || onOpenRoad(s));
   const sense = s.spiritSense;
@@ -238,7 +244,8 @@ function stats(s) {
     ${vital("气血", s.hp, s.maxHp, s.hp / s.maxHp < 0.3, "气血耗尽会倒下。敷伤药或在据点歇息都能恢复。", "health")}
     ${canUseSalve ? linkButton("敷伤药", "use", "salve", "quick-eat") : ""}
     ${vital("饱腹", s.satiety, s.maxSatiety, s.satiety < 24, `每过一日少 ${rules.satietyDrainPerDay} 点。吃一份干粮补 ${rules.rationSatiety} 点。`)}
-    ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat") : ""}
+    ${canEat ? linkButton(`吃${itemRows[meal.id].name}`, "eat", meal.id, "quick-eat")
+      : refill ? linkButton("装干粮", "setMealPouch", "ration", "quick-eat") : ""}
     ${vital("真气", s.qi, s.maxQi, s.qi < s.maxQi / 3, "催动法攻兵器或冥想会耗气。露天活动时，雾压到了第三格也会耗气。回气散或歇息能补回来。", "qi")}
     ${sense ? `<details class="vital sense"><summary title="${escape(senseSource)}">神识 <b>${sense.current}/${sense.max}</b><span class="meter-track" aria-hidden="true"><i style="--fill:${100 * sense.current / sense.max}%"></i></span></summary><p>${escape(senseSource)}。交手时可用选好的神识，歇息或用相应药物能恢复。</p></details>` : ""}
     ${warnings.map(text => `<span class="warning">${text}</span>`).join("")}${fog}</div>`;
@@ -280,15 +287,18 @@ function siteResources(s, site) {
   const stock = (site?.stockDetails ?? []).map(({ label, count, renewable }) =>
     count > 0 ? `${label} ×${count}` : `${label}${renewable ? "已采空" : "已取尽"}`);
   const witnessedEnemies = site?.witnessedEnemies ?? [];
-  const creatures = Object.entries(site?.creatures ?? {}).filter(([id]) => witnessedEnemies.includes(id)).map(([id, count]) =>
+  const creatures = Object.entries(site?.creatures ?? {}).filter(([id]) => witnessedEnemies.includes(id) && !site?.clearedCreatures?.includes(id)).map(([id, count]) =>
     count > 0 ? `${enemyRows[id].name} ×${count}` : `暂未见${enemyRows[id].name}`);
   return [...stock, ...creatures].join(" · ");
 }
 
 function siteList(s) {
-  return `<div class="site-list">${(s.sites ?? []).map(site => {
+  const sites = s.sites ?? [];
+  const hungerNote = s.satiety <= 0 && sites.some(site => !site.canEnter)
+    ? '<p class="fine">肚子空了。吃些东西，再进灰色的地点。</p>' : "";
+  return `<div class="site-list">${hungerNote}${sites.map(site => {
     const stateText = [siteResources(s, site), site.hasGroundLoot && "留有物品"].filter(Boolean).join(" · ");
-    return `<div class="site-row">${linkButton(site.name, "visit", site.id, "", s.satiety <= 0)}${stateText ? `<span class="fine">${escape(stateText)}</span>` : ""}</div>`;
+    return `<div class="site-row">${linkButton(site.name, "visit", site.id, "", !site.canEnter)}${stateText ? `<span class="fine">${escape(stateText)}</span>` : ""}</div>`;
   }).join("")}</div>`;
 }
 
@@ -304,8 +314,10 @@ function roadPosition(road) {
   const from = road.fromName ?? road.from;
   const to = road.toName ?? road.to;
   const onLastStep = road.legUnits > 0 && road.progress >= road.legUnits;
-  const location = onLastStep ? `${to}附近` : from && to && from !== to ? `${from}与${to}之间` : from || to || "";
-  return `<p class="road-position" aria-label="行程进度"><strong>去${escape(road.destinationName ?? road.destination)}</strong><span>还剩 ${distance(road.remainingUnits)}</span>${location ? `<small>${escape(location)}</small>` : ""}</p>`;
+  const finalApproach = road.remainingUnits === 0;
+  const location = finalApproach ? "" : onLastStep ? `${to}附近` : from && to && from !== to ? `${from}与${to}之间` : from || to || "";
+  const progress = finalApproach ? "快到了" : `还剩 ${distance(road.remainingUnits)}`;
+  return `<p class="road-position" aria-label="行程进度"><strong>去${escape(road.destinationName ?? road.destination)}</strong><span>${progress}</span>${location ? `<small>${escape(location)}</small>` : ""}</p>`;
 }
 
 function banditOffers(s, bandit) {
@@ -340,7 +352,7 @@ function banditScreen(s, bandit, preparation = "") {
   const directCash = askingForMoney && !bandit.offerValue && bandit.coins >= bandit.fee;
   const cashToOffer = askingForMoney ? Math.min(remaining, bandit.coins - (bandit.offerCoins ?? 0)) : 0;
   const pay = directCash ? linkButton(`付 ${bandit.fee} 灵钱`, "banditPay", "", "primary")
-    : cashToOffer > 0 ? linkButton(`选 ${cashToOffer} 灵钱`, "banditPayCoins") : "";
+    : cashToOffer > 0 ? linkButton(`把 ${cashToOffer} 灵钱计入抵价`, "banditPayCoins") : "";
   const surrender = askingForMoney && bandit.allValue < bandit.fee
     ? linkButton("交出行装，求他放行", "banditSurrender", "", "quiet", false, 1, "road-surrender-note") : "";
   const fight = !bandit.aftermath && bandit.fightAllowed !== false ? linkButton("动手闯过去", "banditFight", "", "danger") : "";
@@ -358,10 +370,12 @@ function banditScreen(s, bandit, preparation = "") {
 
 function roadScreen(s) {
   const road = s.roadTrip;
-  const preparation = road.afterBattle ? groundSection(s, "脚边的战利品") : "";
+  const preparation = road.afterBattle ? groundSection(s, "脚边的战利品") : !road.bandit ? groundSection(s) : "";
   if (road.bandit) return banditScreen(s, road.bandit, preparation);
   const turnBack = road.fromName ? `折回${road.fromName}` : "沿原路折返";
-  return panel(road.afterBattle ? "交手之后" : "路上", `${preparation}<div class="actions place-actions">${linkButton("继续赶路", "roadContinue", "", "primary")}
+  const aftermath = road.storyAftermath ? `<p class="intro">${escape(road.storyAftermath)}</p>` : "";
+  const forward = road.remainingUnits === 0 ? `到达${road.destinationName ?? road.destination}` : "继续赶路";
+  return panel(road.afterBattle ? "交手之后" : "路上", `${aftermath}${preparation}<div class="actions place-actions">${linkButton(forward, "roadContinue", "", "primary")}
     ${linkButton(turnBack, "roadBack", "", "quiet")}</div>`);
 }
 
@@ -386,7 +400,9 @@ function journey(s) {
   const originalHome = atLanding(s);
   const needRest = s.hp < s.maxHp || s.qi < s.maxQi || s.wounds || s.toxin || s.fogTier || (s.inventory.ration ?? 0) < rules.reliefRations ||
     (s.spiritSense && s.spiritSense.current < s.spiritSense.max);
-  return panel(s.region.name, `${groundSection(s)}${siteList(s)}${hazardNotice(s.localHazard)}
+  const loss = isHome && s.recoverableLoss;
+  const lossLocation = loss && [loss.region, loss.placeName].filter((name, index, names) => names.indexOf(name) === index).join(" · ");
+  return panel(s.region.name, `${loss ? `<details class="fine"><summary>上次失物 · ${escape(lossLocation)}</summary><p>还有 ${supplies(loss.goods)} 留在那儿。</p></details>` : ""}${groundSection(s)}${siteList(s)}${hazardNotice(s.localHazard)}
   ${roads.length ? `<div class="atlas-local-roads">${roads.map(road => routeAction(road, s.world.edges)).join("")}</div>` : ""}
   <div class="actions place-actions">
     ${originalHome ? tabButton("找药僮", "apprentice") : ""}
@@ -397,14 +413,20 @@ function journey(s) {
     ${originalHome && s.economy ? tabButton("去后院", "yard") : ""}
     ${originalHome && s.alchemy ? tabButton("找丹师", "alchemy") : ""}
     ${isHome && (needRest || !originalHome) ? linkButton("歇息", "rest") : ""}
-    ${s.restSessions > 1 ? linkButton(`歇到缓过来 · ${s.restSessions * rules.restDays}日`, "restUntilRecovered", "", "quiet") : ""}
+    ${s.restSessions > 1 ? longRestButton(s) : ""}
     ${s.sect ? tabButton("找宗门管事", "sect") : ""}
-    ${s.tournament ? tabButton("去看宗门大比", "tournament") : ""}
+    ${s.tournament ? tabButton(s.tournament.stageId ? `去看${s.tournament.name}` : "去擂台看名册", "tournament") : ""}
     ${isHome && s.training?.some(({ region }) => region === s.region.id) ? tabButton("请教修习", "training") : ""}
     ${!isHome ? linkButton("等半日", "wait", "", "quiet", s.satiety <= 0) :
       s.region.id === data.tournament.region && s.boutPause > 0 && !needRest ? linkButton("在场边等半日", "wait", "", "quiet") : ""}
   </div>
   ${s.world.crossings.map(({ label, reason }) => `<p class="fine crossing">${escape(label)} · ${escape(reason)}</p>`).join("")}`);
+}
+
+function longRestButton(s) {
+  const days = s.restSessions * rules.restDays;
+  const warnsHunger = s.satiety > 0 && s.satiety <= days * rules.satietyDrainPerDay;
+  return `${linkButton(`歇到缓过来 · ${days}日`, "restUntilRecovered", "", "quiet")}${warnsHunger ? '<span class="fine">歇足时会饿着肚子。</span>' : ''}`;
 }
 
 const atlasPairs = (coords) => coords.map(([x, y]) => `${x},${y}`).join(" ");
@@ -433,26 +455,44 @@ function atlasOverview(world) {
   return panel("山河总图", `<div class="atlas-view">${atlasViewport("overview", frame, "各州地图", atlasInk(world, frame, "", true) + provinces)}</div>`);
 }
 
-function atlasViewport(id, frame, label, ink) {
+function atlasViewport(id, frame, label, ink, selectedRoad = "") {
   const zoom = atlasCameras.get(id)?.zoom ?? 1;
-  const position = atlasZoomLevels.indexOf(zoom);
-  const zoomButton = (direction, name, symbol, disabled) =>
+  const zoomButton = (direction, name, symbol) =>
     `<button type="button" class="button quiet atlas-zoom" data-atlas-zoom="${direction}" aria-controls="atlas-viewport"
-      aria-label="${name}" aria-disabled="${disabled}">${symbol}</button>`;
+      aria-label="${name}">${symbol}</button>`;
   return `<div class="atlas-frame">
-    <div class="atlas-zoom-tools" role="group" aria-label="地图缩放">
-      ${zoomButton(-1, "缩小地图", "−", position === 0)}
-      <span class="atlas-zoom-level" aria-live="polite">${Math.round(100 * zoom)}%</span>
-      ${zoomButton(1, "放大地图", "+", position === atlasZoomLevels.length - 1)}
+    <div class="atlas-toolbar">
+      ${selectedRoad ? `<div class="atlas-road-picked"><button type="button" class="atlas-road-info" data-atlas-road-info>${escape(selectedRoad)}</button>
+        <button type="button" class="atlas-clear-road" aria-label="取消选路" data-atlas-clear-edge>×</button></div>`
+        : '<span class="atlas-pan-hint" hidden>拖动地图平移</span>'}
+      <div class="atlas-zoom-tools" role="group" aria-label="地图缩放">
+        <button type="button" class="button quiet atlas-fit" data-atlas-zoom="fit" aria-controls="atlas-viewport">全览</button>
+        ${zoomButton(-1, "缩小地图", "−")}
+        <span class="atlas-zoom-level" aria-live="polite"></span>
+        ${zoomButton(1, "放大地图", "+")}
+      </div>
     </div>
-    <div class="atlas-scroll${id === "overview" ? " atlas-scroll-overview" : ""}" id="atlas-viewport" data-atlas-scroll="${id}" data-atlas-enlarged="${zoom > 1}"
-      style="--map-ratio:${frame[2]} / ${frame[3]};--atlas-zoom:${zoom}" role="region" aria-label="${label}" tabindex="0">
+    <div class="atlas-scroll${id === "overview" ? " atlas-scroll-overview" : ""}" id="atlas-viewport" data-atlas-scroll="${id}"
+      data-atlas-scale="${zoom}" data-atlas-ratio="${frame[2] / frame[3]}"
+      style="--map-ratio:${frame[2]} / ${frame[3]};--atlas-zoom:${zoom === "fit" ? 0.75 : zoom}" role="region" aria-label="${label}" tabindex="0">
       <div class="atlas-canvas ${id === "overview" ? "atlas-overview" : "atlas-map"}">${ink}</div>
     </div>
   </div>`;
 }
 
-const atlasZoom = (viewport) => Number(viewport.style.getPropertyValue("--atlas-zoom"));
+const atlasZoom = (viewport) => viewport.dataset.atlasScale === "fit" ? "fit" : Number(viewport.dataset.atlasScale);
+
+function atlasFitZoom(viewport) {
+  const width = viewport.clientWidth;
+  const base = viewport.classList.contains("atlas-scroll-overview") ? width : Math.max(680, width);
+  const whole = Math.min(width, viewport.clientHeight * Number(viewport.dataset.atlasRatio));
+  return Math.min(0.75, Math.floor(100 * whole / base) / 100);
+}
+
+function atlasZoomOptions(viewport) {
+  const fit = atlasFitZoom(viewport);
+  return ["fit", ...atlasZoomLevels.filter(scale => scale > fit)];
+}
 
 function moveAtlas(viewport, dx, dy) {
   viewport.scrollTo(viewport.scrollLeft + dx, viewport.scrollTop + dy);
@@ -466,10 +506,28 @@ function centerAtlasOn(viewport, target) {
     point.top + point.height / 2 - bounds.top - viewport.clientHeight / 2);
 }
 
+function updateAtlasViewport(viewport) {
+  const zoom = atlasZoom(viewport);
+  const fit = atlasFitZoom(viewport);
+  const scale = zoom === "fit" ? fit : zoom;
+  const toolbar = viewport.previousElementSibling;
+  viewport.style.setProperty("--atlas-zoom", scale);
+  placeAtlasLabels(viewport.firstElementChild);
+  viewport.dataset.atlasEnlarged = viewport.scrollWidth > viewport.clientWidth + 1 || viewport.scrollHeight > viewport.clientHeight + 1;
+  const hint = toolbar.querySelector(".atlas-pan-hint");
+  if (hint) hint.hidden = viewport.dataset.atlasEnlarged === "false";
+  toolbar.querySelector(".atlas-zoom-level").textContent = Math.round(scale * 100) + "%";
+  toolbar.querySelector('[data-atlas-zoom="fit"]').setAttribute("aria-pressed", zoom === "fit");
+  toolbar.querySelector('[data-atlas-zoom="-1"]').setAttribute("aria-disabled", zoom === "fit" || zoom <= fit);
+  toolbar.querySelector('[data-atlas-zoom="1"]').setAttribute("aria-disabled", zoom === atlasZoomLevels.at(-1));
+}
+
 function changeAtlasZoom(viewport, step, pointer) {
-  const position = atlasZoomLevels.indexOf(atlasZoom(viewport)) + step;
-  const next = atlasZoomLevels[position];
-  if (!next) return;
+  const options = atlasZoomOptions(viewport);
+  const current = atlasZoom(viewport);
+  const position = Math.max(0, options.indexOf(current));
+  const next = step === "fit" ? "fit" : options[position + step];
+  if (!next || next === current) return;
   const bounds = viewport.getBoundingClientRect();
   const x = pointer?.clientX ?? bounds.left + viewport.clientWidth / 2;
   const y = pointer?.clientY ?? bounds.top + viewport.clientHeight / 2;
@@ -477,108 +535,228 @@ function changeAtlasZoom(viewport, step, pointer) {
   const before = canvas.getBoundingClientRect();
   const mapX = Math.max(0, Math.min(1, (x - before.left) / before.width));
   const mapY = Math.max(0, Math.min(1, (y - before.top) / before.height));
-  viewport.style.setProperty("--atlas-zoom", next);
-  viewport.dataset.atlasEnlarged = next > 1;
+  viewport.dataset.atlasScale = next;
+  updateAtlasViewport(viewport);
   const after = canvas.getBoundingClientRect();
   moveAtlas(viewport, after.left + mapX * after.width - x, after.top + mapY * after.height - y);
-  const tools = viewport.previousElementSibling;
-  tools.querySelector(".atlas-zoom-level").textContent = Math.round(next * 100) + "%";
-  tools.querySelector('[data-atlas-zoom="-1"]').setAttribute("aria-disabled", position === 0);
-  tools.querySelector('[data-atlas-zoom="1"]').setAttribute("aria-disabled", position === atlasZoomLevels.length - 1);
 }
 
 function atlasRoadName(edge, points) {
-  return edge.province ? `${points[edge.from].name} · 往${edge.name}` : `${points[edge.from].name} — ${points[edge.to].name}`;
+  return edge.province ? `${points[edge.from].name} · 往${edge.destinationName || edge.name}` : `${points[edge.from].name} — ${points[edge.to].name}`;
+}
+
+function atlasBorderTail(survey) {
+  const tail = [survey.at(-1)];
+  let remaining = 16;
+  for (let index = survey.length - 2; index >= 0; index--) {
+    const [x, y] = survey[index];
+    const [u, v] = survey[index + 1];
+    const length = Math.hypot(x - u, y - v);
+    if (length > remaining) {
+      tail.unshift([u + (x - u) * remaining / length, v + (y - v) * remaining / length]);
+      break;
+    }
+    tail.unshift(survey[index]);
+    remaining -= length;
+  }
+  return tail;
 }
 
 function atlasRoadMark(edge, chosen, name) {
   const coords = atlasPairs(edge.survey);
+  const exit = edge.province ? `<polyline class="atlas-road-exit" points="${atlasPairs(atlasBorderTail(edge.survey))}"/>` : "";
   return `<g class="atlas-road${edge.avoided ? " avoided" : ""}${chosen ? " chosen" : ""}${!edge.available ? " closed" : ""}${edge.water ? " water" : ""}${edge.province ? " cross" : ""}${edge.risky ? " risky" : ""}"
     data-atlas-edge="${escape(edge.key)}" role="button" tabindex="0" aria-label="${escape(name + (edge.avoided ? "，已避开" : ""))}" aria-pressed="${edge.key === atlasEdge}">
-    <title>${escape(name)}</title><polyline class="atlas-road-ink" points="${coords}"/><polyline class="atlas-road-hit" points="${coords}"/></g>`;
+    <title>${escape(name)}</title><polyline class="atlas-road-ink" points="${coords}"/>${exit}<polyline class="atlas-road-hit" points="${coords}"/></g>`;
+}
+
+function atlasRoadStrokes(canvas, origin = { left: 0, top: 0 }) {
+  const svg = canvas.querySelector(".atlas-ink");
+  const projection = svg.getScreenCTM();
+  if (!projection) return [];
+  return [...svg.querySelectorAll(".atlas-road[data-atlas-edge]")].flatMap(road => {
+    const points = Array.from(road.querySelector(".atlas-road-ink").points, point => {
+      const { x, y } = new DOMPoint(point.x, point.y).matrixTransform(projection);
+      return [x - origin.left, y - origin.top];
+    });
+    return points.slice(1).map(([u, v], index) => {
+      const [x, y] = points[index];
+      return { road, x, y, dx: u - x, dy: v - y, length: Math.hypot(u - x, v - y), left: Math.min(x, u), right: Math.max(x, u),
+        top: Math.min(y, v), bottom: Math.max(y, v) };
+    });
+  });
 }
 
 function atlasRoadUnderPointer(target, event) {
-  if (!event.detail || !target.matches(".atlas-road")) return target;
-  const svg = target.ownerSVGElement;
-  const projection = svg.getScreenCTM();
-  if (!projection) return target;
-  const fromPointer = road => {
-    const points = Array.from(road.querySelector(".atlas-road-ink").points,
-      point => new DOMPoint(point.x, point.y).matrixTransform(projection));
-    return points.slice(1).reduce((best, end, index) => {
-      const start = points[index];
-      const dx = end.x - start.x, dy = end.y - start.y;
-      const x = event.clientX - start.x, y = event.clientY - start.y;
-      const lengthSquared = dx * dx + dy * dy;
-      const along = lengthSquared ? Math.max(0, Math.min(1, (x * dx + y * dy) / lengthSquared)) : 0;
-      return Math.min(best, (x - dx * along) ** 2 + (y - dy * along) ** 2);
-    }, Infinity);
-  };
+  const canvas = event.target.closest?.(".atlas-map");
+  const onLabel = event.target.closest?.(".atlas-label");
+  if (!event.detail || !canvas || (target?.matches(".atlas-mark") && !onLabel)) return target;
+  const x = event.clientX;
+  const y = event.clientY;
+  let nearest = (onLabel ? 2 : event.pointerType === "touch" ? 12 : 7) ** 2;
   let closest = target;
-  let nearest = fromPointer(target);
-  for (const road of svg.querySelectorAll(".atlas-road[data-atlas-edge]")) {
-    if (road === target) continue;
-    const gap = fromPointer(road);
-    if (gap + 0.25 < nearest) {
-      closest = road;
+  for (const segment of atlasRoadStrokes(canvas)) {
+    const lengthSquared = segment.dx * segment.dx + segment.dy * segment.dy;
+    if (!lengthSquared) continue;
+    const px = x - segment.x;
+    const py = y - segment.y;
+    const along = Math.max(0, Math.min(1, (px * segment.dx + py * segment.dy) / lengthSquared));
+    const gap = (px - segment.dx * along) ** 2 + (py - segment.dy * along) ** 2;
+    if (gap < nearest) {
+      closest = segment.road;
       nearest = gap;
     }
   }
   return closest;
 }
 
-function atlasLabelOffsets(points, frame, selected) {
-  const factor = 680 / frame[2];
-  const projected = points.map((point) => ({ point, x: (point.x - frame[0]) * factor, y: (point.y - frame[1]) * factor }));
-  const space = projected.map(({ x, y }) => [x - 9, y - 9, x + 9, y + 9]);
-  const overlap = (a, b) => Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]))
-    * Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
-  const bounds = [4, 6, 676, frame[3] * factor - 22];
-  const priority = (point) => Number(point.id === selected.id) * 3 + Number(point.settlement) + Number(point.current) * 2;
-  return Object.fromEntries(projected.sort((a, b) => priority(b.point) - priority(a.point)).map(({ point, x, y }) => {
-    const width = [...point.name].length * 12 + 9;
-    const side = width / 2;
-    const positions = [[0, 17], [0, -17], [side + 11, 0], [-side - 11, 0],
-      [side + 5, -13], [-side - 5, 13], [side + 5, 13], [-side - 5, -13],
-      [0, 33], [0, -33], [side + 11, 26], [-side - 11, 26], [side + 11, -26], [-side - 11, -26],
-      [side + 20, 36], [-side - 20, 36], [side + 20, -36], [-side - 20, -36]];
-    const candidates = positions.map(([dx, dy], index) => {
-      const box = [x + dx - width / 2, y + dy - 11, x + dx + width / 2, y + dy + 11];
-      const cost = (width * 22 - overlap(box, bounds)) * 6 + space.reduce((sum, inside) => sum + overlap(box, inside), 0) + index * 0.1;
-      return { dx, dy, box, cost };
-    });
-    const { dx, dy, box } = candidates.reduce((best, row) => row.cost < best.cost ? row : best);
-    space.push(box);
-    return [point.id, `--label-x:${dx}px;--label-y:${dy}px`];
-  }));
+function atlasStrokeInBox(segment, [left, top, right, bottom]) {
+  if (segment.right < left || segment.left > right || segment.bottom < top || segment.top > bottom) return 0;
+  const horizontal = segment.dx ? [(left - segment.x) / segment.dx, (right - segment.x) / segment.dx] : [-Infinity, Infinity];
+  const vertical = segment.dy ? [(top - segment.y) / segment.dy, (bottom - segment.y) / segment.dy] : [-Infinity, Infinity];
+  const entry = Math.max(0, Math.min(...horizontal), Math.min(...vertical));
+  const exit = Math.min(1, Math.max(...horizontal), Math.max(...vertical));
+  return Math.max(0, exit - entry) * segment.length;
 }
 
-function atlasMap(world, province, points, byId, selected, route, edges) {
+const atlasOverlap = (a, b) => Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]))
+  * Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+
+function atlasLabelPositions(width, height, mapWidth) {
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+  const positions = [];
+  const gaps = [9, 13, 17, 21, 25, 30, 35, 40, 46, 52];
+  if (mapWidth < 465) gaps.push(58, 64);
+  for (const gap of gaps) {
+    const side = halfWidth + gap;
+    const end = halfHeight + gap;
+    for (const shift of [0, -1 / 3, 1 / 3, -2 / 3, 2 / 3, -1, 1]) {
+      positions.push([side, halfHeight * shift], [-side, halfHeight * shift],
+        [halfWidth * shift, -end], [halfWidth * shift, end]);
+    }
+    for (const angle of [Math.PI / 8, Math.PI / 4, 3 * Math.PI / 8]) {
+      const x = halfWidth + gap * Math.cos(angle);
+      const y = halfHeight + gap * Math.sin(angle);
+      positions.push([x, -y], [-x, -y], [x, y], [-x, y]);
+    }
+  }
+  return positions;
+}
+
+function arrangeAtlasLabels(labels, choices) {
+  const order = labels.map((_, index) => index);
+  const orders = [order, [...order].reverse(), [...order].sort((a, b) => labels[a].y - labels[b].y),
+    [...order].sort((a, b) => labels[a].x - labels[b].x)];
+  const clash = (option, placed, index) => placed.reduce((sum, other, i) =>
+    sum + (i === index ? 0 : atlasOverlap(option.box, other.box) * 80), 0);
+  let bestLayout;
+  let bestTotal = Infinity;
+  for (const sweep of orders) {
+    const placed = new Array(labels.length);
+    // Revisit each choice once its neighbors have found space beside their markers.
+    for (let pass = 0; pass < 3; pass++) {
+      for (const index of sweep) {
+        let best = Infinity;
+        for (const option of choices[index]) {
+          const cost = option.cost + clash(option, placed, index);
+          if (cost >= best) continue;
+          best = cost;
+          placed[index] = option;
+        }
+      }
+    }
+    const total = placed.reduce((sum, option, index) => sum + option.cost + clash(option, placed, index) / 2, 0);
+    if (total >= bestTotal) continue;
+    bestTotal = total;
+    bestLayout = placed;
+  }
+  return bestLayout;
+}
+
+function placeAtlasLabels(canvas) {
+  const leaders = canvas.querySelector(".atlas-leaders");
+  if (!leaders) return;
+  const map = canvas.getBoundingClientRect();
+  if (!map.width || !map.height) return;
+  const viewport = canvas.parentElement;
+  const heightAvailable = atlasZoom(viewport) === "fit" ? Math.max(map.height, viewport.clientHeight) : map.height;
+  const roads = atlasRoadStrokes(canvas, map);
+  const labels = [...canvas.querySelectorAll(".atlas-label, .atlas-cross-label")].map(label => {
+    const anchor = label.parentElement.getBoundingClientRect();
+    const { width, height } = label.getBoundingClientRect();
+    return { label, width, height, x: anchor.left + anchor.width / 2 - map.left, y: anchor.top + anchor.height / 2 - map.top };
+  });
+  const density = ({ label, x, y, width }) => Number(label.matches(".atlas-cross-label")) * 100
+    + roads.filter(road => atlasStrokeInBox(road, [x - 28, y - 20, x + 28, y + 20]) > 0).length
+    + labels.filter(other => Math.abs(other.x - x) < 45 && Math.abs(other.y - y) < 22).length + width / 30;
+  labels.forEach(point => { point.density = density(point); });
+  labels.sort((a, b) => b.density - a.density);
+  const pins = labels.map(({ x, y }) => [x - 5, y - 5, x + 5, y + 5]);
+  const anchors = labels.map(({ x, y }) => [x - 8, y - 8, x + 8, y + 8]);
+  const scale = canvas.querySelector(".atlas-scale").getBoundingClientRect();
+  anchors.push([scale.left - map.left - 4, scale.top - map.top - 4, scale.right - map.left + 4, scale.bottom - map.top + 4]);
+  const bounds = [3, 3, map.width - 3, heightAvailable - 3];
+  const choices = labels.map(({ x, y, width, height }) => {
+    const options = atlasLabelPositions(width, height, map.width).map(([dx, dy], index) => {
+      const box = [x + dx - width / 2 - 2, y + dy - height / 2 - 2, x + dx + width / 2 + 2, y + dy + height / 2 + 2];
+      const size = (width + 4) * (height + 4);
+      const spills = Math.max(0, size - atlasOverlap(box, bounds));
+      const blocksPin = labels.some(pin => pin.x > box[0] + 2 && pin.x < box[2] - 2 && pin.y > box[1] + 2 && pin.y < box[3] - 2);
+      const obscures = pins.reduce((sum, pin) => sum + atlasOverlap(box, pin), 0);
+      const covers = anchors.reduce((sum, anchor) => sum + atlasOverlap(box, anchor), 0);
+      const roadCover = roads.reduce((sum, road) => {
+        const length = atlasStrokeInBox(road, box);
+        return sum + (length > 0.5 ? 420 + length * 22 : 0);
+      }, 0);
+      const edgeX = Math.sign(dx) * Math.max(0, Math.abs(dx) - width / 2);
+      const edgeY = Math.sign(dy) * Math.max(0, Math.abs(dy) - height / 2);
+      const gap = Math.hypot(edgeX, edgeY);
+      const cost = spills * 800 + obscures * 160 + covers * 5 + roadCover + gap * 2
+        + Math.max(0, gap - 25) * 7 + Math.max(0, gap - 40) * 32 + index / 100;
+      return { dx, dy, box, cost, edgeX, edgeY, gap, blocked: blocksPin || spills > 1 };
+    });
+    const clear = options.filter(option => !option.blocked);
+    return clear.length ? clear : options;
+  });
+  const placed = arrangeAtlasLabels(labels, choices);
+  const guides = [];
+  labels.forEach(({ label, x, y }, index) => {
+    const { dx, dy, edgeX, edgeY, gap } = placed[index];
+    label.style.setProperty("--label-x", dx + "px");
+    label.style.setProperty("--label-y", dy + "px");
+    if (gap > 14) guides.push(`M${x + edgeX * 8 / gap} ${y + edgeY * 8 / gap}L${x + edgeX} ${y + edgeY}`);
+  });
+  leaders.querySelector("path").setAttribute("d", guides.join(""));
+}
+
+const atlasResize = new ResizeObserver(entries => {
+  const viewport = entries[0]?.target;
+  if (viewport?.isConnected) updateAtlasViewport(viewport);
+});
+
+function revealAtlas() {
+  if (main.querySelector(".atlas-frame")) window.scrollTo(0, 0);
+}
+
+function atlasMap(world, province, points, byId, selected, route, edges, edge) {
   const frame = world.geography.provinces[province].frame;
   const routeLegs = new Set((route?.path ?? []).slice(1).map((id, index) => [route.path[index], id].sort().join("|")));
   const inkOrder = (edge) => edge.key === atlasEdge ? 2 : Number(routeLegs.has(edge.key));
   const lines = [...edges].sort((a, b) => inkOrder(a) - inkOrder(b))
     .map((edge) => atlasRoadMark(edge, routeLegs.has(edge.key), atlasRoadName(edge, byId))).join("");
-  const borders = new Map();
-  for (const edge of edges) {
-    if (!edge.province) continue;
-    const end = edge.survey.at(-1);
-    const prior = edge.survey.at(-2);
-    if (!prior) continue;
+  const crossLabels = edges.filter(link => link.province && link.survey.length > 1).map(link => {
+    const end = link.survey.at(-1);
+    const prior = link.survey.at(-2);
     const angle = Math.atan2(end[1] - prior[1], end[0] - prior[0]);
-    const arrow = `<span class="atlas-border-arrow" aria-hidden="true" style="${atlasAt(end, frame)};--arrow:${angle}rad"></span>`;
-    const row = borders.get(edge.province);
-    if (row) row.arrows += arrow;
-    else borders.set(edge.province, { label: edge.name, end, arrows: arrow });
-  }
-  const crossLabels = [...borders.values()].map(({ label, end, arrows }) =>
-    `${arrows}<span class="atlas-cross-label" aria-hidden="true" style="${atlasAt(end, frame)}">往${escape(label)}</span>`).join("");
-  const offsets = atlasLabelOffsets(points, frame, selected);
+    return `<span class="atlas-border" aria-hidden="true" style="${atlasAt(end, frame)}"><span class="atlas-border-arrow" style="--arrow:${angle}rad"></span>
+      <span class="atlas-cross-label">往${escape(link.destinationName || link.name)}</span></span>`;
+  }).join("");
   const marks = points.map(point => `<button type="button" class="atlas-mark${point.current ? " here" : ""}${point.settlement ? " town" : ""}${point.portal ? " portal" : ""}${point.attuned ? " linked" : ""}"
-    style="${atlasAt([point.x, point.y], frame)};${offsets[point.id]}" data-atlas-point="${escape(point.id)}" aria-label="${escape(point.name)}" aria-pressed="${point.id === selected.id}">
+    style="${atlasAt([point.x, point.y], frame)}" data-atlas-point="${escape(point.id)}" aria-label="${escape(point.name)}" aria-pressed="${!edge && point.id === selected.id}">
     <span class="atlas-dot"></span><span class="atlas-label">${escape(point.name)}</span></button>`).join("");
-  return `${atlasViewport(province, frame, "已知地点和道路", atlasInk(world, frame, lines) + marks + crossLabels)}
+  const leaders = '<svg class="atlas-leaders" aria-hidden="true"><path/></svg>';
+  return `${atlasViewport(province, frame, "已知地点和道路", atlasInk(world, frame, lines) + leaders + marks + crossLabels, edge ? atlasRoadName(edge, byId) : "")}
     <p class="atlas-legend"><span class="atlas-key key-wild">野外</span><span class="atlas-key key-town">休息点</span><span class="atlas-key key-portal">传送门</span>${edges.some(({ risky }) => risky) ? '<span class="atlas-key key-risk">险路</span>' : ""}</p>`;
 }
 
@@ -630,7 +808,7 @@ function atlas(s) {
   const up = '<button class="button quiet atlas-up" type="button" data-atlas-overview>返回总图</button>';
   if (!selected) return panel(province.name, '<div class="atlas-view"><p class="intro">还没听说州里的去处。</p></div>', up);
   const idle = s.mode !== "event";
-  const road = idle && world.journeys.find(({ id }) => id === selected.id);
+  const road = world.journeys.find(({ id }) => id === selected.id);
   const edge = edges.find(({ key }) => key === atlasEdge);
   const gate = world.gates.find(({ id }) => id === selected.id);
   const array = idle && world.arrays.find(({ id }) => id === selected.id);
@@ -641,13 +819,13 @@ function atlas(s) {
   const scrollBlocker = makeScroll && s.craftReasons[recipe.id];
   const usable = gate && !selected.current;
   const doorToDoor = idle && usable && world.localGate?.attuned && selected.province === world.province;
-  const reasons = [idle && !road && !selected.current && (selected.travelReason || "目前没有已知的走法。"),
+  const reasons = [!road && !selected.current && (selected.travelReason || "目前没有已知的走法。"),
     selected.portal && !selected.current && !selected.attuned && "亲自点亮这里的传送门后，才能传到这里。",
     doorToDoor && !gate.available && gate.reason,
     usable && !gate.byScroll && gate.scrollReason,
     array && !array.available && selected.id !== s.region.id && world.localArray?.active && array.reason].filter(Boolean);
   const transport = `<div class="actions atlas-actions">
-      ${road ? routeAction(road, world.edges, road.rescue ? "慢慢走过去" : "走过去") : ""}
+      ${road ? routeAction(road, world.edges, `${idle ? "" : "离开此处，"}${road.rescue ? "慢慢走过去" : "走过去"}`) : ""}
       ${currentGate ? linkButton("点亮传送门", "attuneGate") : ""}
       ${doorToDoor ? linkButton(`门间传送 · ${gate.price} 灵钱`, "gateJump", gate.id, "", !gate.available) : ""}
       ${usable ? linkButton(`用卷轴传送 · 1 张 + ${gate.scrollPrice} 灵钱`, "gateScroll", gate.id, "", !gate.byScroll) : ""}
@@ -655,16 +833,16 @@ function atlas(s) {
       ${makeScroll && selected.current ? linkButton(scrollBlocker || "制备传送卷轴", "craft", recipe.id, "quiet", Boolean(scrollBlocker)) : ""}
     </div>`;
   return panel(province.name, `<div class="atlas-view">
-    ${atlasMap(world, province.id, points, byId, selected, road, edges)}
+    ${atlasMap(world, province.id, points, byId, selected, edge ? null : road, edges, edge)}
     ${edge ? atlasRoadDetail(edge, byId, idle) : ""}
     <div class="atlas-tools"><details class="atlas-index"${atlasIndexOpen ? " open" : ""}><summary>选地点</summary><div class="actions">${points.map(({ id, name }) =>
       `<button type="button" class="button quiet" data-atlas-point="${escape(id)}" aria-pressed="${selected.id === id}">${escape(name)}</button>`).join("")}</div></details>
     ${atlasRoadIndex(edges, byId, selected)}</div>
-    <div class="atlas-place"><h3>${escape(selected.name)}</h3>${marks ? tag(marks) : ""}
+    <div class="atlas-place"${edge ? " hidden" : ""}><h3>${escape(selected.name)}</h3>${marks ? tag(marks) : ""}
     <p class="intro">${escape(selected.description)}</p>${transport}
     ${[...new Set(reasons)].map(reason => `<p class="fine">${escape(reason)}</p>`).join("")}
     ${makeScroll && selected.current ? `<p class="fine">每批 ${recipe.count} 张 · ${recipe.cost} 灵钱 · ${escape(supplies(recipe.need))}</p>` : ""}
-    </div>${idle && selected.current ? arrayLedger(world.localArray) : ""}</div>`, up);
+    </div>${!edge && idle && selected.current ? arrayLedger(world.localArray) : ""}</div>`, up);
 }
 
 function eventScreen(s) {
@@ -674,16 +852,18 @@ function eventScreen(s) {
   const resources = siteResources(s, local);
   const gathering = s.gathering;
   const description = s.mechanism?.complete ? s.mechanism.text : event.text;
-  const choices = s.visibleChoices.map(choice => {
+  const choices = s.visibleChoices.filter(choice => !choice.retired).map(choice => {
     const cue = publicText(choice.desc);
     const blocker = choice.lockedReason;
     const active = gathering?.index === choice.index;
+    const payment = [choice.cost ? `${choice.cost} 灵钱` : "", supplies(choice.materials)].filter(Boolean).join(" · ");
     const button = linkButton(choice.label, choice.gather?.length ? "beginGather" : "choose", choice.index, "", Boolean(gathering) || !choice.available);
     return `<div class="choice">
       ${cue ? `<p class="choice-cue">${escape(cue)}</p>` : ""}
       ${button}
-      ${choice.cost ? `<p class="fine">花费 ${choice.cost} 灵钱</p>` : ""}
-      ${active ? '<div class="gather-progress"><span aria-live="polite">采集中…</span><progress max="1" value="0" aria-label="采集进度" data-gather-progress tabindex="-1"></progress></div>' : ""}
+      ${payment ? `<p class="fine">花费 ${escape(payment)}</p>` : ""}
+      ${!active && (choice.gather?.length ? choice.days > 0 : choice.days >= 0.75) ? `<p class="fine">约 ${choice.days} 日</p>` : ""}
+      ${active ? `<div class="gather-progress"><span aria-live="polite">采集中…</span><progress max="1" value="0" aria-label="采集进度" data-gather-progress tabindex="-1"></progress>${linkButton("停手", "cancelGather", "", "quiet")}</div>` : ""}
       ${blocker ? `<p class="choice-blocker">${escape(blocker)}</p>` : ""}
     </div>`;
   }).join("");
@@ -693,10 +873,11 @@ function eventScreen(s) {
     ${resources ? `<p class="site-stock">${escape(resources)}</p>` : ""}
     ${groundSection(s)}
     <div class="choice-list">${choices}</div>
+    ${s.siteQuests.length ? `<div class="card-grid">${s.siteQuests.map(row => questCard(row, Boolean(gathering))).join("")}</div>` : ""}
     ${lessons.length ? `<div class="choice-list">${lessons.map(skill => `<div class="choice">${spiritLesson(skill, gathering)}</div>`).join("")}</div>` : ""}
     ${s.mechanism && !s.mechanism.complete ? mechanismPanel(s.mechanism) : ""}
     ${s.experiment ? `<fieldset class="event-experiment"${gathering ? " disabled" : ""}>${experimentForm(s.experiment)}</fieldset>` : ""}
-    <div class="actions">${linkButton("离开", "leave", "", "quiet", Boolean(gathering))}</div>`, tag(s.region.name));
+    <div class="actions">${event.id === data.tournament.site && s.tournament && !gathering ? tabButton("到名册前", "tournament") : ""}${linkButton("离开", "leave", "", "quiet", Boolean(gathering))}</div>`, tag(s.region.name));
 }
 
 function mechanismPanel(puzzle) {
@@ -711,7 +892,7 @@ function mechanismPanel(puzzle) {
 }
 
 function experimentForm(experiment) {
-  if (experiment.blockedReason) return `<section class="experiment"><p class="fine">${escape(experiment.blockedReason)}</p></section>`;
+  if (experiment.blockedReason) return `<section class="experiment"><h3>现场验证</h3><p class="fine">${escape(experiment.blockedReason)}</p></section>`;
   const draft = experimentDrafts.get(experiment.id);
   const controls = experiment.controls.map(control => `<label class="experiment-control">
     <span>${escape(control.label)}</span>
@@ -767,15 +948,12 @@ function combatScreen(s) {
     : `<p class="intent unread">${s.combatRead === "enemy" ? "对方盯着你的起手，没先露招。" : "一时看不清对方的来招。"}</p>`;
   const openingNote = openingShot ? "对方还隔着一段路。这一回合放箭，能拦住它的头一扑。"
     : !intent && s.openingShotPossible ? "还隔着一段路。对方若冲来，首箭能拦一下。" : "";
-  const chargeNote = [
-    charging && (fistCharged ? '拳劲已收住，可以打出这一拳。' : `${charging.name}已经蓄好力，可以出手。`),
-    s.enemyCharged && "对方已经攒足了劲。",
-  ].filter(Boolean).join("");
+  const chargeNote = charging && (fistCharged ? "拳劲已收住，可以打出这一拳。" : `${charging.name}已经蓄好力，可以出手。`);
   const observation = enemy.desc ? `<details class="field-note"${combatObservation === state.combat ? " open" : ""}><summary>观察对手</summary><p>${escape(publicText(enemy.desc))}</p></details>` : "";
   const spell = weapon?.spellQi && linkButton(`催动${weapon.name} · ${weapon.spellQi} 真气`, "weaponSpell", "", "",
     s.qi < weapon.spellQi || Boolean(charging || suppress));
   const knownSpirit = spirit?.active;
-  const spiritDescription = suppress ? `这回合可以防御、闪避、蓄势${enemy.medicineRestricted ? "" : "或服药"}。`
+  const spiritDescription = suppress ? "这回合不能出手。"
     : spirit?.remaining ? `效果还剩 ${spirit.remaining} 回合。` : spirit?.invokeBlocker || knownSpirit?.desc;
   const spiritButton = knownSpirit && `<span class="action-hint">${linkButton(suppress ? `${knownSpirit.name}已发动` : spirit.waiting
     ? `${knownSpirit.name} · 尚需 ${spirit.waiting} 回合` : `${knownSpirit.name} · ${knownSpirit.cost} 神识`,
@@ -783,12 +961,14 @@ function combatScreen(s) {
     role="tooltip">${itemTipBody(spiritDescription, spiritStats(knownSpirit))}</span></span>`;
   const readings = spirit?.readings.map(({ label, value }) => `${label} ${value}`).join(" · ");
   return panel(enemy.name, `
+    ${enemy.tell ? `<p class="intro">${escape(enemy.tell)}</p>` : ""}
     ${intentLine}
     ${openingNote ? `<p class="fine">${openingNote}</p>` : ""}
     ${chargeNote ? `<p class="fine">${escape(chargeNote)}</p>` : ""}
     ${enemy.sparring ? `<p class="fine">${enemy.medicineRestricted ? "裁判叫停就收招。双方在场上不能用药或吃东西。" : "约好点到为止，一方撑不住就收招。"}</p>` : ""}
     ${meter("对方气血", enemy.health, 1)}
     ${ammoBar}
+    ${s.enemyCharged ? '<p class="intent"><b>对方已经蓄势</b>，接下来若出手，来招会更重。</p>' : ""}
     <div class="actions">${linkButton(attackLabel, !canMainAttack && fist ? "fistAttack" : "attack", "", fistCharged ? "" : "primary", mainBlocked)}
       ${spell || ""}
       ${side ? linkButton(sideLabel, "offhandAttack", "", "", sideBlocked) : ""}
@@ -803,7 +983,7 @@ function combatScreen(s) {
     </div>
     ${retreatCue ? `<p class="fine retreat-cue" id="retreat-cue">${escape(retreatCue)}</p>` : ""}
     ${s.lastEnemyIntent ? `<p class="fine">上回合 · ${escape(s.lastEnemyIntent.name)}</p>` : ""}
-    ${readings ? `<p class="fine">${escape(readings)}</p>` : ""}
+    ${readings ? `<p class="fine">所学神识辨出的属性 · ${escape(readings)}</p>` : ""}
     ${observation}
     `, tag(tierName(enemy.tier), "warn"));
 }
@@ -826,7 +1006,7 @@ const flatEffects = [
   ["retreat", "脱身", true], ["dodge", "闪避值", true],
 ];
 const recoveryEffects = [["hp", "气血"], ["satiety", "饱腹"], ["qi", "真气"], ["sense", "神识"]];
-const traitNames = { damage: "伤害", pierce: "穿甲", guard: "护持", reflect: "反伤", dodge: "闪避值", accuracy: "命中值" };
+const traitNames = { damage: "伤害", pierce: "无视护持", guard: "护持", reflect: "反伤", dodge: "闪避值", accuracy: "命中值" };
 const targetNames = { scaled: "鳞甲", stoneborn: "石甲", furred: "带毛", beast: "妖兽", spirit: "精怪" };
 const traitIntents = { attack: "普攻", heavy: "重招", drain: "夺气", guard: "防御" };
 
@@ -853,6 +1033,7 @@ function gearStats(s, gear, wear) {
   const ammo = gear.ammo ?? [];
   const stockedAmmo = ammo.reduce((count, id) => count + (s.inventory[id] ?? 0), 0);
   return [
+    ["装备部位", slotNames[gear.slot]],
     ...(wear === 0 ? [["损坏", "加成暂时失效"]] : []),
     ...effectRows(gear, flatEffects),
     ...(gear.fixedDamage ? [["普攻固定伤害", s.creatorSwordDamage]] : []),
@@ -870,7 +1051,7 @@ function gearStats(s, gear, wear) {
     ...(ammo.length ? [["弹药 · 每招 1 发", ammo.map(id => itemRows[id].name).join("、")]] : []),
     ...(ammo.length && s.inventory[gear.id] ? [["随身合用弹药", `${stockedAmmo} 发`]] : []),
     ...(hold ? [["持用", hold]] : []),
-    ["耐久", `${wear ?? gear.durability} / ${gear.durability}`],
+    wear == null ? ["耐久上限", gear.durability] : ["耐久", `${wear} / ${gear.durability}`],
     ["境界要求", gear.fixedDamage ? "无" : tierName(gear.tier)],
   ];
 }
@@ -954,11 +1135,13 @@ function itemSlot(s, item, location, actions = "", label = "", count = 0, contro
   const shortcut = controls.shortcut
     ? ` data-bag-action="${controls.shortcut.action}" data-bag-id="${escape(controls.shortcut.bagId)}" data-bag-item="${escape(item.id)}"` : "";
   const gear = gearRows.get(item.id);
+  const condition = location === "worn" && gear && controls.wear != null ? gearCondition(controls.wear, gear.durability) : "";
+  const wearLabel = condition === "损坏" ? "已损坏" : condition === "将坏" ? "快磨坏了" : "";
   const status = gear && controls.wear != null ? `目前${gearCondition(controls.wear, gear.durability)}。` : controls.status ?? "";
   const entry = controls.entry ?? { id: item.id, text: itemDescription(s, item.id), stats: itemStats(s, item.id, controls.wear) };
   return `<div class="item-row" data-item-row="${escape(key)}">
     ${label ? `<span class="slot-label">${escape(label)}</span>` : ""}
-    <button type="button" class="item-trigger" data-item="${escape(key)}"${openAction}${shortcut} aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}</button>
+    <button type="button" class="item-trigger" data-item="${escape(key)}"${openAction}${shortcut} aria-expanded="${open}" aria-describedby="tip-${escape(key)}">${escape(item.name)}${count ? `<span class="item-count">×${count}</span>` : ""}${wearLabel ? `<span class="item-broken">${wearLabel}</span>` : ""}</button>
     <span class="item-tip" id="tip-${escape(key)}" role="tooltip">${itemTipBody(entry.text, entry.stats, entry.id)}</span>
     ${actions || status ? `<div class="item-tools"${open ? "" : " hidden"}>${status ? `<span class="fine item-status">${escape(status)}</span>` : ""}${actions}</div>` : ""}
   </div>`;
@@ -1020,7 +1203,8 @@ function groundRows(s) {
     const label = maximum === count ? "拾取全部" : maximum ? `拾取 ${maximum}` : "拿不了";
     const cue = maximum ? `${label} · ${item.name}` : `${item.name} · ${reason}`;
     return `<div class="ground-row">
-      ${itemSlot(s, item, "ground", "", "", count, { wear: s.groundWear[id] })}
+      ${itemSlot(s, item, "ground", "", "", count, { wear: s.groundWear[id],
+        status: s.freshGroundMeat?.includes(id) ? "没收拾的鲜肉，搁久了会坏。" : "" })}
       <button type="button" class="button quiet" data-action="take" data-value="${escape(id)}" aria-label="${escape(cue)}"${s.gathering || !maximum ? " disabled" : ""}>${label}</button>
       ${reason ? `<p class="fine ground-reason">${escape(reason)}</p>` : ""}
     </div>`;
@@ -1033,7 +1217,10 @@ function groundSection(s, title = "脚边的物品") {
 }
 
 function discardActions(s, id) {
-  const { maximum, relief } = s.discardOptions[id] ?? {};
+  const terms = s.discardOptions[id] ?? {};
+  const packed = s.packedMeal?.id === id ? s.packedMeal.count : 0;
+  const maximum = Math.min(terms.maximum ?? 0, (s.inventory[id] ?? 0) - packed);
+  const relief = Math.max(0, maximum - ((s.inventory[id] ?? 0) - (terms.relief ?? 0)));
   if (!maximum) return "";
   const reliefOnly = relief === maximum;
   const label = reliefOnly ? "舍弃救济干粮" : "放下";
@@ -1057,8 +1244,12 @@ function pack(s, showGround) {
   const canEat = canManageManual;
   const repair = s.mode === "village" ? s.repairService : null;
   function repairAction(id, remaining, durability) {
+    if (remaining >= durability) return "";
     const price = repair?.prices[id];
-    if (price == null || remaining >= durability) return "";
+    if (price == null) {
+      const directions = s.mode === "village" && s.localMarket?.repairReferral;
+      return directions ? `<p class="fine">${escape(directions)}</p>` : "";
+    }
     const coins = linkButton(`付钱修理 · ${price}钱`, "repair", id, "quiet", s.coins < price);
     const parts = repair.materials[id];
     if (!parts) return coins;
@@ -1160,12 +1351,12 @@ function pack(s, showGround) {
         linkButton("移回行囊", "setMealPouch", "none", "quiet") : "", "", meal.count)
     : `<p class="fine">${canEat && carried.some(({ id }) => foodRows[id]) ? "点一份口粮装进来。" : "空"}</p>`;
   return `<section class="kit-section"><h2>装备</h2>${worn.join("") || '<p class="fine">空</p>'}</section>
-    <section class="kit-section"><div class="kit-head"><h2>${escape(s.backpackName)}</h2><span class="fine" title="${capacityLabel}">${useProgress ? `${s.backpackUsed}/${s.backpackCapacity} 格` : room}</span></div>
+    <section class="kit-section"><div class="kit-head"><h2>${escape(s.backpackName)}</h2><span class="fine" title="${escape(`${capacityLabel} · ${room} · 多数物品每格最多${rules.backpackStackSize}件`)}">${s.backpackUsed}/${s.backpackCapacity} 格</span></div>
       ${meter}
       <div class="meal-pocket"><h3>便当栏</h3>${packedFood}</div>
       ${inventory.join("") || '<p class="fine">空</p>'}
     </section>
-    ${bagContents(s, openBag, canManageManual)}
+    ${bagContents(s, openBag, canManageManual || s.mode === "road")}
     ${kitDetails("clues", "线索", clues, clues.length <= 5)}
     ${kitDetails("formulae", "丹方", formulae)}
     ${kitDetails("food-recipes", "食谱", foodRecipes)}
@@ -1191,6 +1382,7 @@ function categoryOf(item) {
 function encyclopediaEntry(s, item, noteLimit) {
   const id = escape(item.id);
   const description = itemDescription(s, item.id);
+  const wear = s.durability[item.id] ?? s.economy?.containers?.[0]?.stored.find(row => row.id === item.id)?.wear;
   const editing = bookEditing === item.id;
   const modified = Object.hasOwn(s.itemNotes ?? {}, item.id);
   const body = editing ? `<form class="book-form" data-book-note="${id}">
@@ -1200,7 +1392,7 @@ ${escape(bookDrafts.get(item.id) ?? description)}</textarea>
     <div class="actions"><button type="submit" class="button primary">保存介绍</button>
       <button type="button" class="button quiet" data-book-cancel="${id}">取消</button>
       ${modified ? `<button type="button" class="button quiet" data-book-reset="${id}">恢复原文</button>` : ""}
-    </div></form>` : `<p class="item-description">${escape(description)}</p>${statList(itemStats(s, item.id, s.durability[item.id]))}
+    </div></form>` : `<p class="item-description">${escape(description)}</p>${statList(itemStats(s, item.id, wear))}
     <div class="actions"><button type="button" class="button quiet" data-book-edit="${id}">改介绍</button>
       ${modified ? `<button type="button" class="button quiet" data-book-reset="${id}">恢复原文</button>` : ""}</div>`;
   return `<article class="book-entry" data-book-entry="${id}"><h3>${escape(item.name)}</h3>${body}</article>`;
@@ -1255,11 +1447,15 @@ function saveEncyclopediaNote(id, text) {
 }
 
 function observeShopItems(s, tab) {
-  const rows = tab === "alchemy" ? s.alchemy.offers
+  const sectStock = tab === "sect" && s.sect?.joined && s.sect.id === data.measuringSect.id
+    && ["store", "exchange"].includes(measuringSectMode);
+  const rows = sectStock ? s.sect[measuringSectMode].filter(offer => measuringCanAccess(s.sect, offer.office))
+    : tab === "alchemy" ? s.alchemy.offers
     : marketMode !== "buy" ? [] : tab === "market" ? s.market.stalls.flatMap(stall => stall.offers)
       : tab === "localMarket" ? s.localMarket.offers : [];
   const ids = rows.filter(row => (row.stock ?? row.count ?? 1) > 0).map(row => row.id);
-  return ids.length && act(state, "observeGuideItems", { source: tab, ids }).changed;
+  const source = sectStock ? measuringSectMode === "store" ? "sectStore" : "sectExchange" : tab;
+  return ids.length && act(state, "observeGuideItems", { source, ids }).changed;
 }
 
 function villageServices(s) {
@@ -1275,8 +1471,12 @@ function cultivation(s) {
   const next = s.nextRealm;
   const missing = s.progression?.pending ?? (next ? [s.insight < next.insight && "根基尚未稳固", s.coins < next.cost && "灵钱不足",
     !hasSupply(s, next.need, homeMaterials(s)) && `还缺${supplies(next.need)}`].filter(Boolean) : []);
+  const costs = next ? [next.days && `${next.days} 日`, next.cost && `${next.cost} 灵钱`, supplies(next.need)].filter(Boolean) : [];
+  const practice = s.progression?.requiredPractice;
   return panel("修行", `<div class="actions place-actions">${linkButton("打坐", "research")}
     ${next ? linkButton("尝试突破", "breakthrough", "", "primary", missing.length > 0) : ""}</div>
+    ${costs.length ? `<p class="fine">突破需 ${escape(costs.join(" · "))}</p>` : ""}
+    ${practice ? `<p class="fine">历练 ${Math.min(s.progression.practice, practice)}/${practice} · 采集、取胜和打坐可积累，每日计入有限。</p>` : ""}
     ${missing.length ? `<p class="fine">${escape(missing.join(" · "))}</p>` : ""}`);
 }
 
@@ -1292,7 +1492,9 @@ function workshop(s) {
   const showEddyMap = s.inventory.eddy_note > 0 && !recipes.some(row => row.id === "r_bank_talisman")
     ? `<p class="intro workshop-hint">纸卷的边角还有些潮。裴匠收起剪子，给你腾出一角干案。</p>
       <div class="actions">${linkButton("给裴匠看回汊图", "showEddyMapToSmith")}</div>` : "";
-  const mapTrade = smithMap ? `<p class="intro">${escape(smithMap.desc)}</p>${smithMap.ready ? `<div class="actions">${linkButton("递一块寒铁", "handin", smithMap.id)}</div>` : ""}` : "";
+  const mapTrade = smithMap ? `<p class="intro">${escape(smithMap.desc)}</p>
+    <div class="actions">${linkButton("递一块寒铁", "handin", smithMap.id, "", !smithMap.ready)}</div>
+    ${smithMap.blockedReason ? `<p class="fine">${escape(smithMap.blockedReason)}</p>` : ""}` : "";
   return panel("工坊", `${recipes.length ? '<div class="workshop-art" aria-hidden="true"></div>' : ""}
     ${remarks}${mapTrade}${showEddyMap}
     <div class="card-grid">${recipes.map(row => {
@@ -1303,15 +1505,24 @@ function workshop(s) {
   }).join("")}</div>`);
 }
 
+function quantityPicker(action, id, label, field) {
+  return `<details class="quantity-picker"><summary>选数量</summary>
+    <form data-quantity-action="${escape(action)}" data-quantity-item="${escape(id)}">
+      <label>数量 ${field}</label><button type="submit" class="button quiet">${label}</button>
+    </form>
+  </details>`;
+}
+
 function storageRows(s, rows, action) {
   const depositing = action === "econDeposit";
   const label = depositing ? "存入" : "取出";
   return rows.length ? rows.map(row => {
     const bulk = Math.min(row.count, row.maximum ?? row.count);
-    return `<div class="storage-row"><span>${entryLabel(row.name, itemEntry(s, row.id))} <small>×${row.count}</small></span>
+    return `<div class="storage-row"><span>${entryLabel(row.name, itemEntry(s, row.id))} <small>×${row.count}</small>${row.contained === undefined ? "" : ` <small>· 袋内 ${row.contained} 格</small>`}</span>
       <div class="actions">
         ${linkButton(row.reason || `${label}一份`, action, row.id, "quiet", Boolean(row.reason))}
         ${!row.reason && bulk > 1 ? linkButton(`${label} ×${bulk}`, action, row.id, "", false, bulk) : ""}
+        ${!row.reason && bulk > 2 ? quantityPicker(action, row.id, label, `<input name="count" type="number" min="1" max="${bulk}" step="1" required>`) : ""}
       </div>
     </div>`;
   }).join("") : '<p class="fine">空</p>';
@@ -1322,9 +1533,9 @@ function warehouseScreen(s, warehouse) {
     ${linkButton("存放原料", "econStoreMaterials", "", "quiet")}
     <span class="fine">${escape(supplies(warehouse.materialPlan))}</span>
   </div>` : "";
-  return `<div class="storage-columns">
+  return `<p class="fine">仓位 ${warehouse.used}/${warehouse.capacity} 格</p><div class="storage-columns">
     <section><h3>行囊可存</h3>${unload}${storageRows(s, warehouse.carried, "econDeposit")}</section>
-    <section><h3>仓中存货 <span class="fine">${warehouse.used}/${warehouse.capacity} 格</span></h3>
+    <section><h3>仓中存货</h3>
       ${storageRows(s, warehouse.stored, "econWithdraw")}
     </section>
   </div>`;
@@ -1333,14 +1544,15 @@ function warehouseScreen(s, warehouse) {
 function productionScreen(facility) {
   const upgrade = facility.upgrade;
   const upgradePanel = upgrade ? `<div class="facility-upgrade">
-    <p class="fine">${[supplies(upgrade.need), upgrade.cost && `${upgrade.cost} 灵钱`, upgrade.days && `${upgrade.days} 日`].filter(Boolean).map(escape).join(" · ")}</p>
+    <p class="fine">${[supplies(upgrade.need), upgrade.cost && `${upgrade.cost} 灵钱`, upgrade.days && `${upgrade.days} 日`,
+      upgrade.satiety > 0 && `饱腹 −${upgrade.satiety}`].filter(Boolean).map(escape).join(" · ")}</p>
     <div class="actions">${linkButton(upgrade.reason || (facility.level ? "扩建" : "搭建"), "econBuild", facility.id, "", Boolean(upgrade.reason))}</div>
   </div>` : "";
   const jobs = facility.jobs.map(job => card(
     job.name, "", tag(`${job.batches > 1 ? `${job.batches} 批 · ` : ""}${job.ready ? "已完工" : `还需 ${Number(job.remaining.toFixed(2))} 日`}`, job.ready ? "" : "off"),
     `<span class="fine">${escape(supplies(job.loot))}</span>` + (job.ready ?
       linkButton(job.reason || "收进行囊", "econCollect", job.id, "", Boolean(job.reason)) +
-      (!job.storeReason || job.storeReason === "仓架放不下了。"
+      (!job.storeReason || job.storeReason.startsWith("仓架放不下了")
         ? linkButton(job.storeReason || "收进仓库", "econStoreJob", job.id, "quiet", Boolean(job.storeReason)) : "") : ""),
   )).join("");
   const wait = facility.wait;
@@ -1349,15 +1561,18 @@ function productionScreen(facility) {
     ${wait.days ? `<span class="fine">饱腹 −${Number(wait.satiety.toFixed(3))}</span>` : ""}
   </div>` : "";
   const projects = facility.projects.map(project => {
-    const badge = [project.days && `${project.days} 日`, project.cost && `${project.cost} 灵钱`].filter(Boolean).join(" · ");
+    const orderTime = project.setupDays + project.days + project.collectDays;
+    const badge = [`共 ${orderTime} 日`, project.cost && `${project.cost} 灵钱`].filter(Boolean).join(" · ");
+    const output = `<span class="fine">产出 ${escape(supplies(project.loot))}</span>`;
     const bulk = project.batches.length ? `<details class="route-list">
       <summary>合批做</summary>${project.batches.map(batch => `<div class="actions">
         ${linkButton(`做 ${batch.count} 批`, "econStart", project.id, "quiet", false, batch.count)}
-        <span class="fine">${escape([supplies(batch.need), batch.cost && `${batch.cost} 灵钱`, `${batch.days} 日`].filter(Boolean).join(" · "))}</span>
+        <span class="fine">${escape([supplies(batch.need), batch.cost && `${batch.cost} 灵钱`,
+          `共 ${project.setupDays + batch.days + project.collectDays} 日`, `产出 ${supplies(batch.loot)}`].filter(Boolean).join(" · "))}</span>
       </div>`).join("")}
     </details>` : "";
-    return card(project.name, project.description, badge ? tag(badge, "off") : "",
-      linkButton(project.reason || "做一批", "econStart", project.id, "", Boolean(project.reason)) + bulk, "", project.need);
+    return card(project.name, project.description, tag(badge, "off"),
+      output + linkButton(project.reason || "做一批", "econStart", project.id, "", Boolean(project.reason)) + bulk, "", project.need);
   }).join("");
   return upgradePanel + (jobs ? `<div class="card-grid">${jobs}</div>${waitAction}` : "") +
     (projects ? `<div class="card-grid">${projects}</div>` : "");
@@ -1384,10 +1599,15 @@ function backpackScreen(s, backpack, containerPlans) {
       linkButton(row.label, "econExpandPack", row.capacity, "", Boolean(row.reason)) +
       (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : ""),
     "", row.need)).join("");
-  const bags = containerPlans.map(row => card(row.name, row.desc, tag(`${row.capacity} 格`),
-    `<span class="fine">${row.cost} 枚灵钱 · ${row.days} 日</span>` +
+  const bags = containerPlans.map(row => {
+    const replacement = row.replacement;
+    const action = replacement ? linkButton("缝新袋并移入旧物", "econReplaceBag", row.id, "", Boolean(replacement.reason)) +
+      `<span class="fine">${escape(replacement.reason || `把${replacement.name}的 ${replacement.used} 格物件移入新袋，旧袋入仓。`)}</span>` :
       linkButton(row.label || "缝制", "econCraftBag", row.id, "", Boolean(row.reason)) +
-      (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : ""), "", row.need)).join("");
+      (row.reason ? `<span class="fine">${escape(row.reason)}</span>` : "");
+    return card(row.name, row.desc, tag(`${row.capacity} 格`),
+      `<span class="fine">${row.cost} 枚灵钱 · ${row.days} 日</span>` + action, "", row.need);
+  }).join("");
   return `<p class="fine">随身用的是${escape(s.backpackName)}，共 ${s.backpackCapacity} 格。</p>
     ${upgrades || bags ? `<div class="card-grid">${upgrades}${bags}</div>` : ""}`;
 }
@@ -1408,28 +1628,40 @@ function saleButtonLabel(label, entry, count) {
   return entry.demand ? `${label} · ${saleTotal(entry, count)} 灵钱` : label;
 }
 
-function regularSaleButton(entry, action, batch) {
-  const count = entry.demand?.remaining;
-  return count > 1 && count < batch
-    ? linkButton(saleButtonLabel(`常价卖出 ×${count}`, entry, count), action, entry.id, "quiet", false, count)
-    : "";
+function tradeButtons(entry, action, selling, label = selling ? "卖出" : "购入") {
+  const quantities = entry.quantities;
+  const maximum = quantities.at(-1);
+  if (!maximum) return `<span class="fine">${escape(entry.blockedReason || entry.reason || "眼下不能成交。")}</span>`;
+  const one = quantities.includes(1) ? linkButton(saleButtonLabel(label, entry, 1), action, entry.id) : "";
+  const batch = maximum > 1 ? linkButton(saleButtonLabel(`${label} ×${maximum}`, entry, maximum), action, entry.id, "quiet", false, maximum) : "";
+  const demand = entry.demand?.remaining;
+  const regular = selling && demand > 1 && demand < maximum && quantities.includes(demand)
+    ? linkButton(saleButtonLabel(`常价卖出 ×${demand}`, entry, demand), action, entry.id, "quiet", false, demand) : "";
+  const more = quantities.filter(count => count > 1 && count < maximum && (!regular || count !== demand));
+  const denomination = action === "sectExchange" ? "贡献" : "灵钱";
+  const field = `<select name="count">${more.map(count =>
+    `<option value="${count}">${count} 件 · ${saleTotal(entry, count)} ${denomination}</option>`).join("")}</select>`;
+  const split = selling && entry.singleSaleReason ?
+    `<span class="fine">单卖一件时，${escape(entry.singleSaleReason)} 批量卖出可以腾出格子。</span>` : "";
+  return one + regular + batch + (more.length ? quantityPicker(action, entry.id, label, field) : "") + split;
+}
+
+function saleHolding(s, entry) {
+  if (Object.values(s.equipment).includes(entry.id)) return '<span class="fine">穿戴中</span>';
+  if (!entry.count) return "";
+  const gear = gearRows.get(entry.id);
+  const wear = s.durability[entry.id];
+  const condition = gear && wear != null ? ` · ${gearCondition(wear, gear.durability)}` : "";
+  return `<span class="fine">手边 ×${entry.count}${condition}</span>`;
 }
 
 function marketItem(s, entry, selling) {
   const item = itemRows[entry.id];
-  const gear = gearRows.get(item.id);
-  const allowed = selling ? entry.canSell : entry.canBuy;
-  const label = allowed ? (selling ? "卖出" : "购入") : entry.blockedReason;
   const price = selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`);
-  const wear = gear && s.durability[item.id];
-  const quantity = selling && entry.count ? `<span class="fine">可卖 ×${entry.count}${wear != null && gear ? ` · ${gearCondition(wear, gear.durability)}` : ""}</span>` : "";
+  const quantity = selling ? saleHolding(s, entry) : "";
   const action = selling ? "sell" : "buy";
-  const batch = Math.min(entry.demand ? rules.maxTradeCount : 5, selling ? entry.count : entry.maximum);
-  const batchLabel = `${selling ? "卖出" : "购入"} ×${batch}`;
-  const bulk = allowed && !gear && batch > 1 ? linkButton(saleButtonLabel(batchLabel, entry, batch), action, item.id, "quiet", false, batch) : "";
-  const regular = selling && allowed ? regularSaleButton(entry, action, batch) : "";
   const stock = !selling && Number.isFinite(entry.stock) ? `<span class="fine">摊上余 ${entry.stock}</span>` : "";
-  return card(item.name, "", price, `${linkButton(allowed ? saleButtonLabel(label, entry, 1) : label, action, item.id, "", !allowed)}${regular}${bulk}${quantity}${stock}${saleDemandNote(entry)}`, itemEntry(s, item.id));
+  return card(item.name, "", price, `${tradeButtons(entry, action, selling)}${quantity}${stock}${saleDemandNote(entry)}`, itemEntry(s, item.id));
 }
 
 function merchantOffer(stall) {
@@ -1445,7 +1677,7 @@ function merchantOffer(stall) {
 }
 
 function market(s) {
-  const specialized = s.market.sales.filter(({ canSell }) => canSell);
+  const specialized = s.market.sales;
   const fallback = s.localMarket?.buys.filter((entry) => !specialized.some(({ id }) => id === entry.id)) ?? [];
   const contents = marketMode === "sell"
     ? (specialized.length || fallback.length ? `<div class="card-grid">${specialized.map(entry => marketItem(s, entry, true)).join("")}${fallback.map(entry => localMarketItem(s, entry, true)).join("")}</div>`
@@ -1466,31 +1698,52 @@ function marketSwitcher() {
 
 function localMarketItem(s, entry, selling) {
   const item = itemRows[entry.id];
-  const maximum = selling ? Math.min(entry.count, rules.maxTradeCount) : entry.maximum;
-  const label = selling ? "卖出" : "购入";
   const action = selling ? "localSell" : "localBuy";
-  const reason = entry.reason || (selling ? "暂不能出手" : entry.count ? "眼下买不了" : "已卖完");
-  const buttons = linkButton(maximum ? saleButtonLabel(label, entry, 1) : reason, action, item.id, "", !maximum) +
-    (selling ? regularSaleButton(entry, action, maximum) : "") +
-    (maximum > 1 ? linkButton(saleButtonLabel(`${label} ×${maximum}`, entry, maximum), action, item.id, "quiet", false, maximum) : "");
-  const stock = `<span class="fine">${selling ? "可卖" : "在摊"} ×${entry.count}</span>`;
-  return card(item.name, "", selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`), `${buttons}${stock}${saleDemandNote(entry)}`,
+  const buttons = tradeButtons(entry, action, selling);
+  const stock = selling ? saleHolding(s, entry)
+    : `<span class="fine">在摊 ×${entry.count}${entry.imported ? " · 外地寄售" : ""}</span>`;
+  return card(item.name, entry.source, selling ? salePriceTag(entry) : tag(`${entry.price} 灵钱/件`), `${buttons}${stock}${saleDemandNote(entry)}`,
     itemEntry(s, item.id));
+}
+
+function localMarketDepartment(offer) {
+  if (offer.department) return offer.department;
+  const gear = gearRows.get(offer.id);
+  if (gear) return gear.slot === "weapon" || gear.sideAtk ? "兵器铺" : "护具铺";
+  return ({ pill: "丹药铺", food: "口粮摊", material: "材料摊", ammo: "箭符铺", talisman: "箭符铺" })[itemRows[offer.id].kind]
+    ?? "杂货柜";
+}
+
+function localMarketShelves(s, offers) {
+  const shops = new Map();
+  for (const offer of offers) {
+    const department = localMarketDepartment(offer);
+    const key = offer.merchant || department;
+    if (!shops.has(key)) shops.set(key, []);
+    shops.get(key).push(offer);
+  }
+  const tier = (id) => gearRows.get(id)?.tier ?? pillRows.get(id)?.tier ?? 0;
+  return [...shops].map(([name, rows]) => `<section class="market-stall"><h3>${escape(name)}</h3>
+    <div class="card-grid">${rows.sort((a, b) => tier(a.id) - tier(b.id) || a.price - b.price)
+      .map(entry => localMarketItem(s, entry, false)).join("")}</div></section>`).join("");
 }
 
 function localMarketScreen(s) {
   const selling = marketMode === "sell";
   const rows = selling ? s.localMarket.buys : s.localMarket.offers;
   const talk = s.localMarket.talk;
-  return panel(`${s.region.name}集市`, `${marketSwitcher()}${talk ? `<div class="actions">${linkButton(talk.label, "localAsk", "", "quiet")}</div>` : ""}${rows.length ? `<div class="card-grid">${rows.map(entry => localMarketItem(s, entry, selling)).join("")}</div>` :
-    '<p class="intro">行囊里暂时没有能卖的东西。</p>'}`, tag(`灵钱 ${s.coins}`));
+  const stalls = selling ? (rows.length ? `<div class="card-grid">${rows.map(entry => localMarketItem(s, entry, true)).join("")}</div>`
+    : '<p class="intro">行囊里暂时没有能卖的东西。</p>') : localMarketShelves(s, rows);
+  return panel(`${s.region.name}集市`, `${marketSwitcher()}${talk ? `<div class="actions">${linkButton(talk.label, "localAsk", "", "quiet")}</div>` : ""}${stalls}`, tag(`灵钱 ${s.coins}`));
 }
 
 function sectScreen(s) {
   const sect = s.sect;
+  if (sect.id === data.measuringSect.id) return measuringSectScreen(s);
   const joining = sect.join;
   const disciple = sect.disciple;
-  const jobs = sect.joined ? sect.jobs.map(job => card(job.name, job.desc, tag(`${job.credit} 功劳`),
+  const jobs = sect.joined ? sect.jobs.map(job => card(job.name, job.desc,
+    tag([`${job.credit} 功劳`, job.coins && `${job.coins} 灵钱`, supplies(job.reward)].filter(Boolean).join(" · ")),
     linkButton(job.reason || "交这班差事", "sectWork", job.id, "", !job.available), "", job.need)).join("") : "";
   const ranks = sect.joined ? sect.ranks.map(rank => {
     const role = rank.disciple === disciple?.name && rank.credit === disciple?.credit ? "" : rank.role;
@@ -1506,22 +1759,131 @@ function sectScreen(s) {
     disciple ? tag(`${disciple.name} · ${sect.credit} 功劳`) : "");
 }
 
+function measuringCanAccess(sect, office) {
+  const offices = Object.keys(data.measuringSect.offices);
+  return offices.indexOf(sect.office) >= offices.indexOf(office);
+}
+
+function measuringSection(id, title, contents, defaultOpen = false) {
+  return `<details class="sect-section"${(measuringSectionsOpen.get(id) ?? defaultOpen) ? " open" : ""}>
+    <summary data-sect-section="${escape(id)}">${title}</summary><div class="card-grid">${contents}</div></details>`;
+}
+
+function measuringDuties(sect) {
+  const groups = Object.entries(data.measuringSect.offices).filter(([id]) => measuringCanAccess(sect, id));
+  return groups.reverse().map(([id, office]) => {
+    const jobs = sect.jobs.filter(job => job.office === id);
+    if (!jobs.length) return "";
+    const rows = jobs.map(job => card(job.name, job.desc, tag(job.type),
+      `<span class="fine">${job.coins} 灵钱 · ${job.credit} 贡献${job.days ? ` · ${job.days} 日` : ""}</span>
+      ${linkButton("交付物资", "sectWork", job.id, "", !job.available)}
+      ${job.reason ? `<span class="fine">${escape(job.reason)}</span>` : ""}`, "", job.need)).join("");
+    return measuringSection(`jobs-${id}`, `${escape(office.name)}的差事`, rows, id === sect.office);
+  }).join("");
+}
+
+function measuringOffers(s, exchange) {
+  const rows = (exchange ? s.sect.exchange : s.sect.store).filter(offer => measuringCanAccess(s.sect, offer.office));
+  const categories = [...new Set(rows.map(offer => offer.category))];
+  return categories.map((category, index) => {
+    const cards = rows.filter(offer => offer.category === category).map(offer => {
+      const quantity = tag(`${offer.price} ${exchange ? "贡献" : "灵钱"}/件`);
+      const verbs = tradeButtons({ ...offer, quantities: offer.counts }, exchange ? "sectExchange" : "sectBuy",
+        false, exchange ? "兑换" : "购入");
+      const limitText = offer.unique && !offer.interval ? (exchange ? " · 每人限领一次" : " · 每人限购一次") : "";
+      const stock = `<span class="fine">余 ${offer.stock}${offer.nextAt ? ` · 第 ${Math.ceil(offer.nextAt)} 日补货` : limitText}</span>`;
+      return card(offer.name, offer.source ?? "", quantity, `${verbs}${stock}`, itemEntry(s, offer.id));
+    }).join("");
+    return measuringSection(`${exchange ? "exchange" : "store"}-${category}`, escape(category), cards, index === 0);
+  }).join("");
+}
+
+function measuringManagement(s, hall) {
+  const active = hall.active;
+  const orders = hall.orders.map(order => card(order.name, order.desc, tag(`${order.days} 日`),
+    `<span class="fine">门库支出 ${order.fee} 灵钱</span>
+    ${linkButton("派弟子去办", "sectManageOrder", order.id, "", !order.available)}
+    ${order.reason ? `<span class="fine">${escape(order.reason)}</span>` : ""}`)).join("");
+  const projects = hall.projects.map(project => card(project.name, project.desc, tag(`${project.level}/${project.maxLevel}`),
+    project.next ? `<span class="fine">门库支出 ${project.next.fee} 灵钱 · ${project.next.days} 日</span>
+      ${linkButton("拨款修造", "sectUpgradeHall", project.id, "", !project.available)}
+      ${project.reason ? `<span class="fine">${escape(project.reason)}</span>` : ""}` : "", "", project.next?.need)).join("");
+  const donation = hall.donationMax > 0 ? quantityPicker("sectFundHall", "", "拨入门库",
+    `<input name="count" type="number" value="1" min="1" max="${hall.donationMax}" step="1" required>`) : "";
+  return `<div class="sect-balance"><b>门库 ${hall.fund}/${hall.capacity} 灵钱</b>
+    <span class="fine">第 ${Math.ceil(hall.nextIncome)} 日入库 ${hall.income} 灵钱</span>${donation}</div>
+    ${hall.lastReport ? `<p class="fine">${escape(hall.lastReport)}</p>` : ""}
+    ${hall.patrolUntil > s.day ? `<p class="fine">堤路还有 ${Math.round((hall.patrolUntil - s.day) * 1000) / 1000} 日巡守。</p>` : ""}
+    ${active ? `<section class="tournament-prize"><h3>${escape(active.name)}</h3>
+      ${active.ready ? linkButton("听弟子回报", "sectSettleOrder", active.id, "primary")
+        : `<p class="fine">尚在途中，约第 ${Math.ceil(active.doneAt)} 日回观。</p>${linkButton("在观里等半日", "wait", "", "quiet")}`}
+      </section>` : ""}
+    ${measuringSection("orders", "派差", `<p class="fine">一队人领一件差，回观报过账才能再派。</p>${orders}`, true)}
+    ${measuringSection("projects", "观内修造", projects)}`;
+}
+
+function measuringSectScreen(s) {
+  const sect = s.sect;
+  const options = [["main", "名册"]];
+  if (sect.joined) {
+    if (!sect.management) options.push(["jobs", "差事榜"]);
+    options.push(["store", "宗门货柜"]);
+    if (sect.exchange.length) options.push(["exchange", sect.management ? "结清旧贡献" : "贡献堂"]);
+    if (sect.management) options.push(["management", "宗门事务"]);
+  }
+  if (!options.some(([id]) => id === measuringSectMode)) measuringSectMode = "main";
+  const mode = measuringSectMode;
+  const tabs = options.map(([id, label]) => `<button type="button" class="button ${mode === id ? "primary" : "quiet"}"
+    data-sect-mode="${id}" aria-pressed="${mode === id}">${label}</button>`).join("");
+  const rule = sect.joined ? `<p class="intro">${escape(sect.disciple.role)}</p>
+      <div class="actions">${s.tournament ? tabButton(s.tournament.stageId ? s.tournament.name : "查看擂台名册", "tournament") : ""}
+      ${sect.canLeave ? linkButton("向管事辞行", "sectLeave", "", "quiet") : ""}</div>
+      ${sect.leaveReason && !sect.management ? `<p class="fine">${escape(sect.leaveReason)}</p>` : ""}`
+    : `<p class="intro">${escape(sect.desc)}</p>
+      <p class="fine">${sect.join.returning ? "退门前的名册和旧账都还留着。" : `入门需 ${escape(supplies(sect.join.need))}、${sect.join.coins} 灵钱。`}</p>
+      <div class="actions">${linkButton(sect.join.returning ? "回守尺观" : "向管事投帖", "sectJoin", "", "primary", !sect.join.available)}</div>
+      ${sect.join.reason ? `<p class="fine">${escape(sect.join.reason)}</p>` : ""}`;
+  const body = mode === "jobs" ? measuringDuties(sect)
+    : mode === "store" || mode === "exchange" ? measuringOffers(s, mode === "exchange")
+      : mode === "management" ? measuringManagement(s, sect.management) : rule;
+  const balance = mode === "store" ? tag(`${s.coins} 灵钱`) : mode === "exchange" || mode === "jobs" ? tag(`${sect.credit} 贡献`)
+    : sect.joined ? tag(sect.disciple.name) : "";
+  return panel(sect.name, `<div class="actions sect-tabs">${tabs}</div>${body}`, balance);
+}
+
 function tournamentScreen(s) {
   const match = s.tournament;
   const opponent = match.match;
   const blocker = match.enrolled ? match.fightReason : match.enrollReason;
+  const canRest = match.enrolled && (s.boutPause > 0 || s.restSessions > 0);
+  const claims = match.claims?.map(prize => `<section class="tournament-prize">
+    <h3>${escape(prize.name)}</h3><p class="fine">${escape(supplies(prize.reward))}</p>
+    ${linkButton("领取差额奖品", "tournamentClaim", prize.id, "", !prize.available)}
+    ${prize.reason ? `<p class="fine">${escape(prize.reason)}</p>` : ""}
+  </section>`).join("") ?? "";
+  const stages = match.stages?.map(stage => `<li><span>${escape(stage.name)}</span>
+    <span>${stage.best > 0 ? `最好 ${stage.best}/5 胜` : "尚无胜绩"}</span></li>`).join("") ?? "";
   return panel(match.name, `<p class="intro">${escape(match.desc)}</p>
     ${match.result ? `<p class="fine">${escape(match.result)}</p>` : ""}
     ${opponent ? `<p class="intro">${escape(opponent.name)} · ${escape(opponent.opponent)}<br>${escape(opponent.note)}</p>` : ""}
     ${blocker ? `<p class="fine">${escape(blocker)}</p>` : ""}
-    ${match.claimBlocked ? `<p class="fine">${escape(match.claimBlocked)}</p>` : ""}
     <div class="actions">
-      ${!match.enrolled ? linkButton(`报名 · ${match.fee} 灵钱`, "tournamentEnroll", "", "", !match.canEnroll) : ""}
+      ${!match.enrolled && match.stageId && !match.handover?.available ? linkButton(`报名 · ${match.fee} 灵钱`, "tournamentEnroll", "", "", !match.canEnroll) : ""}
       ${match.enrolled ? linkButton("登台过招", "tournamentFight", "", "primary", !match.canFight) : ""}
-      ${match.enrolled && s.boutPause > 0 ? linkButton("去场边歇半日", s.restSessions ? "rest" : "wait", "", "quiet") : ""}
+      ${canRest ? (s.mode === "event" ? linkButton("离开擂台去歇脚", "leave", "", "quiet") : linkButton("去场边歇半日", s.restSessions ? "rest" : "wait", "", "quiet")) : ""}
+      ${match.enrolled && s.mode !== "event" && s.restSessions > 1 ? longRestButton(s) : ""}
       ${match.canWithdraw ? linkButton("跟裁判说退赛", "tournamentWithdraw", "", "quiet") : ""}
-      ${match.canClaim ? linkButton(match.claimName || "领取奖品", "tournamentClaim") : ""}
-    </div>`, match.enrolled ? tag(`已胜 ${match.wins} 场`) : "");
+      ${!s.sect?.joined && s.sect && s.mode !== "event" ? tabButton("去见宗门管事", "sect") : ""}
+      ${s.mode === "event" ? tabButton("回到擂台", "journey") : ""}
+    </div>
+    ${match.handover ? `<section class="tournament-prize"><h3>观主交接</h3>
+      ${match.handover.text ? `<p class="intro">${escape(match.handover.text)}</p>` : ""}
+      ${match.handover.available ? linkButton("去见秦观澜", "tournamentHandover", "", "primary") : ""}
+      ${match.handover.reason ? `<p class="fine">${escape(match.handover.reason)}</p>` : ""}
+    </section>` : ""}
+    ${claims}
+    ${stages ? `<details class="tournament-prize"><summary>往届战绩</summary><ul class="tournament-record">${stages}</ul></details>` : ""}
+  `, match.enrolled ? tag(`已胜 ${match.wins}/${match.matchCount} 场`) : "");
 }
 
 function trainingScreen(s) {
@@ -1580,12 +1942,17 @@ function visibleQuests(s) {
     !apprenticeQuests.includes(row.id) && row.id !== "sell_forging");
 }
 
+function questCard(row, disabled = false) {
+  const reason = row.blockedReason ? `<span class="fine">${escape(row.blockedReason)}</span>` : "";
+  const handin = linkButton(row.ready ? "交付" : "暂不能交付", "handin", row.id, "primary", disabled || !row.ready);
+  return card(row.name, row.desc, "", handin + reason, "", row.need);
+}
+
 function questBoard(s) {
   const list = visibleQuests(s);
   const pending = list.filter(row => !questDone(s, row));
   const delivered = list.filter(row => questDone(s, row));
-  const current = pending.map(row => card(row.name, row.desc + (row.blockedReason ? ` ${row.blockedReason}` : ""), "",
-    linkButton(row.ready ? "交付" : "暂不能交付", "handin", row.id, "primary", !row.ready), "", row.need)).join("");
+  const current = pending.map(row => questCard(row)).join("");
   const history = delivered.map(row => card(row.name, row.desc)).join("");
   return panel("委托", `${current ? `<div class="card-grid">${current}</div>` : ""}
     ${history ? `<details class="merchant-order"${pending.length ? "" : " open"}><summary>已交付 · ${delivered.length}</summary><div class="card-grid">${history}</div></details>` : ""}`);
@@ -1625,9 +1992,9 @@ function deductionHistory(s) {
   return `<details class="deduction-history" data-deduction-history${deductionHistoryOpen ? " open" : ""}>
     <summary>推演历史</summary>
     ${ordered.map(({ id, title, conclusion, reason, verified, destination }) =>
-      `<details class="deduction-record" data-deduction-record="${escape(id)}"${openDeductions.has(id) ? " open" : ""}>
-        <summary>${escape(title)} <span class="fine">· ${verified ? "已验证" : "待验证"}</span></summary>
-        ${destination ? `<p class="fine">${escape(destination.region)} · ${escape(destination.site)}</p>` : ""}
+      `<details class="deduction-record" name="deduction-history-records" data-deduction-record="${escape(id)}"${openDeduction === id ? " open" : ""}>
+        <summary>${escape(title)} <span class="fine">${destination ? `· ${escape(destination.region)} ` : ""}· ${verified ? "已验证" : "待验证"}</span></summary>
+        ${destination ? `<p class="fine">${escape(destination.site)}</p>` : ""}
         <p>${escape(conclusion)}</p><p class="fine deduction-reason">${escape(reason)}</p>
       </details>`).join("")}
   </details>`;
@@ -1645,7 +2012,7 @@ function deductionBoard(s) {
 }
 
 const focusKeys = ["data-action", "data-value", "data-count", "data-bag-id", "data-tab", "data-facility",
-  "data-market-mode", "data-item", "data-atlas-province", "data-atlas-point", "data-atlas-edge", "data-atlas-overview", "data-atlas-zoom", "data-atlas-scroll"];
+  "data-market-mode", "data-sect-mode", "data-item", "data-atlas-province", "data-atlas-point", "data-atlas-edge", "data-atlas-overview", "data-atlas-zoom", "data-atlas-scroll", "data-atlas-road-info", "data-atlas-clear-edge"];
 const focusControls = ["button", ".atlas-road[data-atlas-edge]", "[data-atlas-scroll]"];
 const visibleFocusControls = focusControls.map(selector => selector + ":focus-visible").join(", ");
 
@@ -1694,6 +2061,7 @@ function render() {
   if (s.mode !== "combat") combatObservation = null;
   const dead = s.mode === "death";
   const inEvent = s.mode === "event";
+  const atTournamentArena = inEvent && s.currentEvent?.id === data.tournament.site;
   const inEncounter = dead || s.mode === "combat" || s.mode === "victory" || s.mode === "road" || Boolean(s.gathering);
   const services = inVillage(s) ? villageServices(s) : [];
   const originalHome = atLanding(s);
@@ -1702,11 +2070,12 @@ function render() {
     deduction: Boolean(s.activeClues?.length || s.deductionDraft || s.deductionHistory?.length),
     workshop: originalHome && s.services.includes("workshop"), market: originalHome && s.services.includes("market"),
     yard: originalHome && Boolean(s.economy), alchemy: originalHome && Boolean(s.alchemy),
-    atlas: !inEvent || s.world.scrollCount > 0, localMarket: inVillage(s) && !originalHome && Boolean(s.localMarket),
-    sect: inVillage(s) && Boolean(s.sect), tournament: inVillage(s) && Boolean(s.tournament), training: Boolean(s.training?.length || s.spiritSense),
+    atlas: true, localMarket: inVillage(s) && !originalHome && Boolean(s.localMarket),
+    sect: inVillage(s) && Boolean(s.sect), tournament: (inVillage(s) || atTournamentArena) && Boolean(s.tournament), training: Boolean(s.training?.length || s.spiritSense),
   };
   for (const service of services) available[service] = true;
   const eventTabs = ["journey", "atlas", "deduction"];
+  if (atTournamentArena) eventTabs.push("tournament");
   const tab = inEncounter || !available[screen] || (inEvent && !eventTabs.includes(screen)) ? "journey" : screen;
   if (observeShopItems(s, tab)) s = view(state);
   const content = { journey, village, apprentice, cultivate: cultivation, workshop, market, yard, alchemy, quests: questBoard,
@@ -1729,6 +2098,7 @@ function render() {
   }
   for (const button of document.querySelectorAll(".navigation button")) {
     const id = button.dataset.tab;
+    if (id === "village") button.textContent = originalHome ? "村务" : "本地事务";
     button.hidden = inEncounter || id === tab || !available[id] || (inEvent && !eventTabs.includes(id));
   }
   guide.querySelector('[data-tab="training"]').hidden = !available.training || inEncounter || inEvent;
@@ -1738,7 +2108,10 @@ function render() {
   guideDeduction.hidden = !available.deduction;
   main.innerHTML = (dead ? "" : roadPosition(s.roadTrip)) + content[tab](s);
   const nextMap = main.querySelector("[data-atlas-scroll]");
+  atlasResize.disconnect();
   if (nextMap) {
+    updateAtlasViewport(nextMap);
+    atlasResize.observe(nextMap);
     const camera = atlasCameras.get(nextMap.dataset.atlasScroll);
     if (camera) nextMap.scrollTo(camera.x, camera.y);
     else centerAtlasOn(nextMap, nextMap.querySelector(".atlas-mark[aria-pressed='true']"));
@@ -1767,7 +2140,7 @@ function showNotice(lines, warning) {
     toast.append(text);
   }
   notices.append(toast);
-  while (notices.childElementCount > 3) notices.firstElementChild.remove();
+  while (notices.childElementCount > 2) notices.firstElementChild.remove();
   setTimeout(() => toast.remove(), 4400);
 }
 
@@ -1784,12 +2157,7 @@ function feedback(before, after, result, action, presentation, payload) {
       return [`${selling ? "卖出" : "买入"}${traded.name} ×${quantity(traded)}，${selling ? "收到" : "付出"} ${Math.abs(after.coins - before.coins)} 灵钱。`, result.merchantMessage].filter(Boolean);
     }
   }
-  if (result.ok && (action === "econDeposit" || action === "econWithdraw")) {
-    const depositing = action === "econDeposit";
-    const quantity = item => ((after.inventory[item.id] ?? 0) - (before.inventory[item.id] ?? 0)) * (depositing ? -1 : 1);
-    const moved = data.items.find(item => quantity(item) > 0);
-    if (moved) return [`${depositing ? "存入" : "取出"}${moved.name} ×${quantity(moved)}。`];
-  }
+  if (result.ok && (action === "econDeposit" || action === "econWithdraw")) return [result.message];
   if (result.ok && bagTransferActions.includes(action)) {
     const item = itemRows[payload.id];
     const bag = itemRows[payload.bagId];
@@ -1806,7 +2174,7 @@ function feedback(before, after, result, action, presentation, payload) {
     const lost = [banditLoss.coins > 0 && `${banditLoss.coins} 灵钱`, supplies(banditLoss.goods)].filter(Boolean).join("、");
     if (lost) lines.push(`强盗拿走了${lost}。`);
   }
-  if (result.roadCoins > 0) lines.push(`从路上捡到 ${result.roadCoins} 灵钱。`);
+  if (result.roadCoins > 0) lines.push(`收下强盗掉落的 ${result.roadCoins} 灵钱。`);
   if (result.injury?.amount) {
     const cause = result.injury.cause.replace(/[。！]+$/, "");
     lines.push(`${cause}，气血减少 ${result.injury.amount} 点。`);
@@ -1819,13 +2187,14 @@ function feedback(before, after, result, action, presentation, payload) {
     ].filter(Boolean).join(""));
   }
   const acquired = data.items.filter(item => (after.inventory[item.id] ?? 0) > (before.inventory[item.id] ?? 0));
-  const goods = acquired.filter(item => item.kind !== "key" || item.id === "foundation_pill");
-  const clues = acquired.filter(item => item.kind === "key" && item.id !== "foundation_pill");
+  const goods = acquired.filter(item => item.kind !== "key" || item.breakthrough || item.physical);
+  const clues = acquired.filter(item => item.kind === "key" && !item.breakthrough && !item.physical);
   const picking = result.ok && action === "take";
+  const pickingCoins = picking && payload.id === "spirit_coin";
   const gathered = supplies(result.gathered);
-  let narrative = result.message ?? "";
+  let narrative = result.roadStoryResolved ? "" : result.message ?? "";
   const restored = result.medicineRecovery;
-  if (restored || result.enemyMedicineRecovery) narrative = narrative.replace(/(?:气血|神识)回了\d+点。/g, "");
+  if (restored || result.enemyMedicineRecovery) narrative = narrative.replace(/(?:气血|真气|神识)回了\d+点。/g, "");
   const roadEncounter = result.ok && before.roadBandit !== after.roadBandit && presentation.roadTrip?.bandit;
   if (roadEncounter) {
     lines.push(`路上遇见${roadEncounter.name}。`);
@@ -1838,12 +2207,13 @@ function feedback(before, after, result, action, presentation, payload) {
     narrative = narrative.replace(/^你(?:递给他|交出|交了)[^。]+。/, "").replace(/他还要\d+枚。/, "");
   }
   if (result.roadCoins) narrative = narrative.replace(/从他掉下的钱袋里捡到\d+枚灵钱。/, "");
-  if (ate) narrative = narrative.replace(/(?:饱腹|气血)\+\d+(?:\.\d+)?[，。]?/g, "");
+  if (ate) narrative = narrative.replace(/(?:饱腹|气血|真气|神识)\+\d+(?:\.\d+)?[，。]?/g, "");
   if (result.damageDealt || result.damageTaken) {
     narrative = narrative.replace(/(?:造成|你受了|脱身时受了|另造成)\d+点伤(?:害)?。?/g, "")
       .replace(/，造成\d+点反伤。/g, "。").replace(/反击，[。]?/g, "反击。");
   }
   if (acquired.length) narrative = narrative.replace(/获得[^。]+。/g, "");
+  if (goods.length && action === "econCollect") narrative = narrative.replace(/收好[^。]+。/g, "");
   if (picking && acquired.length) narrative = "";
   if (gathered) narrative = narrative.replace(/采得[^。]*，留在脚边。|脚边留下[^。]*。/g, "");
   if (result.injury) narrative = narrative.replace(result.injury.cause, "").replace(/丹毒积重，损失\d+点生命。?/g, "");
@@ -1851,10 +2221,11 @@ function feedback(before, after, result, action, presentation, payload) {
     narrative = narrative.replace(/^(?:抵达[^。]+|在[^。]+遇上[^。]+)。/, "");
   }
   if (result.travelMeals) narrative = narrative.replace(/途中吃了[^。]+。/, "");
-  if (!result.ok || !["batchEat", "restUntilRecovered", "repairMaterials"].includes(action)) narrative = publicText(narrative);
-  narrative = narrative.replace(/^初探此地[，。]?/, "").trim();
+  narrative = narrative.replace(/(?:见识|修为)\s*[+−-]\s*\d+(?:\.\d+)?。?/g, "")
+    .replace(/^初探此地[，。]?/, "").trim();
   if (narrative) lines.push(narrative);
-  const medicineEffect = [restored?.hp > 0 && `气血回了${restored.hp}点。`, restored?.sense > 0 && `神识回了${restored.sense}点。`].filter(Boolean).join("");
+  const medicineEffect = [restored?.hp > 0 && `气血回了${restored.hp}点。`,
+    restored?.qi > 0 && `真气回了${restored.qi}点。`, restored?.sense > 0 && `神识回了${restored.sense}点。`].filter(Boolean).join("");
   if (medicineEffect) lines.push(medicineEffect);
   if (result.enemyMedicineRecovery) lines.push(`对手气血回了${result.enemyMedicineRecovery}点。`);
   if (supplies(result.travelMeals)) lines.push(`途中吃了${supplies(result.travelMeals)}。${result.roadInterrupted ? "停步" : "抵达"}时饱腹 ${Math.floor(after.satiety)} 点。`);
@@ -1868,17 +2239,19 @@ function feedback(before, after, result, action, presentation, payload) {
   if (result.leftOnGround) lines.push(`行囊装不下剩下的，${supplies(result.leftOnGround)}留在脚边。`);
   if (clues.length) lines.push(`得到线索「${clues.map(item => item.name).join("、")}」。`);
   const didRecover = (ate || rested || action === "choose" || action === "use") && after.hp > before.hp && !result.injury;
+  const senseGain = (after.training?.sense ?? 0) - before.sense;
   const changes = [
     didRecover && !restored?.hp && !narrative.includes("气血") && `气血回升 ${after.hp - before.hp} 点`,
-    action === "guard" && after.qi > before.qi && `真气回升 ${after.qi - before.qi} 点`,
-    after.qi > before.qi && (rested || action === "choose" || action === "use") && !narrative.includes("真气") && "真气恢复",
+    after.qi > before.qi && (ate || rested || ["guard", "choose", "use"].includes(action)) && !restored?.qi &&
+      !/真气[^。]*\d+点|\d+点真气/.test(narrative) && `真气回升 ${after.qi - before.qi} 点`,
+    ate && senseGain > 0 && `神识回升 ${senseGain} 点`,
     result.fogLoss > 0 && `浓雾耗去 ${result.fogLoss} 点真气`,
     !result.fogLoss && after.qi < before.qi && ["choose", "visit", "revisit", "weaponSpell", "meditate"].includes(action) && !narrative.includes("真气") && `真气减少 ${before.qi - after.qi} 点`,
     after.satiety > before.satiety && (ate || action === "use") && `饱腹回升 ${Math.floor(after.satiety) - Math.floor(before.satiety)} 点`,
-    action === "restUntilRecovered" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
-    action === "finishGather" && Math.floor(after.satiety) < Math.floor(before.satiety) && `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
+    !roadTravelActions.includes(action) && Math.floor(after.satiety) < Math.floor(before.satiety) && !/饱腹[^。]*\d+点/.test(narrative) &&
+      `饱腹减少 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点`,
     roadTravelActions.includes(action) && !result.travelMeals && Math.floor(after.satiety) < Math.floor(before.satiety) && `赶路消耗 ${Math.floor(before.satiety) - Math.floor(after.satiety)} 点饱腹`,
-    after.coins > before.coins && !result.roadCoins && !banditPaymentActions.includes(action) && action !== "sell" && `获得 ${after.coins - before.coins} 灵钱`,
+    after.coins > before.coins && !pickingCoins && !result.roadCoins && !banditPaymentActions.includes(action) && action !== "sell" && `获得 ${after.coins - before.coins} 灵钱`,
     after.coins < before.coins && ["alchemyBuyFormula", "alchemyAdvance"].includes(action) && `付出 ${before.coins - after.coins} 灵钱`,
   ].filter(Boolean);
   if (changes.length) lines.push(changes.join("，") + "。");
@@ -1903,8 +2276,7 @@ function confirmDisposal(options, message) {
   const verb = options.action === "discard" ? "放下" : unpacking ? "拆篓取药" : "卖出";
   disposal.querySelector("#disposal-title").textContent = `确认${verb}`;
   disposal.querySelector("[data-disposal-item]").textContent = options.name;
-  disposal.querySelector("#disposal-description").textContent = options.action === "discard"
-    ? `这件物品无法重新取得。放下后仍可回${options.placeName}找。` : message;
+  disposal.querySelector("#disposal-description").textContent = message;
   const quantity = disposal.querySelector('[name="count"]');
   quantity.closest("label").hidden = unpacking;
   quantity.value = options.count;
@@ -1920,10 +2292,12 @@ function closeDisposal() {
 }
 
 function performAction(action, payload) {
+  const beforeScreen = screen;
   const before = {
+    region: state.region, event: state.event, victory: state.victoryPending, trip: state.roadTrip,
     inventory: { ...state.inventory }, discovered: [...state.discovered],
     banditLeads: [...(state.banditLeads ?? [])], roadBandit: state.roadBandit, combat: state.combat,
-    hp: state.hp, qi: state.qi, satiety: state.satiety, coins: state.coins,
+    hp: state.hp, qi: state.qi, satiety: state.satiety, coins: state.coins, sense: state.training?.sense ?? 0,
   };
   const result = act(state, action, payload);
   if (result.confirmation) {
@@ -1937,7 +2311,7 @@ function performAction(action, payload) {
   if (readyToDeduce || concluded) screen = "deduction";
   if (concluded) {
     deductionHistoryOpen = true;
-    openDeductions.add(payload.id);
+    openDeduction = payload.id;
   }
   const transferred = result.ok && instantRoutes.includes(action);
   if ((result.ok && roadTravelActions.includes(action)) || ["visit", "choose", "leave", "revisit", "resume"].includes(action) || transferred) screen = "journey";
@@ -1959,8 +2333,11 @@ function performAction(action, payload) {
   const lines = feedback(before, state, result, action, presentation, payload);
   const newThreat = before.roadBandit !== state.roadBandit && presentation.roadTrip?.bandit?.fightAllowed;
   showNotice(lines, Boolean(result.injury || result.damageTaken || result.banditLoss || presentation.mode === "death" || newThreat || !result.ok));
+  const sceneChanged = before.region !== state.region || before.event !== state.event || before.combat !== state.combat ||
+    Boolean(before.trip) !== Boolean(state.roadTrip) || before.victory !== state.victoryPending;
+  if (result.ok && (sceneChanged || beforeScreen !== screen || transferred || action === "mechanismTry" ||
+      action === "experiment" || (before.combat && action === "use"))) window.scrollTo(0, 0);
   if (transferred) showTransfer();
-  if ([...roadTravelActions, "visit", "choose", "revisit"].includes(action)) main.scrollIntoView({ block: "nearest" });
 }
 
 function runGatherProgress(job) {
@@ -2008,6 +2385,12 @@ document.addEventListener("input", event => {
 
 document.addEventListener("submit", event => {
   const form = event.target;
+  if (form.dataset.quantityAction) {
+    event.preventDefault();
+    const count = Number(new FormData(form).get("count"));
+    if (Number.isSafeInteger(count) && count > 0) performAction(form.dataset.quantityAction, { id: form.dataset.quantityItem, count });
+    return;
+  }
   if (form.hasAttribute("data-disposal-confirm")) {
     event.preventDefault();
     if (!pendingDisposal) return;
@@ -2034,6 +2417,20 @@ document.addEventListener("submit", event => {
 });
 
 disposal.addEventListener("cancel", () => { pendingDisposal = null; });
+
+const sideBySideKit = matchMedia("(min-width: 611px)");
+function placeKitTip(trigger) {
+  if (!sideBySideKit.matches || !trigger || trigger.getAttribute("aria-expanded") === "true") return;
+  const tip = trigger.nextElementSibling;
+  if (!tip?.classList.contains("item-tip")) return;
+  const left = Math.max(8, kit.getBoundingClientRect().left - tip.offsetWidth - 8);
+  const top = Math.max(8, Math.min(trigger.getBoundingClientRect().top, window.innerHeight - tip.offsetHeight - 8));
+  tip.style.setProperty("--kit-tip-left", `${left}px`);
+  tip.style.setProperty("--kit-tip-top", `${top}px`);
+}
+kit.addEventListener("pointerover", event => placeKitTip(event.target.closest(".item-trigger")));
+kit.addEventListener("focusin", event => placeKitTip(event.target.closest(".item-trigger")));
+kit.addEventListener("scroll", () => placeKitTip(kit.querySelector(".item-trigger:hover, .item-trigger:focus-visible")), { passive: true });
 
 kit.addEventListener("contextmenu", event => {
   const trigger = event.target.closest("button[data-bag-action]");
@@ -2112,6 +2509,8 @@ document.addEventListener("keydown", event => {
 });
 
 document.addEventListener("click", event => {
+  const measuringSection = event.target.closest("[data-sect-section]");
+  if (measuringSection) measuringSectionsOpen.set(measuringSection.dataset.sectSection, !measuringSection.parentElement.open);
   const observation = event.target.closest(".field-note > summary");
   if (observation && state.combat) combatObservation = observation.parentElement.open ? null : state.combat;
   const summary = event.target.closest("summary[data-kit-section]");
@@ -2125,10 +2524,9 @@ document.addEventListener("click", event => {
   const deductionSummary = event.target.closest("[data-deduction-record] > summary");
   if (deductionSummary) {
     const record = deductionSummary.parentElement;
-    if (record.open) openDeductions.delete(record.dataset.deductionRecord);
-    else openDeductions.add(record.dataset.deductionRecord);
+    openDeduction = record.open ? null : record.dataset.deductionRecord;
   }
-  const button = event.target.closest("button, .atlas-road[data-atlas-edge]");
+  const button = atlasRoadUnderPointer(event.target.closest("button, .atlas-road[data-atlas-edge]"), event);
   if (!button) return;
   if (button.hasAttribute("data-skip-opening")) {
     dismissOpening();
@@ -2208,6 +2606,8 @@ document.addEventListener("click", event => {
     state = freshGame();
     screen = "journey";
     marketMode = "buy";
+    measuringSectMode = "main";
+    measuringSectionsOpen.clear();
     activeFacility = "warehouse";
     kitSectionOpen.clear();
     atlasProvince = null;
@@ -2223,7 +2623,7 @@ document.addEventListener("click", event => {
     for (const topic of guide.querySelectorAll("details")) topic.open = false;
     meditationClue = null;
     deductionHistoryOpen = false;
-    openDeductions.clear();
+    openDeduction = null;
     experimentDrafts.clear();
     notices.replaceChildren();
     if (encyclopedia.open) encyclopedia.close();
@@ -2240,6 +2640,11 @@ document.addEventListener("click", event => {
     render();
     return;
   }
+  if (button.dataset.sectMode) {
+    measuringSectMode = button.dataset.sectMode;
+    render();
+    return;
+  }
   if (button.dataset.facility) {
     activeFacility = button.dataset.facility;
     render();
@@ -2247,7 +2652,20 @@ document.addEventListener("click", event => {
   }
   if (button.dataset.atlasZoom) {
     const viewport = button.closest(".atlas-frame").querySelector("[data-atlas-scroll]");
-    changeAtlasZoom(viewport, Number(button.dataset.atlasZoom));
+    const choice = button.dataset.atlasZoom;
+    changeAtlasZoom(viewport, choice === "fit" ? choice : Number(choice));
+    return;
+  }
+  if (button.hasAttribute("data-atlas-road-info")) {
+    const detail = main.querySelector("#atlas-edge-detail");
+    detail?.scrollIntoView({ block: "center" });
+    detail?.querySelector("button:enabled")?.focus({ preventScroll: true });
+    return;
+  }
+  if (button.hasAttribute("data-atlas-clear-edge")) {
+    atlasEdge = null;
+    render();
+    main.querySelector("[data-atlas-scroll]")?.focus({ preventScroll: true });
     return;
   }
   if (button.dataset.atlasProvince) {
@@ -2255,6 +2673,7 @@ document.addEventListener("click", event => {
     atlasPoint = null;
     atlasEdge = null;
     render();
+    revealAtlas();
     (main.querySelector('.atlas-map [aria-pressed="true"]') ?? main.querySelector("[data-atlas-overview]"))?.focus({ preventScroll: true });
     return;
   }
@@ -2264,6 +2683,7 @@ document.addEventListener("click", event => {
     atlasPoint = null;
     atlasEdge = null;
     render();
+    revealAtlas();
     main.querySelector(`[data-atlas-province="${CSS.escape(province)}"]`)?.focus({ preventScroll: true });
     return;
   }
@@ -2283,14 +2703,14 @@ document.addEventListener("click", event => {
   }
   if (button.dataset.atlasEdge) {
     const fromList = Boolean(button.closest(".atlas-road-index"));
-    atlasEdge = atlasRoadUnderPointer(button, event).dataset.atlasEdge;
+    atlasEdge = button.dataset.atlasEdge;
     render();
     const detail = main.querySelector("#atlas-edge-detail");
     const road = main.querySelector(`.atlas-map [data-atlas-edge="${CSS.escape(atlasEdge)}"]`);
     const scroll = road?.closest("[data-atlas-scroll]");
     if (fromList && scroll) centerAtlasOn(scroll, road);
-    (detail?.querySelector("button:enabled") ?? road)?.focus({ preventScroll: true });
-    detail?.scrollIntoView({ block: "nearest" });
+    (fromList ? detail?.querySelector("button:enabled") ?? road : road)?.focus({ preventScroll: true });
+    if (fromList) detail?.scrollIntoView({ block: "nearest" });
     return;
   }
   if (button.dataset.tab) {
@@ -2305,6 +2725,8 @@ document.addEventListener("click", event => {
       act(state, "showHideToSmith");
     }
     render();
+    if (screen === "atlas" || screen === "deduction") revealAtlas();
+    else window.scrollTo(0, 0);
     return;
   }
   const action = button.dataset.action;

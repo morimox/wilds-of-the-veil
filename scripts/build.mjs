@@ -4,13 +4,16 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const file = async path => (await readFile(new URL(path, root), "utf8")).replace(/\r\n/g, "\n");
-const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, geography, world, training, data, economy, alchemy, ferry, hazards, caravan, employers, border, hunts, dyke, ridge, kit, innerStyles, banditContentSource, banditTaleSource, encyclopediaSource, recoverySource, bandits, tactics, deductions, westQuests, eastQuests, combatBalance, spiritCombat, engine, app] = await Promise.all([
+const [html, style, intro, river, zhao, sand, late, puzzles, mechanisms, tournament, measuringSect, geography, world, training, data, economy, alchemy, ferry, hazards, caravan, employers, border, hunts, dyke, ridge, kit, innerStyles, banditContentSource, banditTaleSource, encyclopediaSource, recoverySource, bandits, tactics, deductions, westQuests, eastQuests, combatBalance, enemyRanks, enemyHumans, enemyEncounters, materialValues, marketPrices, craftValues, foePayout, spiritCombat, engine, app] = await Promise.all([
   file("game.html"), file("style.css"), file("intro.css"), file("river-content.mjs"), file("zhao-content.mjs"), file("sand-content.mjs"),
-  file("late-content.mjs"), file("puzzle-content.mjs"), file("mechanisms.mjs"), file("tournament.mjs"), file("atlas-geography.mjs"), file("world.mjs"), file("training.mjs"), file("data.mjs"), file("economy.mjs"),
+  file("late-content.mjs"), file("puzzle-content.mjs"), file("mechanisms.mjs"), file("tournament.mjs"), file("measuring-sect.mjs"), file("atlas-geography.mjs"), file("world.mjs"), file("training.mjs"), file("data.mjs"), file("economy.mjs"),
   file("alchemy.mjs"), file("ferry-content.mjs"), file("hazards.mjs"), file("caravan-content.mjs"),
   file("employers-content.mjs"), file("border-content.mjs"), file("hunt-materials.mjs"), file("dyke-armory.mjs"), file("ridge-armory.mjs"),
   file("explorer-kit.mjs"), file("inner-style-content.mjs"), file("bandit-content.mjs"), file("bandit-tale-content.mjs"), file("encyclopedia-content.mjs"), file("progression-recovery.mjs"),
-  file("bandits.mjs"), file("combat-tactics.mjs"), file("sandbox-deductions.mjs"), file("sandbox-quests-west.mjs"), file("sandbox-quests-east.mjs"), file("combat-balance.mjs"), file("spirit-combat.mjs"), file("engine.mjs"), file("app.mjs"),
+  file("bandits.mjs"), file("combat-tactics.mjs"), file("sandbox-deductions.mjs"), file("sandbox-quests-west.mjs"), file("sandbox-quests-east.mjs"), file("combat-balance.mjs"),
+  file("enemy-rank-bands.mjs"), file("enemy-roaming-human.mjs"), file("enemy-encounters.mjs"),
+  file("economy-material-values.mjs"), file("economy-price-ladder.mjs"), file("economy-craft-values.mjs"), file("economy-foe-payout.mjs"),
+  file("spirit-combat.mjs"), file("engine.mjs"), file("app.mjs"),
 ]);
 const originalCss = `${style}\n${intro}`;
 const destination = process.argv[2] ? resolve(process.argv[2]) : fileURLToPath(new URL("dist/雾渡山河.html", root));
@@ -54,6 +57,10 @@ return puzzleContent;
 const { tournamentContent, tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution } = (() => {
 ${moduleBody(tournament)}
 return { tournamentContent, tournamentData, initialTournament, tournamentView, tournamentAction, tournamentResolution };
+})();
+const { measuringSectData, measuringSectContent, measuringSectView, measuringSectAction, measuringAffiliation, measuringPatrolFactor, beginMeasuringManagement } = (() => {
+${moduleBody(measuringSect)}
+return { measuringSectData, measuringSectContent, measuringSectView, measuringSectAction, measuringAffiliation, measuringPatrolFactor, beginMeasuringManagement };
 })();
 const ferryContent = (() => {
 ${moduleBody(ferry)}
@@ -127,6 +134,39 @@ const { tuneCombatData } = (() => {
 ${moduleBody(combatBalance)}
 return { tuneCombatData };
 })();
+const { applyEnemyRanks } = (() => {
+${moduleBody(enemyRanks)}
+return { applyEnemyRanks };
+})();
+const { rollHumanLoadout } = (() => {
+${moduleBody(enemyHumans)}
+return { rollHumanLoadout };
+})();
+const { rollEnemyIndividual, variesAtSite } = (() => {
+${moduleBody(enemyEncounters)}
+return { rollEnemyIndividual, variesAtSite };
+})();
+const { applyMaterialEconomy, materialDemandRules, materialBuyback } = (() => {
+${moduleBody(materialValues)}
+return { applyMaterialEconomy, materialDemandRules, materialBuyback };
+})();
+const { applyMarketPriceLadder } = (() => {
+${moduleBody(marketPrices)}
+return { applyMarketPriceLadder };
+})();
+const { applyCraftValueEconomy } = (() => {
+${moduleBody(craftValues)}
+return { applyCraftValueEconomy };
+})();
+const { foePurseReward } = (() => {
+${moduleBody(foePayout)}
+return { foePurseReward };
+})();
+const economyModule = (() => {
+${moduleBody(economy)}
+return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem, containerCarryReason, tradeCapacityReason, tradeQuantityOptions };
+})();
+const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem, containerCarryReason, tradeCapacityReason, tradeQuantityOptions } = economyModule;
 const moduleData = (() => {
 ${moduleBody(data)}
 return { default: data, ...data };
@@ -156,11 +196,6 @@ const { initialMechanisms, mechanismView, mechanismAction } = (() => {
 ${moduleBody(mechanisms)}
 return { initialMechanisms, mechanismView, mechanismAction };
 })();
-const economyModule = (() => {
-${moduleBody(economy)}
-return { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem, containerCarryReason };
-})();
-const { economyData, initialEconomyState, economyView, economyAction, recordPurchase, marketStock, merchantInfo, backpackCapacity, backpackName, saleQuote, saleTotal, recordSale, containerHasItem, containerCarryReason } = economyModule;
 const { alchemyData, initialAlchemyState, alchemyView, alchemyAction } = (() => {
 ${moduleBody(alchemy)}
 return { alchemyData, initialAlchemyState, alchemyView, alchemyAction };

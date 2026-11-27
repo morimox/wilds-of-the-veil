@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { data } from './data.mjs';
 import { act, createGame, rules, view } from './engine.mjs';
 import { stageRetreatOpening } from './game-test-fixtures.mjs';
+import { chooseEnemyIntent } from './combat-tactics.mjs';
 
 function play(state, action, payload) {
   const result = act(state, action, payload);
@@ -102,4 +103,18 @@ test('a spell-only enemy spends its own finite Qi and has to take a turn to reco
     }
   }
   assert.fail('The enemy never spent Qi after recovering');
+});
+
+test('human opponents cannot heal by breathing once their Qi runs out', () => {
+  const healers = data.enemies.filter((enemy) => enemy.tags.includes('human')
+    && enemy.intents.some((intent) => intent.kind === 'heal'));
+  const warden = healers.find((enemy) => enemy.id === 'border_rope_warden');
+  assert.ok(warden);
+  assert.equal(warden.qi, 16);
+  for (const enemy of healers) {
+    const recovery = enemy.intents.filter((intent) => intent.kind === 'heal');
+    assert.ok(recovery.every((intent) => intent.qiCost > 0 && intent.qiCost <= enemy.qi), enemy.id);
+    const choice = chooseEnemyIntent(enemy, { round: 2, hp: 1, qi: 0, rng: 0.5 });
+    assert.notEqual(choice.kind, 'heal', enemy.id);
+  }
 });

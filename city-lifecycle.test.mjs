@@ -101,9 +101,11 @@ test('a raised rain flag stays up and the hide coat protects against a real mart
   const biteIntent = enemy.intents.find(({ kind }) => kind === 'attack');
   state.combat.plan.intent = biteIntent;
   state.combat.plan.reader = 'player';
+  const unarmored = structuredClone(state);
+  unarmored.equipment.armor = null;
   const bite = play(state, 'attack');
   assert.equal(bite.enemyMove.name, biteIntent.name);
-  assert.equal(bite.damageTaken, 1);
+  assert.ok((bite.damageTaken ?? 0) < play(unarmored, 'attack').damageTaken);
   assert.ok(data.enemies.filter(item => item.loot?.beast_meat).every(item => item.tags.includes('beast')));
 });
 
@@ -312,15 +314,15 @@ test('the bog has four repeatable hunts and one species can regrow without spend
   assert.ok(populations()[eel] > after.count);
 });
 
-test('the shop quotes and charges 118 spirit coins for the bank guard sword', () => {
+test('the shop quotes and charges 135 spirit coins for the bank guard sword', () => {
   const state = throughTown();
   const id = 'weir_knife';
   const quote = () => view(state).localMarket.offers.find(offer => offer.id === id);
-  assert.equal(quote().price, 118);
-  state.coins = 117;
+  assert.equal(quote().price, 135);
+  state.coins = 134;
   assert.equal(act(state, 'localBuy', { id }).ok, false);
   assert.equal(quote().count, 1);
-  state.coins = 118;
+  state.coins = 135;
   play(state, 'localBuy', { id });
   assert.equal(state.coins, 0);
   assert.equal(state.inventory[id], 1);

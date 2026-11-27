@@ -174,6 +174,30 @@ test('fixing the flow while the warning is still in effect resolves it immediate
   assert.equal(offer(state, 'divert'), undefined);
 });
 
+test('a traveler can watch the herd arrive and leave without walking away or spending extra time', () => {
+  const state = reported(undefined, true);
+  job(state, 'move');
+  job(state, 'brace');
+  const incident = state.hazards[hazardData.id];
+  const start = state.day;
+  const satiety = state.satiety;
+  assert.match(offer(state, 'watch').label, /等兽群下来/);
+  job(state, 'watch');
+  assert.equal(state.day, incident.starts);
+  assert.equal(state.region, inn);
+  assert.equal(view(state).localHazard.phase, 'surge');
+  assert.equal(state.satiety, Math.max(0, satiety - (incident.starts - start) * 16));
+
+  assert.match(offer(state, 'watch').label, /等兽群散去/);
+  job(state, 'watch');
+  assert.equal(state.day, incident.ends);
+  assert.equal(view(state).localHazard.phase, 'aftermath');
+  assert.equal(offer(state, 'watch'), undefined);
+  const coins = state.coins;
+  job(state, 'settle');
+  assert.equal(state.coins - coins, jobs.move.reward + jobs.brace.reward);
+});
+
 test('sheltered people do not build pressure while exposed errands still do', () => {
   const indoor = at(inn);
   for (let i = 0; i < 4; i++) {

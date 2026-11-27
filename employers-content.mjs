@@ -5,7 +5,7 @@ const items = [
   key('zhao_cargo_receipt', '搁浅货船的收货条', '徐篙收下了前两批货。船板上总共刻了三笔，徐篙把最后一批的去向写在收货条背面。'),
   key('zhao_cargo_ledger', '押船人的发货账簿', '礁边油布里取出的一本发货账簿。夹页写着哪一户的米换成了沙袋。池秋在城里等这份簿子，好给各家按原账还货。'),
   key('zhao_sluice_agreement', '修水闸用的布牌', '谷惟给的布牌，绑在手上，连环浅洲的闸工就认识你。牌背写着做下水背带用的松枝和兽革。'),
-  key('zhao_sluice_receipt', '浅洲水闸的试水回条', '樊娘试过水闸，盖了拇指印。卡住闸板的碎石来自缺轮磨台，她在回条背面画了磨台的引水口。'),
+  key('zhao_sluice_receipt', '浅洲水闸的试水回条', '樊娘试过水闸，在回条上按了指印。背面画着从蛙背塘沿岸到水藻泥湾，再顺石槽去缺轮磨台的路。'),
   key('zhao_sluice_witness', '磨坊的通水回条', '樊娘试过水才签了条。两道闸都通了，把回条交给照原城的谷惟，她就能安排给田里放水。'),
   { id: 'zhao_cargo_brace', name: '缠绳护腕', kind: 'gear', price: 0, sell: 25, keepOnFall: true, oneOfAKind: true,
     desc: '码头押货人用的厚护腕。皮环里缠着船索，用空着的那只手格挡也稳。' },
@@ -62,16 +62,22 @@ const fixed = (count) => ({ start: count, cap: count });
 const fight = (label, desc, enemy, extra = {}) => ({ label, desc, enemy, days: 0.125, ...extra });
 
 scene('zhao_city', 'zhao_public_scales', '码头的公秤房',
-  '两个木盘搁在大秤旁。池秋把一袋掺了沙的米倒进左盘，谷惟把泡烂的闸门背带搁在右盘。两人都缺帮手，出城的小舟眼下只开一趟。', [
-    { label: '押十四枚灵钱，接池秋的护货差事', desc: '池秋要你去碎琉璃滩帮徐篙守货。她借出一套吊货绳钩，收十四枚押钱。把货和绳钩还来就退，出门领粮和药膏。',
-      days: 0.125, coins: -14, loot: { zhao_cargo_agreement: 1, ration: 3, salve: 1 }, excludesChoices: [1], stay: true,
-      outcome: '池秋数了钱，把吊货绳钩交给出城的徐篙保管。她从船票上撕下半张给你。「碎琉璃滩晒网上系着红布，认带红布的货船。」' },
-    { label: '给谷惟备齐材料，接下修闸差事', desc: '谷惟需要两份松枝和一张兽革，好给下水的人做背带。她备了干粮和丹药，要你跟樊娘查清是哪儿堵了水。',
-      days: 0.125, need: { wood: 2, hide: 1 }, consume: true, loot: { zhao_sluice_agreement: 1, ration: 2, heal_pill: 2 }, excludesChoices: [0], stay: true,
-      outcome: '谷惟把兽革摊开，量好能裁出的两条长带，又用松枝搭住缝架。她把丹药和布牌给你。「去连环浅洲，找绑了旧竹筏的浅水口。樊娘在那里。」' },
-  ], { once: [0, 1], afterOnceText: {
-    0: '池秋将你的半张号票摁在账本下，另一盘已经腾空，谷惟去找她另约的下水人了。船行柜就在秤房外，各家在那里收货条。',
-    1: '新背带在秤边上了油。谷惟裹好带子，托樊娘下水时穿上。池秋挑着米袋去了另一条货船。各家收工的单子记在秤房外的柜上。',
+  '池秋往秤里倒了一把掺沙的米，谷惟提着泡烂的闸门背带。窗下的小舟等着接跑差的人。池秋说：「两桩事各缺个人。你若肯领一桩，另一桩我让码头的人去办。」', [
+    { label: '押十四枚灵钱，接池秋的护货差事', desc: '池秋要你去碎琉璃滩帮徐篙守货。徐篙领用吊货的绳钩，你先押十四枚灵钱。等他收齐这趟货、把绳钩锁回箱里，拿他的收货条回这里领脚钱和押钱。',
+      days: 0.125, coins: -14, loot: { zhao_cargo_agreement: 1, ration: 3, salve: 1 }, excludesChoices: [1], hideWhenExcluded: true, stay: true,
+      outcome: '池秋数了押钱，从船票上撕下半张给你。「徐篙拿着绳钩，守着晒网上扎红布的那条船。」谷惟把烂背带卷起来，出门找值船的闸工去了。' },
+    { label: '给谷惟松木和兽革，接下修闸差事', desc: '谷惟要两份松木搭缝架、一张兽革做下水背带。她备了干粮和丹药，要你跟樊娘查清哪儿堵了水。试完水，拿樊娘签的条子回来找她。',
+      days: 0.125, need: { wood: 2, hide: 1 }, consume: true, loot: { zhao_sluice_agreement: 1, ration: 2, heal_pill: 2 }, excludesChoices: [0], hideWhenExcluded: true, stay: true,
+      outcome: '谷惟把兽革摊在案上，量出两条长带。她把丹药和布牌交给你。「到连环浅洲认绑旧竹筏的浅水口，樊娘在那里。」池秋把护货的船票交给了等在窗外的脚夫。' },
+  ], { once: [0, 1], localQuests: ['zhao_cargo_front_pay', 'zhao_cargo_deep_pay', 'zhao_sluice_front_pay', 'zhao_sluice_deep_pay'],
+  afterQuestText: {
+    zhao_cargo_front_pay: '池秋在第一张收货条上盖过印，又把押钱一栏划清。她翻到后面一页，第三批货另记在上面。',
+    zhao_cargo_deep_pay: '池秋摊着第三批货的发货簿。旧账边夹了张新纸，写的是各家该补回的米。柜下还放着徐篙那趟货的账本。',
+    zhao_sluice_front_pay: '谷惟收好了浅洲闸的试水条。窗下有几个拿着铁锹的田户，正等她指哪一条田沟先清。',
+    zhao_sluice_deep_pay: '谷惟把磨坊回条压在新写的放水时辰旁，正给排队来认田的人念木牌。浅洲闸另有它的账，放在秤边。',
+  }, afterOnceText: {
+    0: '池秋将自己的半张船票夹在账本里。「徐篙到了岸上会认你这半张。回来的收货条，拿到这里给我。」',
+    1: '谷惟给新缝的背带抹了油，裹起来托人送给樊娘。「她试过前闸就会签条子，你带回来给我看。」',
   } });
 
 scene('glass_bank', 'zhao_cargo_pole', '晒网外的搁浅货船',
@@ -95,8 +101,9 @@ scene('beacon_reefs', 'zhao_cargo_blue_reef', '礁灯下的搭板',
     { label: '踩到外段搭板，扯开挂帘', desc: '门帘是用米袋缝的，蓝布绳头从底下传进去。通船的搭板仍有人守着。',
       guardedBy: ['zhao_cargo_shield', 'zhao_cargo_hook'], days: 0.125, stay: true,
       outcome: '搭板晃了两下。帘后有人正把秤砣塞进空米袋，他扣住手边长刀，伙计喊了一声「马四」。发货账簿压在船头油布下面。' },
-    fight('登船拦住马四', '马四守在油布前，长刀能越过半条船板。下到礁背的搭板仍在身后。', 'zhao_cargo_keeper', { afterChoice: 2 }),
-    { label: '松开蓝布绳，把货和发货账簿交给接船人', desc: '绳上扣住了第三批的米袋。私船沉下去半边，压货的簿子还没有沾水。', afterFight: 'zhao_cargo_keeper',
+    fight('登船拦住马四', '马四守在油布前，长刀能越过半条船板。下到礁背的搭板仍在身后。', 'zhao_cargo_keeper',
+      { afterChoice: 2, hideAfterFight: 'zhao_cargo_keeper' }),
+    { label: '把货搬上接船人的船，带走发货账簿', desc: '蓝布绳扣住第三批米袋。船头油布底下还干着，簿子压在边角。', afterFight: 'zhao_cargo_keeper',
       days: 0.375, stay: true, loot: { zhao_cargo_ledger: 1 },
       outcome: '徐篙的接船人从礁背探过篙，把三根缆接到自己船上。你掀开油布取出发货账簿，他将米袋逐一搬过去，要你把簿子带回照原城给池秋。' },
   ], { afterChoices: ['zhao_cargo_pole:2'], once: [2, 4], afterOnceText: {
@@ -109,11 +116,11 @@ scene('beacon_reefs', 'zhao_cargo_blue_reef', '礁灯下的搭板',
 
 scene('ring_isles', 'zhao_sluice_outer_isle', '竹筏下的浅洲闸',
   '旧竹筏只拴在岸上。樊娘倚着木桩扣紧背带，另一手试着扳一根伸出水面的横柄。闸板下面咯了一声，浅水里涌过一泡泥浆。', [
-    fight('踩上木桩，赶开缠住闸柱的青鳗', '青影在木桩下绕过，尾巴一抽，横柄就在樊娘手里晃。', 'zhao_sluice_eel'),
+    fight('踩上木桩，截住缠在闸柱上的青鳗', '青影在木桩下绕过，尾巴一抽，横柄就在樊娘手里晃。', 'zhao_sluice_eel'),
     fight('扶住筏头，冲散贴板的水影', '两块坏木板浮在筏边，一团贴着板缝摆动的水始终没流走。', 'zhao_sluice_echo'),
     { label: '按住横柄，让樊娘试着开闸', desc: '樊娘试过新背带。得先把闸板和撑脚的竹筏都空出来，她才能伸手清闸槽。',
       guardedBy: ['zhao_sluice_eel', 'zhao_sluice_echo'], days: 0.375, stay: true, loot: { zhao_sluice_receipt: 1 },
-      outcome: '樊娘从槽里摸出一片缺了角的青石，闸板终于能动。「缺轮磨台用的就是这种石头，怕是那边也堵了。」她在试水回条背面画下磨台的引水口，给你指了沿岸去水藻泥湾的路。' },
+      outcome: '樊娘从槽里摸出一片缺了角的青石，闸板终于能动。「缺轮磨台的石头就是这个色，当心上头也堵了。」她在回条背面画了两笔。「出了浅洲回蛙背塘，贴岸走到水藻泥湾。瞧见砖槽，顺着它就到磨台。我去木梯边等你。」' },
   ], { reveal: { item: 'zhao_sluice_agreement' }, once: [2], afterOnceText: {
     2: '浅洲闸已经能开半扇，来接班的闸工坐在竹筏边等水位降下去。樊娘带着新背带和一把锤子去缺轮磨台了。',
   }, creatureText: {
@@ -123,12 +130,13 @@ scene('ring_isles', 'zhao_sluice_outer_isle', '竹筏下的浅洲闸',
 
 scene('jade_mill', 'zhao_sluice_mill_intake', '石磨后面的引水口',
   '石磨背面露出旧砖槽。槽边有条踩得泛白的浅沿，木梯搭进槽底，梯下的水被一排大石堵住。樊娘在上方的木梯旁等你。', [
-    fight('沿石槽边走，赶开水里的大鱼', '大鱼的背鳞和周围石块一个颜色，动了才看得见。', 'zhao_sluice_wash'),
+    fight('沿石槽边走，迎上水里的大鱼', '大鱼的背鳞和周围石块一个颜色，动了才看得见。', 'zhao_sluice_wash'),
     fight('等水轮转过来，迎上水里的影子', '水轮缺了一角。一片影子沿着砖槽逆水翻滚。', 'zhao_sluice_shade'),
     { label: '扶好木梯，下去查看堵水的石板', desc: '木梯只搭到槽里。梯脚四周的水得安静些才站得住。',
       guardedBy: ['zhao_sluice_wash', 'zhao_sluice_shade'], days: 0.125, stay: true,
       outcome: '一片大石从梯下拱起来，几道裂缝合拢，截住流往槽底的水。樊娘抓牢梯顶。「这块自己能动。空出石缝之后，还要一块寒铁卡住它挤歪的支脚。」' },
-    fight('站上梯下的槽沿，把活石从水口引开', '石上的裂缝一开一合，水向里倒流。木梯能原样爬上去。', 'zhao_sluice_anchor', { afterChoice: 2 }),
+    fight('站上梯下的槽沿，把活石从水口引开', '石上的裂缝一开一合，水向里倒流。木梯能原样爬上去。', 'zhao_sluice_anchor',
+      { afterChoice: 2, hideAfterFight: 'zhao_sluice_anchor' }),
     { label: '用寒铁把偏掉的支脚卡回槽里', desc: '活石退到梯外，歪掉的支脚还没受力。樊娘把小锤从木梯上递下来。', afterFight: 'zhao_sluice_anchor',
       days: 0.375, need: { ore: 1 }, consume: true, stay: true, loot: { zhao_sluice_witness: 1 },
       outcome: '你塞进寒铁，樊娘用锤背敲了三次，支脚和槽口终于贴齐。她下梯摸了摸穿过石缝的水，湿手指在通水回条上按印，请你回照原找谷惟结账。' },

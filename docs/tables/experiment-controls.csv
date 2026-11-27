@@ -14,7 +14,7 @@
 那只贴岩的手（read_echo）,回声石洞（stone_niche）,hand,手怎么放,hover,手悬在岩面前,否,你听见铃响，却只觉得手前有阵冷风。
 那只贴岩的手（read_echo）,回声石洞（stone_niche）,hand,手怎么放,palm,用掌心贴住岩面,是,
 那只贴岩的手（read_echo）,回声石洞（stone_niche）,beat,什么时候把气往下沉,first,刚听见铃响时,否,你先沉了气。等洞里那一声传来，手掌已经松了力。
-那只贴岩的手（read_echo）,回声石洞（stone_niche）,beat,什么时候把气往下沉,second,听见第二声回响时,是,
+那只贴岩的手（read_echo）,回声石洞（stone_niche）,beat,什么时候把气往下沉,second,听到洞里传来的第二声时,是,
 那只贴岩的手（read_echo）,回声石洞（stone_niche）,beat,什么时候把气往下沉,quiet,两声都消失以后,否,你再把气沉下去，洞里只剩细细的摩擦声，手掌一点震动也没摸到。
 瓦上反字（trace_backwash）,没篷的渡舟（boat_shade）,tile,瓦上有字的一面朝哪儿,fire,朝着灯火,否,烟很快熏黑了刻字的一面，瓦上的纹路都看不清了。
 瓦上反字（trace_backwash）,没篷的渡舟（boat_shade）,tile,瓦上有字的一面朝哪儿,away,背对灯火,是,
@@ -66,8 +66,8 @@
 磨台下的干门（mill_dry_workbench）,横卧的半边磨轮（zhao_old_wheel）,wedge,木楔怎么放,flat,把木楔宽面垫在岸门门框底下,是,
 磨台下的干门（mill_dry_workbench）,横卧的半边磨轮（zhao_old_wheel）,ring,门环往哪里抬,land,沿门缝往岸上抬，再向外拉,是,
 磨台下的干门（mill_dry_workbench）,横卧的半边磨轮（zhao_old_wheel）,ring,门环往哪里抬,water,往引水槽那头横着拽,否,铁环斜着咬紧了石缝，你扶回原位才把环松开。
-火道口该留哪一道缝（east_kiln_ash）,挂湿帘的窑棚（zhao_firedoor）,cloth,湿帘垂到哪里,ground,垂到地面,是,
-火道口该留哪一道缝（east_kiln_ash）,挂湿帘的窑棚（zhao_firedoor）,cloth,湿帘垂到哪里,raised,保留帘脚的空隙,否,烟倒是往上走了，火舌还是从帘脚探出来。马荻伸脚把泥盆推远。
+火道口该留哪一道缝（east_kiln_ash）,挂湿帘的窑棚（zhao_firedoor）,cloth,窑棚的长帘垂到哪里,ground,垂到地面,是,
+火道口该留哪一道缝（east_kiln_ash）,挂湿帘的窑棚（zhao_firedoor）,cloth,窑棚的长帘垂到哪里,raised,保留帘脚的空隙,否,烟倒是往上走了，火舌还是从帘脚探出来。马荻伸脚把泥盆推远。
 火道口该留哪一道缝（east_kiln_ash）,挂湿帘的窑棚（zhao_firedoor）,vent,把哪一道窄缝留作出气口,crown,窑口上沿,是,
 火道口该留哪一道缝（east_kiln_ash）,挂湿帘的窑棚（zhao_firedoor）,vent,把哪一道窄缝留作出气口,base,墙根,否,贴地的火往外一舔，泥面上马上多了一道红边。马荻用长柄把火拨回去。
 干台下面的第二道水（east_second_drain）,铜槽旁（zhao_submerged_table）,seal,木塞安在哪里,foot,干台脚下的低孔,是,
@@ -97,8 +97,8 @@
 秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,sack,拿哪只来称空袋重,wet,刚沥过的湿袋连系绳,是,
 秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,sack,拿哪只来称空袋重,dry,晒干的空袋连系绳,否,邢茧把盐袋角捏给你看，还渗得出水。二两的干袋代不上这只湿袋。
 秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,sack,拿哪只来称空袋重,full,从刚挑来的盐袋取样,否,那包里是盐，空袋重得单独称。邢茧把货放回秤架。
-秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,entry,重填票时记多少,net,单列四两袋重，盐记十六两,是,
-秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,entry,重填票时记多少,gross,只记整袋二十两,否,点钱的人把旧票翻到背面，圈出了「去袋」。他肯按实出的盐付钱。
+秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,entry,空袋称过后怎么记账,net,把袋重另写一行，从整袋里扣去,是,
+秤上多出一只空袋（east_salt_tare）,井边老秤（sand_salt_ledger）,entry,空袋称过后怎么记账,gross,按整袋的分量记账,否,点钱的人把旧票翻到背面，圈住「已扣袋重」，又把你写的二十两整袋重量推回来。
 桥栏是哪一头在咬木（east_bridge_copper）,桥边的铜扣（sand_bridge_rail）,notch,铜扣的小缺口朝哪里,out,桥栏外沿,是,
 桥栏是哪一头在咬木（east_bridge_copper）,桥边的铜扣（sand_bridge_rail）,notch,铜扣的小缺口朝哪里,in,桥面中心,否,铜扣转过去倒是扣得上，桥板一受力，仍咬出几丝新木屑。
 桥栏是哪一头在咬木（east_bridge_copper）,桥边的铜扣（sand_bridge_rail）,step,试踩时先压哪里,inside,桥板内侧,是,

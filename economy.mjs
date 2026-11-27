@@ -1,3 +1,5 @@
+import { materialDemandRules } from './economy-material-values.mjs';
+
 const facilities = [
   {
     id: 'warehouse', name: '仓库', start: 1,
@@ -126,6 +128,11 @@ const merchantOrders = {
     name: '给药商续锅料', text: '捎来够一锅的灵草和引火松木，药商留两罐自用，剩下的分给你。',
     need: { reed: 8, wood: 3 }, reward: { salve: 4, wood: 2 },
     outcome: '药商煨好两小锅膏，分出四罐，把未用的两块松木一并还给你。',
+    repeat: {
+      name: '替夏婆备一只出门药匣', text: '夏婆把一只空匣搁到案边。「下一班巡堤的走前来拿。四罐外敷的膏，三包回气散。凑齐了，我给二十六钱。」',
+      need: { salve: 4, qi_powder: 3 }, reward: { spirit_coin: 26 }, cooldown: 14,
+      outcome: '夏婆包好药，把药匣搁在门边等巡堤人来拿。她在纸上勾去一笔，数出二十六钱交给你。',
+    },
   },
   qi_powder: {
     units: 4, regularText: '「你买得多，我天天磨药。碾药的槽裂了，得拿寒铁做个圈子箍牢。」',
@@ -205,6 +212,10 @@ const batchKinds = new Set(['ammo', 'food', 'pill', 'talisman']);
 export const bulkSaleRules = Object.freeze({
   ore: Object.freeze({ capacity: 12, replenished: 4, days: 5, reserveRate: 0.6 }),
   core: Object.freeze({ capacity: 10, replenished: 3, days: 5, reserveRate: 0.6 }),
+  meat_broth: Object.freeze({ capacity: 6, replenished: 3, days: 4, reserveRate: 0.5 }),
+  qi_powder: Object.freeze({ capacity: 6, replenished: 3, days: 5, reserveRate: 0.67 }),
+  heal_pill: Object.freeze({ capacity: 4, replenished: 2, days: 6, reserveRate: 0.57 }),
+  ...materialDemandRules,
 });
 
 export const economyData = {
@@ -248,6 +259,18 @@ export function saleTotal(quote, count) {
   const { regular, reserve, remaining } = quote.demand;
   const atRegular = Math.min(remaining, count);
   return atRegular * regular + (count - atRegular) * reserve;
+}
+
+export function tradeCapacityReason(state, { id, count, total, buying }, kit) {
+  const received = buying ? { [id]: count } : { [kit.currency]: total };
+  const spent = buying ? { [kit.currency]: total } : { [id]: count };
+  if (kit.hasRoom(state, received, spent)) return '';
+  return buying ? '行囊已满，放不下这笔货。' : '行囊满了，收不下卖得的灵钱。';
+}
+
+export function tradeQuantityOptions(maximum, reasonAtCount) {
+  return Array.from({ length: maximum }, (_, index) => index + 1)
+    .filter((count) => !reasonAtCount(count));
 }
 
 export function recordSale(state, id, count, quote) {
@@ -306,6 +329,12 @@ function depositable(state, id, kit) {
   return Math.max(0, kit.owns(state, id) - (id === 'ration' ? (state.reliefRations ?? 0) : 0));
 }
 
+function bagDepositable(state, id, kit) {
+  const held = kit.owns(state, id);
+  const packedMeal = kit.packedMealCount?.(state, id) ?? (state.mealPouch === id ? held : 0);
+  return Math.min(depositable(state, id, kit), Math.max(0, held - packedMeal));
+}
+
 function spaceInWarehouse(state) {
   return warehouseCap[state.economy?.buildings.warehouse ?? 1];
 }
@@ -316,7 +345,8 @@ function warehouseSpaceReason(state, goods, kit, stored = storedItems(state)) {
     combined[id] = (combined[id] ?? 0) + count;
     if (combined[id] > 1 && storageUnique(id, kit)) return '仓库已有同样的物件。';
   }
-  return goodsVolume(combined, kit) > spaceInWarehouse(state) ? '仓架放不下了。' : '';
+  const missingSlots = goodsVolume(combined, kit) - spaceInWarehouse(state);
+  return missingSlots > 0 ? `仓架放不下了，还差${missingSlots}格。` : '';
 }
 
 function depositReason(state, id, count, kit, stored) {
@@ -405,6 +435,7 @@ function transfer(state, id, count, deposit, kit) {
   const why = deposit ? depositReason(state, id, count, kit) : withdrawalReason(state, id, count, kit);
   if (why) return kit.refuse(why);
   const economy = normalizeEconomy(state);
+  const wasActiveManual = deposit && state.activeManual === id;
   if (deposit) {
     storeInWarehouse(state, { [id]: count }, kit, state.durability);
     kit.removeItem(state, id, count, false);
@@ -417,7 +448,8 @@ function transfer(state, id, count, deposit, kit) {
       delete economy.warehouseWear[id];
     }
   }
-  return kit.say(state, `${deposit ? '存入' : '取出'}${kit.nameOf(id)}×${count}。`);
+  const stoppedManual = wasActiveManual && state.activeManual !== id ? '这门内功已停止运转。' : '';
+  return kit.say(state, `${deposit ? '存入' : '取出'}${kit.nameOf(id)}×${count}。${stoppedManual}`);
 }
 
 function containerTransferReason(state, plan, id, count, deposit, kit) {
@@ -432,7 +464,10 @@ function containerTransferReason(state, plan, id, count, deposit, kit) {
   if (kit.isEvidence(item)) return '线索和信物要留在身上。';
   if (Object.values(state.equipment).includes(id)) return '先把穿戴的装备收下。';
   if (state.activeManual === id) return '先停下这门内功，再把书收入袋里。';
-  if (depositable(state, id, kit) < count) return '手头没有这么多能放进袋里的东西。';
+  if (bagDepositable(state, id, kit) < count) {
+    if (state.mealPouch === id && depositable(state, id, kit) >= count) return '先把便当栏里的口粮移回行囊。';
+    return '行囊里没有这么多能放进袋里的物件。';
+  }
   const combined = { ...contents, [id]: (contents[id] ?? 0) + count };
   if (storageUnique(id, kit) && combined[id] > 1) return '袋里已经有同样的物件。';
   return goodsVolume(combined, kit, kit.rules.backpackStackSize) > plan.capacity ? '这只乾坤袋装不下了。' : '';
@@ -445,7 +480,7 @@ function transferContainer(state, bagId, id, requested, deposit, kit) {
     return kit.refuse('请选择实际物件和件数。');
   }
   const check = (count) => containerTransferReason(state, plan, id, count, deposit, kit);
-  const available = deposit ? kit.owns(state, id) : containerContents(state, bagId)[id] ?? 0;
+  const available = deposit ? bagDepositable(state, id, kit) : containerContents(state, bagId)[id] ?? 0;
   const count = requested === 'all' ? transferable(available, check) : requested;
   const reason = check(count || 1);
   if (reason || !count) return kit.refuse(reason || '没有能存取的物件。');
@@ -473,8 +508,9 @@ function transferContainer(state, bagId, id, requested, deposit, kit) {
 function carriedContainersView(state, kit) {
   const plans = carriedContainerPlans(state, kit);
   if (!plans.length) return [];
-  const canStore = Object.keys(state.inventory).filter((id) =>
-    kit.records.items[id]?.kind !== 'container' && state.activeManual !== id && depositable(state, id, kit));
+  const canStore = Object.keys(state.inventory)
+    .filter((id) => kit.records.items[id]?.kind !== 'container' && state.activeManual !== id)
+    .map((id) => [id, bagDepositable(state, id, kit)]).filter(([, count]) => count > 0);
   return plans.map((plan) => {
     const { id, name, capacity } = plan;
     const contents = containerContents(state, id);
@@ -484,7 +520,7 @@ function carriedContainersView(state, kit) {
     });
     return { id, name, capacity, used: goodsVolume(contents, kit, kit.rules.backpackStackSize),
       stored: Object.entries(contents).map(([item, count]) => row(item, count, false)),
-      carried: canStore.map((item) => row(item, depositable(state, item, kit), true)) };
+      carried: canStore.map(([item, count]) => row(item, count, true)) };
   });
 }
 
@@ -501,7 +537,8 @@ function allProjects(state, kit) {
 
 function nextUpgrade(state, facility, kit) {
   const row = facility.upgrades[effectiveLevel(state, facility) - facility.start];
-  return row ? { ...row, reason: kit.homeRequirements(state, row.cost, row.need) || '' } : null;
+  return row ? { ...row, satiety: Math.min(state.satiety, row.days * kit.rules.satietyDrainPerDay),
+    reason: kit.homeRequirements(state, row.cost, row.need) || '' } : null;
 }
 
 function facilityJobs(state, id) {
@@ -527,8 +564,14 @@ function waitForProduction(state, facility, kit) {
   return kit.say(state, wait.ready ? '等到这一单完工。' : '等了一阵，肚里没了力气。');
 }
 
-function heldGear(state, loot, kit) {
-  return Object.keys(loot).some((id) => kit.records.gear[id] && (kit.homeSupplies(state, id) || containerHasItem(state, id)));
+function projectGearLocation(state, loot, kit) {
+  for (const id of Object.keys(loot)) {
+    if (!kit.records.gear[id]) continue;
+    if (kit.owns(state, id)) return '身上已有同名器具。';
+    if (storedItems(state)[id]) return '仓库里已有同名器具。';
+    if (containerHasItem(state, id)) return '乾坤袋里已有同名器具。';
+  }
+  return '';
 }
 
 function projectBlocker(state, project, facility, kit) {
@@ -536,13 +579,13 @@ function projectBlocker(state, project, facility, kit) {
   const level = effectiveLevel(state, facility);
   if (project.level > level) return `需${facility.name}${project.level}级。`;
   const jobs = facilityJobs(state, facility.id);
+  const pending = (state.economy?.jobs ?? []).find(({ loot }) =>
+    Object.keys(project.loot).some((id) => kit.records.gear[id] && loot[id]));
+  if (pending) return daysRemaining(state, pending) > 0 ? '同名器具正在制作。' : '同名器具已做完，尚未领取。';
+  const location = projectGearLocation(state, project.loot, kit);
+  if (location) return location;
   if (jobs.filter((job) => daysRemaining(state, job) > 0).length >= level) return '这处还在忙。';
   if (jobs.length >= level * facilityOrderMultiplier) return '案上堆满成品了，先收一单。';
-  const pending = (state.economy?.jobs ?? []).some(({ loot }) =>
-    Object.keys(project.loot).some((id) => kit.records.gear[id] && loot[id]));
-  if (heldGear(state, project.loot, kit) || pending) {
-    return '手上已经有同名器具或正在打造。';
-  }
   return kit.homeRequirements(state, project.cost, project.need) || '';
 }
 
@@ -562,14 +605,15 @@ function projectOptions(state, project, facility, kit) {
     ? Array.from({ length: limit - 1 }, (_, i) => {
       const count = i + 2;
       const order = orderedProject(project, count);
-      return { count, cost: order.cost, days: order.days, need: order.need };
+      return { count, cost: order.cost, days: order.days, need: order.need, loot: order.loot };
     }).filter(({ cost, need }) => !kit.homeRequirements(state, cost, need))
     : [];
-  return { ...project, reason, batches };
+  return { ...project, reason, batches, setupDays, collectDays };
 }
 
 function collectionBlocker(state, job, kit, store) {
-  if (heldGear(state, job.loot, kit)) return '身边已有同名器具，先把它处置妥当。';
+  const location = projectGearLocation(state, job.loot, kit);
+  if (location) return location;
   if (store) {
     if (Object.keys(job.loot).some((id) => kit.isEvidence(kit.records.items[id]))) return '要亲手收好这批东西。';
     return warehouseSpaceReason(state, job.loot, kit);
@@ -615,25 +659,48 @@ function knowsContainerPlan(state, plan, kit) {
   return state.knownItems.includes(plan.lead) || kit.homeSupplies(state, plan.lead) > 0;
 }
 
-function containerPlanReason(state, plan, kit) {
+function containerPlanReason(state, plan, kit, previous) {
   if (state.economy?.containers?.[plan.id] || kit.homeSupplies(state, plan.id) > 0 ||
       Object.values(state.ground ?? {}).some((pile) => (pile[plan.id] ?? 0) > 0)) {
     return '这张样布已经用来缝过这只袋子。';
   }
-  return containerCarryReason(state.inventory) || kit.homeRequirements(state, plan.cost, plan.need) ||
-    (kit.hasRoom(state, { [plan.id]: 1 }, kit.homeBagSpend(state, plan.need)) ? '' : '先在行囊里腾出一格来收袋子。');
+  const blocker = (!previous && containerCarryReason(state.inventory)) || kit.homeRequirements(state, plan.cost, plan.need);
+  if (blocker) return blocker;
+  const spent = kit.homeBagSpend(state, plan.need);
+  if (previous) {
+    const stored = { ...storedItems(state) };
+    for (const [id, needed] of Object.entries(plan.need)) {
+      const fromWarehouse = needed - (spent[id] ?? 0);
+      if (fromWarehouse) stored[id] -= fromWarehouse;
+    }
+    const warehouseBlocker = warehouseSpaceReason(state, { [previous.id]: 1 }, kit, stored);
+    if (warehouseBlocker) return warehouseBlocker;
+    spent[previous.id] = 1;
+  }
+  spent[kit.currency] = plan.cost;
+  return kit.hasRoom(state, { [plan.id]: 1 }, spent) ? '' : '先在行囊里腾出一格来收袋子。';
 }
 
-function craftContainer(state, id, kit) {
+function craftContainer(state, id, kit, replace = false) {
   const plan = containerPlans.find((entry) => entry.id === id && knowsContainerPlan(state, entry, kit));
   if (!plan) return kit.refuse('皮匠还没见到能照着缝的袋样。');
-  const reason = containerPlanReason(state, plan, kit);
+  const previous = replace ? carriedContainerPlans(state, kit)[0] : null;
+  if (replace && (!previous || previous.capacity >= plan.capacity)) return kit.refuse('先带来一只更小的乾坤袋。');
+  const reason = containerPlanReason(state, plan, kit, previous);
   if (reason) return kit.refuse(reason);
   kit.spendHome(state, plan.cost, plan.need);
+  const containers = (normalizeEconomy(state).containers ??= {});
+  if (previous) {
+    storeInWarehouse(state, { [previous.id]: 1 }, kit);
+    kit.removeItem(state, previous.id, 1, false);
+    containers[plan.id] = containers[previous.id] ?? { items: {}, wear: {} };
+    containers[previous.id] = { items: {}, wear: {} };
+  } else {
+    containers[plan.id] = { items: {}, wear: {} };
+  }
   kit.advance(state, plan.days);
   kit.addItems(state, { [id]: 1 });
-  (normalizeEconomy(state).containers ??= {})[id] = { items: {}, wear: {} };
-  return kit.say(state, `${plan.outcome}得到${plan.name}。`);
+  return kit.say(state, `${plan.outcome}得到${plan.name}。${previous ? `原来的物件已移入新袋，空的${previous.name}收入仓库。` : ''}`);
 }
 
 export function economyView(state, kit) {
@@ -667,8 +734,14 @@ export function economyView(state, kit) {
       return row(id, count, (quantity) => depositReason(state, id, quantity, kit));
     }).filter(({ count }) => count > 0),
   };
-  const bagPlans = containerPlans.filter((plan) => knowsContainerPlan(state, plan, kit))
-    .map((plan) => ({ ...plan, reason: containerPlanReason(state, plan, kit) }));
+  const carried = carriedContainerPlans(state, kit)[0];
+  const bagPlans = containerPlans.filter((plan) => knowsContainerPlan(state, plan, kit)).map((plan) => ({
+    ...plan, reason: containerPlanReason(state, plan, kit),
+    replacement: carried && carried.capacity < plan.capacity && !state.economy?.containers?.[plan.id] ? {
+      name: carried.name, used: goodsVolume(containerContents(state, carried.id), kit, kit.rules.backpackStackSize),
+      reason: containerPlanReason(state, plan, kit, carried),
+    } : null,
+  }));
   return { facilities: localFacilities, warehouse, backpack: backpackView(state, kit), containers, containerPlans: bagPlans };
 }
 
@@ -812,8 +885,11 @@ function fulfillOrder(state, id, kit) {
 
 export function economyAction(state, action, { bagId, id, count = 1 }, kit) {
   if (action === 'econBagDeposit' || action === 'econBagWithdraw') {
-    if (state.combat || state.gathering || state.roadBandit) return kit.refuse('先把眼前的事处理完，再解开乾坤袋。');
-    return transferContainer(state, bagId, id, count, action === 'econBagDeposit', kit);
+    const deposit = action === 'econBagDeposit';
+    if (state.combat || state.gathering || (deposit && state.roadBandit && !state.roadBandit.aftermath)) {
+      return kit.refuse('先把眼前的事处理完，再收拾乾坤袋。');
+    }
+    return transferContainer(state, bagId, id, count, deposit, kit);
   }
   const actions = {
     econDeposit: () => transfer(state, id, count, true, kit),
@@ -826,6 +902,7 @@ export function economyAction(state, action, { bagId, id, count = 1 }, kit) {
     econWait: () => waitForProduction(state, id, kit),
     econExpandPack: () => expandBackpack(state, id, kit),
     econCraftBag: () => craftContainer(state, id, kit),
+    econReplaceBag: () => craftContainer(state, id, kit, true),
     merchantTalk: () => merchantTalk(state, id, kit),
     merchantOrder: () => fulfillOrder(state, id, kit),
   };

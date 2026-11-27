@@ -13,6 +13,7 @@ function play(state, action, details = {}) {
 const choose = (state, index) => play(state, 'choose', { index });
 const available = (state, index) => Boolean(view(state).visibleChoices.find((choice) => choice.index === index)?.available);
 const knownHere = (state, id) => view(state).sites.some((site) => site.id === id);
+const siloLeaderPurse = 112;
 
 function traveler(realm = 4) {
   const state = createGame(2021);
@@ -124,7 +125,7 @@ function fight(state, index, expected, ledger = []) {
   }
   assert.ok(state.defeated.includes(expected), `lost to ${expected}, began at ${startingHealth} health\n${state.log.slice(-12).join('\n')}`);
   assert.ok(state.event, `winner was not returned to ${expected}'s scene`);
-  assert.deepEqual(view(state).groundLoot, {}, 'human opponents gave no body drops');
+  assert.deepEqual(view(state).groundLoot, boss ? { spirit_coin: siloLeaderPurse } : {});
   ledger.push(turns);
   return turns;
 }
@@ -193,12 +194,18 @@ test('a normal outfitted traveler clears ten opponents with distinct tactics, ma
   fight(state, 1, 'border_silo_chain', ledger);
   assert.equal(available(state, 4), true);
   choose(state, 3);
+  const beforeBoss = state.coins;
   fight(state, 4, 'border_silo_leader', ledger);
+  assert.equal(state.coins, beforeBoss);
+  play(state, 'take', { id: 'spirit_coin' });
+  assert.equal(state.coins, beforeBoss + siloLeaderPurse);
+  assert.equal(view(state).groundLoot.spirit_coin, undefined);
 
   // Full bags leave ordinary rewards where granted. The key ledger can still come out with the player.
   const oldOre = state.inventory.ore;
   state.inventory.ore = rules.backpackCapacity * rules.backpackStackSize;
   choose(state, 5);
+  assert.equal(state.coins, beforeBoss + siloLeaderPurse + 54);
   assert.equal(state.inventory.border_warehouse_ledger, 1);
   assert.equal(view(state).groundLoot.black_iron, 3);
   if (oldOre) state.inventory.ore = oldOre;
@@ -230,7 +237,7 @@ test('a normal outfitted traveler clears ten opponents with distinct tactics, ma
   assert.equal(new Set(ledger.map(({ enemy }) => enemy)).size, 10);
   assert.ok(turns >= 50 && turns <= 115);
   assert.ok(totals.guard > 0 && totals.weaponSpell > 0 && totals.attack > 0);
-  assert.equal(state.coins - startCoins, 206 - repairBill);
+  assert.equal(state.coins - startCoins, 206 + siloLeaderPurse - repairBill);
   t.diagnostic(`10 bouts, ${turns} rounds: ${JSON.stringify(totals)}`);
   t.diagnostic(ledger.map((entry) => `${entry.enemy}:${entry.attack + entry.guard + entry.weaponSpell + entry.use}`).join(', '));
   t.diagnostic(`From first arrival: ${state.day - startDay} game days, ${state.coins - startCoins} coins net, ${startFood + 4 - (state.inventory.ration ?? 0)} rations eaten.`);
@@ -291,12 +298,13 @@ test('a weak arrival can turn back, or fall and return without opening stages or
   state.hp = 1;
   choose(state, 0);
   play(state, 'attack');
-  assert.equal(state.region, 'mingsha_city');
+  assert.equal(state.region, 'sand_bell_cloister');
+  assert.equal(state.world.lastSettlement, 'sand_bell_cloister');
   assert.ok(state.wounds > 0);
   assert.equal(state.siteVictories.border_hoof_patrol, undefined);
   assert.equal(state.seenChoices.includes('border_hoof_patrol:1'), false);
   assert.equal(state.defeated.includes('border_ridge_runner'), false);
-  for (const region of ['sand_bell_cloister', 'wind_slate']) go(state, region);
+  go(state, 'wind_slate');
   assert.equal(knownHere(state, 'border_wind_track'), false);
   assert.equal(act(state, 'visit', { id: 'border_wind_track' }).ok, false);
 });

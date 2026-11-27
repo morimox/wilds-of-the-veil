@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import data from './data.mjs';
 import { act, view } from './engine.mjs';
-import { spiritSkills } from './spirit-combat.mjs';
+import { considerEnemySpirit, spiritSkills } from './spirit-combat.mjs';
 import { createQuietGame } from './game-test-fixtures.mjs';
 
 function actOk(state, action, payload) {
@@ -10,6 +10,23 @@ function actOk(state, action, payload) {
   assert.ok(result.ok, result.message);
   return result;
 }
+
+test('an enemy can declare a school and reserve without reading a player action', () => {
+  const fight = { round: 0 };
+  const elder = { id: 'new_examiner', tier: 7, spiritSkill: 'press_edge', spiritReserve: 2 };
+  considerEnemySpirit(fight, elder, { kind: 'attack' });
+  assert.equal(fight.enemySpirit, undefined);
+  assert.equal(fight.enemySense, undefined);
+  considerEnemySpirit(fight, elder, { kind: 'guard' });
+  assert.equal(fight.enemySpirit.id, 'press_edge');
+  assert.equal(fight.enemySense, 0);
+  fight.round = fight.enemySpirit.ready;
+  considerEnemySpirit(fight, elder, { kind: 'guard' });
+  assert.equal(fight.enemySpirit.start, 0);
+  const young = { round: 0 };
+  considerEnemySpirit(young, { ...elder, tier: 5 }, { kind: 'guard' });
+  assert.equal(young.enemySpirit, undefined);
+});
 
 function wield(state, id) {
   const gear = data.gear.find((row) => row.id === id);

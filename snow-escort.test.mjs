@@ -30,6 +30,29 @@ const choose = (state, index) => play(state, 'choose', { index });
 const option = (state, index) => view(state).visibleChoices.find((entry) => entry.index === index);
 const leave = (state) => state.event && play(state, 'leave');
 
+test('a hungry traveler can enter the fire shed and buy its reserved meal', () => {
+  const state = traveler();
+  state.satiety = 0;
+  state.coins = 3;
+  delete state.inventory.ration;
+  assert.equal(view(state).sites.find(({ id }) => id === 'snow_fire').canEnter, true);
+  assert.equal(view(state).sites.find(({ id }) => id === 'silk_bough').canEnter, false);
+  assert.equal(act(state, 'visit', { id: 'silk_bough' }).ok, false);
+
+  visit(state, 'snow_fire');
+  choose(state, 3);
+  assert.equal(option(state, 6).lockedReason, '还差6灵钱（共需9枚）。');
+  state.coins = 9;
+  assert.equal(option(state, 6).available, true);
+  choose(state, 6);
+  assert.equal(state.coins, 0);
+  assert.equal(state.inventory.ration, 3);
+  assert.equal(state.satiety, 0);
+  play(state, 'eat', { id: 'ration' });
+  assert.ok(state.satiety > 0);
+  assert.equal(option(state, 6), undefined);
+});
+
 function fight(state, index) {
   if (state.satiety < 58) play(state, 'eat', { id: 'ration' });
   choose(state, index);

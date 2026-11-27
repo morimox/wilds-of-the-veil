@@ -51,6 +51,8 @@ test('a shoal resident or a river worker can independently point out the old doo
     } else {
       play(state, 'visit', 'marsh_pole_lesson');
       assert.match(play(state, 'choose', 0).message, /高苇.*石门/);
+      assert.equal(view(state).currentEvent.id, 'marsh_pole_lesson');
+      play(state, 'leave');
     }
     assert.ok(view(state).sites.some(({ id }) => id === 'undertow_door'));
     play(state, 'visit', 'undertow_door');

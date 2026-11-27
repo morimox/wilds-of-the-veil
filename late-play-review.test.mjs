@@ -30,7 +30,7 @@ test('returning to any former sect quotes the same free admission it charges', (
     assert.equal(quote.available, true);
     assert.equal(quote.coins, 0);
     assert.deepEqual(quote.need, {});
-    assert.match(play(state, 'sectJoin').message, /原来那一页.*旧功劳都在/);
+    assert.match(play(state, 'sectJoin').message, /旧功劳都在|功劳与大比成绩都在/);
     assert.equal(state.coins, 0);
   }
 });
@@ -80,14 +80,16 @@ test('fixed fixtures and borrowed devices keep their new site states on return',
 
 test('the tournament distinguishes an unpaid fee from a hungry registered fighter', () => {
   const state = arriveForCheck(tournamentData.region);
-  play(state, 'visit', { id: 'zhao_bamboo_duel' });
-  play(state, 'choose', { index: 0 });
-  state.coins = tournamentData.fee - 1;
+  assert.match(act(state, 'tournamentEnroll').message, /只收守尺观弟子/);
+  Object.assign(state.inventory, data.measuringSect.join.need);
+  play(state, 'sectJoin');
+  const fee = tournamentData.stages[0].fee;
+  state.coins = fee - 1;
   const earlier = view(state).tournament;
   assert.equal(earlier.canEnroll, false);
   assert.equal(earlier.enrollReason, act(state, 'tournamentEnroll').message);
 
-  state.coins = tournamentData.fee;
+  state.coins = fee;
   play(state, 'tournamentEnroll');
   state.satiety = 1;
   play(state, 'wait');

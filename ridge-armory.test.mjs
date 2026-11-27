@@ -95,11 +95,15 @@ test('the two wind paths share thirty animals and the real horn leads to a reusa
   assert.equal(state.inventory.battle_sinew, 4);
   play(state, 'leave');
   travel(state, 'sand_bell_cloister');
+  play(state, 'visit', { id: 'ridge_armory_bench' });
+  assert.ok(view(state).siteQuests.some(row => row.id === quest && row.ready));
   play(state, 'handin', { id: quest });
   assert.equal(state.inventory[horn], 1);
   assert.equal(state.inventory[pattern], 1);
   assert.equal(state.inventory.battle_sinew, undefined);
+  assert.match(view(state).currentEvent.text, /弦稳稳地绷在新钩上/);
   assert.equal(act(state, 'handin', { id: quest }).ok, false);
+  play(state, 'leave');
 
   // Stage the return to the main forge with gathered ingredients.
   state.region = 'village';

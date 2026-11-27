@@ -88,9 +88,13 @@ function actionsAt(state, kit, incident, phase) {
     return entries;
   }
   if (here === inn) {
+    const warning = phase === 'warning';
+    const days = (warning ? incident.starts : incident.ends) - state.day;
+    const watch = warning ? '在驿里等兽群下来' : '留在驿里等兽群散去';
     return [
       ...(!incident.move ? [option('move', '陪驿童把驮兽赶进石院')] : []),
       ...(!incident.brace ? [option('brace', '用两块松木和一块寒铁加固驿后栏杆')] : []),
+      { id: 'watch', label: `${watch} · ${Math.round(days * 1000) / 1000} 日`, days, reason: '' },
     ];
   }
   if (here === dunes) {
@@ -146,8 +150,14 @@ export function hazardView(state, kit) {
 
 export function hazardAction(state, action, { id } = {}, kit) {
   if (action !== 'hazard') return null;
-  const offer = hazardView(state, kit)?.actions.find(entry => entry.id === id);
+  const current = hazardView(state, kit);
+  const offer = current?.actions.find(entry => entry.id === id);
   if (!offer || offer.reason) return kit.refuse(offer?.reason || '眼下没有这桩活。');
+
+  if (id === 'watch') {
+    kit.advance(state, offer.days);
+    return kit.say(state, current.phase === 'warning' ? '驿门外响起密密的蹄声。草丘上的兽群已经下来。' : '蹄声过去了。杨芹举灯照了照后栏，推开驿门。');
+  }
 
   const job = jobs[id];
   if (job.need) kit.spendHome(state, 0, job.need);

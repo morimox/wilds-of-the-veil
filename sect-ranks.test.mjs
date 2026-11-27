@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { act, rules, view } from './engine.mjs';
+import { act, view } from './engine.mjs';
 import { createQuietGame as createGame } from './game-test-fixtures.mjs';
 
 function play(state, action, payload = {}) {
@@ -21,7 +21,7 @@ function denyUnchanged(state, action, payload) {
   return result.message;
 }
 
-test('sect standing unlocks appropriate work independently of cultivation and optional gifts', () => {
+test('the Measuring Hall keeps merit, standing, and cultivation distinct when a disciple travels or returns', () => {
   const state = createGame(731);
   assert.equal(view(state).affiliation, null);
   state.region = 'measuring_hall';
@@ -37,43 +37,23 @@ test('sect standing unlocks appropriate work independently of cultivation and op
   assert.match(view(state).sect.disciple.role, /木桩/);
   assert.equal(job(state, 'gauge_silt').available, false);
   assert.match(denyUnchanged(state, 'sectWork', { id: 'gauge_silt' }), /内门弟子/);
-  assert.match(denyUnchanged(state, 'sectWork', { id: 'gauge_flood_check' }), /执事弟子/);
+  assert.match(denyUnchanged(state, 'sectWork', { id: 'gauge_flood_check' }), /内门弟子/);
 
-  const inner = play(state, 'sectWork', { id: 'gauge_posts' });
-  assert.match(inner.message, /内门弟子/);
-  assert.equal(view(state).sect.disciple.name, '内门弟子');
-  assert.equal(view(state).affiliation.disciple.name, '内门弟子');
-  assert.equal(view(state).affiliation.disciple.credit, 4);
-  assert.equal(job(state, 'gauge_silt').available, true);
-
-  state.inventory.ration = rules.backpackStackSize;
-  const availableSlots = view(state).backpackCapacity - view(state).backpackUsed;
-  state.inventory.iron_arrow = availableSlots * rules.backpackStackSize;
-  assert.equal(view(state).backpackUsed, view(state).backpackCapacity);
-  const reward = view(state).sect.ranks.find(rank => rank.disciple === '内门弟子');
-  assert.match(denyUnchanged(state, 'sectClaim', { id: reward.id }), /行囊装不下/);
-  assert.equal(view(state).sect.disciple.name, '内门弟子');
-  play(state, 'sectWork', { id: 'gauge_silt' });
-  assert.equal(job(state, 'gauge_flood_check').available, false);
-
-  const steward = play(state, 'sectWork', { id: 'gauge_pillbox' });
-  assert.match(steward.message, /执事弟子/);
+  play(state, 'sectWork', { id: 'gauge_posts' });
+  play(state, 'sectWork', { id: 'gauge_pillbox' });
+  assert.equal(view(state).sect.disciple.name, '外门弟子');
+  assert.equal(view(state).affiliation.disciple.name, '外门弟子');
+  assert.equal(view(state).affiliation.credit, 10);
+  assert.equal(job(state, 'gauge_silt').available, false);
   assert.equal(state.realm, 0);
-  assert.equal(view(state).sect.disciple.name, '执事弟子');
-  assert.equal(job(state, 'gauge_flood_check').available, true);
-  play(state, 'sectWork', { id: 'gauge_flood_check' });
-  assert.equal(state.inventory.heal_pill, 1);
-  assert.match(denyUnchanged(state, 'sectWork', { id: 'gauge_flood_check' }), /再来/);
-
-  const rations = state.inventory.ration ?? 0;
-  play(state, 'sectClaim', { id: reward.id });
-  assert.equal(state.inventory.ration, rations + reward.reward.ration);
-  assert.equal(view(state).sect.disciple.name, '执事弟子');
-  assert.equal(act(state, 'sectClaim', { id: reward.id }).ok, false);
+  assert.match(denyUnchanged(state, 'sectClaim', { id: '0' }), /贡献堂/);
+  play(state, 'sectExchange', { id: 'iron_talisman' });
+  assert.equal(state.inventory.iron_talisman, 1);
+  assert.equal(view(state).affiliation.credit, 6);
 
   play(state, 'travel', { id: 'old_marker' });
   assert.equal(view(state).sect, null);
-  assert.equal(view(state).affiliation.disciple.name, '执事弟子');
+  assert.equal(view(state).affiliation.disciple.name, '外门弟子');
   play(state, 'travel', { id: 'measuring_hall' });
   const coins = state.coins;
   const credit = view(state).affiliation.credit;
@@ -83,5 +63,5 @@ test('sect standing unlocks appropriate work independently of cultivation and op
   play(state, 'sectJoin');
   assert.equal(state.coins, coins);
   assert.equal(view(state).affiliation.credit, credit);
-  assert.equal(view(state).sect.disciple.name, '执事弟子');
+  assert.equal(view(state).sect.disciple.name, '外门弟子');
 });

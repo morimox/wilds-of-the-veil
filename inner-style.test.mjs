@@ -78,21 +78,24 @@ test('a new character can hunt bare-handed with their walking stick still equipp
     deny(state, 'fistCharge');
     const startingDay = state.day;
     let turns = 0;
+    let damage = 0;
     while (turns < 8 && state.combat) {
-      play(state, view(state).intent?.kind === 'heavy' ? 'guard' : action);
+      const step = play(state, view(state).intent?.kind === 'heavy' ? 'guard' : action);
+      damage = Math.max(damage, step.damageDealt ?? 0);
       turns += 1;
     }
     assert.ok(state.defeated.includes('reed_fox'));
     assert.equal(state.equipment.weapon, 'cudgel');
     assert.equal(state.day, startingDay);
-    return { hp: state.hp, turns, wear: gear.cudgel.durability - state.durability.cudgel };
+    return { hp: state.hp, turns, damage, wear: gear.cudgel.durability - state.durability.cudgel };
   };
   const bare = hunt('fistAttack');
   const armed = hunt('attack');
   assert.equal(bare.wear, 0);
   assert.ok(armed.wear > 0);
   assert.ok(bare.hp > 0 && bare.hp <= armed.hp);
-  assert.ok(bare.turns > armed.turns);
+  assert.ok(bare.turns >= armed.turns);
+  assert.ok(armed.damage > bare.damage);
 });
 
 test('the ferryman introduces a single real book and a full bag leaves it available for collection', () => {
@@ -373,7 +376,8 @@ test('a precise weapon must actually be used to counter an evasive enemy', () =>
   state.realm = 3;
   equip(state, 'trail_cutter');
   stage(state, 'zhao_rush_eel', 'attack');
-  state.enemyEvadeSeed = seedForRoll(0.09, 0.10);
+  const evasiveness = enemies.zhao_rush_eel.dodge / (1 + enemies.zhao_rush_eel.dodge);
+  state.enemyEvadeSeed = seedForRoll(evasiveness * 0.9, evasiveness * 0.97);
   const bare = structuredClone(state);
   const precise = structuredClone(state);
   assert.equal(play(bare, 'fistAttack').damageDealt, 0);

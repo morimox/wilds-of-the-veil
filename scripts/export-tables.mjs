@@ -1,10 +1,14 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import data from '../data.mjs';
 import { baseEscapeChance, createGame, rules, view, weaponRepairNeed } from '../engine.mjs';
 import { banditRules, roadKey } from '../bandits.mjs';
 import { bulkSaleRules, economyData } from '../economy.mjs';
+import { foePurseRows } from '../economy-foe-payout.mjs';
+import { materialEconomy } from '../economy-material-values.mjs';
+import { enemyRankLabels, enemySpecialtyLabels } from '../enemy-rank-bands.mjs';
+import { variesAtSite } from '../enemy-encounters.mjs';
 import { alchemyData } from '../alchemy.mjs';
 import { localGoods, roadGraph, settlementOf, transportRules } from '../world.mjs';
 import { atlasLocation } from '../atlas-geography.mjs';
@@ -303,13 +307,25 @@ const facilityLevels = economyData.facilities.flatMap(({ id, name, start, desc, 
       alternateReveal,
     })));
 const weaponClass = { staff: '杖', blade: '刀', sword: '剑', spear: '长兵', axe: '斧', bow: '弓', crossbow: '弩', hammer: '锤', fist: '徒手与指虎' };
-const offeredItems = new Set(marketOffers.map(({ id }) => id));
-const itemTradeRows = data.items.map((item) => ({ ...item, price: offeredItems.has(item.id) ? item.price : 0 }));
 const localOfferRows = data.regions.flatMap(({ id: region }) => {
   const settlement = settlementOf(data, region);
   if (!settlement) return [];
   return Object.entries(localGoods(settlement)).map(([id, offer]) => ({ region, id, name: name(id), ...offer }));
 });
+const cashPrices = new Map();
+for (const { id, price } of [...marketOffers, ...localOfferRows, ...data.measuringSect.store]) {
+  if (price > 0) cashPrices.set(id, Math.min(cashPrices.get(id) ?? Infinity, price));
+}
+const itemTradeRows = data.items.map(item => ({ ...item, price: cashPrices.get(item.id) ?? 0 }));
+const gearPriceRows = ['炼气', '筑基', '金丹'].map((name, stage) => {
+  const prices = data.gear.filter(gear => Math.floor(gear.tier / 3) === stage && cashPrices.has(gear.id))
+    .map(gear => cashPrices.get(gear.id));
+  return { name, count: prices.length, low: Math.min(...prices), high: Math.max(...prices),
+    average: Number((prices.reduce((sum, price) => sum + price, 0) / prices.length).toFixed(2)) };
+});
+const craftValueRows = data.craftEconomy.map(row => ({
+  ...row, productName: name(row.product), premium: Number((100 * (row.outputValue / row.materialsValue - 1)).toFixed(1)),
+}));
 const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMap(({ id }) => [
   ...(Object.values(data.starting.gear).includes(id) ? [{ id, method: '初始装备' }] : []),
   ...marketOffers.filter((offer) => offer.id === id).map((offer) => ({
@@ -319,6 +335,17 @@ const acquisitionRows = data.gear.filter(({ slot }) => slot === 'weapon').flatMa
   ...localOfferRows.filter((offer) => offer.id === id).map((offer) => ({
     id, method: '定居点货架', source: ref(offer.region), price: offer.price, interval: offer.interval,
     repeatable: offer.interval > 0 && (offer.growth ?? 1) > 0,
+  })),
+  ...data.measuringSect.store.filter(offer => offer.id === id).map(offer => ({
+    id, method: '宗门货柜', source: `守尺观 · ${data.measuringSect.offices[offer.office].name}`,
+    price: offer.price, interval: offer.interval, repeatable: offer.interval > 0,
+  })),
+  ...data.measuringSect.exchange.filter(offer => offer.id === id).map(offer => ({
+    id, method: '宗门贡献兑换', source: `守尺观 · ${data.measuringSect.offices[offer.office].name} · ${offer.price} 贡献`,
+    interval: offer.interval, repeatable: offer.interval > 0,
+  })),
+  ...data.tournament.stages.filter(stage => stage.prizes.some(prize => prize.reward[id])).map(stage => ({
+    id, method: '大比名次奖', source: `守尺观 · ${stage.name}`, repeatable: false,
   })),
   ...data.recipes.filter((recipe) => recipe.result === id).map((recipe) => ({
     id, method: '制作', source: recipe.id, price: recipe.cost, need: recipe.need, repeatable: true,
@@ -412,7 +439,10 @@ const normalHit = (enemy) => [...new Set(enemy.intents.filter(({ kind }) => kind
   .map(({ mult }) => Math.ceil(enemy.atk * (mult ?? 1))))].join(' / ');
 const enemyRows = gated(data.enemies.map((enemy) => {
   const hasSpoils = Object.keys(enemy.loot ?? {}).length || Object.keys(enemy.chanceLoot ?? {}).length;
+  const roaming = data.sites.some(site => variesAtSite(enemy, site, data.roadBandits.dens[site.id]?.boss)) ||
+    data.roadBandits.pools.some(({ enemy: id }) => id === enemy.id);
   return { ...enemy, normalHits: normalHit(enemy), escapeChance: baseEscapeChance(enemy),
+    roaming: roaming ? (enemy.tags.includes('human') ? '属性、招法、用药' : '属性') : '固定',
     spoilsSource: !hasSpoils ? '' : enemy.tags.includes('human') ? '对手随身物品'
       : enemy.tags.includes('beast') ? '兽身解取' : enemy.tags.includes('spirit') ? '灵形遗留' : '实体解取' };
 }));
@@ -448,8 +478,19 @@ const localRepairRows = towns.flatMap(({ id: region }) => {
     repairMaterials: weaponRepairNeed(id),
   }));
 });
-const sectJobs = data.sects.flatMap((sect) => sect.jobs.map((job) => ({ region: sect.region, sect: sect.name, ...job })));
+const sectJobs = data.sects.flatMap((sect) => sect.jobs.map(({ office, ...job }) => ({
+  region: sect.region, sect: sect.name, ...job, office: sect.offices?.[office]?.name,
+})));
 const sectRanks = data.sects.flatMap((sect) => sect.ranks.map((rank) => ({ region: sect.region, sect: sect.name, ...rank })));
+sectRanks.push(...Object.entries(data.measuringSect.offices).map(([id, office]) => ({
+  region: data.measuringSect.region, sect: data.measuringSect.name, disciple: office.name, role: office.role,
+  condition: ({ outer: '投帖入门', inner: '外门大比五场全胜', elder: '内门大比五场全胜', actingHead: '长老考核五场全胜并接印' })[id],
+})));
+const sectGoods = ['store', 'exchange', 'actingHeadStore'].flatMap(channel => data.measuringSect[channel].map(({ office, ...offer }) => ({
+  ...offer, name: name(offer.id), channel: channel === 'exchange' ? '贡献' : '灵钱', office: data.measuringSect.offices[office].name,
+})));
+const sectProjects = data.measuringSect.projects.flatMap(({ steps, ...project }) =>
+  steps.map((step, index) => ({ ...project, ...step, rank: index + 1 })));
 const trainingRows = trainingData.flatMap(({ ranks, ...track }) => ranks.map((rank, index) => ({ ...track, ...rank, level: index + 1 })));
 const transportRows = [
   ...transportRules.crossings.map(({ a, b, label, days, item, quest, reason }) => ({ label, a, b, days, item, quest, reason })),
@@ -495,16 +536,24 @@ const marketTalkRows = towns.flatMap(({ id: region }) => {
   const talk = settlementOf(data, region).talk;
   return talk ? [{ region, ...talk }] : [];
 });
-const matchRows = data.tournament.matches.map((match, index) => ({ ...match, order: index + 1, region: data.tournament.region,
-  lead: data.tournament.lead, fee: data.tournament.fee, days: data.tournament.boutDays, cooldown: data.tournament.cooldown }));
-const tournamentPrizes = data.tournament.prizes.map((prize, wins) => ({ ...prize, wins }));
+const matchRows = data.tournament.stages.flatMap(stage => stage.matches.map((match, index) => {
+  const { tier: opponentTier, hp, atk, def, qi, perception, spiritSkill, spiritReserve } = data.enemies.find(enemy => enemy.id === match.enemy);
+  return { ...match, stage: stage.name, order: index + 1, region: data.tournament.region, opponentRealm: realm(opponentTier),
+    hp, atk, def, qi, perception, spiritSkill, spiritReserve, fee: stage.fee, days: data.tournament.boutDays, cooldown: stage.cooldown };
+}));
+const tournamentPrizes = data.tournament.stages.flatMap(stage => stage.prizes.map((prize, wins) => ({
+  stage: stage.name, wins, ...prize,
+})));
 const incidentJobNames = { report: '向杨芹报信', brace: '加固栏杆', move: '撤驮兽', look: '从草丘查水源',
   divert: '给旧水槽分流', fight: '前往截住盐泥豺', repair: '善后修栏', settle: '结清工钱' };
 const manualSources = data.events.flatMap(({ id, choices }) => choices.flatMap((choice, index) =>
   Object.keys(choice.loot ?? {}).map((item) => [item, describeChoice(`${id}:${index}`)])));
 manualSources.push(...fixedBanditRows.flatMap(({ a, b, label, loot }) =>
   Object.keys(loot ?? {}).map((item) => [item, `${name(a)}至${name(b)} · ${label}`])));
-manualSources.push(['echo_guard_manual', '回声石洞验证掌法'], ['terrace_counter_manual', '竹尺庭大比三场全胜回礼']);
+manualSources.push(['echo_guard_manual', '回声石洞验证掌法']);
+manualSources.push(...data.tournament.stages.flatMap(stage => Object.keys(stage.prizes.at(-1).reward)
+  .map(id => [id, `守尺观${stage.name}名次奖`])));
+manualSources.push(...sectGoods.map(({ id, channel, office }) => [id, `守尺观 · ${office} · ${channel}`]));
 const innerStyleRanks = data.innerStyles.flatMap(({ id, name, grade, tier, specialty, ranks }) =>
   ranks.map(({ base, focus, fistCharge, effect, tier: rankTier = tier, cost = 0, days = 0, need }, index) => ({
     id, name, grade, rank: index + 1, maxRank: ranks.length, tier: rankTier, cost, days, need, effect,
@@ -523,7 +572,25 @@ const tables = [
   ], { note: '出伤倍率用于向更高境界进攻。相隔两境时，两档倍率连乘。' }),
   table('items', '物品与交易', itemTradeRows, ['id', 'name', 'kind', 'price', 'sell',
     ['oneOfAKind', '不可重复获得的支线独件'], ['discardable', '此关键实物可放下并补办'], 'desc'],
-    { note: '价格为 0 表示无对应买卖渠道。买入的货源与到货条件见坊市货单。卖出按手中符合规则的物件结算。' }),
+    { note: '买价取坊市、地方铺货和宗门灵钱柜的最低挂牌。0 表示该物无此现金渠道。实际报价与补货另见各地货单。' }),
+  table('economy-realm-prices', '各大境界可购装备标价', gearPriceRows, [
+    'name', ['count', '装备数'], ['low', '最低'], ['high', '最高'], ['average', '平均'],
+  ], { note: '每件只取最低可购现金挂牌并计一次。同款外地寄售可能更贵。' }),
+  table('material-values', '原料来路与常价', materialEconomy.map(row => ({
+    ...row, name: name(row.id), grade: row.tier == null ? '' : realm(row.tier),
+    access: row.access === 'open' ? '普通原料' : '受守原料',
+    source: ({ gather: '无须交手可取得', hunt: '妖兽战利品', protectedGather: '清守护后实采' })[row.source],
+  })), ['id', 'name', ['access', '类别'], ['source', '取得方式'], ['grade', '最低常见守护强度'],
+    ['sell', '默认常价'], ['note', '实际来源'], ['guards', '守护兽', ids => ids.map(ref).join('、')], ['site', '采集处', ref], ['enemy', '对应首领', ref]],
+    { omit: ['tier', 'formerSell'], note: '同一物可在安全来源重复取得时按普通货定价。少量旧货或一次性掉落不会成为长期来源。' }),
+  table('craft-values', '高阶加工的原料与回收价值', craftValueRows, [
+    'id', ['productName', '成品'], ['stage', '大境界档'], 'need', ['batch', '一次做出件数'], ['materialsValue', '原料合计回收价'],
+    ['cost', '加工费'], ['unitSell', '成品单件回收价'], ['outputValue', '整批成品回收价'], ['premium', '相对原料增加（%）'],
+  ], { omit: ['product'], note: '以默认常价计，一般只加少量加工价值。取两种成本上限，少数在当地常见的成品回收更低。' }),
+  table('foe-purses', '人形强敌战后可拾钱袋', foePurseRows, [
+    ['enemy', '人物', ref], ['site', '交战处', ref], ['coins', '一次掉落灵钱'],
+    ['equipment', '另有可拾装备', ref], ['wear', '装备剩余耐久比例'], 'text',
+  ], { note: '限对应现场的首次胜利。脚边掉落须实际拾取。另有后续核账、清仓、交货等奖赏各自独立结算。' }),
   table('common-materials', '常用原料跨系统用途', stapleRows, [
     'id', 'name', ['pools', '可回生的现场'], ['enemySources', '解取的对手'],
     ['recipes', '用到的配方数'], ['projects', '用到的后院项目数'], ['facilities', '用到的设施升级数'],
@@ -685,7 +752,9 @@ const tables = [
   ]),
   table('world-arrays', '州阵修复', arrayRows, ['region', ['province', '州', ref], ['coins', '总需灵钱'], 'need'],
     { note: '可分批交钱和材料。两端全部修通即可通行。修好后传送时另计路费。' }),
-  table('settlement-goods', '各定居点本地买进货单', localOfferRows, ['region', 'id', 'name', 'price', ['start', '初始存货'], ['cap', '存货上限'], ['interval', '补货间隔（天）'], ['growth', '每次补货量']],
+  table('settlement-goods', '各定居点本地买进货单', localOfferRows, ['region', 'id', 'name', 'price',
+    ['department', '铺类'], ['merchant', '店铺'], ['source', '货源'], ['imported', '外地寄售'], ['markup', '外货加价比例'],
+    ['start', '初始存货'], ['cap', '存货上限'], ['interval', '补货间隔（天）'], ['growth', '每次补货量']],
     { note: '未标每次补货数量时为一件。落灯村的具名货架另见坊市货单。' }),
   table('settlement-buyback', '各定居点收购价与常价收量', localSaleRows, ['region', 'id', 'name', ['price', '常价（每件）'],
     ['reserve', '当期超量价（每件）'], ['capacity', '常价收满件数'], ['replenished', '每期恢复件数'], ['days', '恢复间隔（日）']],
@@ -699,18 +768,35 @@ const tables = [
     warning: id === 'report' ? hazardData.warningDays : undefined,
     surge: id === 'report' ? hazardData.surgeDays : undefined,
   })), ['id', 'name', 'days', 'need', ['pay', '结工钱时获得（灵钱）'], ['warning', '示警期（游戏日）'], ['surge', '兽群经过（游戏日）']],
-  { note: '拿到兽迹后向炭篷驿报信才开始计时。兽潮可提前疏水结束，没赶上也能在事后回驿站看现场。工钱仅按实际完成的动作结一次。' }),
+  { note: '拿到兽迹后向炭篷驿报信才开始计时。留在驿里等候可走到当前阶段的结束日，照常消耗饱腹。兽潮可提前疏水结束，没赶上也能在事后回驿站看现场。工钱仅按实际完成的动作结一次。' }),
   table('market-talk', '摊上的线索', marketTalkRows, ['region', ['label', '交谈动作'], ['lead', '交付的线索', ref], ['outcome', '摊主所说']]),
-  table('sect-admission', '宗门和入门物资', data.sects.map(({ jobs, ranks, join, ...sect }) => ({ ...sect, ...join })), ['region', 'id', 'name', 'desc', 'need', ['coins', '入门灵钱']]),
+  table('sect-admission', '宗门和入门物资', data.sects.map(({ region, id, name, desc, join }) => ({ region, id, name, desc, ...join })), ['region', 'id', 'name', 'desc', 'need', ['coins', '入门灵钱']]),
   table('sect-jobs', '宗门差事', sectJobs, ['region', ['sect', '宗门'], 'id', 'name', 'desc', 'need', 'reward', ['coins', '灵钱报酬'], ['credit', '增加功劳'],
     ['afterQuests', '做完任一委托后出现', (ids) => ids.map(ref).join('、')], ['minCredit', '差事最低功劳'],
-    ['rankReason', '资格说明'], 'days', ['cooldown', '下一单间隔（天）']]),
+    ['rankReason', '资格说明'], ['office', '最低职分'], ['type', '差事类型'], ['needsQuest', '实际完成委托', ref],
+    ['needsDefeat', '实际击败', ref], 'days', ['cooldown', '下一单间隔（天）']]),
   table('sect-awards', '宗门身份、职责及奖赏', sectRanks, ['region', ['sect', '宗门'], 'name', ['credit', '功劳门槛'],
-    ['disciple', '弟子身份'], ['role', '当值工作'], 'reward']),
-  table('tournament', '守尺观大比', matchRows, ['region', ['order', '场次'], 'name', 'enemy', ['lead', '认得赛帖的证物', ref],
+    ['disciple', '弟子身份'], ['role', '当值工作'], ['condition', '身份取得'], 'reward']),
+  table('sect-stock', '守尺观货柜与贡献堂', sectGoods, [
+    'id', 'name', ['office', '最低职分'], ['channel', '所用货币'], ['category', '品类'], ['price', '单件价格'],
+    ['stock', '库存上限'], ['interval', '每次补货间隔（天）'], ['unique', '限领物'],
+    ['sharesExchangeStock', '与贡献堂共用领取记录'], ['source', '货源'],
+  ]),
+  table('sect-orders', '守尺观代宗主派差', data.measuringSect.orders, [
+    'id', 'name', 'desc', ['fee', '门库支出'], 'days', ['proceeds', '结算门库收入'],
+  ]),
+  table('sect-projects', '守尺观修造', sectProjects, [
+    'id', 'name', ['rank', '阶次'], 'desc', ['fee', '门库支出'], 'need', 'days',
+  ]),
+  table('tournament', '守尺观分阶比试', matchRows, ['region', ['stage', '赛别'], ['order', '场次'], 'name', ['enemy', '对手', ref],
+    ['grade', '场次定位'], ['opponentRealm', '对手实际境界'], 'hp', 'atk', 'def', 'qi',
+    ['perception', '洞察'], ['spiritSkill', '神识招式', ref], ['spiritReserve', '神识储备'],
     ['fee', '每届报名费'], 'days', ['cooldown', '下次报名间隔（天）'], ['note', '对手介绍']],
-    { note: '各轮均由裁判护场。散修也可报名，符合领取条件的奖品可稍后领。' }),
-  table('tournament-prizes', '会比名次回礼', tournamentPrizes, [['wins', '胜场'], 'name', 'reward']),
+    { note: '须加入守尺观，身份决定本届赛别。每场有裁判和禁药规则。初次胜满五场会晋升或取得交接资格。' }),
+  table('tournament-prizes', '会比累计名次与新增奖品', tournamentPrizes, [
+    ['stage', '赛别'], ['wins', '胜场'], 'name', ['reward', '该名次累计奖励', resources],
+    ['increment', '比上一名次新增', resources],
+  ], { note: '实际发放达到过的最高名次和已领取名次之间的差额。零胜无奖，已被晋升替换的赛别仍可领取欠奖。' }),
   table('training', '修习项目、每阶成本和战力效果', trainingRows, [
     'id', 'name', ['level', '阶次'], 'region', ['teacher', '传授人物'], ['lead', '发现所需线索', ref], 'need', ['coins', '灵钱'], 'days', ['effect', '本阶效果'],
     ['hp', '气血上限加成'], ['def', '防御加成'], ['qi', '真气上限加成'], ['restQi', '歇息额外真气'],
@@ -770,17 +856,20 @@ const tables = [
     ['action', '操作'], 'days', ['spent', '消耗物件', resources], 'loot', ['note', '执行后反馈'],
   ], { note: '查看保留药篓。带回后可交还药僮，完整交还和拆篓取物互相排斥。交付奖励见委托表。' }),
   table('enemies', '敌人', enemyRows, [
-    'id', 'name', ['tier', '敌方境界'], tier, 'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
+    'id', 'name', ['tier', '敌方境界'], tier, ['rank', '同境强度', id => enemyRankLabels[id]],
+    ['specialty', '偏长', id => enemySpecialtyLabels[id]], ['roaming', '个体差异'],
+    'hp', ['atk', '基础攻击'], ['normalHits', '普攻扣防前伤害'],
     ['qi', '单场起始真气'], ['physicalResist', '物抗', percent], ['magicResist', '魔抗', percent],
     'def', ['perception', '洞察'], ['accuracy', '命中值', percent], ['dodge', '被动闪避值', percent],
     ['escapeChance', '未被进攻时基础脱身概率', percent],
     ['innerStyleName', '使用内功'], ['manualGuard', '内功兵刃专攻护持'], ['manualPierce', '内功兵刃专攻穿甲'],
     ['strategy', '交手策略', (id) => ({
       instinct: '本能', predator: '抢攻', bulwark: '守中求进', duelist: '见招拆招', schemer: '耗气与破势',
+      counter: '守后反打', footwork: '闪身追击',
     })[id] ?? id], ['medicine', '单场携带补药', ({ id, count }) => `${ref(id)}×${count}`],
     ['tags', '装备克制标签'], ['sparring', '仅在护场地结算切磋'], ['insight', '首胜修为'],
     ['spoilsSource', '物品从哪里来'], ['loot', '战后固定所得', resources], ['chanceLoot', '战后概率额外所得', formatChanceLoot], 'desc',
-  ], { omit: ['intents'], note: '普攻取所列攻击乘招式倍率后向上取整。攻击等基础值已算入内功，出招专攻护持另列，差距至少三小境时另有压制。命中和被动闪避空白表示无该项加成。补药只由明确带药的对手使用。' }),
+  ], { omit: ['intents'], note: '列出每类底数。复刷个体在原境界内围绕底数波动，首村相邻地点的炼气初期个体受新手保护。普攻取攻击乘招式倍率向上取整。差距至少三小境另有压制。可复刷人形按兵器更换招法，有的会带补药。' }),
   table('enemy-intents', '敌人回合意图', intents, [
     ['enemyId', '敌人标识'], ['enemyName', '敌人名称'], ['order', '常用动作序号'], 'name', 'kind', 'mult', ['ranged', '远程出手'],
     ['damageType', '伤害类别', (id) => knownKinds[id] ?? id], ['qiCost', '施法耗气'], ['recover', '调息回气量'],
@@ -854,11 +943,18 @@ const introduction = [
   '',
   '修改项目中的游戏数据后，在项目根目录运行 `npm run tables` 即可重新导出。',
 ].join('\n');
-await Promise.all([
-  writeFile(resolve(output, 'README.md'), [introduction, ...tables.map(markdownTable)].join('\n\n') + '\n', 'utf8'),
-  ...tables.map(({ file, values }) => writeFile(
-    resolve(output, `${file}.csv`),
-    `\uFEFF${values.map((row) => row.map(csvCell).join(',')).join('\r\n')}\r\n`,
-    'utf8',
-  )),
-]);
+const exports = [
+  ['README.md', [introduction, ...tables.map(markdownTable)].join('\n\n') + '\n'],
+  ...tables.map(({ file, values }) => [`${file}.csv`, `\uFEFF${values.map((row) => row.map(csvCell).join(',')).join('\r\n')}\r\n`]),
+];
+for (const [name, content] of exports) {
+  const destination = resolve(output, name);
+  const pending = `${destination}.${process.pid}.tmp`;
+  try {
+    await writeFile(pending, content, 'utf8');
+    await rename(pending, destination);
+  } catch (error) {
+    await rm(pending, { force: true }).catch(() => {});
+    throw error;
+  }
+}

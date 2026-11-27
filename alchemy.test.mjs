@@ -70,6 +70,8 @@ test('bringing a real herb to the apprentice introduces the alchemist and a boug
   while (!timer().ready) play(state, 'wait');
   play(state, 'econCollect', { id: timer().id });
   assert.equal(state.inventory.qi_powder, data.recipes.find(({ id }) => id === 'r_qi').count);
+  state.knownItems.push('qi_core');
+  assert.match(view(state).alchemy.intro, /猎来的妖丹按境界分开装/);
 });
 
 test('the water diagram leads to two different repeatable spirit medicines', () => {
@@ -101,7 +103,7 @@ test('the water diagram leads to two different repeatable spirit medicines', () 
   assert.equal(state.coins, 78);
   play(state, 'alchemyTalk');
   state.economy.buildings.furnace = 1;
-  state.economy.warehouse = { reed: 10, gold_core: 2, beast_eye: 2 };
+  state.economy.warehouse = { reed: 10, gold_core: 2, beast_eye: 2, qi_powder: 8 };
   deny(state, 'econStart', { id: 'r_heart_pill' });
   state.economy.buildings.furnace = 2;
   play(state, 'econStart', { id: 'r_sense_powder' });
@@ -122,10 +124,11 @@ test('the late recovery formula uses a gold core for each batch after the old ag
   state.inventory.ration = 6;
   state.knownItems.push('clinic_note');
   state.economy.buildings.furnace = 3;
-  state.economy.warehouse = { reed: 10, core: 4, foundation_core: 2 };
+  state.economy.warehouse = { reed: 10, core: 4, foundation_core: 2, qi_powder: 4 };
   deny(state, 'alchemyBuyFormula', { id: 'formula_return_breath' });
   state.knownItems.push('fault_receipt');
-  play(state, 'alchemyBuyFormula', { id: 'formula_return_breath' });
+  const learned = play(state, 'alchemyBuyFormula', { id: 'formula_return_breath' });
+  assert.match(learned.message, /先前查明的水路/);
   assert.match(act(state, 'econStart', { id: 'r_return_breath' }).message, /金丹期妖丹×1/);
   state.economy.warehouse.gold_core = 1;
   play(state, 'econStart', { id: 'r_return_breath' });

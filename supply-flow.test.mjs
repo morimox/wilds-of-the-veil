@@ -49,12 +49,13 @@ test('inn recovery matches the half-day cycle with wounds, pressure, poison, tra
   unchanged(state, 'restUntilRecovered');
 });
 
-test('a full bag does not block recovery or drop relief food into the field', () => {
+test('a full bag with a different meal in the pouch does not block recovery or drop relief food', () => {
   const state = createGame(26);
   state.hp = 4;
   state.qi = 0;
   delete state.inventory.ration;
-  state.mealPouch = null;
+  state.mealPouch = 'meat_broth';
+  state.inventory.meat_broth = 1;
   state.coins = 0;
   state.inventory.wood = rules.backpackCapacity * rules.backpackStackSize;
   assert.equal(view(state).backpackUsed, view(state).backpackCapacity);
@@ -66,6 +67,27 @@ test('a full bag does not block recovery or drop relief food into the field', ()
   assert.deepEqual(view(state).groundLoot, {});
   unchanged(state, 'restUntilRecovered');
   unchanged(state, 'rest');
+});
+
+test('an empty meal slot can save ground food and relief food when the main pack is full', () => {
+  const state = createGame(29);
+  delete state.inventory.ration;
+  state.mealPouch = 'meat_broth';
+  state.coins = 0;
+  state.inventory.wood = rules.backpackCapacity * rules.backpackStackSize;
+  assert.equal(view(state).backpackUsed, view(state).backpackCapacity);
+  const relief = structuredClone(state);
+  play(relief, 'rest');
+  assert.deepEqual(view(relief).packedMeal, { id: 'ration', count: rules.reliefRations });
+  assert.equal(relief.reliefRations, rules.reliefRations);
+  assert.deepEqual(view(relief).groundLoot, {});
+
+  state.ground.village = { ration: rules.backpackStackSize + 1 };
+  assert.equal(view(state).groundPickup.ration, rules.backpackStackSize);
+  play(state, 'take', { id: 'ration' });
+  assert.deepEqual(view(state).packedMeal, { id: 'ration', count: rules.backpackStackSize });
+  assert.deepEqual(view(state).groundLoot, { ration: 1 });
+  assert.equal(view(state).backpackUsed, view(state).backpackCapacity);
 });
 
 test('an explicit batch of one selected food gives the same full meals, honors stock, and never wastes satiety', () => {

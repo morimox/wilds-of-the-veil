@@ -15,7 +15,7 @@ function ask(state, action, id) {
   const prior = structuredClone(state);
   const result = act(state, action, { id, count: 1 });
   assert.equal(result.ok, false);
-  assert.match(result.message, /无法重新取得/);
+  assert.match(result.message, action === 'discard' ? /只有这一份.*留在.*再回来拾取/ : /无法重新取得.*收不回来/);
   assert.equal(result.confirmation.action, action);
   assert.equal(result.confirmation.id, id);
   assert.equal(result.confirmation.count, 1);

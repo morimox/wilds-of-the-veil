@@ -70,8 +70,11 @@ test('a fresh hunt leaves anatomy outside the bag until the player picks what to
   assert.deepEqual(view(state).groundLoot, {});
   assert.equal(readyHearth(state).level, 0);
   assert.deepEqual(readyHearth(state).projects.map(({ id }) => id), []);
-  deny(state, 'sell', { id: 'beast_meat' });
+  play(state, 'sell', { id: 'beast_meat' });
+  assert.equal(state.coins, openingCoins + 1);
+  assert.equal(state.inventory.beast_meat, undefined);
   play(state, 'sell', { id: 'hide' });
+  assert.equal(state.coins, openingCoins + 4);
   assert.equal(state.inventory.hide, 1);
   deny(state, 'buy', { id: 'qi_core' });
   play(state, 'sell', { id: 'qi_core' });
@@ -79,8 +82,8 @@ test('a fresh hunt leaves anatomy outside the bag until the player picks what to
   assert.equal(state.inventory.qi_core, undefined);
 });
 
-test('the renewable snow beast yields three foundation cores that sell for 21 each', () => {
-  const state = createGame();
+test('the renewable snow beast yields three foundation cores that sell for 48 each', () => {
+  const state = createGame(85);
   // Start with earned equipment already fitted to isolate the snow fight and its population clock.
   state.realm = 3;
   state.region = 'snow_pass';
@@ -117,9 +120,10 @@ test('the renewable snow beast yields three foundation cores that sell for 21 ea
   play(state, 'wait');
   assert.equal(population(), 1);
   play(state, 'travel', { id: 'village' });
-  deny(state, 'sell', { id: 'beast_eye' });
+  play(state, 'sell', { id: 'beast_eye' });
+  assert.equal(state.coins, openingCoins + 7);
   play(state, 'sell', { id: 'foundation_core', count: 3 });
-  assert.equal(state.coins, openingCoins + 63);
+  assert.equal(state.coins, openingCoins + 151);
   assert.equal(state.inventory.foundation_core, undefined);
 });
 
@@ -127,7 +131,8 @@ test('three independently learned recipes use their own ingredients and recovery
   const state = createGame();
   // Supplies are pre-gathered so this test isolates furnace level, production timing and consumption.
   state.coins = 100;
-  const ingredients = { beast_meat: 7, wood: 30, reed: 12, ore: 8, kiln_clay: 6, millet_grain: 4, foundation_meat: 2, gold_meat: 1 };
+  const ingredients = { beast_meat: 7, wood: 30, reed: 12, ore: 8, kiln_clay: 6, ration: 7,
+    millet_grain: 4, foundation_meat: 2, gold_meat: 1 };
   for (const [id, amount] of Object.entries(ingredients)) {
     state.inventory[id] = amount;
     state.knownItems.push(id);
@@ -141,11 +146,12 @@ test('three independently learned recipes use their own ingredients and recovery
 
   const dishes = [
     { project: 'simmer_meat_broth', food: 'meat_broth', count: 1, satiety: 44, hp: 6, qi: 0, realm: 0 },
-    { project: 'cook_herb_stew', food: 'herb_stew', count: 2, satiety: 56, hp: 14, qi: 13, realm: 3 },
-    { project: 'cook_crystal_feast', food: 'crystal_feast', count: 2, satiety: 72, hp: 24, qi: 28, realm: 6 },
+    { project: 'cook_herb_stew', food: 'herb_stew', count: 2, satiety: 56, hp: 14, qi: 13, realm: 3, baseFood: 3 },
+    { project: 'cook_crystal_feast', food: 'crystal_feast', count: 2, satiety: 72, hp: 24, qi: 28, realm: 6, baseFood: 4 },
   ];
   for (const [index, dish] of dishes.entries()) {
     const recipe = economyData.projects.find(({ id }) => id === dish.project);
+    assert.equal(recipe.need.ration, dish.baseFood);
     assert.equal(canSee(dish.project), false);
     state.knownItems.push(recipe.reveal);
     if (index === 1) {

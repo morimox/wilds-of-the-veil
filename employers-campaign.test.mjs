@@ -89,14 +89,18 @@ function finishStops(state, first, second, note) {
   assert.equal(act(state, 'choose', { index: 2 }).ok, false);
   let turns = bout(state, 0, first);
   assert.match(option(state, 2).lockedReason, /3/);
+  assert.equal(option(state, 0).retired, false, 'the second fixed guard must still appear in the site screen');
   play(state, 'leave');
   play(state, 'visit', { id: front });
   assert.match(option(state, 2).lockedReason, /3/);
+  assert.equal(option(state, 0).retired, false, 'reentering does not hide the surviving fixed guard');
   turns += bout(state, 1, second);
   turns += bout(state, 0, first);
   assert.match(option(state, 2).lockedReason, /1/);
   turns += bout(state, 1, second);
   assert.equal(option(state, 2).available, true);
+  assert.equal(option(state, 0).retired, true);
+  assert.equal(option(state, 1).retired, true);
   assert.equal(state.inventory[note], undefined, 'proof is at the site, outside the combat reward');
   choose(state, 2);
   assert.equal(state.inventory[note], 1);
@@ -123,6 +127,7 @@ function finishSource(state, first, second, chief) {
   assert.equal(option(state, 3).available, true);
   turns += bout(state, 3, chief);
   assert.equal(option(state, 4).available, true);
+  assert.equal(option(state, 3), undefined, 'the one-off lookout no longer advertises a fight');
   return turns;
 }
 
@@ -134,6 +139,7 @@ test('cargo cover pays the deposit once and exhibits exactly eight persistent vi
   assert.equal(state.inventory.zhao_sluice_agreement, undefined);
   assert.equal(act(state, 'choose', { index: 0 }).ok, false);
   assert.equal(act(state, 'choose', { index: 1 }).ok, false);
+  assert.equal(option(state, 1), undefined);
   assert.equal(state.inventory.wood, 2);
   takeRoad(state, 'flood_market', 'glass_bank');
   play(state, 'visit', { id: 'zhao_cargo_pole' });
@@ -141,20 +147,29 @@ test('cargo cover pays the deposit once and exhibits exactly eight persistent vi
   assert.deepEqual(view(state).groundLoot, {});
   takeRoad(state, 'flood_market', 'zhao_city');
   const frontPay = { id: 'zhao_cargo_front_pay' };
+  play(state, 'visit', { id: 'zhao_public_scales' });
+  assert.deepEqual(view(state).siteQuests.map(({ id }) => id), [frontPay.id]);
   play(state, 'handin', frontPay);
+  assert.match(view(state).currentEvent.text, /押钱一栏划清/);
+  assert.equal(view(state).siteQuests.length, 0);
   assert.equal(state.coins, 79);
   assert.equal(act(state, 'handin', frontPay).ok, false);
   assert.equal(state.inventory.zhao_cargo_receipt ?? 0, 0);
+  play(state, 'leave');
   restUntilReady(state);
   takeRoad(state, 'flood_market', 'glass_bank', 'beacon_reefs');
   play(state, 'visit', { id: 'zhao_cargo_blue_reef' });
   turns += finishSource(state, 'zhao_cargo_shield', 'zhao_cargo_hook', 'zhao_cargo_keeper');
+  assert.ok(!state.seenChoices.includes('zhao_sluice_outer_isle:2'));
   assert.equal(state.inventory.zhao_cargo_ledger, undefined);
   choose(state, 4);
   assert.equal(act(state, 'choose', { index: 4 }).ok, false);
   takeRoad(state, 'glass_bank', 'flood_market', 'zhao_city');
   const deepPay = { id: 'zhao_cargo_deep_pay' };
+  play(state, 'visit', { id: 'zhao_public_scales' });
+  assert.deepEqual(view(state).siteQuests.map(({ id }) => id), [deepPay.id]);
   play(state, 'handin', deepPay);
+  assert.match(view(state).currentEvent.text, /各家该补回的米/);
   assert.equal(state.coins, 147);
   assert.equal(state.inventory.zhao_cargo_brace, 1);
   assert.equal(act(state, 'handin', deepPay).ok, false);
@@ -173,14 +188,23 @@ test('sluice guard spends the actual wood, hide and ore before paying the repair
   assert.equal(state.inventory.wood ?? 0, 0);
   assert.equal(state.inventory.hide ?? 0, 0);
   assert.equal(act(state, 'choose', { index: 0 }).ok, false);
+  assert.equal(option(state, 0), undefined);
   takeRoad(state, 'green_dyke', 'frog_pond', 'ring_isles');
   play(state, 'visit', { id: 'zhao_sluice_outer_isle' });
+  assert.ok(!view(state).world.points.some(({ id }) => id === 'jade_mill'));
   let turns = finishStops(state, 'zhao_sluice_eel', 'zhao_sluice_echo', 'zhao_sluice_receipt');
+  assert.deepEqual(view(state).world.journeys.find(({ id }) => id === 'jade_mill').path,
+    ['ring_isles', 'frog_pond', 'scale_bog', 'jade_mill']);
   assert.deepEqual(view(state).groundLoot, { beast_meat: 4, qi_core: 4 });
   takeRoad(state, 'green_dyke', 'zhao_city');
+  play(state, 'visit', { id: 'zhao_public_scales' });
+  assert.deepEqual(view(state).siteQuests.map(({ id }) => id), ['zhao_sluice_front_pay']);
   play(state, 'handin', { id: 'zhao_sluice_front_pay' });
+  assert.match(view(state).currentEvent.text, /收好了浅洲闸的试水条/);
   assert.equal(state.coins, 84);
   assert.equal(state.inventory.zhao_sluice_receipt ?? 0, 0);
+  assert.ok(view(state).world.points.some(({ id }) => id === 'jade_mill'), 'directions survive handing over the note');
+  play(state, 'leave');
   restUntilReady(state);
   takeRoad(state, 'green_dyke', 'frog_pond', 'scale_bog', 'jade_mill');
   play(state, 'visit', { id: 'zhao_sluice_mill_intake' });
@@ -194,11 +218,40 @@ test('sluice guard spends the actual wood, hide and ore before paying the repair
   assert.equal(act(state, 'choose', { index: 4 }).ok, false);
   takeRoad(state, 'zhao_hermit', 'old_marker', 'measuring_hall', 'zhao_city');
   const deepPay = { id: 'zhao_sluice_deep_pay' };
+  play(state, 'visit', { id: 'zhao_public_scales' });
   play(state, 'handin', deepPay);
+  assert.match(view(state).currentEvent.text, /新写的放水时辰/);
   assert.equal(state.coins, 142);
   assert.equal(state.inventory.leaf_pill, 2);
   assert.equal(state.inventory.zhao_cargo_brace, undefined);
   assert.equal(act(state, 'handin', deepPay).ok, false);
   assert.equal(Object.values(state.siteVictories).flatMap(Object.values).reduce((sum, count) => sum + count, 0), 8);
   context.diagnostic(`8 wins, ${turns} battle rounds plus a deliberate retreat, 92 coins and 4 material units used`);
+});
+
+test('front and final proofs can be handed to the employer in either order', () => {
+  for (const [index, first, last, frontOnly, closed] of [
+    [0, ['zhao_cargo_receipt', 'zhao_cargo_front_pay'], ['zhao_cargo_ledger', 'zhao_cargo_deep_pay'], /押钱一栏划清/, /各家该补回的米/],
+    [1, ['zhao_sluice_receipt', 'zhao_sluice_front_pay'], ['zhao_sluice_witness', 'zhao_sluice_deep_pay'], /收好了浅洲闸的试水条/, /新写的放水时辰/],
+  ]) {
+    const state = arriveAtZhao();
+    play(state, 'visit', { id: 'zhao_public_scales' });
+    choose(state, index);
+    for (const [id] of [first, last]) {
+      state.inventory[id] = 1;
+      state.knownItems.push(id);
+    }
+    const frontFirst = structuredClone(state);
+    play(frontFirst, 'handin', { id: first[1] });
+    assert.match(view(frontFirst).currentEvent.text, frontOnly);
+    play(frontFirst, 'handin', { id: last[1] });
+    assert.match(view(frontFirst).currentEvent.text, closed);
+    play(state, 'handin', { id: last[1] });
+    assert.match(view(state).currentEvent.text, closed);
+    assert.deepEqual(view(state).siteQuests.map(({ id }) => id), [first[1]]);
+    play(state, 'handin', { id: first[1] });
+    assert.match(view(state).currentEvent.text, closed);
+    assert.equal(state.coins, frontFirst.coins);
+    assert.deepEqual(state.inventory, frontFirst.inventory);
+  }
 });

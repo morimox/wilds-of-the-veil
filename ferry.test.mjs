@@ -17,6 +17,7 @@ test('the ferry shift starts at night, can be waited for in place, and settles o
   step(state, 'visit', { id: 'ford_watch_lamp' });
   const appointment = () => view(state).visibleChoices.find(({ index }) => index === 0);
   assert.match(appointment().lockedReason, /等天黑/);
+  assert.match(view(state).currentEvent.text, /两盏灯还没点/);
   const before = [state.day, state.satiety, state.coins];
   assert.equal(act(state, 'choose', { index: 0 }).ok, false);
   assert.deepEqual([state.day, state.satiety, state.coins], before);
@@ -24,8 +25,13 @@ test('the ferry shift starts at night, can be waited for in place, and settles o
     step(state, 'choose', { index: 1 });
     assert.equal(state.event, 'ford_watch_lamp');
   }
+  assert.match(view(state).currentEvent.text, /两盏灯都亮了/);
   step(state, 'choose', { index: 0 });
   assert.equal(state.inventory.ferry_watch_tag, 1);
+  step(state, 'visit', { id: 'ford_watch_lamp' });
+  assert.match(view(state).currentEvent.text, /木钩已经空了/);
+  assert.ok(!view(state).visibleChoices.some(({ index }) => index === 0 || index === 1));
+  step(state, 'leave');
   step(state, 'travel', { id: 'hidden' });
   step(state, 'visit', { id: 'wharf_lee_lamp' });
   step(state, 'choose', { index: 0 });
@@ -53,6 +59,7 @@ test('repairing the old lamp rewards the actual boat pole once', () => {
   state.knownItems.push('ferry_watch_tag');
   state.inventory.ferry_watch_tag = 1;
   step(state, 'visit', { id: 'wharf_lee_lamp' });
+  assert.match(view(state).currentEvent.text, /两只木脚都朽了/);
   assert.ok(!view(state).visibleChoices.some(({ index }) => index === 1));
   step(state, 'choose', { index: 0 });
   step(state, 'choose', { index: 1 });

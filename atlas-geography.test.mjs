@@ -113,6 +113,42 @@ test('roads do not trace the same corridor beyond a shared junction in any provi
   }
 });
 
+test('revealed cave, waterworks, salt well and quarry roads leave room to select their neighbors', () => {
+  const comparisons = [
+    ['reed_meadows|village', 'marsh|undertow_grotto', 29],
+    ['crane_granary|flood_market', 'flood_market|glass_bank', 13],
+    ['scale_bog|sunken_lab', 'jade_mill|sunken_lab', 11.5],
+    ['burnt_weir|fault_lake', 'burnt_weir|zhao_hermit', 14],
+    ['chalk_archive|chalk_hoof_trail', 'salt_ledger_barrows|stillwell_mouth', 16],
+    ['salt_ledger_barrows|stillwell_mouth', 'stillwell_mouth|stillwell_vault', 14],
+    ['cold_kiln|hanging_vein', 'cold_kiln|dry_sound_bridge', 14],
+    ['cold_kiln|hanging_vein', 'glass_hail_sink|hanging_vein', 14],
+  ];
+  for (const [first, second, clearance] of comparisons) {
+    const a = maps.find(edge => edge.key === first);
+    const b = maps.find(edge => edge.key === second);
+    // Use the reduced desktop atlas. Distinct strokes must separate after leaving the shared marker.
+    const scale = 0.75 * 733 / atlasGeography.provinces[province(a.from)].frame[2];
+    const junction = [a.from, a.to].find(id => id === b.from || id === b.to);
+    const outsideMarker = point => !junction || distance(point, atlasLocation(junction)) * scale >= 16;
+    const samples = road => segments(road).flatMap(([p, q]) => {
+      const count = Math.ceil(distance(p, q) * scale * 2);
+      return Array.from({ length: count + 1 }, (_, index) =>
+        [p[0] + (q[0] - p[0]) * index / count, p[1] + (q[1] - p[1]) * index / count]);
+    }).filter(outsideMarker);
+    const other = samples(b);
+    const gap = Math.min(...samples(a).map(point => Math.min(...other.map(tip => distance(point, tip))))) * scale;
+    assert.ok(gap >= clearance, `${first} and ${second} leave only ${gap.toFixed(1)} px`);
+  }
+
+  const state = createGame(5);
+  const shortcut = () => roadGraph(data, { state }).find(({ key }) => key === 'cold_kiln|hanging_vein');
+  assert.equal(shortcut(), undefined);
+  state.seenChoices.push('sand_hunt_colony:4');
+  assert.equal(shortcut().units, 3.5);
+  assert.equal(shortcut().days, 0.875);
+});
+
 test('shared trails go through actual stops in each province', () => {
   const routes = [
     ['marsh', 'ridge', 'ford'],

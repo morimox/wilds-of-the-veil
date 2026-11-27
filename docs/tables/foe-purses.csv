@@ -1,0 +1,7 @@
+﻿人物,交战处,一次掉落灵钱,另有可拾装备,装备剩余耐久比例,正文
+守粮仓的灰衣人（caravan_broker）,崖后的粮仓（caravan_granary）,24,,,灰衣人从后梯退走，椅脚旁落着他随身的短绳钱袋。
+灰沟贼王许涧（bandit_den_leader）,灰沟坡寨（bandit_slope_den）,28,,,许涧腰间的钱袋被凳脚扯脱，落在长桌下。
+芦湾船主邵苹（bandit_red_rope_chief）,芦湾棚船（bandit_red_rope_den）,66,,,邵苹随身的皮钱袋从衣襟滑落，卡在两块船板中间。
+押私船的马四（zhao_cargo_keeper）,礁灯下的搭板（zhao_cargo_blue_reef）,56,,,马四落在船板上的小钱袋，系的是他自己腰间那条蓝绳。
+劫货头领阮隼（border_silo_leader）,粮仓下的侧门（border_silo_den）,112,,,阮隼贴身的布钱袋落在秤梁边，和货架上待点验的货分在两处。
+盐洞首领封霁（bandit_salt_cave_chief）,断阶盐洞（bandit_salt_cave_den）,210,厚底踏砂靴（bandit_salt_boots）,0.8,封霁披风里那只沉甸甸的钱袋落在石凳旁。

@@ -4,6 +4,9 @@ import { act, createGame, rules, view } from './engine.mjs';
 import { data } from './data.mjs';
 import { tournamentData } from './tournament.mjs';
 
+const [outer, inner, elder] = tournamentData.stages;
+const guild = 'water_gauge';
+
 function play(state, action, payload = {}) {
   const result = act(state, action, payload);
   assert.ok(result.ok, `${action}: ${result.message}`);
@@ -14,101 +17,141 @@ function atTheHall() {
   const state = createGame(93);
   state.region = 'measuring_hall';
   state.world.lastSettlement = state.region;
-  state.coins = 60;
+  state.coins = 600;
   return state;
 }
 
-function getInvitation(state) {
-  play(state, 'visit', { id: 'zhao_bamboo_duel' });
-  play(state, 'choose', { index: 0 });
-  assert.equal(state.inventory.body_breath_note, 1);
-  assert.equal(state.world.affiliation, null);
+function joinTheHall(state) {
+  const sect = data.sects.find(({ id }) => id === guild);
+  Object.assign(state.inventory, sect.join.need);
+  play(state, 'sectJoin');
+  assert.equal(state.world.affiliation, guild);
 }
 
-function outfitForThreeBouts(state) {
-  state.realm = 5;
-  state.inventory.ration = 8;
-  for (const id of ['sky_sword', 'gauze_armor', 'coal_tassel']) {
-    const gear = data.gear.find((row) => row.id === id);
-    state.equipment[gear.slot] = id;
-    state.inventory[id] = 1;
-    state.durability[id] = gear.durability;
-  }
+function recoverForFlowTest(state) {
+  while (state.day < state.regulatedBoutUntil) play(state, 'wait');
+  state.satiety = 100;
   state.hp = view(state).maxHp;
   state.qi = view(state).maxQi;
 }
 
-function winCurrentBout(state) {
-  for (let i = 0; state.combat && i < 16; i++) play(state, view(state).intent?.kind === 'heavy' ? 'guard' : 'attack');
+function advanceRound(state, match) {
+  recoverForFlowTest(state);
+  assert.equal(view(state).tournament.match.name, match.name);
+  assert.equal(view(state).tournament.match.grade, match.grade);
+  play(state, 'tournamentFight');
+  assert.equal(view(state).currentEnemy.id, match.enemy);
+  assert.equal(view(state).currentEnemy.sparring, true);
+  assert.equal(view(state).currentEnemy.medicineRestricted, true);
+  assert.equal(act(state, 'rest').ok, false);
+  assert.equal(act(state, 'tournamentFight').ok, false);
+  state.combat.hp = 1;
+  for (let i = 0; state.combat && i < 6; i++) play(state, 'attack');
   assert.equal(state.combat, null);
   assert.equal(state.event, null);
   assert.equal(state.region, 'measuring_hall');
   assert.deepEqual(view(state).groundLoot, {});
 }
 
-test('three real arena opponents, rest between bouts, and a one-time first place manual', () => {
-  const state = atTheHall();
-  assert.equal(view(state).tournament, null);
-  assert.equal(act(state, 'tournamentEnroll').ok, false);
-  assert.equal(state.coins, 60);
-  getInvitation(state);
-  outfitForThreeBouts(state);
-  assert.equal(view(state).tournament.canEnroll, true);
-  play(state, 'tournamentEnroll');
-  assert.equal(state.coins, 60 - tournamentData.fee);
-  assert.equal(act(state, 'tournamentEnroll').ok, false);
+function waitToEnterAgain(state, stage) {
+  while (state.day < state.tournament.stages[stage.id].until) play(state, 'wait');
+  recoverForFlowTest(state);
+}
 
-  for (const [index, match] of tournamentData.matches.entries()) {
-    assert.equal(view(state).tournament.match.name, match.name);
-    assert.equal(view(state).tournament.canFight, true);
-    play(state, 'tournamentFight');
-    assert.equal(view(state).currentEnemy.id, match.enemy);
-    assert.equal(view(state).currentEnemy.sparring, true);
-    assert.equal(view(state).currentEnemy.medicineRestricted, true);
-    assert.equal(act(state, 'rest').ok, false);
-    assert.equal(act(state, 'tournamentFight').ok, false);
-    winCurrentBout(state);
-    assert.equal(view(state).tournament.wins, index + 1);
-    if (index < 2) {
-      const blocked = view(state).tournament;
-      assert.equal(blocked.canFight, false);
-      assert.equal(act(state, 'tournamentFight').message, blocked.fightReason);
-      assert.match(blocked.fightReason, /先在场边歇/);
-      state.qi = 0;
-      play(state, 'rest');
-      assert.equal(state.qi, rules.restQi);
-      play(state, 'eat');
+function claim(state, stage) {
+  const pending = view(state).tournament.claims.find(({ id }) => id === stage.id);
+  assert.ok(pending?.available);
+  const before = { ...state.inventory, spirit_coin: state.coins };
+  play(state, 'tournamentClaim', { id: stage.id });
+  const after = { ...state.inventory, spirit_coin: state.coins };
+  for (const [id, count] of Object.entries(pending.reward)) assert.equal(after[id] - (before[id] ?? 0), count, id);
+  return pending.reward;
+}
+
+test('three teams have five distinct opponents with staged realms and strictly higher cumulative prizes', () => {
+  const opponents = tournamentData.matches.map(({ enemy }) => data.enemies.find(({ id }) => id === enemy));
+  assert.equal(new Set(opponents.map(({ id }) => id)).size, 15);
+  assert.deepEqual(opponents.map(({ tier }) => tier), [0, 1, 2, 1, 2, 3, 4, 5, 4, 5, 6, 7, 8, 7, 8]);
+  for (const stage of tournamentData.stages) {
+    assert.deepEqual(stage.prizes[0].reward, {});
+    const strength = stage.matches.map(({ enemy }) => opponents.find(({ id }) => id === enemy));
+    for (const [index, prize] of stage.prizes.slice(1).entries()) {
+      const before = stage.prizes[index].reward;
+      assert.ok(prize.reward.spirit_coin > (before.spirit_coin ?? 0), stage.id);
+      assert.ok(Object.entries(before).every(([id, count]) => prize.reward[id] >= count), stage.id);
+      if (index > 0) {
+        assert.ok(strength[index].hp > strength[index - 1].hp, stage.id);
+        assert.ok(strength[index].atk > strength[index - 1].atk, stage.id);
+      }
     }
   }
-  assert.equal(view(state).tournament.result, '三场全胜');
-  assert.equal(view(state).tournament.best, 3);
-  assert.match(view(state).tournament.claimName, /三场全胜.*奖品/);
-  assert.equal(state.inventory.terrace_counter_manual, undefined);
-  assert.equal(view(state).tournament.canEnroll, false);
+});
+
+test('membership, five fights per stage, stock room, promotions, and one visible handover', () => {
+  const state = atTheHall();
+  assert.equal(view(state).tournament.enlisted, false);
+  assert.match(act(state, 'tournamentEnroll').message, /只收守尺观弟子/);
+  assert.equal(state.coins, 600);
+  joinTheHall(state);
+  state.realm = 8;
+  recoverForFlowTest(state);
+  play(state, 'visit', { id: tournamentData.site });
+  assert.match(play(state, 'choose', { index: 0 }).message, /各有五场/);
+  assert.equal(state.event, tournamentData.site);
+  assert.equal(view(state).tournament.canEnroll, true);
+  assert.match(act(state, 'tournamentEnroll', { id: 'inner' }).message, /只能报名本门身份/);
+
+  for (const stage of [outer, inner, elder]) {
+    assert.equal(view(state).tournament.stageId, stage.id);
+    const cash = state.coins;
+    play(state, 'tournamentEnroll', { id: stage.id });
+    assert.equal(state.coins, cash - stage.fee);
+    assert.equal(act(state, 'tournamentEnroll').ok, false);
+    for (const [index, match] of stage.matches.entries()) {
+      advanceRound(state, match);
+      assert.equal(state.tournament.stages[stage.id].wins, index + 1);
+      if (index < stage.matches.length - 1) {
+        const pending = view(state).tournament;
+        assert.equal(pending.canFight, false);
+        assert.equal(act(state, 'tournamentFight').message, pending.fightReason);
+        assert.match(pending.fightReason, /先在场边歇/);
+      }
+    }
+    assert.equal(state.tournament.stages[stage.id].result, '五场全胜');
+    assert.equal(view(state).tournament.stages.find(({ id }) => id === stage.id).best, 5);
+    assert.equal(act(state, 'tournamentEnroll', { id: stage.id }).ok, false);
+  }
+
+  assert.equal(state.tournament.handoverPending, true);
+  assert.equal(state.world.memberships[guild].office, 'elder');
+  assert.equal(view(state).tournament.handover.available, true);
+  assert.match(act(state, 'tournamentEnroll').message, /来接印/);
+  assert.match(play(state, 'tournamentHandover').message, /秦观澜.*闭关冲元婴中期/);
+  assert.equal(state.world.memberships[guild].office, 'actingHead');
+  assert.equal(view(state).tournament.handover.done, true);
+  assert.equal(act(state, 'tournamentHandover').ok, false);
+  assert.equal(act(state, 'tournamentFight').ok, false);
 
   const rations = state.inventory.ration;
   state.inventory.ration = rules.backpackCapacity * rules.backpackStackSize;
   assert.equal(view(state).tournament.canClaim, false);
-  assert.equal(act(state, 'tournamentClaim').ok, false);
-  assert.equal(state.tournament.claimed, -1);
+  assert.deepEqual(view(state).tournament.claims.map(({ id }) => id), ['outer', 'inner', 'elder']);
+  assert.match(act(state, 'tournamentClaim', { id: 'inner' }).message, /行囊装不下/);
+  assert.equal(state.tournament.stages.inner.claimed, 0);
   state.inventory.ration = rations;
-  play(state, 'tournamentClaim');
-  assert.equal(state.inventory.tournament_citation, 1);
-  assert.equal(state.inventory.jade_pill, 2);
+  assert.deepEqual(claim(state, inner), inner.prizes[5].reward);
+  assert.deepEqual(claim(state, outer), outer.prizes[5].reward);
+  assert.deepEqual(claim(state, elder), elder.prizes[5].reward);
   assert.equal(state.inventory.terrace_counter_manual, 1);
+  assert.equal(state.inventory.tournament_citation, 1);
+  assert.equal(state.inventory.measuring_cedar_ruler, 1);
+  assert.equal(state.inventory.measuring_river_seal, 1);
   assert.equal(act(state, 'tournamentClaim').ok, false);
-
-  const prizeLead = atTheHall();
-  prizeLead.region = 'village';
-  prizeLead.realm = 5;
-  prizeLead.knownItems.push('tournament_citation');
-  assert.equal(prizeLead.inventory.terrace_counter_manual, undefined);
-  assert.equal(act(prizeLead, 'equipManual', { id: 'terrace_counter_manual' }).ok, false);
 });
 
-test('loss preserves score validity and possessions; one consolation with a four-day re-entry delay', () => {
+test('a first fight loss preserves possessions and gives no award; same or lower finish pays nothing', () => {
   const state = atTheHall();
-  getInvitation(state);
+  joinTheHall(state);
   play(state, 'tournamentEnroll');
   play(state, 'tournamentFight');
   const purse = state.coins;
@@ -122,43 +165,59 @@ test('loss preserves score validity and possessions; one consolation with a four
   assert.equal(state.wounds, 0);
   assert.deepEqual(state.inventory, belongings);
   assert.equal(state.coins, purse);
-  assert.equal(state.tournament.wins, 0);
-  assert.equal(state.tournament.until - state.day, tournamentData.cooldown);
-  assert.match(act(state, 'tournamentEnroll').message, /等四个游戏日.*再报名/);
-  play(state, 'tournamentClaim');
-  assert.equal(state.inventory.ration, belongings.ration + 2);
+  assert.equal(state.tournament.stages.outer.best, 0);
+  assert.equal(state.tournament.stages.outer.until - state.day, outer.cooldown);
+  assert.match(act(state, 'tournamentEnroll').message, /再歇 4 日/);
+  const nearReopening = structuredClone(state);
+  nearReopening.day = state.tournament.stages.outer.until - 0.25;
+  assert.match(act(nearReopening, 'tournamentEnroll').message, /再歇 0.25 日/);
   assert.equal(act(state, 'tournamentClaim').ok, false);
-  while (state.day < state.tournament.until) play(state, 'wait');
+
+  state.realm = 8;
+  waitToEnterAgain(state, outer);
   play(state, 'tournamentEnroll');
-  if (state.satiety === 0) play(state, 'eat');
-  assert.equal(view(state).tournament.canFight, false);
-  assert.match(view(state).tournament.fightReason, /气血还没到一半/);
-  play(state, 'restUntilRecovered');
-  if (state.satiety === 0) play(state, 'eat');
-  assert.equal(view(state).tournament.canFight, true);
+  advanceRound(state, outer.matches[0]);
+  play(state, 'tournamentWithdraw');
+  assert.deepEqual(claim(state, outer), outer.prizes[1].reward);
+  assert.equal(act(state, 'tournamentClaim').ok, false);
+
+  waitToEnterAgain(state, outer);
+  play(state, 'tournamentEnroll');
+  advanceRound(state, outer.matches[0]);
   play(state, 'tournamentWithdraw');
   assert.equal(act(state, 'tournamentClaim').ok, false);
-  assert.equal(state.coins, purse - tournamentData.fee);
+
+  waitToEnterAgain(state, outer);
+  play(state, 'tournamentEnroll');
+  advanceRound(state, outer.matches[0]);
+  advanceRound(state, outer.matches[1]);
+  play(state, 'tournamentWithdraw');
+  assert.deepEqual(claim(state, outer), outer.prizes[2].increment);
+  assert.equal(act(state, 'tournamentClaim').ok, false);
+
+  waitToEnterAgain(state, outer);
+  play(state, 'tournamentEnroll');
+  advanceRound(state, outer.matches[0]);
+  play(state, 'tournamentWithdraw');
+  assert.equal(act(state, 'tournamentClaim').ok, false);
+  assert.equal(state.tournament.stages.outer.best, 2);
 });
 
-test('ordinary retreat concedes a live official match, and legit earlier wins still count', () => {
+test('retreat during an official match concedes only the current competition', () => {
   const state = atTheHall();
-  getInvitation(state);
-  outfitForThreeBouts(state);
+  joinTheHall(state);
+  state.realm = 8;
   play(state, 'tournamentEnroll');
-  play(state, 'tournamentFight');
-  winCurrentBout(state);
-  play(state, 'wait');
+  advanceRound(state, outer.matches[0]);
+  recoverForFlowTest(state);
   play(state, 'tournamentFight');
   const health = state.hp;
   play(state, 'retreat');
   assert.equal(state.hp, health);
-  assert.equal(state.tournament.enrolled, false);
-  assert.equal(state.tournament.best, 1);
-  assert.equal(state.tournament.result, '自行退赛');
-  assert.match(view(state).tournament.claimName, /第一场.*奖品/);
-  play(state, 'tournamentClaim');
-  assert.equal(state.inventory.iron_talisman, 1);
+  assert.equal(state.tournament.current, null);
+  assert.equal(state.tournament.stages.outer.best, 1);
+  assert.equal(state.tournament.stages.outer.result, '自行退赛');
+  assert.match(view(state).tournament.claimName, /外门大比.*一胜/);
   assert.equal(state.inventory.tournament_citation, undefined);
 });
 
@@ -210,7 +269,7 @@ test('the brick ring prohibits applying medicine and meal recovery until the fig
 
 test('enemy medicine is withheld by strict referee rules even when an opponent carries a dose', () => {
   const state = atTheHall();
-  getInvitation(state);
+  joinTheHall(state);
   play(state, 'tournamentEnroll');
   play(state, 'tournamentFight');
   const enemy = data.enemies.find(({ id }) => id === state.combat.id);

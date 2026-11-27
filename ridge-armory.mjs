@@ -4,6 +4,7 @@ const leader = 'ridge_armory_ram';
 const horn = 'ridge_ramhorn';
 const pattern = 'ridge_bracer_pattern';
 const bracer = 'ridge_bracer';
+const commission = 'ridge_bracer_commission';
 const animals = ['ridge_armory_goat', 'ridge_armory_lizard', 'ridge_armory_lynx', leader];
 
 const fixed = (count) => ({ start: count, cap: count, interval: 0, growth: 0 });
@@ -12,7 +13,7 @@ const item = (id, name, kind, desc) => ({ id, name, kind, price: 0, sell: 0, des
 
 export const ridgeArmoryContent = {
   items: [
-    item(horn, '弯角岩羚的弯角', 'key', '角根嵌着一截折断的弦钩。双手掰一掰，薄的一侧松手便会弹回原处。梁弦在找这样的弧度。'),
+    { ...item(horn, '岩羚的弯角', 'key', '角根嵌着一截折断的弦钩。双手掰一掰，松手时薄的一侧会弹回原处。梁弦在找这样的弧度。'), physical: true },
     item(pattern, '回力护腕图', 'key', '梁弦把护腕的两根横筋画在角弧里，又补了一笔掌侧的松扣。图旁压着一句：让入臂的劲循原路退回去。'),
     item(bracer, '回力护腕', 'gear', '暗金片底下绷着几根短筋，贴身重击落在护腕上时，有一股力会沿弯角弹回来。'),
   ],
@@ -28,8 +29,9 @@ export const ridgeArmoryContent = {
       desc: '照手里的弯角把暗金压好，再用坚韧兽筋绷紧，护腕内侧垫厚甲片。原角留着比形。' },
   ],
   sites: [
-    { id: bench, region: 'sand_bell_cloister', name: '梁师傅的旧弓架', once: [0],
-      afterOnceText: { 0: '学徒已把断绳换下，梁弦正用木尺量仍完好的弦。院墙外能看见架风板顶上露出来的石梁。' } },
+    { id: bench, region: 'sand_bell_cloister', name: '梁师傅的旧弓架', once: [0], localQuests: [commission],
+      afterOnceText: { 0: '学徒已把断绳换下，梁弦正用木尺量仍完好的弦。院墙外能看见架风板顶上露出来的石梁。' },
+      afterQuestText: { [commission]: '学徒用包了皮的双手拉开旧弓。弦稳稳地绷在新钩上，梁弦转过木尺，在钩边添了一道记号。' } },
     { id: refuge, region: 'wind_slate', name: '挡风板后的旧弓弦库', afterChoices: [`${bench}:0`],
       creatures: {
         ridge_armory_goat: fixed(16), ridge_armory_lizard: fixed(8), ridge_armory_lynx: fixed(5), [leader]: fixed(1),
@@ -43,7 +45,7 @@ export const ridgeArmoryContent = {
   ],
   events: [
     { id: bench, name: '梁师傅的旧弓架',
-      text: '学徒踩着凳子拉一副旧石簧，绳子才绷住，就有一股劲把手掀了开去。梁弦拿木尺敲了敲缺掉的弦钩。',
+      text: '学徒踩着凳子试拉架上的旧弓，弦刚绷紧就脱了钩，掀开他的手。梁弦拿木尺指了指挂钩缺了一块的地方。',
       choices: [
         { label: '问梁弦缺的是哪一截', days: 0.125, stay: true,
           outcome: '「旧件全在架风板底下。沿板边找断绳，进石门，碰上妖物就从矮墙退。」他指指折钩上的一缕毛。「一只大角羚顶歪了梁。我想看看它角根的弧度，断了的钩就是顺这个道理做的。」' },
@@ -80,7 +82,7 @@ export const ridgeArmoryContent = {
       chanceLoot: { gold_core: { count: 3, chance: 0.59 } } },
   ],
   quests: [
-    { id: 'ridge_bracer_commission', region: 'sand_bell_cloister', name: '把弯角给梁弦，请他试弓',
+    { id: commission, region: 'sand_bell_cloister', name: '把弯角给梁弦，请他试弓',
       reveal: { item: horn, need: { [horn]: 1 } }, need: { battle_sinew: 4, hide: 2 }, reward: { [pattern]: 1 },
       desc: '梁弦拿弯角对着缺钩比了比。「角只借来看。还得给学徒换两层包手皮、四根短筋，才能放手试这股弹劲。」',
       outcome: '梁弦绷上新筋，把弯角还给你。学徒再拉旧架时手没有被掀起来，他便把护腕的做法画给你。' },

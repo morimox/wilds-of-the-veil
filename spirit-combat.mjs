@@ -3,24 +3,24 @@ import data from './data.mjs';
 export const spiritSkills = [
   { id: 'fold_armor', name: '折甲', cost: 2, duration: 3, cooldown: 6, strength: 0.5, stat: 'physicalResist',
     region: 'zhao_city', site: 'zhao_flood_office', teacher: '杜椿', defeated: 'fault_warden',
-    desc: '物抗减半，架招失去卸力效果。对手还可以闪避。',
-    lesson: '杜椿把分柱水君拦下来的那一股水引入浅盘，拨开两截交错的竹片。甲再厚，架不住两边的力同时抽开。' },
+    desc: '使对手的物抗减半，防御失去减伤效果。对手仍可闪避。',
+    lesson: '杜椿把浅盘里的水引到两截交叠的竹片上。他用指尖各拨一下，两片竹子刚一错开，水就穿了过去。' },
   { id: 'split_stream', name: '并流', cost: 3, duration: 2, cooldown: 7, strength: 3,
     region: 'glass_rotunda', site: 'sand_glass_chamber', teacher: '邢既横', defeated: 'sand_sundial_master',
-    desc: '下一回合打中的一击造成三倍伤害。可以趁发动时蓄势。',
-    lesson: '邢既横把铜轮转了一圈，支住一重一轻两股回力，让你等它们碰到一处再出手。' },
+    desc: '只在下一回合，打中造成三倍伤害。发动时可以先蓄势。',
+    lesson: '邢既横让你把手按在铜轮上。第一下震动过去，他仍让你按住。等第二下从另一头传来，他才点头让你松手。' },
   { id: 'turn_edge', name: '返势', cost: 1, duration: 1, cooldown: 4,
     region: 'measuring_hall', site: 'zhao_bamboo_duel', teacher: '傅澄', price: 180,
-    desc: '这回合对手若发动攻击，来招折回对手身上。',
+    desc: '这回合若对手出招打你，它会吃下自己的那一招。对手若收招，你也就无招可借。',
     lesson: '傅澄把尺横在你腕下。你连着三次往下压，第三次刚发力，尺身已经转了半圈。' },
   { id: 'veil_eye', name: '遮眼', cost: 1, duration: 3, cooldown: 5, strength: 0.5, stat: 'perception',
     region: 'cold_kiln', site: 'sand_cold_kiln_house', teacher: '阮杪', proof: 'cold_kiln_record', price: 90,
-    desc: '对手洞察减半。这个回合已经看破的动作照常，往后两回合更容易瞒住起手。',
-    lesson: '阮杪把冷炉验火册翻到画着水汽的一页。他教你让动作起在雾纹外，把要落的地方留在雾纹里。' },
+    desc: '使对手的洞察减半。这回合的读招已经判定，接下来两回合更容易瞒住起手。',
+    lesson: '阮杪把冷炉验火册翻到画着水汽的一页，自己站到灯影底下。你看见他已经抬手，却没看清手里何时多了一截竹片。' },
   { id: 'press_edge', name: '压锋', cost: 2, duration: 2, cooldown: 5, strength: 0.6, stat: 'attack',
     region: 'cold_kiln', site: 'sand_cold_kiln_house', teacher: '阮杪', defeated: 'sand_inverted_keeper',
-    desc: '对手两回合内的出手力道削去四成。',
-    lesson: '阮杪听完倒驿锁影的事，在一截铁链上另挂了只齐重的秤砣。你照他的指点重新拽了一下，链子尚未回紧，力先泄了。' },
+    desc: '使对手两回合内的攻击威力降低四成。',
+    lesson: '阮杪听完倒驿锁影的事，取了两只同样重的秤砣挂在铁链两侧。他让你先拽一头，再拨另一头，链子立时松下来。' },
 ];
 
 const spirits = new Map(spiritSkills.map((skill) => [skill.id, skill]));
@@ -70,7 +70,8 @@ export function invokeSpirit(state, kit) {
   if (reason) return kit.refuse(reason);
   state.training.sense -= skill.cost;
   state.combat.playerSpirit = frameFor(skill, state.combat.round);
-  return kit.say(state, `施展${skill.name}，用去${skill.cost}点神识。这回合还能防御、闪避或蓄势。`);
+  const next = skill.id === 'split_stream' ? '这回合可先蓄势，下一回合再出手。' : '这回合不能攻击。';
+  return kit.say(state, `施展${skill.name}，用去${skill.cost}点神识。${next}`);
 }
 
 export function spiritBlocksStrike(combat) {
@@ -78,10 +79,10 @@ export function spiritBlocksStrike(combat) {
 }
 
 export function considerEnemySpirit(combat, enemy, intent) {
-  const skill = spirits.get(enemyPractices[enemy.id]);
+  const skill = spirits.get(enemy.spiritSkill ?? enemyPractices[enemy.id]);
   if (!skill || enemy.tier < firstTier || (combat.enemySpirit?.ready ?? 0) > combat.round) return;
   const canUse = ['guard', 'dodge', 'focus', 'recoverQi'].includes(intent.kind);
-  const reserve = combat.enemySense ?? 3;
+  const reserve = combat.enemySense ?? enemy.spiritReserve ?? 3;
   if (!canUse || reserve < skill.cost) return;
   combat.enemySense = reserve - skill.cost;
   combat.enemySpirit = frameFor(skill, combat.round);
@@ -112,7 +113,7 @@ export function spiritStudies(state, kit) {
   const rows = spiritSkills.filter((skill) => known.includes(skill.id) || (state.event === skill.site && sourceOpen(state, skill)))
     .map((skill) => ({ ...skill, learned: known.includes(skill.id), selected: active?.id === skill.id,
       blocker: instructionBlocker(state, skill, kit) }));
-  const enemy = combat && kit.records.enemies[combat.id];
+  const enemy = combat && kit.enemyOf(state);
   const readings = enemy ? spiritSkills.filter((skill) => known.includes(skill.id) && skill.stat)
     .map(({ stat }) => ({ label: statNames[stat],
       value: stat === 'attack' ? enemy.atk : stat === 'physicalResist'

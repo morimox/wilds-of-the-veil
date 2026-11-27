@@ -16,14 +16,14 @@
     <a href="https://morimox.github.io/wilds-of-the-veil/?play=42" target="_blank" rel="noopener">在浏览器中打开</a>
   </section>
   <div id="app" class="layout" hidden>
+    <header class="topbar">
+      <h1>雾渡山河</h1>
+      <span class="clock" id="clock"></span>
+      <button type="button" class="top-button" data-open-encyclopedia hidden>百科全书</button>
+      <button type="button" class="top-button" data-help aria-label="行旅菜单">菜单</button>
+    </header>
+    <div id="player-status" aria-label="角色状态"></div>
     <div class="travel-column">
-      <header class="topbar">
-        <h1>雾渡山河</h1>
-        <span class="clock" id="clock"></span>
-        <button type="button" class="top-button" data-open-encyclopedia hidden>百科全书</button>
-        <button type="button" class="top-button" data-help aria-label="行旅菜单">菜单</button>
-      </header>
-      <div id="player-status" aria-label="角色状态"></div>
       <main id="main" aria-label="游戏操作区"></main>
       <nav class="navigation" aria-label="其他操作">
         <button type="button" data-tab="journey" hidden>回到当前地点</button>

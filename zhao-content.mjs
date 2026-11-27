@@ -8,9 +8,10 @@ const townStall = {
     weir_knife: { price: 118, start: 1, cap: 1, interval: 18 } },
   buys: { reed: 2, ore: 5, core: 10, black_iron: 13, qi_core: 7, foundation_core: 21, gold_core: 37 },
   talk: { label: '问铁货商蒲霖柜上的旧秤', lead: 'market_scale_verse',
-    outcome: '蒲霖把寒铁往柜里推，拎出两枚砝码。「守尺观那架老秤得两头摆平。右边有两个小盘，那两盘合起来还得正好六两。」他抽出垫在秤脚下的验货单，请你捎过去。' },
+    outcome: '蒲霖把寒铁往柜里推，拎出两枚砝码。「守尺观那架秤，右边两盘合起来得有六两，两头还要平。旧验货单上存着这条规矩，你不妨看一看。」' },
 };
 const hallStall = { type: '宗门', inn: true,
+  repairReferral: '值门弟子看了眼磨损的兵甲。「从观门下去就是照原城。进城找蒲霖，他后炉能修。」',
   goods: { ration: { price: 4, start: 8, cap: 10, interval: 4 }, heal_pill: { price: 27, start: 3, cap: 4, interval: 6 },
     leaf_pill: { price: 37, start: 2, cap: 3, interval: 7 }, clear_needle: { price: 4, start: 14, cap: 20, interval: 5 } },
   buys: { reed: 2, hide: 3, qi_core: 7, foundation_core: 21, gold_core: 37 } };
@@ -24,10 +25,10 @@ const landmarks = [
   ['old_marker', '没顶刻碑', 42, 28, 0, 1, ['zhao_hermit'], '半截石碑立在浅沟，水上能看见朝反方向刻的浪纹。'],
   ['zhao_hermit', '斜漏水驿', 51, 37, 1, 1, ['jade_mill'], '驿棚钉满别处借来的水尺，一支铁楔正压住桌角。', { portal: true }],
   ['ring_isles', '连环浅洲', 53, 14, 1, 1, ['frog_pond'], '浮草稀的地方露着几块踏脚石，踩着它们能走到几座浅水小岛。'],
-  ['scale_bog', '水藻泥湾', 54, 24, 2, 1.25, ['jade_mill', 'sunken_lab'], '水藻裹着泥里的铁砂。青苔长满窄堤，后头偶尔有东西窜过去。'],
+  ['scale_bog', '水藻泥湾', 54, 24, 2, 1.25, ['jade_mill', 'sunken_lab'], '水藻裹着泥里的铁砂。青苔长满窄堤，后头偶尔有东西窜过去。', { routeHint: 'zhao_sluice_outer_isle:2' }],
   ['crane_granary', '白鹤粮仓', 31, 84, 0, 0.75, ['glass_bank'], '粮仓的木桩架得很高。漏下的谷壳被鸟衔走，枯木堆在后门。'],
   ['zhao_pass', '叠石驿关', 91, 62, 1, 1.25, ['rope_sands', 'mingsha_city'], '关后是一道没树的长坡。领路人腰间挂着一串能扣在一起的木通行牌。', { portal: true }],
-  ['jade_mill', '缺轮磨台', 63, 36, 2, 1, ['sunken_lab', 'fault_lake'], '石磨只剩半只轮，中心的圆孔朝着一道塌掉的浅渠。'],
+  ['jade_mill', '缺轮磨台', 63, 36, 2, 1, ['sunken_lab', 'fault_lake'], '石磨只剩半只轮，中心的圆孔朝着一道塌掉的浅渠。', { routeHint: 'zhao_sluice_outer_isle:2' }],
   ['charcoal_ridge', '挂炭坳', 47, 50, 1, 1.25, ['night_pit'], '炭袋挂在山间低处晾干。窑工掀起布角，炉灰的红光后露出一座封了多年的窑。'],
   ['sunken_lab', '沉水量站', 66, 16, 4, 1.5, [], '一排台阶朝水，一排贴着岩壁。水一急，只能靠新挂的灯辨认哪条路通往旧水槽。', { reveal: { item: 'lab_beacon' } }],
   ['night_pit', '烧黑的伏火坑', 57, 57, 5, 1.5, ['burnt_weir'], '炭坑后是一条横着挖开的火道。用湿帘挡住贴地的暗火，里面才有余地换气。', { reveal: { item: 'fire_cloth' } }],
@@ -38,20 +39,20 @@ const landmarks = [
   ['beacon_reefs', '望船排礁', 72, 86, 1, 1.25, [], '礁石上的灯快灭了，灯下拴着一支接货小船用的桨。'],
 ];
 
-const regions = landmarks.map(([id, name, , , tier, travel, , desc, configuration = {}]) => ({
-  id, name, tier, travel, desc, ...(configuration.reveal ? { reveal: configuration.reveal, secret: true } : {}),
+const regions = landmarks.map(([id, name, , , tier, travel, , desc, { reveal, routeHint } = {}]) => ({
+  id, name, tier, travel, desc, ...(reveal ? { reveal, secret: true } : {}), ...(routeHint ? { routeHint } : {}),
 }));
-const regionDetails = Object.fromEntries(landmarks.map(([id, , x, y, , , links, , { reveal, ...features } = {}]) =>
+const regionDetails = Object.fromEntries(landmarks.map(([id, , x, y, , , links, , { reveal, routeHint, ...features } = {}]) =>
   [id, { province, x, y, links, ...features }]));
 
 const key = (id, name, desc) => ({ id, name, desc, kind: 'key', price: 0, sell: 0 });
 const items = [
   key('return_tide_note', '旧碑上的退潮印纸', '从旧碑背面的刻痕印下来的纸，记的是一路向西退去的潮水。纸角写着「斜漏水驿，施荀收」。'),
   key('zhao_sand_chit', '漏潮货签', '余节从秋天的货账上取下的签条。叠石关的柯伯认得正面的签名，签尾另有省潮司留下的缺口。'),
-  key('lab_beacon', '照岩壁的旧灯', '量水司借出的小灯。挂低些，通往旧量水站的那排岩壁上会反出两点光。'),
-  key('fire_cloth', '泡过草汁的湿帘', '炭工用草汁泡过的短帘。在旧窑口找铁钩把帘挂下，就能挡住贴地窜来的暗火。'),
+  { ...key('lab_beacon', '照岩壁的旧灯', '章老借出的小灯。从水藻泥湾的石沿或缺轮磨台背面挂低照岩壁，看见两点反光，就能认出去沉水量站的入口。'), physical: true },
+  { ...key('fire_cloth', '泡过草汁的湿帘', '马荻给的短帘，和窑棚挂的长帘用的是同一种草汁。伏火坑外有铁钩，挂下短帘能暂时挡住贴地的暗火。'), physical: true },
   key('fault_route', '错水湖的折尺', '把尺摊开，能看见三根沉在湖底的柱子和露出它们的水位。照着找能辨认错水湖里的路。'),
-  key('fault_receipt', '湖底旧约', '错水湖底藏着一页旧时分水的约定。落款写了沿途三户撑船人家的姓名。'),
+  { ...key('fault_receipt', '湖底旧约', '错水湖底的一页分水约定，落款写着三户撑船人家的姓名。纸上两道水位刻度已临在随身的图纸上。'), physical: true },
   key('body_breath_note', '扶膝起身帖', '傅澄给访客的一页旧讲义。倒向地面时先稳住呼吸，起身用脚底与腰背一起发力。'),
   key('market_scale_verse', '秤下的验货单', '蒲霖从旧秤下抽出的验货单。上面写着守尺观的规矩：秤的两头要平，右边两个小盘里砝码的总重还得是六两。'),
   key('zhao_porridge_order', '粥铺的领米条', '照原城粥铺的赊账条。昨日没来粮，姜婶托人拿它去白鹤粮仓问何绢。'),
@@ -123,18 +124,27 @@ function offer(label, desc, need, loot, coins, outcome, options = {}) {
   return { label, desc, need, consume: true, loot, coins, days: 0.25, insight: 4, outcome, ...options };
 }
 
-scene('zhao_city', 'zhao_flood_office', '城门旁的水尺房', '一排尺杆挂在墙上。管水位的杜椿和外州船户核对水痕，手边搁着新、旧两册。', [
-  { label: '问两本账的来历', days: 0.125, insight: 3, outcome: '杜椿用指头压着旧账上一行小字。「落灯去年停船。照这上头的水位，比眼下还低半尺，怎么就不能走了？」他翻了翻后一页，空的。「这一页是施荀量的。他如今在斜漏水驿，你若遇见，替我问一声。」' },
+scene('zhao_city', 'zhao_flood_office', '城门旁的水尺房', '一排尺杆挂在墙上。管水位的杜椿和外州船户核对水痕，手边搁着新、旧两册。案上催办秋汛的手令，落款是城主石照川。', [
+  { label: '问两本账的来历', days: 0.125, insight: 3, stay: true,
+    outcome: '杜椿用指头压着旧账上的小字。「落灯去年停船，可照这行字，当时的水比眼下还低半尺。」他把账往后翻，后页是空的。「施荀接着量过。他如今在斜漏水驿，你若遇见，替我问一声。」' },
   { label: '把冷炉验火册给杜椿看', hidden: true, need: { cold_kiln_record: 1 }, days: 0.25, insight: 5,
     outcome: '杜椿看得很慢。「同一晚，雾梁涨了水，鸣沙退了水，照原的水却往地下渗。账没错。施荀那儿有只试水槽，能用一碗水试出那晚怎么回事。」' },
   { label: '取一张窗格下的悬赏告示', days: 0.125, loot: { zhao_gate_notice: 1 },
     outcome: '杜椿往你手上的告示点了一下。「青埂报了三夜的撞门响。先问堤工，再去河边看。是谁碰了闩，别只凭一枚妖丹回来报。」' },
-], { once: [0, 1, 2], choiceText: { 2: { before: '窗格下压着几张新盖印的告示。', after: '窗格下还压着几张给过路人的告示。' } } });
+  { label: '问城主的手令要送去哪里', days: 0.125, stay: true,
+    outcome: '杜椿把手令翻过来，背面画着两处合流口。「一份留在城里，一份送去守尺观。照原州到了元婴初期的，只有石城主和秦观主。真要两处一起决堤，得请他们各去一头。」' },
+], { once: [0, 1, 2, 3], localQuests: ['zhao_sealed_load', 'zhao_gate_bounty', 'zhao_bank_rescue', 'zhao_joint_measure', 'dyke_tailor_handoff'],
+  afterQuestText: {
+    zhao_joint_measure: '三州的水尺已量齐。杜椿把新刻度抄到桌边的小册上，川上的船户可以随时来对。城主催办秋汛的手令还压在册下。',
+  },
+  choiceText: { 2: { before: '窗格下压着几张新盖印的告示。', after: '窗格下还压着几张给过路人的告示。' } } });
 
 scene('zhao_city', 'zhao_porridge_shed', '城墙根的粥铺', '姜婶用铁勺刮了刮铜锅底，又给端碗的人添了一瓢水。门框上夹着一张等船脚带走的领米条。', [
-  { label: '替姜婶把领米条带去白鹤粮仓', days: 0.125, loot: { zhao_porridge_order: 1 },
+  { label: '替姜婶把领米条带去白鹤粮仓', days: 0.125, loot: { zhao_porridge_order: 1 }, stay: true,
     outcome: '姜婶把纸条折好塞进你手里。「船行说雨大，昨儿没捎来米。你找看高脚粮仓的何绢问问，有货给我留两袋，空船路过就带。」' },
-], { once: [0], afterOnceText: { 0: '姜婶慢慢搅着火上的粥。沿墙有一排倒扣的青瓷碗，给刚下船的人用。' } });
+], { once: [0], localQuests: ['zhao_porridge_reply'],
+  afterQuestText: { zhao_porridge_reply: '何绢的回条夹在门边，写着给粥铺留的两袋干谷。姜婶已同卸货的船工打过招呼，在锅边腾出一只空粮瓮。' },
+  afterOnceText: { 0: '姜婶慢慢搅着火上的粥。沿墙有一排倒扣的青瓷碗，给刚下船的人用。' } });
 
 scene('green_dyke', 'zhao_dyke_bend', '两面低埂', '晒席垂在靠水一面，水线贴着席子的下沿。老堤工站在低埂上，手边是一根挂晴雨旗的杆。', [
   gather('掐浅水白芽', '贴席的水不及鞋面。', 'reed', 4, 0.5, '从还没伸叶的老根上掐下了几束白芽。'),
@@ -259,17 +269,17 @@ scene('jade_mill', 'zhao_old_wheel', '横卧的半边磨轮', '半只磨轮躺�
   { label: '看看磨轮背后写了什么', days: 0.25, insight: 3, outcome: '牌上写着，把灯挂在磨轮下面，靠岩壁的一边会反出两点光。卖竹筐的人把灯连同坏器具带去了碎琉璃滩，搁在晒网上。' },
 ], { once: [1], stocks: { core: stock('磨轮灵晶', 8, 12, 6, 4, 0) } });
 
-scene('charcoal_ridge', 'zhao_firedoor', '挂湿帘的窑棚', '窑主马荻在洞口挂湿帘。余火会贴地窜出来，先有浸过草汁的湿帘护身，才能靠近窑口。', [
-  offer('给马荻材料，换一面湿帘', '帘绳断了，帘下的接缝被烤得发红。马荻要补泥、皮料和灵草。', { kiln_clay: 5, hide: 3, reed: 5 }, { fire_cloth: 1 }, -8,
-    '马荻抹泥封住侧面的缝，抛给你另一面湿帘。「里面那东西受惊就踩着炭堆扑。真要进去，先看看哪边能退出去。」'),
+scene('charcoal_ridge', 'zhao_firedoor', '挂湿帘的窑棚', '马荻把长帘挂在窑棚门上。隔一阵，就有一股余火贴地窜出来。他脚边另有一副卷好的短帘，外出可以带。', [
+  offer('用补棚的材料换一面短湿帘', '马荻愿意匀出短帘。补棚要五份耐火泥、三份兽革和五份灵草，浸帘用的药汁另算八钱。', { kiln_clay: 5, hide: 3, reed: 5 }, { fire_cloth: 1 }, -8,
+    '马荻把浸过草汁的短帘卷好递给你。「进去先找挂钩。帘子能挡一会儿地火。里头有只兽伏在炭灰里，听见响动就扑过来。你先认好回来这几步路。」', { stay: true }),
   gather('捡晾棚的松枝头', '被雨打湿的整炭仍在袋里，棚外松尖晾得干。', 'wood', 5, 0.75, '轻推棚角，掉下来一些没熏透的松尖。'),
 ], { once: [0], stocks: { wood: stock('炭棚松枝', 7, 12, 5, 4, 1) },
-  afterOnceText: { 0: '马荻挂稳了湿帘，窑口的火苗没再贴地蹿出来。外头的晾棚晒着炭，棚角散着窑工削下的枝头。' } });
+  afterOnceText: { 0: '能带走的短帘已经交给你。门上这面长帘底下仍有空隙，马荻蹲在棚边，等火收回去再探头察看。' } });
 
 scene('sunken_lab', 'zhao_submerged_table', '铜槽旁', '低挂的灯在岩壁上照出两点光。铜水槽一头还在溅水，另一头有东西用肩抵住出水孔。侧边钉着刻了图的铜板，入口附近还有一块够不到水的台子。', [
   { label: '提灯沿水槽走到深处', days: 0.25, enemy: 'lab_crawler',
     outcome: '灯一晃，湿漉漉的石甲从槽里拱起来。堵在出水孔里的东西侧过身，水打湿了你半条裤腿。' },
-  { label: '拔掉铜板的插销，印下刻图', afterFight: 'lab_crawler', days: 0.75, loot: { phase_chart: 1 }, insight: 6,
+  { label: '拔掉铜板的插销，印下刻图', afterFight: 'lab_crawler', days: 0.75, loot: { phase_chart: 1 }, insight: 6, stay: true,
     outcome: '压住槽沿的石甲已经裂开，水槽另一头终于能抬起来。铜板背面刻着水滴该隔多久落下。你把图印到纸上，原板留在旧站。' },
   gather('在外围收晶屑', '灯旁有一块高台，槽里的水挤不到这边。', 'core', 7, 1.25, '干台的一层短晶透过水汽露出了棱。'),
 ], { once: [1], stocks: { core: stock('量槽外晶屑', 9, 15, 8, 4, 2) }, creatures: { lab_crawler: { start: 1, cap: 1, interval: 0, growth: 0 } },
@@ -290,17 +300,17 @@ scene('night_pit', 'zhao_bank_fire', '赤泥横穴', '湿帘贴住地面，帘�
 
 scene('glass_bank', 'zhao_glass_net', '六角晒网', '网上晾着带刻度的碎琉璃和一盏浸水也不灭的旧灯。章老把几块轻的碎片摆在外头，看风往哪边吹。', [
   offer('修好灯座，向章老借灯', '灯座搁在网上，撑灯的横木已经开裂。', { ore: 5, wood: 5, core: 2 }, { lab_beacon: 1 }, -16,
-    '章老拿撑渔网的杆子压了压新灯座。「去缺轮磨台，过了磨轮后站到岩壁边。哪条路反出两点光，就沿哪条去沉水量站。」'),
+    '章老拿撑渔网的杆子压了压新灯座。「从水藻泥湾沿露在水面的石头走，或从缺轮磨台背后贴着岩壁走。把灯拿低，岩上有两点反光。沿着岩壁走，就找得到沉水量站。」', { stay: true }),
   gather('从碎琉璃中挑灵晶', '晒网旁的碎片里也有清澈的灵晶。', 'core', 4, 0.75, '你一片片挑出来，把表面的盐洗掉。'),
 ], { once: [0], stocks: { core: stock('滩中灵晶', 6, 10, 6, 3, 1) },
   afterOnceText: { 0: '晒网边原先搁灯的地方空了。章老在翻晾带刻度的碎琉璃。' },
   stockText: { core: { present: '篮子旁还有没挑出来的灵晶。', absent: '篮子旁的灵晶已经挑完了。' } } });
 
 scene('fault_lake', 'zhao_deep_pillars', '分水三柱', '三根石柱并排露在水上。中间有人用剑尖挑起水流，两边的浪跟着拐了个弯。最外头那根柱已经断成两半，裂口泛白。', [
-  { label: '踏过断柱，往对面的石台去', desc: '你刚把脚搭上断柱，那人就横过了剑。退回岸上的路还在。', days: 0.25, enemy: 'fault_warden',
+  { label: '踏过断柱，往对面的石台去', desc: '你刚把脚搭上断柱，那人就横过了剑。退回岸上的路还在。', days: 0.25, enemy: 'fault_warden', hideAfterFight: 'fault_warden',
     outcome: '他在水上让开半步，一道浪却贴着他的剑锋扫到石台边。' },
-  { label: '掀开石台上的槽盖', afterFight: 'fault_warden', days: 0.75, loot: { fault_receipt: 1 }, insight: 7,
-    outcome: '你抬起暗槽一侧还能活动的盖，里头压着一份旧约。纸上除了三州的水位，还记着田地淹过以后，三户船家分头把船送到了哪儿。' },
+  { label: '掀开石台上的槽盖', afterFight: 'fault_warden', days: 0.75, loot: { fault_receipt: 1 }, insight: 7, stay: true,
+    outcome: '槽盖下压着一页旧约，上面记着三州的水位，也写了涨水后各家把船送去了哪儿。你怕这一页沾水，先把两道水位临到随身的图纸上，再拿起原件。' },
 ], { once: [1], creatures: { fault_warden: { start: 1, cap: 1, interval: 0, growth: 0 } },
   afterWinText: { fault_warden: '水君的身形散了。浪流进湖底的石缝，石台渐渐露出来。台上有道窄槽，槽盖只有一头还被钉着。' },
   afterOnceText: { 1: '石台上的窄槽空了，一边盖子斜敞着。水绕开半沉的断柱，缓缓流向远处。' } });
@@ -314,7 +324,7 @@ scene('rope_sands', 'zhao_rope_sound', '拴着石坠的探路绳', '石坠沉在
 scene('burnt_weir', 'zhao_broken_rake', '露出水面的三根断柱', '三根断石柱露在水面外。管水坝的楚棱扶着两根水尺，一边的水退到柱脚，他就抬尺读数。', [
   gather('从外侧石柱旁铲灵晶', '通向里面的路断了，外侧石柱边的白晶还够得着。', 'core', 6, 1.25, '铲下的灵晶沿水坝滑到浅滩，薄片之间还滴着水。'),
   { label: '把铜板上的滴水图给楚棱看', hidden: true, need: { phase_chart: 1 }, days: 0.5, loot: { fault_route: 1 }, insight: 5,
-    outcome: '楚棱认出旧水槽的退水记号，把尺从布套里取出摊开。「湖底有三根柱子，一位修士守着残台。去过的人多半给赶回来了。下水前先看看从哪儿退。」' },
+    outcome: '楚棱认出退水的记号，把短尺递给你。「从这儿下水，柱脚有三道旧刻痕。末一道露全了再下去。水上来得快，回来时就贴着带刻痕的石柱走。」' },
 ], { once: [1], stocks: { core: stock('断齿灵晶', 8, 14, 7, 4, 0) } });
 
 scene('beacon_reefs', 'zhao_ferry_hook', '礁石上的灯座', '清点货物的人往灯里添油，搁在灯下的船桨还粘着雾梁州的泥。礁石后常积着水冲来的沉木。', [
@@ -336,30 +346,10 @@ scene('zhao_hermit', 'zhao_assay_tubs', '用陶罐试水的旧槽', '两根管�
   misses: { fall: { pulse: '来得急的水漫进第二道槽，把沉泥卷起来。两边的清水和泥水混到了一起。' },
     salt: { cool: '水滴已经稳了。井盐碰到冷罐底却结成一小团，水面没能凝出盐圈。' } },
   reward: { gold_formula: 1 },
-  outcome: '泥在罐里慢慢沉底，温热的陶罐底沿凝出一道盐圈。施荀写下刚才的温度、用料和水量，把验好的方子和剩下的料都交给你。',
+  afterText: '两边的水滴得一样慢，黑泥静静沉在罐底。温热的陶罐内沿留着一圈细盐。施荀摊开干净的纸，就照着这次的火候和用料给你写了结丹散的方子。',
+  outcome: '盐圈结成了。施荀把结丹散丹方和剩下的料交给你。',
 });
 
-const sects = [{ id: 'water_gauge', region: 'measuring_hall', name: '守尺观',
-  desc: '守尺观替沿河人量水位。傅澄教弟子用尺，也会请来歇脚的访客到庭里切磋。', join: { need: { reed: 4, wood: 4 }, coins: 16 },
-  entryRole: '在观里备量水用的木桩、绳和药箱，也能跟傅师父学用尺。',
-  jobs: [
-    { id: 'gauge_posts', name: '换掉量水绳的断桩', desc: '去量水的人踩断了两根木桩。换好木桩和铁扣，才能重新拉绳量水。', need: { wood: 6, ore: 2 }, credit: 4, coins: 14, cooldown: 6 },
-    { id: 'gauge_pillbox', name: '修好外出用的药箱', desc: '弟子从暴雨里捞回药箱，得用兽革重新包好，再补些灵草。', need: { reed: 7, hide: 3 }, credit: 6, coins: 22, cooldown: 9 },
-    { id: 'gauge_silt', name: '备齐试水槽的灵晶和妖丹', desc: '傅澄想试试妖丹能不能稳住漏水处的阵法。他每天都要把浸水的材料取出来看看。',
-      minCredit: 4, rankReason: '傅澄把开着的试水阵交给值守的内门弟子。',
-      need: { core: 5, foundation_core: 1 }, credit: 10, coins: 29, cooldown: 12 },
-    { id: 'gauge_flood_check', name: '查两户人家报上来的汛期水位', desc: '两只木匣同时送到，里头的水位纸差了一截。傅澄请人用院里的水槽校准两家的尺，再回信给各户。',
-      minCredit: 16, rankReason: '回信要盖观里的印。两户的水位由执事弟子核过，才会照信开闸。',
-      days: 0.75, need: { wood: 2, ore: 3, core: 2 }, credit: 5, coins: 28, cooldown: 11, reward: { heal_pill: 1 },
-      text: '一户的尺脚磨短了。你箍紧新木脚，把两把尺浸进同一股水。守门弟子照你核准的水位回信，叫两户各照信上写的时辰开闸。' },
-  ],
-  ranks: [
-    { credit: 4, name: '替尺行走', disciple: '内门弟子', role: '替观里试水槽，帮傅澄照看小阵，跟着学怎么读水尺。',
-      reward: { ration: 5 } },
-    { credit: 16, name: '河记执事', disciple: '执事弟子', role: '核对各户送来的水位，用观里的印回信，告诉他们照哪个水位开闸。',
-      reward: { formula_gold_salve: 1, gold_salve: 2 } },
-  ],
-}];
 
 const quests = [
   { id: 'zhao_sealed_load', region: 'zhao_city', name: '修好省潮司的水位尺', desc: '城门旁水尺的支脚已泡烂。杜椿想在秋汛前换上松木支脚，用寒铁把尺身重新箍紧。',
@@ -368,7 +358,7 @@ const quests = [
   { id: 'zhao_joint_measure', region: 'zhao_city', name: '校准三州的水尺', reveal: { item: 'fault_receipt' },
     desc: '杜椿在等那份给三州分水的旧约。施荀要做三副铜夹，用同一股水把各州的刻度对齐。',
     need: { fault_receipt: 1, core: 10, ore: 12, wood: 8 }, reward: { gold_salve: 4 }, coins: 81, insight: 14,
-    outcome: '三把尺并排浸进水槽，水痕终于挨成一条线。来借尺的货郎问杜椿：「按这把量，下游庄子哪天能收粮？我好把船给他们留一趟。」' },
+    outcome: '杜椿收了旧约原件，借你的临本核过刻度。三把尺并排浸进水槽，水痕终于挨成一条线。旁边的货郎问：「按这把量，下游庄子哪天能收粮？我好给他们留趟船。」' },
   { id: 'zhao_porridge_reply', region: 'zhao_city', name: '给粥铺回个准话', reveal: { item: 'zhao_porridge_order' },
     desc: '姜婶给船工留着下午的一锅粥。去白鹤粮仓找何绢问清有没有干谷，把她的回条带回照原。',
     need: { zhao_grain_reply: 1 }, reward: { ration: 3 }, insight: 2, requiresKnownMaterials: false,
@@ -383,4 +373,4 @@ const quests = [
     outcome: '杜椿把断闩拿去和先前的齿印比对，再照回条给各家的引水册补上一页。他拆下已验的告示，依悬赏所写给你灵钱和药膏。' },
 ];
 
-export const zhaoContent = { regions, regionDetails, items, sites, events, enemies, sects, quests };
+export const zhaoContent = { regions, regionDetails, items, sites, events, enemies, quests };

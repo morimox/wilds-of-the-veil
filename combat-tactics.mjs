@@ -3,9 +3,12 @@ const strategies = {
   bulwark: { guardAt: 0.42, healAt: 0.48 },
   duelist: { guardAt: 0.62, healAt: 0.3 },
   schemer: { guardAt: 0.68, healAt: 0.43 },
+  counter: { guardAt: 0.38, healAt: 0.3 },
+  footwork: { guardAt: 0.68, healAt: 0.32 },
 };
 
 const focus = { kind: 'focus', name: '蓄势待发' };
+const fallback = { kind: 'guard', name: '勉强架住双手', mult: 1 };
 const isAttack = (kind) => kind === 'attack' || kind === 'heavy' || kind === 'drain';
 
 function recentEstimate(values) {
@@ -31,19 +34,37 @@ function worthwhileHeal(enemy, heal, hp, threat, threshold) {
   return restored > Math.max(2, threat);
 }
 
+function pursuitAttack(attacks) {
+  let best = null;
+  let bestAccuracy = -Infinity;
+  for (const attack of attacks) {
+    const quick = attack.ranged || attack.damageType === 'magic' || attack.kind === 'drain';
+    const accuracy = (attack.accuracy ?? 0) + (quick ? 0.15 : 0);
+    if (accuracy <= bestAccuracy) continue;
+    best = attack;
+    bestAccuracy = accuracy;
+  }
+  return best;
+}
+
 export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, read, observedHits = [], medicine, qi = Infinity }) {
   const start = round % enemy.intents.length;
   const order = [...enemy.intents.slice(start), ...enemy.intents.slice(0, start)];
   const recentlyRecovered = previousKind === 'heal' || previousKind === 'remedy';
-  const available = order.filter(({ kind, qiCost = 0 }) => qiCost <= qi && kind !== 'recoverQi' &&
-    !(kind === 'guard' && previousKind === 'guard') && !(kind === 'heal' && recentlyRecovered));
-  const attack = available.find(({ kind }) => kind === 'attack') ?? available.find(({ kind }) => isAttack(kind));
+  const available = order.filter(({ kind, qiCost = 0, follows, spendsCharge }) => qiCost <= qi && kind !== 'recoverQi' &&
+    (!follows || follows === previousKind) && (!spendsCharge || charged) &&
+    !(kind === 'guard' && previousKind === 'guard') && !(kind === 'heal' && recentlyRecovered) &&
+    !(kind === 'focus' && charged) && !(kind === 'dodge' && previousKind === 'dodge' && enemy.strategy === 'footwork'));
+  const attacks = available.filter(({ kind }) => isAttack(kind));
   const regain = order.find(({ kind }) => kind === 'recoverQi');
-  if (!attack && regain && qi < enemy.qi) return regain;
-  const planned = available[0] ?? { kind: 'guard', name: '勉强架住双手', mult: 1 };
+  const planned = available[0] ?? fallback;
+  const attack = attacks.find(({ kind }) => kind === 'attack') ?? attacks[0];
+  if (!attack) return regain && qi < enemy.qi ? regain : planned;
   const heavy = previousKind === 'heavy' ? null : available.find(({ kind }) => kind === 'heavy');
+  const release = attacks.find(({ spendsCharge }) => spendsCharge);
+  const prepare = available.find(({ kind }) => kind === 'focus') ?? focus;
   const strategy = Object.hasOwn(strategies, enemy.strategy) ? strategies[enemy.strategy] : null;
-  if (read?.kind === 'medicine' && charged) return heavy ?? attack;
+  if (read?.kind === 'medicine' && charged) return release ?? heavy ?? attack;
 
   if (!strategy) {
     if (!read) return planned;
@@ -57,6 +78,10 @@ export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, rea
   const heal = available.find(({ kind }) => kind === 'heal');
   const threat = incomingEstimate(enemy, guard ?? order.find(({ kind }) => kind === 'guard'), observedHits);
   const open = threat?.open ?? 0;
+  const follow = attacks.find(({ follows }) => follows);
+
+  if (release && (!read || ['strike', 'focus', 'medicine', 'recover'].includes(read.kind))) return release;
+  if (follow && (!read || ['strike', 'focus', 'recover'].includes(read.kind))) return follow;
 
   const safeWindow = ['brace', 'dodge', 'focus', 'recover', 'switch', 'medicine'].includes(read?.kind);
   const recentlyPassive = previousKind === 'guard' || recentlyRecovered || previousKind === 'focus';
@@ -80,17 +105,24 @@ export function chooseEnemyIntent(enemy, { round, hp, previousKind, charged, rea
   if (read.kind === 'focus') return heavy ?? attack;
   if (read.kind === 'brace') {
     if (worthwhileHeal(enemy, heal, hp, 0, strategy.healAt)) return heal;
-    if (!charged && hp > enemy.hp * 0.25 && enemy.strategy !== 'predator') return focus;
+    if (!charged && hp > enemy.hp * 0.25 && enemy.strategy !== 'predator') return prepare;
     return attack;
   }
   if (read.kind === 'dodge') {
     if (worthwhileHeal(enemy, heal, hp, 0, strategy.healAt)) return heal;
-    return available.find(({ accuracy, ranged, kind }) => isAttack(kind) && (accuracy || ranged || kind === 'drain')) ?? attack;
+    return pursuitAttack(attacks) ?? attack;
   }
   if (read.kind === 'recover' && worthwhileHeal(enemy, heal, hp, 0, strategy.healAt)) return heal;
   if (read.kind !== 'strike') {
     const drain = enemy.strategy === 'schemer' && read.kind === 'recover' && available.find(({ kind }) => kind === 'drain');
     return drain || (enemy.strategy === 'bulwark' ? attack : heavy ?? attack);
+  }
+
+  if (enemy.strategy === 'counter' && guard && !recentlyPassive && open >= Math.max(5, hp * 0.12) &&
+      threat.braced < hp && threat.braced + 2 <= open) return guard;
+  if (enemy.strategy === 'footwork' && open >= Math.max(6, hp * 0.14) && !recentlyPassive) {
+    const sidestep = available.find(({ kind }) => kind === 'dodge');
+    if (sidestep) return sidestep;
   }
 
   if (!recentlyPassive && threat) {

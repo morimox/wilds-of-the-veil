@@ -68,7 +68,7 @@ export const sandboxQuestsWest = [
         scoop: { top: '姚六把刚捞的几粒倒进掌心，挨个掐开，只拣出了空壳。他把干种袋口重新拴紧。' },
       },
       days: 0.375, insight: 4, reward: { millet_seed: 4, millet_grain: 3 },
-      outcome: '浮的那粒掐开只有壳，沉的那粒满满一芯。姚六把浸过的一小把装在瓢里，预备今夜先下近处的两垄。远田的种还干着，他从那袋匀了些种子和能下锅的粟给你。',
+      outcome: '浮的那粒掐开只有壳，沉下的满满一芯。姚六把浸过的一小把撒进已退水的近处两垄。远田的种还干着，他从那袋匀了些种子和能下锅的粟给你。',
       afterText: '里沟边的瓢还是湿的，姚六把留种袋移到坡上的干处去了。试过的那把粟已撒下近处两垄。',
     },
   },
@@ -115,7 +115,7 @@ export const sandboxQuestsWest = [
           outcome: '朝阳那片卷成细条，叶背一整圈都发褐。竹槛背阴处那片已经干了，银纹却还清楚。' } },
       { id: 'wet_packed_leaf', name: '药篓夹层里的水珠', site: 'kiln_carter',
         desc: '篓顶摊开的一层叶子已经干了，篓里两个叶面相贴的地方还是湿的。',
-        action: { label: '帮赶车人分开叠在一起的药叶', desc: '他把篓盖支着，最上面一层叶已经与里头的颜色不同了。', days: 0.125,
+        action: { label: '帮赶车人摊开卸下车的药叶', desc: '石檐下那只篓还装着货。他把篓盖支起，面上的叶已经发干，里头的颜色还深。', days: 0.125,
           outcome: '上头的叶子一掰就脆。下面两张贴得紧，刚揭开就滴了一滴水，贴住的边已经起黑点。' } },
     ],
     experiment: {
@@ -224,7 +224,7 @@ export const sandboxQuestsWest = [
           outcome: '「老放里头，两脚一收就会撞结。」裴见把两脚并到一起，两只鞋的内侧各有一道被磨白的短痕。' } },
     ],
     experiment: {
-      desc: '白宜手上有两双编好的试鞋，只有鞋底的凹槽和脚踝绳没做完。她坐在浅处的石头上试脚，不必走到急水里。',
+      desc: '白宜拿来两双新试鞋。厚皮刚缝上去，鞋底还没开槽，脚踝的两根皮绳也垂着。岸边有块平石，够她扶着试走几步。',
       controls: [
         { id: 'sole', label: '鞋底的凹槽通向哪儿', options: [
           { id: 'edge', label: '把槽划到鞋底边缘' },
@@ -241,7 +241,7 @@ export const sandboxQuestsWest = [
         knot: { inner: '白宜刚并脚站稳，两边的皮结便碰上了。她解开湿绳重新拿好。' },
       },
       days: 0.5, insight: 5, reward: { wuliang_shoal_shoes: 1 },
-      outcome: '白宜沿浅水走了几步，抬脚时槽里没留尖砂，脚边的绳也不再打架。她给另一双照样开完槽，把鞋边的厚皮缝紧递给你。「背庄稼、挖草药都用得上，穿走吧。」',
+      outcome: '白宜沿浅水走了几步，鞋底一抬，细砂便顺着水从槽口退了出去。她站稳并了并脚，两边的绳结也碰不着。她照样做好另一双，递给你。「下浅滩时穿这双。」',
     },
   },
   {
@@ -311,7 +311,7 @@ export const sandboxQuestsWest = [
         send: { bird: '何绢掀开袋口给你看，整个布面都是碎壳。「这一袋送去喂鸡。」' },
       },
       days: 0.25, insight: 4, reward: { crystal_feast: 2, millet_grain: 4 },
-      outcome: '何绢拆看一小撮，碎谷里没混进糠。她把干板抬到船工够得到的地方，进屋拿了两包做好的禾香封肉，又从新粟里给你匀了一把。',
+      outcome: '何绢拆看一小撮粟，没混进糠。她把待发的粮袋抬上干板，从屋里拿出两包前一船捎来的粟香封岩肉，又从自家留的粟里给你匀了一把。',
     },
   },
   {
@@ -414,19 +414,19 @@ export const sandboxQuestsWestExtras = {
   sites: [
     { id: 'zhao_mill_dry_workroom', region: 'jade_mill', name: '岸门下的干工房',
       reveal: { item: 'zhao_mill_door_pin' }, once: [0],
-      afterOnceText: { 0: '石柜的隔板已经掀起，上头搁着一捆扎过又拆开的麻绳。屋外的水响隔着墙，倒比外头还低。' },
+      afterOnceText: { 0: '石柜的隔板已经掀起，上头搁着拆下来的麻绳。灰雾从柜后的窄缝飘进屋，隔着石壁，水声听来很轻。' },
       creatures: { zhao_mill_stone_rat: { start: 1, cap: 1, interval: 8, growth: 1, fixedPopulation: true } },
       creatureText: { zhao_mill_stone_rat: {
-        present: '石柜后面的窄缝能透风，地上滚着几粒新咬开的松子，墙上足印绕到工作台背后。',
+        present: '地上滚着几粒新咬开的松子，墙上足印绕到工作台背后。',
         absent: '工作台背后没有动静，旧爪印上已经落了一层灰。',
       } },
     },
   ],
   events: [
     { id: 'zhao_mill_dry_workroom', name: '岸门下的干工房',
-      text: '短门插撑着头顶的石门，七级石梯下去，是间没被水淹过的小屋。工作台上画着卸磨轮的办法，门边的石柜还留有一包用油布扎好的工具。',
+      text: '短门插撑着头顶的石门，七级石梯下去，是间没被水淹过的小屋。工作台上画着卸磨轮的办法，门边的石柜里还有一包油布裹好的工具，柜后窄缝飘进一线灰雾。',
       choices: [
-        { label: '打开石柜，看那包旧工具', desc: '粗麻绳上的半枚封印同余节那张撤磨册落下的印一样。', days: 0.25,
+        { label: '打开石柜，看那包旧工具', desc: '粗麻绳上的半枚封印同余节那张撤磨册落下的印一样。', days: 0.25, stay: true,
           loot: { ore: 6, hard_scale: 3 },
           outcome: '旧木柄糟得提不起来。油布里的几片磨面厚甲和没生锈的寒铁却还能用，你把好料从腐断的绳里挑出来。' },
         { label: '绕到工作台背后，找咬开松子的东西', desc: '墙缝里的动静在工作台那头。只开石柜，从门边伸手就够得着。',

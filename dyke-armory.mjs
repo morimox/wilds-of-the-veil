@@ -8,7 +8,7 @@ const heavy = (name, mult = 1.55) => ({ kind: 'heavy', name, mult });
 const guard = (name, mult = 1.4) => ({ kind: 'guard', name, mult });
 
 const items = [
-  { id: 'dyke_backstrap', name: '老鳄的背筋', kind: 'key', price: 0, sell: 0,
+  { id: 'dyke_backstrap', name: '老鳄的背筋', kind: 'key', physical: true, price: 0, sell: 0,
     desc: '从沉木滩的老鳄脊骨旁取下。两边粗细不等，一合一松，仿佛还在牵着背鳞转身。' },
   { id: 'dyke_jacket_pattern', name: '短褂的裁样', kind: 'key', price: 0, sell: 0,
     desc: '针匠蒋榛依老鳄的背筋画的纸样。两边的皮条错着下针，急转身体时肩口仍能松开。' },

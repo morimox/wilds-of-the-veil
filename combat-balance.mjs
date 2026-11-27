@@ -1,12 +1,12 @@
 const goldEnemyResistance = {
-  river_spar_captain: { physicalResist: 0.23, magicResist: 0.10 },
+  river_spar_captain: { physicalResist: 0.27, magicResist: 0.10 },
   undertow_moundback: { physicalResist: 0.27, magicResist: 0.08 },
   ember_yak: { physicalResist: 0.15, magicResist: 0.23 },
   fault_warden: { physicalResist: 0.09, magicResist: 0.42 },
   sand_glass_lynx: { physicalResist: 0.07, magicResist: 0.22 },
   sand_inverted_keeper: { physicalResist: 0.27, magicResist: 0.09 },
   sand_basket_mender: { physicalResist: 0.15, magicResist: 0.17 },
-  sand_sundial_master: { physicalResist: 0.17, magicResist: 0.34 },
+  sand_sundial_master: { physicalResist: 0.21, magicResist: 0.37 },
   sky_spillway_lizard: { physicalResist: 0.22, magicResist: 0.08 },
   sand_anchor_scorpion: { physicalResist: 0.34, magicResist: 0.06 },
   sand_spine_lizard: { physicalResist: 0.29, magicResist: 0.11 },
@@ -44,8 +44,11 @@ const enemySpells = {
   zhao_sluice_anchor: { qi: 29, costs: { 从石缝往回抽气: 6, 由低处顶起水柱: 8 } },
   sand_well_basilisk: { qi: 28, costs: { 喷出带寒气的白沫: 7 } },
   terrace_finalist: { qi: 30, costs: { '把尺垂下，探你的气息': 6 } },
+  caravan_broker: { qi: 16, costs: { 收刀调息: 8 } },
+  border_rope_warden: { qi: 16, costs: { 抱柄调息: 8 } },
+  border_kiln_brazier: { qi: 24, costs: { 添炭拨灰: 8 } },
   border_silo_roof: { qi: 28, costs: { 贴窗引气: 6, 回身再抽真气: 7 } },
-  border_silo_leader: { qi: 31, costs: { 折刀牵气: 7 } },
+  border_silo_leader: { qi: 39, costs: { 折刀牵气: 7, 倚梁按刃调息: 9 } },
   ridge_armory_lizard: { qi: 28, costs: { 贴砂引气: 6 } },
 
   undertow_moundback: { qi: 35, costs: { 掀来倒流的潮水: 8 } },
@@ -57,7 +60,7 @@ const enemySpells = {
   },
   sand_glass_lynx: { qi: 29, costs: { 扬起呛人的晶尘: 7 } },
   sand_inverted_keeper: { qi: 35, costs: { 收紧锁链护身: 7 } },
-  sand_sundial_master: { qi: 48, costs: { 连拖三步: 8, 借石光从下往上挑刀: 11 } },
+  sand_sundial_master: { qi: 56, costs: { 刀背拖地牵走真气: 8, 借石光从下往上挑刀: 11 } },
   sky_spillway_lizard: { qi: 30, costs: { 两脊拨水闭息: 7 } },
   sand_spine_lizard: { qi: 30, costs: { 张鳞卷砂: 7 } },
   sand_quarry_guard: { qi: 31, costs: { 张喉卷走石尘: 8 } },
@@ -65,6 +68,42 @@ const enemySpells = {
   ridge_armory_lynx: { qi: 28, costs: { 埋耳借风: 7 } },
   ridge_armory_ram: { qi: 39, costs: { 扬头牵走风气: 9 } },
 };
+
+function tuneNamedFighter(enemy) {
+  if (enemy.id === 'zhao_spar') {
+    enemy.hp += 7;
+    enemy.strategy = 'counter';
+    enemy.perception += 3;
+    enemy.desc = '他把竹尺沿着前臂竖起，尺尖留在你手腕旁。若还循原路进尺，下一手便会被他赶着打。';
+    enemy.intents = [
+      { kind: 'attack', name: '走上半步，用竹尺点腕', mult: 1 },
+      { kind: 'guard', name: '沿前臂竖尺，留住尺尖', mult: 1.9 },
+      { kind: 'attack', name: '顺着挡住的来势推尺', mult: 1.4, pierce: 7, follows: 'guard' },
+      { kind: 'heavy', name: '反过尺背打向肩头', mult: 1.53 },
+      { kind: 'attack', name: '转身用竹尺横推', mult: 1.08 },
+    ];
+  } else if (enemy.id === 'sand_basket_mender') {
+    enemy.strategy = 'footwork';
+    enemy.dodge = 0.25;
+    enemy.perception += 3;
+  } else if (enemy.id === 'border_silo_leader') {
+    enemy.perception += 2;
+    enemy.medicine = { id: 'heal_pill', count: 1 };
+  } else if (enemy.id === 'bandit_salt_cave_chief') {
+    Object.assign(enemy, { hp: 135, atk: 24, def: 9, perception: 34, strategy: 'counter' });
+    enemy.desc = '封霁穿厚软底靴。鞋底踏过一层盐壳也没声。他把剑拢在披风内，挡开招之后，剑尖常从你放下兵刃的那一侧递过来。';
+    enemy.intents = [
+      { kind: 'attack', name: '贴身递剑', mult: 1.04, accuracy: 0.1 },
+      { kind: 'guard', name: '以披风遮剑，偏过身架住兵刃', mult: 1.72 },
+      { kind: 'attack', name: '从披风下反刺肋侧', mult: 1.34, follows: 'guard', pierce: 3, accuracy: 0.13 },
+      { kind: 'heavy', name: '踏住盐砾，从侧面挑起剑锋', mult: 1.58, pierce: 2 },
+      { kind: 'dodge', name: '错一步退进石隙' },
+    ];
+  } else if (enemy.id === 'sand_sundial_master') {
+    enemy.intents = enemy.intents.map(intent => intent.kind === 'guard'
+      ? { ...intent, name: '立刀引气，把撞来的术法卸入石壁', magicWard: 10 } : intent);
+  }
+}
 
 const forgedGear = [
   {
@@ -92,7 +131,7 @@ const forgedGear = [
       desc: '水纹从佩心往外刻，直到一圈没有接缝的暗金边。' },
     gear: { slot: 'charm', tier: 8, def: 1, hp: 4, qi: 10, durability: 61, repair: 24,
       physicalResist: 0.04, magicResist: 0.15, spiritReserve: 1,
-      entry: '金丹后期可佩，能多存些真气。打来的术法沿水纹散开，也能卸掉一点兵刃力道。' },
+      entry: '金丹后期可佩，能多存真气和一点神识。打来的术法沿水纹散开，也能卸去些兵刃力道。' },
     recipe: { tier: 8, reveal: { item: 'fault_receipt' }, cost: 72, days: 6,
       need: { core: 10, black_iron: 8, ore: 5, gold_core: 5 },
       desc: '旧约记着先向哪边放水。护心佩照这个次序刻开水纹，让打来的气劲沿浅槽分散。' },
@@ -141,12 +180,13 @@ const channeling = {
 export function tuneCombatData({ enemies, gear, items, recipes }) {
   for (const enemy of enemies) {
     Object.assign(enemy, goldEnemyResistance[enemy.id]);
+    tuneNamedFighter(enemy);
     const spells = enemySpells[enemy.id];
     if (!spells) continue;
     enemy.qi = spells.qi;
     enemy.intents = enemy.intents.map((intent) => {
       const qiCost = spells.costs[intent.name];
-      return qiCost ? { ...intent, damageType: 'magic', qiCost } : intent;
+      return qiCost ? (intent.kind === 'heal' ? { ...intent, qiCost } : { ...intent, damageType: 'magic', qiCost }) : intent;
     });
     if (spells.recover) enemy.intents.push(spells.recover);
   }

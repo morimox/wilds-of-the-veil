@@ -14,11 +14,19 @@ function equalSetting(first, second) {
   return first.length === second.length && first.every((value, index) => value === second[index]);
 }
 
+function leadObstruction(state, lead, kit) {
+  if (!lead) return '';
+  if (lead.afterChoice && state.seenChoices.includes(lead.afterChoice)) return '';
+  if (!kit.owns(state, lead.item)) return lead.blockedText ?? '机关还缺一个零件。';
+  return lead.prepareText ?? '';
+}
+
 function obstruction(state, mechanism, progress, kit) {
   if (progress?.complete) return '机关已经打开。';
   if (state.combat) return '先处理眼前的对手。';
   if (state.gathering) return '这次采集还没结束。';
-  if (mechanism.lead && !kit.owns(state, mechanism.lead.item)) return mechanism.lead.blockedText ?? '机关还缺一个零件。';
+  const missingLead = leadObstruction(state, mechanism.lead, kit);
+  if (missingLead) return missingLead;
   if (state.satiety === 0) return '太饿了，先吃点东西。';
   return '';
 }
@@ -35,7 +43,9 @@ export function mechanismView(state, kit) {
   const maxLength = inSequence ? mechanism.maxLength ?? 8 : null;
   const full = inSequence && setting.length >= maxLength;
   const moves = mechanism.moves.map(({ id, label }) => ({ id, label }));
-  const leadText = mechanism.lead && kit.owns(state, mechanism.lead.item) ? mechanism.lead.text : '';
+  const leadBlocked = leadObstruction(state, mechanism.lead, kit);
+  const leadText = mechanism.lead && !leadBlocked ? mechanism.lead.text : '';
+  const unreadable = leadBlocked && mechanism.lead.obscuredReadout;
   return {
     id: mechanism.id,
     title: mechanism.title,
@@ -46,7 +56,7 @@ export function mechanismView(state, kit) {
     text: complete ? mechanism.completeText ?? mechanism.success : '',
     leadText,
     moves,
-    readout: inSequence ? [] : mechanism.dials.map(({ id, name, states }, index) => ({ id, name, value: states[setting[index]] })),
+    readout: inSequence ? [] : mechanism.dials.map(({ id, name, states }, index) => ({ id, name, value: unreadable || states[setting[index]] })),
     sequence: inSequence ? setting.map((id) => moves.find((move) => move.id === id)) : [],
     maxLength,
     canMove: !blocked && !full,

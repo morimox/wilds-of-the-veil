@@ -122,10 +122,12 @@ export function roadBanditRisk(state, leg, kit) {
     .flatMap(({ trait, traits = [] }) => [trait, ...traits])
     .reduce((sum, trait) => sum + (trait?.kind === 'dodge' ? trait.bonus : 0), 0);
   const concealment = Math.min(banditRules.maxConcealment, avoidance * banditRules.concealmentFactor);
-  return { chance: profile.chance * (remaining / population) * patrol * (1 - concealment), crew: profile.crew,
+  const sectPatrol = kit.measuringPatrolFactor?.(state, leg) ?? 1;
+  return { chance: profile.chance * (remaining / population) * patrol * (1 - concealment) * sectPatrol, crew: profile.crew,
     riskText: !remaining ? '近来已看不见守路伸手的人。'
       : defeated >= population / 2 ? '这一带拦路的人已经少多了。'
-      : routed ? '路边的贼哨少了。' : profile.riskText };
+      : sectPatrol < 1 ? '守尺观的巡堤弟子近来常走这段路。'
+        : routed ? '路边的贼哨少了。' : profile.riskText };
 }
 
 function pickBandit(state, appearance, crewId, kit) {
@@ -136,11 +138,14 @@ function pickBandit(state, appearance, crewId, kit) {
   const odds = appearance.grade === null
     ? [[0.8, 0.12, 0], [0.35, 0.6, 0.05], [0, 0.3, 0.7]][Math.max(0, appearance.strongest)]
     : banditRules.gearGradeOdds[appearance.grade];
-  const stages = odds.map((weight, index) => ({
-    weight, members: roster.filter(({ tier }) => Math.floor(tier / 3) === index),
-  })).filter(({ weight, members }) => weight > 0 && members.length);
-  const stage = chooseWeighted(state, stages, ({ weight }) => weight);
-  return stage && chooseWeighted(state, stage.members, ({ tier }) => [4, 3, 2][tier % 3]);
+  let roll = draw(state);
+  const stage = odds.findIndex((weight) => {
+    roll -= weight;
+    return roll < 0;
+  });
+  // An empty grade leaves its share of the road quiet.
+  const members = roster.filter(({ tier }) => Math.floor(tier / 3) === stage);
+  return chooseWeighted(state, members, ({ tier }) => [4, 3, 2][tier % 3]);
 }
 
 function unvisitedRoadStories(state, kit) {
@@ -180,13 +185,15 @@ function stopForBandit(state, leg, crewId, kit) {
   const fee = fixed ? (nonThreat ? null : fixed.fee ?? null)
     : range({ roadSeed: memberLootSeed(state, { crew: crewId, member: member.key }) ^ 0x85a3ef1f }, pool.fee);
   const onStoryRoad = fixed && roadKey(fixed.a, fixed.b) === leg.key;
+  const generation = state.banditCrews[crewId]?.recruits?.[member?.key] ?? 0;
+  const individual = fixed ? null : kit.individualAt(state, enemy, `road:${crewId}:${member.key}:${generation}`);
   const uncertain = grade === null ? '他先看你手边，再抬眼打量你的行装，半晌才伸手拦住。' : '';
   const unexpected = stage < grade
     ? '他先打量你背光的一侧，伸手时并没看清护具的纹样。'
     : '路边的人本像是在等别的旅客。见你到了近处，他才挪身拦住。';
   const message = fixed
     ? ((nonThreat && fixed.nonThreatIntro) || (onStoryRoad ? fixed.intro : fixed.crewIntro ?? fixed.intro))
-    : (uncertain || (stage === grade ? '他横着兵器挡住路，朝你的行囊抬了抬下巴。' : unexpected));
+    : [uncertain || (stage === grade ? '来人横在道上，朝你的行囊抬了抬下巴。' : unexpected), individual.loadout?.tell].filter(Boolean).join('');
   (state.roadTrip.banditsMet ??= []).push(fixed?.id ?? `${crewId}/${member.key}`);
   crewRecord(state, crewId).encounters++;
   const passChance = visible === 0 ? banditRules.ignoreUnarmedChance : grade === null && stage < strongest ? 0.7 : 0;
@@ -196,7 +203,7 @@ function stopForBandit(state, leg, crewId, kit) {
       roadInterrupted: true, banditDismissed: true };
   }
   state.roadBandit = { enemy, fixed: fixed?.id, crew: crewId, member: member?.key,
-    fee, intro: message, nonThreat };
+    fee, intro: message, nonThreat, ...(individual ? { individual } : {}) };
   return { ...kit.say(state, message), roadInterrupted: true };
 }
 
@@ -241,8 +248,10 @@ function plotOptions(story, encounter) {
 function plotReason(state, option, kit) {
   if (state.coins < (option.coins ?? 0)) return `还要带${option.coins}枚灵钱。`;
   const missing = Object.fromEntries(Object.entries(option.need ?? {})
-    .filter(([id, count]) => kit.saleTerms(state, id).count < count));
-  return Object.keys(missing).length ? `手边还缺${kit.goodsText(missing)}。` : '';
+    .map(([id, count]) => [id, count - kit.saleTerms(state, id).count])
+    .filter(([, count]) => count > 0));
+  if (!Object.keys(missing).length) return '';
+  return [`手边还缺${kit.goodsText(missing)}。`, kit.packedRequirement(state, missing)].filter(Boolean).join(' ');
 }
 
 function tollOffer(state, bandit, kit) {
@@ -290,9 +299,10 @@ function resolveBandit(state, story, reward, message, kit) {
   const carried = kit.goodsText(accepted);
   const onGround = kit.goodsText(spilled);
   state.roadBandit = null;
-  return { ...kit.say(state, `${message}${carried ? `得到${carried}。` : ''}${onGround ? `${onGround}留在脚边。` : ''}` +
-    (newRoute ? `从${kit.records.regions[found.region].name}可以去「${found.name}」了。` : '')),
-    roadInterrupted: true };
+  const outcome = `${message}${carried ? `得到${carried}。` : ''}${onGround ? `${onGround}留在脚边。` : ''}` +
+    (newRoute ? `从${kit.records.regions[found.region].name}可以去「${found.name}」了。` : '');
+  if (story && state.roadTrip) state.roadTrip.storyAftermath = outcome;
+  return { ...kit.say(state, outcome), roadStoryResolved: Boolean(story), roadInterrupted: true };
 }
 
 function payAndPass(state, story, message, kit) {
@@ -385,7 +395,7 @@ export function banditAction(state, action, { id, count = 1 }, kit) {
   if (action === 'banditFight') {
     if (bandit.nonThreat) return kit.refuse('他已经把兵器收起，让开了路。');
     delete bandit.offer;
-    kit.startCombat(state, bandit.enemy);
+    kit.startCombat(state, bandit.enemy, undefined, false, bandit.individual);
     state.combat.roadBandit = true;
     return kit.say(state, '你把行囊拢到身后，摆开架势。');
   }
@@ -465,17 +475,18 @@ export function winRoadBandit(state, enemy, kit) {
   const lootRoll = { roadSeed: memberLootSeed(state, bandit) };
   const rich = draw(lootRoll) < pool.richChance;
   const coins = range(lootRoll, rich ? pool.richCash : pool.cash);
-  const candidate = draw(lootRoll) < (rich ? banditRules.richGearChance : banditRules.ordinaryGearChance)
-    ? chooseWeighted(lootRoll, rich ? pool.richGear : pool.gear, ({ weight }) => weight) : null;
+  const choices = rich ? pool.richGear : pool.gear;
+  const wornGear = enemy.loadout?.gearIds;
+  const carried = wornGear ? choices.filter(({ id }) => wornGear.includes(id)) : choices;
+  const candidate = draw(lootRoll) < (rich ? banditRules.richGearChance : banditRules.ordinaryGearChance) && carried.length
+    ? chooseWeighted(lootRoll, carried, ({ weight }) => weight) : null;
   const item = candidate && !kit.groundAt(state)[candidate.id] && !kit.gearReserved(state, candidate.id)
     ? kit.records.gear[candidate.id] : null;
-  const goods = item ? { [item.id]: 1 } : {};
+  const goods = { ...(coins ? { [kit.currency]: coins } : {}), ...(item ? { [item.id]: 1 } : {}) };
   const wear = item ? { [item.id]: Math.ceil(item.durability * range(lootRoll, rich ? [65, 87] : [34, 65]) / 100) } : {};
   kit.leaveOnGround(state, goods, wear);
-  const cash = kit.addCoins(state, coins);
   const loot = kit.goodsText(goods);
-  return { ...resolveBandit(state, null, null, lead + (coins ? cash.spilled[kit.currency]
-    ? `他的钱袋掉在脚边，里面有${coins}枚灵钱。` : `从他掉下的钱袋里捡到${coins}枚灵钱。` : '') +
-    (loot ? `他把${loot}落在了脚边。` : coins ? '' : '他身上没落下什么。'), kit),
-    roadCoins: cash.accepted[kit.currency] ?? 0, ...(loot ? { gathered: goods, gatheredRegion: state.region } : {}) };
+  const found = loot ? `脚边留下${loot}。` : '他身上没落下什么。';
+  return { ...resolveBandit(state, null, null, lead + found, kit),
+    ...(loot ? { gathered: goods, gatheredRegion: state.region } : {}) };
 }

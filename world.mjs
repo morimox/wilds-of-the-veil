@@ -1,5 +1,6 @@
-import { saleQuote, saleTotal, recordSale } from './economy.mjs';
+import { saleQuote, saleTotal, recordSale, tradeCapacityReason, tradeQuantityOptions } from './economy.mjs';
 import { atlasBorderRoad, atlasGeography, atlasLocation, atlasRoadDistance, atlasRoadPath } from './atlas-geography.mjs';
+import { measuringSectAction, measuringSectView, measuringAffiliation } from './measuring-sect.mjs';
 
 const home = 'village';
 const roadUnitDays = 0.25;
@@ -64,8 +65,15 @@ export function alwaysKnownRegion(id) {
 }
 
 export function rescueSettlement(state, kit) {
+  const { data } = kit;
+  const province = provinceOf(data, state.region);
+  const localRoads = roadGraph(data, { state }).filter((edge) =>
+    provinceOf(data, edge.from) === province && provinceOf(data, edge.to) === province);
+  const destinations = [...knownRoutes(state, localRoads)].filter(([id]) => settlementOf(data, id));
+  destinations.sort(([, left], [, right]) => left.units - right.units);
+  if (destinations.length) return destinations[0][0];
   const last = state.world?.lastSettlement;
-  return last && settlementOf(kit.data, last) ? last : home;
+  return last && settlementOf(data, last) ? last : home;
 }
 
 function crossBlocker(state, edge) {
@@ -246,7 +254,6 @@ function quoteRoad(state, id, kit, edges, routes) {
   const road = { ...route, legs, days: route.units * transportRules.roadUnitDays, cross: legs.some((leg) => leg.cross) };
   if (state.satiety === 0) {
     if (road.cross) return { ...road, reason: '腹中空空，先回住处吃些东西，再走跨州路。' };
-    if (!settlementOf(kit.data, id)?.inn) return { ...road, reason: '腹中空空，先吃些东西。' };
     return { ...road, days: road.days + kit.rules.emptyReturnDays, rescue: true, reason: '' };
   }
   const provisions = legs.reduce((sum, leg) => sum + leg.days * leg.rate, 0);
@@ -269,7 +276,7 @@ function quoteRoad(state, id, kit, edges, routes) {
     }
   }
   return { ...road, autoMeals, reserve, meals: food?.meals, emptyOnArrival: remaining + (food?.satiety ?? 0) <= 0,
-    restock, reason: foodShort ? '带的口粮还不够走完全程。' : '' };
+    restock, reason: foodShort ? `带的口粮还不够走完全程。还缺能补 ${Math.ceil(food.deficit - reserve)} 点饱腹的口粮。` : '' };
 }
 
 function arrive(state, id, days, kit, { clearEvent = false, satietyRate } = {}) {
@@ -333,6 +340,7 @@ function walkRoad(state, kit) {
   const trip = state.roadTrip;
   trip.stop = null;
   delete trip.afterBattle;
+  delete trip.storyAftermath;
   while (trip.legIndex < trip.legs.length) {
     const leg = trip.legs[trip.legIndex];
     const { rate, protection } = legDiet(state, leg, kit);
@@ -360,6 +368,8 @@ export function travelRoad(state, id, kit) {
   const edges = roadGraph(kit.data, { state });
   const road = quoteRoad(state, id, kit, edges, knownRoutes(state, edges));
   if (road.reason) return kit.refuse(road.reason);
+  state.event = null;
+  state.huntEdge = null;
   state.roadTrip = { destination: id, legs: road.legs, legIndex: 0, progress: 0, unitsWalked: 0, totalUnits: road.units,
     stop: null, autoMeals: Boolean(road.autoMeals), reserve: road.reserve ?? 0,
     extraDays: road.rescue ? kit.rules.emptyReturnDays : 0, meals: {} };
@@ -374,7 +384,8 @@ export function continueRoad(state, kit) {
   if (!trip.backtrack && remaining.some(({ cross }) => cross)) {
     const provisions = remaining.reduce((cost, leg, i) => cost + (leg.units - (i === 0 ? trip.progress : 0))
       * transportRules.roadUnitDays * legDiet(state, leg, kit).rate, 0);
-    if (roadFood(state, provisions, kit).deficit > 0) return kit.refuse('带的口粮还不够走完这段路。');
+    const shortfall = roadFood(state, provisions, kit).deficit;
+    if (shortfall > 0) return kit.refuse(`带的口粮还不够走完这段路。还缺能补 ${Math.ceil(shortfall)} 点饱腹的口粮。`);
   }
   return walkRoad(state, kit);
 }
@@ -399,7 +410,8 @@ export function roadTripView(state, kit) {
     from: leg.from, fromName: kit.records.regions[leg.from].name, to: leg.to, toName: kit.records.regions[leg.to].name,
     key: leg.key, progress: trip.progress, legUnits: leg.units, unitsWalked: trip.unitsWalked, totalUnits: trip.totalUnits,
     remainingUnits: trip.totalUnits - trip.unitsWalked,
-    stop: trip.stop, afterBattle: Boolean(trip.afterBattle), backDays: trip.progress * transportRules.roadUnitDays };
+    stop: trip.stop, afterBattle: Boolean(trip.afterBattle), storyAftermath: trip.storyAftermath,
+    backDays: trip.progress * transportRules.roadUnitDays };
 }
 
 function gateQuote(state, id, kit, scroll) {
@@ -517,6 +529,8 @@ function salePrice(place, item, kit) {
     const supply = localGoods(settlement)[item.id];
     if (supply?.price > 0) offered.push(localPrice(item, supply));
   }
+  const sectPrice = kit.data.measuringSect?.store.find(offer => offer.id === item.id)?.price;
+  if (sectPrice > 0) offered.push(Math.max(0, sectPrice - 1));
   return Math.min(...offered);
 }
 
@@ -532,8 +546,7 @@ function localPurchaseBlocker(state, id, kit, count, inStock, price) {
   if (count > inStock) return inStock ? '摊上没有这么多货。' : '这批货已经卖完。';
   if (state.coins < price * count) return '手头的灵钱不够。';
   if (kit.records.gear[id] && (count !== 1 || kit.gearReserved(state, id))) return '同名装备只能留一件。';
-  if (!kit.hasRoom(state, { [id]: count }, { [kit.currency]: price * count })) return '行囊装不下这笔货。';
-  return '';
+  return tradeCapacityReason(state, { id, count, total: price * count, buying: true }, kit);
 }
 
 function localMarket(state, kit) {
@@ -542,15 +555,27 @@ function localMarket(state, kit) {
   const offers = Object.entries(localGoods(place)).filter(([id]) => kit.records.items[id] && !kit.isEvidence(kit.records.items[id])).map(([id, offer]) => {
     const { count } = shopStock(state, id, offer);
     const price = localPrice(kit.records.items[id], offer);
-    let maximum = Math.min(kit.rules.maxTradeCount, count, price > 0 ? Math.floor(state.coins / price) : count);
-    if (kit.records.gear[id]) maximum = Math.min(maximum, 1);
-    while (maximum > 0 && localPurchaseBlocker(state, id, kit, maximum, count, price)) maximum--;
+    const limit = Math.min(kit.records.gear[id] ? 1 : kit.rules.maxTradeCount, count, price > 0 ? Math.floor(state.coins / price) : count);
+    const quantities = tradeQuantityOptions(limit, (quantity) => localPurchaseBlocker(state, id, kit, quantity, count, price));
+    const maximum = quantities.at(-1) ?? 0;
     const reason = maximum ? '' : localPurchaseBlocker(state, id, kit, 1, count, price);
-    return { id, count, price, maximum, reason };
+    return { id, count, price, quantities, maximum, reason, source: offer.source, department: offer.department,
+      merchant: offer.merchant, imported: offer.imported };
   });
-  const buys = kit.data.items.filter((item) => kit.owns(state, item.id) > 0).map((item) => ({ id: item.id,
-    ...saleQuote(state, item.id, salePrice(place, item, kit)), ...localSaleTerms(state, item.id, kit) })).filter(({ price }) => price > 0);
-  return { offers, buys, talk: place.talk ? { label: place.talk.label, heard: known(state, place.talk.lead) } : null };
+  const buys = kit.data.items.flatMap((item) => {
+    const price = salePrice(place, item, kit);
+    if (!price || !kit.owns(state, item.id)) return [];
+    const id = item.id;
+    const { count, reason } = localSaleTerms(state, id, kit);
+    const quote = saleQuote(state, id, price);
+    const reasonAt = (quantity) => tradeCapacityReason(state, { id, count: quantity, total: saleTotal(quote, quantity), buying: false }, kit);
+    const quantities = reason ? [] : tradeQuantityOptions(Math.min(count, kit.rules.maxTradeCount), reasonAt);
+    const singleSaleReason = quantities.includes(1) ? '' : reason || reasonAt(1);
+    return [{ id, ...quote, count, quantities, ...(quantities.length && singleSaleReason ? { singleSaleReason } : {}),
+      reason: quantities.length ? '' : singleSaleReason }];
+  });
+  return { offers, buys, repairReferral: place.repairReferral,
+    talk: place.talk ? { label: place.talk.label, heard: known(state, place.talk.lead) } : null };
 }
 
 function localAsk(state, kit) {
@@ -576,7 +601,8 @@ function localTrade(state, id, count, kit, buying, confirmationOptions) {
     if (confirmation) return confirmation;
     const quote = saleQuote(state, id, price);
     const total = saleTotal(quote, count);
-    if (!kit.hasRoom(state, { [kit.currency]: total }, { [id]: count })) return kit.refuse('行囊满了，收不下卖得的灵钱。');
+    const capacity = tradeCapacityReason(state, { id, count, total, buying: false }, kit);
+    if (capacity) return kit.refuse(capacity);
     kit.removeItem(state, id, count);
     kit.addCoins(state, total);
     recordSale(state, id, count, quote);
@@ -613,11 +639,13 @@ function discipleStanding(sect, credit) {
 function sectView(state, kit) {
   const sect = localSect(state, kit);
   if (!sect) return null;
+  if (sect.id === 'water_gauge') return measuringSectView(state, kit);
   const membership = pledge(state, sect);
   const joined = state.world.affiliation === sect.id;
   const returning = Boolean(membership && !joined);
   const admission = returning ? { coins: 0, need: {} } : sect.join;
-  const joinReason = joined ? '' : state.world.affiliation ? '先回原来的师门辞行，再来拜师。' :
+  const previousSect = kit.data.sects.find(({ id }) => id === state.world.affiliation);
+  const joinReason = joined ? '' : state.world.affiliation ? `先回${previousSect?.name ?? '原师门'}辞行，再来拜师。` :
     kit.homeRequirements(state, admission?.coins ?? 0, admission?.need) || '';
   const credit = membership?.credit ?? 0;
   const disciple = joined ? discipleStanding(sect, credit) : null;
@@ -703,7 +731,7 @@ export function worldView(state, kit) {
         units: quote.units, direct: Boolean(ordinary && !isAvoidedRoad(ordinary, avoidedRoads)), via: via.map((id) => kit.records.regions[id].name), path: [state.region, ...via, region.id],
         meals: quote.meals, emptyOnArrival: quote.emptyOnArrival, restock: quote.restock })];
   });
-  const roads = journeys.filter((road) => road.direct || road.rescue);
+  const roads = journeys.filter((road) => road.direct || (road.rescue && settlementOf(kit.data, road.id)?.inn));
   const neighbors = roadNeighbors(openKnownRoads(state, edges));
   const roadStatus = (edge) => {
     const reason = crossBlocker(state, edge.cross);
@@ -725,6 +753,7 @@ export function worldView(state, kit) {
       const province = provinceOf(kit.data, other);
       if (!marked(state, from) || !knownProvinces.has(province)) return [];
       return [{ from, province, name: provinceNames.get(province), key: edge.key, label: edge.label,
+        destinationName: marked(state, other) ? kit.records.regions[other].name : null,
         units: edge.units, days: edge.days, water: edge.water,
         survey: atlasBorderRoad(atlasRoadPath(from, other), provinceOf(kit.data, from)),
         ...(risk ? { riskText: risk.riskText, risky: risk.chance > 0 } : {}), ...status }];
@@ -755,7 +784,7 @@ export function worldView(state, kit) {
   const credit = affiliation ? pledge(state, affiliation)?.credit ?? 0 : 0;
   const [hereX, hereY] = atlasLocation(actual.id);
   return { settlement: settlementOf(kit.data, state.region), localMarket: localMarket(state, kit), sect: sectView(state, kit),
-    affiliation: affiliation ? { id: affiliation.id, name: affiliation.name, credit, disciple: discipleStanding(affiliation, credit) } : null,
+    affiliation: measuringAffiliation(state) ?? (affiliation ? { id: affiliation.id, name: affiliation.name, credit, disciple: discipleStanding(affiliation, credit) } : null),
     world: { province: provinceOf(kit.data, state.region), provinces, geography: atlasGeography, points, roads, edges: knownEdges, journeys,
       crossings: closedSidePaths, crossLinks,
       here: { id: actual.id, name: actual.name, province: provinceOf(kit.data, state.region), x: hereX, y: hereY, description: here.description ?? actual.desc },
@@ -774,6 +803,8 @@ export function worldAction(state, action, payload, kit) {
   if (action === 'localBuy') return localTrade(state, id, count, kit, true);
   if (action === 'localSell') return localTrade(state, id, count, kit, false, payload);
   if (action === 'localAsk') return localAsk(state, kit);
+  const measuring = measuringSectAction(state, action, payload, kit);
+  if (measuring) return measuring;
   if (['sectJoin', 'sectLeave', 'sectWork', 'sectClaim'].includes(action)) return actSect(state, action, id, kit);
   return null;
 }

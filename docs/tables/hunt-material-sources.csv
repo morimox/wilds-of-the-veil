@@ -78,9 +78,9 @@
 兽革（hide）,碎云雪关（snow_pass）,露背的雪沟（white_ravine）,雪脊兽（snow_warden）,筑基初期,4,,,4,1,1,18,1,固定间隔,,在迎风处敲响谷口的旧锣
 筑基期妖丹（foundation_core）,天衡石台（sky_terrace）,反峰镜门（mirror_gate）,持衡镜灵（mirror_warden）,筑基初期,2,,,2,1,1,0,0,不回补,偏影观星梁（old_observatory） · 趁雾散拓下石梁里的刻圈,跨过观星梁的投影查验印座
 炼气期妖丹（qi_core）,云炉石谷（kiln_valley）,旧丹窑内壁（foundation_kiln）,护印窑影（foundation_kiln_echo）,炼气后期,3,,,3,1,1,0,0,不回补,得知物品 丹窑移灰牌（foundation_delivery）,扶住挡板，朝窑影走过去
-炼气期妖丹（qi_core）,蒲湾圩田（reed_meadows）,雁脚泥垄（meadow_ruts）,苇尾狐（reed_fox）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,沿土窝外面走一圈
-生兽肉（beast_meat）,蒲湾圩田（reed_meadows）,雁脚泥垄（meadow_ruts）,苇尾狐（reed_fox）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,沿土窝外面走一圈
-兽革（hide）,蒲湾圩田（reed_meadows）,雁脚泥垄（meadow_ruts）,苇尾狐（reed_fox）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,沿土窝外面走一圈
+炼气期妖丹（qi_core）,蒲湾圩田（reed_meadows）,雁脚泥垄（meadow_ruts）,苇尾狐（reed_fox）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,顺着狐印追到土窝
+生兽肉（beast_meat）,蒲湾圩田（reed_meadows）,雁脚泥垄（meadow_ruts）,苇尾狐（reed_fox）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,顺着狐印追到土窝
+兽革（hide）,蒲湾圩田（reed_meadows）,雁脚泥垄（meadow_ruts）,苇尾狐（reed_fox）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,顺着狐印追到土窝
 炼气期妖丹（qi_core）,跃鱼旧渠（fish_ladder）,第三级闸口（ladder_drop）,横脊闸兽（river_gateback）,炼气后期,2,,,2,2,3,6,1,随种群密度变化,,走到中间的台阶，引开水里的兽
 生兽肉（beast_meat）,跃鱼旧渠（fish_ladder）,第三级闸口（ladder_drop）,横脊闸兽（river_gateback）,炼气后期,3,,,3,2,3,6,1,随种群密度变化,,走到中间的台阶，引开水里的兽
 兽革（hide）,跃鱼旧渠（fish_ladder）,第三级闸口（ladder_drop）,横脊闸兽（river_gateback）,炼气后期,2,,,2,2,3,6,1,随种群密度变化,,走到中间的台阶，引开水里的兽
@@ -126,10 +126,10 @@
 炼气期妖丹（qi_core）,拴绳沙洼（rope_sands）,拴着石坠的探路绳（zhao_rope_sound）,黄沿水貂（dyke_marten）,炼气初期,1,,,1,2,5,5,1,随种群密度变化,,顺足印去背阴处
 生兽肉（beast_meat）,拴绳沙洼（rope_sands）,拴着石坠的探路绳（zhao_rope_sound）,黄沿水貂（dyke_marten）,炼气初期,2,,,2,2,5,5,1,随种群密度变化,,顺足印去背阴处
 兽革（hide）,拴绳沙洼（rope_sands）,拴着石坠的探路绳（zhao_rope_sound）,黄沿水貂（dyke_marten）,炼气初期,1,,,1,2,5,5,1,随种群密度变化,,顺足印去背阴处
-筑基期妖丹（foundation_core）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,2,,,2,1,1,,,不回补,,踩着井壁的凹坑过去，引开那头鳞兽
-生兽肉（beast_meat）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,4,,,4,1,1,,,不回补,,踩着井壁的凹坑过去，引开那头鳞兽
-妖目（beast_eye）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,1,,,1,1,1,,,不回补,,踩着井壁的凹坑过去，引开那头鳞兽
-兽革（hide）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,3,,,3,1,1,,,不回补,,踩着井壁的凹坑过去，引开那头鳞兽
+筑基期妖丹（foundation_core）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,2,,,2,1,1,,,不回补,,踩着踏脚坑下去，对付井底的鳞兽
+生兽肉（beast_meat）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,4,,,4,1,1,,,不回补,,踩着踏脚坑下去，对付井底的鳞兽
+妖目（beast_eye）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,1,,,1,1,1,,,不回补,,踩着踏脚坑下去，对付井底的鳞兽
+兽革（hide）,静盐井心（stillwell_vault）,挂陶罐的井壁（sand_stillwell_vault）,静井伏鳞（sand_well_basilisk）,筑基后期,3,,,3,1,1,,,不回补,,踩着踏脚坑下去，对付井底的鳞兽
 金丹期妖丹（gold_core）,倒驿白廊（chalk_archive）,倒挂的驿印（sand_archive_guard）,倒驿锁影（sand_inverted_keeper）,金丹中期,2,,,2,1,1,,,不回补,,举起兵器，走向白柱后的守影
 炼气期妖丹（qi_core）,空音桥（dry_sound_bridge）,桥边的铜扣（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,炼气中期,2,,,2,2,5,4.5,1,随种群密度变化,,扶住桥栏，探头看栏下
 生兽肉（beast_meat）,空音桥（dry_sound_bridge）,桥边的铜扣（sand_bridge_rail）,黄结桥蝰（sand_rattle_viper）,炼气中期,2,,,2,2,5,4.5,1,随种群密度变化,,扶住桥栏，探头看栏下
@@ -137,17 +137,17 @@
 炼气期妖丹（qi_core）,空粮仓（hollow_silo）,关了一半的仓门（sand_silo_door）,仓花貂（sand_silo_marten）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,站到滑槽旁等小兽出来
 生兽肉（beast_meat）,空粮仓（hollow_silo）,关了一半的仓门（sand_silo_door）,仓花貂（sand_silo_marten）,炼气初期,2,,,2,3,6,4,1,随种群密度变化,,站到滑槽旁等小兽出来
 兽革（hide）,空粮仓（hollow_silo）,关了一半的仓门（sand_silo_door）,仓花貂（sand_silo_marten）,炼气初期,1,,,1,3,6,4,1,随种群密度变化,,站到滑槽旁等小兽出来
-金丹期妖丹（gold_core）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,2,,,2,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
-生兽肉（beast_meat）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,5,,,5,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
-妖目（beast_eye）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,1,,,1,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
-兽革（hide）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,4,,,4,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
-坚韧兽筋（battle_sinew）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,2,,,2,2,3,13,1,随种群密度变化,,翻过断晶，往爪声传来的地方走
-筑基期妖丹（foundation_core）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,2,,,2,2,3,8,1,随种群密度变化,,靠近绳架，看看暗处那双金眼
-生兽肉（beast_meat）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,3,,,3,2,3,8,1,随种群密度变化,,靠近绳架，看看暗处那双金眼
-兽革（hide）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,3,,,3,2,3,8,1,随种群密度变化,,靠近绳架，看看暗处那双金眼
-炼气期妖丹（qi_core）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,铁斑蜥（sand_iron_skink）,炼气中期,2,,,2,2,5,5.5,1,随种群密度变化,,翻到外侧晒石上，从侧面堵住花斑蜥
-生兽肉（beast_meat）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,铁斑蜥（sand_iron_skink）,炼气中期,1,,,1,2,5,5.5,1,随种群密度变化,,翻到外侧晒石上，从侧面堵住花斑蜥
-兽革（hide）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,铁斑蜥（sand_iron_skink）,炼气中期,1,,,1,2,5,5.5,1,随种群密度变化,,翻到外侧晒石上，从侧面堵住花斑蜥
+金丹期妖丹（gold_core）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,2,,,2,2,3,13,1,随种群密度变化,,翻过断晶，走向深处
+生兽肉（beast_meat）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,5,,,5,2,3,13,1,随种群密度变化,,翻过断晶，走向深处
+妖目（beast_eye）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,1,,,1,2,3,13,1,随种群密度变化,,翻过断晶，走向深处
+兽革（hide）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,4,,,4,2,3,13,1,随种群密度变化,,翻过断晶，走向深处
+坚韧兽筋（battle_sinew）,落琉洼（glass_hail_sink）,断开的晶石（sand_hail_floor）,三痕琉狮（sand_glass_lynx）,金丹初期,2,,,2,2,3,13,1,随种群密度变化,,翻过断晶，走向深处
+筑基期妖丹（foundation_core）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,2,,,2,2,3,8,1,随种群密度变化,,摸到矿绳旁找负砂豺
+生兽肉（beast_meat）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,3,,,3,2,3,8,1,随种群密度变化,,摸到矿绳旁找负砂豺
+兽革（hide）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,负砂豺（sand_vein_jackal）,筑基中期,3,,,3,2,3,8,1,随种群密度变化,,摸到矿绳旁找负砂豺
+炼气期妖丹（qi_core）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,铁斑蜥（sand_iron_skink）,炼气中期,2,,,2,2,5,5.5,1,随种群密度变化,,沿着外侧晒石找花斑蜥
+生兽肉（beast_meat）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,铁斑蜥（sand_iron_skink）,炼气中期,1,,,1,2,5,5.5,1,随种群密度变化,,沿着外侧晒石找花斑蜥
+兽革（hide）,横生脉（hanging_vein）,贴着矿壁的木架（sand_hanging_support）,铁斑蜥（sand_iron_skink）,炼气中期,1,,,1,2,5,5.5,1,随种群密度变化,,沿着外侧晒石找花斑蜥
 炼气期妖丹（qi_core）,伏兔草丘（camel_grass_dunes）,沙坎下的背阴草沟（sand_dune_grass）,沙丘野兔（sand_dune_hare）,炼气初期,1,,,1,3,6,3.5,1,随种群密度变化,,去看草根边跳动的耳朵
 生兽肉（beast_meat）,伏兔草丘（camel_grass_dunes）,沙坎下的背阴草沟（sand_dune_grass）,沙丘野兔（sand_dune_hare）,炼气初期,1,,,1,3,6,3.5,1,随种群密度变化,,去看草根边跳动的耳朵
 兽革（hide）,伏兔草丘（camel_grass_dunes）,沙坎下的背阴草沟（sand_dune_grass）,沙丘野兔（sand_dune_hare）,炼气初期,1,,,1,3,6,3.5,1,随种群密度变化,,去看草根边跳动的耳朵
@@ -159,16 +159,16 @@
 炼气期妖丹（qi_core）,伏兔草丘（camel_grass_dunes）,沙坎下的背阴草沟（sand_dune_grass）,伏沟野猪（sand_root_boar）,炼气后期,3,,,3,2,4,7,1,随种群密度变化,,顺着翻开的湿土找伏沟野猪
 生兽肉（beast_meat）,伏兔草丘（camel_grass_dunes）,沙坎下的背阴草沟（sand_dune_grass）,伏沟野猪（sand_root_boar）,炼气后期,4,,,4,2,4,7,1,随种群密度变化,,顺着翻开的湿土找伏沟野猪
 兽革（hide）,伏兔草丘（camel_grass_dunes）,沙坎下的背阴草沟（sand_dune_grass）,伏沟野猪（sand_root_boar）,炼气后期,1,,,1,2,4,7,1,随种群密度变化,,顺着翻开的湿土找伏沟野猪
-炼气期妖丹（qi_core）,沉钟岭（ridge）,翻车弯（caravan_wreck）,咬缰绳的瘦狗（caravan_mule_hound）,炼气初期,1,,,1,1,1,0,0,不回补,车牌棚（caravan_slate） · 问林嫂在等哪几辆车,赶开咬着缰绳的瘦獒
-兽革（hide）,沉钟岭（ridge）,翻车弯（caravan_wreck）,咬缰绳的瘦狗（caravan_mule_hound）,炼气初期,1,,,1,1,1,0,0,不回补,车牌棚（caravan_slate） · 问林嫂在等哪几辆车,赶开咬着缰绳的瘦獒
+炼气期妖丹（qi_core）,沉钟岭（ridge）,翻车弯（caravan_wreck）,咬缰绳的瘦狗（caravan_mule_hound）,炼气初期,1,,,1,1,1,0,0,不回补,车牌棚（caravan_slate） · 问林嫂在等哪几辆车,走近翻车处，对付咬缰绳的瘦獒
+兽革（hide）,沉钟岭（ridge）,翻车弯（caravan_wreck）,咬缰绳的瘦狗（caravan_mule_hound）,炼气初期,1,,,1,1,1,0,0,不回补,车牌棚（caravan_slate） · 问林嫂在等哪几辆车,走近翻车处，对付咬缰绳的瘦獒
 炼气期妖丹（qi_core）,晒盘坡（screen_slope）,粮车停靠的石坎（caravan_wagon_rise）,守车的白鼻兽（caravan_guard_hound）,炼气中期,2,,,2,2,2,0,0,不回补,,越过小门，迎住守车兽
 生兽肉（beast_meat）,晒盘坡（screen_slope）,粮车停靠的石坎（caravan_wagon_rise）,守车的白鼻兽（caravan_guard_hound）,炼气中期,2,,,2,2,2,0,0,不回补,,越过小门，迎住守车兽
 兽革（hide）,晒盘坡（screen_slope）,粮车停靠的石坎（caravan_wagon_rise）,守车的白鼻兽（caravan_guard_hound）,炼气中期,1,,,1,2,2,0,0,不回补,,越过小门，迎住守车兽
-炼气期妖丹（qi_core）,连环浅洲（ring_isles）,竹筏下的浅洲闸（zhao_sluice_outer_isle）,缠住闸柱的青鳗（zhao_sluice_eel）,炼气后期,1,,,1,2,2,,,不回补,得知物品 修水闸用的布牌（zhao_sluice_agreement）,踩上木桩，赶开缠住闸柱的青鳗
-生兽肉（beast_meat）,连环浅洲（ring_isles）,竹筏下的浅洲闸（zhao_sluice_outer_isle）,缠住闸柱的青鳗（zhao_sluice_eel）,炼气后期,2,,,2,2,2,,,不回补,得知物品 修水闸用的布牌（zhao_sluice_agreement）,踩上木桩，赶开缠住闸柱的青鳗
+炼气期妖丹（qi_core）,连环浅洲（ring_isles）,竹筏下的浅洲闸（zhao_sluice_outer_isle）,缠住闸柱的青鳗（zhao_sluice_eel）,炼气后期,1,,,1,2,2,,,不回补,得知物品 修水闸用的布牌（zhao_sluice_agreement）,踩上木桩，截住缠在闸柱上的青鳗
+生兽肉（beast_meat）,连环浅洲（ring_isles）,竹筏下的浅洲闸（zhao_sluice_outer_isle）,缠住闸柱的青鳗（zhao_sluice_eel）,炼气后期,2,,,2,2,2,,,不回补,得知物品 修水闸用的布牌（zhao_sluice_agreement）,踩上木桩，截住缠在闸柱上的青鳗
 炼气期妖丹（qi_core）,连环浅洲（ring_isles）,竹筏下的浅洲闸（zhao_sluice_outer_isle）,凝在碎板上的水影（zhao_sluice_echo）,炼气后期,1,,,1,2,2,,,不回补,得知物品 修水闸用的布牌（zhao_sluice_agreement）,扶住筏头，冲散贴板的水影
-筑基期妖丹（foundation_core）,缺轮磨台（jade_mill）,石磨后面的引水口（zhao_sluice_mill_intake）,水槽里的石鱼（zhao_sluice_wash）,筑基初期,1,,,1,2,2,,,不回补,竹筏下的浅洲闸（zhao_sluice_outer_isle） · 按住横柄，让樊娘试着开闸,沿石槽边走，赶开水里的大鱼
-生兽肉（beast_meat）,缺轮磨台（jade_mill）,石磨后面的引水口（zhao_sluice_mill_intake）,水槽里的石鱼（zhao_sluice_wash）,筑基初期,2,,,2,2,2,,,不回补,竹筏下的浅洲闸（zhao_sluice_outer_isle） · 按住横柄，让樊娘试着开闸,沿石槽边走，赶开水里的大鱼
+筑基期妖丹（foundation_core）,缺轮磨台（jade_mill）,石磨后面的引水口（zhao_sluice_mill_intake）,水槽里的石鱼（zhao_sluice_wash）,筑基初期,1,,,1,2,2,,,不回补,竹筏下的浅洲闸（zhao_sluice_outer_isle） · 按住横柄，让樊娘试着开闸,沿石槽边走，迎上水里的大鱼
+生兽肉（beast_meat）,缺轮磨台（jade_mill）,石磨后面的引水口（zhao_sluice_mill_intake）,水槽里的石鱼（zhao_sluice_wash）,筑基初期,2,,,2,2,2,,,不回补,竹筏下的浅洲闸（zhao_sluice_outer_isle） · 按住横柄，让樊娘试着开闸,沿石槽边走，迎上水里的大鱼
 筑基期妖丹（foundation_core）,缺轮磨台（jade_mill）,石磨后面的引水口（zhao_sluice_mill_intake）,倒挂在水轮下的影子（zhao_sluice_shade）,筑基初期,1,,,1,1,1,,,不回补,竹筏下的浅洲闸（zhao_sluice_outer_isle） · 按住横柄，让樊娘试着开闸,等水轮转过来，迎上水里的影子
 筑基期妖丹（foundation_core）,缺轮磨台（jade_mill）,石磨后面的引水口（zhao_sluice_mill_intake）,堵住水道的石怪（zhao_sluice_anchor）,筑基中期,2,,,2,1,1,,,不回补,竹筏下的浅洲闸（zhao_sluice_outer_isle） · 按住横柄，让樊娘试着开闸,站上梯下的槽沿，把活石从水口引开
 筑基期妖丹（foundation_core）,碎云雪关（snow_pass）,雪线下的暖涧（snow_hunt_scree）,雪涧里的斑獭（snow_gully_otter）,筑基初期,2,,,2,3,4,5.5,1,随种群密度变化,,沿浅涧的爪印找斑獭
@@ -179,11 +179,11 @@
 生兽肉（beast_meat）,碎云雪关（snow_pass）,雪线下的暖涧（snow_hunt_scree）,雪地石羚（snow_rime_antelope）,筑基初期,5,,,5,2,3,7.5,1,随种群密度变化,,踩露出的山石上坡，接近石羚
 兽革（hide）,碎云雪关（snow_pass）,雪线下的暖涧（snow_hunt_scree）,雪地石羚（snow_rime_antelope）,筑基初期,3,,,3,2,3,7.5,1,随种群密度变化,,踩露出的山石上坡，接近石羚
 坚韧兽筋（battle_sinew）,碎云雪关（snow_pass）,雪线下的暖涧（snow_hunt_scree）,雪地石羚（snow_rime_antelope）,筑基初期,1,1,45%,1.45,2,3,7.5,1,随种群密度变化,,踩露出的山石上坡，接近石羚
-金丹期妖丹（gold_core）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,3,,,3,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,扶着矮墙，靠近水槽里露出背鳍的东西
-生兽肉（beast_meat）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,5,,,5,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,扶着矮墙，靠近水槽里露出背鳍的东西
-妖目（beast_eye）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,0,1,60%,0.6,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,扶着矮墙，靠近水槽里露出背鳍的东西
-兽革（hide）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,2,,,2,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,扶着矮墙，靠近水槽里露出背鳍的东西
-厚甲片（hard_scale）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,2,,,2,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,扶着矮墙，靠近水槽里露出背鳍的东西
+金丹期妖丹（gold_core）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,3,,,3,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,沿矮墙下到分水槽
+生兽肉（beast_meat）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,5,,,5,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,沿矮墙下到分水槽
+妖目（beast_eye）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,0,1,60%,0.6,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,沿矮墙下到分水槽
+兽革（hide）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,2,,,2,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,沿矮墙下到分水槽
+厚甲片（hard_scale）,天衡石台（sky_terrace）,石台背面的分水槽（sky_hunt_spillway）,双脊水蜥（sky_spillway_lizard）,金丹初期,2,,,2,2,3,10,1,随种群密度变化,得知物品 湖底旧约（fault_receipt）,沿矮墙下到分水槽
 筑基期妖丹（foundation_core）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,雪涧里的斑獭（snow_gully_otter）,筑基初期,2,,,2,3,5,7,1,随种群密度变化,,沿滩找活物留下的踪迹
 生兽肉（beast_meat）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,雪涧里的斑獭（snow_gully_otter）,筑基初期,3,,,3,3,5,7,1,随种群密度变化,,沿滩找活物留下的踪迹
 妖目（beast_eye）,碎云雪关（snow_pass）,融雪沟的黑石滩（snow_armor_bank）,雪涧里的斑獭（snow_gully_otter）,筑基初期,0,1,55%,0.55,3,5,7,1,随种群密度变化,,沿滩找活物留下的踪迹
@@ -289,11 +289,11 @@
 生兽肉（beast_meat）,架风板（wind_slate）,挡风板后的旧弓弦库（ridge_armory_refuge）,弯角岩羚（ridge_armory_ram）,金丹中期,5,,,5,1,1,0,0,不回补,梁师傅的旧弓架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外侧的石梁绕到仓门对面
 兽革（hide）,架风板（wind_slate）,挡风板后的旧弓弦库（ridge_armory_refuge）,弯角岩羚（ridge_armory_ram）,金丹中期,3,,,3,1,1,0,0,不回补,梁师傅的旧弓架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外侧的石梁绕到仓门对面
 坚韧兽筋（battle_sinew）,架风板（wind_slate）,挡风板后的旧弓弦库（ridge_armory_refuge）,弯角岩羚（ridge_armory_ram）,金丹中期,3,,,3,1,1,0,0,不回补,梁师傅的旧弓架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外侧的石梁绕到仓门对面
-弯角岩羚的弯角（ridge_ramhorn）,架风板（wind_slate）,挡风板后的旧弓弦库（ridge_armory_refuge）,弯角岩羚（ridge_armory_ram）,金丹中期,1,,,1,1,1,0,0,不回补,梁师傅的旧弓架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外侧的石梁绕到仓门对面
-筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,2,,,2,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
-生兽肉（beast_meat）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,3,,,3,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
-厚甲片（hard_scale）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,1,,,1,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
-坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,1,,,1,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,上梁去够油布包
+岩羚的弯角（ridge_ramhorn）,架风板（wind_slate）,挡风板后的旧弓弦库（ridge_armory_refuge）,弯角岩羚（ridge_armory_ram）,金丹中期,1,,,1,1,1,0,0,不回补,梁师傅的旧弓架（ridge_armory_bench） · 问梁弦缺的是哪一截,贴矮墙进库、沿外侧的石梁绕到仓门对面
+筑基期妖丹（foundation_core）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,2,,,2,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,扶住断柱，上梁对付水蟒
+生兽肉（beast_meat）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,3,,,3,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,扶住断柱，上梁对付水蟒
+厚甲片（hard_scale）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,1,,,1,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,扶住断柱，上梁对付水蟒
+坚韧兽筋（battle_sinew）,断齿内堰（burnt_weir）,断柱下的横梁（encyclopedia_weir_beam）,灰背水蟒（encyclopedia_weir_snake）,筑基中期,1,,,1,1,1,0,0,不回补,得知物品 周简的字条（encyclopedia_clerk_note）,扶住断柱，上梁对付水蟒
 炼气期妖丹（qi_core）,缺轮磨台（jade_mill）,岸门下的干工房（zhao_mill_dry_workroom）,磨房石鼠（zhao_mill_stone_rat）,炼气后期,1,,,1,1,1,8,1,固定间隔,得知物品 干工房的门插（zhao_mill_door_pin）,绕到工作台背后，找咬开松子的东西
 生兽肉（beast_meat）,缺轮磨台（jade_mill）,岸门下的干工房（zhao_mill_dry_workroom）,磨房石鼠（zhao_mill_stone_rat）,炼气后期,2,,,2,1,1,8,1,固定间隔,得知物品 干工房的门插（zhao_mill_door_pin）,绕到工作台背后，找咬开松子的东西
 兽革（hide）,缺轮磨台（jade_mill）,岸门下的干工房（zhao_mill_dry_workroom）,磨房石鼠（zhao_mill_stone_rat）,炼气后期,0,1,60%,0.6,1,1,8,1,固定间隔,得知物品 干工房的门插（zhao_mill_door_pin）,绕到工作台背后，找咬开松子的东西
@@ -303,7 +303,7 @@
 妖目（beast_eye）,篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,筑基初期,0,1,33%,0.33,1,1,0,0,不回补,,绕到墙边看看土台
 兽革（hide）,篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,筑基初期,2,,,2,1,1,0,0,不回补,,绕到墙边看看土台
 厚甲片（hard_scale）,篁泽药谷（herb_basin）,药谷的旧灶（basin_cook_hut）,蒲根巨蜥（herb_den_lizard）,筑基初期,2,,,2,1,1,0,0,不回补,,绕到墙边看看土台
-金丹期妖丹（gold_core）,冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,1,2,60%,2.2,1,1,0,0,不回补,,绕到上风处，靠近石锅
-生兽肉（beast_meat）,冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,3,,,3,1,1,0,0,不回补,,绕到上风处，靠近石锅
-兽革（hide）,冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,2,,,2,1,1,0,0,不回补,,绕到上风处，靠近石锅
-厚甲片（hard_scale）,冷炉院（cold_kiln）,背风的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,3,,,3,1,1,0,0,不回补,,绕到上风处，靠近石锅
+金丹期妖丹（gold_core）,冷炉院（cold_kiln）,废窑后的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,1,2,60%,2.2,1,1,0,0,不回补,,绕到上风处，靠近石锅
+生兽肉（beast_meat）,冷炉院（cold_kiln）,废窑后的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,3,,,3,1,1,0,0,不回补,,绕到上风处，靠近石锅
+兽革（hide）,冷炉院（cold_kiln）,废窑后的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,2,,,2,1,1,0,0,不回补,,绕到上风处，靠近石锅
+厚甲片（hard_scale）,冷炉院（cold_kiln）,废窑后的石灶（kiln_stone_pot）,棘背岩蜥（sand_spine_lizard）,金丹初期,3,,,3,1,1,0,0,不回补,,绕到上风处，靠近石锅

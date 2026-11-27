@@ -50,8 +50,8 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
   assert.equal(enemies.size, data.enemies.length);
   assert.equal(data.sites.length, data.events.length);
   const animalParts = new Set(['beast_meat', 'foundation_meat', 'gold_meat', 'hide', 'beast_eye']);
-  const leaderParts = { herb_den_elder: 'den_neck_plate', sand_quarry_matriarch: 'quarry_back_spine',
-    dyke_old_croc: 'dyke_backstrap', ridge_armory_ram: 'ridge_ramhorn' };
+  const leaderParts = { herb_den_elder: ['den_neck_plate'], sand_quarry_matriarch: ['quarry_back_spine', 'white_lizard_tail_spur'],
+    dyke_old_croc: ['dyke_backstrap', 'dyke_gill_scale'], ridge_armory_ram: ['ridge_ramhorn'] };
   const denSupplies = { bandit_den_scout: 'ration', bandit_den_sentry: 'salve', bandit_den_bodyguard: 'ore' };
   const officialOpponents = new Set(data.tournament.matches.map(({ enemy }) => enemy));
   for (const enemy of data.enemies) {
@@ -74,7 +74,7 @@ test('new scene requirements, guarded gains and enemy bodies reference real thin
     } else assert.equal(enemy.medicine, undefined, id);
     const core = tier < 3 ? 'qi_core' : tier < 6 ? 'foundation_core' : 'gold_core';
     const hasThickArmor = tier >= 3 && (tags.includes('scaled') || tags.includes('stoneborn'));
-    assert.ok([...loot].every((key) => key === core || animalParts.has(key) || key === leaderParts[id] ||
+    assert.ok([...loot].every((key) => key === core || animalParts.has(key) || leaderParts[id]?.includes(key) ||
       key === 'hard_scale' && hasThickArmor || key === 'battle_sinew' && tier >= 3 && tags.includes('beast') || key === denSupplies[id]), id);
     for (const { count, chance } of Object.values(enemy.chanceLoot ?? {})) {
       assert.ok(Number.isSafeInteger(count) && count > 0 && chance > 0 && chance < 1, id);

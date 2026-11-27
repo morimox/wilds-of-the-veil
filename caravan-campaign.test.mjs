@@ -203,7 +203,7 @@ test('the full expedition clears both guard groups and collects its cargo proof 
   assert.equal(state.inventory.caravan_lading, undefined);
   assert.equal(state.coins - purse, 70);
   assert.equal(view(state).groundLoot.caravan_bell, 1);
-  assert.match(view(state).currentEvent.text, /预备沿背崖往渡口运粮/);
+  assert.match(view(state).currentEvent.text, /背崖的栈房搬.*草窖取.*都送往闭潮渡.*带着热汤去了晒盘坡石屋/);
   const relaxed = fieldSupplies.find(({ id, oneOfAKind }) => id !== 'ration' && state.inventory[id] === 1 && !oneOfAKind);
   play(state, 'discard', { id: relaxed.id, count: 1 });
   play(state, 'take', { id: 'caravan_bell' });

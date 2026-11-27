@@ -260,7 +260,7 @@ function extendScenes(sites, events, allGear, enemies) {
 
   appendChoice(sites, events, 'sand_basket_shed', {
     label: '请老人教那一步怎么站稳', afterVisitChoice: 4,
-    desc: '老人摸了摸竹杖上两道长年磨出来的掌印，拿杖尖把圈里的碎石拨到一边。',
+    desc: '老人把杖尖点在沙地上，示意你把脚收回半步。',
     days: 0.5, stay: true, loot: { stone_shoulder_manual: 1 },
     outcome: '他让你往圈里挪半步，再用杖贴住你的肩，你终于没往后栽。老人掀开箩筐底，拿两片旧竹夹住薄册。「早些年打石头，也用的是这个站法。学会了再去打石，别拿肩去撞。」',
   }, '圈里的碎石拨成一堆，老人已经把竹杖靠回凳后。');

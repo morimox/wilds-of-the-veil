@@ -75,7 +75,8 @@ test('an unaffiliated traveler can light and report the lower road without a fig
   assert.ok(sites(state).includes('slope_lantern_low'));
   assert.ok(!sites(state).includes('slope_lantern_high'));
   visit(state, 'slope_lantern_gap');
-  assert.match(view(state).currentEvent.text, /铜扣已经铆进扁石.*旧吊板那头仍旧很暗/);
+  assert.match(view(state).currentEvent.text, /唯一的旧铜扣已经铆进扁石.*旧吊板那头仍暗着/);
+  assert.equal(view(state).visibleChoices.find(({ index }) => index === 2), undefined);
   assert.equal(act(state, 'choose', { index: 2 }).ok, false);
   visit(state, 'slope_lantern_low');
   play(state, 'beginGather', { index: 0 });
@@ -83,7 +84,11 @@ test('an unaffiliated traveler can light and report the lower road without a fig
   assert.equal(view(state).groundLoot.reed, 2);
   walk(state, 'ridge', 'ford', 'pine_ridge', 'lantern_court');
   const coins = state.coins;
+  visit(state, 'lantern_term');
+  assert.deepEqual(view(state).siteQuests.map(({ id }) => id), ['lantern_low_report']);
   play(state, 'handin', { id: 'lantern_low_report' });
+  assert.match(view(state).currentEvent.text, /交班的木牌上画了低灯/);
+  play(state, 'leave');
   assert.equal(state.coins, coins + 10);
   assert.equal(state.world.affiliation, null);
   assert.equal(state.inventory.lantern_low_note, undefined);
@@ -111,7 +116,11 @@ test('the upper repair opens protected mineral access and members can take a rec
   play(state, 'finishGather');
   assert.equal(view(state).groundLoot.core, 2);
   walk(state, 'ridge', 'ford', 'pine_ridge', 'lantern_court');
+  visit(state, 'lantern_term');
+  assert.deepEqual(view(state).siteQuests.map(({ id }) => id), ['lantern_high_report']);
   play(state, 'handin', { id: 'lantern_high_report' });
+  assert.match(view(state).currentEvent.text, /两盏灯的位置画在交班牌/);
+  play(state, 'leave');
   const coins = state.coins;
   const day = state.day;
   play(state, 'sectWork', { id: 'lantern_spare_watch' });

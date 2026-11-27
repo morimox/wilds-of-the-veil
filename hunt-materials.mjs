@@ -18,7 +18,7 @@ const sites = [
   { id: 'sky_hunt_spillway', region: 'sky_terrace', name: '石台背面的分水槽', reveal: { item: 'fault_receipt' },
     creatures: { sky_spillway_lizard: wild(2, 3, 10) },
     creatureText: {
-      sky_spillway_lizard: { present: '水面高低错开两寸。两道贴槽游动的黑脊会在最窄处重叠。', absent: '两道水槽都能看到底。矮沿后传来流水落在石洞里的空声。' },
+      sky_spillway_lizard: { present: '水面高低错开两寸。一对黑脊贴槽游动，到最窄处便叠成一道。', absent: '两道水槽都能看到底。矮沿后传来流水落在石洞里的空声。' },
     } },
   { id: 'snow_armor_bank', region: 'snow_pass', name: '融雪沟的黑石滩',
     creatures: { snow_gully_otter: wild(3, 5, 7), snow_rime_antelope: wild(2, 3, 10),
@@ -62,9 +62,9 @@ const events = [
         outcome: '石羚从高处退了半步，两只前蹄同时把雪壳碾碎。' },
     ] },
   { id: 'sky_hunt_spillway', name: '石台背面的分水槽',
-    text: '对照湖底旧约上的水位记号，才认出石台背面两排浅刻。刻痕往下接着被雾挡住的旧分水槽。槽边有道干燥的矮沿，低头便能望见清水下的两道脊鳍。',
+    text: '石台背面有两排很浅的刻痕，跟你从湖底旧约上临下来的水位对得上。两道刻痕沿着干燥的矮沿，一路通到旧分水槽。',
     choices: [
-      { label: '扶着矮墙，靠近水槽里露出背鳍的东西', desc: '这段槽只有两步宽。两道水流往相反的方向弯过去。', days: 0.375, enemy: 'sky_spillway_lizard',
+      { label: '沿矮墙下到分水槽', desc: '这段槽只有两步宽。两道水流往相反的方向弯过去。', days: 0.375, enemy: 'sky_spillway_lizard',
         outcome: '两道脊鳍突然并在一起。水蜥贴着回上来的水露出头，泥水溅到了矮沿上。' },
     ] },
   { id: 'snow_armor_bank', name: '融雪沟的黑石滩',

@@ -49,6 +49,7 @@
 蒲根下的水洞（herb_den）,种群,断桩老蜥（herb_den_elder）,herb_den_elder,,1,1,0,0,不回补,,,
 白藤塘（vine_pond）,资源,灵草（reed）,reed,塘边银脉叶,4,8,7,2,,1.5,,3
 白藤塘（vine_pond）,资源,灵草（reed）,reed_upper,上游银脉叶,5,6,10,2,,,,5
+白藤塘（vine_pond）,资源,银脉草心（silver_leaf_heart）,silver_leaf_heart,银脉草心,1,1,15,1,,,,6
 白藤塘（vine_pond）,种群,白角藤鹿（vine_stag）,vine_stag,,2,6,8,1,随种群密度变化,1.5,,
 白藤塘（vine_pond）,种群,白纹鹿王（vine_king）,vine_king,,1,1,0,0,不回补,,,
 黑砂洗矿槽（mine_tailings）,资源,暗金（black_iron）,black_iron,槽沿暗金,4,5,7,1,,1.5,,1
@@ -88,8 +89,10 @@
 双灯照到的旧吊板（slope_lantern_high）,种群,石鹞（river_cliff_kite）,river_cliff_kite,,1,1,8,1,随种群密度变化,,,
 退水石脊（undertow_bed）,资源,灵晶（core）,core,侧洞灵晶,5,9,7,2,,,,3
 退水石脊（undertow_bed）,资源,回潮洞的黑泥（heart_silt）,heart_silt,潮沟新泥,1,2,9,1,,,,4
+退水石脊（undertow_bed）,资源,寒脉草（coldvein_herb）,coldvein_herb,寒脉草,2,2,0,0,,,,6
 退水石脊（undertow_bed）,种群,驮泥大蛇（undertow_moundback）,undertow_moundback,,1,1,0,0,不回补,,,
 古钟旁的信架（counter_bell_score）,资源,暗金（black_iron）,black_iron,钟座暗金,4,8,7,2,,,,3
+古钟旁的信架（counter_bell_score）,资源,鸣纹晶砂（bell_crystal_sand）,bell_crystal_sand,鸣纹晶砂,2,2,0,0,,,,5
 古钟旁的信架（counter_bell_score）,种群,屈膝铜影（river_copper_echo）,river_copper_echo,,1,1,0,0,不回补,,,
 两面低埂（zhao_dyke_bend）,资源,灵草（reed）,reed,白芽,6,9,4,3,,,,1
 两面低埂（zhao_dyke_bend）,种群,黄沿水貂（dyke_marten）,dyke_marten,,2,5,4,1,随种群密度变化,,,
@@ -114,6 +117,7 @@
 铜槽旁（zhao_submerged_table）,种群,槽背水魁（lab_crawler）,lab_crawler,,1,1,0,0,不回补,,,
 赤泥横穴（zhao_bank_fire）,资源,暗金（black_iron）,black_iron,帘内暗金,9,14,10,4,,,,2
 赤泥横穴（zhao_bank_fire）,资源,暗金（black_iron）,vent_sand,帘外重砂,2,2,0,0,,,,4
+赤泥横穴（zhao_bank_fire）,资源,赤纹石髓（ember_ore_pith）,ember_ore_pith,赤纹石髓,2,2,22,2,,,,6
 赤泥横穴（zhao_bank_fire）,种群,伏灰炭魈（ember_yak）,ember_yak,,1,1,19,1,固定间隔,,,
 六角晒网（zhao_glass_net）,资源,灵晶（core）,core,滩中灵晶,6,10,6,3,,,,2
 分水三柱（zhao_deep_pillars）,种群,分柱水君（fault_warden）,fault_warden,,1,1,0,0,不回补,,,
@@ -213,12 +217,12 @@
 芦湾棚船（bandit_red_rope_den）,种群,芦湾放哨人（bandit_red_rope_watch）,bandit_red_rope_watch,,9,9,28,1,固定间隔,1,是,
 芦湾棚船（bandit_red_rope_den）,种群,红绳把头（bandit_red_rope_knife）,bandit_red_rope_knife,,8,8,32,1,固定间隔,1,是,
 芦湾棚船（bandit_red_rope_den）,种群,芦湾船主邵苹（bandit_red_rope_chief）,bandit_red_rope_chief,,1,1,0,0,不回补,,是,
-断磴盐窟（bandit_salt_cave_den）,种群,盐窟守门刀客（bandit_salt_cave_watch）,bandit_salt_cave_watch,,10,10,32,1,固定间隔,1,是,
-断磴盐窟（bandit_salt_cave_den）,种群,盐道灰翎弓手（bandit_salt_cave_bow）,bandit_salt_cave_bow,,9,9,36,1,固定间隔,1,是,
-断磴盐窟（bandit_salt_cave_den）,种群,盐窟魁首封霁（bandit_salt_cave_chief）,bandit_salt_cave_chief,,1,1,0,0,不回补,,是,
+断阶盐洞（bandit_salt_cave_den）,种群,盐洞守门刀客（bandit_salt_cave_watch）,bandit_salt_cave_watch,,10,10,32,1,固定间隔,1,是,
+断阶盐洞（bandit_salt_cave_den）,种群,盐道灰翎弓手（bandit_salt_cave_bow）,bandit_salt_cave_bow,,9,9,36,1,固定间隔,1,是,
+断阶盐洞（bandit_salt_cave_den）,种群,盐洞首领封霁（bandit_salt_cave_chief）,bandit_salt_cave_chief,,1,1,0,0,不回补,,是,
 断柱下的横梁（encyclopedia_weir_beam）,种群,灰背水蟒（encyclopedia_weir_snake）,encyclopedia_weir_snake,,1,1,0,0,不回补,,,
 岸门下的干工房（zhao_mill_dry_workroom）,种群,磨房石鼠（zhao_mill_stone_rat）,zhao_mill_stone_rat,,1,1,8,1,固定间隔,,是,
 封乔的护堤木台（marsh_pole_lesson）,种群,护堤人封乔（river_spar_captain）,river_spar_captain,,1,1,5,1,固定间隔,,,
 闸下无灯梯（ford_below_steps）,种群,拖梯水影（ford_lower_spirit）,ford_lower_spirit,,2,4,11,1,固定间隔,,,
 药谷的旧灶（basin_cook_hut）,种群,蒲根巨蜥（herb_den_lizard）,herb_den_lizard,,1,1,0,0,不回补,,,
-背风的石灶（kiln_stone_pot）,种群,棘背岩蜥（sand_spine_lizard）,sand_spine_lizard,,1,1,0,0,不回补,,,
+废窑后的石灶（kiln_stone_pot）,种群,棘背岩蜥（sand_spine_lizard）,sand_spine_lizard,,1,1,0,0,不回补,,,

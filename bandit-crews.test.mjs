@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { banditRules, roadBanditRisk } from './bandits.mjs';
+import { banditRules, checkRoadBanditStep, roadBanditRisk } from './bandits.mjs';
 import { data } from './data.mjs';
 import { act, createGame, rules, view } from './engine.mjs';
 import { roadGraph } from './world.mjs';
@@ -99,8 +99,10 @@ function stageDen() {
 
 function encounterInDen(state, seed) {
   state.encounterSeed = seed;
-  play(state, 'choose', { index: 0 });
+  const start = play(state, 'choose', { index: 0 });
   assert.ok(state.combat);
+  const encounterText = data.events.find(({ id }) => id === state.combat.siteId)?.choices[0].encounterText;
+  assert.ok(start.message.includes(encounterText[state.combat.id]), 'the approach describes the defender actually drawn');
   return state.combat.id;
 }
 
@@ -138,10 +140,10 @@ test('all hazardous edges belong to populated crews with a headquarters and most
 
 test('regional witnesses point to a hidden den, where the chief alone opens the cache and clears its roads', () => {
   const outings = [
-    { crew: 'ferryWood', witness: 'bandit_net_keeper', prize: 'bandit_ford_bell', money: 145 },
-    { crew: 'windBridge', witness: 'bandit_salt_carrier', prize: 'bandit_salt_boots', money: 240 },
+    { crew: 'ferryWood', witness: 'bandit_net_keeper', prize: 'bandit_ford_bell', money: 490, purse: 66 },
+    { crew: 'windBridge', witness: 'bandit_salt_carrier', prize: 'bandit_salt_boots', money: 1750, purse: 210, carried: true },
   ];
-  for (const { crew, witness, prize, money } of outings) {
+  for (const { crew, witness, prize, money, purse, carried } of outings) {
     const { den, headquarters } = data.roadBandits.crews[crew];
     const { heads, boss } = data.roadBandits.dens[den];
     const roads = data.roadBandits.roads.filter((row) => row.crew === crew)
@@ -160,13 +162,25 @@ test('regional witnesses point to a hidden den, where the chief alone opens the 
     play(traveler, 'visit', { id: den });
     assert.equal(act(traveler, 'choose', { index: 1 }).ok, false);
     assert.equal(encounterInDen(traveler, seedFor([1 - 0.5 / heads, 1])), boss);
+    const beforeFight = traveler.coins;
     finishFight(traveler);
     assert.equal(traveler.siteVictories[den][boss], 1);
     assert.ok(roads.every((road) => risk(traveler, road) === 0));
+    assert.equal(traveler.coins, beforeFight);
+    assert.equal(view(traveler).groundLoot.spirit_coin, purse);
+    play(traveler, 'take', { id: 'spirit_coin' });
+    assert.equal(traveler.coins, beforeFight + purse);
+    assert.equal(view(traveler).groundLoot.spirit_coin, undefined);
+    if (carried) {
+      assert.equal(view(traveler).groundLoot[prize], 1);
+      play(traveler, 'take', { id: prize });
+      assert.equal(traveler.durability[prize], Math.ceil(data.gear.find(item => item.id === prize).durability * 0.8));
+    }
     const prior = traveler.coins;
     play(traveler, 'choose', { index: 1 });
     assert.equal(traveler.coins, prior + money);
     assert.equal(traveler.inventory[prize], 1);
+    assert.equal(view(traveler).groundLoot[prize], undefined);
     assert.equal(act(traveler, 'choose', { index: 1 }).ok, false);
     assert.notEqual(encounterInDen(traveler, seedFor([0.95, 1])), boss);
   }
@@ -227,7 +241,7 @@ test('one victory barely changes a fresh large crew and its loot does not reroll
   const victim = winRoadFight(state);
   const comparisonVictim = winRoadFight(comparison);
   assert.deepEqual(crewState(state).defeated, [bandit.member]);
-  assert.equal(victim.roadCoins, comparisonVictim.roadCoins);
+  assert.deepEqual(victim.gathered, comparisonVictim.gathered);
   assert.deepEqual(view(state).groundLoot, view(comparison).groundLoot);
   assert.deepEqual(state.groundDurability, comparison.groundDurability);
   for (const [index, road] of [firstRoad, secondRoad].entries()) {
@@ -265,6 +279,7 @@ test('road wins temporarily empty the shared patrol and recruits arrive one at a
     wins.push(target.member);
     if (index === 0) firstRecruitDay = state.day + banditRules.recruitDelay;
     assert.equal(crewState(state).nextRecruitDay, firstRecruitDay);
+    for (const id of Object.keys(view(state).groundLoot)) play(state, 'take', { id });
     finishRoad(state, destination);
   }
   assert.equal(new Set(wins).size, 2);
@@ -345,7 +360,9 @@ test('a first-fight leader win opens the one-time cache and ends linked road thr
   assert.equal(state.coins, coinsBeforeBoss + 7);
   assert.equal(state.banditSpoils[linkedSpoils], undefined);
   assert.equal(state.banditSpoils[otherSpoils].coins, 6);
-  assert.deepEqual(view(state).groundLoot, { wood: 1, knife: 1 });
+  assert.deepEqual(view(state).groundLoot, { wood: 1, knife: 1, spirit_coin: 28 });
+  play(state, 'take', { id: 'spirit_coin' });
+  assert.equal(state.coins, coinsBeforeBoss + 7 + 28);
   play(state, 'take', { id: 'knife' });
   assert.equal(state.durability.knife, 8);
   assert.deepEqual(state.siteVictories[den], { [greyLeader]: 1 });
@@ -368,7 +385,7 @@ test('a first-fight leader win opens the one-time cache and ends linked road thr
   const beforeCache = state.coins;
   play(state, 'choose', { index: treasury });
   assert.equal(state.coins, beforeCache + event.choices[treasury].coins);
-  assert.ok(event.choices[treasury].coins >= 150);
+  assert.equal(event.choices[treasury].coins, 280);
   assert.equal(state.inventory[blade], 1);
   assert.equal(state.inventory.road_sleeve_manual, 1);
   const total = state.coins;
@@ -486,6 +503,19 @@ test('the all-Gold crew ignores worn starter gear and challenges a visibly high-
   assert.equal(matching.roadBandit.crew, crew);
   assert.ok(data.enemies.find(({ id }) => id === matching.roadBandit.enemy).tier >= 6);
   assert.equal(matching.banditCrews[crew].encounters, 1);
+});
+
+test('an empty matching grade does not make the rare adjacent grade intercept every hit', () => {
+  const state = readyTraveler();
+  equip(state, 'knife');
+  assert.equal(state.equipment.armor, 'straw_cape');
+  state.resolvedBandits = data.roadBandits.fixed.map(({ id }) => id);
+  state.banditCrews[crewId] = { encounters: 0, defeated: crewMembers().filter(key => Number(key.split(':')[0]) < 3) };
+  state.roadTrip = { banditsMet: [], banditRiskByLeg: { [firstRoad.key]: { chance: 1, crew: crewId } } };
+  state.roadSeed = lowGradeEncounterSeed;
+  const policy = { ...banditPolicy, groundAt: () => ({}) };
+  assert.equal(checkRoadBanditStep(state, firstRoad, 1, policy), null);
+  assert.equal(crewState(state).encounters, 0);
 });
 
 test('the wounded bandit can be spared or killed after defeating him and either choice points to the den', () => {

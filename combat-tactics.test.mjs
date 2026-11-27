@@ -53,6 +53,22 @@ test('preparing exposes a player to physical attack, and a tactical opponent may
   assert.equal(chooseEnemyIntent(fighter, { ...context, read: { kind: 'brace' } }), hit);
 });
 
+test('fighters use their own preparation without repeating it while already charged', () => {
+  const preparation = { kind: 'focus', name: '把空凳拨到身前，藏刀攒劲' };
+  const chairFighter = { ...fighter, strategy: 'duelist', intents: [hit, preparation, heavy] };
+  assert.equal(chooseEnemyIntent(chairFighter, { ...context, read: { kind: 'brace' } }), preparation);
+  assert.equal(chooseEnemyIntent(chairFighter, { ...context, round: 1, charged: true }), heavy);
+});
+
+test('reading a dodge favors a move that can reach, without using a spell the fighter cannot afford', () => {
+  const arrow = { ...hit, name: '射箭', ranged: true };
+  const spell = { ...heavy, name: '催气追击', damageType: 'magic', accuracy: 0.09, qiCost: 6 };
+  const hunter = { ...fighter, strategy: 'schemer', intents: [hit, arrow, spell] };
+  const dodging = { ...context, read: { kind: 'dodge' } };
+  assert.equal(chooseEnemyIntent(hunter, { ...dodging, qi: 10 }), spell);
+  assert.equal(chooseEnemyIntent(hunter, { ...dodging, qi: 5 }), arrow);
+});
+
 test('opponents spend an opening on recovery only while injured and do not heal twice in a row', () => {
   const exposed = { ...context, hp: 30, round: 2, previousKind: 'attack', read: { kind: 'recover' }, observedHits: samples(7) };
   assert.equal(chooseEnemyIntent(defender, exposed), heal);
@@ -90,4 +106,36 @@ test('a medicine cooldown also covers innate healing and a depleted supply gives
     assert.equal(chooseEnemyIntent(defender, { ...exposed, previousKind }), hit);
   }
   assert.equal(chooseEnemyIntent(defender, { ...exposed, medicine: undefined }), heal);
+});
+
+test('a patient counterfighter needs measured hits to change posture and can only return the special strike after guarding', () => {
+  const riposte = { ...hit, name: '顺着挡住的来势推尺', mult: 1.4, pierce: 7, follows: 'guard' };
+  const specialist = { ...fighter, strategy: 'counter', intents: [hit, riposte, { ...shield, mult: 1.9 }] };
+  const pressure = { ...context, round: 1, read: { kind: 'strike' }, observedHits: samples(11) };
+  assert.equal(chooseEnemyIntent(specialist, { ...pressure, round: 0, observedHits: [] }), hit);
+  assert.equal(chooseEnemyIntent(specialist, pressure).kind, 'guard');
+  assert.equal(chooseEnemyIntent(specialist, { ...pressure, previousKind: 'guard' }), riposte);
+  assert.equal(chooseEnemyIntent(specialist, { ...pressure, round: 2 }).kind, 'guard');
+});
+
+test('the old staff fighter sidesteps a read strike and has to come out of the sidestep before doing it again', () => {
+  const dodge = { kind: 'dodge', name: '让开杖尖，错半步' };
+  const reply = { ...hit, name: '沿侧面反点手腕', follows: 'dodge', pierce: 5 };
+  const specialist = { ...fighter, strategy: 'footwork', intents: [hit, dodge, reply, shield] };
+  const pressured = { ...context, read: { kind: 'strike' }, observedHits: samples(11) };
+  assert.equal(chooseEnemyIntent(specialist, { ...pressured, read: undefined }), hit);
+  assert.equal(chooseEnemyIntent(specialist, pressured), dodge);
+  assert.equal(chooseEnemyIntent(specialist, { ...pressured, previousKind: 'dodge' }), reply);
+  assert.equal(chooseEnemyIntent(specialist, { ...pressured, round: 2 }).kind, 'dodge');
+});
+
+test('a follow-through needs a held charge and finite qi still limits self-healing', () => {
+  const closing = { ...heavy, name: '跟着第二声挥刀', spendsCharge: true };
+  const paidHealing = { ...heal, qiCost: 9 };
+  const specialist = { ...fighter, strategy: 'schemer', intents: [heavy, closing, paidHealing, hit] };
+  const low = { ...context, round: 2, hp: 30, read: { kind: 'recover' }, observedHits: samples(4) };
+  assert.equal(chooseEnemyIntent(specialist, { ...low, qi: 8 }), heavy);
+  assert.equal(chooseEnemyIntent(specialist, { ...low, qi: 9 }), paidHealing);
+  assert.notEqual(chooseEnemyIntent(specialist, { ...context, round: 1, charged: false }), closing);
+  assert.equal(chooseEnemyIntent(specialist, { ...context, charged: true, read: { kind: 'medicine' } }), closing);
 });

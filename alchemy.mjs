@@ -5,7 +5,7 @@ const town = {
   intro: '桌边晾着几张抄好的丹方。安蒲用湿布裹住药炉，等它凉下来。',
   greeting: '安蒲抽出压在秤底的图。「院里找面背风的墙，就能搭炉。先用小火，闻到焦味就停。」',
   knownGreeting: '「想炼哪种药，先找那一味的丹方。炉子也得经得住那个火候。」',
-  coreRemark: '安蒲指了指药案上分开的药罐。「不同妖丹不能混用。活着取回的先留些，运气破关、开炉和打兵器都用得上。剩下的拿去坊市能换钱。」',
+  coreRemark: '安蒲指了指药案上的几只罐子。「猎来的妖丹按境界分开装。破境、开炉、打兵器都用得上。手头有余，再拿去坊市换钱。」',
 };
 
 const offers = [
@@ -20,7 +20,7 @@ const offers = [
   { id: 'formula_sense', recipe: 'r_sense_powder', name: '凝神散丹方', price: 22, reveal: 'phase_chart',
     desc: '安蒲看过滴水图，从案下抽出一页抄方。「照原教人闭眼观水。我曾替他们配过这味药。用神识用得眼花时，把细末含在舌下，等一等就能缓过来。」' },
   { id: 'formula_return_breath', recipe: 'r_return_breath', name: '归元丹方', price: 38, reveal: 'fault_receipt',
-    desc: '安蒲用两只碗照旧约的画法分水。「一枚金丹妖丹能炼三颗。赶远路连打几阵，气跟不上时吃一颗。」' },
+    desc: '安蒲摆出两只碗，照你先前查明的水路分水。「一枚金丹妖丹能炼三颗。赶远路连打几阵，气跟不上时吃一颗。」' },
 ];
 
 const inquiry = [
@@ -113,7 +113,7 @@ function inquiryProgress(state, index, canDiscuss, kit) {
   if (!index || canDiscuss) return '';
   if (index < inquiry.length) return inquiry[index - 1].progress;
   if (state.realm >= 3) return '';
-  if (kit.owns(state, 'foundation_pill') > 0) return '筑基丹已经收好，闭关突破时再服。';
+  if (kit.owns(state, 'foundation_pill') > 0) return '筑基丹已经收好。从「村务」进「修行」，闭关突破时再服。';
   const batch = state.economy?.jobs.find(({ loot }) => loot.foundation_pill);
   if (batch) return batch.readyDay - state.day > 1e-9
     ? '后院那炉筑基丹还在火上，等药成了再去收。'

@@ -82,7 +82,9 @@ test('mid- and late-stage body armor use the common scales without requiring a s
     assert.equal(short.ok, false);
     assert.match(short.message, /厚甲片×1/);
     assert.equal(act(state, 'buy', { id: 'hard_scale', count: 1 }).ok, false);
-    assert.equal(act(state, 'sell', { id: 'hard_scale', count: 1 }).ok, false);
+    const vendor = structuredClone(state);
+    play(vendor, 'sell', { id: 'hard_scale', count: 1 });
+    assert.equal(vendor.coins - state.coins, data.items.find(({ id }) => id === 'hard_scale').sell);
     state.inventory.hard_scale += 1;
     play(state, 'econDeposit', { id: 'hard_scale', count: 1 });
     play(state, 'econStart', { id: recipeId });
@@ -133,7 +135,7 @@ test('the armguard cushions braced hits and occupies the same hand as a shield o
 
 test('the spear trades ordinary damage for penetration against scaled opponents even after resistance', () => {
   for (const [enemy, expectedDirection] of [['sand_quarry_guard', 1], ['sand_glass_lynx', -1]]) {
-    const state = duel(enemy, 5);
+    const state = duel(enemy, 6);
     state.enemyEvadeSeed = 0; // Compare two actual hits, including against the agile lynx.
     const sword = structuredClone(state);
     sword.combat = null;

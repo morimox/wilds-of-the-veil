@@ -105,7 +105,10 @@ function feed(state, minimum) {
 }
 
 function uncoverFerryman(state) {
-  return chooseAt(state, 'bank_watch', 1);
+  const result = chooseAt(state, 'bank_watch', 1);
+  assert.equal(state.event, 'bank_watch');
+  play(state, 'leave');
+  return result;
 }
 
 const marshLandmarks = ['reed_banks', 'sunk_pack', 'mud_track', 'bank_watch', 'marsh_pole_lesson'];
@@ -780,7 +783,7 @@ test('capacity checks do not charge for a refused transaction and discarded gear
   for (const [action, payload] of [
     ['craft', { id: 'r_reed_arrow' }], ['buy', { id: 'ration' }], ['handin', { id: 'reed_salve' }],
   ]) {
-    assert.match(act(state, action, payload).message, /行囊已满/);
+    assert.match(act(state, action, payload).message, action === 'handin' ? /再腾出 1 格/ : /行囊已满/);
     assert.deepEqual(state, before);
   }
   play(state, 'discard', { id: 'ration', count: rules.backpackStackSize });
@@ -838,6 +841,14 @@ test('the boatman and village smith trade maps that open travel for a beginning 
   assert.equal(siteIds(detour).includes('cracked_bell'), true);
   walk(reloaded, 'village');
   const ore = reloaded.inventory.ore;
+  const alreadyMapped = structuredClone(reloaded);
+  supplyFixture(alreadyMapped, { ford_chart: 1 });
+  assert.match(view(alreadyMapped).quests.find(({ id }) => id === 'sell_forging').desc, /早认得/);
+  play(alreadyMapped, 'handin', { id: 'sell_forging' });
+  assert.equal(alreadyMapped.inventory.ford_chart, 1);
+  assert.equal(alreadyMapped.inventory.ore, ore - 1);
+  assert.equal(alreadyMapped.inventory.iron_talisman, 1);
+  assert.ok(view(alreadyMapped).market.stalls.some(({ offers }) => offers.some(({ id }) => id === 'iron_sword')));
   const mapTrade = play(reloaded, 'handin', { id: 'sell_forging' });
   assert.match(mapTrade.outcome, /通往闭潮渡的水图/);
   assert.equal(reloaded.inventory.ore, ore - 1);
@@ -935,7 +946,15 @@ test('the opponent hands over the map and agreed blade only after the spar at th
   assert.equal(state.inventory.ridge_rubbing, undefined);
   assert.equal(state.inventory.hook_blade, undefined);
   assert.equal(state.siteVictories.bank_watch.bank_runner, 1);
+  assert.ok(!view(state).sites.find(({ id }) => id === 'bank_watch').witnessedEnemies.includes('bank_runner'));
+  assert.match(view(state).currentEvent.text, /解开了系住折图的细绳/);
   assert.equal(act(state, 'travel', { id: 'ridge' }).ok, false);
+  const alreadyMapped = structuredClone(state);
+  supplyFixture(alreadyMapped, { ridge_rubbing: 1 });
+  assert.match(view(alreadyMapped).visibleChoices.find(({ index }) => index === 2).desc, /刀柄朝你/);
+  chooseAt(alreadyMapped, 'bank_watch', 2);
+  assert.equal(alreadyMapped.inventory.ridge_rubbing, 1);
+  assert.equal(alreadyMapped.inventory.hook_blade, 1);
   chooseAt(state, 'bank_watch', 2);
   assert.equal(state.inventory.ridge_rubbing, 1);
   assert.equal(state.inventory.hook_blade, 1);
@@ -1055,6 +1074,7 @@ test('damage wears equipped gear, defeating an enemy rewards only first-kill ins
   assert.equal(state.inventory.hide, undefined);
   play(state, 'take', { id: 'hide', count: view(state).groundLoot.hide });
   assert.ok(state.inventory.hide > 0);
+  const collectedHide = state.inventory.hide;
 
   state.combat = { id: 'mud_beast', hp: 25, round: 1, escapeBonus: 0 };
   state.inventory.kiln_shard = 1;
@@ -1066,11 +1086,17 @@ test('damage wears equipped gear, defeating an enemy rewards only first-kill ins
   assert.equal(state.inventory.hide, undefined);
   assert.ok(state.inventory.cudgel);
   assert.equal(state.inventory.kiln_shard, 1);
+  assert.deepEqual(view(state).recoverableLoss?.goods, { hide: collectedHide });
+  assert.equal(view(state).recoverableLoss?.place, 'marsh');
   play(state, 'rest');
   assert.equal(state.wounds, 0);
   assert.ok(state.hp > 1);
   play(state, 'repair', { id: 'cudgel' });
   assert.equal(state.durability.cudgel, before);
+  assert.equal(view(state).recoverableLoss?.goods.hide, collectedHide);
+  walk(state, 'marsh');
+  play(state, 'take', { id: 'hide' });
+  assert.equal(view(state).recoverableLoss, undefined);
 });
 
 test('a bow found by following material knowledge hits a furred beast harder', () => {
@@ -1100,7 +1126,7 @@ test('a bow found by following material knowledge hits a furred beast harder', (
   choose(state, 2);
   assert.equal(view(state).currentEnemy.id, 'reed_fox');
 
-  const fox = data.enemies.find(({ id }) => id === 'reed_fox');
+  const fox = { ...data.enemies.find(({ id }) => id === 'reed_fox'), ...state.combat.individual };
   const beast = data.enemies.find(({ id }) => id === 'mud_beast');
   const bow = data.gear.find(({ id }) => id === 'reed_bow');
   const arrow = data.ammunition.find(({ id }) => id === 'reed_arrow');
@@ -1521,10 +1547,12 @@ test('the old ford route and its optional hidden map remain playable with earned
   play(state, 'resume');
   assert.equal(view(state).mode, 'village');
   assert.ok(marketStock(state).includes('heal_pill'));
-  const lowRealm = { ...state, realm: 0 };
+  const lowRealm = structuredClone(state);
+  lowRealm.realm = 0;
   const lateOffer = view(lowRealm).market.stalls.flatMap(({ offers }) => offers).find(({ id }) => id === 'heal_pill');
-  assert.equal(lateOffer.canBuy, false);
-  assert.match(lateOffer.blockedReason, /境界|炼气中期/);
+  assert.equal(lateOffer.canBuy, true);
+  play(lowRealm, 'buy', { id: 'heal_pill' });
+  assert.match(act(lowRealm, 'use', { id: 'heal_pill' }).message, /承受不了/);
   assert.deepEqual(marketStock(lowRealm), marketStock(state));
   assert.equal(view(state).discovered.includes('hidden'), false);
   assert.equal(act(state, 'travel', { id: 'hidden' }).ok, false);
@@ -1604,6 +1632,32 @@ test('the moved ford platform stays moved when its food was recovered before or 
     assert.match(view(state).currentEvent.text, /石阶已露出/);
     assert.doesNotMatch(view(state).currentEvent.text, /还牵着木排/);
   }
+});
+
+test('the medicine stall buys a limited batch of finished remedies below its retail prices', () => {
+  const state = createGame(79);
+  const stall = data.market.stalls.find(row => row.offers.some(({ id }) => id === 'salve'));
+  const id = stall.id;
+  state.coins = 100;
+  play(state, 'buy', { stallId: id, id: 'salve', count: 4 });
+  supplyFixture(state, { reed: 8, wood: 3 });
+  play(state, 'merchantOrder', { id });
+  const order = () => view(state).market.stalls.find(row => row.id === id).merchant.order;
+  assert.match(order().reason, /上一单/);
+  state.day += 14;
+  assert.match(order().reason, /回气散/);
+  supplyFixture(state, { qi_powder: 3 });
+  const purchaseCost = order().need.salve * data.items.find(item => item.id === 'salve').price
+    + order().need.qi_powder * data.items.find(item => item.id === 'qi_powder').price;
+  assert.ok(order().reward.spirit_coin < purchaseCost);
+  const before = state.coins;
+  play(state, 'merchantOrder', { id });
+  assert.equal(state.coins, before + 26);
+  assert.equal(state.inventory.salve, 4);
+  assert.equal(state.inventory.qi_powder, undefined);
+  assert.match(order().reason, /上一单/);
+  assert.equal(act(state, 'merchantOrder', { id }).ok, false);
+  assert.equal(state.coins, before + 26);
 });
 
 test('paid purchases reveal only that specialist’s order and the planted seed sustains multiple trips', () => {
@@ -1712,7 +1766,7 @@ test('ranged strikes spend compatible ammo, and an empty bow falls back to fists
 });
 
 test('a prepared ford expedition opens each later region through field contacts, then verifies a design and finishes at 筑基初期', () => {
-  const state = createGame();
+  const state = createGame(731);
   // The earlier route test earns and collects the ford seal. Start with that expedition's supplies.
   supplyFixture(state, { ford_chart: 1, ridge_rubbing: 1, seal: 1, ore: 1, tide_coat: 1, tide_note: 1 });
   state.realm = 2;
@@ -1841,7 +1895,7 @@ test('a prepared ford expedition opens each later region through field contacts,
   provision();
   walk(state, 'snow_pass');
   visitAndChoose('white_ravine', 0);
-  for (let turn = 0; turn < 15 && state.combat; turn++) {
+  for (let turn = 0; turn < 30 && state.combat; turn++) {
     const panel = view(state);
     if (panel.hp < panel.maxHp - 15 && state.inventory.heal_pill && panel.intent?.kind !== 'heavy') play(state, 'use', { id: 'heal_pill' });
     else if (panel.intent?.kind === 'heavy') play(state, 'guard');

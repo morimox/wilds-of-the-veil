@@ -93,6 +93,7 @@ test('the two leads require an actual fight and repair, then a free physical slo
   assert.equal(view(state).groundLoot.encyclopedia, undefined);
   assert.equal(state.inventory[weirLeaf], undefined);
   assert.equal(view(state).groundLoot[weirLeaf], undefined);
+  assert.ok(!view(state).visibleChoices.some(({ index }) => index === 0));
   assert.equal(state.inventory.battle_sinew, 1);
   play(state, 'take', { id: 'battle_sinew' });
   if (!state.satiety) play(state, 'eat', { id: 'ration' });
@@ -107,6 +108,8 @@ test('the two leads require an actual fight and repair, then a free physical slo
   assert.equal(state.inventory.wood, undefined);
   assert.equal(state.inventory.hide, undefined);
   walk(state, 'measuring_hall');
+  play(state, 'visit', { id: 'encyclopedia_copy_desk' });
+  assert.deepEqual(view(state).siteQuests.map(({ id }) => id), [quest]);
 
   const rationSlots = Math.ceil(state.inventory.ration / rules.backpackStackSize);
   const current = view(state);
@@ -115,7 +118,7 @@ test('the two leads require an actual fight and repair, then a free physical slo
   const full = structuredClone(state);
   const blocked = act(state, 'handin', { id: quest });
   assert.equal(blocked.ok, false);
-  assert.match(blocked.message, /行囊已满/);
+  assert.match(blocked.message, /再腾出 1 格/);
   assert.deepEqual(state, full);
   state.inventory.ration -= rules.backpackStackSize;
   const before = view(state).backpackUsed;
@@ -124,6 +127,8 @@ test('the two leads require an actual fight and repair, then a free physical slo
   assert.equal(view(state).backpackUsed, before + 1);
   assert.equal(state.inventory[weirLeaf], undefined);
   assert.equal(state.inventory[kilnProof], undefined);
+  assert.match(view(state).currentEvent.text, /案边已订好几册/);
+  assert.deepEqual(view(state).siteQuests, []);
   assert.equal(act(state, 'handin', { id: quest }).ok, false);
   assert.equal(state.inventory.encyclopedia, 1);
 });

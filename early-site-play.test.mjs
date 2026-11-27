@@ -68,9 +68,11 @@ test('the dry wood and paper scraps in the rain shelter leave distinct changes b
   gather(state, 1, 'wood');
   assert.match(scene(state), /露着一角破瓦.*夹着一点纸边.*石板底下已经空了/);
   choose(state, 2);
-  visit(state, 'old_fire');
+  assert.equal(state.event, 'old_fire');
   assert.match(scene(state), /瓦角的地方还留着.*夹着一点纸边.*石板底下已经空了/);
   choose(state, 3);
+  assert.equal(state.event, 'old_fire');
+  play(state, 'leave');
   visit(state, 'old_fire');
   assert.match(scene(state), /瓦角的地方还留着.*砖缝里留下一缕松灰.*石板底下已经空了/);
 });

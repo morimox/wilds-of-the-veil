@@ -65,12 +65,13 @@ const enemies = [
     [['抽紧腿边铁链', 'heavy', 1.71], ['按住铁链拦路', 'guard', 1.48], ['裂地扫脚', 'attack', 1.12], ['绕柱甩链', 'heavy', 1.59], ['踢链碰踝', 'attack']]),
   localEnemy('border_silo_roof', '守小窗的人', 4, 91, 19, 7, 9, '他身上的灰布会把真气往窗口引。每次回身扶墙时，脚步总要顿一下。',
     [['贴窗引气', 'drain', 1.05], ['腾身斜砍', 'attack', 1.14], ['一手摸墙站稳', 'guard', 1.43], ['借窗沿翻身下劈', 'heavy', 1.6], ['回身再抽真气', 'drain', 0.86]]),
-  localEnemy('border_silo_leader', '劫货头领阮隼', 5, 122, 22, 9, 13, '他扣下商队的货后，便轮着守粮仓的两扇门。见他收刀退步，多半是在调息。他双手推刀时，得避开正面。',
-    [['刀尖点过麻绳', 'attack'], ['右手推刀', 'heavy', 1.62], ['横刀近身', 'guard', 1.54], ['按刃回气', 'heal', 0.67], ['左手扣住刀背猛推', 'heavy', 1.72], ['折刀牵气', 'drain', 0.87]]),
+  localEnemy('border_silo_leader', '劫货头领阮隼', 5, 139, 25, 9, 13, '粮堆挡去半边身子。他退到秤梁边会按住刀背调息，腰间还系着一只药囊。见他腾出左手扣刀，就别再沿货架往里逼了。',
+    [['刀尖点过麻绳', 'attack'], ['右手推刀', 'heavy', 1.62], ['横刀近身', 'guard', 1.54], ['倚梁按刃调息', 'heal', 0.76], ['左手扣住刀背猛推', 'heavy', 1.72], ['折刀牵气', 'drain', 0.94]]),
 ];
 
 const sites = [
-  { id: 'border_watch_desk', region: 'mingsha_city', name: '城门内的驿货簿', once: [0],
+  { id: 'border_watch_desk', region: 'mingsha_city', name: '城门内的驿货簿', once: [0], localQuests: ['border_close_account'],
+    afterQuestText: { border_close_account: '宋禾把追回的盐粮分开登记。原先缺货的几行添了领货人的名字，桌角还压着留给未到场人家的短签。' },
     afterOnceText: { 0: '宋禾把找货的雇单分给三处，给晚归的骡队留了半张桌子。' } },
   ...patrols.map(({ id, region, name, enemy, interval, present, absent }) => ({
     id, region, name, afterChoices: ['border_watch_desk:0'],
@@ -118,7 +119,7 @@ const events = [
   { id: 'border_watch_desk', name: '城门内的驿货簿',
     text: '炉灰还挂在空车底。宋禾拿煤条算了两遍缺了几包盐，才抬眼望向城门外等话的人。',
     choices: [
-      { label: '问宋禾缺的是哪几车货', days: 0.125, insight: 2,
+      { label: '问宋禾缺的是哪几车货', days: 0.125, insight: 2, stay: true,
         outcome: '「白蹄旧道有人拦驮队，断帐旧道有人拆铁箍，担盐岗连封袋都有人抢。」宋禾用煤条圈了三个地方。「各处都留了雇人钱，到了找班婆、闻陇和戚盈。挑一个顺路的先去。」' },
     ],
   },
@@ -136,7 +137,7 @@ const events = [
         outcome: '石角碎了一片，弩箭插在你刚才站的地方。' },
       { label: '上坡迎住拎斧的人', afterFight: 'border_wind_ambusher', days: 0.125, enemy: 'border_rope_warden',
         outcome: '斧手用脚把红绳踩进砂里，提斧抢上来。' },
-      { label: '到石头背后的避风处喝口水', afterFight: 'border_wind_ambusher', days: 0.25, hp: 10, qi: 8, stay: true,
+      { label: '到石头背后的避风处喝口水', afterFight: 'border_wind_ambusher', days: 0.25, hp: 10, qi: 8, fogShelter: true, stay: true,
         desc: '石凹里有个盖紧的公用水瓮。坡上的人看不见这侧。', outcome: '你把皮帘放下，在背风处喝水歇了一会。' },
       { label: '放倒拴绳的木桩，去坡下看看在哪卸货', afterFight: 'border_rope_warden', days: 0.25, insight: 4, coins: 26, stay: true,
         desc: '桩边拴着一只盖城印的工钱匣，红绳伸向冷炉院。', outcome: '绳上夹着运货人绑的木签。冷炉院的窦芸顺绳回来，从工钱匣给你付了一段路的工钱，指着废窑让你去认门。' },
@@ -147,7 +148,7 @@ const events = [
     choices: [
       { label: '从车侧挤过去，迎上窑门的铁盾', days: 0.125, enemy: 'border_kiln_shield',
         outcome: '铁盾擦掉了门框半截砖角，那人把鞋跟卡在门坎里。' },
-      { label: '在窦芸的小灶边歇一会', afterFight: 'border_kiln_shield', days: 0.25, hp: 15, qi: 12, stay: true,
+      { label: '在窦芸的小灶边歇一会', afterFight: 'border_kiln_shield', days: 0.25, hp: 15, qi: 12, fogShelter: true, stay: true,
         loot: { ration: 2 }, outcome: '窦芸帮你取水，让出灶边，又从自家口粮里匀了两包。你坐下缓了一会，才听清窑里刮灰的声音。' },
       { label: '绕过车轨，拦住往火盆添炭的人', afterFight: 'border_kiln_shield', days: 0.125, enemy: 'border_kiln_brazier',
         desc: '前面的灰落得很快，有人提着火钳挡住卸货道。', outcome: '你踩上空车架。火钳敲在车辕上，灰土一下扬了起来。' },
@@ -167,9 +168,9 @@ const events = [
       { label: '沿左墙爬上石坎，靠近递粮的小窗', afterChoice: 0, days: 0.125, enemy: 'border_silo_roof',
         outcome: '守窗人踢开东倒西歪的几个粮筐，翻到低处找你。' },
       { label: '退到矮墙后喝水歇息', afterChoice: 0, afterFight: 'border_silo_roof',
-        guardedBy: ['border_silo_chain', 'border_silo_roof'], days: 0.375, hp: 22, qi: 16, stay: true,
-        desc: '矮墙外有窦芸搁着的水囊。这一侧离仓门还有些距离。',
-        outcome: '窦芸守着窗下。你背靠矮墙喝了几口，在墙后缓了两阵气。' },
+        guardedBy: ['border_silo_chain', 'border_silo_roof'], days: 0.375, hp: 22, qi: 16, fogShelter: true, stay: true,
+        desc: '矮墙后有个旧雨棚。窦芸把水囊搁进去，又垂下了挡雾的厚帘。',
+        outcome: '窦芸守着窗下。你坐在帘后喝了几口水，等气息平稳才起身。' },
       { label: '和窦芸从矮墙后进仓', afterChoice: 0, guardedBy: ['border_silo_chain', 'border_silo_roof'],
         days: 0.125, enemy: 'border_silo_leader',
         desc: '再往里，货架边的人已经抽出刀，刀背宽得可以托住那根秤梁。',

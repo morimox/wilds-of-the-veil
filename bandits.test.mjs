@@ -165,7 +165,7 @@ const roadPolicyKit = { data, records: { gear: allGear },
   activeGear: (state) => Object.values(state.equipment).filter((id) => state.durability[id] > 0).map((id) => allGear[id]) };
 const banditStepKit = { ...roadPolicyKit, records: {
   ...roadPolicyKit.records, enemies: Object.fromEntries(data.enemies.map((enemy) => [enemy.id, enemy])),
-}, groundAt: () => ({}), say: (_state, message) => ({ ok: true, message }) };
+}, groundAt: () => ({}), individualAt: () => ({}), say: (_state, message) => ({ ok: true, message }) };
 
 function seedWith(...limits) {
   for (let seed = 0; seed < 100000; seed++) {
@@ -321,8 +321,15 @@ test('a traveler short of money hands over gear and collateral together and keep
   const state = interrupted();
   state.coins = 1;
   state.inventory.wood = 1;
-  state.inventory.quarry_spear = 1;
-  state.durability.quarry_spear = allGear.quarry_spear.durability;
+  const valuable = structuredClone(state);
+  valuable.inventory.quarry_spear = 1;
+  valuable.durability.quarry_spear = allGear.quarry_spear.durability;
+  assert.ok(view(valuable).roadTrip.bandit.allValue >= valuable.roadBandit.fee);
+  assert.match(act(valuable, 'banditSurrender').message, /还凑得齐/);
+  assert.equal(valuable.inventory.quarry_spear, 1);
+
+  state.inventory.caravan_bell = 1;
+  state.durability.caravan_bell = allGear.caravan_bell.durability;
   state.inventory.road_sleeve_manual = 1;
   state.inventory.ridge_rubbing = 1;
   state.reliefRations = state.inventory.ration;
@@ -335,7 +342,7 @@ test('a traveler short of money hands over gear and collateral together and keep
   const paid = act(state, 'banditSurrender');
   assert.ok(paid.ok);
   assert.equal(paid.paidCoins, 1);
-  assert.deepEqual(paid.paidGoods, { wood: 1, quarry_spear: 1, cudgel: 1, straw_cape: 1 });
+  assert.deepEqual(paid.paidGoods, { wood: 1, caravan_bell: 1, cudgel: 1, straw_cape: 1 });
   for (const id of Object.keys(paid.paidGoods)) assert.equal(state.inventory[id], undefined);
   assert.ok(Object.values(state.equipment).every((item) => item === null));
   assert.equal(state.coins, 0);
@@ -460,21 +467,45 @@ test('a road win pauses for manual pickups, medicine and a change of gear at tha
   state.banditLootSeed = 3;
   assert.ok(act(state, 'banditFight').ok);
   const combat = structuredClone(state);
+  const coins = state.coins;
   assert.match(act(state, 'combatEquip', { id: 'cudgel' }).message, /交手中不能换装备/);
   assert.deepEqual(state, combat);
   let win;
   for (let i = 0; state.combat && i < 8; i++) win = act(state, 'attack');
   assert.ok(!state.combat);
-  assert.ok(win.roadCoins > 0);
+  assert.ok(win.gathered.spirit_coin > 0);
+  assert.equal(state.coins, coins);
   assert.equal(state.roadTrip.stop, coordinate);
   assert.equal(view(state).roadTrip.afterBattle, true);
   assert.equal(state.roadBandit, null);
-  assert.deepEqual(view(state).groundLoot, { knife: 1 });
-  for (const [id, amount] of Object.entries(view(state).groundLoot)) {
-    assert.ok(!state.inventory[id]);
-    assert.equal(amount, 1);
-    assert.ok(act(state, 'take', { id }).ok);
-  }
+  const droppedCash = win.gathered.spirit_coin;
+  assert.deepEqual(view(state).groundLoot, { knife: 1, spirit_coin: droppedCash });
+  const full = structuredClone(state);
+  full.coins = 0;
+  const pack = view(full);
+  full.inventory.iron_arrow = (pack.backpackCapacity - pack.backpackUsed) * rules.backpackStackSize;
+  assert.equal(view(full).backpackUsed, pack.backpackCapacity);
+  assert.equal(view(full).groundPickup.spirit_coin, 0);
+  assert.match(act(full, 'take', { id: 'spirit_coin' }).message, /行囊已满/);
+  prepareQuietRoad(full);
+  assert.ok(act(full, 'roadContinue').ok);
+  assert.equal(full.region, riskyLeg.to);
+  prepareQuietRoad(full);
+  assert.equal(act(full, 'travel', { id: riskyLeg.from }).roadInterrupted, true);
+  assert.equal(full.roadTrip.stop, coordinate);
+  assert.equal(view(full).groundLoot.spirit_coin, droppedCash);
+  assert.ok(act(full, 'discard', { id: 'iron_arrow', count: rules.backpackStackSize }).ok);
+  assert.ok(act(full, 'take', { id: 'spirit_coin' }).ok);
+  assert.equal(full.coins, droppedCash);
+  assert.equal(view(full).groundLoot.knife, 1);
+
+  assert.ok(!state.inventory.knife);
+  assert.ok(act(state, 'take', { id: 'knife' }).ok);
+  assert.equal(state.coins, coins);
+  assert.deepEqual(view(state).groundLoot, { spirit_coin: droppedCash });
+  assert.ok(act(state, 'take', { id: 'spirit_coin' }).ok);
+  assert.equal(state.coins, coins + droppedCash);
+  assert.equal(act(state, 'take', { id: 'spirit_coin' }).ok, false);
   const day = state.day;
   const wounds = state.hp;
   assert.ok(act(state, 'use', { id: 'salve' }).ok);
