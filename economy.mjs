@@ -633,6 +633,7 @@ function projectView(state, job, kit) {
   const remaining = daysRemaining(state, job);
   return {
     id: job.id, name: job.name, remaining, ready: remaining === 0, loot: job.loot,
+    collectDays, collectSatiety: Math.min(state.satiety, collectDays * kit.rules.satietyDrainPerDay),
     reason: remaining === 0 ? collectionBlocker(state, job, kit) : '',
     storeReason: remaining === 0 ? collectionBlocker(state, job, kit, true) : '',
     batches: job.batches ?? 1,

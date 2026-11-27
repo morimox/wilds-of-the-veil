@@ -1476,8 +1476,11 @@ function cultivation(s) {
     !hasSupply(s, next.need, homeMaterials(s)) && `还缺${supplies(next.need)}`].filter(Boolean) : []);
   const costs = next ? [next.days && `${next.days} 日`, next.cost && `${next.cost} 灵钱`, supplies(next.need)].filter(Boolean) : [];
   const practice = s.progression?.requiredPractice;
-  return panel("修行", `<div class="actions place-actions">${linkButton("打坐", "research")}
+  const sitting = s.research;
+  return panel("修行", `<div class="actions place-actions">${linkButton("打坐", "research", "", "", Boolean(sitting?.reason))}
     ${next ? linkButton("尝试突破", "breakthrough", "", "primary", missing.length > 0) : ""}</div>
+    ${sitting ? `<p class="fine">本境静修 ${sitting.sessions}/${sitting.limit} · 每次 ${sitting.days} 日 · 真气 −${sitting.qi}</p>
+    ${sitting.reason ? `<p class="fine">${escape(sitting.reason)}</p>` : ""}` : ""}
     ${costs.length ? `<p class="fine">突破需 ${escape(costs.join(" · "))}</p>` : ""}
     ${practice ? `<p class="fine">历练 ${Math.min(s.progression.practice, practice)}/${practice} · 采集、取胜和打坐可积累，每日计入有限。</p>` : ""}
     ${missing.length ? `<p class="fine">${escape(missing.join(" · "))}</p>` : ""}`);
@@ -1554,6 +1557,7 @@ function productionScreen(facility) {
   const jobs = facility.jobs.map(job => card(
     job.name, "", tag(`${job.batches > 1 ? `${job.batches} 批 · ` : ""}${job.ready ? "已完工" : `还需 ${Number(job.remaining.toFixed(2))} 日`}`, job.ready ? "" : "off"),
     `<span class="fine">${escape(supplies(job.loot))}</span>` + (job.ready ?
+      `<span class="fine">领取用时 ${job.collectDays} 日${job.collectSatiety ? ` · 饱腹 −${job.collectSatiety}` : ""}</span>` +
       linkButton(job.reason || "收进行囊", "econCollect", job.id, "", Boolean(job.reason)) +
       (!job.storeReason || job.storeReason.startsWith("仓架放不下了")
         ? linkButton(job.storeReason || "收进仓库", "econStoreJob", job.id, "quiet", Boolean(job.storeReason)) : "") : ""),

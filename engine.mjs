@@ -1137,6 +1137,10 @@ export function view(state) {
     retreatRisk: intent && !inProtectedBout(state) ? { blocked: attackingIntent(intent) } : null,
     breathingQi: intent?.kind === 'guard' ? breathingQi(state) : 0,
     discoveredRecipes: knownRecipes.map(({ id }) => id),
+    research: services.includes('cultivate') ? {
+      sessions: state.studies[state.realm] ?? 0, limit: rules.researchLimit,
+      reason: researchBlocker(state), days: rules.researchDays, qi: rules.researchQi,
+    } : null,
     craftReasons: inSettlement ? Object.fromEntries(knownRecipes.map((recipe) => [recipe.id, craftBlocker(state, recipe)])) : {},
     discoveredQuests: discoveredQuests.map(({ id }) => id),
     discoveredItems: data.items.filter((item) => knowsItem(state, item)).map(({ id }) => id),
@@ -2452,10 +2456,16 @@ function rest(state, untilRecovered = false) {
   return say(state, `在${regionOf(state).name}歇了${duration}。${recoveredSense ? `神识回了${recoveredSense}点。` : ''}${granted ? `灶上匀给你${granted}份${nameOf(supply)}。` : relief ? '行囊已满，拿不了干粮。' : ''}`);
 }
 
-function research(state) {
+function researchBlocker(state) {
   const sessions = state.studies[state.realm] ?? 0;
-  if (sessions >= rules.researchLimit) return refuse('在这个境界，静修已不能再增长见识。出门探索、交手或办委托都能继续增长。');
-  if (state.qi < rules.researchQi) return refuse('真气不足，先歇息片刻。');
+  if (sessions >= rules.researchLimit) return '在这个境界，静修已不能再增长见识。出门探索、交手或办委托都能继续增长。';
+  return state.qi < rules.researchQi ? '真气不足，先歇息片刻。' : '';
+}
+
+function research(state) {
+  const reason = researchBlocker(state);
+  if (reason) return refuse(reason);
+  const sessions = state.studies[state.realm] ?? 0;
   advance(state, rules.researchDays);
   state.qi -= rules.researchQi;
   state.studies[state.realm] = sessions + 1;
