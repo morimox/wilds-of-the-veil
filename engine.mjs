@@ -2694,7 +2694,7 @@ function marketView(state) {
   })).filter(({ offers }) => offers.length);
   const sales = data.items.filter(({ id, sell }) => sell > 0 && owns(state, id)).map(({ id, sell }) => {
     const { count, blockedReason } = saleTerms(state, id);
-    const quote = saleQuote(state, id, sell);
+    const quote = saleQuote(state, id, sell, records.gear[id]);
     const reasonAt = (quantity) => tradeCapacityReason(state, { id, count: quantity, total: saleTotal(quote, quantity), buying: false }, economyKit);
     const quantities = blockedReason ? [] : tradeQuantityOptions(Math.min(count, rules.maxTradeCount), reasonAt);
     const singleSaleReason = quantities.includes(1) ? '' : blockedReason || reasonAt(1);
@@ -2727,7 +2727,7 @@ function trade(state, id, count, buying, stallId, confirmationOptions) {
     if (blockedReason) return refuse(blockedReason);
     const confirmation = disposalConfirmation(state, 'sell', item, count, Math.min(owned, rules.maxTradeCount), confirmationOptions);
     if (confirmation) return confirmation;
-    const quote = saleQuote(state, id, price);
+    const quote = saleQuote(state, id, price, records.gear[id]);
     total = saleTotal(quote, count);
     const capacity = tradeCapacityReason(state, { id, count, total, buying: false }, economyKit);
     if (capacity) return refuse(capacity);

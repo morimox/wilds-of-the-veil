@@ -238,7 +238,14 @@ export function initialEconomyState() {
   };
 }
 
-export function saleQuote(state, id, regular) {
+export const wornGearSaleRate = 0.35;
+
+export function saleQuote(state, id, regular, gear) {
+  if (gear?.durability > 0) {
+    const remaining = Math.min(gear.durability, Math.max(0, state.durability[id] ?? gear.durability));
+    const price = Math.max(1, Math.round(regular * (wornGearSaleRate + (1 - wornGearSaleRate) * remaining / gear.durability)));
+    return { price, ...(price < regular ? { fullConditionPrice: regular } : {}) };
+  }
   const rule = Object.hasOwn(bulkSaleRules, id) ? bulkSaleRules[id] : null;
   if (!rule || regular < 2) return { price: regular };
   const { capacity, replenished, days, reserveRate } = rule;

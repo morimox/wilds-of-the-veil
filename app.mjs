@@ -1652,7 +1652,8 @@ function saleHolding(s, entry) {
   const gear = gearRows.get(entry.id);
   const wear = s.durability[entry.id];
   const condition = gear && wear != null ? ` · ${gearCondition(wear, gear.durability)}` : "";
-  return `<span class="fine">手边 ×${entry.count}${condition}</span>`;
+  const estimate = entry.fullConditionPrice ? ` · 完好可卖 ${entry.fullConditionPrice} 灵钱` : "";
+  return `<span class="fine">手边 ×${entry.count}${condition}${estimate}</span>`;
 }
 
 function marketItem(s, entry, selling) {

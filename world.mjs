@@ -567,7 +567,7 @@ function localMarket(state, kit) {
     if (!price || !kit.owns(state, item.id)) return [];
     const id = item.id;
     const { count, reason } = localSaleTerms(state, id, kit);
-    const quote = saleQuote(state, id, price);
+    const quote = saleQuote(state, id, price, kit.records.gear[id]);
     const reasonAt = (quantity) => tradeCapacityReason(state, { id, count: quantity, total: saleTotal(quote, quantity), buying: false }, kit);
     const quantities = reason ? [] : tradeQuantityOptions(Math.min(count, kit.rules.maxTradeCount), reasonAt);
     const singleSaleReason = quantities.includes(1) ? '' : reason || reasonAt(1);
@@ -599,7 +599,7 @@ function localTrade(state, id, count, kit, buying, confirmationOptions) {
     if (sale.reason) return kit.refuse(sale.reason);
     const confirmation = kit.disposalConfirmation(state, 'localSell', record, count, Math.min(sale.count, kit.rules.maxTradeCount), confirmationOptions);
     if (confirmation) return confirmation;
-    const quote = saleQuote(state, id, price);
+    const quote = saleQuote(state, id, price, kit.records.gear[id]);
     const total = saleTotal(quote, count);
     const capacity = tradeCapacityReason(state, { id, count, total, buying: false }, kit);
     if (capacity) return kit.refuse(capacity);

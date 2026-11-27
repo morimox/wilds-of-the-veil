@@ -313,7 +313,7 @@ const sites = [
     afterWinText: { [redRopeChief]: '邵苹倒下后，带红绳的人退进前棚。岸边一条小船朝后舱靠过来。门敞着，桌上还有一只铜匣。' },
     afterOnceText: { 1: '船家已把匣子带到岸上核账。后舱桌上还剩几捆旧网，各压着一张写了姓名的货签。' } },
   { id: saltCarrier, name: '桥头的盐车', region: 'dry_sound_bridge', once: [0],
-    afterOnceText: { 0: '盐车已经走了，桥栏下还挂着一小段拴车的草绳。' } },
+    afterOnceText: { 0: '桥栏下还挂着一截拴车的草绳。车夫已经把盐车牵到桥下，约在洞外的白石旁等你。' } },
   { id: windDen, name: '断阶盐洞', region: 'dry_sound_bridge', afterBandit: windDen,
     afterChoices: [`${saltCarrier}:0`], once: [1],
     creatures: { [windWatch]: resident(10, 32), [windBow]: resident(9, 36), [windChief]: resident(1) },

@@ -110,3 +110,29 @@ test('a costly consignment quotes and charges the same number and cannot fund it
   state.day += localLines.mingsha_city[id].interval;
   assert.equal(offer().count, 1);
 });
+
+test('both market counters pay the quoted condition-adjusted amount for damaged equipment', () => {
+  for (const [region, viewName, list, action] of [
+    ['village', 'market', 'sales', 'sell'], ['zhao_city', 'localMarket', 'buys', 'localSell'],
+  ]) {
+    const id = 'sky_sword';
+    const maximum = gear.get(id).durability;
+    const prepared = createGame(411);
+    prepared.region = region;
+    prepared.inventory[id] = 1;
+    prepared.durability[id] = maximum;
+    const quote = (state) => view(state)[viewName][list].find(row => row.id === id);
+    const regular = quote(prepared).price;
+    for (const remaining of [maximum, Math.floor(maximum / 2), 0]) {
+      const state = structuredClone(prepared);
+      state.durability[id] = remaining;
+      const price = Math.round(regular * (0.35 + 0.65 * remaining / maximum));
+      assert.equal(quote(state).price, price);
+      assert.equal(quote(state).fullConditionPrice, remaining === maximum ? undefined : regular);
+      const cash = state.coins;
+      assert.equal(act(state, action, { id }).ok, true);
+      assert.equal(state.coins, cash + price);
+      assert.equal(state.inventory[id], undefined);
+    }
+  }
+});

@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import data from '../data.mjs';
 import { baseEscapeChance, createGame, rules, view, weaponRepairNeed } from '../engine.mjs';
 import { banditRules, roadKey } from '../bandits.mjs';
-import { bulkSaleRules, economyData } from '../economy.mjs';
+import { bulkSaleRules, economyData, wornGearSaleRate } from '../economy.mjs';
 import { foePurseRows } from '../economy-foe-payout.mjs';
 import { materialEconomy } from '../economy-material-values.mjs';
 import { enemyRankLabels, enemySpecialtyLabels } from '../enemy-rank-bands.mjs';
@@ -758,7 +758,7 @@ const tables = [
     { note: '未标每次补货数量时为一件。落灯村的具名货架另见坊市货单。' }),
   table('settlement-buyback', '各定居点收购价与常价收量', localSaleRows, ['region', 'id', 'name', ['price', '常价（每件）'],
     ['reserve', '当期超量价（每件）'], ['capacity', '常价收满件数'], ['replenished', '每期恢复件数'], ['days', '恢复间隔（日）']],
-    { note: '关键物品、装备中的物品与救济干粮的收取限制另行校验。旧坊市专门商人的实际报价见对应表。' }),
+    { note: `表中是装备完好时的收购价。破损时报价按剩余耐久线性递减，耐久为零时按完好价的 ${wornGearSaleRate * 100}% 取整，至少一灵钱。关键物品、穿戴中的物品与救济干粮的收取限制另行校验。` }),
   table('settlement-repairs', '接修地点、工钱与材料', localRepairRows,
     ['region', ['service', '修具处'], 'id', 'name', ['surcharge', '异地加价（灵钱）'], ['price', '修满费用（灵钱）'],
       ['repairMaterials', '从零耐久修满的材料', resources]],
