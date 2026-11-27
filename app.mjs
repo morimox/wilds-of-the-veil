@@ -629,12 +629,16 @@ function atlasLabelPositions(width, height, mapWidth) {
   const halfWidth = width / 2;
   const halfHeight = height / 2;
   const positions = [];
-  const gaps = [9, 13, 17, 21, 25, 30, 35, 40, 46, 52];
-  if (mapWidth < 465) gaps.push(58, 64);
+  const gaps = [9, 11, 13, 15, 17, 19, 21, 24, 28, 32, 36, 41, 46, 52, 58, 64, 70, 76];
+  const shifts = [0, -1 / 3, 1 / 3, -2 / 3, 2 / 3, -1, 1];
+  if (mapWidth < 465) {
+    gaps.push(7, 83);
+    shifts.push(-1 / 6, 1 / 6, -0.5, 0.5, -5 / 6, 5 / 6);
+  }
   for (const gap of gaps) {
     const side = halfWidth + gap;
     const end = halfHeight + gap;
-    for (const shift of [0, -1 / 3, 1 / 3, -2 / 3, 2 / 3, -1, 1]) {
+    for (const shift of shifts) {
       positions.push([side, halfHeight * shift], [-side, halfHeight * shift],
         [halfWidth * shift, -end], [halfWidth * shift, end]);
     }
@@ -710,7 +714,7 @@ function placeAtlasLabels(canvas) {
       const covers = anchors.reduce((sum, anchor) => sum + atlasOverlap(box, anchor), 0);
       const roadCover = roads.reduce((sum, road) => {
         const length = atlasStrokeInBox(road, box);
-        return sum + (length > 0.5 ? 420 + length * 22 : 0);
+        return sum + (length > 0.5 ? 1600 + length * 72 : 0);
       }, 0);
       const edgeX = Math.sign(dx) * Math.max(0, Math.abs(dx) - width / 2);
       const edgeY = Math.sign(dy) * Math.max(0, Math.abs(dy) - height / 2);

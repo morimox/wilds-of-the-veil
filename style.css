@@ -408,7 +408,10 @@ main { display: grid; gap: 11px; min-width: 0; border-top: 1px solid var(--line)
 .atlas-label { position: absolute; top: calc(50% + var(--label-y, -16px)); left: calc(50% + var(--label-x, 0px)); transform: translate(-50%, -50%); white-space: nowrap; background: #182a23de; border-radius: 3px; padding: 1px 3px; font-size: 12px; line-height: 1.2; }
 .atlas-mark[aria-pressed="true"] .atlas-label { color: #fff1cf; background: #493a26; }
 .atlas-scroll:is([data-atlas-scale="0.75"], [data-atlas-scale="fit"]) .atlas-label { font-size: 11px; }
-@media (max-width: 610px) { .atlas-label { font-size: 11px; } }
+@media (max-width: 610px) {
+  .atlas-label { font-size: 11px; }
+  .atlas-scroll[data-atlas-scale="fit"] :is(.atlas-label, .atlas-cross-label) { font-size: 10px; padding-inline: 2px; }
+}
 @media (max-width: 360px) {
   .atlas-label, .atlas-cross-label,
   .atlas-scroll:is([data-atlas-scale="0.75"], [data-atlas-scale="fit"]) .atlas-label { font-size: 10px; padding-inline: 2px; }
